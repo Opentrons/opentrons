@@ -1,9 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 import { LegacyStyledText, StyledText } from '@opentrons/components'
 
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
+import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   selectActivePipette,
@@ -12,14 +16,9 @@ import {
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-
-import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
-import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
-import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   const { proceedStep, goBackLastStep, commandUtils, runId } = props

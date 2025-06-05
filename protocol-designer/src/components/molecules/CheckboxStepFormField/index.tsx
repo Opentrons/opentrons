@@ -2,8 +2,8 @@ import {
   Checkbox,
   Flex,
   SPACING,
-  TOOLTIP_TOP,
   Tooltip,
+  TOOLTIP_TOP,
   useHoverTooltip,
 } from '@opentrons/components'
 

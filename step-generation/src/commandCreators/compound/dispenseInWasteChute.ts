@@ -1,10 +1,11 @@
+import { ZERO_OFFSET } from '../../constants'
 import {
   curryWithoutPython,
   indentPyLines,
   reduceCommandCreators,
 } from '../../utils'
-import { ZERO_OFFSET } from '../../constants'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
+
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DispenseInWasteChuteArgs {
@@ -20,9 +21,8 @@ export const dispenseInWasteChute: CommandCreator<DispenseInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const { pipetteId, flowRate, volume, wasteChuteId } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const wasteChutePythonName =
-    additionalEquipmentEntities[wasteChuteId].pythonName
+  const { pipetteEntities, wasteChuteEntities } = invariantContext
+  const wasteChutePythonName = wasteChuteEntities[wasteChuteId].pythonName
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
   const pythonArgs = [
     `volume=${volume}`,

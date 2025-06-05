@@ -4,16 +4,16 @@ import { updateErrorRecoverySettings } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type {
-  UseMutationOptions,
-  UseMutationResult,
-  UseMutateFunction,
-} from 'react-query'
 import type { AxiosError } from 'axios'
 import type {
-  HostConfig,
-  ErrorRecoverySettingsResponse,
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type {
   ErrorRecoverySettingsRequest,
+  ErrorRecoverySettingsResponse,
+  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateErrorRecoverySettingsMutationResult = UseMutationResult<

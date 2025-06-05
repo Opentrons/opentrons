@@ -1,15 +1,15 @@
 import type {
-  UiInitializedAction,
-  UsbRequestsAction,
   AppRestartAction,
+  NotifySubscribeAction,
+  NotifyTopic,
   ReloadUiAction,
-  SendLogAction,
-  UpdateBrightnessAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
-  NotifySubscribeAction,
-  NotifyTopic,
+  SendLogAction,
+  UiInitializedAction,
+  UpdateBrightnessAction,
+  UsbRequestsAction,
 } from './types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'

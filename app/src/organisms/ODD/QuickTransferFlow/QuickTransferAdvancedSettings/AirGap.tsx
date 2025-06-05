@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
@@ -8,25 +8,27 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  RadioButton,
   POSITION_FIXED,
+  RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
-import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 interface AirGapProps {
   onBack: () => void
@@ -162,7 +164,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
         header={
           kind === 'aspirate'
             ? t('air_gap_after_aspirating')
-            : t('air_gap_before_dispensing')
+            : t('air_gap_after_dispensing')
         }
         buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
@@ -175,19 +177,26 @@ export function AirGap(props: AirGapProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableAirGapDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={airGapEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {kind === 'aspirate'
+              ? t('air_gap_description_aspirate')
+              : t('air_gap_description_dispense')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableAirGapDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={airGapEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (

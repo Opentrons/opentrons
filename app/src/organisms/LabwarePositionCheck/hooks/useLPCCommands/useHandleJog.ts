@@ -4,19 +4,20 @@ import debounce from 'lodash/debounce'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
-import { moveRelativeCommand, moveToWellCommands } from './commands'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { Coordinates } from '@opentrons/shared-data'
+import { moveRelativeCommand, moveToWellCommands } from './commands'
+
+import type { VectorOffset } from '@opentrons/api-client'
+import type { Vector3D } from '@opentrons/shared-data'
 import type {
   Axis,
   Jog,
   Sign,
   StepSize,
 } from '/app/molecules/JogControls/types'
-import type { UseLPCCommandWithChainRunChildProps } from './types'
-import type { VectorOffset } from '@opentrons/api-client'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAX_QUEUED_JOGS = 3
@@ -54,7 +55,7 @@ export function useHandleJog({
       axis: Axis
       dir: Sign
       step: StepSize
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     }>
   >([])
   const processingRef = useRef(false)
@@ -82,9 +83,7 @@ export function useHandleJog({
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setErrorMessage(`Error issuing jog command: ${e.message}`)
@@ -132,7 +131,7 @@ export function useHandleJog({
       axis: Axis,
       dir: Sign,
       step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     ): void => {
       if (queueRef.current.length < MAX_QUEUED_JOGS) {
         queueRef.current.push({ axis, dir, step, onSuccess })

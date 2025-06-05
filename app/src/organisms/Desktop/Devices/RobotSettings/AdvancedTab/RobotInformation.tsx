@@ -1,18 +1,20 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   Box,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_START,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { useRobot } from '/app/redux-resources/robots'
 import {
-  getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
+  getRobotSerialNumber,
 } from '/app/redux/discovery'
 
 interface RobotInformationProps {

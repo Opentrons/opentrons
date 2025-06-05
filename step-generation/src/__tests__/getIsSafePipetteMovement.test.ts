@@ -1,14 +1,17 @@
-import { expect, describe, it, beforeEach } from 'vitest'
-import { getIsSafePipetteMovement } from '../utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   COLUMN,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V2,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import { getIsSafePipetteMovement } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -63,7 +66,10 @@ describe('getIsSafePipetteMovement', () => {
         },
       },
       moduleEntities: {},
-      additionalEquipmentEntities: {},
+      trashBinEntities: {},
+      wasteChuteEntities: {},
+      stagingAreaEntities: {},
+      gripperEntities: {},
       liquidEntities: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -72,53 +78,71 @@ describe('getIsSafePipetteMovement', () => {
     mockRobotState = {
       pipettes: { pip: { mount: 'left' } },
       labware: {
-        [mockLabwareId]: { slot: 'D2' },
-        [mockTiprackId]: { slot: 'A2' },
+        [mockLabwareId]: { stack: ['mockLabwareId', 'D2'] },
+        [mockTiprackId]: { stack: ['mockTiprackId', 'A2'] },
       },
       modules: {},
       tipState: { tipracks: {}, pipettes: {} },
-      liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
+      liquidState: {
+        pipettes: {},
+        labware: {},
+        trashBins: {},
+        wasteChute: {},
+      },
     }
   })
 
   it('returns true when the labware id is a trash bin', () => {
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      {
+    const result = getIsSafePipetteMovement({
+      pipetteId: mockPipId,
+      robotState: {
         labware: {},
         pipettes: {},
         modules: {},
         tipState: {},
         liquidState: {},
       } as any,
-      {
+      invariantContext: {
         labwareEntities: {},
         pipetteEntities: {},
         moduleEntities: {},
         liquidEntities: {},
-        additionalEquipmentEntities: {
-          trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },
+        trashBinEntities: {
+          trashBin: {
+            pythonName: 'trash_bin_1',
+            location: 'A3',
+            id: 'trashBin',
+          },
         },
+        wasteChuteEntities: {},
+        stagingAreaEntities: {},
+        gripperEntities: {},
         config: {} as any,
       },
-      'mockId',
-      'mockTrashBin',
-      mockTipUri,
-      { x: 0, y: 0, z: 0 }
-    )
+      labwareId: 'mockId',
+      wellLocationOffset: { x: 0, y: 0, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(true)
   })
   it('returns false when within pipette extents is false', () => {
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -12, y: -100, z: 20 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: -12, y: -100, z: 20 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   it('returns true when there are no collisions and a module near it', () => {
@@ -133,34 +157,39 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -1, y: 5, z: 20 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      robotState: mockRobotState,
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: -1, y: 5, z: 20 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(true)
   })
   it('returns false when there is a tip that collides', () => {
     mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
     mockRobotState.labware = {
       ...mockRobotState.labware,
-      [mockAdapter]: { slot: 'D1' },
+      [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: -1, y: 5, z: 0 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: -1, y: 5, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   it('returns false when there is a tall module nearby in a diagonal slot with adapter and labware', () => {
@@ -168,12 +197,12 @@ describe('getIsSafePipetteMovement', () => {
       [mockModule]: { slot: 'D1', moduleState: {} as any },
     }
     mockRobotState.labware = {
-      [mockLabwareId]: { slot: 'D2' },
+      [mockLabwareId]: { stack: [mockLabwareId, 'D2'] },
       [mockAdapter]: {
-        slot: mockModule,
+        stack: [mockAdapter, mockModule, 'D1'],
       },
       [mockLabware2]: {
-        slot: mockAdapter,
+        stack: [mockLabware2, mockAdapter, mockModule, 'D1'],
       },
     }
     mockInvariantProperties.moduleEntities = {
@@ -184,16 +213,23 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement(
-      COLUMN,
-      mockRobotState,
-      mockInvariantProperties,
-      mockPipId,
-      mockLabwareId,
-      mockTipUri,
-      { x: 0, y: 0, z: 0 },
-      mockWellName
-    )
+    const result = getIsSafePipetteMovement({
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: COLUMN,
+          },
+        },
+      },
+      invariantContext: mockInvariantProperties,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: 0, y: 0, z: 0 },
+      wellTargetName: mockWellName,
+    })
     expect(result).toEqual(false)
   })
   //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up

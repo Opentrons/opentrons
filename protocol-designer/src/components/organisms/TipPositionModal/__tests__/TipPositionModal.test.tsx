@@ -1,9 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { TipPositionModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { TipPositionSideView } from '../TipPositionSideView'
-import { TipPositionModal } from '..'
 
 import type { ComponentProps } from 'react'
 
@@ -79,11 +80,11 @@ describe('TipPositionModal', () => {
   it('renders the captions, and visual', () => {
     render(props)
     screen.getByText('X position')
-    screen.getByText('between -5.1 and 5.1')
+    screen.getByText('Must be between -5.1 and 5.1')
     screen.getByText('Y position')
-    screen.getByText('between -5.2 and 5.2')
+    screen.getByText('Must be between -5.2 and 5.2')
     screen.getByText('Z position')
-    screen.getByText('between 0 and 50')
+    screen.getByText('Must be between 0 and 50')
     screen.getByText('mock TipPositionSideView')
   })
   it('renders a custom input field and clicks on it, calling the mock updates', () => {

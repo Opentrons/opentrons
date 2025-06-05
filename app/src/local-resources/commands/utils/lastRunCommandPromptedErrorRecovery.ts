@@ -1,4 +1,5 @@
 import type { RunCommandSummary } from '@opentrons/api-client'
+
 // Whether the last run protocol command prompted Error Recovery, if Error Recovery is enabled.
 export function lastRunCommandPromptedErrorRecovery(
   summary: RunCommandSummary[],

@@ -1,26 +1,25 @@
 import { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
-import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
-
-import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getRobotUpdateAvailable,
-  clearRobotUpdateSession,
-} from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
-import { UNREACHABLE } from '/app/redux/discovery/constants'
+import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 import {
-  UpdateRobotSoftware,
-  NoUpdateFound,
   ErrorUpdateSoftware,
+  NoUpdateFound,
+  UpdateRobotSoftware,
 } from '/app/organisms/UpdateRobotSoftware'
+import { getLocalRobot } from '/app/redux/discovery'
+import { UNREACHABLE } from '/app/redux/discovery/constants'
+import {
+  clearRobotUpdateSession,
+  getRobotUpdateAvailable,
+} from '/app/redux/robot-update'
+import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
-import type { State, Dispatch } from '/app/redux/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function UpdateRobot(): JSX.Element {
   const navigate = useNavigate()

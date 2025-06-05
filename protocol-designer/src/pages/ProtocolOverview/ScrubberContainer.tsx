@@ -1,30 +1,37 @@
 import { useSelector } from 'react-redux'
 import flatMap from 'lodash/flatMap'
+
 import { ProtocolTimelineScrubber } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  COLUMN_4_SLOTS,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
 import {
   getInitialRobotState,
   getRobotStateTimeline,
   getRobotType,
 } from '../../file-data/selectors'
-import { uuid } from '../../utils'
+import { getLoadCommands } from '../../file-data/selectors/utils'
+import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import {
   getInitialDeckSetup,
   getInvariantContext,
   getLiquidEntities,
 } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { getLoadCommands } from '../../file-data/selectors/utils'
+import { uuid } from '../../utils'
+
 import type {
   AddressableAreaName,
   CompletedProtocolAnalysis,
   LabwareLocation,
   Liquid,
-  LoadModuleRunTimeCommand,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
+  LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
@@ -43,12 +50,7 @@ export function ScrubberContainer(): JSX.Element | null {
   }
 
   const { pipetteEntities, labwareEntities, moduleEntities } = invariantContext
-  const {
-    pipettes,
-    modules,
-    labware,
-    additionalEquipmentOnDeck,
-  } = initialDeckSetup
+  const { pipettes, modules, labware } = initialDeckSetup
 
   const loadCommands = getLoadCommands(
     initialRobotState,
@@ -114,28 +116,25 @@ export function ScrubberContainer(): JSX.Element | null {
   }))
 
   const loadLabware: LoadedLabware[] = Object.values(labware).map(lw => {
-    let location: LabwareLocation = { slotName: lw.slot }
-    if (lw.slot in modules) {
-      location = { moduleId: lw.slot }
-    } else if (
-      labware[lw.slot] != null &&
-      labware[lw.slot].def.allowedRoles?.includes('adapter')
-    ) {
-      location = { labwareId: lw.slot }
-    } else if (lw.slot === 'offDeck') {
+    let location: LabwareLocation = {
+      slotName: getSlotInLocationStack(lw.stack),
+    }
+    const locationUnderLabware = lw.stack[1]
+    if (moduleEntities[locationUnderLabware] != null) {
+      location = { moduleId: moduleEntities[locationUnderLabware].id }
+    } else if (labwareEntities[locationUnderLabware] != null) {
+      location = { labwareId: labwareEntities[locationUnderLabware].id }
+    } else if (getSlotInLocationStack(lw.stack) === 'offDeck') {
       location = 'offDeck'
-    } else if (
-      Object.values(additionalEquipmentOnDeck).find(
-        ae => ae.location === lw.slot
-      )
-    ) {
-      const inWasteChute = Object.values(additionalEquipmentOnDeck).find(
-        ae => ae.location === lw.slot && ae.name === 'wasteChute'
-      )
+    } else if (getSlotInLocationStack(lw.stack) === 'gripperWasteChute') {
       location = {
-        addressableAreaName: inWasteChute
-          ? 'gripperWasteChute'
-          : (lw.slot as AddressableAreaName),
+        addressableAreaName: 'gripperWasteChute',
+      }
+    } else if (COLUMN_4_SLOTS.includes(getSlotInLocationStack(lw.stack))) {
+      location = {
+        addressableAreaName: getSlotInLocationStack(
+          lw.stack
+        ) as AddressableAreaName,
       }
     }
 

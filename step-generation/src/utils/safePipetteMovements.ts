@@ -1,12 +1,16 @@
 import {
+  ALL,
   FLEX_ROBOT_TYPE,
-  SINGLE,
-  THERMOCYCLER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
   getPositionFromSlotId,
+  SINGLE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
+
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -14,11 +18,11 @@ import type {
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
-  RobotState,
   InvariantContext,
-  PipetteEntity,
-  ModuleEntities,
   LabwareEntity,
+  ModuleEntities,
+  PipetteEntity,
+  RobotState,
 } from '../types'
 
 const A12_column_front_left_bound = { x: -11.03, y: 2 }
@@ -151,51 +155,28 @@ const getHighestZInSlot = (
   const { moduleEntities, labwareEntities } = invariantContext
 
   let totalHeight: number = 0
+  const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
   const moduleInSlot = Object.keys(modules).find(
     moduleId => modules[moduleId].slot === slotId
   )
-  // module in slot
-  if (moduleInSlot != null) {
+
+  //  if slot has labware, includes labware, adapters, and module
+  if (largestLabwareStack != null) {
+    largestLabwareStack.forEach(item => {
+      if (modules[item] != null) {
+        totalHeight += getModuleHeightFromDeckDefinition(
+          moduleEntities[item].model
+        )
+      }
+      if (labware[item] != null) {
+        totalHeight += labwareEntities[item].def.dimensions.zDimension
+      }
+    })
+    // if slot only has module
+  } else if (moduleInSlot != null) {
     totalHeight += getModuleHeightFromDeckDefinition(
       moduleEntities[moduleInSlot].model
     )
-    const moduleDirectChildId = Object.keys(labware).find(
-      lwId => labware[lwId].slot === moduleInSlot
-    )
-    if (moduleDirectChildId != null) {
-      const moduleChildHeight =
-        labwareEntities[moduleDirectChildId].def.dimensions.zDimension
-      totalHeight += moduleChildHeight
-
-      // check if adapter is on module and has child
-      const moduleGrandchildId = Object.keys(labware).find(
-        lwId => labware[lwId].slot === moduleDirectChildId
-      )
-      if (moduleGrandchildId != null) {
-        const moduleGrandchildHeight =
-          labwareEntities[moduleGrandchildId].def.dimensions.zDimension
-        totalHeight += moduleGrandchildHeight
-      }
-    }
-  } else {
-    const labwareInSlotId = Object.keys(labware).find(
-      lwId => labware[lwId].slot === slotId
-    )
-    if (labwareInSlotId != null) {
-      const slotDirectChild = labwareEntities[labwareInSlotId]
-      const slotDirectChildHeight = slotDirectChild.def.dimensions.zDimension
-      totalHeight += slotDirectChildHeight
-
-      // check if adapter and has child
-      const slotGrandchildId = Object.keys(labware).find(
-        lwId => labware[lwId].slot === labwareInSlotId
-      )
-      if (slotGrandchildId != null) {
-        const slotGrandchildHeight =
-          labwareEntities[slotGrandchildId].def.dimensions.zDimension
-        totalHeight += slotGrandchildHeight
-      }
-    }
   }
   return totalHeight
 }
@@ -292,49 +273,60 @@ const getWellPosition = (
 }
 
 //  util to use in step-generation for if the pipette movement is safe
-export const getIsSafePipetteMovement = (
-  nozzleConfiguation: NozzleConfigurationStyle | null,
-  robotState: RobotState,
-  invariantContext: InvariantContext,
-  pipetteId: string,
-  labwareId: string,
-  tipRackDefURI: string,
-  wellLocationOffset: Point,
+export const getIsSafePipetteMovement = (args: {
+  robotState: RobotState
+  invariantContext: InvariantContext
+  pipetteId: string
+  labwareId: string
+  wellLocationOffset: Point
   wellTargetName?: string
-): boolean => {
+}): boolean => {
+  const {
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset,
+    wellTargetName,
+  } = args
   const deckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const {
     pipetteEntities,
     labwareEntities,
-    additionalEquipmentEntities,
+    stagingAreaEntities,
     moduleEntities,
   } = invariantContext
   const { labware: labwareState, tipState } = robotState
+
+  const pipetteEntity = pipetteEntities[pipetteId]
+  const nozzleConfiguration = robotState.pipettes[pipetteId]?.nozzles
 
   //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    nozzleConfiguation == null
+    nozzleConfiguration == null ||
+    nozzleConfiguration === ALL
   ) {
     return true
   }
 
-  const tiprackEntityId = Object.keys(labwareEntities).find(lwKey =>
-    lwKey.includes(tipRackDefURI)
-  )
+  const tiprackURI = tipState.pipettes[pipetteId]?.tiprackURI
+  const tiprackEntityId =
+    tiprackURI != null
+      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackURI))
+      : null
   const tiprackTipLength =
     tiprackEntityId != null
       ? labwareEntities[tiprackEntityId].def.parameters.tipLength
       : 0
-  const stagingAreaSlots = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'stagingArea')
-    .map(stagingArea => stagingArea.location as string)
-  const pipetteEntity = pipetteEntities[pipetteId]
-  const pipetteHasTip = tipState.pipettes[pipetteId]
+  const stagingAreaSlots = Object.values(stagingAreaEntities).map(
+    stagingArea => stagingArea.location as string
+  )
+  const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
-  const labwareSlot = labwareState[labwareId].slot
+  const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
   const addressableAreaOffset = getPositionFromSlotId(
     labwareSlot,
     deckDefinition
@@ -347,10 +339,10 @@ export const getIsSafePipetteMovement = (
     pipetteHasTip
   )
   let primaryNozzle = 'A12'
-  if (nozzleConfiguation === SINGLE && pipetteEntity.spec.channels === 96) {
+  if (nozzleConfiguration === SINGLE && pipetteEntity.spec.channels === 96) {
     primaryNozzle = 'H12'
   } else if (
-    nozzleConfiguation === SINGLE &&
+    nozzleConfiguration === SINGLE &&
     pipetteEntity.spec.channels === 8
   ) {
     primaryNozzle = 'H1'
@@ -358,7 +350,7 @@ export const getIsSafePipetteMovement = (
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(
     wellTargetPoint,
-    nozzleConfiguation,
+    nozzleConfiguration,
     primaryNozzle
   )
   if (!isWithinPipetteExtents) {

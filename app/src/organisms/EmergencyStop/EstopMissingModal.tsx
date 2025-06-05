@@ -1,15 +1,15 @@
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
   Modal,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

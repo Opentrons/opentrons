@@ -1,6 +1,6 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+import { app, BrowserWindow, shell } from 'electron'
 
 import { getConfig } from './config'
 import { RELOAD_UI, UI_INITIALIZED } from './constants'

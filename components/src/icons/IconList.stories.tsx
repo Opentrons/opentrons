@@ -1,20 +1,21 @@
 import * as React from 'react'
 
 import {
-  Text,
-  Flex,
-  DIRECTION_COLUMN,
-  WRAP,
-  TYPOGRAPHY,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  Text,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
-import { ICON_DATA_BY_NAME } from './icon-data'
-import { Icon as IconComponent } from './Icon'
 
-import type { Story, Meta } from '@storybook/react'
+import { Icon as IconComponent } from './Icon'
+import { ICON_DATA_BY_NAME } from './icon-data'
+
+import type { Meta, Story } from '@storybook/react'
 import type { IconName } from './Icon'
 
 export default {

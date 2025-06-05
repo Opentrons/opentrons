@@ -1,5 +1,5 @@
-import { SkipStepInfo } from '../shared'
 import { RECOVERY_MAP } from '../constants'
+import { SkipStepInfo } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'

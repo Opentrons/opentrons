@@ -1,5 +1,5 @@
-import { STYLE_PROPS } from '../../primitives'
 import { StyledText } from '../../atoms/StyledText'
+import { STYLE_PROPS } from '../../primitives'
 import { Banner } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'

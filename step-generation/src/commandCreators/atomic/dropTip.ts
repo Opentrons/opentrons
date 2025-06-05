@@ -1,5 +1,7 @@
 import { uuid } from '../../utils'
+
 import type { CommandCreator } from '../../types'
+
 interface DropTipArgs {
   pipette: string
   dropTipLocation: string
@@ -17,7 +19,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
 ) => {
   const { pipette, dropTipLocation } = args
   // No-op if there is no tip
-  if (!prevRobotState.tipState.pipettes[pipette]) {
+  if (!prevRobotState.tipState.pipettes[pipette]?.hasTip) {
     return {
       commands: [],
     }

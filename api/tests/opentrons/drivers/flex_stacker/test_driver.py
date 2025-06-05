@@ -10,6 +10,7 @@ from opentrons.drivers.asyncio.communication.serial_connection import (
 from opentrons.drivers.flex_stacker.driver import (
     DEFAULT_FS_TIMEOUT,
     FS_MOVE_TIMEOUT,
+    FS_TOF_INIT_TIMEOUT,
     FS_TOF_TIMEOUT,
     FlexStackerDriver,
 )
@@ -502,7 +503,7 @@ async def test_get_tof_sensor_status(
     tof_status = types.GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(
         types.TOFSensor.Z.name
     )
-    connection.send_command.assert_any_call(tof_status)
+    connection.send_command.assert_any_call(tof_status, timeout=FS_TOF_INIT_TIMEOUT)
     connection.reset_mock()
 
     # Test invalid response
@@ -513,7 +514,7 @@ async def test_get_tof_sensor_status(
     tof_status = types.GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(
         types.TOFSensor.Z.name
     )
-    connection.send_command.assert_any_call(tof_status)
+    connection.send_command.assert_any_call(tof_status, timeout=FS_TOF_INIT_TIMEOUT)
 
 
 async def test_manage_tof_measurement(
@@ -651,7 +652,7 @@ async def test_get_tof_histogram(
     subject: FlexStackerDriver,
     connection: AsyncMock,
     decoy: Decoy,
-    histogram_bins: Dict[int, List[int]],
+    histogram_bins: Dict[int, List[float]],
 ) -> None:
     """it should send a start and get tof measurements until full payload is transfered"""
     connection.send_command.side_effect = [

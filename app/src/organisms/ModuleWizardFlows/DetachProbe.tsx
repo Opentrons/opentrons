@@ -1,18 +1,20 @@
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
+import {
+  Flex,
+  LegacyStyledText,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-import { useTranslation } from 'react-i18next'
-import {
-  Flex,
-  RESPONSIVENESS,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { ModuleSetupWizardStepProps } from './types'
 
 const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -24,7 +26,7 @@ const BODY_STYLE = css`
 `
 
 export const DetachProbe = (
-  props: ModuleCalibrationWizardStepProps
+  props: ModuleSetupWizardStepProps
 ): JSX.Element | null => {
   const { attachedPipette, proceed, goBack } = props
   const { t, i18n } = useTranslation('module_wizard_flows')

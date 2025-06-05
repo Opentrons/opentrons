@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { SPACING, Banner } from '@opentrons/components'
+
+import { Banner, SPACING } from '@opentrons/components'
+
 import { REACHABLE } from '/app/redux/discovery'
 
 import type { DiscoveredRobot } from '/app/redux/discovery/types'

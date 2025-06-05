@@ -1,9 +1,9 @@
+import type { PipetteOffsetCalibration } from '@opentrons/api-client'
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
 } from '/app/redux/pipettes/types'
-import type { PipetteOffsetCalibration } from '@opentrons/api-client'
 
 export function downloadFile(data: object | string, fileName: string): void {
   // Create a blob with the data we want to download as a file

@@ -1,9 +1,10 @@
 import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
-import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
 import { Box } from '../../primitives'
 import { CommandText as CommandTextComponent } from './index'
-import type { RobotType } from '@opentrons/shared-data'
+import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
+
 import type { Meta, StoryObj } from '@storybook/react'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface StorybookArgs {
   onDevice: boolean

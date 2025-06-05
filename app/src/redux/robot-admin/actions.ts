@@ -1,7 +1,7 @@
 import * as Constants from './constants'
-import type * as Types from './types'
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
+import type * as Types from './types'
 
 export const restartRobot = (robotName: string): Types.RestartRobotAction => ({
   type: Constants.RESTART,

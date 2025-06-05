@@ -1,0 +1,312 @@
+import { useEffect, useReducer, useState } from 'react'
+import { useSelector } from 'react-redux'
+
+import {
+  useCreateLiveCommandMutation,
+  useDeleteMaintenanceRunMutation,
+} from '@opentrons/react-api-client'
+
+import { getModulePrepCommands } from '/app/local-resources/modules'
+import { getIsOnDevice } from '/app/redux/config'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import {
+  useChainMaintenanceCommands,
+  useNotifyCurrentMaintenanceRun,
+} from '/app/resources/maintenance_runs'
+import {
+  useChainLiveCommands,
+  useCreateTargetedMaintenanceRunMutation,
+} from '/app/resources/runs'
+
+import { ACTIONS } from './constants'
+import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
+
+import type { SetStateAction } from 'react'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { PipetteInformation } from '/app/redux/pipettes'
+import type { ModuleSetupWizardStep } from './types'
+
+const RUN_REFETCH_INTERVAL = 5000
+
+export interface UseModuleSetupWizardResult {
+  showModuleWizard: boolean
+  currentStep: ModuleSetupWizardStep | null
+  currentStepIndex: number
+  totalStepCount: number
+  createMaintenanceRun: CreateMaintenanceRunType
+  handleCleanUpAndClose: () => void
+  wizardFlowBaseProps: {
+    attachedPipette: PipetteInformation | null
+    chainRunCommands?: (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ) => Promise<CommandData[]>
+    isRobotMoving: boolean
+    proceed: () => void
+    maintenanceRunId: string | null
+    goBack: () => void
+    setErrorMessage: (message: string | null) => void
+    errorMessage: string | null
+    isOnDevice: boolean
+    attachedModule: AttachedModule | null
+    isExiting: boolean
+  }
+  buildFlowForSelectedModule: (module: AttachedModule) => void
+  patchModuleAfterUpdate: (module: AttachedModule) => void
+  deckConfig: DeckConfiguration
+}
+
+export interface UseModuleSetupWizardParams {
+  closeFlow: () => void
+  attachedModuleOnLaunch?: AttachedModule
+  onComplete?: () => void
+}
+
+export function useModuleSetupWizard(
+  params: UseModuleSetupWizardParams
+): UseModuleSetupWizardResult {
+  const { closeFlow, attachedModuleOnLaunch, onComplete } = params
+  const isOnDevice = useSelector(getIsOnDevice)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
+    currentStepIndex: 0,
+    currentStep: null,
+    totalStepCount: 5,
+    stepsInFlow: [],
+    attachedModule: attachedModuleOnLaunch ?? null,
+  })
+  const {
+    currentStepIndex,
+    currentStep,
+    totalStepCount,
+    attachedModule,
+  } = state
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipette =
+    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
+      ? attachedPipettes.left
+      : attachedPipettes.right
+
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+
+  const goBack = (): void => {
+    dispatch({
+      type: ACTIONS.GO_BACK,
+    })
+  }
+  const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
+
+  const {
+    chainRunCommands,
+    isCommandMutationLoading,
+  } = useChainMaintenanceCommands()
+  const {
+    chainLiveCommands,
+    isCommandMutationLoading: isLiveCommandLoading,
+  } = useChainLiveCommands()
+
+  const {
+    createTargetedMaintenanceRun,
+    isLoading: isCreateLoading,
+  } = useCreateTargetedMaintenanceRunMutation({
+    onSuccess: (response: { data: { id: SetStateAction<string | null> } }) => {
+      setMaintenanceRunId(response.data.id)
+    },
+  })
+
+  useMonitorMaintenanceRunForDeletion({
+    maintenanceRunId,
+    setMaintenanceRunId,
+    closeFlow,
+  })
+
+  const [errorMessage, setErrorMessage] = useState<null | string>(null)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
+  const proceed = (): void => {
+    if (!isCommandMutationLoading) {
+      dispatch({
+        type: ACTIONS.PROCEED,
+      })
+    }
+  }
+  const handleClose = (): void => {
+    setIsExiting(false)
+    closeFlow()
+    if (onComplete != null) onComplete()
+  }
+
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => {
+      setMaintenanceRunId(null)
+      handleClose()
+    },
+    onError: () => {
+      setMaintenanceRunId(null)
+      handleClose()
+    },
+  })
+
+  const handleCleanUpAndClose = (): void => {
+    if (attachedModule != null) {
+      createLiveCommand({
+        command: {
+          commandType: 'identifyModule',
+          params: {
+            model: attachedModule.moduleModel,
+            moduleId: attachedModule.id,
+            start: false,
+          },
+        },
+      })
+    }
+    setIsExiting(true)
+    if (maintenanceRunId == null) handleClose()
+    else {
+      chainRunCommands(
+        maintenanceRunId as string,
+        [{ commandType: 'home' as const, params: {} }],
+        false
+      )
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error.message)
+          handleClose()
+        })
+    }
+  }
+
+  const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (
+      isCommandMutationLoading ||
+      isExiting ||
+      isCreateLoading ||
+      isLiveCommandLoading
+    ) {
+      setIsRobotMoving(true)
+    } else {
+      setIsRobotMoving(false)
+    }
+  }, [
+    isCommandMutationLoading,
+    isExiting,
+    isCreateLoading,
+    isLiveCommandLoading,
+  ])
+
+  let chainMaintenanceRunCommands
+
+  if (maintenanceRunId != null) {
+    chainMaintenanceRunCommands = (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ): Promise<CommandData[]> =>
+      chainRunCommands(
+        maintenanceRunId as string,
+        commands,
+        continuePastCommandFailure
+      )
+  }
+
+  const calibrateBaseProps = {
+    attachedPipette,
+    chainRunCommands: chainMaintenanceRunCommands,
+    isRobotMoving,
+    proceed,
+    maintenanceRunId,
+    goBack,
+    setErrorMessage,
+    errorMessage,
+    isOnDevice,
+    attachedModule,
+    isExiting,
+  }
+
+  const buildFlowForSelectedModule = (
+    selectedModuleToBuildFlow: AttachedModule
+  ): void => {
+    const modulePrepCommands = getModulePrepCommands(selectedModuleToBuildFlow)
+    if (modulePrepCommands.length > 0) {
+      chainLiveCommands(
+        getModulePrepCommands(selectedModuleToBuildFlow),
+        false
+      ).catch((e: Error) => {
+        setErrorMessage(e.message)
+      })
+    }
+    dispatch({
+      type: ACTIONS.BUILD_FLOW,
+      attachedModule: selectedModuleToBuildFlow,
+    })
+  }
+
+  const patchModuleAfterUpdate = (refreshedModule: AttachedModule): void => {
+    dispatch({
+      type: ACTIONS.PATCH_MODULE,
+      attachedModule: refreshedModule,
+    })
+  }
+
+  return {
+    showModuleWizard: true,
+    currentStep,
+    currentStepIndex,
+    totalStepCount,
+    createMaintenanceRun: createTargetedMaintenanceRun,
+    handleCleanUpAndClose,
+    wizardFlowBaseProps: calibrateBaseProps,
+    deckConfig,
+    buildFlowForSelectedModule,
+    patchModuleAfterUpdate,
+  }
+}
+
+function useMonitorMaintenanceRunForDeletion({
+  maintenanceRunId,
+  setMaintenanceRunId,
+  closeFlow,
+}: {
+  maintenanceRunId: string | null
+  setMaintenanceRunId: (id: string | null) => void
+  closeFlow: () => void
+}): void {
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = useState<boolean>(false)
+
+  // We should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: maintenanceRunId != null,
+  })
+
+  useEffect(() => {
+    if (maintenanceRunId === null) {
+      setMonitorMaintenanceRunForDeletion(false)
+    } else if (
+      maintenanceRunId !== null &&
+      maintenanceRunData?.data.id === maintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    } else if (
+      maintenanceRunData?.data.id !== maintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      setMaintenanceRunId(null)
+      closeFlow()
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    maintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    setMaintenanceRunId,
+  ])
+}

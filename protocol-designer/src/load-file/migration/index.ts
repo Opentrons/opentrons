@@ -1,6 +1,7 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
+
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
@@ -13,9 +14,13 @@ import { migrateFile as migrateFileEight } from './8_0_0'
 import { migrateFile as migrateFileEightOne } from './8_1_0'
 import { migrateFile as migrateFileEightTwo } from './8_2_0'
 import { migrateFile as migrateFileEightTwoPointTwo } from './8_2_2'
+import { migrateFile as migrateFileEightFourFour } from './8_4_4'
 import { migrateFile as migrateFileEightFive } from './8_5_0'
 
-import type { PDProtocolFile } from '../../file-types'
+import type {
+  PDProtocolFile,
+  PythonDesignerApplication,
+} from '../../file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string
@@ -60,17 +65,19 @@ const allMigrationsByVersion: MigrationsByVersion = {
   // @ts-expect-error
   '8.2.2': migrateFileEightTwoPointTwo,
   // @ts-expect-error
+  '8.4.4': migrateFileEightFourFour,
+  // @ts-expect-error
   '8.5.0': migrateFileEightFive,
 }
 export const migration = (
   file: any
 ): {
-  file: PDProtocolFile
+  file: PDProtocolFile | PythonDesignerApplication
   didMigrate: boolean
   migrationsRan: string[]
 } => {
   const designerApplication =
-    file.designerApplication || file['designer-application']
+    file.designerApplication || file['designer-application'] || file
   // NOTE: default exists because any protocol that doesn't include the application version
   // key will be treated as the oldest migrateable version ('1.0.0')
   const applicationVersion: string =

@@ -8,6 +8,7 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
+
 import { ProfileSettings } from './ProfileSettings'
 import { ProfileStepsSummary } from './ProfileStepsSummary'
 import { ThermocyclerState } from './ThermocyclerState'

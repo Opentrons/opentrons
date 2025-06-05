@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
@@ -12,20 +12,22 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
-import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 interface DelayProps {
   onBack: () => void
@@ -93,7 +95,7 @@ export function Delay(props: DelayProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
         onBack()
@@ -114,7 +116,7 @@ export function Delay(props: DelayProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
       }

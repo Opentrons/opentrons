@@ -14,6 +14,9 @@ from typing import (
 )
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
@@ -299,3 +302,30 @@ class StackerFillEmptyStrategy(str, Enum):
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
+
+
+class StackerStoredLabwareGroup(BaseModel):
+    """Represents one group of labware stored in a stacker hopper."""
+
+    primaryLabwareId: str
+    adapterLabwareId: str | SkipJsonSchema[None] = None
+    lidLabwareId: str | SkipJsonSchema[None] = None
+
+
+@dataclass
+class StackerPoolDefinition:
+    """Represents an internal configuraiton of stored labware."""
+
+    primaryLabwareDefinition: LabwareDefinition
+    adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
+    lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
+
+
+class IdentifyColor(str, Enum):
+    """Module identify color."""
+
+    WHITE = "white"
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+    YELLOW = "yellow"

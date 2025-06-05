@@ -1,5 +1,6 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   Box,
   COLORS,
@@ -8,20 +9,22 @@ import {
   RadioButton,
   SPACING,
   StyledText,
-  TOOLTIP_TOP_START,
   Tooltip,
+  TOOLTIP_TOP_START,
   useHoverTooltip,
 } from '@opentrons/components'
+
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import SINGLE_IMAGE from '../../../../../assets/images/path_single_transfers.svg'
-import MULTI_DISPENSE_IMAGE from '../../../../../assets/images/path_multi_dispense.svg'
-import MULTI_ASPIRATE_IMAGE from '../../../../../assets/images/path_multi_aspirate.svg'
 import { getDisabledPathMap } from './utils'
 
 import type { ChangeEvent, ReactNode } from 'react'
 import type { PathOption } from '../../../../../form-types'
 import type { FieldProps } from '../types'
 import type { DisabledPathMap, ValuesForPath } from './utils'
+
+import MULTI_ASPIRATE_IMAGE from '../../../../../assets/images/path_multi_aspirate.svg'
+import MULTI_DISPENSE_IMAGE from '../../../../../assets/images/path_multi_dispense.svg'
+import SINGLE_IMAGE from '../../../../../assets/images/path_single_transfers.svg'
 
 const PATH_ANIMATION_IMAGES = {
   single: new URL(

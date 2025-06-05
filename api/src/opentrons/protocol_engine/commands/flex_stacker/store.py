@@ -1,10 +1,16 @@
 """Command models to retrieve a labware from a Flex Stacker."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING, Type, Union
+from typing import Optional, Literal, TYPE_CHECKING, Type, Union, cast
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
 
 from ..command import (
     AbstractCommandImpl,
@@ -13,7 +19,15 @@ from ..command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from ..flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+    labware_locations_for_group,
+    labware_location_base_sequence,
+    primary_location_sequence,
+    adapter_location_sequence,
+    lid_location_sequence,
+)
 from ...errors import (
     ErrorOccurrence,
     CannotPerformModuleAction,
@@ -25,11 +39,9 @@ from ...state import update_types
 from ...types import (
     LabwareLocationSequence,
     InStackerHopperLocation,
+    StackerStoredLabwareGroup,
+    ModuleLocation,
 )
-
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
-from opentrons.calibration_storage.helpers import uri_from_details
-
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -52,9 +64,9 @@ class StoreParams(BaseModel):
 class StoreResult(BaseModel):
     """Result data from a labware storage command."""
 
-    eventualDestinationLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(
+    eventualDestinationLocationSequence: (
+        LabwareLocationSequence | SkipJsonSchema[None]
+    ) = Field(
         None,
         description=(
             "The full location in which all labware moved by this command will eventually reside."
@@ -94,7 +106,8 @@ class StoreResult(BaseModel):
 
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
-    DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError]
+    | DefinedErrorData[FlexStackerShuttleError],
 ]
 
 
@@ -115,11 +128,12 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
     def _verify_labware_to_store(
         self, params: StoreParams, stacker_state: FlexStackerSubState
     ) -> tuple[str, str | None, str | None]:
+        location = self._state_view.modules.get_location(params.moduleId)
         try:
             bottom_id = self._state_view.labware.get_id_by_module(params.moduleId)
         except LabwareNotLoadedOnModuleError:
             raise CannotPerformModuleAction(
-                "Cannot store labware if Flex Stacker carriage is empty"
+                f"Flex Stacker in {location} cannot store labware because its carriage is empty"
             )
         labware_ids = self._state_view.labware.get_labware_stack_from_parent(bottom_id)
         labware_defs = [
@@ -132,12 +146,12 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         assert pool_list is not None
         if len(labware_ids) != len(pool_list):
             raise CannotPerformModuleAction(
-                "Cannot store labware stack that does not correspond with Flex Stacker configuration"
+                f"Cannot store labware stack that does not correspond with the configuration of Flex Stacker in {location}"
             )
         if stacker_state.pool_lid_definition is not None:
             if labware_defs[-1] != stacker_state.pool_lid_definition:
                 raise CannotPerformModuleAction(
-                    "Cannot store labware stack that does not correspond with Flex Stacker configuration"
+                    f"Cannot store labware stack that does not correspond with the configuration of Flex Stacker in {location}"
                 )
             lid_id = labware_ids[-1]
 
@@ -147,14 +161,14 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 or labware_defs[1] != stacker_state.pool_primary_definition
             ):
                 raise CannotPerformModuleAction(
-                    "Cannot store labware stack that does not correspond with Flex Stacker configuration"
+                    f"Cannot store labware stack that does not correspond with the configuration of Flex Stacker in {location}"
                 )
             else:
                 return labware_ids[1], labware_ids[0], lid_id
         else:
             if labware_defs[0] != stacker_state.pool_primary_definition:
                 raise CannotPerformModuleAction(
-                    "Cannot store labware stack that does not correspond with Flex Stacker configuration"
+                    f"Cannot store labware stack that does not correspond with the configuration of Flex Stacker in {location}"
                 )
             return labware_ids[0], None, lid_id
 
@@ -164,15 +178,19 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             params.moduleId
         )
 
-        if stacker_state.pool_count == stacker_state.max_pool_count:
-            raise CannotPerformModuleAction(
-                "Cannot store labware in Flex Stacker while it is full"
-            )
-
+        location = self._state_view.modules.get_location(params.moduleId)
         pool_definitions = stacker_state.get_pool_definition_ordered_list()
         if pool_definitions is None:
             raise FlexStackerLabwarePoolNotYetDefinedError(
-                message="The Flex Stacker has not been configured yet and cannot be filled."
+                message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
+            )
+
+        if (
+            len(stacker_state.contained_labware_bottom_first)
+            == stacker_state.max_pool_count
+        ):
+            raise CannotPerformModuleAction(
+                f"Cannot store labware in Flex Stacker in {location} because it is full"
             )
 
         primary_id, maybe_adapter_id, maybe_lid_id = self._verify_labware_to_store(
@@ -182,11 +200,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         # Allow propagation of ModuleNotAttachedError.
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
-        eventual_target_location_sequence = (
-            self._state_view.geometry.get_predicted_location_sequence(
-                InStackerHopperLocation(moduleId=params.moduleId)
-            )
-        )
         stack_height = self._state_view.geometry.get_height_of_labware_stack(
             pool_definitions
         )
@@ -194,6 +207,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         state_update = update_types.StateUpdate()
         try:
             if stacker_hw is not None:
+                stacker_hw.set_stacker_identify(True)
                 await stacker_hw.store_labware(labware_height=stack_height)
         except FlexStackerStallError as e:
             return DefinedErrorData(
@@ -207,12 +221,34 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                             error=e,
                         )
                     ],
+                    errorInfo={"labwareId": primary_id},
+                ),
+            )
+        except FlexStackerShuttleMissingError as e:
+            return DefinedErrorData(
+                public=FlexStackerShuttleError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                    errorInfo={"labwareId": primary_id},
                 ),
             )
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None
         ]
+
+        group = StackerStoredLabwareGroup(
+            primaryLabwareId=primary_id,
+            adapterLabwareId=maybe_adapter_id,
+            lidLabwareId=maybe_lid_id,
+        )
 
         state_update.set_batch_labware_location(
             new_locations_by_id={
@@ -221,52 +257,53 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             new_offset_ids_by_id={id: None for id in id_list},
         )
 
-        state_update.update_flex_stacker_labware_pool_count(
-            module_id=params.moduleId, count=stacker_state.pool_count + 1
+        state_update.update_flex_stacker_contained_labware(
+            module_id=params.moduleId,
+            contained_labware_bottom_first=(
+                [group] + stacker_state.contained_labware_bottom_first
+            ),
         )
-        if stacker_state.pool_primary_definition is None:
-            raise FlexStackerLabwarePoolNotYetDefinedError(
-                "The Primary Labware must be defined in the stacker pool."
-            )
+
+        original_location_sequences = labware_locations_for_group(
+            group,
+            labware_location_base_sequence(
+                group,
+                self._state_view,
+                self._state_view.geometry.get_predicted_location_sequence(
+                    ModuleLocation(moduleId=params.moduleId)
+                ),
+            ),
+        )
+
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
-            public=StoreResult(
-                eventualDestinationLocationSequence=eventual_target_location_sequence,
-                primaryOriginLocationSequence=self._state_view.geometry.get_location_sequence(
-                    primary_id
+            public=StoreResult.model_construct(
+                eventualDestinationLocationSequence=[
+                    InStackerHopperLocation(moduleId=params.moduleId)
+                ],
+                primaryOriginLocationSequence=primary_location_sequence(
+                    original_location_sequences
                 ),
                 primaryLabwareId=primary_id,
-                adapterOriginLocationSequence=(
-                    self._state_view.geometry.get_location_sequence(maybe_adapter_id)
-                    if maybe_adapter_id is not None
-                    else None
+                adapterOriginLocationSequence=adapter_location_sequence(
+                    original_location_sequences
                 ),
                 adapterLabwareId=maybe_adapter_id,
-                lidOriginLocationSequence=(
-                    self._state_view.geometry.get_location_sequence(maybe_lid_id)
-                    if maybe_lid_id is not None
-                    else None
+                lidOriginLocationSequence=lid_location_sequence(
+                    original_location_sequences
                 ),
                 lidLabwareId=maybe_lid_id,
-                primaryLabwareURI=uri_from_details(
-                    stacker_state.pool_primary_definition.namespace,
-                    stacker_state.pool_primary_definition.parameters.loadName,
-                    stacker_state.pool_primary_definition.version,
+                primaryLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    cast(LabwareDefinition, stacker_state.pool_primary_definition)
                 ),
-                adapterLabwareURI=uri_from_details(
-                    stacker_state.pool_adapter_definition.namespace,
-                    stacker_state.pool_adapter_definition.parameters.loadName,
-                    stacker_state.pool_adapter_definition.version,
-                )
-                if stacker_state.pool_adapter_definition is not None
-                else None,
-                lidLabwareURI=uri_from_details(
-                    stacker_state.pool_lid_definition.namespace,
-                    stacker_state.pool_lid_definition.parameters.loadName,
-                    stacker_state.pool_lid_definition.version,
-                )
-                if stacker_state.pool_lid_definition is not None
-                else None,
+                adapterLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_adapter_definition
+                ),
+                lidLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_lid_definition
+                ),
             ),
             state_update=state_update,
         )

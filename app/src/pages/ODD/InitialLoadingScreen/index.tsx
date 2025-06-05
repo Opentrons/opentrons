@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,6 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+
 import { getIsShellReady } from '/app/redux/shell'
 
 import type { ReactNode } from 'react'

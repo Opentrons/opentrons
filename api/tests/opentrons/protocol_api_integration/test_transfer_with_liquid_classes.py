@@ -1881,13 +1881,11 @@ def test_water_transfer_with_lpd(
     )
     water = simulated_protocol_context.define_liquid_class("water")
 
-    with (
-        mock.patch.object(
-            InstrumentCore,
-            "liquid_probe_with_recovery",
-            autospec=True,
-        ) as patched_liquid_probe
-    ):
+    with mock.patch.object(
+        InstrumentCore,
+        "liquid_probe_with_recovery",
+        autospec=True,
+    ) as patched_liquid_probe:
         mock_manager = mock.Mock()
         mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
         pipette_1k.transfer_with_liquid_class(
@@ -1932,13 +1930,11 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
     )
     water = simulated_protocol_context.define_liquid_class("water")
 
-    with (
-        mock.patch.object(
-            InstrumentCore,
-            "liquid_probe_with_recovery",
-            autospec=True,
-        ) as patched_liquid_probe
-    ):
+    with mock.patch.object(
+        InstrumentCore,
+        "liquid_probe_with_recovery",
+        autospec=True,
+    ) as patched_liquid_probe:
         mock_manager = mock.Mock()
         mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
         pipette_1k.transfer_with_liquid_class(
@@ -1984,13 +1980,11 @@ def test_water_distribution_with_lpd(
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
 
-    with (
-        mock.patch.object(
-            InstrumentCore,
-            "liquid_probe_with_recovery",
-            autospec=True,
-        ) as patched_liquid_probe
-    ):
+    with mock.patch.object(
+        InstrumentCore,
+        "liquid_probe_with_recovery",
+        autospec=True,
+    ) as patched_liquid_probe:
         mock_manager = mock.Mock()
         mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
         pipette_1k.distribute_with_liquid_class(

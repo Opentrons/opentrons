@@ -31,7 +31,8 @@
           "displayName": "123",
           "description": null,
           "displayColor": "#b925ff",
-          "liquidGroupId": "0"
+          "liquidGroupId": "0",
+          "liquidClass": null
         }
       },
       "ingredLocations": {
@@ -2265,12 +2266,13 @@
       }
     }
   },
-  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "liquidSchemaId": "opentronsLiquidSchemaV2",
   "liquids": {
     "0": {
       "displayName": "123",
       "description": "",
-      "displayColor": "#b925ff"
+      "displayColor": "#b925ff",
+      "liquidClass": null
     }
   },
   "commandSchemaId": "opentronsCommandSchemaV10",
@@ -2343,25 +2345,11 @@
       }
     },
     {
-      "commandType": "thermocycler/waitForLidTemperature",
-      "key": "c992ec02-343a-400d-b3e2-7d36458290ab",
-      "params": {
-        "moduleId": "82858229-5c25-46cc-87d4-35ab318c18ce:thermocyclerModuleType"
-      }
-    },
-    {
       "commandType": "thermocycler/setTargetLidTemperature",
       "key": "dfb8cfb1-5fbd-484c-969e-4817e1d7d253",
       "params": {
         "moduleId": "82858229-5c25-46cc-87d4-35ab318c18ce:thermocyclerModuleType",
         "celsius": 40
-      }
-    },
-    {
-      "commandType": "thermocycler/waitForLidTemperature",
-      "key": "b489f2cf-5900-4b9c-b259-8475dcad6f53",
-      "params": {
-        "moduleId": "82858229-5c25-46cc-87d4-35ab318c18ce:thermocyclerModuleType"
       }
     },
     {

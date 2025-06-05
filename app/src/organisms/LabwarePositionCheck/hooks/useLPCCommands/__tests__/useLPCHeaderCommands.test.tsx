@@ -1,18 +1,19 @@
-import { describe, beforeEach, afterEach, it, vi, expect } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { useSelector, Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider, useSelector } from 'react-redux'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
 import { LPC_STEP } from '/app/redux/protocol-runs'
+
 import { useLPCHeaderCommands } from '../useLPCHeaderCommands'
 
+import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
-import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
 import type { State } from '/app/redux/types'
-import type { Store } from 'redux'
+import type { UseLPCHeaderCommandsProps } from '../useLPCHeaderCommands'
 
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof Provider>()

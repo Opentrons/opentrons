@@ -1,22 +1,34 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+
 import {
-  getLabwareDefURI,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
-  THERMOCYCLER_MODULE_TYPE,
-  getIsLabwareAboveHeight,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  HEATERSHAKER_MODULE_TYPE,
-  fixtureTrash as _fixtureTrash,
   fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
+  fixtureTrash as _fixtureTrash,
   fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
+  getIsLabwareAboveHeight,
+  getLabwareDefURI,
+  HEATERSHAKER_MODULE_TYPE,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import * as SharedData from '@opentrons/shared-data'
+
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
+import { DEFAULT_CONFIG } from '../fixtures'
+import {
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsTallLabwareEastWestOfHeaterShaker,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -29,18 +41,8 @@ import {
   splitLiquid,
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { DEFAULT_CONFIG } from '../fixtures'
-import {
-  getIsHeaterShakerEastWestWithLatchOpen,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsTallLabwareEastWestOfHeaterShaker,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  thermocyclerPipetteCollision,
-} from '../utils'
-import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
-import * as SharedData from '@opentrons/shared-data'
 
-import type { Diff } from '../utils/thermocyclerStateDiff'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RobotState } from '../'
 import type {
   LabwareEntities,
@@ -48,7 +50,7 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Diff } from '../utils/thermocyclerStateDiff'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -324,14 +326,17 @@ describe('makeInitialRobotState', () => {
               pythonName: 'mockPythonName',
             },
           },
-          additionalEquipmentEntities: {},
+          wasteChuteEntities: {},
+          trashBinEntities: {},
+          stagingAreaEntities: {},
+          gripperEntities: {},
           liquidEntities: {},
         },
         labwareLocations: {
-          somePlateId: { slot: '1' },
-          tiprack10Id: { slot: '2' },
-          tiprack300Id: { slot: '4' },
-          fixedTrash: { slot: '12' },
+          somePlateId: { stack: ['somePlateId', '1'] },
+          tiprack10Id: { stack: ['tiprack10Id', '2'] },
+          tiprack300Id: { stack: ['tiprack300Id', '4'] },
+          fixedTrash: { stack: ['fixedTrash', '12'] },
         },
         moduleLocations: {
           someTempModuleId: {
@@ -652,7 +657,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -672,7 +677,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -692,7 +697,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: false,
@@ -712,7 +717,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId },
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] },
       },
       labwareId: 'someOtherLabwareNotOnTC',
       expected: false,
@@ -804,7 +809,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
   let labwareState: RobotState['labware']
   beforeEach(() => {
     labwareState = {
-      labwareId: { slot: '2' },
+      labwareId: { stack: ['labwareId', '2'] },
     }
     labwareEntities = {
       labwareId: {
@@ -836,7 +841,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
     ).toBe(false)
   })
   it('should return false when there is NO labware next to a heater shaker', () => {
-    labwareState.labwareId.slot = '9'
+    labwareState.labwareId.stack = ['labwareId', '9']
     when(getIsLabwareAboveHeight)
       .calledWith(
         expect.any(Object),

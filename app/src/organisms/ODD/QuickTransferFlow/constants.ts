@@ -15,15 +15,20 @@ export const ACTIONS = {
   SET_DELAY_ASPIRATE: 'SET_DELAY_ASPIRATE',
   SET_TOUCH_TIP_ASPIRATE: 'SET_TOUCH_TIP_ASPIRATE',
   SET_AIR_GAP_ASPIRATE: 'SET_AIR_GAP_ASPIRATE',
+  SET_SUBMERGE_ASPIRATE: 'SET_SUBMERGE_ASPIRATE',
+  SET_RETRACT_ASPIRATE: 'SET_RETRACT_ASPIRATE',
   SET_DISPENSE_TIP_POSITION: 'SET_DISPENSE_TIP_POSITION',
   SET_MIX_ON_DISPENSE: 'SET_MIX_ON_DISPENSE',
   SET_DELAY_DISPENSE: 'SET_DELAY_DISPENSE',
   SET_TOUCH_TIP_DISPENSE: 'SET_TOUCH_TIP_DISPENSE',
   SET_BLOW_OUT: 'SET_BLOW_OUT',
   SET_AIR_GAP_DISPENSE: 'SET_AIR_GAP_DISPENSE',
+  SET_SUBMERGE_DISPENSE: 'SET_SUBMERGE_DISPENSE',
+  SET_RETRACT_DISPENSE: 'SET_RETRACT_DISPENSE',
   SET_CHANGE_TIP: 'SET_CHANGE_TIP',
   SET_DROP_TIP_LOCATION: 'SET_DROP_TIP_LOCATION',
   SET_FLOW_RATE: 'SET_FLOW_RATE',
+  SET_LIQUID_CLASS: 'SET_LIQUID_CLASS',
 } as const
 
 export const DISTRIBUTE = 'distribute'
@@ -194,3 +199,27 @@ export const NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE = [
   'opentrons/usascientific_12_reservoir_22ml/3',
   'opentrons/usascientific_96_wellplate_2.4ml_deep/2',
 ]
+
+export const ASPIRATE_SETTING_OPTIONS = {
+  ASPIRATE_FLOW_RATE: 'aspirate_flow_rate',
+  ASPIRATE_TIP_POSITION: 'aspirate_tip_position',
+  PRE_WET_TIP: 'pre_wet_tip',
+  ASPIRATE_MIX: 'aspirate_mix',
+  ASPIRATE_DELAY: 'aspirate_delay',
+  ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
+  ASPIRATE_AIR_GAP: 'aspirate_air_gap',
+  ASPIRATE_SUBMERGE: 'aspirate_submerge',
+  ASPIRATE_RETRACT: 'aspirate_retract',
+} as const
+
+export const DISPENSE_SETTING_OPTIONS = {
+  DISPENSE_FLOW_RATE: 'dispense_flow_rate',
+  DISPENSE_TIP_POSITION: 'dispense_tip_position',
+  DISPENSE_MIX: 'dispense_mix',
+  DISPENSE_DELAY: 'dispense_delay',
+  DISPENSE_TOUCH_TIP: 'dispense_touch_tip',
+  DISPENSE_AIR_GAP: 'dispense_air_gap',
+  DISPENSE_BLOW_OUT: 'dispense_blow_out',
+  DISPENSE_SUBMERGE: 'dispense_submerge',
+  DISPENSE_RETRACT: 'dispense_retract',
+} as const

@@ -1,4 +1,5 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getMigrationMessage } from '../utils'
 
 const tMock = (key: string) => key

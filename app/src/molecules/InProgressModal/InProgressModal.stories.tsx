@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { InProgressModal as InProgressModalComponent } from './'
 import { SimpleWizardInProgressBody } from '../SimpleWizardBody'
+import { InProgressModal as InProgressModalComponent } from './'
+
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof InProgressModalComponent> = {
   title: 'App/Molecules/InProgressModal',

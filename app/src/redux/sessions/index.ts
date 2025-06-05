@@ -1,11 +1,11 @@
 // sessions constants, actions, selectors, and types
 import type {
-  Session,
-  SessionType,
   CalibrationCheckSession,
-  TipLengthCalibrationSession,
   DeckCalibrationSession,
   PipetteOffsetCalibrationSession,
+  Session,
+  SessionType,
+  TipLengthCalibrationSession,
 } from './types'
 
 export * from './actions'

@@ -1,5 +1,6 @@
-import { InputField } from '@opentrons/components'
 import { Controller } from 'react-hook-form'
+
+import { InputField } from '@opentrons/components'
 
 interface ControlledInputFieldProps {
   id?: string

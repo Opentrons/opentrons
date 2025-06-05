@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useDrop, useDrag } from 'react-dnd'
+
 import {
   Box,
   COLORS,
@@ -9,11 +10,13 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
+
 import { DND_TYPES } from '../../../../constants'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { stepIconsByType } from '../../../../form-types'
-import { StepContainer } from './StepContainer'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
+import { StepContainer } from './StepContainer'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
 import type { StepIdType } from '../../../../form-types'
@@ -70,8 +73,10 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
       },
       drop: (item: DropType) => {
         const draggedId = item.stepId
-        if (draggedId !== stepId) {
-          const overIndex = findStepIndex(stepId)
+        const draggedIndex = findStepIndex(draggedId)
+        const overIndex = findStepIndex(stepId)
+        // if hovering the step immediately below, don't move (the preview bar is at the step's current position)
+        if (draggedIndex !== overIndex && draggedIndex !== overIndex - 1) {
           moveStep(draggedId, overIndex)
         }
       },
@@ -124,10 +129,15 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
       ...orderedStepIds.slice(0, currentIndex),
       ...orderedStepIds.slice(currentIndex + 1, orderedStepIds.length),
     ]
+    // need to account for whether we are dragging onto a step above or below the current step
+    const reinsertOffset = currentIndex < targetIndex ? 1 : 0
     const currentReinserted = [
-      ...currentRemoved.slice(0, targetIndex),
+      ...currentRemoved.slice(0, targetIndex - reinsertOffset),
       stepId,
-      ...currentRemoved.slice(targetIndex, currentRemoved.length),
+      ...currentRemoved.slice(
+        targetIndex - reinsertOffset,
+        currentRemoved.length
+      ),
     ]
     if (confirm(t('confirm_reorder') as string)) {
       reorderSteps(currentReinserted)

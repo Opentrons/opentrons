@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   BORDERS,
@@ -15,8 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
-  TOOLTIP_LEFT,
   Tooltip,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -24,6 +24,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
@@ -36,24 +37,20 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import {
-  useChainLiveCommands,
-  useRunCalibrationStatus,
-  useModuleRenderInfoForProtocolById,
-  useUnmatchedModulesForProtocol,
-} from '/app/resources/runs'
+import { getModuleImage } from '/app/local-resources/modules'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
-  getModulePrepCommands,
-  getModuleImage,
-} from '/app/local-resources/modules'
+  useModuleRenderInfoForProtocolById,
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 
@@ -64,8 +61,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type {
-  ProtocolCalibrationStatus,
   ModuleRenderInfoForProtocol,
+  ProtocolCalibrationStatus,
 } from '/app/resources/runs'
 
 interface SetupModulesListProps {
@@ -181,21 +178,8 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
 
   const handleCalibrateClick = (): void => {
-    if (attachedModuleMatch != null) {
-      chainLiveCommands(
-        getModulePrepCommands(attachedModuleMatch),
-        false
-      ).catch((e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      })
-    }
     setShowModuleWizard(true)
   }
 
@@ -260,13 +244,18 @@ export function ModulesListItem({
       textColor={COLORS.green60}
     />
   )
-
-  if (
+  const stackerShuttleMissing =
+    attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
+      ? attachedModuleMatch?.data.platformState === 'missing'
+      : false
+  const needsCalibration =
     isFlex &&
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
+    attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
-  ) {
+
+  if (needsCalibration || stackerShuttleMissing) {
     renderModuleStatus = (
       <>
         <TertiaryButton
@@ -275,7 +264,7 @@ export function ModulesListItem({
           width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
-          {t('calibrate_now')}
+          {t('setup_now')}
         </TertiaryButton>
         {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
         isModuleTooHot ? (
@@ -323,10 +312,7 @@ export function ModulesListItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
+          robotName={robotName}
         />
       ) : null}
       <Box
@@ -343,7 +329,7 @@ export function ModulesListItem({
               setShowModuleSetupModal(null)
             }}
             moduleDisplayName={showModuleSetupModal}
-            isAbsorbanceReader={moduleModel === ABSORBANCE_READER_V1}
+            moduleModel={moduleModel}
           />
         ) : null}
         <Flex

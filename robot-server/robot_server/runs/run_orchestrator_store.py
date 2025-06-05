@@ -55,6 +55,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
 
@@ -349,6 +350,10 @@ class RunOrchestratorStore:
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
         return self.run_orchestrator.get_run_time_parameters()
+
+    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+        """Get the current (if any) Flex Stacker Substates keyed by modile id."""
+        return self.run_orchestrator.get_flex_stacker_substate()
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""

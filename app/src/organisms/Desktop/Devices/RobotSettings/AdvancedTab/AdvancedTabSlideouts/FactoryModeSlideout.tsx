@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { useForm, Controller } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,

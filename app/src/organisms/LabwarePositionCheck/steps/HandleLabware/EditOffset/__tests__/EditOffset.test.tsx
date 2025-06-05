@@ -1,25 +1,25 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import {
-  selectSelectedLwFlowType,
-  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
-  selectCurrentSubstep,
-  selectActivePipette,
-  selectStepInfo,
-  selectSelectedLwOverview,
   goBackEditOffsetSubstep,
-  proceedEditOffsetSubstep,
   HANDLE_LW_SUBSTEP,
+  proceedEditOffsetSubstep,
+  selectActivePipette,
+  selectCurrentSubstep,
+  selectSelectedLwFlowType,
+  selectSelectedLwOverview,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+  selectStepInfo,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/PrepareLabware',

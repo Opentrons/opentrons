@@ -1,9 +1,12 @@
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
+
 import { SimpleWizardBody } from '..'
 
 import type { ComponentProps } from 'react'

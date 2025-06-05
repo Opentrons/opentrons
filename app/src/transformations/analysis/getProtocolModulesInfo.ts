@@ -1,14 +1,16 @@
 import {
-  SPAN7_8_10_11_SLOT,
-  getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
+  getModuleDef2,
   getPositionFromSlotId,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
+
 import { getModuleInitialLoadInfo } from '../commands'
+
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   ModuleDefinition,
   ProtocolAnalysisOutput,
@@ -20,7 +22,7 @@ export interface ProtocolModuleInfo {
   y: number
   z: number
   moduleDef: ModuleDefinition
-  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDef: LabwareDefinition | null
   nestedLabwareDisplayName: string | null
   nestedLabwareId: string | null
   protocolLoadOrder: number

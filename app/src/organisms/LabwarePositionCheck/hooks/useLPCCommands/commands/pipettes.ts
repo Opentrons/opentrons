@@ -1,5 +1,6 @@
 import { fullHomeCommands } from './gantry'
 
+import type { VectorOffset } from '@opentrons/api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -7,7 +8,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
-import type { VectorOffset } from '@opentrons/api-client'
 
 const PROBE_LENGTH_MM = 44.5
 

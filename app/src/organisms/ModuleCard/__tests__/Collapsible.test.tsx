@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { Collapsible } from '../Collapsible'
 
 import type { ComponentProps } from 'react'

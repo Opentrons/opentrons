@@ -1,8 +1,9 @@
 import {
-  navigateToUrl,
   fileHelper,
+  navigateToUrl,
   wellBottomImageLocator,
 } from '../../support/e2e'
+
 const fileHolder = fileHelper('testpro_24_aluminumblock_10ul')
 
 context('Tubes and Block', () => {

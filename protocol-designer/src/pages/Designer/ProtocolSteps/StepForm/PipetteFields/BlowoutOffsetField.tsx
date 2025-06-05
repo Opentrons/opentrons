@@ -1,19 +1,22 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
-import { getWellDepth } from '@opentrons/shared-data'
+import { useSelector } from 'react-redux'
+
 import {
   Flex,
   InputField,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import { getWellDepth } from '@opentrons/shared-data'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
+
 import { ZTipPositionModal } from '../../../../../components/organisms'
 import { getLabwareEntities } from '../../../../../step-forms/selectors'
+
 import type { FieldProps } from '../types'
 
 interface BlowoutOffsetFieldProps extends FieldProps {

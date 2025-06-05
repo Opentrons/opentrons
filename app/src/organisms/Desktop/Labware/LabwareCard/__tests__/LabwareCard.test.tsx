@@ -1,11 +1,13 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach } from 'vitest'
-import { renderWithProviders, nestedTextMatcher } from '/app/__testing-utils__'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useAllLabware } from '/app/local-resources/labware'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
+
 import { LabwareCard } from '..'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'

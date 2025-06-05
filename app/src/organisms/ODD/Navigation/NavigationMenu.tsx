@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -16,9 +16,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
-import { getTopPortalEl } from '/app/App/portal'
+
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { MouseEventHandler } from 'react'

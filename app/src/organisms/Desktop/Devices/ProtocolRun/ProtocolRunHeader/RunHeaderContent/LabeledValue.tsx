@@ -1,8 +1,8 @@
 import {
-  DIRECTION_COLUMN,
   COLORS,
-  SPACING,
+  DIRECTION_COLUMN,
   Flex,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 

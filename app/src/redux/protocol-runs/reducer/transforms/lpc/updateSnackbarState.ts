@@ -5,9 +5,9 @@ import {
   SET_FINAL_POSITION,
 } from '/app/redux/protocol-runs'
 
-import type { UpdateOffsetsAction } from './types'
-import type { LPCUiState } from '/app/redux/protocol-runs/types/lpc/ui'
 import type { LPCWizardState } from '/app/redux/protocol-runs'
+import type { LPCUiState } from '/app/redux/protocol-runs/types/lpc/ui'
+import type { UpdateOffsetsAction } from './types'
 
 // Determine the appropriate snackbar to render, if any.
 export function updateSnackbarState(

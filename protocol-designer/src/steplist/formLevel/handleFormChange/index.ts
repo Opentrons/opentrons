@@ -1,17 +1,19 @@
 import { dependentFieldsUpdateAbsorbanceReader } from './dependentFieldsUpdateAbsorbanceReader'
-import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiquid'
-import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
+import { dependentFieldsUpdateHeaterShaker } from './dependentFieldsUpdateHeaterShaker'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
+import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
+import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiquid'
 import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
-import { dependentFieldsUpdateHeaterShaker } from './dependentFieldsUpdateHeaterShaker'
 import { dependentFieldsUpdateThermocycler } from './dependentFieldsUpdateThermocycler'
+
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
+
 export function handleFormChange(
   patch: FormPatch,
   rawForm: FormData | null | undefined,

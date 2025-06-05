@@ -1,40 +1,41 @@
-import { screen } from '@testing-library/react'
-import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LocalizationProvider } from '../../LocalizationProvider'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
 import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
-import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
+import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
+import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
+import { NameRobot } from '/app/pages/ODD/NameRobot'
+import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
+import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
+import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
+import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
-import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
-import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
-import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
-import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
 import { Welcome } from '/app/pages/ODD/Welcome'
-import { NameRobot } from '/app/pages/ODD/NameRobot'
-import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
-import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '/app/redux/config'
-import { getIsShellReady } from '/app/redux/shell'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { useProtocolReceiptToast, useScrollRef } from '../hooks'
+import { getIsShellReady } from '/app/redux/shell'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+
+import { LocalizationProvider } from '../../LocalizationProvider'
+import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
+import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
 import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
-import type { LocalizationProviderProps } from '../../LocalizationProvider'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
+import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
 vi.mock('@opentrons/react-api-client', async () => {
   const actual = await vi.importActual('@opentrons/react-api-client')
@@ -68,6 +69,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/shell')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks')
 vi.mock('../ODDTopLevelRedirects')
 

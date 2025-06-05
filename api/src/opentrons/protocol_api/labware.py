@@ -25,6 +25,7 @@ from typing import (
     Mapping,
     Union,
     Literal,
+    Callable,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -471,6 +472,23 @@ class Labware:
             " It no longer has meaning, but will always return `False`"
         )
         return False
+
+    @classmethod
+    def _builder_for_core_map(
+        cls,
+        api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
+    ) -> Callable[[AbstractLabware[Any]], Labware]:
+        def _do_build(core: AbstractLabware[Any]) -> Labware:
+            return Labware(
+                core=core,
+                api_version=api_version,
+                protocol_core=protocol_core,
+                core_map=core_map,
+            )
+
+        return _do_build
 
     @property
     @requires_version(2, 0)

@@ -1,48 +1,53 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
+
 import { getPDMetadata } from '../../file-types'
+
 import type { Reducer } from 'redux'
 import type {
-  SingleLabwareLiquidState,
-  LocationLiquidState,
   LabwareLiquidState,
   LiquidEntities,
   LiquidEntity,
+  LocationLiquidState,
+  SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
-import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
+import type { LoadFileAction } from '../../load-file'
 import type { Action, DeckSlot } from '../../types'
 import type {
-  DisplayLabware,
-  ZoomedIntoSlotInfoState,
-  GenerateNewProtocolState,
-} from '../types'
-import type { LoadFileAction } from '../../load-file'
-import type {
-  RemoveWellsContentsAction,
-  CreateContainerAction,
-  DeleteLiquidGroupAction,
-  DuplicateLabwareAction,
-  EditLiquidGroupAction,
-  SelectLiquidAction,
-  SetWellContentsAction,
-  RenameLabwareAction,
-  DeleteContainerAction,
-  OpenAddLabwareModalAction,
-  OpenIngredientSelectorAction,
   CloseIngredientSelectorAction,
+  CreateContainerAction,
+  DeleteContainerAction,
+  DeleteLiquidGroupAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
-  SelectLabwareAction,
-  SelectNestedLabwareAction,
-  SelectModuleAction,
-  SelectFixtureAction,
-  ZoomedIntoSlotAction,
-  GenerateNewProtocolAction,
+  DuplicateLabwareAction,
+  EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  EditSlotInfoAction,
+  GenerateNewProtocolAction,
+  OpenAddLabwareModalAction,
+  OpenIngredientSelectorAction,
+  RemoveWellsContentsAction,
+  RenameLabwareAction,
+  SelectAdapterAction,
+  SelectFixtureAction,
+  SelectLidAction,
+  SelectLiquidAction,
+  SelectModuleAction,
+  SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
+  SetWellContentsAction,
+  ZoomedIntoSlotAction,
 } from '../actions'
+import type {
+  DisplayLabware,
+  GenerateNewProtocolState,
+  ZoomedIntoSlotInfoState,
+} from '../types'
+
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -174,105 +179,24 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       action: LoadFileAction
     ): ContainersState => {
       const { file } = action.payload
+      const metadata = getPDMetadata(file)
+      const containers: ContainersState = Object.entries(
+        metadata.labware
+      ).reduce((acc: ContainersState, [id, labwareLoadInfo], key) => {
+        acc[id] = {
+          nickname: labwareLoadInfo.displayName,
+          disambiguationNumber: key,
+        }
 
-      const loadLabwareCommands = Object.values(file.commands).filter(
-        command => command.commandType === 'loadLabware'
-      ) as LoadLabwareCreateCommand[]
+        return acc
+      }, {})
 
-      return loadLabwareCommands.reduce(
-        (acc: ContainersState, command, key): ContainersState => {
-          const { labwareId, displayName } = command.params
-
-          if (labwareId == null) {
-            console.error('expected to find a labwareId but could not')
-          }
-
-          return {
-            ...acc,
-            [labwareId ?? '']: {
-              nickname: displayName,
-              disambiguationNumber: key,
-            },
-          }
-        },
-        {}
-      )
+      return containers
     },
   },
   initialLabwareState
 )
-type SavedLabwareState = Record<string, boolean>
 
-/** Keeps track of which labware have saved nicknames */
-// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
-  {
-    DELETE_CONTAINER: (
-      state: SavedLabwareState,
-      action: DeleteContainerAction
-    ) => ({ ...state, [action.payload.labwareId]: false }),
-    RENAME_LABWARE: (
-      state: SavedLabwareState,
-      action: RenameLabwareAction
-    ) => ({ ...state, [action.payload.labwareId]: true }),
-    DUPLICATE_LABWARE: (
-      state: SavedLabwareState,
-      action: DuplicateLabwareAction
-    ) => ({ ...state, [action.payload.duplicateLabwareId]: true }),
-    LOAD_FILE: (
-      state: SavedLabwareState,
-      action: LoadFileAction
-    ): SavedLabwareState => {
-      const file = action.payload.file
-      const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
-        (command): command is LoadLabwareCreateCommand =>
-          command.commandType === 'loadLabware'
-      )
-
-      const labware = loadLabwareAndAdapterCommands.reduce(
-        (
-          acc: Record<
-            string,
-            {
-              slot: string
-              definitionId?: string
-              displayName?: string
-            }
-          >,
-          command
-        ) => {
-          const { displayName, loadName, labwareId } = command.params
-          const location = command.params.location
-          let slot
-          if (location === 'offDeck' || location === 'systemLocation') {
-            slot = 'offDeck'
-          } else if ('moduleId' in location) {
-            slot = location.moduleId
-          } else if ('labwareId' in location) {
-            slot = location.labwareId
-          } else if ('addressableAreaName' in location) {
-            slot = location.addressableAreaName
-          } else {
-            slot = location.slotName
-          }
-
-          return {
-            ...acc,
-            [loadName]: {
-              slot,
-              definitionId: labwareId,
-              displayName: displayName,
-            },
-          }
-        },
-        {}
-      )
-      return mapValues(labware, () => true)
-    },
-  },
-  {}
-)
 export type IngredientsState = LiquidEntities
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -381,30 +305,40 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedLabwareDefUri: null,
-  selectedNestedLabwareDefUri: null,
+  selectedTopLabware: { labwareDefURI: null, amount: 1 },
+  selectedAdapterDefURI: null,
   selectedModuleModel: null,
   selectedFixture: null,
+  selectedLidLabware: null,
   selectedSlot: { slot: null, cutout: null },
 }
 
 export const zoomedInSlotInfo = (
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
-    | SelectLabwareAction
-    | SelectNestedLabwareAction
+    | SelectTopLabwareAction
+    | SelectAdapterAction
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
+    | SelectLidAction
+    | SelectTopLabwareAmountAction
+    | EditSlotInfoAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
-    case 'SELECT_LABWARE': {
-      const { labwareDefUri } = action.payload
-      return { ...state, selectedLabwareDefUri: labwareDefUri }
+    case 'SELECT_TOP_LABWARE': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI,
+          amount: state.selectedTopLabware.amount,
+        },
+      }
     }
-    case 'SELECT_NESTED_LABWARE': {
-      const { nestedLabwareDefUri } = action.payload
-      return { ...state, selectedNestedLabwareDefUri: nestedLabwareDefUri }
+    case 'SELECT_ADAPTER': {
+      const { adapterDefURI } = action.payload
+      return { ...state, selectedAdapterDefURI: adapterDefURI }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
@@ -422,6 +356,44 @@ export const zoomedInSlotInfo = (
           slot,
           cutout,
         },
+      }
+    }
+    case 'SELECT_LID': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedLidLabware: labwareDefURI,
+      }
+    }
+    case 'SELECT_TOP_LABWARE_AMOUNT': {
+      const { amount } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: state.selectedTopLabware.labwareDefURI,
+          amount,
+        },
+      }
+    }
+    case 'EDIT_SLOT_INFO': {
+      const {
+        labwareDefURI,
+        adapterDefURI,
+        moduleModel,
+        fixture,
+        lidDefURI,
+        amount,
+      } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: labwareDefURI ?? null,
+          amount: amount ?? 1,
+        },
+        selectedAdapterDefURI: adapterDefURI ?? null,
+        selectedModuleModel: moduleModel ?? null,
+        selectedFixture: fixture ?? null,
+        selectedLidLabware: lidDefURI ?? null,
       }
     }
     default:
@@ -452,7 +424,6 @@ export interface RootState {
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId
   containers: ContainersState
-  savedLabware: SavedLabwareState
   selectedLiquidGroup: SelectedLiquidGroupState
   ingredients: IngredientsState
   ingredLocations: LocationsState
@@ -466,7 +437,6 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   selectedLiquidGroup,
   drillDownLabwareId,
   containers,
-  savedLabware,
   ingredients,
   ingredLocations,
   generateNewProtocol,

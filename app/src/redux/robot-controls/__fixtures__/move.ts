@@ -1,4 +1,5 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
+
 import type { Method } from '../../robot-api/types'
 
 // POST /robot/move

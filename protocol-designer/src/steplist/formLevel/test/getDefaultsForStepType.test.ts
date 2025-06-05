@@ -1,4 +1,6 @@
-import { vi, it, describe, expect, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -6,7 +8,6 @@ import {
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
 } from '../../../constants'
-import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {
@@ -86,6 +87,8 @@ describe('getDefaultsForStepType', () => {
         preWetTip: false,
         pushOut_checkbox: null,
         pushOut_volume: null,
+        conditioning_checkbox: false,
+        conditioning_volume: null,
 
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,
@@ -104,7 +107,7 @@ describe('getDefaultsForStepType', () => {
         dispense_y_position: 0,
         blowout_z_offset: 0,
         liquidClassesSupported: true,
-        liquidClass: null,
+        liquidClass: 'none',
       })
     })
   })
@@ -141,6 +144,10 @@ describe('getDefaultsForStepType', () => {
         mix_y_position: 0,
         blowout_z_offset: 0,
         liquidClassesSupported: true,
+        liquidClass: 'none',
+        pushOut_checkbox: null,
+        pushOut_volume: null,
+        mix_position_reference: null,
       })
     })
   })

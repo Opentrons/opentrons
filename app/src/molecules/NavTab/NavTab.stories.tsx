@@ -1,14 +1,16 @@
-import type * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+
 import {
-  Flex,
   ALIGN_START,
   DIRECTION_ROW,
+  Flex,
   SPACING,
 } from '@opentrons/components'
+
 import { NavTab } from './'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'App/Molecules/NavTab',

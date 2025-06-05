@@ -8,13 +8,17 @@ import {
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
   RobotWorkSpace,
-  SPACING_AUTO,
   SPACING,
+  SPACING_AUTO,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 
@@ -24,11 +28,10 @@ export interface GalleryProps {
 
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition } = props
-  const {
-    parameters: params,
-    dimensions: dims,
-    cornerOffsetFromSlot,
-  } = definition
+  const { parameters: params } = definition
+  const dims = getSchema2Dimensions(definition)
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+
   const xDimension =
     params.loadName === 'opentrons_universal_flat_adapter'
       ? 127.4

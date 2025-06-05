@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { clearSnackbarStatus } from '/app/redux/protocol-runs'
-
 import { useToaster } from '/app/organisms/ToasterOven'
+import { clearSnackbarStatus } from '/app/redux/protocol-runs'
 
 import type { LPCSnackbarType } from '/app/redux/protocol-runs/types/lpc/ui'
 

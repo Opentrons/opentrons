@@ -1,14 +1,17 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getHasWasteChute } from '@opentrons/step-generation'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getAdditionalEquipmentEntities } from '../../../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../../../top-selectors/labware-locations'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../../components/molecules'
+
 import type { FieldProps } from '../../types'
 
 interface LabwareLocationFieldProps extends FieldProps {
@@ -27,7 +30,10 @@ export function LabwareLocationField(
   const dispatch = useDispatch()
   const robotState = useSelector(getRobotStateAtActiveItem)
   const isLabwareOffDeck =
-    labware != null ? robotState?.labware[labware]?.slot === 'offDeck' : false
+    labware != null
+      ? getSlotInLocationStack(robotState?.labware[labware]?.stack ?? []) ===
+        'offDeck'
+      : false
 
   let unoccupiedLabwareLocationsOptions =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
@@ -38,7 +44,12 @@ export function LabwareLocationField(
     )
   }
 
-  if (!useGripper && getHasWasteChute(additionalEquipmentEntities)) {
+  if (
+    !useGripper &&
+    Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    ) != null
+  ) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== WASTE_CHUTE_CUTOUT
     )
@@ -49,6 +60,7 @@ export function LabwareLocationField(
       {...props}
       options={unoccupiedLabwareLocationsOptions}
       errorToShow={props.errorToShow}
+      width="100%"
       title={t('protocol_steps:new_location')}
       onEnter={(id: string) => {
         dispatch(

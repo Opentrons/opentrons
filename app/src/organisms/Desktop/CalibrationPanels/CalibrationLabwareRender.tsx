@@ -1,27 +1,29 @@
 import {
-  LabwareRender,
-  LabwareNameOverlay,
-  RobotCoordsForeignDiv,
-  RobotCoordsText,
   C_MED_DARK_GRAY,
   C_MED_GRAY,
   C_MED_LIGHT_GRAY,
   FONT_WEIGHT_SEMIBOLD,
+  LabwareNameOverlay,
+  LabwareRender,
+  RobotCoordsForeignDiv,
+  RobotCoordsText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
+import {
+  getIsTiprack,
+  getLabwareDisplayName,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
+
 import styles from './styles.module.css'
 
-import type {
-  LabwareDefinition2,
-  CoordinateTuple,
-} from '@opentrons/shared-data'
+import type { CoordinateTuple, LabwareDefinition } from '@opentrons/shared-data'
 
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
 interface CalibrationLabwareRenderProps {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   slotDefPosition: CoordinateTuple | null
 }
 
@@ -31,6 +33,7 @@ export function CalibrationLabwareRender(
   const { labwareDef, slotDefPosition } = props
 
   const title = getLabwareDisplayName(labwareDef)
+  const dimensions = getSchema2Dimensions(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
   // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
@@ -42,10 +45,10 @@ export function CalibrationLabwareRender(
     >
       <LabwareRender definition={labwareDef} />
       <RobotCoordsForeignDiv
-        width={labwareDef.dimensions.xDimension}
-        height={labwareDef.dimensions.yDimension}
+        width={dimensions.xDimension}
+        height={dimensions.yDimension}
         x={0}
-        y={0 - labwareDef.dimensions.yDimension}
+        y={0 - dimensions.yDimension}
         transformWithSVG
         innerDivProps={{ className: styles.labware_ui_wrapper }}
       >
@@ -65,6 +68,7 @@ export function CalibrationBlockRender(
   props: CalibrationLabwareRenderProps
 ): JSX.Element | null {
   const { labwareDef, slotDefPosition } = props
+  const dimensions = getSchema2Dimensions(labwareDef)
 
   switch (labwareDef.parameters.loadName) {
     case 'opentrons_calibrationblock_short_side_right': {
@@ -75,8 +79,8 @@ export function CalibrationBlockRender(
           )})`}
         >
           <rect
-            width={labwareDef.dimensions.xDimension}
-            height={labwareDef.dimensions.yDimension}
+            width={dimensions.xDimension}
+            height={dimensions.yDimension}
             rx="10"
             ry="10"
             x={0}
@@ -84,8 +88,8 @@ export function CalibrationBlockRender(
             fill={C_MED_DARK_GRAY}
           />
           <rect
-            width={labwareDef.dimensions.xDimension / 2}
-            height={labwareDef.dimensions.yDimension}
+            width={dimensions.xDimension / 2}
+            height={dimensions.yDimension}
             rx="10"
             ry="10"
             x={0}
@@ -106,7 +110,7 @@ export function CalibrationBlockRender(
           <g transform="rotate(90)">
             <RobotCoordsText
               x={25}
-              y={-labwareDef.dimensions.xDimension + 5}
+              y={-dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -125,8 +129,8 @@ export function CalibrationBlockRender(
           )})`}
         >
           <rect
-            width={labwareDef.dimensions.xDimension}
-            height={labwareDef.dimensions.yDimension}
+            width={dimensions.xDimension}
+            height={dimensions.yDimension}
             rx="10"
             ry="10"
             x={0}
@@ -134,11 +138,11 @@ export function CalibrationBlockRender(
             fill={C_MED_DARK_GRAY}
           />
           <rect
-            width={labwareDef.dimensions.xDimension / 2}
-            height={labwareDef.dimensions.yDimension}
+            width={dimensions.xDimension / 2}
+            height={dimensions.yDimension}
             rx="10"
             ry="10"
-            x={labwareDef.dimensions.xDimension / 2}
+            x={dimensions.xDimension / 2}
             y={0}
             fill={C_MED_GRAY}
           />
@@ -156,7 +160,7 @@ export function CalibrationBlockRender(
           <g transform="rotate(90)">
             <RobotCoordsText
               x={30}
-              y={-labwareDef.dimensions.xDimension + 5}
+              y={-dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}

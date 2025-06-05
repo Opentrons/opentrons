@@ -1,30 +1,33 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   Banner,
   COLORS,
   Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
-import { getPipetteAnimations } from './utils'
-import { ProbeNotAttached } from './ProbeNotAttached'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { MotorAxes, CreateCommand } from '@opentrons/shared-data'
+import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { ProbeNotAttached } from './ProbeNotAttached'
+import { getPipetteAnimations } from './utils'
+
+import type { CreateCommand, MotorAxes } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {

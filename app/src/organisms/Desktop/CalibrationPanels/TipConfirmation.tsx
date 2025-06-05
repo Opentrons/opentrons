@@ -1,23 +1,24 @@
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 
-import * as Sessions from '/app/redux/sessions'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
 
-import type { CalibrationPanelProps } from './types'
 import type {
-  SessionType,
   SessionCommandString,
+  SessionType,
 } from '/app/redux/sessions/types'
+import type { CalibrationPanelProps } from './types'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

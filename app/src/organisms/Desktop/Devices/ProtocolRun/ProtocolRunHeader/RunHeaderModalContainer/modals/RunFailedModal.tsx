@@ -2,28 +2,28 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
+  Modal,
   OVERFLOW_AUTO,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { useDownloadRunLog } from '../../../../hooks'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 import type { MouseEventHandler } from 'react'
 import type { RunStatus } from '@opentrons/api-client'

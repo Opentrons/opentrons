@@ -1,8 +1,8 @@
 import {
   Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import type { ComponentProps } from 'react'

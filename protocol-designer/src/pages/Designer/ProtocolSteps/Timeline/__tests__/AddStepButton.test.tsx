@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -10,6 +11,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../assets/localization'
 import { OFFDECK } from '../../../../../constants'
@@ -26,12 +28,11 @@ import {
 import { getIsMultiSelectMode } from '../../../../../ui/steps'
 import { AddStepButton } from '../AddStepButton'
 
+import type { ComponentProps } from 'react'
 import type {
   LabwareDefinition2,
   LabwareParameters,
 } from '@opentrons/shared-data'
-
-import type { ComponentProps } from 'react'
 import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../../../../../feature-flags/selectors')
@@ -56,13 +57,13 @@ const MOCK_TIPRACK_ENTITY = {
   } as LabwareDefinition2,
 } as LabwareEntity
 const MOCK_TIPRACK_LABWARE = {
-  slot: 'C2',
+  stack: [MOCK_TIPRACK_ID, 'C2'],
 }
 const MOCK_TUBERACK_LABWARE_ONDECK = {
-  slot: 'C2',
+  stack: [MOCK_TUBERACK_ID, 'C2'],
 }
 const MOCK_TUBERACK_LABWARE_OFFDECK = {
-  slot: OFFDECK,
+  stack: [MOCK_TUBERACK_ID, OFFDECK],
 }
 
 const MOCK_INITIAL_ROBOT_STATE = {
@@ -79,7 +80,8 @@ const MOCK_INITIAL_ROBOT_STATE = {
   liquidState: {
     pipettes: {},
     labware: {},
-    additionalEquipment: {},
+    trashBins: {},
+    wasteChute: {},
   },
   tipState: {
     pipettes: {},
@@ -144,7 +146,9 @@ describe('AddStepButton', () => {
         },
       },
       labware: {},
-      additionalEquipmentOnDeck: {},
+      additionalEquipmentOnDeck: {
+        trash: { id: 'trash', location: 'cutoutA3', name: 'trashBin' },
+      },
       pipettes: {},
     })
     vi.mocked(getRobotStateTimeline).mockReturnValue({ timeline: [] })

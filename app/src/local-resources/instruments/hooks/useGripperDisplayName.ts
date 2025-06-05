@@ -1,4 +1,5 @@
 import { getGripperDisplayName, GRIPPER_MODELS } from '@opentrons/shared-data'
+
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
 import type { GripperModel } from '@opentrons/shared-data'

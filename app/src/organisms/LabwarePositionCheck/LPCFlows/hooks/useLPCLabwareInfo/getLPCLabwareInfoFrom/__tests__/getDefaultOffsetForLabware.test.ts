@@ -1,4 +1,4 @@
-import { vi, it, describe, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ANY_LOCATION } from '@opentrons/api-client'
 import {
@@ -7,8 +7,9 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { getDefaultOffsetDetailsForLabware } from '../getDefaultOffsetForLabware'
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
+
+import { getDefaultOffsetDetailsForLabware } from '../getDefaultOffsetForLabware'
 
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'

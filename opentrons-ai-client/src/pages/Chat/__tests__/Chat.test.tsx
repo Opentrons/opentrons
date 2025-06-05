@@ -1,10 +1,12 @@
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { PromptGuide } from '../../../molecules/PromptGuide'
 import { ChatFooter } from '../../../molecules/ChatFooter'
+import { PromptGuide } from '../../../molecules/PromptGuide'
 import { Chat } from '../index'
+
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('../../../molecules/PromptGuide')

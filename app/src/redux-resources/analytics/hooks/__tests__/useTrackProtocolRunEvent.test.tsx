@@ -1,23 +1,24 @@
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { Provider } from 'react-redux'
+import { renderHook, waitFor } from '@testing-library/react'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { waitFor, renderHook } from '@testing-library/react'
 
-import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
-import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
+import { useRobot } from '/app/redux-resources/robots'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_ACTION,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getAppLanguage } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { useRobot } from '/app/redux-resources/robots'
 
-import type { FunctionComponent, ReactNode } from 'react'
+import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
+import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
+
 import type { Store } from 'redux'
 import type { Mock } from 'vitest'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('../useProtocolRunAnalyticsData')

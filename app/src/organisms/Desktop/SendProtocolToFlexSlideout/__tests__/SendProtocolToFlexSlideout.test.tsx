@@ -1,39 +1,42 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { MemoryRouter } from 'react-router-dom'
 
-import {
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-} from '../../../../../../discovery-client/src/fixtures'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '/app/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-  startDiscovery,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
+  startDiscovery,
 } from '/app/redux/discovery'
-import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
-import { renderWithProviders } from '/app/__testing-utils__'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '/app/redux/networking'
-import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
-import { SendProtocolToFlexSlideout } from '..'
+import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
+import { SendProtocolToFlexSlideout } from '..'
+import {
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '../../../../../../discovery-client/src/fixtures'
 
 import type { ComponentProps } from 'react'
 import type * as ApiClient from '@opentrons/react-api-client'

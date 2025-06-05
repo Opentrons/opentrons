@@ -1,22 +1,22 @@
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import {
-  useTrackEvent,
-  ANALYTICS_MODULE_COMMAND_ERROR,
   ANALYTICS_MODULE_COMMAND_COMPLETED,
+  ANALYTICS_MODULE_COMMAND_ERROR,
+  useTrackEvent,
 } from '/app/redux/analytics'
 
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CommandStatus,
+  CompletedProtocolAnalysis,
   ModuleOnlyParams,
   ModuleType,
-  TemperatureParams,
-  TemperatureModuleAwaitTemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
   RunTimeCommand,
-  CompletedProtocolAnalysis,
+  TemperatureModuleAwaitTemperatureParams,
+  TemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
   'thermocycler/closeLid',

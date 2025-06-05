@@ -2,27 +2,28 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
-  SPACING,
-  ALIGN_CENTER,
+  JUSTIFY_CENTER,
   JUSTIFY_END,
   PrimaryButton,
-  JUSTIFY_CENTER,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { RecoverySingleColumnContentWrapper } from './shared'
+
 import {
   DESKTOP_ONLY,
   ICON_SIZE_ALERT_INFO_STYLE,
   ODD_ONLY,
   RECOVERY_MAP,
 } from './constants'
+import { RecoverySingleColumnContentWrapper } from './shared'
 
 import type { RecoveryContentProps } from './types'
 

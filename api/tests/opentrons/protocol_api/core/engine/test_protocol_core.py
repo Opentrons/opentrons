@@ -1038,9 +1038,9 @@ def test_move_labware(
                 labwareId="labware-id",
                 newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
                 strategy=expected_strategy,
-                pickUpOffset=LabwareOffsetVector(x=4, y=5, z=6)
-                if pick_up_offset
-                else None,
+                pickUpOffset=(
+                    LabwareOffsetVector(x=4, y=5, z=6) if pick_up_offset else None
+                ),
                 dropOffset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
             )
         ),
@@ -1112,6 +1112,7 @@ def test_move_labware_on_non_connected_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
+        protocol_core=subject,
     )
     subject.move_labware(
         labware_core=labware,
@@ -1232,6 +1233,7 @@ def test_load_labware_on_module(
         engine_client=mock_engine_client,
         api_version=api_version,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=subject,
     )
 
     result = subject.load_labware(
@@ -1309,6 +1311,7 @@ def test_load_labware_on_non_connected_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
+        protocol_core=subject,
     )
 
     result = subject.load_labware(

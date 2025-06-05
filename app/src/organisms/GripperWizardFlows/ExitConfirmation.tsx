@@ -1,20 +1,24 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
-  Flex,
-  COLORS,
-  SPACING,
   AlertPrimaryButton,
-  SecondaryButton,
+  COLORS,
+  Flex,
   JUSTIFY_FLEX_END,
+  SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
-import { getIsOnDevice } from '/app/redux/config'
+
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { SmallButton } from '/app/atoms/buttons'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { GRIPPER_FLOW_TYPES } from './constants'
+
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {

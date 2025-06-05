@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -10,8 +12,6 @@ import {
   JUSTIFY_SPACE_AROUND,
   StyledText,
 } from '@opentrons/components'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 interface SendButtonProps {
   handleClick: () => void

@@ -1,44 +1,46 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   getDeckDefFromRobotType,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  useChainLiveCommands,
-  useRunStatus,
-  useMostRecentCompletedAnalysis,
-  useRunCalibrationStatus,
-} from '/app/resources/runs'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
-import { useAttachedModules } from '/app/resources/modules'
-import {
-  getProtocolModulesInfo,
-  getAttachedProtocolModuleMatches,
-} from '/app/transformations/analysis'
-import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
-import { getLocalRobot } from '/app/redux/discovery'
-import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { getUnmatchedModulesForProtocol } from '../utils'
+import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useAttachedModules } from '/app/resources/modules'
+import {
+  useChainLiveCommands,
+  useMostRecentCompletedAnalysis,
+  useRunCalibrationStatus,
+  useRunStatus,
+} from '/app/resources/runs'
+import {
+  getAttachedProtocolModuleMatches,
+  getProtocolModulesInfo,
+} from '/app/transformations/analysis'
+
+import { ProtocolSetupModulesAndDeck } from '..'
+import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'
-import { ProtocolSetupModulesAndDeck } from '..'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { getUnmatchedModulesForProtocol } from '../utils'
 
-import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { UseQueryResult } from 'react-query'
+import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/modules')
@@ -48,6 +50,7 @@ vi.mock('/app/transformations/analysis')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
 vi.mock('/app/organisms/ModuleWizardFlows')
+vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('../FixtureTable')
 vi.mock('/app/organisms/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapView')
@@ -113,6 +116,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectedRobot,
       name: ROBOT_NAME,
+    })
+    vi.mocked(useIsDoorOpen).mockReturnValue({
+      isDoorOpen: true,
+      moduleDoorLocation: null,
     })
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
@@ -221,37 +228,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
     render()
     screen.getByText('Heater-Shaker Module GEN1')
     fireEvent.click(screen.getByText('Calibrate'))
-    await waitFor(() => {
-      expect(mockChainLiveCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'heaterShaker/closeLabwareLatch',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateHeater',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/deactivateShaker',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-          {
-            commandType: 'heaterShaker/openLabwareLatch',
-            params: {
-              moduleId: mockApiHeaterShaker.id,
-            },
-          },
-        ],
-        false
-      )
-    })
     screen.getByText('mock ModuleWizardFlows')
   })
 

@@ -1,16 +1,17 @@
-import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
-import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import {
   useNotifyRunQuery,
   useRunPipetteInfoByMount,
 } from '/app/resources/runs'
+
+import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
+import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 
 import type { PipetteInfo } from '/app/redux/pipettes'
 

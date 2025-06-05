@@ -1,6 +1,8 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
+
 import type { BlowoutParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forBlowout(
   params: BlowoutParams,
   invariantContext: InvariantContext,
@@ -10,7 +12,7 @@ export function forBlowout(
   const { robotState } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     pipetteId,
-    labwareId,
+    entityId: labwareId,
     useFullVolume: true,
     wellName,
     prevLiquidState: robotState.liquidState,

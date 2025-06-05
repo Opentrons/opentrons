@@ -1,8 +1,7 @@
+import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { createPortal } from 'react-dom'
 
-import { useInstrumentsQuery, useHost } from '@opentrons/react-api-client'
 import {
   COLORS,
   CURSOR_DEFAULT,
@@ -14,12 +13,12 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
+import { useHost, useInstrumentsQuery } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { BackButton } from '/app/atoms/buttons/BackButton'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
-import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,
@@ -28,7 +27,9 @@ import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
-import { getTopPortalEl } from '/app/App/portal'
+import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
+
+import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'

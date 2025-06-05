@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   Box,
   Flex,
   JUSTIFY_FLEX_END,
-  PrimaryButton,
-  SPACING,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'

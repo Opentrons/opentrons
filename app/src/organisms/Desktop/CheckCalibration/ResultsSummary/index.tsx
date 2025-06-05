@@ -1,31 +1,32 @@
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
+import find from 'lodash/find'
 
 import {
-  Box,
-  Flex,
-  Link,
   ALIGN_CENTER,
+  Box,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  PrimaryButton,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import find from 'lodash/find'
 import { LEFT, RIGHT } from '/app/redux/pipettes'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '/app/redux/sessions'
-import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
-import { RenderMountInformation } from './RenderMountInformation'
-import { CalibrationResult } from './CalibrationResult'
 
-import type { Mount } from '/app/redux/pipettes/types'
+import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
+import { CalibrationResult } from './CalibrationResult'
+import { RenderMountInformation } from './RenderMountInformation'
+
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
+import type { Mount } from '/app/redux/pipettes/types'
 import type {
-  CalibrationCheckInstrument,
   CalibrationCheckComparisonsPerCalibration,
+  CalibrationCheckInstrument,
 } from '/app/redux/sessions/types'
 
 export function ResultsSummary(

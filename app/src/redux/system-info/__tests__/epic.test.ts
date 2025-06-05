@@ -1,10 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Alerts from '../../alerts'
-import * as Selectors from '../selectors'
-import { NOT_APPLICABLE, UP_TO_DATE, OUTDATED } from '../constants'
+import { NOT_APPLICABLE, OUTDATED, UP_TO_DATE } from '../constants'
 import { systemInfoEpic } from '../epic'
+import * as Selectors from '../selectors'
 
 import type { Action, State } from '../../types'
 import type { DriverStatus } from '../types'

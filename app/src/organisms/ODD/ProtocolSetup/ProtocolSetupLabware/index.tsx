@@ -1,70 +1,72 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  getLabwareInfoByLiquidId,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   Box,
   Chip,
-  Tag,
-  ListButton,
   COLORS,
   DeckInfoLabel,
-  StyledText,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  ListButton,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
+  Tag,
   TYPOGRAPHY,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import {
+  useCreateLiveCommandMutation,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  useCreateLiveCommandMutation,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
 
 import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import {
-  getStackedItemsOnStartingDeck,
-  getLabwareLiquidRenderInfoFromStack,
-} from '/app/transformations/commands'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  getLabwareInfoByLiquidId,
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
+} from '/app/transformations/commands'
+
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
-import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
-  StackItem,
-  ModuleInStack,
+  LabwareByLiquidId,
   LabwareInStack,
+  StackItem,
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
-import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -105,10 +107,11 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 
@@ -177,7 +180,6 @@ export function ProtocolSetupLabware({
             {showMapView ? (
               <LabwareMapView
                 mostRecentAnalysis={mostRecentAnalysis}
-                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
                 startingDeck={startingDeck}
                 labwareByLiquidId={labwareByLiquidId}
                 handleLabwareClick={setSelectedLabwareStack}
@@ -416,9 +418,7 @@ function RowLabware({
   onClick,
   labwareByLiquidId,
 }: RowLabwareProps): JSX.Element | null {
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
@@ -462,12 +462,12 @@ function RowLabware({
       type="noActive"
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      gridGap={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
       onClick={() => {
         onClick([slotName, labwareInStack])
       }}
     >
-      <Flex gridGap={SPACING.spacing4} width="7.6875rem">
+      <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
         {matchedModule != null ? (
           <DeckInfoLabel
@@ -481,7 +481,7 @@ function RowLabware({
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
-        width="75%"
+        width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           {labwareLiquidRenderInfo.map((labware, index) => (

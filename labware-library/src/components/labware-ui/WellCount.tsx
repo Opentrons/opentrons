@@ -1,5 +1,5 @@
 import { COUNT } from '../../localization'
-import { LabelText, Value, LABEL_LEFT } from '../ui'
+import { LABEL_LEFT, LabelText, Value } from '../ui'
 import styles from './styles.module.css'
 
 export interface WellCountProps {

@@ -1,13 +1,16 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
+
 import type { InvariantContext, RobotState } from '../types'
+
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
 
 describe('dropTip', () => {
@@ -24,8 +27,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },
@@ -37,8 +46,14 @@ describe('dropTip', () => {
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: false,
-        p300MultiId: true,
+        p300SingleId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
+        p300MultiId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
       })
     })
     // TODO: IL 2019-11-20
@@ -50,8 +65,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },
@@ -63,8 +84,14 @@ describe('dropTip', () => {
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: true,
-        p300MultiId: false,
+        p300SingleId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
+        p300MultiId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
       })
     })
   })
@@ -74,8 +101,14 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
           tipracks: {} as any,
         },

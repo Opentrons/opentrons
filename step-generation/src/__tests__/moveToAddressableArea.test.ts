@@ -1,23 +1,25 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import { moveToAddressableArea } from '../commandCreators/atomic'
 import {
+  DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
-  getInitialRobotStateStandard,
-  DEFAULT_PIPETTE,
 } from '../fixtures'
-import { moveToAddressableArea } from '../commandCreators/atomic'
-import type { InvariantContext, RobotState } from '../types'
+
 import type { CutoutId } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 const mockCutout = 'cutoutA3' as CutoutId
 const mockTrashId = 'mockTrashId'
 let invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  trashBinEntities: {
     [mockTrashId]: {
       id: mockTrashId,
-      name: 'trashBin',
       pythonName: 'mock_trash_bin_1',
       location: mockCutout,
     },
@@ -51,17 +53,16 @@ describe('moveToAddressableArea', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mock_trash_bin_1)'
+      'mock_pipette.move_to(mock_trash_bin_1)'
     )
   })
   it('should call moveToAddressableArea with correct params for waste chute', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
           pythonName: 'mock_waste_chute_1',
           location: WASTE_CHUTE_CUTOUT,
         },
@@ -89,7 +90,7 @@ describe('moveToAddressableArea', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.move_to(mock_waste_chute_1)'
+      'mock_pipette.move_to(mock_waste_chute_1)'
     )
   })
 })

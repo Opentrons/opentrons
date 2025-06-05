@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
+  COLORS,
   DIRECTION_COLUMN,
-  SPACING,
-  StyledText,
+  Flex,
   InfoScreen,
   ListItem,
   ListItemDescriptor,
-  COLORS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { SavedStepFormState } from '../../step-forms'

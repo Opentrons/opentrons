@@ -1,26 +1,29 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   COLUMN,
-  fixtureTiprack1000ul,
   fixtureTiprack300ul,
+  fixtureTiprack1000ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTiprackTipstate,
-  getTipColumn,
-  getSuccessResult,
-  pickUpTipHelper,
-  dropTipHelper,
-  dropTipInPlaceHelper,
-  moveToAddressableAreaHelper,
-  DEFAULT_PIPETTE,
-  PIPETTE_96,
-} from '../fixtures'
+
 import { replaceTip } from '../commandCreators/compound/replaceTip'
 import { FIXED_TRASH_ID } from '../constants'
+import {
+  DEFAULT_PIPETTE,
+  dropTipHelper,
+  dropTipInPlaceHelper,
+  getInitialRobotStateStandard,
+  getSuccessResult,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  moveToAddressableAreaHelper,
+  pickUpTipHelper,
+  PIPETTE_96,
+} from '../fixtures'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -71,7 +74,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: false,
+              p300SingleId: { hasTip: false },
             },
           },
         })
@@ -86,7 +89,7 @@ describe('replaceTip', () => {
             [tiprack1Id]: getTipColumn(1, false),
           },
           pipettes: {
-            p300SingleId: false,
+            p300SingleId: { hasTip: false },
           },
         },
       })
@@ -111,7 +114,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            p300SingleId: true,
+            p300SingleId: { hasTip: true },
           },
         },
       })
@@ -139,7 +142,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            [PIPETTE_96]: true,
+            [PIPETTE_96]: { hasTip: true },
           },
         },
         pipettes: {
@@ -180,7 +183,7 @@ describe('replaceTip', () => {
             [tiprack1Id]: getTiprackTipstate(false),
           },
           pipettes: {
-            p300SingleId: false,
+            p300SingleId: { hasTip: false },
           },
         },
       })
@@ -203,9 +206,9 @@ describe('replaceTip', () => {
     it('Single-channel: dropping tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },
@@ -219,7 +222,7 @@ describe('replaceTip', () => {
             },
           },
           pipettes: {
-            p300SingleId: true,
+            p300SingleId: { hasTip: true },
           },
         },
       })
@@ -291,7 +294,10 @@ describe('replaceTip', () => {
         tipState: {
           ...initialRobotState.tipState,
           pipettes: {
-            p300MultiId: true,
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
         },
       }
@@ -318,9 +324,9 @@ describe('replaceTip', () => {
       invariantContext = {
         ...invariantContext,
 
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },
@@ -335,7 +341,10 @@ describe('replaceTip', () => {
             [tiprack5Id]: getTiprackTipstate(true),
           },
           pipettes: {
-            p100096Id: true,
+            p100096Id: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
         },
       }

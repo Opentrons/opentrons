@@ -1,10 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+
 import { SelectPipette } from '../SelectPipette'
 
 import type { ComponentProps } from 'react'

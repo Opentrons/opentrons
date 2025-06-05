@@ -1,26 +1,25 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { i18n } from '/app/i18n'
 import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { DetachProbe } from '/app/organisms/LabwarePositionCheck/steps'
 import {
-  selectStepInfo,
-  selectActivePipetteChannelCount,
   selectActivePipette,
+  selectActivePipetteChannelCount,
   selectCurrentSubstep,
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+  selectStepInfo,
 } from '/app/redux/protocol-runs'
 
-import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
-import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
-import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,

@@ -1,47 +1,47 @@
-import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  RESPONSIVENESS,
-  SPACING,
-  POSITION_FIXED,
-  ModalShell,
-  PrimaryButton,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  AlertPrimaryButton,
-  SecondaryButton,
-  Box,
   Icon,
-  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
   Link,
+  ModalShell,
+  POSITION_FIXED,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SecondaryButton,
+  SPACING,
   StyledText,
   truncateString,
 } from '@opentrons/components'
 
+import { getModalPortalEl } from '/app/App/portal'
 import { StepMeter } from '/app/atoms/StepMeter'
+import { LPC_HREF } from '/app/local-resources/offsets'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   HANDLE_LW_SUBSTEP,
   LPC_STEP,
   selectCurrentStep,
   selectStepInfo,
 } from '/app/redux/protocol-runs'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getModalPortalEl } from '/app/App/portal'
-import { getIsOnDevice } from '/app/redux/config'
-import { LPC_HREF } from '/app/local-resources/offsets'
 
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 interface LPCContentContainerTertiaryBtnProps {
   onClick: () => void

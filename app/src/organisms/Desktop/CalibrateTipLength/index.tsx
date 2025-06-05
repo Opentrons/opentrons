@@ -5,39 +5,39 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
 
+import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 
-import * as Sessions from '/app/redux/sessions'
-import {
-  Introduction,
-  DeckSetup,
-  TipPickUp,
-  TipConfirmation,
-  MeasureNozzle,
-  MeasureTip,
-  ConfirmExit,
-  LoadingState,
-  CompleteConfirmation,
-} from '/app/organisms/Desktop/CalibrationPanels'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getTopPortalEl } from '/app/App/portal'
+import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
+import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   CalibrationError,
   useCalibrationError,
 } from '/app/organisms/Desktop/CalibrationError'
-import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
-import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+import {
+  CompleteConfirmation,
+  ConfirmExit,
+  DeckSetup,
+  Introduction,
+  LoadingState,
+  MeasureNozzle,
+  MeasureTip,
+  TipConfirmation,
+  TipPickUp,
+} from '/app/organisms/Desktop/CalibrationPanels'
+import * as Sessions from '/app/redux/sessions'
 
 import type { ComponentType } from 'react'
 import type { Mount } from '@opentrons/components'
+import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
-  SessionCommandParams,
   CalibrationLabware,
   CalibrationSessionStep,
+  SessionCommandParams,
 } from '/app/redux/sessions/types'
-import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'

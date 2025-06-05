@@ -1,7 +1,10 @@
 import assert from 'assert'
-import { ALL, COLUMN, SINGLE, getIsTiprack } from '@opentrons/shared-data'
+
+import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
+
 import type { PickUpTipParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forPickUpTip(
   params: PickUpTipParams,
   invariantContext: InvariantContext,
@@ -17,7 +20,8 @@ export function forPickUpTip(
   const tipState = robotStateAndWarnings.robotState.tipState
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   // pipette now has tip(s)
-  tipState.pipettes[pipetteId] = true
+  tipState.pipettes[pipetteId].hasTip = true
+  tipState.pipettes[pipetteId].tiprackURI = labwareId
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 || nozzles === SINGLE) {
     tipState.tipracks[labwareId][wellName] = false

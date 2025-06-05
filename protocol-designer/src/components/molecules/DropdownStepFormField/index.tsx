@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
-  DIRECTION_COLUMN,
   DeckInfoLabel,
+  DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
   LINE_CLAMP_TEXT_STYLE,
@@ -13,7 +14,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { selectDropdownItem } from '../../../ui/steps/actions/actions'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
 
@@ -88,7 +91,11 @@ export function DropdownStepFormField(
 
   return (
     <Flex padding={padding ?? SPACING.spacing16}>
-      {options.length > 1 || options.length === 0 ? (
+      {/* NOTE: we should not run into value == null when length === 1, but this
+      just some extra error protection so users can't stuck where they can't select a value */}
+      {options.length > 1 ||
+      options.length === 0 ||
+      (value == null && options.length === 1) ? (
         <DropdownMenu
           tooltipText={tooltipContent != null ? t(`${tooltipContent}`) : null}
           width={width}

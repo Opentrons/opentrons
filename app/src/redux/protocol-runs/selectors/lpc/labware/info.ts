@@ -1,8 +1,12 @@
-import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
+
+import {
+  OFFSET_KIND_DEFAULT,
+  OFFSET_KIND_LOCATION_SPECIFIC,
+  OFFSETS_SOURCE_INITIALIZING,
+} from '/app/redux/protocol-runs/constants'
 
 import {
   getAreAnyLocationSpecificOffsetsMissing,
@@ -10,12 +14,9 @@ import {
   getItemLabwareDef,
   getSelectedLabwareDefFrom,
 } from '../transforms'
-import {
-  OFFSET_KIND_DEFAULT,
-  OFFSET_KIND_LOCATION_SPECIFIC,
-  OFFSETS_SOURCE_INITIALIZING,
-} from '/app/redux/protocol-runs/constants'
-import type { State } from '/app/redux/types'
+
+import type { Selector } from 'reselect'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   ConflictTimestampInfo,
   LPCFlowType,
@@ -23,6 +24,7 @@ import type {
   OffsetSources,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 
 export interface LPCLabwareInfoAndDefaultStatus {
   uri: string
@@ -158,7 +160,7 @@ export const selectIsSelectedLwTipRack = (
 // Returns the labware definition for the user-selected labware, if any.
 export const selectSelectedLwDef = (
   runId: string
-): Selector<State, LabwareDefinition2 | null> =>
+): Selector<State, LabwareDefinition | null> =>
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,
@@ -184,7 +186,7 @@ export const selectSelectedLwDef = (
 
 export const selectSelectedLwAdapterDef = (
   runId: string
-): Selector<State, LabwareDefinition2 | null> =>
+): Selector<State, LabwareDefinition | null> =>
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,

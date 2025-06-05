@@ -1,9 +1,10 @@
 // tests for the HostConfig context and hook
-import type * as React from 'react'
-import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import { ApiHostProvider, useHost } from '..'
+
+import type * as React from 'react'
 
 describe('ApiHostProvider and useHost', () => {
   it('should default to null if no host provided', () => {

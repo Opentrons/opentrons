@@ -1,6 +1,8 @@
-import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { InstrumentContainer } from '..'
 
 import type { ComponentProps } from 'react'

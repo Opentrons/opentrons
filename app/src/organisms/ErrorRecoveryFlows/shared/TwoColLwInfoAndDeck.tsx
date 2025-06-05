@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   Flex,
@@ -7,16 +9,16 @@ import {
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
-import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+
 import { RECOVERY_MAP } from '../constants'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { ComponentProps } from 'react'
-import type { RecoveryContentProps } from '../types'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
@@ -28,6 +30,8 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    recoveryMap,
+    recoveryCommands,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -36,17 +40,32 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
+    LOAD_LABWARE_SHUTTLE_AND_RETRY,
+    HOPPER_MANUAL_LOAD_AND_RETRY,
+    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
+  const { manualRetrieve } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     relevantPickUpTipWellName,
     relevantPickUpTipLabware,
+    labwareQuantity,
   } = failedLabwareUtils
-  const { proceedNextStep } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
+  const { step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
+    switch (step) {
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        void manualRetrieve().then(() => proceedNextStep())
+    }
     void proceedNextStep()
   }
 
@@ -77,6 +96,26 @@ export function TwoColLwInfoAndDeck(
           })
         }
       }
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+        return t('ensure_stacker_has_labware')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
+              .HOPPER_MANUAL_REPLACE ||
+          step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
+        ) {
+          return t('load_labware_into_labware_shuttle')
+        } else {
+          return t('ensure_stacker_has_labware')
+        }
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+        return t('ensure_stacker_has_labware')
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+        return t('load_labware_into_stacker', { quantity: labwareQuantity })
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -85,7 +124,7 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildBannerText = (): string => {
+  const buildBannerText = (): string | null => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
@@ -98,6 +137,23 @@ export function TwoColLwInfoAndDeck(
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
       }
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+        return t('make_sure_loaded_correct_number_of_labware_stacker')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        if (
+          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
+          step ===
+            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+        ) {
+          return null
+        } else {
+          return t('make_sure_loaded_correct_number_of_labware_stacker')
+        }
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+        return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -113,8 +169,24 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return 'location-arrow-location'
       default:
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
         return 'location'
+    }
+  }
+
+  const buildLayoutType = (): ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['layout'] => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+        return 'stacked'
+      default:
+        return 'default'
     }
   }
 
@@ -195,11 +267,15 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
+          layout={buildLayoutType()}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
-      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+      <RecoveryFooterButtons
+        primaryBtnOnClick={primaryOnClick}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
     </RecoverySingleColumnContentWrapper>
   )
 }

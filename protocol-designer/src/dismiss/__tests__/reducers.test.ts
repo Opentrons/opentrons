@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { _allReducers } from '../reducers'
+
 import type { DismissedWarningState } from '../reducers'
 
 const { dismissedWarnings } = _allReducers

@@ -1,13 +1,15 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { prepareToAspirate } from '../commandCreators/atomic'
 import {
-  makeContext,
+  DEFAULT_PIPETTE,
   getRobotStateWithTipStandard,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
 } from '../fixtures'
-import { prepareToAspirate } from '../commandCreators/atomic'
+
 import type { PrepareToAspirateParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('prepareToAspirate', () => {
   let invariantContext: InvariantContext
@@ -36,6 +38,6 @@ describe('prepareToAspirate', () => {
         },
       },
     ])
-    expect(res.python).toBe('mockPythonName.prepare_to_aspirate()')
+    expect(res.python).toBe('mock_pipette.prepare_to_aspirate()')
   })
 })

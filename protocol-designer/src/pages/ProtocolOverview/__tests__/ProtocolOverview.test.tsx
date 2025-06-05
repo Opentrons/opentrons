@@ -1,24 +1,25 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
+import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
 import { getDismissedHints } from '../../../tutorial/selectors'
-import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
-import { ProtocolMetadata } from '../ProtocolMetadata'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
-import { StepsInfo } from '../StepsInfo'
+import { ProtocolMetadata } from '../ProtocolMetadata'
 import { StartingDeck } from '../StartingDeck'
+import { StepsInfo } from '../StepsInfo'
 
 import type { NavigateFunction } from 'react-router-dom'
 

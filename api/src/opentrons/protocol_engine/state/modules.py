@@ -55,6 +55,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
     AddressableAreaLocation,
+    StackerStoredLabwareGroup,
 )
 
 from ..resources import DeckFixedLabware
@@ -387,8 +388,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 pool_primary_definition=None,
                 pool_adapter_definition=None,
                 pool_lid_definition=None,
-                pool_count=0,
+                contained_labware_bottom_first=[],
                 max_pool_count=0,
+                pool_overlap=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -1448,9 +1450,34 @@ class ModuleView:
             )
 
     def stacker_max_pool_count_by_height(
-        self, module_id: str, pool_height: float
+        self,
+        module_id: str,
+        pool_height: float,
+        pool_overlap: float,
     ) -> int:
         """Get the maximum stack count for the Flex Stacker by stack height."""
         max_fill_height = self.get_stacker_max_fill_height(module_id)
         assert max_fill_height > 0
-        return math.floor(max_fill_height / pool_height)
+        # Subtracting the pool overlap from the stack element (pool height) allows us to account for
+        # elements nesting on one-another, and we must subtract from max height to apply starting offset.
+        # Ex: Let H be the total height of the stack; h be the height of a stack element;
+        # d be the stack overlap; and N be the number of labware. Then for N >= 1,
+        # H = Nh - (N-1)d
+        # H = Nh - Nd + d
+        # H - d = N(h-d)
+        # (H-d)/(h-d) = N
+        return math.floor(
+            (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
+        )
+
+    def stacker_contained_labware(
+        self, module_id: str
+    ) -> list[StackerStoredLabwareGroup]:
+        """Get the labware contained in a Flex Stacker."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_contained_labware()
+
+    def stacker_max_pool_count(self, module_id: str) -> int | None:
+        """Get the max stored labware in this stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        return substate.get_max_pool_count()

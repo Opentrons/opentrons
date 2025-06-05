@@ -1,8 +1,9 @@
 import { useRef } from 'react'
-import { describe, it, vi, expect } from 'vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { IndividualKey } from '..'
 
 import type { ComponentProps } from 'react'

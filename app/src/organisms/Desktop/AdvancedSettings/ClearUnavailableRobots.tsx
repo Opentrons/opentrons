@@ -9,22 +9,22 @@ import {
   Btn,
   COLORS,
   DIRECTION_ROW,
+  ERROR_TOAST,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
-  ERROR_TOAST,
+  Modal,
+  SPACING,
+  SPACING_AUTO,
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useConditionalConfirm,
-  Modal,
 } from '@opentrons/components'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getTopPortalEl } from '/app/App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,

@@ -1,6 +1,8 @@
 import { uuid } from '../../utils'
+
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
+
 export const thermocyclerSetTargetBlockTemperature: CommandCreator<TemperatureParams> = (
   args,
   invariantContext,

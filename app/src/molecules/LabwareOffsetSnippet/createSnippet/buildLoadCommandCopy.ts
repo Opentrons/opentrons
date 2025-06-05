@@ -2,22 +2,22 @@ import isEqual from 'lodash/isEqual'
 
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
-import { getLabwareDefinitionUri } from '/app/transformations/protocols'
-import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
+import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
+import { getLabwareDefinitionUri } from '/app/transformations/protocols'
 
-import type {
-  RunTimeCommand,
-  LoadedLabware,
-  LoadedModule,
-  LoadLabwareRunTimeCommand,
-  LoadModuleRunTimeCommand,
-} from '@opentrons/shared-data'
 import type {
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
   LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  LoadLabwareRunTimeCommand,
+  LoadModuleRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type { LabwareOffsetSnippetProps } from '/app/molecules/LabwareOffsetSnippet'
 
 // Returns all copy for all load commands.
@@ -93,6 +93,8 @@ function handleLoadLabwareCommand(
       adapterVariableById
     )
 
+    // todo(mm, 2025-05-19): What is this adding over just using loadedLabware.definitionUri?
+    // Is the lookup into labwareDefinitions load-bearing for some safety thing?
     const labwareDefUri = getLabwareDefinitionUri(
       labwareId,
       labware,

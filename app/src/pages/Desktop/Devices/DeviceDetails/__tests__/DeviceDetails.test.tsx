@@ -1,18 +1,18 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
-import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { i18n } from '/app/i18n'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
+import { useRobot } from '/app/redux-resources/robots'
 import { getScanning } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { useRobot } from '/app/redux-resources/robots'
+
 import { DeviceDetails } from '..'
 
 import type { State } from '/app/redux/types'

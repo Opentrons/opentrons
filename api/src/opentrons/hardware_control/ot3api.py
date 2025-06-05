@@ -91,6 +91,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -244,6 +246,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -278,6 +281,14 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
+
+    @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
 
     @property
     def gantry_load(self) -> GantryLoad:
@@ -318,11 +329,16 @@ class OT3API(
         async with self._backend.grab_pressure(instrument.channels, mount):
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
         self.door_state = door_state
+        self.module_door_serial = module_serial
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
+            hw_event = DoorStateNotification(
+                new_state=door_state, module_serial=module_serial
+            )
             try:
                 cb(hw_event)
             except Exception:
@@ -575,13 +591,22 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:

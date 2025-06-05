@@ -1,9 +1,9 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useDispatch, useSelector } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getRequests, dismissAllRequests } from '/app/redux/robot-api'
 import { useCalibrationError } from '/app/organisms/Desktop/CalibrationError'
+import { dismissAllRequests, getRequests } from '/app/redux/robot-api'
 
 vi.mock('react-redux', () => ({
   useDispatch: vi.fn(),

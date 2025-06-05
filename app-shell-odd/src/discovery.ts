@@ -9,26 +9,24 @@ import {
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 
+import { getFullConfig, handleConfigChange } from './config'
 import {
-  UI_INITIALIZED,
-  DISCOVERY_START,
+  CLEAR_CACHE,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
-  CLEAR_CACHE,
+  DISCOVERY_START,
+  UI_INITIALIZED,
 } from './constants'
-
-import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 
+import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 import type {
   Address,
+  DiscoveryClient,
   DiscoveryClientRobot,
   LegacyService,
-  DiscoveryClient,
 } from '@opentrons/discovery-client'
-
 import type { Action, Dispatch } from './types'
-import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 
 const log = createLogger('discovery')
 

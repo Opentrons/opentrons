@@ -1,33 +1,36 @@
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
-import without from 'lodash/without'
 import startCase from 'lodash/startCase'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
+import without from 'lodash/without'
+
 import { SINGLE } from '@opentrons/shared-data'
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
-  getDisabledFields,
-  getDefaultsForStepType,
-} from '../../../../steplist/formLevel'
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
+
 import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import { getFieldErrors } from '../../../../steplist/fieldLevel'
+import {
+  getDefaultsForStepType,
+  getDisabledFields,
+} from '../../../../steplist/formLevel'
+
 import type { DropdownOption } from '@opentrons/components'
-import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../../../steplist/types'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type {
   FormData,
+  HydratedFormData,
+  PathOption,
   ProfileItem,
   StepFieldName,
   StepType,
-  PathOption,
-  HydratedFormData,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
+import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
+import type { FormWarning } from '../../../../steplist/formLevel/warnings'
+import type { StepFormErrors } from '../../../../steplist/types'
 import type { NozzleType } from '../../../../types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
@@ -205,6 +208,51 @@ export const getSingleSelectDisabledTooltip = (
     ? t(`step_fields.${stepType}.disabled.${name}`)
     : t(`step_fields.${stepType}.disabled.$generic`)
 
+export const getFieldCaptions = (
+  name: string,
+  t: any,
+  hydratedForm: HydratedFormData
+): string | null => {
+  if (name == null) {
+    return null
+  }
+
+  //  special-casing the volume field to add a max const
+  if (name === 'volume') {
+    let labware
+    if (
+      'dispense_labware' in hydratedForm &&
+      hydratedForm.dispense_labware != null &&
+      hydratedForm.stepType === 'moveLiquid'
+    ) {
+      labware = hydratedForm.dispense_labware
+    } else if (
+      'labware' in hydratedForm &&
+      hydratedForm.labware != null &&
+      hydratedForm.stepType === 'mix'
+    ) {
+      labware = hydratedForm.labware
+    }
+
+    if (labware == null) {
+      return null
+    }
+    const dispenseLabwareMaxVolume =
+      'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
+    if (dispenseLabwareMaxVolume != null) {
+      return t(`protocol_steps:captions_for_fields.volume`, {
+        max: dispenseLabwareMaxVolume,
+      })
+    } else {
+      return null
+    }
+  } else {
+    const key = `protocol_steps:captions_for_fields.${name}`
+    const translated = t(key)
+    return translated === `captions_for_fields.${name}` ? null : translated
+  }
+}
+
 // TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
 // but since utils like addFieldNamePrefix return StepFieldName/string instead
 // of strict TipOffsetFields, we have to be more lenient with the types
@@ -274,10 +322,9 @@ export const makeSingleEditFieldProps = (
       focusedField,
       dirtyFields,
     })
-    const errors = getFieldErrors(name, value)
+    const errors = getFieldErrors(name, value, hydratedForm)
     const errorToShow =
       showErrors && errors.length > 0 ? errors.join(', ') : null
-
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }
@@ -296,6 +343,8 @@ export const makeSingleEditFieldProps = (
       formData.stepType,
       t
     )
+    const caption = getFieldCaptions(name, t, hydratedForm)
+
     const fieldProps: FieldProps = {
       disabled,
       errorToShow,
@@ -305,6 +354,7 @@ export const makeSingleEditFieldProps = (
       onFieldBlur,
       onFieldFocus,
       tooltipContent: disabled ? disabledTooltip : defaultTooltip,
+      caption: caption ?? undefined,
     }
     return { ...acc, [name]: fieldProps }
   }, {})
@@ -389,4 +439,32 @@ export const getFormLevelError = (
     mappedErrorsToField[fieldName].showAtField
     ? mappedErrorsToField[fieldName].title
     : null
+}
+
+export const getShouldUpdateForLiquidClass = (
+  changedFields: string[],
+  formType: string
+): boolean => {
+  switch (formType) {
+    case 'moveLiquid':
+      return [
+        'aspirate_labware',
+        'aspirate_wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    case 'mix':
+      return [
+        'labware',
+        'wells',
+        'pipette',
+        'tipRack',
+        'path',
+        'liquidClass',
+      ].some(field => changedFields.includes(field))
+    default:
+      return false
+  }
 }

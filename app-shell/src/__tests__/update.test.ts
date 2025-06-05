@@ -1,9 +1,11 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
-import { registerUpdate } from '../update'
+
 import * as Cfg from '../config'
+import { registerUpdate } from '../update'
 
 import type { Dispatch } from '../types'
 

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -12,24 +12,24 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
-  LOW_VOLUME_PIPETTES,
   getTipTypeFromTipRackDefinition,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type { SupportedTip } from '@opentrons/shared-data'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
 
 interface FlowRateEntryProps {

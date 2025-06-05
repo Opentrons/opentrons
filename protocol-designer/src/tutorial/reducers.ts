@@ -1,10 +1,11 @@
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import type { Reducer } from 'redux'
-import type { Action } from '../types'
 import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
 

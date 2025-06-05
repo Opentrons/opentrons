@@ -2,11 +2,11 @@ import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_2_X_ADJUSTMENT,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
-  COLUMN_2_X_ADJUSTMENT,
 } from './constants'
 
 import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'

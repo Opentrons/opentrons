@@ -1,24 +1,30 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  getLabwareInfoByLiquidId,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StyledText,
-  COLORS,
 } from '@opentrons/components'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+
+import {
+  getLabwareInfoByLiquidId,
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
+} from '/app/transformations/commands'
+
 import { LabwareListItem } from './LabwareListItem'
+import { SlotDetailModal } from './SlotDetailModal'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { StackItem } from '/app/transformations/commands'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
+import type { StackItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { SlotDetailModal } from './SlotDetailModal'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
@@ -52,10 +58,11 @@ export function SetupLabwareList(
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 

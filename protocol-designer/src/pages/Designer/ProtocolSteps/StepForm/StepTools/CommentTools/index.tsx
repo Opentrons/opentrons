@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -6,7 +7,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { TextAreaField } from '../../../../../../components/molecules'
+
 import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'
 

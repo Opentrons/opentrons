@@ -1,37 +1,38 @@
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
+import styled from 'styled-components'
 
-import {
-  getLabwareDisplayName,
-  getLoadedLabwareDefinitionsByUri,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
   getLabwareDefinitionsFromCommands,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
-import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
+import type { TFunction } from 'i18next'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
-  RunTimeCommand,
   LoadedLabware,
   LoadedModule,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

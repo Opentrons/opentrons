@@ -83,8 +83,12 @@ jobs:
       - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:
+          NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
+          # ToDo(kk:04/23/2025) need to setup sentry org account and project
+          # OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DNS }}
+          # OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
         run: |
           make -C protocol-designer NODE_ENV=development
       - name: 'upload github artifact'
@@ -92,6 +96,23 @@ jobs:
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
+
+  # ToDo(kk:04/23/2025) need to setup sentry org account and project
+  # upload-sourcemaps-pd:
+  #   timeout-minutes: 10
+  #   name: 'upload protocol designer source maps'
+  #   needs: ['build-pd']
+  #   runs-on: 'ubuntu-24.04'
+  #   if: github.event_name != 'pull_request'
+
+  #   uses: getsentry/action-release@v3
+  #   env:
+  #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  #     SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+  #     SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+  #   with:
+  #     name: pd-artifact
+  #     sourcemaps: ./dist
 
   deploy-pd:
     timeout-minutes: 10

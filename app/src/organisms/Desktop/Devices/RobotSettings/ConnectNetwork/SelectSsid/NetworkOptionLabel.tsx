@@ -1,5 +1,7 @@
 import styled from 'styled-components'
-import { Icon, FONT_BODY_1_DARK, SPACING } from '@opentrons/components'
+
+import { FONT_BODY_1_DARK, Icon, SPACING } from '@opentrons/components'
+
 import { SECURITY_NONE } from '/app/redux/networking'
 
 import type { StyledComponent } from 'styled-components'

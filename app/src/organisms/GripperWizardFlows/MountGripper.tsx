@@ -1,4 +1,8 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -6,27 +10,25 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { css } from 'styled-components'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { getIsOnDevice } from '/app/redux/config'
+
+import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
+import { getIsOnDevice } from '/app/redux/config'
 
-import type { GripperWizardStepProps } from './types'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
+import type { GripperWizardStepProps } from './types'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};

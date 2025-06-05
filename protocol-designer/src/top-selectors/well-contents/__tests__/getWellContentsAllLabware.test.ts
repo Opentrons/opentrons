@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   fixture_24_tuberack,
   fixture_96_plate,
@@ -6,11 +7,12 @@ import {
 } from '@opentrons/shared-data/labware/fixtures/2'
 
 import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../labware-defs/utils')
 

@@ -1,12 +1,13 @@
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
-
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 vi.mock('/app/redux/robot-settings')
 

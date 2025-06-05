@@ -1,6 +1,19 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { expect } from 'vitest'
 
+export async function fillProtocolFormatSectionAndClickConfirm(): Promise<void> {
+  const pyProtocolButton = screen.getByRole('label', {
+    name: 'Python protocol',
+  })
+  fireEvent.click(pyProtocolButton)
+
+  const confirmButton = screen.getByText('Confirm')
+  await waitFor(() => {
+    expect(confirmButton).toBeEnabled()
+  })
+  fireEvent.click(confirmButton)
+}
+
 export async function fillApplicationSectionAndClickConfirm(): Promise<void> {
   const applicationDropdown = screen.getByText('Select an option')
   fireEvent.click(applicationDropdown)
@@ -67,6 +80,20 @@ export async function fillLabwareLiquidsSectionAndClickConfirm(): Promise<void> 
 
   fireEvent.change(screen.getByRole('textbox'), {
     target: { value: 'Test liquid' },
+  })
+
+  const confirmButton = screen.getByText('Confirm')
+  await waitFor(() => {
+    expect(confirmButton).toBeEnabled()
+  })
+  fireEvent.click(confirmButton)
+}
+
+export async function fillRuntimeParametersSectionAndClickConfirm(): Promise<void> {
+  // Add a value for runtime parameters to make it show up in the preview
+  const textArea = screen.getByRole('textbox')
+  fireEvent.change(textArea, {
+    target: { value: 'Set sample count (1-96, default: 48)' },
   })
 
   const confirmButton = screen.getByText('Confirm')

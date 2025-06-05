@@ -1,5 +1,6 @@
 // mock electron-store
 'use strict'
+
 import { vi } from 'vitest'
 
 // will by default mock the config dir. if you need other behaavior you can

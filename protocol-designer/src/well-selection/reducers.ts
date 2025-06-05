@@ -6,9 +6,9 @@ import type { Reducer } from 'redux'
 import type { WellGroup } from '@opentrons/components'
 import type { Action } from '../types'
 import type {
+  DeselectWellsAction,
   HighlightWellsAction,
   SelectWellsAction,
-  DeselectWellsAction,
 } from './actions'
 
 interface SelectedWellsState {

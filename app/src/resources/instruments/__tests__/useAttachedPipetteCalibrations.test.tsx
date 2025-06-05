@@ -1,9 +1,10 @@
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach } from 'vitest'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
@@ -21,8 +22,8 @@ import {
 
 import { useAttachedPipetteCalibrations } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')

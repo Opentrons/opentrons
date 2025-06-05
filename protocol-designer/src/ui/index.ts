@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux'
+
 import { rootReducer as stepsReducer } from './steps/reducers'
+
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { StepsState } from './steps/reducers'

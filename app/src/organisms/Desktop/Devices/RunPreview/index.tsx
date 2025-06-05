@@ -1,7 +1,7 @@
-import { useMemo, useState, forwardRef, useRef } from 'react'
-import { css } from 'styled-components'
+import { forwardRef, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ViewportList } from 'react-viewport-list'
+import { css } from 'styled-components'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
@@ -13,26 +13,26 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   Flex,
+  getLabwareDefinitionsFromCommands,
   InfoScreen,
   LegacyStyledText,
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
-  getLabwareDefinitionsFromCommands,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { NAV_BAR_WIDTH } from '/app/App/constants'
+import { Divider } from '/app/atoms/structure'
+import { CommandIcon } from '/app/molecules/Command'
 import {
+  useLastRunCommand,
+  useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
   useRunStatus,
-  useMostRecentCompletedAnalysis,
-  useLastRunCommand,
 } from '/app/resources/runs'
-import { CommandIcon } from '/app/molecules/Command'
-import { Divider } from '/app/atoms/structure'
-import { NAV_BAR_WIDTH } from '/app/App/constants'
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

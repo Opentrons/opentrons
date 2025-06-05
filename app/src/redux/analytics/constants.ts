@@ -82,6 +82,7 @@ export const ANALYTICS_QUICK_TRANSFER_FLOW_STARTED = 'quickTransferFlowStarted'
 export const ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION =
   'quickTransferWellSelectionDuration'
 export const ANALYTICS_QUICK_TRANSFER_EXIT_EARLY = 'quickTransferExitEarly'
+// ToDo(kk:04/11/2025) the following two tab events will be removed when ff is removed
 export const ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB =
   'quickTransferAdvancedSettingsTab'
 export const ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB =

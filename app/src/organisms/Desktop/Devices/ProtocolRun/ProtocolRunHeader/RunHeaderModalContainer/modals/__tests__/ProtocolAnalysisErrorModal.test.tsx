@@ -1,8 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
 
 import type { ComponentProps } from 'react'

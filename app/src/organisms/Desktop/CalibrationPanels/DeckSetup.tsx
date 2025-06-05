@@ -8,18 +8,20 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   RobotWorkSpace,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 import {
   getDeckDefinitions,
   getLabwareDisplayName,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import * as Sessions from '/app/redux/sessions'
+
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import * as Sessions from '/app/redux/sessions'
+
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
 import type { AddressableArea } from '@opentrons/shared-data'

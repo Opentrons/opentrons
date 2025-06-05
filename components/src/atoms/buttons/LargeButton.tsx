@@ -1,9 +1,5 @@
 import { css } from 'styled-components'
 
-import { Btn } from '../../primitives'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -13,11 +9,15 @@ import {
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
 } from '../..'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { Btn } from '../../primitives'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
 
 import type { ReactNode } from 'react'
-import type { StyleProps } from '../../primitives'
 import type { IconName } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 type LargeButtonTypes =
   | 'primary'

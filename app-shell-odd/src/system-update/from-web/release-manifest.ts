@@ -1,11 +1,12 @@
 import * as FS from 'fs/promises'
 import path from 'path'
-import { readJson, outputJson } from 'fs-extra'
+import { outputJson, readJson } from 'fs-extra'
+
+import { fetchJson, LocalAbortError } from '../../http'
+import { createLogger } from '../../log'
 
 import type { Stats } from 'fs'
-import { fetchJson, LocalAbortError } from '../../http'
 import type { ReleaseManifest, ReleaseSetUrls } from '../types'
-import { createLogger } from '../../log'
 
 const log = createLogger('systemUpdate/from-web/provider')
 

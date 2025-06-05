@@ -1,8 +1,9 @@
-import type * as React from 'react'
-import { SidePanel as SidePanelComponent } from './SidePanel'
-import { Text, Flex, JUSTIFY_CENTER, ALIGN_CENTER } from '@opentrons/components'
+import { ALIGN_CENTER, Flex, JUSTIFY_CENTER, Text } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
+import { SidePanel as SidePanelComponent } from './SidePanel'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Side Panel',

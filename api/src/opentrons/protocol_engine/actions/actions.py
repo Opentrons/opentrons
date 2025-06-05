@@ -109,6 +109,7 @@ class DoorChangeAction:
     """Handle events coming in from hardware control."""
 
     door_state: DoorState
+    module_serial: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)

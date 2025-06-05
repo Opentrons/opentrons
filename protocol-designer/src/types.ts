@@ -1,10 +1,16 @@
-import type { FC } from 'react'
 import type { OutputSelector } from 'reselect'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { FC } from 'react'
+import type {
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  NozzleConfigurationStyle,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
-import type { RootState as FileData } from './file-data'
 import type { RootState as FeatureFlags } from './feature-flags'
+import type { RootState as FileData } from './file-data'
 import type { RootState as LabwareIngred } from './labware-ingred/reducers'
 import type { RootState as LoadFile } from './load-file'
 import type { RootState as Navigation } from './navigation'
@@ -12,6 +18,7 @@ import type { RootState as StepForms } from './step-forms'
 import type { RootState as Tutorial } from './tutorial'
 import type { RootState as UI } from './ui'
 import type { RootState as WellSelection } from './well-selection/reducers'
+
 export interface BaseState {
   analytics: Analytics
   dismiss: Dismiss
@@ -61,3 +68,9 @@ export interface RouteProps {
   path: string
   navLinkTo: string
 }
+
+export type OT2ModuleType =
+  | typeof MAGNETIC_MODULE_TYPE
+  | typeof TEMPERATURE_MODULE_TYPE
+  | typeof THERMOCYCLER_MODULE_TYPE
+  | typeof HEATERSHAKER_MODULE_TYPE

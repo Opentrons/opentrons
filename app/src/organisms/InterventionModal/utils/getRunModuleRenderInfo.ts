@@ -1,13 +1,13 @@
 import {
-  SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getPositionFromSlotId,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareDefinitionsByUri,
   ModuleDefinition,
 } from '@opentrons/shared-data'
@@ -17,7 +17,7 @@ export interface RunModuleInfo {
   x: number
   y: number
   moduleDef: ModuleDefinition
-  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDef: LabwareDefinition | null
   nestedLabwareId: string | null
 }
 

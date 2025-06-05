@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,6 +8,7 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
+
 import { AlphanumericKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InputPrompt } from '../../InputPrompt'

@@ -1,15 +1,17 @@
 import head from 'lodash/head'
+
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
+
 import { useAttachedPipettes } from './useAttachedPipettes'
 
-import type { PipetteCalibrationsByMount } from '/app/redux/pipettes/types'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '@opentrons/api-client'
+import type { PipetteCalibrationsByMount } from '/app/redux/pipettes/types'
 
 export function useAttachedPipetteCalibrations(): PipetteCalibrationsByMount {
   const attachedPipettes = useAttachedPipettes()

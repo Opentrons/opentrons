@@ -16,13 +16,13 @@ import type {
   LegacyLabwareOffsetLocation,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
-import type { RobotType, Coordinates } from '@opentrons/shared-data'
+import type { RobotType, Vector3D } from '@opentrons/shared-data'
 import type { ResolvedOffsetSource } from '/app/redux/protocol-runs'
 
 interface ReportSaveOffsetToRunRecordParams {
   uri: string
   locationDetails: LegacyLabwareOffsetLocation
-  vector: Coordinates
+  vector: Vector3D
   slot: string
 }
 

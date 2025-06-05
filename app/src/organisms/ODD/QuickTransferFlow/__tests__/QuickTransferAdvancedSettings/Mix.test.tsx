@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
 import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
 
 import type { ComponentProps } from 'react'
@@ -90,7 +91,7 @@ describe('Mix', () => {
       kind: 'dispense',
     }
     render(props)
-    screen.getByText('Mix before dispensing')
+    screen.getByText('Mix after dispensing')
   })
 
   it('renders save button if you select enabled, then moves to second screen', () => {
@@ -194,7 +195,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnAspirate: {
           mixVolume: 15,
-          repititions: 55,
+          repetitions: 55,
         },
       },
     }
@@ -232,7 +233,7 @@ describe('Mix', () => {
         ...props.state,
         mixOnDispense: {
           mixVolume: 18,
-          repititions: 2,
+          repetitions: 2,
         },
       },
     }

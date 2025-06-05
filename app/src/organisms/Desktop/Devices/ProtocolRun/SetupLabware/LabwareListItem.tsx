@@ -4,12 +4,11 @@ import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Btn,
-  Tag,
+  ALIGN_FLEX_END,
   Box,
+  Btn,
   COLORS,
   DeckInfoLabel,
-  ListButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -17,40 +16,47 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  ListButton,
   MODULE_ICON_NAME_BY_TYPE,
   SIZE_AUTO,
   SPACING,
   StyledText,
+  Tag,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleType,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
+
 import { ToggleButton } from '/app/atoms/buttons'
+import {
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+} from '/app/transformations/commands'
+
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
+  LabwareDefinition,
   ModuleType,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
-  StackItem,
-  ModuleInStack,
-  LabwareInStack,
+  LabwareByLiquidId,
   LabwareDefinitionsByURI,
+  LabwareInStack,
+  StackItem,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
@@ -80,9 +86,7 @@ export function LabwareListItem(
     definitionsByURI,
     onClick,
   } = props
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
@@ -230,12 +234,9 @@ export function LabwareListItem(
       type="noActive"
       gridGap={SPACING.spacing24}
       padding={SPACING.spacing12}
+      alignItems={ALIGN_CENTER}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing2}
-        width="6.25rem"
-      >
+      <Flex gridGap={SPACING.spacing2} flexWrap="wrap" width="6.25rem">
         {isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
@@ -391,12 +392,15 @@ const LabwareThumbnail = styled.svg`
 `
 
 function StandaloneLabware(props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+  const dimensions = getSchema2Dimensions(definition)
+
   return (
     <LabwareThumbnail
-      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
     >
       <LabwareRender
         definition={definition}

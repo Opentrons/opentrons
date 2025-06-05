@@ -17,13 +17,16 @@ import type {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   LEFT,
-  LIQUID_MENISCUS,
   MAGDECK,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_CENTER,
+  POSITION_REFERENCE_LIQUID_MENISCUS,
+  POSITION_REFERENCE_TOP,
   RIGHT,
   TEMPDECK,
   TEMPERATURE_MODULE_TYPE,
@@ -33,9 +36,6 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  WELL_BOTTOM,
-  WELL_CENTER,
-  WELL_TOP,
 } from './constants'
 import type { PipetteName } from './pipettes'
 
@@ -115,12 +115,17 @@ export interface LabwareDimensions {
   zDimension: number
 }
 
-export interface Coordinates {
+export interface Vector2D {
+  x: number
+  y: number
+}
+export interface Vector3D {
   x: number
   y: number
   z: number
 }
-export type LabwareOffset = Coordinates
+
+export type LabwareOffset = Vector3D
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -240,6 +245,21 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface AxisAlignedBoundingBox2D {
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
+export interface AxisAlignedBoundingBox3D {
+  backLeftBottom: Vector3D
+  frontRightTop: Vector3D
+}
+
+export interface Extents {
+  total: AxisAlignedBoundingBox3D
+  footprint: AxisAlignedBoundingBox2D
+}
+
 export type LabwareRoles =
   | 'labware'
   | 'adapter'
@@ -275,8 +295,7 @@ export interface LabwareDefinition3 {
   schemaVersion: 3
   namespace: string
   metadata: LabwareMetadata
-  dimensions: LabwareDimensions
-  cornerOffsetFromSlot: LabwareOffset
+  extents: Extents
   parameters: LabwareParameters
   brand: LabwareBrand
   ordering: string[][]
@@ -290,7 +309,11 @@ export interface LabwareDefinition3 {
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
-export interface LabwareDefByDefURI {
+// LabwareDefinition1 deliberately excluded.
+// I'm pretty sure nothing in the frontend needs to deal with it anymore.
+export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
+
+export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }
 export interface LegacyLabwareDefByName {
@@ -477,9 +500,9 @@ export interface ModuleLayer {
 export interface ModuleDefinition {
   moduleType: ModuleType
   model: ModuleModel
-  labwareOffset: Coordinates
+  labwareOffset: Vector3D
   dimensions: ModuleDimensions
-  cornerOffsetFromSlot: Coordinates
+  cornerOffsetFromSlot: Vector3D
   calibrationPoint: ModuleCalibrationPoint
   displayName: string
   quirks: string[]
@@ -716,12 +739,12 @@ export interface Liquid {
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
-type LiquidHandlingPropertyByVolume = number[][]
+export type LiquidHandlingPropertyByVolume = number[][]
 export type PositionReference =
-  | typeof WELL_BOTTOM
-  | typeof WELL_CENTER
-  | typeof WELL_TOP
-  | typeof LIQUID_MENISCUS
+  | typeof POSITION_REFERENCE_BOTTOM
+  | typeof POSITION_REFERENCE_CENTER
+  | typeof POSITION_REFERENCE_TOP
+  | typeof POSITION_REFERENCE_LIQUID_MENISCUS
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
@@ -729,7 +752,7 @@ interface DelayParams {
 }
 export interface TipPosition {
   positionReference: PositionReference
-  offset: Coordinates
+  offset: Vector3D
 }
 export interface DelayProperties {
   enable: boolean
@@ -740,7 +763,7 @@ interface TouchTipParams {
   mmFromEdge: number
   speed: number
 }
-interface TouchTipProperties {
+export interface TouchTipProperties {
   enable: boolean
   params?: TouchTipParams
 }
@@ -749,7 +772,7 @@ interface MixParams {
   repetitions: number
   volume: number
 }
-interface MixProperties {
+export interface MixProperties {
   enable: boolean
   params?: MixParams
 }
@@ -757,7 +780,7 @@ interface BlowoutParams {
   location: BlowoutLocation
   flowRate: number
 }
-interface BlowoutProperties {
+export interface BlowoutProperties {
   enable: boolean
   params?: BlowoutParams
 }
@@ -773,8 +796,8 @@ interface BaseRetract {
   touchTip: TouchTipProperties
   delay: DelayProperties
 }
-type RetractAspirate = BaseRetract
-interface RetractDispense extends BaseRetract {
+export type RetractAspirate = BaseRetract
+export interface RetractDispense extends BaseRetract {
   blowout: BlowoutProperties
 }
 interface BaseLiquidHandlingProperties<RetractType> {
@@ -802,7 +825,7 @@ export interface MultiDispenseProperties
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
-interface ByTipTypeSetting {
+export interface ByTipTypeSetting {
   tiprack: string
   aspirate: AspirateProperties
   singleDispense: SingleDispenseProperties

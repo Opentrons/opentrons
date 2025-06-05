@@ -1,4 +1,5 @@
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+
 export type AnalysisStatus =
   | 'missing'
   | 'loading'

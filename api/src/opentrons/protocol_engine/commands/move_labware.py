@@ -2,17 +2,26 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any, List
-from typing_extensions import TypedDict  # note: need this instead of typing for py<3.12
+from typing_extensions import (
+    TypedDict,
+    assert_type,
+)  # note: need this instead of typing for py<3.12
 
 from pydantic.json_schema import SkipJsonSchema
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+)
 from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
     StallOrCollisionDetectedError,
 )
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.types import Point
@@ -46,7 +55,6 @@ from .command import (
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
-from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
@@ -213,7 +221,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 # slide" to dropoffs in the waste chute in order to guarantee that the
                 # labware can drop fully through the chute before the gripper jaws close.
                 post_drop_slide_offset = Point(
-                    x=(current_labware_definition.dimensions.xDimension / 2.0)
+                    x=(_labware_x_dimension(current_labware_definition) / 2.0)
                     + (GRIPPER_PADDLE_WIDTH / 2.0)
                     + _TRASH_CHUTE_DROP_BUFFER_MM,
                     y=0,
@@ -280,6 +288,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 ),
             )
 
+        module_location_error = None
         if isinstance(available_new_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_has_labware_on_top(
                 available_new_location.labwareId
@@ -293,7 +302,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 raise LabwareMovementNotAllowedError(
                     "Cannot move a labware onto itself."
                 )
-        # Validate labware for the absorbance reader
+        # Validate labware for the module placement
         elif isinstance(available_new_location, ModuleLocation):
             module = self._state_view.modules.get(available_new_location.moduleId)
             if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
@@ -335,6 +344,13 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     current_labware.location
                 )
             )
+
+            if module_location_error:
+                return DefinedErrorData(
+                    public=module_location_error,
+                    state_update=state_update,
+                )
+
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
@@ -490,7 +506,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
 
 
 class MoveLabware(
-    BaseCommand[MoveLabwareParams, MoveLabwareResult, GripperMovementError]
+    BaseCommand[
+        MoveLabwareParams,
+        MoveLabwareResult,
+        GripperMovementError,
+    ]
 ):
     """A ``moveLabware`` command."""
 
@@ -508,3 +528,14 @@ class MoveLabwareCreate(BaseCommandCreate[MoveLabwareParams]):
     params: MoveLabwareParams
 
     _CommandCls: Type[MoveLabware] = MoveLabware
+
+
+def _labware_x_dimension(labware_definition: LabwareDefinition) -> float:
+    if isinstance(labware_definition, LabwareDefinition2):
+        return labware_definition.dimensions.xDimension
+    else:
+        assert_type(labware_definition, LabwareDefinition3)
+        return (
+            labware_definition.extents.total.frontRightTop.x
+            - labware_definition.extents.total.backLeftBottom.x
+        )

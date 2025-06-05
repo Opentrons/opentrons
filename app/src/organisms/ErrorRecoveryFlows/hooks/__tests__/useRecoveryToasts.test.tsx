@@ -1,11 +1,12 @@
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { I18nextProvider } from 'react-i18next'
 import { render, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { i18n } from '/app/i18n'
 import { useCommandTextString } from '/app/local-resources/commands'
-import type { ReactElement } from 'react'
-import { I18nextProvider } from 'react-i18next'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Mock } from 'vitest'
+
 import { useToaster } from '../../../ToasterOven'
 import { RECOVERY_MAP } from '../../constants'
 import {
@@ -15,6 +16,9 @@ import {
   useRecoveryToasts,
   useRecoveryToastText,
 } from '../useRecoveryToasts'
+
+import type { Mock } from 'vitest'
+import type { ReactElement } from 'react'
 import type { BuildToast } from '../useRecoveryToasts'
 
 vi.mock('../../../ToasterOven')
@@ -298,6 +302,9 @@ describe('handleRecoveryOptionAction', () => {
     RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
     RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE,
     RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+    RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+    RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+    RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
   ]
 
   // Routes that should return the currentStepReturnVal toasts.
@@ -310,6 +317,10 @@ describe('handleRecoveryOptionAction', () => {
     RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
     RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
     RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
+    RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+    RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
+    RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+    RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
   ]
 
   // Routes that should return no toasts.
@@ -326,6 +337,7 @@ describe('handleRecoveryOptionAction', () => {
     RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE,
     RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE,
     RECOVERY_MAP.OPTION_SELECTION.ROUTE,
+    RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
   ]
 
   it.each(NEXT_STEP_ROUTES)('should return nextStepReturnVal for %s', route => {

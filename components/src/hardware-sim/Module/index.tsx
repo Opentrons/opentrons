@@ -1,5 +1,6 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -8,24 +9,26 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import {
+  ALIGN_CENTER,
   C_DARK_GRAY,
   C_MED_LIGHT_GRAY,
-  SPACING_1,
-  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
   DISPLAY_FLEX,
   FONT_WEIGHT_SEMIBOLD,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_1,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
 import { multiplyMatrices } from '../utils'
-import { Thermocycler } from './Thermocycler'
+import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
-import { Temperature } from './Temperature'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
 import { PlateReader } from './PlateReader'
+import { Temperature } from './Temperature'
+import { Thermocycler } from './Thermocycler'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type {
@@ -146,7 +149,9 @@ export const Module = (props: Props): JSX.Element => {
   const rotationCenterY = (footprintYDimension ?? yDimension) / 2
 
   const orientationTransform =
-    orientation === 'left' || moduleType === ABSORBANCE_READER_TYPE
+    orientation === 'left' ||
+    moduleType === ABSORBANCE_READER_TYPE ||
+    moduleType === FLEX_STACKER_MODULE_TYPE
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
@@ -206,6 +211,8 @@ export const Module = (props: Props): JSX.Element => {
     )
   } else if (moduleType === ABSORBANCE_READER_TYPE) {
     moduleViz = <PlateReader />
+  } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
+    moduleViz = <FlexStacker />
   }
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>

@@ -816,6 +816,9 @@ class OT3Simulator(FlexBackend):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await asyncio.sleep(0)
 
+    def get_status_bar_enabled(self) -> bool:
+        return True
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._sim_status_bar_state
 

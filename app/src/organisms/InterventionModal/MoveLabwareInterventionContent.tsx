@@ -10,38 +10,40 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
+  getLoadedLabware,
+  getLoadedModule,
   Icon,
   LabwareRender,
+  LegacyStyledText,
   Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
-  getLoadedLabware,
-  getLoadedModule,
 } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleType,
+  inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
-  inferModuleOrientationFromXCoordinate,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleType,
 } from '@opentrons/shared-data'
 
-import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-  getLabwareNameFromRunData,
-  getModuleModelFromRunData,
-} from './utils'
 import { Divider } from '/app/atoms/structure'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import {
+  getLabwareNameFromRunData,
+  getModuleModelFromRunData,
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+} from './utils'
+
+import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinitionsByUri,
@@ -49,7 +51,6 @@ import type {
   MoveLabwareRunTimeCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type { RunData } from '@opentrons/api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};

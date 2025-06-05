@@ -1,4 +1,5 @@
-import { LOW_VOLUME_PIPETTES, getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { getPipetteSpecsV2, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+
 import type { PipetteName } from '@opentrons/shared-data'
 
 export function getDefaultBlowoutFlowRate(

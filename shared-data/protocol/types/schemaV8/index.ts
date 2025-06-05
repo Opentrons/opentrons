@@ -89,6 +89,18 @@ export interface LiquidV1Mixin {
   }
 }
 
+export interface LiquidV2Mixin {
+  liquidSchemaId: 'opentronsLiquidSchemaV2'
+  liquids: {
+    [liquidId: string]: {
+      displayName: string
+      description: string
+      liquidClass: string | null
+      displayColor?: string
+    }
+  }
+}
+
 export interface RobotStructure {
   model: string
   deckId: string

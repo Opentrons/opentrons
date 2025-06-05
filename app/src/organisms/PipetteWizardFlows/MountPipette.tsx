@@ -1,18 +1,21 @@
 import { useTranslation } from 'react-i18next'
+
+import {
+  Banner,
+  Flex,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  SIZE_1,
+  SPACING,
+} from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import {
-  Flex,
-  Banner,
-  JUSTIFY_CENTER,
-  SIZE_1,
-  SPACING,
-  LegacyStyledText,
-} from '@opentrons/components'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+
 import { Skeleton } from '/app/atoms/Skeleton'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'

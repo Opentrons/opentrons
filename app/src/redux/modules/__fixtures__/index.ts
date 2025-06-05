@@ -1,9 +1,9 @@
-import type * as Types from '../types'
-import type * as ApiTypes from '../api-types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
+import type * as ApiTypes from '../api-types'
+import type * as Types from '../types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -374,6 +374,29 @@ export const mockHeaterShaker: Types.HeaterShakerModule = {
   },
   usbPort: {
     path: '/dev/ot_module_heatershaker0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockFlexStacker: Types.FlexStackerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'fsm123',
+  hardwareRevision: 'flexstacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    latchState: 'closed',
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+    installDetected: true,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
     port: 1,
     hub: false,
     portGroup: 'unknown',

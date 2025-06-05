@@ -1,5 +1,5 @@
-import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_START,
@@ -20,15 +20,15 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ModuleOnDeck, LabwareOnDeck } from '@opentrons/components'
+import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type { State } from '/app/redux/types'
 import type {
   LPCWizardState,
   OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)
  * and the labware immediately beneath the topmost labware.
@@ -46,7 +46,7 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as SelectedLwOverview
   const labwareDef = useSelector(
     selectSelectedLwDef(runId)
-  ) as LabwareDefinition2
+  ) as LabwareDefinition
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails

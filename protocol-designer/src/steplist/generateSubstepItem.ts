@@ -1,36 +1,40 @@
 import cloneDeep from 'lodash/cloneDeep'
-import range from 'lodash/range'
-import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
+
 import {
   consolidate,
-  distribute,
-  transfer,
-  mix,
   curryCommandCreator,
+  distribute,
+  mix,
+  transfer,
 } from '@opentrons/step-generation'
+
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+
 import type {
-  CurriedCommandCreator,
-  InvariantContext,
-  RobotState,
   ConsolidateArgs,
+  CurriedCommandCreator,
   DistributeArgs,
+  InvariantContext,
   MixArgs,
+  RobotState,
   TransferArgs,
 } from '@opentrons/step-generation'
 import type { StepIdType } from '../form-types'
 import type {
+  LabwareNamesByModuleId,
   NamedIngred,
+  SourceDestSubstepItem,
   StepArgsAndErrors,
   StepItemSourceDestRow,
-  SourceDestSubstepItem,
   SubstepItemData,
   SubstepTimelineFrame,
-  LabwareNamesByModuleId,
 } from './types'
+
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
   | ConsolidateArgs
@@ -258,7 +262,9 @@ function transferLikeSubsteps(args: {
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const tipState = cloneDeep(args.robotState.tipState)
-  tipState.pipettes = mapValues(tipState.pipettes, () => true)
+  tipState.pipettes = mapValues(tipState.pipettes, () => {
+    return { hasTip: true, tiprackURI: '' } // arbitrary tip URI
+  })
   const initialRobotState = { ...args.robotState, tipState }
   const { pipette: pipetteId } = stepArgs
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec

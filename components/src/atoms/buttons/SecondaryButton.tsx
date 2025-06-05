@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 
-import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
-import { isntStyleProp, styleProps } from '../../primitives'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../index'
+import { isntStyleProp, styleProps } from '../../primitives'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+
 import type { StyleProps } from '../../index'
 
 interface SecondaryButtonProps extends StyleProps {
@@ -12,8 +13,7 @@ interface SecondaryButtonProps extends StyleProps {
   'aria-disabled'?: boolean
 }
 export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
-  shouldForwardProp: p =>
-    isntStyleProp(p) && p !== 'isDangerous' && p !== 'aria-disabled',
+  shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
 })<SecondaryButtonProps>`
   appearance: none;
   cursor: ${props =>
@@ -31,7 +31,9 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
-  ${TYPOGRAPHY.pSemiBold}
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight20};
 
   &:hover,
   &:focus {
@@ -42,7 +44,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   &:hover {
     color: ${props => {
       if (props['aria-disabled']) return COLORS.grey40
-      return props.isDangerous ? COLORS.red50 : COLORS.blue60
+      return props.isDangerous ? COLORS.red55 : COLORS.blue55
     }};
     border-color: ${props => {
       if (props['aria-disabled']) return COLORS.grey30
@@ -61,18 +63,21 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
       return props.isDangerous ? COLORS.red50 : COLORS.blue60
     }};
     box-shadow: ${props =>
-      props['aria-disabled'] ? 'none' : `0 0 0 3px ${COLORS.yellow50}`};
+      props['aria-disabled']
+        ? 'none'
+        : `outline: 2px solid ${COLORS.blue50};
+    outline-offset: 0.25rem;`};
   }
 
   &:active {
     box-shadow: none;
     color: ${props => {
       if (props['aria-disabled']) return COLORS.grey40
-      return props.isDangerous ? COLORS.red60 : COLORS.blue55
+      return props.isDangerous ? COLORS.red60 : COLORS.blue60
     }};
     border-color: ${props => {
       if (props['aria-disabled']) return COLORS.grey30
-      return props.isDangerous ? COLORS.red60 : COLORS.blue55
+      return props.isDangerous ? COLORS.red60 : COLORS.blue60
     }};
   }
 
@@ -86,3 +91,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
 
   ${styleProps}
 `
+
+SecondaryButton.defaultProps = {
+  'aria-disabled': false,
+}

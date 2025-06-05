@@ -1,27 +1,28 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
-import { SecureLabwareModal } from '../SecureLabwareModal'
+
 import { LabwareListItem } from '../LabwareListItem'
+import { SecureLabwareModal } from '../SecureLabwareModal'
 
 import type { ComponentProps } from 'react'
 import type {
+  LabwareDefinition,
   ModuleModel,
   ModuleType,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
@@ -29,7 +30,7 @@ import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')
 
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {
@@ -99,6 +100,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: '7',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -134,6 +136,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: 'B1',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -165,6 +168,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'magneticModuleId',
           moduleModel: 'magneticModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -205,6 +209,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -246,6 +251,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV2' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: '7',
@@ -310,6 +316,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: mockModuleId,
           moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,

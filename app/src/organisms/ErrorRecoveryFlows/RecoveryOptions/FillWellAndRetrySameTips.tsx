@@ -1,25 +1,25 @@
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  LegacyStyledText,
-  Flex,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
+  InlineNotification,
+  LegacyStyledText,
   RESPONSIVENESS,
+  SPACING,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
-import { CancelRun } from './CancelRun'
 import {
   FillWell,
   RetryWithSameTips,
   TwoColTextAndFailedStepNextStep,
 } from '../shared'
+import { CancelRun } from './CancelRun'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 export function FillWellAndRetrySameTips(
   props: RecoveryContentProps

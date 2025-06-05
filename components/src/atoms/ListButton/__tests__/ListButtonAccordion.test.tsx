@@ -1,8 +1,8 @@
-import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../testing/utils'
+import { beforeEach, describe, it } from 'vitest'
 
 import { ListButtonAccordion } from '..'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

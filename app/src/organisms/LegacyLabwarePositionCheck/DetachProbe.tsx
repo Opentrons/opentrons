@@ -1,20 +1,24 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RobotMotionLoader } from './RobotMotionLoader'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
+import { RobotMotionLoader } from './RobotMotionLoader'
+
 import type { Dispatch } from 'react'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
@@ -23,7 +27,6 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
 
 const StyledVideo = styled.video`
   padding-top: ${SPACING.spacing4};

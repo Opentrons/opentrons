@@ -1,10 +1,12 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { ExitConfirmModal } from '../index'
-import { describe, it, vi, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
-import type { NavigateFunction } from 'react-router-dom'
 import { displayExitConfirmModalAtom } from '../../../resources/atoms'
+import { ExitConfirmModal } from '../index'
+
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 

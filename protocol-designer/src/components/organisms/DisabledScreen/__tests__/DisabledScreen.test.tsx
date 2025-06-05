@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
 
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
 import { DisabledScreen } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
 
 const render = () => {
   return renderWithProviders(<DisabledScreen />, { i18nInstance: i18n })

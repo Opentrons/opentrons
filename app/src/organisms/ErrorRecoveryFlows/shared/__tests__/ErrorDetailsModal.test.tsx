@@ -1,21 +1,26 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { screen, act, renderHook } from '@testing-library/react'
+import { act, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { InlineNotification } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockRecoveryContentProps } from '../../__fixtures__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { StepInfo } from '../StepInfo'
 import { OddModal } from '/app/molecules/OddModal'
+
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
-  useErrorDetailsModal,
   ErrorDetailsModal,
-  OverpressureBanner,
-  TipNotDetectedBanner,
   GripperErrorBanner,
-  StallErrorBanner,
+  LabwareMissingErrorBanner,
+  LabwareMissingOnShuttleErrorBanner,
   NoLiquidDetectedBanner,
+  OverpressureBanner,
+  StackerStallErrorBanner,
+  StallErrorBanner,
+  TipNotDetectedBanner,
+  useErrorDetailsModal,
 } from '../ErrorDetailsModal'
+import { StepInfo } from '../StepInfo'
 
 import type { ComponentProps } from 'react'
 
@@ -27,7 +32,13 @@ vi.mock('/app/molecules/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 
-vi.mock('/app/atoms/InlineNotification')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(),
+  }
+})
 vi.mock('../StepInfo')
 
 describe('useErrorDetailsModal', () => {
@@ -133,14 +144,14 @@ describe('ErrorDetailsModal', () => {
   })
 })
 
-describe('OverpressureBanner', () => {
+describe('renders the InlineNotification', () => {
   beforeEach(() => {
     vi.mocked(InlineNotification).mockReturnValue(
       <div>MOCK_INLINE_NOTIFICATION</div>
     )
   })
 
-  it('renders the InlineNotification', () => {
+  it('renders the InlineNotification for OverpressureBanner', () => {
     renderWithProviders(<OverpressureBanner />, {
       i18nInstance: i18n,
     })
@@ -155,16 +166,8 @@ describe('OverpressureBanner', () => {
       {}
     )
   })
-})
 
-describe('TipNotDetectedBanner', () => {
-  beforeEach(() => {
-    vi.mocked(InlineNotification).mockReturnValue(
-      <div>MOCK_INLINE_NOTIFICATION</div>
-    )
-  })
-
-  it('renders the InlineNotification', () => {
+  it('renders the InlineNotification for TipNotDetectedBanner', () => {
     renderWithProviders(<TipNotDetectedBanner />, {
       i18nInstance: i18n,
     })
@@ -179,16 +182,8 @@ describe('TipNotDetectedBanner', () => {
       {}
     )
   })
-})
 
-describe('GripperErrorBanner', () => {
-  beforeEach(() => {
-    vi.mocked(InlineNotification).mockReturnValue(
-      <div>MOCK_INLINE_NOTIFICATION</div>
-    )
-  })
-
-  it('renders the InlineNotification', () => {
+  it('renders the InlineNotification for GripperErrorBanner', () => {
     renderWithProviders(<GripperErrorBanner />, {
       i18nInstance: i18n,
     })
@@ -203,15 +198,8 @@ describe('GripperErrorBanner', () => {
       {}
     )
   })
-})
 
-describe('StallErrorBanner', () => {
-  beforeEach(() => {
-    vi.mocked(InlineNotification).mockReturnValue(
-      <div>MOCK_INLINE_NOTIFICATION</div>
-    )
-  })
-  it('renders the InlineNotification', () => {
+  it('renders the InlineNotification for StallErrorBanner', () => {
     renderWithProviders(<StallErrorBanner />, {
       i18nInstance: i18n,
     })
@@ -225,15 +213,7 @@ describe('StallErrorBanner', () => {
       {}
     )
   })
-})
-
-describe('NoLiquidDectedBanner', () => {
-  beforeEach(() => {
-    vi.mocked(InlineNotification).mockReturnValue(
-      <div>MOCK_INLINE_NOTIFICATION</div>
-    )
-  })
-  it('renders the InlineNotification', () => {
+  it('renders the InlineNotification for NoLiquidDetectedBanner', () => {
     renderWithProviders(<NoLiquidDetectedBanner />, {
       i18nInstance: i18n,
     })
@@ -243,6 +223,52 @@ describe('NoLiquidDectedBanner', () => {
         heading:
           'Droplets or liquid in the tips may cause liquid level detection to fail',
         message: 'Use dry, unused tips for best results',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for StackerStallErrorBanner', () => {
+    renderWithProviders(<StackerStallErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading: `A stall or collision is detected when the robot's motors are blocked`,
+        message: 'Clear obstructions before proceeding',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for LabwareMissingErrorBanner', () => {
+    renderWithProviders(<LabwareMissingErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker',
+        message:
+          'Load the stacker with the correct labware to complete the stacker retrieve step.',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for LabwareMissingOnShuttleErrorBanner', () => {
+    renderWithProviders(<LabwareMissingOnShuttleErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions',
+        message:
+          'If the issue persists, cancel the run and reach out to Opentrons support',
       }),
       {}
     )

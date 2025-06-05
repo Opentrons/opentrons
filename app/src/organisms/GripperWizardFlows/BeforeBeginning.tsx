@@ -1,29 +1,32 @@
 import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
+
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+
 import {
-  GRIPPER_FLOW_TYPES,
-  SCREWDRIVER_LOADNAME,
-  GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
   CALIBRATION_PIN_DISPLAY_NAME,
+  GRIPPER_FLOW_TYPES,
+  GRIPPER_LOADNAME,
   HEX_SCREWDRIVER_DISPLAY_NAME,
+  SCREWDRIVER_LOADNAME,
 } from './constants'
 
-import type { UseMutateFunction } from 'react-query'
 import type { AxiosError } from 'axios'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {

@@ -1,14 +1,15 @@
 import styled, { css } from 'styled-components'
+
 import {
   DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_ROW,
-  TYPOGRAPHY,
-  JUSTIFY_CENTER,
-  RESPONSIVENESS,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

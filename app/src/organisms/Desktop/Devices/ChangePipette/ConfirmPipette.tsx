@@ -1,22 +1,25 @@
 import { useTranslation } from 'react-i18next'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import {
   COLORS,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  PrimaryButton,
-  SecondaryButton,
 } from '@opentrons/components'
-import { CheckPipettesButton } from './CheckPipettesButton'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+
+import { CheckPipettesButton } from './CheckPipettesButton'
 import { LevelPipette } from './LevelPipette'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
   PipetteDisplayCategory,
+  PipetteModelSpecs,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
 import type { Mount } from '/app/redux/pipettes/types'

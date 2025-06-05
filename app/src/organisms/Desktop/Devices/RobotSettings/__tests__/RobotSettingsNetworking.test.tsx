@@ -1,24 +1,25 @@
 import { MemoryRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
-  HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
 import * as Networking from '/app/redux/networking'
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'

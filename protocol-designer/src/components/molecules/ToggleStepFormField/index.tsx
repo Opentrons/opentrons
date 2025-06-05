@@ -78,7 +78,11 @@ export function ToggleStepFormField(
                   toggledOn={isSelected}
                 />
               ) : (
-                <Check color={COLORS.blue50} isChecked={isSelected} />
+                <Check
+                  color={COLORS.blue50}
+                  isChecked={isSelected}
+                  disabled={isDisabled}
+                />
               )}
             </Flex>
           </Flex>

@@ -1,3 +1,7 @@
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,12 +11,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import { LabwareOffsetsTable } from '/app/organisms/LabwareOffsetsTable'
-import type { SetupLabwarePositionCheckProps } from '..'
 import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+
+import type { SetupLabwarePositionCheckProps } from '..'
 
 export function LPCSetupOffsetsTable(
   props: SetupLabwarePositionCheckProps

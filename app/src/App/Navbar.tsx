@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
 import debounce from 'lodash/debounce'
+import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -10,19 +10,19 @@ import {
   ALIGN_STRETCH,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_NONE,
   Flex,
+  FLEX_NONE,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import logoSvg from '/app/assets/images/logo_nav.svg'
 import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
+import logoSvg from '/app/assets/images/logo_nav.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
 

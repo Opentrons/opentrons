@@ -1,26 +1,31 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
+import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
-import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
-import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
-import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal'
-import { useFeatureFlag } from '/app/redux/config'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+
+// TODO(jh, 04-23-25): Prettier import order affects testing. Investigate further.
+// prettier-ignore
+import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
+
 import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
-import { useSoftwareUpdatePoll } from '../hooks'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
+
 import { DesktopApp } from '../DesktopApp'
+import { useSoftwareUpdatePoll } from '../hooks'
 
 import type { LocalizationProviderProps } from '/app/LocalizationProvider'
 

@@ -1,7 +1,9 @@
 import { defaultMemoize } from 'reselect'
-import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
-import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+
 import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
+import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
+
 import type {
   HydratedFormData,
   HydratedHeaterShakerFormData,

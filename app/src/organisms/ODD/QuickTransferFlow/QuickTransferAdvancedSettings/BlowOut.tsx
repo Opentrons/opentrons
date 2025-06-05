@@ -1,37 +1,41 @@
 import { useState } from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
+
 import {
-  Flex,
-  SPACING,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_FIXED,
   RadioButton,
-  COLORS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
-  WASTE_CHUTE_FIXTURES,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { getTopPortalEl } from '/app/App/portal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
-  FlowRateKind,
   BlowOutLocation,
+  FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
   TransferType,
 } from '../types'
-import { i18n } from '/app/i18n'
 
 interface BlowOutProps {
   onBack: () => void
@@ -141,7 +145,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `BlowOut`,
+            setting: `BlowOut`,
           },
         })
         onBack()
@@ -156,7 +160,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
         properties: {
-          settting: `BlowOut`,
+          setting: `BlowOut`,
         },
       })
       onBack()
@@ -188,19 +192,24 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableBlowOutDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={isBlowOutEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('blow_out_description')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableBlowOutDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={isBlowOutEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
@@ -208,26 +217,31 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {blowOutLocationItems.map(blowOutLocationItem => (
-            <RadioButton
-              key={blowOutLocationItem.description}
-              isSelected={
-                isEqual(blowOutLocation, blowOutLocationItem.location) ||
-                blowOutLocation === blowOutLocationItem.location
-              }
-              onChange={() => {
-                setBlowOutLocation(
-                  blowOutLocationItem.location as BlowOutLocation
-                )
-              }}
-              buttonValue={blowOutLocationItem.description}
-              buttonLabel={blowOutLocationItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('select_blow_out_location')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {blowOutLocationItems.map(blowOutLocationItem => (
+              <RadioButton
+                key={blowOutLocationItem.description}
+                isSelected={
+                  isEqual(blowOutLocation, blowOutLocationItem.location) ||
+                  blowOutLocation === blowOutLocationItem.location
+                }
+                onChange={() => {
+                  setBlowOutLocation(
+                    blowOutLocationItem.location as BlowOutLocation
+                  )
+                }}
+                buttonValue={blowOutLocationItem.description}
+                buttonLabel={blowOutLocationItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
     </Flex>,

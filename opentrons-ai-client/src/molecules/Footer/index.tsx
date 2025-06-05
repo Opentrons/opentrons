@@ -1,4 +1,6 @@
+import { Trans, useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,7 +9,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Trans, useTranslation } from 'react-i18next'
 
 const NewLineText = styled.span`
   display: block;

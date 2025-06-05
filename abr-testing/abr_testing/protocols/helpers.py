@@ -15,9 +15,12 @@ from opentrons.protocol_api.module_contexts import (
     MagneticModuleContext,
     AbsorbanceReaderContext,
 )
+import configparser
+from pathlib import Path
+import json
+from abr_testing.automation import slack
 from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from datetime import datetime
 
 # FUNCTIONS FOR LOADING COMMON CONFIGURATIONS
@@ -42,35 +45,18 @@ def load_common_liquid_setup_labware_and_instruments(
 def load_disposable_lids(
     protocol: ProtocolContext,
     num_of_lids: int,
-    deck_slot: List[str],
+    deck_slot: str,
     deck_riser: bool = False,
-) -> List[Labware]:
+) -> Labware:
     """Load Stack of Disposable lids."""
+    lid_str = "opentrons_tough_pcr_auto_sealing_lid"
     if deck_riser:
         deck_riser_adapter = protocol.load_adapter(
-            "opentrons_flex_deck_riser", deck_slot[0]
+            "opentrons_flex_deck_riser", deck_slot
         )
-        unused_lids = [
-            deck_riser_adapter.load_labware("opentrons_tough_pcr_auto_sealing_lid")
-        ]
+        unused_lids = deck_riser_adapter.load_lid_stack(lid_str, num_of_lids)
     else:
-        unused_lids = [
-            protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", deck_slot[0])
-        ]
-
-    if len(deck_slot) == 1:
-        for i in range(num_of_lids - 1):
-            unused_lids.append(
-                unused_lids[-1].load_labware("opentrons_tough_pcr_auto_sealing_lid")
-            )
-    else:
-        for i in range(len(deck_slot) - 1):
-            unused_lids.append(
-                protocol.load_labware(
-                    "opentrons_tough_pcr_auto_sealing_lid", deck_slot[i]
-                )
-            )
-    unused_lids.reverse()
+        unused_lids = protocol.load_lid_stack(lid_str, deck_slot[0], num_of_lids)
     return unused_lids
 
 
@@ -99,6 +85,7 @@ def load_temp_adapter_and_labware(
     temp_mod_adapters = {
         "nest_96_wellplate_2ml_deep": "opentrons_96_deep_well_temp_mod_adapter",
         "armadillo_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_well_aluminum_block",
+        "opentrons_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_well_aluminum_block",
     }
     temp_adapter_type = temp_mod_adapters.get(labware_str, "")
     if temp_adapter_type:
@@ -131,10 +118,23 @@ def create_channel_parameter(parameters: ParameterContext) -> None:
     )
 
 
+def create_meniscus_z_parameter(parameters: ParameterContext) -> None:
+    """Create meniscus z parameter."""
+    # NOTE: meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    parameters.add_float(
+        variable_name="meniscus_z",
+        display_name="Meniscus Z",
+        default=-0.5,
+        minimum=-10.0,
+        maximum=10.0,
+        description="Z offset for meniscus height. Default is -1.5mm.",
+    )
+
+
 def create_pipette_parameters(parameters: ParameterContext) -> None:
     """Create parameter for pipettes."""
     # NOTE: Place function inside def add_parameters(parameters) in protocol.
-    # NOTE: Copy ctx.params.left mount, ctx.params.right_mount # type: ignore[attr-defined]
+    # NOTE: Copy ctx.params.left_mount, ctx.params.right_mount # type: ignore[attr-defined]
     # to get result
     # Left Mount
     parameters.add_str(
@@ -221,13 +221,23 @@ def create_csv_parameter(parameters: ParameterContext) -> None:
     )
 
 
+def create_probe_liquid_height_parameter(parameters: ParameterContext) -> None:
+    """Create parameter for probe liquid height."""
+    parameters.add_bool(
+        variable_name="probe_liquid_height",
+        display_name="Probe Liquid Height",
+        description="True means probe liquid height at start of run.",
+        default=False,
+    )
+
+
 def create_disposable_lid_parameter(parameters: ParameterContext) -> None:
     """Create parameter to use/not use disposable lid."""
     parameters.add_bool(
         variable_name="disposable_lid",
         display_name="Disposable Lid",
         description="True means use lid.",
-        default=False,
+        default=True,
     )
 
 
@@ -247,7 +257,7 @@ def create_tc_lid_deck_riser_parameter(parameters: ParameterContext) -> None:
         variable_name="deck_riser",
         display_name="Deck Riser",
         description="True means use deck riser.",
-        default=False,
+        default=True,
     )
 
 
@@ -264,6 +274,28 @@ def create_tip_size_parameter(parameters: ParameterContext) -> None:
         ],
         default="opentrons_flex_96_tiprack_50ul",
     )
+
+
+def create_all_deck_slot_parameters(parameters: ParameterContext) -> None:
+    """Create parameters for all deck slots."""
+    deck_slots = [f"{letter}{number}" for letter in "ABCD" for number in range(1, 4)]
+    for deck_slot in deck_slots:
+        parameters.add_bool(
+            variable_name=deck_slot, display_name=f"Slot {deck_slot}", default=True
+        )
+    # WHAT TO COPY PASTE IN PROTOCOL
+    # slot_a1 = protocol.params.A1 # type: ignore[attr-defined]
+    # slot_a2 = protocol.params.A2 # type: ignore[attr-defined]
+    # slot_a3 = protocol.params.A3 # type: ignore[attr-defined]
+    # slot_b1 = protocol.params.B1 # type: ignore[attr-defined]
+    # slot_b2 = protocol.params.B2 # type: ignore[attr-defined]
+    # slot_b3 = protocol.params.B3 # type: ignore[attr-defined]
+    # slot_c1 = protocol.params.C1 # type: ignore[attr-defined]
+    # slot_c2 = protocol.params.C2 # type: ignore[attr-defined]
+    # slot_c3 = protocol.params.C3 # type: ignore[attr-defined]
+    # slot_d1 = protocol.params.D1 # type: ignore[attr-defined]
+    # slot_d2 = protocol.params.D2 # type: ignore[attr-defined]
+    # slot_d3 = protocol.params.D3 # type: ignore[attr-defined]
 
 
 def create_dot_bottom_parameter(parameters: ParameterContext) -> None:
@@ -359,7 +391,6 @@ def create_deactivate_modules_parameter(parameters: ParameterContext) -> None:
 # FUNCTIONS FOR COMMON MODULE SEQUENCES
 def deactivate_modules(protocol: ProtocolContext) -> None:
     """Deactivate all loaded modules."""
-    print("Deactivating Modules")
     modules = protocol.loaded_modules
 
     if modules:
@@ -454,29 +485,24 @@ def set_hs_speed(
 
 def use_disposable_lid_with_tc(
     protocol: ProtocolContext,
-    unused_lids: List[Labware],
-    used_lids: List[Labware],
+    lid_stack: Labware,
     plate_in_thermocycler: Labware,
     thermocycler: ThermocyclerContext,
-) -> Tuple[Labware, List[Labware], List[Labware]]:
+) -> None:
     """Use disposable lid with thermocycler."""
-    lid_on_plate = unused_lids[0]
-    protocol.move_labware(lid_on_plate, plate_in_thermocycler, use_gripper=True)
-    # Remove lid from the list
-    unused_lids.pop(0)
-    used_lids.append(lid_on_plate)
+    thermocycler.open_lid()
+    protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
     thermocycler.close_lid()
-    return lid_on_plate, unused_lids, used_lids
 
 
 # FUNCTIONS FOR COMMON PIPETTE COMMAND SEQUENCES
 
 
 def clean_up_plates(
+    protocol: ProtocolContext,
     pipette: InstrumentContext,
     list_of_labware: List[Labware],
     liquid_waste: Well,
-    tip_size: int,
 ) -> None:
     """Aspirate liquid from labware and dispense into liquid waste."""
     pipette.pick_up_tip()
@@ -490,31 +516,17 @@ def clean_up_plates(
         elif num_of_active_channels == 96:
             list_of_wells = [labware.wells()[0]]
         for well in list_of_wells:
-            vol_removed = 0.0
-            while well.max_volume > vol_removed:
-                pipette.aspirate(tip_size, well)
-                pipette.dispense(
-                    tip_size,
-                    liquid_waste.top(),
+            if protocol.is_simulating():
+                vol_transfer = well.max_volume
+            else:
+                vol_transfer = well.current_liquid_volume()  # type: ignore
+                pipette.transfer(
+                    vol_transfer, well, liquid_waste.top(), new_tip="never"
                 )
-                pipette.blow_out(liquid_waste.top())
-                vol_removed += pipette.max_volume
     if pipette.channels != num_of_active_channels:
         pipette.drop_tip()
     else:
         pipette.return_tip()
-
-
-def find_liquid_height(pipette: InstrumentContext, well_to_probe: Well) -> float:
-    """Find liquid height of well."""
-    try:
-        liquid_height = (
-            pipette.measure_liquid_height(well_to_probe)
-            - well_to_probe.bottom().point.z
-        )
-    except PipetteLiquidNotFoundError:
-        liquid_height = 0
-    return liquid_height if isinstance(liquid_height, (float, int)) else 0
 
 
 def load_wells_with_custom_liquids(
@@ -546,7 +558,6 @@ def load_wells_with_custom_liquids(
         liquid = protocol.define_liquid(
             liquid_name, display_color=liquid_colors[i % len(liquid_colors)]
         )
-        i += 1
         # Load liquid into each specified well or list of wells
         for well_info in wells_info:
             if isinstance(well_info["well"], list):
@@ -555,12 +566,42 @@ def load_wells_with_custom_liquids(
                 wells = [well_info["well"]]
             else:
                 wells = []
-            if isinstance(well_info["volume"], float):
+            if isinstance(well_info["volume"], (float, int)):
                 volume = well_info["volume"]
-
             # Load liquid into each well
             for well in wells:
                 well.load_liquid(liquid, volume)
+
+
+def set_up_slack() -> slack.Slack:
+    """Set up slack channel connection."""
+    configs_file = "/var/lib/jupyter/notebooks/config.ini"
+    configs_file_path = Path(configs_file)
+    try:
+        configurations = configparser.ConfigParser()
+        configurations.read(configs_file_path)
+    except configparser.ParsingError as e:
+        print(f"Cannot read configuration file\n {e}")
+    discovery_file = "/data/ODD/discovery.json"
+    try:
+        with open(discovery_file, "r") as file:
+            discovery_data = json.load(file)
+    except FileNotFoundError:
+        print(f"ERROR: file not found at {discovery_file}")
+        discovery_data = {}
+    except json.JSONDecodeError:
+        print(f"ERROR: Invalid json format in {discovery_file}")
+        discovery_data = {}
+    try:
+        robot_name = discovery_data["robots"][0]["name"]
+    except KeyError:
+        print("Can't simulate slack, run on robot")
+        robot_name = "test"
+    return slack.Slack(
+        configuration=configurations,
+        channel_name="abr-robot-alerts",
+        user_name=robot_name,
+    )
 
 
 def comment_height_of_specific_labware(
@@ -593,11 +634,11 @@ def find_liquid_height_of_all_wells(
             and total_number_of_wells_in_plate > 12
             and well.well_name.startswith("A")
         ):
-            liquid_height_of_well = find_liquid_height(pipette, well)
-            dict_of_labware_heights[labware_name, well] = liquid_height_of_well
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
         elif total_number_of_wells_in_plate <= 12:
-            liquid_height_of_well = find_liquid_height(pipette, well)
-            dict_of_labware_heights[labware_name, well] = liquid_height_of_well
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
     if pip_channels != pipette.channels:
         pipette.drop_tip()
     else:

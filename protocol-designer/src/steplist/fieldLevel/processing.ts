@@ -13,6 +13,9 @@ export const maskToInteger = (rawValue: unknown): string => {
   return rawNumericValue
 }
 export const maskToTime = (rawValue: unknown): string => {
+  if (rawValue == null) {
+    return ''
+  }
   const rawTimeValue =
     typeof rawValue === 'string'
       ? rawValue.replace(/[^-0-9:]/g, '')

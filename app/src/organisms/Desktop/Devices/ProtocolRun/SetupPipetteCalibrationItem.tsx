@@ -1,25 +1,28 @@
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
+
 import {
+  ALIGN_CENTER,
   Banner,
   Box,
-  Flex,
-  LegacyTooltip,
-  useHoverTooltip,
-  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_FLEX_END,
+  LegacyTooltip,
+  Link,
   SIZE_4,
+  SPACING,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
-  Link,
-  COLORS,
-  SPACING,
-  JUSTIFY_FLEX_END,
+  useHoverTooltip,
   WRAP,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '/app/atoms/buttons'
 import * as PipetteConstants from '/app/redux/pipettes/constants'
+
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 

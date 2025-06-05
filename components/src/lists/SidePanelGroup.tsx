@@ -1,8 +1,8 @@
 // SidePanelGroup component
 import cx from 'classnames'
 
-import styles from './lists.module.css'
 import { Icon } from '../icons'
+import styles from './lists.module.css'
 
 import type { ReactNode } from 'react'
 import type { IconName } from '../icons'

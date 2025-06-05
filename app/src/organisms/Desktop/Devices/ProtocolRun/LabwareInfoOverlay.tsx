@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   Box,
@@ -10,13 +11,18 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   RobotCoordsForeignDiv,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
 interface LabwareInfoProps {
   displayName: string
   labwareId: string
@@ -68,25 +74,37 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 }
 
 interface LabwareInfoOverlayProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   labwareId: string
   displayName: string
   runId: string
   labwareHasLiquid?: boolean
   hover?: boolean
+  xOffset?: number
+  yOffset?: number
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId, displayName, runId, labwareHasLiquid } = props
+  const {
+    definition,
+    labwareId,
+    displayName,
+    runId,
+    labwareHasLiquid,
+    xOffset,
+    yOffset,
+  } = props
 
-  const width = definition.dimensions.xDimension
-  const height = definition.dimensions.yDimension
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
+  const dimensions = getSchema2Dimensions(definition)
+
   return (
     <RobotCoordsForeignDiv
-      x={definition.cornerOffsetFromSlot.x}
-      y={definition.cornerOffsetFromSlot.y}
-      {...{ width, height }}
+      x={cornerOffsetFromSlot.x + (xOffset ?? 0)}
+      y={cornerOffsetFromSlot.y + (yOffset ?? 0)}
+      width={dimensions.xDimension}
+      height={dimensions.yDimension}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,

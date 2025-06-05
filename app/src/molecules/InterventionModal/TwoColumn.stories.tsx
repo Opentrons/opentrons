@@ -1,19 +1,18 @@
-import type * as React from 'react'
+import {
+  Box,
+  DIRECTION_COLUMN,
+  Flex,
+  InlineNotification,
+  LegacyStyledText,
+} from '@opentrons/components'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
-
-import {
-  LegacyStyledText,
-  Flex,
-  DIRECTION_COLUMN,
-  Box,
-} from '@opentrons/components'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { TwoColumn as TwoColumnComponent } from './'
 import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
 
 interface StorybookArgs {
   leftStandIn: boolean

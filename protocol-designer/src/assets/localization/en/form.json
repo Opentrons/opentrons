@@ -2,6 +2,39 @@
   "batch_edit_form": {
     "settings_for": "settings for {{prefix}}"
   },
+  "field_update_confirmation_modal": {
+    "fields": {
+      "path": "pipette path",
+      "pipette": "pipette",
+      "tipRack": "tips",
+      "volume": "volume"
+    },
+    "footer": {
+      "update_settings": "Update settings",
+      "use_current_settings": "Use current settings"
+    },
+    "liquid_class": {
+      "title": "Apply {{liquidClass}} liquid class settings",
+      "body": "Continuing will update this {{stepType}} step’s pipetting settings to the values of the {{liquidClass}} liquid class."
+    },
+    "no_liquid_class": {
+      "title": "Don’t use liquid class settings",
+      "body": "Continuing will undo any changes and clear all pipetting settings associated with the previously selected liquid class."
+    },
+    "other_fields": {
+      "title": "Update {{liquidClass}} liquid class settings?",
+      "body": "We noticed you changed the {{fieldNames}} in this {{stepType}} step. Do you want to use the current pipetting settings or update to the values of the {{liquidClass}} liquid class?"
+    },
+    "steps": {
+      "mix": "mix",
+      "moveLiquid": "transfer"
+    },
+    "string_helpers": {
+      "and_comma_spaces": ", and ",
+      "and_spaces": " and ",
+      "comma_space": ", "
+    }
+  },
   "generic": {
     "default_protocol_name": "Untitled",
     "error": {
@@ -111,11 +144,11 @@
       "change_tip": {
         "label": "change tip",
         "option": {
-          "always": "Before every aspirate",
+          "always": "Always",
           "never": "Never",
-          "once": "Once at the start of step",
-          "perDest": "Per destination well",
-          "perSource": "Per source well"
+          "once": "Once",
+          "perSource": "Per source",
+          "perDest": "Per destination"
         },
         "option_tooltip": {
           "always": "Always aspirate with a fresh tip.",
@@ -128,6 +161,13 @@
       "comment": {
         "label": "comment"
       },
+      "conditioning": {
+        "conditioning_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Conditioning volume"
+        },
+        "title": "Condition"
+      },
       "delay": {
         "label": "delay"
       },
@@ -138,7 +178,7 @@
       "flow_rate": {
         "default_text": "The default {{displayName}} flow rate is optimal for handling aqueous liquids",
         "error_decimals": "A max of {{decimals}} decimal places is allowed",
-        "error_out_of_bounds": "accepted range is {{min}} to {{max}}",
+        "error_out_of_bounds": "Enter a value within the specified range",
         "label": "Flow Rate",
         "range": "between {{min}} and {{max}}"
       },
@@ -150,14 +190,14 @@
           "toggleOn": "Open"
         },
         "shaker": {
-          "setShake": "Shake speed",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "setShake": "Shaker",
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "temperature": {
-          "setTemperature": "Temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Active"
+          "setTemperature": "Heater",
+          "toggleOff": "Off",
+          "toggleOn": "On"
         },
         "timer": {
           "heaterShakerSetTimer": "Timer"
@@ -169,7 +209,7 @@
         "pickUp": "pick up tip"
       },
       "magnetAction": {
-        "label": "Magnet state",
+        "label": "Magnets",
         "options": {
           "disengage": "Disengage",
           "engage": "Engage"
@@ -255,10 +295,9 @@
         "label": "Step Notes"
       },
       "temperature": {
-        "caption": "Valid range is 4 – 95˚C",
         "setTemperature": "Temperature",
-        "toggleOff": "Deactivate",
-        "toggleOn": "Set"
+        "toggleOff": "Off",
+        "toggleOn": "On"
       },
       "thermocyclerAction": {
         "options": {
@@ -293,21 +332,21 @@
       },
       "thermocyclerState": {
         "block": {
-          "engage": "Block temperature",
+          "engage": "Block",
           "label": "Thermocycler block",
           "temperature": "Block temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
-          "valid_range": "Valid range between 4 and 96ºC"
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 4 and 96°C"
         },
         "ending_hold": "Ending hold",
         "lid": {
-          "engage": "Lid temperature",
+          "engage": "Lid",
           "label": "Lid",
           "temperature": "Lid temperature",
-          "toggleOff": "Deactivate",
-          "toggleOn": "Activate",
-          "valid_range": "Valid range between 37 and 110ºC"
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 37 and 110°C"
         },
         "lidPosition": {
           "label": "Lid position",
@@ -357,9 +396,9 @@
       "mixLabware": "labware",
       "movedLabware": "labware"
     },
+    "heat_or_cool": "Heat or cool",
     "mixRepetitions": "repetitions",
     "mixVolumeLabel": "mix volume",
-    "moduleState": "Module state",
     "multiDispenseOptionsLabel": "multi-dispense options",
     "section": {
       "dropTip": "drop tip",

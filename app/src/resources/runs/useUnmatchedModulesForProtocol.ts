@@ -1,14 +1,16 @@
 import reduce from 'lodash/reduce'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import {
+  getModuleType,
+  NON_CONNECTING_MODULE_TYPES,
+} from '@opentrons/shared-data'
 
 import { useRobot } from '/app/redux-resources/robots'
 import { useAttachedModules } from '/app/resources/modules'
+
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
-import {
-  NON_CONNECTING_MODULE_TYPES,
-  getModuleType,
-} from '@opentrons/shared-data'
+
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]

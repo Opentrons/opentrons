@@ -1,18 +1,19 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  selectIsSelectedLwTipRack,
-  selectSelectedLwOverview,
-  OFFSET_KIND_DEFAULT,
-  selectLwDisplayName,
   getFlexSlotNameOnly,
-  selectActivePipetteChannelCount,
+  OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  selectActivePipetteChannelCount,
+  selectIsSelectedLwTipRack,
+  selectLwDisplayName,
+  selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
+
 import { PlaceItemInstruction } from '../PlaceItemInstruction'
 
 vi.mock('react-redux', async () => {

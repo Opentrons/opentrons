@@ -1,60 +1,62 @@
-import type * as React from 'react'
-
 import { css } from 'styled-components'
-import { DeckMapContent } from '.'
-import { Box, RESPONSIVENESS, BORDERS } from '@opentrons/components'
-import type { Meta, StoryObj } from '@storybook/react'
+
+import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   fixture96Plate,
   fixtureTiprack1000ul,
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
+  OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import type { ModuleLocation, LabwareDefinition2 } from '@opentrons/shared-data'
+
+import { DeckMapContent } from '.'
 import {
   EXTENDED_DECK_CONFIG_FIXTURE,
   STANDARD_SLOT_DECK_CONFIG_FIXTURE,
   WASTE_CHUTE_DECK_CONFIG_FIXTURE,
 } from './__fixtures__'
-import { TwoColumn } from './TwoColumn'
 import { StandInContent } from './story-utils/StandIn'
+import { TwoColumn } from './TwoColumn'
+
+import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
+import type { LabwareDefinition, ModuleLocation } from '@opentrons/shared-data'
 
 const DEFAULT_MODULES_ON_DECK = [
   {
     moduleLocation: { slotName: 'B1' },
     moduleModel: THERMOCYCLER_MODULE_V2,
-    nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+    nestedLabwareDef: fixture96Plate as LabwareDefinition,
     innerProps: { lidMotorState: 'open' },
   },
   {
     moduleLocation: { slotName: 'D1' },
     moduleModel: TEMPERATURE_MODULE_V2,
-    nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+    nestedLabwareDef: fixture96Plate as LabwareDefinition,
   },
   {
     moduleLocation: { slotName: 'B3' },
     moduleModel: HEATERSHAKER_MODULE_V1,
-    nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+    nestedLabwareDef: fixture96Plate as LabwareDefinition,
   },
   {
     moduleLocation: { slotName: 'D2' },
     moduleModel: MAGNETIC_BLOCK_V1,
-    nestedLabwareDef: fixture96Plate as LabwareDefinition2,
+    nestedLabwareDef: fixture96Plate as LabwareDefinition,
   },
 ]
 
 const DEFAULT_LABWARE_ON_DECK = [
   {
     labwareLocation: { slotName: 'C2' },
-    definition: fixture96Plate as LabwareDefinition2,
+    definition: fixture96Plate as LabwareDefinition,
   },
   {
     labwareLocation: { slotName: 'C3' },
-    definition: fixtureTiprack1000ul as LabwareDefinition2,
+    definition: fixtureTiprack1000ul as LabwareDefinition,
   },
 ]
 

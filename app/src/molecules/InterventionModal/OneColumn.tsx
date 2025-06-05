@@ -1,6 +1,6 @@
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 

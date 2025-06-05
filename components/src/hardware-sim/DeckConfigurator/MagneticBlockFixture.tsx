@@ -1,21 +1,21 @@
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_2_X_ADJUSTMENT,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_3_X_ADJUSTMENT,
-  FIXTURE_HEIGHT,
-  Y_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
-  STAGING_AREA_FIXTURE_WIDTH,
   CONFIG_STYLE_SELECTED,
+  FIXTURE_HEIGHT,
+  STAGING_AREA_FIXTURE_WIDTH,
+  Y_ADJUSTMENT,
 } from './constants'
 
 import type {

@@ -1,17 +1,17 @@
-import { when } from 'vitest-when'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import { useRobot } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery')
 

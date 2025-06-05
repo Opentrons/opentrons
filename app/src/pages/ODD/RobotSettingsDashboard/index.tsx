@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   DeviceReset,
-  TouchscreenBrightness,
-  TouchScreenSleep,
   LanguageSetting,
   NetworkSettings,
   Privacy,
@@ -18,12 +15,11 @@ import {
   RobotSettingsWifi,
   RobotSettingsWifiConnect,
   RobotSystemVersion,
+  TouchscreenBrightness,
+  TouchScreenSleep,
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
-import {
-  getRobotUpdateAvailable,
-  getRobotUpdateInfoForRobot,
-} from '/app/redux/robot-update'
+import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   getLocalRobot,
   getRobotApiVersion,
@@ -31,12 +27,17 @@ import {
 } from '/app/redux/discovery'
 import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
 import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
-import { useWifiList, useNetworkConnection } from '/app/resources/networking'
+import {
+  getRobotUpdateAvailable,
+  getRobotUpdateInfoForRobot,
+} from '/app/redux/robot-update'
+import { useNetworkConnection, useWifiList } from '/app/resources/networking'
+
 import { RobotSettingsList } from './RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
 import type { SettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')

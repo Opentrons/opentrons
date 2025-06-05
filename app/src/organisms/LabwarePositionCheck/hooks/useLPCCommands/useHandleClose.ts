@@ -1,9 +1,11 @@
 import { useState } from 'react'
+
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
+
 import { retractSafelyAndHomeCommands } from './commands'
 
-import type { UseLPCCommandChildProps } from './types'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { UseLPCCommandChildProps } from './types'
 
 export interface UseHandleConditionalCleanupResult {
   isExiting: boolean

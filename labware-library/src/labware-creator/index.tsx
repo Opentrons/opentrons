@@ -1,14 +1,13 @@
 import assert from 'assert'
-import Ajv from 'ajv'
 import * as React from 'react'
-import { Formik } from 'formik'
+import Ajv from 'ajv'
 import { saveAs } from 'file-saver'
-import { reportEvent } from '../analytics'
-import { reportErrors } from './analyticsUtils'
+import { Formik } from 'formik'
+
 import {
+  AlertModal,
   ALIGN_CENTER,
   ALIGN_END,
-  AlertModal,
   Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -17,33 +16,15 @@ import {
   ModalShell,
   PrimaryButton,
 } from '@opentrons/components'
-import {
-  getAllDefinitions,
-  labwareSchemaV2 as labwareSchema,
-} from '@opentrons/shared-data'
-import {
-  aluminumBlockAutofills,
-  aluminumBlockChildTypeOptions,
-  aluminumBlockTypeOptions,
-  getDefaultFormState,
-  getInitialStatus,
-  tubeRackAutofills,
-  tubeRackInsertOptions,
-} from './fields'
+import { getAllDefinitions, labwareSchemaV2 } from '@opentrons/shared-data'
 
-import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
-import { labwareDefToFields } from './labwareDefToFields'
-import { labwareFormSchema } from './labwareFormSchema'
-import { formLevelValidation } from './formLevelValidation'
-import { fieldsToLabware } from './fieldsToLabware'
-import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
+import { reportEvent } from '../analytics'
+import { reportErrors } from './analyticsUtils'
 import { Dropdown } from './components/Dropdown'
-import { IntroCopy } from './components/IntroCopy'
-
 import { ImportErrorModal } from './components/ImportErrorModal'
+import { IntroCopy } from './components/IntroCopy'
+import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
-import { UploadExisting } from './components/sections/UploadExisting'
-
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
 import { Description } from './components/sections/Description'
 import { Export } from './components/sections/Export'
@@ -55,29 +36,46 @@ import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
 import { Height } from './components/sections/Height'
 import { Preview } from './components/sections/Preview'
 import { Regularity } from './components/sections/Regularity'
+import { StackingOffsets } from './components/sections/StackingOffsets'
+import { UploadExisting } from './components/sections/UploadExisting'
 import { Volume } from './components/sections/Volume'
 import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
+import {
+  aluminumBlockAutofills,
+  aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
+  getDefaultFormState,
+  getInitialStatus,
+  tubeRackAutofills,
+  tubeRackInsertOptions,
+} from './fields'
+import { fieldsToLabware } from './fieldsToLabware'
+import { formLevelValidation } from './formLevelValidation'
 import { getDefaultedDef } from './getDefaultedDef'
+import { labwareDefToFields } from './labwareDefToFields'
+import { labwareFormSchema } from './labwareFormSchema'
+import styles from './styles.module.css'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
-import { StackingOffsets } from './components/sections/StackingOffsets'
+import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { WizardHeader } from './WizardHeader'
 
 import type { FormikErrors } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareCreatorErrors } from './formLevelValidation'
 import type {
   FormStatus,
   ImportError,
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import type { LabwareCreatorErrors } from './formLevelValidation'
 
-import styles from './styles.module.css'
-
+// todo(mm, 2025-05-16): Deduplicate with app and shared-data for schema 3 support and
+// better type-guarding.
 const ajv = new Ajv()
-const validateLabwareSchema = ajv.compile(labwareSchema)
+const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
+
 type WizardStep =
   | 'intro'
   | 'regularity'
@@ -286,13 +284,13 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
             return
           }
 
-          if (!Boolean(validateLabwareSchema(parsedLabwareDef))) {
-            console.warn(validateLabwareSchema.errors)
+          if (!Boolean(validateLabwareSchema2(parsedLabwareDef))) {
+            console.warn(validateLabwareSchema2.errors)
 
             setImportError({
               key: 'INVALID_LABWARE_DEF',
               // @ts-expect-error(IL, 2021-03-24): ajv def mixup
-              messages: validateLabwareSchema.errors.map(
+              messages: validateLabwareSchema2.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
 import { Menu, shell } from 'electron'
-import type { MenuItemConstructorOptions } from 'electron'
 
 import { LOG_DIR } from './log'
+
+import type { MenuItemConstructorOptions } from 'electron'
 
 const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_
 const BUGS_URL: string = _PKG_BUGS_URL_

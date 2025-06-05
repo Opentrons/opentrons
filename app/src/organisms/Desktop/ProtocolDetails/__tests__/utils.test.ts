@@ -1,10 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
+  FLEX_STANDARD_MODEL,
+  OT2_STANDARD_MODEL,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
-  OT2_STANDARD_MODEL,
-  FLEX_STANDARD_MODEL,
 } from '@opentrons/shared-data'
+
 import { getSlotsForThermocycler } from '../utils'
 
 describe('getSlotsForThermocylcer', () => {

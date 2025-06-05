@@ -1,15 +1,16 @@
 import { useFormikContext } from 'formik'
 import capitalize from 'lodash/capitalize'
+
 import { makeMaskToDecimal } from '../../fieldMasks'
+import styles from '../../styles.module.css'
 import { displayAsTube, getLabwareName } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
-import { wellShapeOptionsWithIcons } from '../optionsWithImages'
-import { TextField } from '../TextField'
-import { RadioField } from '../RadioField'
 import { WellXYImg } from '../diagrams'
+import { wellShapeOptionsWithIcons } from '../optionsWithImages'
+import { RadioField } from '../RadioField'
+import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.module.css'
 import type { LabwareFields } from '../../fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)

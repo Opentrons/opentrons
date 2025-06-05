@@ -1,12 +1,16 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom/vitest'
-import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data'
-import { WellLabels } from '../WellLabels'
-import { WELL_LABEL_OPTIONS } from '../../LabwareRender'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, expect, it } from 'vitest'
 
-const troughFixture12 = _fixture12Trough as LabwareDefinition2
+import '@testing-library/jest-dom/vitest'
+
+import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data'
+
+import { WELL_LABEL_OPTIONS } from '../../LabwareRender'
+import { WellLabels } from '../WellLabels'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
+const troughFixture12 = _fixture12Trough as LabwareDefinition
 
 describe('WellLabels', () => {
   it('should render well labels outside of the labware', () => {

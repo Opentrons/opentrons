@@ -1,6 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
-import { AIR } from '@opentrons/step-generation'
+import { describe, expect, it, vi } from 'vitest'
+
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
+import { AIR } from '@opentrons/step-generation'
+
 import { swatchColors } from '../swatchColors'
 
 vi.spyOn(console, 'warn').mockImplementation(() => {})

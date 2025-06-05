@@ -1,18 +1,19 @@
-import labwareSchemaV2 from '../labware/schemas/2.json'
-
-import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
-import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
+import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
+import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
+import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
-import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
-import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
+import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
+import labwareSchemaV2 from '../labware/schemas/2.json'
+import labwareSchemaV3 from '../labware/schemas/3.json'
 
 import type {
-  LabwareDefByDefURI,
+  LabwareDef2ByDefURI,
+  LabwareDefinition,
   LabwareDefinition1,
   LabwareDefinition2,
   LabwareDefinition3,
@@ -23,9 +24,7 @@ import type {
 // that instead, but using it gives me obscure "TypeError: getLabwareDefURI is not a function"
 // errors in certain test files. Some kind of circular dependency problem? Some kind of
 // mocking problem?
-function getLabwareDefURI(
-  def: LabwareDefinition2 | LabwareDefinition3
-): string {
+function getLabwareDefURI(def: LabwareDefinition): string {
   return `${def.namespace}/${def.parameters.loadName}/${def.version}`
 }
 
@@ -79,16 +78,16 @@ const schema3DefinitionsByURI = Object.fromEntries(
 export const getAllLabwareDefs = (): Record<string, LabwareDefinition2> =>
   schema2DefinitionsByURI
 
-let _definitions: LabwareDefByDefURI | null = null
+let _definitions: LabwareDef2ByDefURI | null = null
 export function getAllDefinitions(
   blockList: string[] = []
-): LabwareDefByDefURI {
+): LabwareDef2ByDefURI {
   // todo(mm, 2025-02-27): This looks suspicious: if we're called twice with two
   // different blockList values, we'll return the same results for both.
   if (_definitions == null) {
     _definitions = Object.values(
       getAllLabwareDefs()
-    ).reduce<LabwareDefByDefURI>((acc, labwareDef: LabwareDefinition2) => {
+    ).reduce<LabwareDef2ByDefURI>((acc, labwareDef: LabwareDefinition2) => {
       const labwareDefURI = getLabwareDefURI(labwareDef)
       return blockList.includes(labwareDef.parameters.loadName)
         ? acc
@@ -105,6 +104,7 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
 
 export {
   labwareSchemaV2,
+  labwareSchemaV3,
   fixture96Plate,
   fixture12Trough,
   fixture24Tuberack,

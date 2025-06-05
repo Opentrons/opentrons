@@ -1,16 +1,16 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  mockLPCContentProps,
   mockLocationSpecificOffsetDetails,
+  mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LocationSpecificOffsetsContainer } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/LocationSpecificOffsetsContainer'
 import {
-  selectSortedLSOffsetDetailsWithCopy,
   selectSelectedLwOverview,
+  selectSortedLSOffsetDetailsWithCopy,
 } from '/app/redux/protocol-runs'
 
 import type { ComponentProps } from 'react'

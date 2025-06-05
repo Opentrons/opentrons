@@ -1,16 +1,18 @@
-import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
+  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
+
 import { getSavedStepForms } from '../../../../step-forms/selectors'
 
 import type { ProfileStepItem } from '../../../../form-types'

@@ -1,11 +1,12 @@
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRunHasStarted } from '/app/resources/runs'
 import { formatTimestamp } from '/app/transformations/runs'
+
 import { SetupCalibrationItem } from '../SetupCalibrationItem'
 
 import type { ComponentProps } from 'react'

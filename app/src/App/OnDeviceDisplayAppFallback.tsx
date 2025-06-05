@@ -1,11 +1,6 @@
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '/app/redux/analytics'
-import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
-
-import type { FallbackProps } from 'react-error-boundary'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -13,16 +8,19 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import { appRestart, sendLog } from '/app/redux/shell'
 
-import type { Dispatch } from '/app/redux/types'
+import type { FallbackProps } from 'react-error-boundary'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function OnDeviceDisplayAppFallback({
   error,

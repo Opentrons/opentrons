@@ -2,7 +2,7 @@ import abc
 import asyncio
 import logging
 import re
-from typing import ClassVar, Mapping, Optional, TypeVar
+from typing import Any, ClassVar, Mapping, Optional, TypeVar
 from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -14,6 +14,7 @@ from .types import (
     UploadFunction,
     LiveData,
     ModuleType,
+    HopperDoorState,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -179,6 +180,11 @@ class AbstractModule(abc.ABC):
         """The usb serial number of this device."""
         return self.device_info.get("serial")
 
+    @property
+    def hopper_door_state(self) -> Optional[HopperDoorState]:
+        """Return a Flex Stacker Hopper Module Door State"""
+        pass
+
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
         """Prepare for an update.
@@ -223,4 +229,12 @@ class AbstractModule(abc.ABC):
         Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
         object destruction.
         """
+        pass
+
+    def event_listener(self, event: Any) -> None:
+        """Listen for events and update the module state."""
+        pass
+
+    async def identify(self, start: bool, color: Optional[str] = None) -> None:
+        """Identify the module."""
         pass

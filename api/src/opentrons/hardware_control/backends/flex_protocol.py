@@ -36,6 +36,8 @@ from opentrons.hardware_control.types import (
     HepaFanState,
     HepaUVState,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     PipetteSensorResponseQueue,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -422,7 +424,15 @@ class FlexBackend(Protocol):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         ...
 
+    def get_status_bar_enabled(self) -> bool:
+        ...
+
     def get_status_bar_state(self) -> StatusBarState:
+        ...
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
         ...
 
     @property
