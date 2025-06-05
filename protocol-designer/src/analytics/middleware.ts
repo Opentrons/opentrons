@@ -379,6 +379,8 @@ export const reduxActionToAnalyticsEvent = (
         const { liquidClass } = ingredient
         if (liquidClass != null) {
           acc.push(liquidClass)
+        } else {
+          acc.push('none')
         }
         return acc
       },
