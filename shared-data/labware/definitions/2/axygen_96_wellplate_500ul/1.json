@@ -1006,7 +1006,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "axygen_96_wellplate_500ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

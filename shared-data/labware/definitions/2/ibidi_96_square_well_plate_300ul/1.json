@@ -1087,7 +1087,7 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "gripForce": 15,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "dimensions": { "xDimension": 127.76, "yDimension": 85.47, "zDimension": 15 },
   "parameters": {
     "format": "irregular",

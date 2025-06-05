@@ -4690,7 +4690,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "smc_384_read_plate"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

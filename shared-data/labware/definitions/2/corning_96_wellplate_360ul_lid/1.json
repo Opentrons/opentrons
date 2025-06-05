@@ -35,7 +35,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "corning_96_wellplate_360ul_lid"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithModule": {
