@@ -36,9 +36,9 @@ export function Configurations({
           desktopStyle="bodyDefaultSemiBold"
           css={LINE_CLAMP_TEXT_STYLE(1)}
         >
-          {t('configurations')}
+          {t('configuration')}
         </StyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <HardwareStep sidebarWidth={sidebarWidth} />
           <LiquidButton
             showLiquidOverflowMenu={showLiquidOverflowMenu}

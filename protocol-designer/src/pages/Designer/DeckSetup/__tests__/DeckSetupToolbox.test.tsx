@@ -107,7 +107,7 @@ describe('DeckSetupToolbox', () => {
   })
   it('should render empty labware and add labware CTA opens modal ', () => {
     render(props)
-    screen.getByText('Customize slot')
+    screen.getByText('Edit labware')
     screen.getByText('Add labware')
     screen.getByText('No labware added')
     screen.getByText('Select labware to add to slot')

@@ -1,5 +1,7 @@
 import pick from 'lodash/pick'
 
+import { ALL, SINGLE } from '@opentrons/shared-data'
+
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import {
   chainPatchUpdaters,
@@ -9,6 +11,7 @@ import {
   getDefaultWells,
 } from './utils'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
@@ -56,39 +59,21 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update = {}
-  const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
-  const nChannels =
+  const previousChannels = getChannels(
+    rawForm.pipette as string,
+    pipetteEntities
+  )
+  const nextChannels =
     typeof patch.pipette === 'string'
-      ? getChannels(patch.pipette, pipetteEntities)
+      ? getChannels(patch.pipette as string, pipetteEntities)
       : null
+
   const appliedPatch = { ...rawForm, ...patch }
-  let previousChannels = prevChannels
-  if (
-    rawForm.stepType === 'moveLiquid' ||
-    (rawForm.stepType === 'mix' && prevChannels === 96)
-  ) {
-    if (rawForm.nozzles === 'full') {
-      previousChannels = 96
-    } else {
-      previousChannels = 8
-    }
-  }
-  let nextChannels = nChannels
-  if (
-    rawForm.stepType === 'moveLiquid' ||
-    (rawForm.stepType === 'mix' && nChannels === 96)
-  ) {
-    if (rawForm.nozzles === 'full') {
-      nextChannels = 96
-    } else {
-      nextChannels = 8
-    }
-  }
 
   const singleToMulti =
-    previousChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+    previousChannels === 1 && nextChannels === 8 && patch.nozzles !== SINGLE
   const multiToSingle =
-    (previousChannels === 8 || previousChannels === 96) && nextChannels === 1
+    previousChannels === 8 && rawForm.nozzles !== SINGLE && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
@@ -102,17 +87,6 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
-    let channels: 8 | 96 = 8
-    if (
-      rawForm.stepType === 'moveLiquid' ||
-      (rawForm.stepType === 'mix' && prevChannels === 96)
-    ) {
-      if (rawForm.nozzles === 'full') {
-        channels = 96
-      } else {
-        channels = 8
-      }
-    }
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
 
@@ -122,7 +96,7 @@ const updatePatchOnPipetteChannelChange = (
         wells: getAllWellsFromPrimaryWells(
           appliedPatch.wells as string[],
           labwareDef,
-          channels
+          previousChannels
         ),
       }
     }
@@ -133,19 +107,25 @@ const updatePatchOnPipetteChannelChange = (
 
 const updatePatchOnPipetteChange = (
   patch: FormPatch,
-  rawForm: FormData
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
 ): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates to null
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
+    let nozzles: NozzleConfigurationStyle | null = null
+    const newPipette = patch.pipette
+
+    if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
+      const hasPartialTipSupportedChannel =
+        pipetteEntities[newPipette].spec.channels !== 1
+      nozzles = hasPartialTipSupportedChannel ? ALL : null
+    }
+
     return {
       ...patch,
-      ...getDefaultFields(
-        'aspirate_flowRate',
-        'dispense_flowRate',
-        'tipRack',
-        'nozzles'
-      ),
+      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate', 'tipRack'),
+      nozzles,
     }
   }
 
@@ -163,23 +143,6 @@ const updatePatchOnTiprackChange = (
     }
   }
 
-  return patch
-}
-
-const updatePatchOnNozzleChange = (
-  patch: FormPatch,
-  rawForm: FormData,
-  pipetteEntities: PipetteEntities
-): FormPatch => {
-  if (
-    Object.values(pipetteEntities).find(pip => pip.spec.channels === 96) &&
-    fieldHasChanged(rawForm, patch, 'nozzles')
-  ) {
-    return {
-      ...patch,
-      ...getDefaultFields('wells'),
-    }
-  }
   return patch
 }
 
@@ -205,9 +168,8 @@ export function dependentFieldsUpdateMix(
         labwareEntities,
         pipetteEntities
       ),
-    chainPatch => updatePatchOnPipetteChange(chainPatch, rawForm),
-    chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
     chainPatch =>
-      updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
+      updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
   ])
 }

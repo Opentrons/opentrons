@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { ALL } from '@opentrons/shared-data'
 import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
@@ -110,7 +111,7 @@ describe('well selection should update', () => {
       wells: [],
       aspirate_flowRate: null,
       dispense_flowRate: null,
-      nozzles: null,
+      nozzles: ALL,
       tipRack: null,
     })
   })

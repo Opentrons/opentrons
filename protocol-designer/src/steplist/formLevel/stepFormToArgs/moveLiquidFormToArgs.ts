@@ -119,6 +119,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
           disposalByVolume: null,
         })
@@ -128,6 +130,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
             (liquidClassValuesForTip.multiDispense
               ?.conditioningByVolume as Array<[number, number]>) ?? null,
