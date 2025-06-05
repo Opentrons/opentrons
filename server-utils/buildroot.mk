@@ -21,7 +21,7 @@ PYTHON_OPENTRONS_SERVER_UTILS_SERVICE_FILE_NAME=opentrons-server-utils.service
 PYTHON_OPENTRONS_SERVER_UTILS_DEPENDENCIES = host-python-hatch-vcs-tunable host-python-hatch-dependency-coversion
 PYTHON_OPENTRONS_SERVER_UTILS_ENV = \
   HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_SERVER_UTILS_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
-  HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT)) \
+  HATCH_VCS_TUNABLE_TAG_PATTERN="$(call git_tag_regex_for_project,$(PROJECT))" \
   HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 
 define PYTHON_OPENTRONS_SERVER_UTILS_INSTALL_VERSION

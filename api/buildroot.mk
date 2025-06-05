@@ -5,6 +5,7 @@
 ################################################################################
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
+
 define OTAPI_CALL_PBU
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
@@ -20,7 +21,7 @@ PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VE
 PYTHON_OPENTRONS_API_DEPENDENCIES = host-python-hatch-vcs-tunable host-python-hatch-dependency-coversion
 PYTHON_OPENTRONS_API_ENV = \
   HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_API_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
-  HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT)) \
+  HATCH_VCS_TUNABLE_TAG_PATTERN="$(call git_tag_regex_for_project,$(PROJECT))" \
   HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 
 define PYTHON_OPENTRONS_API_INSTALL_VERSION

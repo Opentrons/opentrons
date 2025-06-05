@@ -21,7 +21,7 @@ PYTHON_OPENTRONS_SYSTEM_SERVER_SERVICE_FILE_NAME=opentrons-system-server.service
 PYTHON_OPENTRONS_SYSTEM_SERVER_DEPENDENCIES = host-python-hatch-vcs-tunable
 PYTHON_OPENTRONS_SYSTEM_SERVER_ENV = \
   HATCH_VCS_TUNABLE_RAW_OPTIONS="root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_SYSTEM_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))" \
-  HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT)) \
+  HATCH_VCS_TUNABLE_TAG_PATTERN="$(call git_tag_regex_for_project,$(PROJECT))" \
   HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 
 
