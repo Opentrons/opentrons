@@ -36,6 +36,7 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getAAByAAId,
   getAADisplayName,
+  getAAFromCutoutFixtureId,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   HEATERSHAKER_MODULE_V1,
@@ -59,6 +60,7 @@ import {
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { ConnectRobotSlideout } from '../Desktop/AppSettings/ConnectRobotSlideout'
 import { getAddressableAreaNameFrom } from '../LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/getUniqueValidLwLocationInfoByAnalysis/getLPCUniqValidLabwareLocationInfo/helpers'
 
 import type { ModalProps } from '@opentrons/components'
@@ -68,7 +70,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { ConnectRobotSlideout } from '../Desktop/AppSettings/ConnectRobotSlideout'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -115,7 +116,7 @@ export function AddFixtureModal({
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to', {
-      slotName: getAADisplayName(addressableArea),
+      slotName: getAADisplayName(addressableAreaId),
     }),
     hasExitIcon: providedFixtureOptions == null,
     onClick: closeModal,
@@ -123,7 +124,7 @@ export function AddFixtureModal({
 
   const modalProps: ModalProps = {
     title: t('add_to', {
-      slotName: getAADisplayName(addressableArea),
+      slotName: getAADisplayName(addressableAreaId),
     }),
     onClose: closeModal,
     closeOnOutsideClick: true,
@@ -131,11 +132,11 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const aaNameMapToSlotId: Record<AddressableAreaName, string> = {
-    D4 :"fakeD4",
-    C4: "fakeC4",
-    B4: "fakeB4",
-    A4: "fakeA4",
+  const aaNameMapToSlotId: Record<AddressableAreaNamesWithFakes, string> = {
+    D4: 'fakeD4',
+    C4: 'fakeC4',
+    B4: 'fakeB4',
+    A4: 'fakeA4',
     flexStackerModuleV1D4: 'fakeD4',
     flexStackerModuleV1C4: 'fakeC4',
     flexStackerModuleV1B4: 'fakeB4',
@@ -179,7 +180,7 @@ export function AddFixtureModal({
     movableTrashD3: 'D3',
     movableTrashC3: 'C3',
     movableTrashB3: 'B3',
-    movableTrashA3: 'A3'
+    movableTrashA3: 'A3',
   } as const
 
   const MODULE_CUTOUT_FIXTURE_ID = [
@@ -234,7 +235,7 @@ export function AddFixtureModal({
         if (aaListStackerMagBlock != null) {
           const aaStackerMagBlock = aaListStackerMagBlock.find(
             (aa: AddressableAreaNamesWithFakes) =>
-              aaNameMapToSlotId[aa] == addressableArea.id
+              aaNameMapToSlotId[aa] == addressableAreaId
           ) as AddressableAreaNamesWithFakes
           stackerOptions.push([
             {
@@ -257,11 +258,11 @@ export function AddFixtureModal({
 
           const aaWithCover = aaListWithCover.find(
             (aa: AddressableAreaNamesWithFakes) =>
-              aaNameMapToSlotId[aa] == addressableArea.id
+              aaNameMapToSlotId[aa] == addressableAreaId
           ) as AddressableAreaNamesWithFakes
           const aaWithNoCover = aaListWithNoCover.find(
             (aa: AddressableAreaNamesWithFakes) =>
-              aaNameMapToSlotId[aa] == addressableArea.id
+              aaNameMapToSlotId[aa] == addressableAreaId
           ) as AddressableAreaNamesWithFakes
           stackerOptions.push(
             [
@@ -288,11 +289,11 @@ export function AddFixtureModal({
         const flexStackerAAItems = addressableAreasById[cutoutFixtureId]
         if (flexStackerAAItems != null) {
           const aa = flexStackerAAItems.find(
-            aa => aaNameMapToSlotId[aa] == addressableArea.id
+            aa => aaNameMapToSlotId[aa] == addressableAreaId
           )
           console.log('aa', aa)
           if (aa == undefined) {
-            console.error(`Was not able to find aa for ${addressableArea.id}`)
+            console.error(`Was not able to find aa for ${addressableAreaId}`)
           } else {
             stackerOptions.push([
               {
@@ -315,11 +316,11 @@ export function AddFixtureModal({
 
         console.log('aaList: ', aaList)
         const aa = aaList.find(
-          aa => aaNameMapToSlotId[aa] == addressableArea.id
+          aa => aaNameMapToSlotId[aa] == addressableAreaId
         ) as AddressableAreaName
         console.log('aa', aa)
         if (aa == undefined) {
-          console.error(`Was not able to find aa for ${addressableArea.id}`)
+          console.error(`Was not able to find aa for ${addressableAreaId}`)
         }
         return [
           {
@@ -424,15 +425,15 @@ export function AddFixtureModal({
     if (aaListMagBlock != null) {
       const aaMagBlock = aaListMagBlock.find(
         (aa: AddressableAreaNamesWithFakes) =>
-          aaNameMapToSlotId[aa] == addressableArea.id
+          aaNameMapToSlotId[aa] == addressableAreaId
       ) as AddressableAreaNamesWithFakes
-        availableOptions.push([
-          {
-            cutoutId,
-            cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-            addressableAreaId: aaMagBlock,
-          }]
-      )
+      availableOptions.push([
+        {
+          cutoutId,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+          addressableAreaId: aaMagBlock,
+        },
+      ])
     }
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
@@ -443,7 +444,7 @@ export function AddFixtureModal({
       if (aaListStagingAndMagBlock != null) {
         const aaMagBlockWithStaging = aaListMagBlock.find(
           (aa: AddressableAreaNamesWithFakes) =>
-            aaNameMapToSlotId[aa] == addressableArea.id
+            aaNameMapToSlotId[aa] == addressableAreaId
         ) as AddressableAreaNamesWithFakes
         availableOptions = [
           ...availableOptions,
@@ -468,53 +469,47 @@ export function AddFixtureModal({
 
   const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
     let availableOptions: CutoutConfigMap[][] = []
-      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
-        cutoutId
-      )
-      console.log("addressableAreasById: ", addressableAreasById)
-      const aaListTrashBin =
-        addressableAreasById[TRASH_BIN_ADAPTER_FIXTURE]
-        console.log("aaListTrashBin: ", aaListTrashBin)
-        console.log(" aaNameMapToSlotId[aa]: ",  aaListTrashBin[0])
-        console.log("addressableArea.id: ", addressableArea.id)
-      if (aaListTrashBin != null) {
-        const TrashBinAA = aaListTrashBin.find(
-          (aa: AddressableAreaNamesWithFakes) =>
-            aaNameMapToSlotId[aa] == addressableArea.id
-        ) as AddressableAreaNamesWithFakes
-        console.log("TrashBinAA: ", TrashBinAA)
-        if(TrashBinAA != null){
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-            addressableAreaId: TrashBinAA
-          },
-        ],
-      ]
+    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      cutoutId
+    )
+    const aaListTrashBin = addressableAreasById[TRASH_BIN_ADAPTER_FIXTURE]
+    if (aaListTrashBin != null) {
+      const TrashBinAA = aaListTrashBin.find(
+        (aa: AddressableAreaNamesWithFakes) =>
+          aaNameMapToSlotId[aa] == addressableAreaId
+      ) as AddressableAreaNamesWithFakes
+      if (TrashBinAA != null) {
+        availableOptions = [
+          ...availableOptions,
+          [
+            {
+              cutoutId,
+              cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+              addressableAreaId: TrashBinAA,
+            },
+          ],
+        ]
+      }
     }
-  }
     const aaListStagingArea =
-        addressableAreasById[STAGING_AREA_RIGHT_SLOT_FIXTURE]
-      if (aaListStagingArea != null) {
-        const stagingAreaAA = aaListStagingArea.find(
-          (aa: AddressableAreaNamesWithFakes) =>
-            aaNameMapToSlotId[aa] == addressableArea.id
-        ) as AddressableAreaNamesWithFakes
+      addressableAreasById[STAGING_AREA_RIGHT_SLOT_FIXTURE]
+    if (aaListStagingArea != null) {
+      const stagingAreaAA = aaListStagingArea.find(
+        (aa: AddressableAreaNamesWithFakes) =>
+          aaNameMapToSlotId[aa] == addressableAreaId
+      ) as AddressableAreaNamesWithFakes
       availableOptions = [
         ...availableOptions,
         [
           {
             cutoutId,
             cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-            addressableAreaId: stagingAreaAA
+            addressableAreaId: stagingAreaAA,
           },
         ],
       ]
     }
-    console.log("availableOptions: ", availableOptions)
+    console.log('availableOptions: ', availableOptions)
     return availableOptions
   }
 
@@ -525,13 +520,27 @@ export function AddFixtureModal({
     optionStage: string
   ): CutoutConfigMap[][] => {
     if (providedFixtureOptions != null) {
-      return providedFixtureOptions?.map(o => [
-        {
-          cutoutId,
-          cutoutFixtureId: o,
-          opentronsModuleSerialNumber: undefined,
-        },
-      ])
+      return providedFixtureOptions?.map((o: CutoutFixtureId) => {
+        const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+          cutoutId
+        )
+        const aaProvidedFixtureOptions = addressableAreasById[o]
+        if (aaProvidedFixtureOptions != null) {
+          const aaProvidedFixtureOptionsItems = aaProvidedFixtureOptions.find(
+            (aa: AddressableAreaNamesWithFakes) =>
+              aaNameMapToSlotId[aa] == addressableAreaId
+          ) as AddressableAreaNamesWithFakes
+          return [
+            {
+              cutoutId,
+              cutoutFixtureId: o,
+              addressableAreaId: aaProvidedFixtureOptionsItems,
+              opentronsModuleSerialNumber: undefined,
+            },
+          ]
+        }
+        return []
+      })
     }
     if (optionStage === 'fixtureOptions') {
       return getFixtureOptions(cutoutId)
@@ -611,7 +620,7 @@ export function AddFixtureModal({
         c => c.cutoutId === fixture.cutoutId
       )
       return replacementCutoutConfig ?? fixture
-    })
+    }) as CutoutConfig[] // we can do this bc we are going to map each aa to the proper fixture
 
     updateDeckConfiguration(newDeckConfig)
     closeModal()

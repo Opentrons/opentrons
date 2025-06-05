@@ -138,7 +138,9 @@ export function ProtocolSetupDeckConfiguration({
               setShowConfirmationModal={setShowDiscardChangeModal}
             />
           ) : null}
-          {showConfigurationModal && cutoutId != null && addressableAreaId != null ? (
+          {showConfigurationModal &&
+          cutoutId != null &&
+          addressableAreaId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
               addressableAreaId={addressableAreaId}

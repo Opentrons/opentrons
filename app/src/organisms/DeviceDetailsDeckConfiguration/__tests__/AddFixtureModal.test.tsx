@@ -40,7 +40,7 @@ describe('Touchscreen AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
-      addressableAreaId: 'D3',     
+      addressableAreaId: 'D3',
       closeModal: mockCloseModal,
       isOnDevice: true,
     }

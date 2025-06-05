@@ -50,7 +50,9 @@ interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
-  setAddressableAreaId: (addressableAreaId: AddressableAreaNamesWithFakes) => void
+  setAddressableAreaId: (
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
