@@ -140,8 +140,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
         preIngreds: nextRow.dest && nextRow.dest.preIngreds,
         postIngreds: nextRow.dest && nextRow.dest.postIngreds,
       },
-      aspirateVolume: currentRow.volume,
-      dispenseVolume: nextRow.volume,
+      aspirateVolume: currentRow.volume ?? null,
+      dispenseVolume: nextRow.volume ?? null,
       volume: showDispenseVol ? nextRow.volume : currentRow.volume,
     }),
     currentRow => {

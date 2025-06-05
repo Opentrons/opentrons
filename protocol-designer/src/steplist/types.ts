@@ -69,8 +69,8 @@ export interface StepItemSourceDestRow {
   substepIndex?: number
   source?: SubstepWellData
   dest?: SubstepWellData
-  aspirateVolume?: number | null
-  dispenseVolume?: number | null
+  aspirateVolume?: number
+  dispenseVolume?: number
   volume?: number | null
   channelId?: number
 }

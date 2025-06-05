@@ -7,10 +7,8 @@ import {
   FLEX_MAX_CONTENT,
   Icon,
   PrimaryButton,
-  SPACING,
   StyledText,
   Toolbox,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
@@ -65,7 +63,7 @@ export function SubStepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
+      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 1.5rem)`}
       height="100%"
       width={FLEX_MAX_CONTENT}
       closeButton={<Icon size="2rem" name="close" />}
@@ -77,13 +75,9 @@ export function SubStepsToolbox(
       }
       subHeader={
         substeps.substepType === THERMOCYCLER_PROFILE ? null : (
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {'commandCreatorFnName' in substeps
-              ? substeps.commandCreatorFnName
+              ? t(`protocol_steps:${substeps.commandCreatorFnName}`)
               : ''}
           </StyledText>
         )

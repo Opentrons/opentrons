@@ -28,8 +28,8 @@ interface SubstepProps {
   dest?: SubstepWellData
   selectSubstep?: (substepIdentifier: SubstepIdentifier) => void
   isSameLabware?: boolean
-  aspirateVolume?: number | null
-  dispenseVolume?: number | null
+  aspirateVolume?: number
+  dispenseVolume?: number
 }
 
 function SubstepComponent(props: SubstepProps): JSX.Element {
@@ -75,7 +75,6 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
     ) : null
 
   const isMix = source?.well === dest?.well && isSameLabware
-  console.log('source', source, 'dest', dest)
   return (
     <Flex
       onMouseEnter={() => {
