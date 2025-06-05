@@ -68,7 +68,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       importTestFile: TestFilePath.ThermocyclerOnOt2V7,
       expectedTestFile: TestFilePath.ThermocyclerOnOt2V7MigratedToV8,
       migrationModal: 'v8.1',
-      hasNoSteps: true,
+      hasNoSteps: false,
     },
   ]
 
