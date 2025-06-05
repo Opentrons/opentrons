@@ -176,7 +176,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     title: error.title,
     body: error.body,
     dependentFields: error.dependentProfileFields,
-    location: 'form' as FormErrorLocationType,
+    location: error.location,
   }))
   const timeline = useSelector(getRobotStateTimeline)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)

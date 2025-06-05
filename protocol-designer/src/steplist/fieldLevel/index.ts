@@ -62,7 +62,9 @@ const getIsAdapterLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[newLocation] == null) return false
+  if (labwareEntities[newLocation] == null) {
+    return false
+  }
   return (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
@@ -102,7 +104,7 @@ const getLabwareLocation = (
 
   if (newLocationString === 'offDeck') {
     return 'offDeck'
-  } else if (newLocationString in state.moduleEntities) {
+  } else if (state.moduleEntities[newLocationString] != null) {
     return { moduleId: newLocationString }
   } else if (
     newLocationString != null &&

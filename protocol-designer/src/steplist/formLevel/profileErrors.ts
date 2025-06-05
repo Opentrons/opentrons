@@ -2,6 +2,7 @@ import uniqBy from 'lodash/uniqBy'
 
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { PROFILE_STEP } from '../../form-types'
+import { FormErrorLocationType } from './errors'
 
 import type { ReactNode } from 'react'
 import type {
@@ -11,14 +12,18 @@ import type {
 
 export interface ProfileFormError {
   title: string
-  body?: ReactNode
   dependentProfileFields: string[]
+  //  location the error appears in the form
+  location: FormErrorLocationType
+  body?: ReactNode
+  page?: number
 }
 type ProfileFormErrorKey = 'INVALID_PROFILE_DURATION'
 const PROFILE_FORM_ERRORS: Record<ProfileFormErrorKey, ProfileFormError> = {
   INVALID_PROFILE_DURATION: {
     title: 'Invalid profile duration',
     dependentProfileFields: ['durationMinutes', 'durationSeconds'],
+    location: 'field',
   },
 }
 // TC Profile multi-field error fns
