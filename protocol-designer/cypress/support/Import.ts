@@ -11,7 +11,6 @@ export interface MigrateTestCase {
   title: string
   importTestFile: TestFilePath
   expectedTestFile: TestFilePath
-  hasNoSteps: boolean
   migrationModal: 'newLabwareDefs' | 'v8.1' | 'noBehaviorChange' | null
 }
 
@@ -66,7 +65,6 @@ export const verifyImportProtocolPage = (protocol: TestFile): void => {
 export const migrateAndMatchSnapshot = ({
   importTestFile,
   expectedTestFile,
-  hasNoSteps,
   migrationModal,
 }: MigrateTestCase): void => {
   const uploadProtocol: TestFile = getTestFile(importTestFile)
@@ -87,10 +85,6 @@ export const migrateAndMatchSnapshot = ({
 
   cy.get(LocatorStrings.exportProtocol).click({ force: true })
 
-  if (hasNoSteps) {
-    cy.get('div').contains(ContentStrings.noStepsWarning).should('exist')
-    cy.contains(ContentStrings.continueWithExport).click({ force: true })
-  }
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)
 
   cy.readFile(expectedProtocol.path).then(expectedProtocolRead => {
