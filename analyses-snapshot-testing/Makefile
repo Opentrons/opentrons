@@ -171,6 +171,18 @@ install-ot:
 	uv pip install -e ../shared-data/python
 	uv pip install -e ../api
 
+.PHONY: create-pl-protocols
+create-pl-protocols:
+	uv run python -m automation.data.create_pl_protocols
+
+.PHONY: protocol-info
+protocol-info: clean-generated-protocols generate-protocols
+	uv run python -m automation.data.collect_direct
+
+.PHONY: audit-registry
+audit-registry:
+	uv run python -m automation.data.audit_registry
+
 .PHONY: clean-ar
 clean-ar:
 	@echo "Deleting all .json files in analyses-snapshot-testing/analysis_results"
@@ -180,3 +192,12 @@ clean-ar:
 clean-chunks:
 	@echo "Deleting all .json files in analyses-snapshot-testing/chunks"
 	rm -f chunks/*.json
+
+.PHONY: clean-generated-protocols
+clean-generated-protocols:
+	@echo "Deleting all files in analyses-snapshot-testing/files/generated_protocols"
+	rm -f files/generated_protocols/*.py
+
+.PHONY: clean
+clean: clean-ar clean-chunks clean-generated-protocols
+
