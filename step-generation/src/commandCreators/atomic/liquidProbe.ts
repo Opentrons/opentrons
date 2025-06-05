@@ -11,7 +11,7 @@ export const liquidProbe: CommandCreator<LiquidProbeParams> = (
   const { pipetteId, labwareId, wellName, wellLocation } = args
 
   // no-op if pipette does not have tips
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     return {
       commands: [],
     }

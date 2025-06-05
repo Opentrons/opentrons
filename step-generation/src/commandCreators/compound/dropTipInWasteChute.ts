@@ -21,7 +21,7 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   let commandCreators: CurriedCommandCreator[] = []
 
   // No-op if there is no tip
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId].hasTip) {
     commandCreators = []
   } else {
     const pipettePythonName = pipetteEntities[pipetteId].pythonName

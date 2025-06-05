@@ -60,7 +60,7 @@ export function PipetteMountViz(
       ) : null}
       {pipetteEntity != null && pipetteId != null ? (
         <PipetteSideView
-          allNozzlesHaveTips={timelineFrame.tipState.pipettes[pipetteId]}
+          allNozzlesHaveTips={timelineFrame.tipState.pipettes[pipetteId].hasTip}
           allNozzleTipContents={Object.values(
             timelineFrame.liquidState.pipettes[pipetteId]
           )}

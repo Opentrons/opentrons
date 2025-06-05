@@ -1,4 +1,4 @@
-import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -50,7 +50,6 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     isAirGap,
     tipRack,
     wellLocation,
-    nozzles,
   } = args
   const actionName = 'aspirate'
   const labwareState = prevRobotState.labware
@@ -104,7 +103,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     errors.push(errorCreators.modulePipetteCollisionDanger())
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
@@ -120,17 +119,18 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   if (
     isMultiChannelPipette &&
-    nozzles !== ALL &&
-    !getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+    !getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      tipRack,
-      (wellLocation?.offset as Point) ?? { x: 0, y: 0, z: 0 },
-      wellName
-    )
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())
   }
