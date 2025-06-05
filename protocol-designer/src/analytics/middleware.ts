@@ -53,11 +53,6 @@ const PIPETTING_ARGS_FILTER_LIST = [
   'dispenseFlowRateUlSec',
 ]
 
-interface LiquidInfo {
-  liquidClass: string | null
-  displayColor: string
-  description: string | null
-}
 interface TransformedPipetteInfo {
   [pipetteId: string]: {
     name: string
