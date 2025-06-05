@@ -71,7 +71,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
-    const protocol = getTestFile(TestFilePath.P50SingleImportTransferLiquid)
+    const protocol = getTestFile(TestFilePath.P50_Single_Import_T_Liquid)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
     cy.openSettingsPage()

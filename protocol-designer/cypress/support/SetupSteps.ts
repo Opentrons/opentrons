@@ -22,6 +22,12 @@ export enum SetupContent {
   SingleChannel = '1-Channel',
   EightChannel = '8-Channel',
   TipRack = 'Filter Tip Rack 50 µL',
+  FullP1000SingleName = 'Flex 1-Channel 1000 µL',
+  Volume200 = '200 µL',
+  FilterTiprack1000 = 'Filter Tip Rack 1000 µL',
+  Tiprack1000 = 'Tip Rack 1000 µL',
+  FilterTiprack200 = 'Filter Tip Rack 200 µL',
+  Tiprack200 = 'Tip Rack 200 µL',
   PipetteType = 'Pipette type',
   PipetteVolume = 'Pipette volume',
   FullP50SingleName = 'Flex 1-Channel 50 µL',
@@ -81,7 +87,6 @@ export enum SetupLocators {
   Button = 'button',
   TempdeckTempInput = 'input[name="targetTemperature"]',
   DoneButtonLabwareSelection = '[data-testid="Toolbox_confirmButton"]',
-
   AspirateWells = 'input[name="aspirate_wells"]',
   div = 'div',
   button = 'button',
@@ -92,8 +97,14 @@ export enum SetupLocators {
 }
 
 export const RegexSetupContent = {
+  slotText: /Edit (slot|labware)/i,
+}
+/*
+Might be 
+export const RegexSetupContent = {
   slotText: /(Add|Edit) labware/i,
 }
+*/
 
 /**
  * Helper function to select a labware by display name.
@@ -176,11 +187,141 @@ function selectWells(wells: string[]): void {
   })
 }
 
+// For Rectangular wells
+function selectRectWells(wells: string[]): void {
+  const wellSelectors: Record<
+    string,
+    () => Cypress.Chainable<JQuery<HTMLElement>>
+  > = {}
+
+  // Dynamically populate (A1..H12)
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+  const columns = Array.from({ length: 12 }, (_, i) => (i + 1).toString())
+
+  rows.forEach(row => {
+    columns.forEach(column => {
+      const wellName = `${row}${column}`
+      // *** MODIFICATION HERE: Changed 'circle' to 'rect' ***
+      wellSelectors[wellName] = () =>
+        cy.get(`rect[data-wellname="${wellName}"]`).click({ force: true })
+    })
+  })
+
+  wells.forEach(well => {
+    const wellAction = wellSelectors[well]
+    if (typeof wellAction === 'function') {
+      wellAction()
+    } else {
+      // This error will occur if a well name outside A1-H12 is passed
+      // or if the wellSelectors map somehow doesn't get populated correctly.
+      throw new Error(`Well ${well} not found in the generated well selectors.`)
+    }
+  })
+}
 /**
  * Each function returns a StepThunk
  * Add a comment to all records
  */
 export const SetupSteps = {
+  SelectTipStrategy: (tipsy: string): StepThunk => ({
+    call: () => {
+      cy.contains('Always').click()
+      cy.contains(tipsy).click()
+    },
+  }),
+
+  SelecTip: (tip: string): StepThunk => ({
+    call: () => {
+      cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
+      const slotToUse = 'Tip Rack '
+      cy.contains(slotToUse + tip).click()
+    },
+  }),
+  /**
+   * Defines a step to move labware from a source deck slot to a destination deck slot.
+   * This involves clicking "Add Step", selecting "Move", and then choosing
+   * the source labware and its new destination using dropdowns.
+   *
+   * @param sourceDeckSlot The name of the source deck slot (e.g., 'A1').
+   * @param destDeckSlot The name of the destination deck slot (e.g., 'B2').
+   * @param trashLabwareFirstTime (Optional) If true, an additional 'Confirm' click is performed,
+   * typically used when moving labware to a trash location that requires confirmation.
+   * Defaults to `false`.
+   * @returns A StepThunk object that, when its `call` method is invoked,
+   * executes the Cypress commands to perform the labware move.
+   */
+
+  MoveLabware: (
+    sourceDeckSlot: string,
+    destDeckSlot: string,
+    trashLabwareFirstTime: boolean = false // Default trashLabware to false
+  ): StepThunk => ({
+    call: () => {
+      cy.contains('Add Step').click({ force: true })
+      cy.contains(/^Move$/).click()
+      // Source Labware Selection
+      cy.contains('p', 'Select labware') // Find the paragraph with "Select labware"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(sourceDeckSlot).click() // Select the source deck slot
+
+      // Destination Location Selection
+      cy.contains('p', 'New location') // Find the paragraph with "New location"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(destDeckSlot).click() // Select the destination deck slot
+
+      cy.contains('Save').click({ force: true })
+
+      // Conditional Confirm click for trashing labware the first time
+      // There is a worning modal
+      if (trashLabwareFirstTime) {
+        cy.contains('Confirm').click({ force: true })
+      }
+    },
+  }),
+
+  MoveLabwareNoGripper: (
+    sourceDeckSlot: string,
+    destDeckSlot: string,
+    trashLabwareFirstTime: boolean = false // Default trashLabware to false
+  ): StepThunk => ({
+    call: () => {
+      cy.contains('Add Step').click({ force: true })
+      cy.contains(/^Move$/).click()
+      // Source Labware Selection
+      cy.contains('Use gripper').click()
+      cy.contains('p', 'Select labware') // Find the paragraph with "Select labware"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(sourceDeckSlot).click() // Select the source deck slot
+
+      // Destination Location Selection
+      cy.contains('p', 'New location') // Find the paragraph with "New location"
+        .parent() // Go up one level
+        .parent() // Go up another level (to the common container that has the dropdown)
+        .contains('Choose option') // Find the "Choose option" text within that container
+        .click() // Click to open the dropdown
+      cy.contains(destDeckSlot).click() // Select the destination deck slot
+
+      cy.contains('Save').click({ force: true })
+    },
+  }),
+
+  SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
+    call: () => {
+      // eslint-disable-next-line no-template-curly-in-string
+      // cy.get(`#${LiquidClass}`).click({ force: true })
+      // eslint-disable-next-line no-template-curly-in-string
+      cy.get(`label[for="${LiquidClass}"]`).click()
+    },
+  }),
   /**
    * Select a labware by display name, then click "Done".
    */
@@ -250,6 +391,48 @@ export const SetupSteps = {
     },
   }),
 
+  EightChannelPipette50: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.EightChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume50).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
+  EightChannelPipette1000: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.EightChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume1000).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      cy.contains(SetupContent.Tiprack200).click()
+      cy.contains(SetupContent.Tiprack1000).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
+
+  SinglePipette1000: (): StepThunk => ({
+    call: () => {
+      cy.contains(SetupContent.AddPipette).click()
+      cy.contains('label', SetupContent.SingleChannel)
+        .should('exist')
+        .and('be.visible')
+        .click()
+      cy.contains(SetupContent.Volume1000).click()
+      cy.contains(SetupContent.Tiprack50).click()
+      cy.contains(SetupContent.Tiprack200).click()
+      cy.contains(SetupContent.Tiprack1000).click()
+      // optional: cy.contains(SetupContent.FilterTiprack50).click()
+    },
+  }),
+
   /**
    * Add a Thermocycler Module GEN2.
    */
@@ -265,6 +448,7 @@ export const SetupSteps = {
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
+      // cy.get('button[data-testid="D1"]').click()
       cy.get('button[data-testid="cutoutD1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.HeaterShaker).click()
@@ -405,6 +589,12 @@ export const SetupSteps = {
     },
   }),
 
+  EditHardwareLabwareOnDeck: (): StepThunk => ({
+    call: () => {
+      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
+    },
+  }),
+
   /**
    * Clicks the "Labware" header.
    */
@@ -420,6 +610,12 @@ export const SetupSteps = {
   ClickWellPlatesSection: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.WellPlatesCat).click()
+    },
+  }),
+
+  ClickTiprack: (): StepThunk => ({
+    call: () => {
+      cy.contains('Tip racks').click()
     },
   }),
 
@@ -455,7 +651,9 @@ export const SetupSteps = {
    */
   AddLiquid: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="LabwareCard_addLiquid_button"]').click()
+      cy.get('button[data-testid="LabwareCard_addLiquid_button"]').click({
+        force: true,
+      })
     },
   }),
   /**
@@ -536,6 +734,15 @@ export const SetupSteps = {
       }
     },
   }),
+  RectWellSelector: (wells: string[]): StepThunk => ({
+    call: () => {
+      if (Array.isArray(wells) && wells.length > 0) {
+        selectRectWells(wells)
+      } else {
+        throw new Error('Wells must be a non-empty array of strings.')
+      }
+    },
+  }),
 
   /**
    * Opens the liquids dropdown.
@@ -543,6 +750,12 @@ export const SetupSteps = {
   LiquidDropdown: (): StepThunk => ({
     call: () => {
       cy.get(SetupLocators.LiquidsDropdown).should('be.visible').click()
+    },
+  }),
+
+  selectLiquidbyname: (liquidName: string): StepThunk => ({
+    call: () => {
+      cy.contains(liquidName).click()
     },
   }),
 
@@ -674,7 +887,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="aspirate_wells"]')
         .should('have.value', 'Choose wells')
-        .click()
+        .click({ force: true })
     },
   }),
 
@@ -683,7 +896,7 @@ export const SetupSteps = {
     call: () => {
       cy.get('input[name="dispense_wells"]')
         .should('have.value', 'Choose wells')
-        .click()
+        .click({ force: true })
     },
   }),
   // Save selected wells
@@ -1177,6 +1390,279 @@ export const CompositeSetupSteps = {
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
+    },
+  }),
+  AddTiprackToDeckSlot: (
+    deckSlot?: string | undefined,
+    labwareName?: string | undefined
+  ): StepThunk => ({
+    call: () => {
+      const slotToUse = deckSlot ?? 'C3'
+      const labwareToUse = labwareName ?? 'Bio-Rad 96 Well Plate'
+      cy.log(
+        `Running AddLabwareToDeckSlot with slot ${deckSlot} and labware ${labwareName}`
+      )
+      SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
+      SetupSteps.AddHardwareLabware().call()
+      SetupSteps.OpenSelectLabwareModal().call()
+      SetupSteps.ClickTiprack().call()
+      SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
+    },
+  }),
+
+  /**
+   * @function Test_LC
+   * @description Creates a StepThunk to perform a liquid handling transfer operation.
+   * It takes optional parameters for source and destination labware and wells,
+   * transfer volume, and liquid class, and orchestrates the necessary SetupSteps
+   * to configure the transfer in the application UI.
+   *
+   * @param {string | undefined} sourceLabware - The name or identifier of the source labware.
+   * @param {string | undefined} sourcewell - The identifier of the source well (e.g., 'A1').
+   * @param {string | undefined} destinationLabware - The name or identifier of the destination labware.
+   * @param {string | undefined} destWell - The identifier of the destination well (e.g., 'B2').
+   * @param {string | undefined} volume - The volume to transfer as a string (e.g., '50').
+   * @param {string | undefined} liquidClass - The name or identifier of the liquid class to use.
+   * @returns {StepThunk} A StepThunk object containing the 'call' function that executes the transfer setup steps.
+   */
+
+  Test_LC: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined,
+    tip?: string | undefined
+  ): StepThunk => ({
+    call: () => {
+      const Tip = tip ?? '50'
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+
+      cy.log('Executing Test_LC step with the following parameters:')
+      cy.log(`  tip: ${tip}`)
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse}`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse}`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
+      UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip)
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
+    },
+  }),
+
+  /**
+   * Executes a liquid transfer step within the Cypress automation framework.
+   * This step configures pipette tip, transfer volume, source labware and wells,
+   * destination labware and wells, and the liquid class.
+   *
+   * It supports selecting wells that are represented as either 'circle' or 'rect'
+   * SVG elements, defaulting to 'circle' if no shape is specified.
+   *
+   * @param sourceLabware (Optional) The name of the source labware. Defaults to 'Bio-Rad 96 Well Plate'.
+   * @param sourceWell (Optional) The specific well (e.g., 'A1') on the source labware. Defaults to 'A1'.
+   * @param destinationLabware (Optional) The name of the destination labware. Defaults to 'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'.
+   * @param destWell (Optional) The specific well (e.g., 'A1') on the destination labware. Defaults to 'A1'.
+   * @param volume (Optional) The volume of liquid to transfer. Defaults to '1'.
+   * @param liquidClass (Optional) The liquid class to use for the transfer. Defaults to 'Aqueous'.
+   * @param tip (Optional) The pipette tip size to use. Defaults to '50'.
+   * @param sourceWellShape (Optional) The SVG element shape for the source well selector. Can be 'circle' or 'rect'. Defaults to 'circle'.
+   * @param destWellShape (Optional) The SVG element shape for the destination well selector. Can be 'circle' or 'rect'. Defaults to 'circle'.
+   * @returns A StepThunk object containing the 'call' method to execute the step.
+   *
+   * @remarks
+   * This function relies on `SetupSteps.WellSelector` for 'circle' well selection
+   * and `SetupSteps.RectWellSelector` for 'rect' well selection. Ensure both functions
+   * are defined and accessible in the same file or imported appropriately.
+   *
+   * Note: The intentional double call to `WellSelector` (or `RectWellSelector`) for both
+   * source and destination wells addresses a specific bug in the application under test.
+   */
+  Test_LC_new_rectangle: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined,
+    tip?: string | undefined,
+    sourceWellShape?: 'circle' | 'rect',
+    destWellShape?: 'circle' | 'rect'
+  ): StepThunk => ({
+    call: () => {
+      const Tip = tip ?? '50'
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+      const sourceShapeToUse = sourceWellShape ?? 'circle'
+      const destShapeToUse = destWellShape ?? 'circle'
+
+      cy.log('Executing Test_LC step with the following parameters:')
+      cy.log(`  tip: ${Tip}`) // Using Tip directly after default is applied
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse} (Shape: ${sourceShapeToUse})`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse} (Shape: ${destShapeToUse})`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
+      UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip)
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+
+      // --- Source Well Selection Logic ---
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+
+      if (sourceShapeToUse === 'circle') {
+        SetupSteps.WellSelector([sourceWellToUse]).call()
+        SetupSteps.WellSelector([sourceWellToUse]).call() // Intentional double call
+      } else if (sourceShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([sourceWellToUse]).call()
+        SetupSteps.RectWellSelector([sourceWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid sourceWellShape: ${sourceShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
+      SetupSteps.Save().call()
+
+      // --- Destination Well Selection Logic ---
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+
+      if (destShapeToUse === 'circle') {
+        SetupSteps.WellSelector([destWellToUse]).call()
+        SetupSteps.WellSelector([destWellToUse]).call() // Intentional double call
+      } else if (destShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([destWellToUse]).call()
+        SetupSteps.RectWellSelector([destWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid destWellShape: ${destShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
+    },
+  }),
+
+  /**
+   * @function Test_LC_tipsy
+   * @description Creates a StepThunk to perform a liquid handling transfer operation with explicit tip and strategy selection.
+   * It takes optional parameters for source and destination labware and wells,
+   * transfer volume, liquid class, the specific tip to use, and the tip strategy.
+   * It orchestrates the necessary SetupSteps to configure the transfer in the application UI,
+   * including selecting the tip and tip strategy.
+   *
+   * @param {string | undefined} sourceLabware - The name or identifier of the source labware.
+   * @param {string | undefined} sourceWell - The identifier of the source well (e.g., 'A1').
+   * @param {string | undefined} destinationLabware - The name or identifier of the destination labware.
+   * @param {string | undefined} destWell - The identifier of the destination well (e.g., 'B2').
+   * @param {string | undefined} volume - The volume to transfer as a string (e.g., '50').
+   * @param {string | undefined} liquidClass - The name or identifier of the liquid class to use (e.g., 'Aqueous').
+   * @param {string | undefined} tip - The specific tip to use for the transfer (e.g., '50'). Defaults to '50' if not provided.
+   * @param {string | undefined} tipstrat - The strategy for tip handling (e.g., 'Always', 'Once'). If you use never, modify the function to do once first
+   * @returns {StepThunk} A StepThunk object containing the 'call' function that executes the transfer setup steps in the UI.
+   */
+
+  Test_LC_tipsy: (
+    sourceLabware?: string | undefined,
+    sourceWell?: string | undefined,
+    destinationLabware?: string | undefined,
+    destWell?: string | undefined,
+    volume?: string | undefined,
+    liquidClass?: string | undefined,
+    tip?: string | undefined,
+    tipstrat?: string | undefined
+  ): StepThunk => ({
+    // Corrected return type annotation: StepThunk before =>
+    call: () => {
+      const Tip = tip ?? '50'
+      const volumeToUse = volume ?? '1'
+      const sourceLabwareToUse = sourceLabware ?? 'Bio-Rad 96 Well Plate'
+      const sourceWellToUse = sourceWell ?? 'A1'
+      const destinationLabwareToUse =
+        destinationLabware ??
+        'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
+      const destWellToUse = destWell ?? 'A1'
+      const liquidClassToUse = liquidClass ?? 'Aqueous'
+      const tipstratToUse = tipstrat ?? 'Always'
+      cy.log('Executing Test_LC_tipsy step with the following parameters:')
+      cy.log(`  tip: ${Tip}`)
+      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
+      cy.log(`  Source Well: ${sourceWellToUse}`)
+      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
+      cy.log(`  Destination Well: ${destWellToUse}`)
+      cy.log(`  Volume: ${volumeToUse}`)
+      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+      SetupSteps.AddStep().call()
+      SetupVerifications.TransferPopOut().call()
+      UniversalSteps.Snapshot()
+      SetupSteps.SelecTip(Tip).call()
+      SetupSteps.SelectTipStrategy(tipstratToUse).call()
+      SetupSteps.InputTransferVolume(volumeToUse).call()
+      SetupSteps.ChoseSourceLabware().call()
+      SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
+      SetupSteps.SelectSourceWells().call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      SetupSteps.WellSelector([sourceWellToUse]).call()
+      // console.log('We will fix this eventually need to double click for now')
+      // SetupSteps.WellSelector([sourceWellToUse]).call(); // Removed likely redundant call
+      SetupSteps.Save().call()
+      SetupSteps.ChoseDestinationLabware().call()
+      SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
+      SetupSteps.SelectDestinationWells().call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      SetupSteps.WellSelector([destWellToUse]).call()
+      // ToDo fix this bug please
+      // SetupSteps.WellSelector([destWellToUse]).call(); // Removed likely redundant call
+      SetupSteps.Save().call()
+      SetupSteps.Continue().call()
+      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
+      SetupSteps.Continue().call()
+      SetupSteps.Save().call()
     },
   }),
 }
