@@ -65,6 +65,13 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "on the left", "value": 1},
             {"display_name": "on the right", "value": 2},
         ],
+    ),
+    parameters.add_float(
+        variable_name="bottom",
+        display_name="Lowest Bottom Offset",
+        default = 0.4,
+        maximum = 1.0,
+        minimum = 0.1
     )
 
 
@@ -90,7 +97,7 @@ def run(protocol: ProtocolContext) -> None:
     pause_centri = protocol.params.pause_centri  # type: ignore[attr-defined]
     mag_type = protocol.params.mag_type  # type: ignore[attr-defined]
     pipet_loc = protocol.params.pipet_loc  # type: ignore[attr-defined]
-
+    bottom = protocol.params.bottom  # type: ignore[attr-defined]
     mag_delay_min = 0.1 if dry_run else 5
     incubation_min = 0.1 if dry_run else 30
     wash_cycle = 1 if dry_run else 3
@@ -116,7 +123,8 @@ def run(protocol: ProtocolContext) -> None:
         "heaterShakerModuleV1", "D1"
     )  # type: ignore[assignment]
     hs.close_labware_latch()
-    working_plate = hs.load_labware(
+    hs_adapter = hs.load_adapter("opentrons_universal_flat_adapter")
+    working_plate = hs_adapter.load_labware(
         "axygen_96_wellplate_500ul", "WORKING PLATE w/ CELL LYSATE & BEADS"
     )
     rxn = working_plate.rows()[0][:sample_columns]
@@ -198,8 +206,9 @@ def run(protocol: ProtocolContext) -> None:
 
             p1k_8.aspirate(vol * 0.8, col.bottom(z=0.5), rate=0.05)
             protocol.delay(seconds=1)
+            print(col.parent)
             p1k_8.aspirate(
-                vol * 0.2 + 20, col.bottom(z=0.1), rate=0.01
+                vol * 0.2 + 20, col.bottom(z=bottom), rate=0.01
             )  # avalanche effect
             protocol.delay(seconds=1)
 
@@ -247,7 +256,7 @@ def run(protocol: ProtocolContext) -> None:
 
     hs.open_labware_latch()
     protocol.move_labware(
-        labware=working_plate, new_location=hs, use_gripper=USE_GRIPPER
+        labware=working_plate, new_location=hs_adapter, use_gripper=USE_GRIPPER
     )
     hs.close_labware_latch()
 
@@ -293,7 +302,7 @@ def run(protocol: ProtocolContext) -> None:
         discard(VOL_WASH, count + 1)
 
         protocol.move_labware(
-            labware=working_plate, new_location=hs, use_gripper=USE_GRIPPER
+            labware=working_plate, new_location=hs_adapter, use_gripper=USE_GRIPPER
         )
         hs.close_labware_latch()
 
@@ -363,13 +372,13 @@ def run(protocol: ProtocolContext) -> None:
         for start, end in zip(rxn, eluates):
             p50_8.configure_for_volume(VOL_ELU)
             p50_8.pick_up_tip()
-            p50_8.aspirate(VOL_ELU, start.bottom(z=0.1), rate=0.02)
+            p50_8.aspirate(VOL_ELU, start.bottom(z=bottom), rate=0.02)
             protocol.delay(seconds=2)
             p50_8.dispense(VOL_ELU, end.bottom(z=1), rate=0.1)
             protocol.delay(seconds=2)
             if x == 1:  # on last elution addition, mix
                 count = 3 if not dry_run else 1
-                p50_8.mix(count, 25, end.bottom(z=0.1), rate=0.2)
+                p50_8.mix(count, 25, end.bottom(z=bottom), rate=0.2)
             protocol.delay(seconds=2)
             diameter_2 = (
                 end.diameter if end.diameter is not None else 0
@@ -380,6 +389,6 @@ def run(protocol: ProtocolContext) -> None:
         if x == 0:
             hs.open_labware_latch()
             protocol.move_labware(
-                labware=working_plate, new_location=hs, use_gripper=USE_GRIPPER
+                labware=working_plate, new_location=hs_adapter, use_gripper=USE_GRIPPER
             )
             hs.close_labware_latch()
