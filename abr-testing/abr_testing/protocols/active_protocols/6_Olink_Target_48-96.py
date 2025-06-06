@@ -119,7 +119,7 @@ def run(protocol: ProtocolContext) -> None:
 
     if ninety_six:
         tip_adap = protocol.load_adapter(
-            "opentrons_flex_96_tiprack_adapter", "A3" if waste_chute else "D3"
+            "opentrons_flex_96_tiprack_adapter", "A3" 
         )
         full_tips_ = tip_adap.load_labware(
             "opentrons_flex_96_filtertiprack_50ul", "Full 96 ch Tips"
@@ -136,7 +136,7 @@ def run(protocol: ProtocolContext) -> None:
     if waste_chute:
         protocol.load_waste_chute()
     else:
-        protocol.load_trash_bin("A3")
+        protocol.load_trash_bin("D3")
 
     primer_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "B1", "Primer Plate"
@@ -489,9 +489,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
             transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
 
-        protocol.move_labware(col_tips[-1], OFF_DECK, use_gripper=False)
-        protocol.move_labware(full_tips_, OFF_DECK, use_gripper=False)
-        protocol.move_labware(tip_adap, OFF_DECK, use_gripper=False)
+        protocol.move_labware(col_tips[-1], "C4", use_gripper=True)
         protocol.move_labware(col_tips[-2], "A1", use_gripper=True)
         pip.configure_nozzle_layout(
             style=SINGLE,
