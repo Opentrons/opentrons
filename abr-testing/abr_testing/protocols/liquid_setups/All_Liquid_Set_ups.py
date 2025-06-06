@@ -382,6 +382,7 @@ def run(protocol: ProtocolContext) -> None:
             blow_out=True,
             blowout_location="destination well",
         )
+        pipette.reset_tipracks()
         pipette.configure_nozzle_layout(
             style=COLUMN, tip_racks=[tip_rack_partial_1], start="A1"
         )
@@ -400,7 +401,6 @@ def run(protocol: ProtocolContext) -> None:
         ]
         for plate in dvt2abr6_plates:
             protocol.move_labware(plate, OFF_DECK, use_gripper=False)
-        pipette.reset_tipracks()
     if pvt1abr8:
         protocol.pause("SET UP PVT1ABR8")
         reservoir_1 = protocol.load_labware(
