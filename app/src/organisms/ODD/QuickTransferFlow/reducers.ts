@@ -190,6 +190,7 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         touchTipAspirate: action.position,
+        touchTipAspirateSpeed: action.touchTipAspirateSpeed,
       }
     }
     case 'SET_AIR_GAP_ASPIRATE': {
@@ -232,6 +233,7 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         touchTipDispense: action.position,
+        touchTipDispenseSpeed: action.touchTipDispenseSpeed,
       }
     }
     case 'SET_BLOW_OUT': {

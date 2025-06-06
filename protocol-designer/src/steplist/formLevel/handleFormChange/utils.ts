@@ -6,6 +6,7 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
@@ -34,6 +35,7 @@ import type {
   AdditionalEquipmentEntities,
   LabwareEntities,
   PipetteEntities,
+  ReferenceVolumes,
 } from '@opentrons/step-generation'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type {
@@ -402,7 +404,7 @@ const getByVolumeField = (args: {
 
 const getSubmergeRetractFields = (args: {
   submergeRetractLookup: Submerge | RetractAspirate | RetractDispense
-  volume: number
+  volumes: ReferenceVolumes
   liquidHandlingAction: LiquidHandlingTab
   tipMovement: 'submerge' | 'retract'
   additionalEquipmentEntities?: AdditionalEquipmentEntities
@@ -411,7 +413,7 @@ const getSubmergeRetractFields = (args: {
 }): Record<string, any> => {
   const {
     submergeRetractLookup,
-    volume,
+    volumes,
     liquidHandlingAction,
     tipMovement,
     additionalEquipmentEntities,
@@ -438,7 +440,7 @@ const getSubmergeRetractFields = (args: {
   const airGapFields =
     'airGapByVolume' in submergeRetractLookup && !isConditioningVolumeEnabled
       ? getByVolumeField({
-          volume,
+          volume: volumes.airGap,
           byVolume: submergeRetractLookup.airGapByVolume,
           field: 'airGap',
           prefix: liquidHandlingAction,
@@ -534,13 +536,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...aspirateFlowRateFields,
     ...aspirateOffsetFields,
     ...aspiratePositionReferenceFields,
-    aspirate_submerge_mmFromBottom: 0,
+    aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
     aspirate_submerge_x_position: 0,
     aspirate_submerge_y_position: 0,
     aspirate_submerge_speed: aspirate.submerge.speed,
     aspirate_retract_speed: aspirate.retract.speed,
-    aspirate_retract_mmFromBottom: 0,
+    aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
     aspirate_retract_x_position: 0,
     aspirate_retract_y_position: 0,
@@ -552,13 +554,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
-    dispense_submerge_mmFromBottom: 0,
+    dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
     dispense_submerge_x_position: 0,
     dispense_submerge_y_position: 0,
     dispense_submerge_speed: dispense.submerge.speed,
     dispense_retract_speed: dispense.retract.speed,
-    dispense_retract_mmFromBottom: 0,
+    dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_retract_position_reference: POSITION_REFERENCE_TOP,
     dispense_retract_x_position: 0,
     dispense_retract_y_position: 0,
@@ -727,13 +729,12 @@ const getLiquidClassValuesMoveLiquid = (args: {
     tiprackDefinition,
     conditioningByVolume,
     disposalByVolume,
-    volume: Number(rawForm.volume),
+    volume,
     path: rawForm.path as PathOption,
     numDispenseWells: rawForm.dispense_wells.length,
-    aspirateAirGap:
-      rawForm.aspirate_airGap_checkbox === true
-        ? Number(rawForm.aspirate_airGap_volume)
-        : null,
+    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+      [number, number]
+    >,
   }).referenceVolumes
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
@@ -794,7 +795,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   // aspirate/dispense submerge fields
   const aspirateSubmergeFields = getSubmergeRetractFields({
     submergeRetractLookup: aspirate.submerge,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'aspirate',
     tipMovement: 'submerge',
     additionalEquipmentEntities,
@@ -804,7 +805,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
       path === 'multiDispense' && multiDispense != null
         ? multiDispense.submerge
         : singleDispense.submerge,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'dispense',
     tipMovement: 'submerge',
   })
@@ -812,7 +813,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   // aspirate/dispense retract fields
   const aspirateRetractFields = getSubmergeRetractFields({
     submergeRetractLookup: aspirate.retract,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'aspirate',
     tipMovement: 'retract',
     isConditioningVolumeEnabled,
@@ -822,7 +823,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
       path === 'multiDispense' && multiDispense != null
         ? multiDispense.retract
         : singleDispense.retract,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'dispense',
     tipMovement: 'retract',
     additionalEquipmentEntities,

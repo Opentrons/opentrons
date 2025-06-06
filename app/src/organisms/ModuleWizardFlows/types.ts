@@ -16,6 +16,7 @@ export type ModuleSetupWizardStep =
 
 export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
+  | ModuleWizardRestartFlowAction
   | ModuleWizardProceedAction
   | ModuleWizardGoBackAction
   | ModuleWizardPatchModuleAction
@@ -32,6 +33,9 @@ interface ModuleWizardBuildFlowAction {
   type: typeof ACTIONS.BUILD_FLOW
   attachedModule: AttachedModule
 }
+interface ModuleWizardRestartFlowAction {
+  type: typeof ACTIONS.RESTART_FLOW
+}
 interface ModuleWizardProceedAction {
   type: typeof ACTIONS.PROCEED
 }
@@ -45,17 +49,20 @@ interface ModuleWizardPatchModuleAction {
 export interface ModuleSetupWizardStepProps {
   proceed: () => void
   goBack: () => void
+  restartSetup: () => void
   chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
+  isModuleUpdating: boolean
+  setIsModuleUpdating: (updating: boolean) => void
   maintenanceRunId: string | null
   attachedModule: AttachedModule
   attachedPipette: PipetteInformation
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
-  isOnDevice: boolean | null
+  isOnDevice: boolean
 }
 
 export type ModuleWizardFlow = typeof FLOWS.SETUP

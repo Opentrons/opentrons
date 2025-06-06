@@ -13,7 +13,7 @@ export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
 
   const errors: CommandCreatorError[] = []
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName: 'blowout',

@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
@@ -26,7 +30,27 @@ describe('getDefaultOffsetDetailsForLabware', () => {
   const ADAPTER_URI = 'opentrons/adapter-1'
 
   const MOCK_LW_LOC_COMBOS = [
-    { definitionUri: LABWARE_URI, labwareId: LABWARE_ID },
+    {
+      definitionUri: LABWARE_URI,
+      labwareId: LABWARE_ID,
+      addressableAreaName: 'A1',
+      closestBeneathModuleId: null,
+    },
+  ]
+
+  const MOCK_LW_LOC_COMBOS_WITH_MODULE = [
+    {
+      definitionUri: LABWARE_URI,
+      labwareId: LABWARE_ID,
+      addressableAreaName: 'A1',
+      closestBeneathModuleId: 'module-123',
+    },
+    {
+      definitionUri: 'other-labware',
+      labwareId: 'other-labware-id',
+      addressableAreaName: 'B2',
+      closestBeneathModuleId: null,
+    },
   ]
 
   const MOCK_OFFSET: StoredLabwareOffset = {
@@ -72,6 +96,21 @@ describe('getDefaultOffsetDetailsForLabware', () => {
         definitionUri: ADAPTER_URI,
       },
     ],
+    modules: [],
+  }
+
+  const MOCK_PROTOCOL_DATA_WITH_C2_MODULE = {
+    labware: [
+      {
+        id: ADAPTER_ID,
+        definitionUri: ADAPTER_URI,
+      },
+    ],
+    modules: [
+      {
+        location: { slotName: 'C2' },
+      },
+    ],
   }
 
   it('should return default offset details with minimal params', () => {
@@ -91,7 +130,7 @@ describe('getDefaultOffsetDetailsForLabware', () => {
         labwareId: LABWARE_ID,
         definitionUri: LABWARE_URI,
         kind: OFFSET_KIND_DEFAULT,
-        addressableAreaName: 'C2',
+        addressableAreaName: C2_ADDRESSABLE_AREA,
         lwOffsetLocSeq: ANY_LOCATION,
         closestBeneathAdapterId: undefined,
         lwModOnlyStackupDetails: [
@@ -203,5 +242,78 @@ describe('getDefaultOffsetDetailsForLabware', () => {
     } as any)
 
     expect(result.locationDetails.closestBeneathAdapterId).toBeUndefined()
+  })
+
+  it('should use C2 when available and no modules are present', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: MOCK_PROTOCOL_DATA,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe(C2_ADDRESSABLE_AREA)
+  })
+
+  it('should find first location with no module when C2 is occupied', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS_WITH_MODULE,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: MOCK_PROTOCOL_DATA_WITH_C2_MODULE,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe('B2')
+  })
+
+  it('should fallback to C3 when C2 is occupied and no locations without modules are found', () => {
+    const lwLocInfoAllWithModules = [
+      {
+        definitionUri: LABWARE_URI,
+        labwareId: LABWARE_ID,
+        addressableAreaName: 'A1' as any,
+        closestBeneathModuleId: 'module-1',
+      },
+      {
+        definitionUri: 'other-labware',
+        labwareId: 'other-labware-id',
+        addressableAreaName: 'B2' as any,
+        closestBeneathModuleId: 'module-2',
+      },
+    ]
+
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: lwLocInfoAllWithModules,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: MOCK_PROTOCOL_DATA_WITH_C2_MODULE,
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe(C3_ADDRESSABLE_AREA)
+  })
+
+  it('should return C2 when C2 is not occupied by modules', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF],
+      locationSpecificOffsetDetails: [],
+      protocolData: {
+        labware: [],
+        modules: [
+          { location: { slotName: 'A1' } },
+          { location: { slotName: 'B1' } },
+        ],
+      },
+    } as any)
+
+    expect(result.locationDetails.addressableAreaName).toBe(C2_ADDRESSABLE_AREA)
   })
 })

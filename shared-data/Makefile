@@ -65,51 +65,51 @@ lint-js-prettier:
 
 .PHONY: setup-py
 setup-py:
-	$(MAKE) -C python setup-py
+	$(MAKE) -f Makefile-python.mk setup-py
 
 .PHONY: dist-py
 dist-py:
-	$(MAKE) -C python sdist wheel
+	$(MAKE) -f Makefile-python.mk sdist wheel
 
 .PHONY: clean-py
 clean-py:
-	$(MAKE) -C python clean
+	$(MAKE) -f Makefile-python.mk clean
 
 .PHONY: teardown-py
 teardown-py:
-	$(MAKE) -C python teardown
+	$(MAKE) -f Makefile-python.mk teardown
 
 .PHONY: lint-py
 lint-py:
-	$(MAKE) -C python lint
+	$(MAKE) -f Makefile-python.mk lint
 
 .PHONY: format-py
 format-py:
-	$(MAKE) -C python format
+	$(MAKE) -f Makefile-python.mk format
 
 .PHONY: push-no-restart
 push-no-restart:
-	$(MAKE) -C python push-no-restart
+	$(MAKE) -f Makefile-python.mk push-no-restart
 
 .PHONY: push
 push:
-	$(MAKE) -C python push
+	$(MAKE) -f Makefile-python.mk push
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3:
-	$(MAKE) -C python push-no-restart-ot3
+	$(MAKE) -f Makefile-python.mk push-no-restart-ot3
 
 .PHONY: push-ot3
 push-ot3:
-	$(MAKE) -C python push-ot3
+	$(MAKE) -f Makefile-python.mk push-ot3
 
 .PHONY: deploy-py
 deploy-py:
-	$(MAKE) -C python deploy
+	$(MAKE) -f Makefile-python.mk deploy
 
 .PHONY: test-py
 test-py:
-	$(MAKE) -C python test
+	$(MAKE) -f Makefile-python.mk test
 
 .PHONY: test
 test:
@@ -117,5 +117,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-shared-data tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
-
+	$(MAKE) -C .. test-js-shared-data tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

@@ -25,6 +25,8 @@ export function AnimationVideo(props: AnimationVideoProps): JSX.Element {
     // https://github.com/facebook/react/issues/10389
     muted = true,
     controls = false,
+    disableRemotePlayback = true,
+    disablePictureInPicture = true,
     ...restProps
   } = props
   return (
@@ -33,6 +35,8 @@ export function AnimationVideo(props: AnimationVideoProps): JSX.Element {
       loop={loop}
       muted={muted}
       controls={controls}
+      disableRemotePlayback={disableRemotePlayback}
+      disablePictureInPicture={disablePictureInPicture}
       {...restProps}
       // Child <source>s rendered via {...restProps} spreading above.
     />

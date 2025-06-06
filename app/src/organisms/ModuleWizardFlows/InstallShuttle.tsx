@@ -34,7 +34,7 @@ const BODY_STYLE = css`
   }
 `
 
-export const InstallShuttle = (props: InstallShuttleProps): JSX.Element => {
+export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
   const { proceed } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 

@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import {
+  ABSORBANCE_READER_V1,
   fixture96Plate,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
@@ -106,12 +107,27 @@ describe('DeckSetupToolbox', () => {
   })
   it('should render empty labware and add labware CTA opens modal ', () => {
     render(props)
-    screen.getByText('Customize slot')
+    screen.getByText('Edit labware')
     screen.getByText('Add labware')
     screen.getByText('No labware added')
     screen.getByText('Select labware to add to slot')
     fireEvent.click(screen.getByText('Add labware'))
     screen.getByText('mock SelectLabwareModal')
+  })
+  it('renders correct copy for adding a labware onto a plate reader', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedFixture: null,
+      selectedModuleModel: ABSORBANCE_READER_V1,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
+    render(props)
+    screen.getByText('Can’t add labware')
+    screen.getByText(
+      'The plate reader must start empty so it can be initialized.'
+    )
   })
   it('should clear the slot from all items when the clear cta is called', () => {
     vi.mocked(getLabwareNicknamesById).mockReturnValue({

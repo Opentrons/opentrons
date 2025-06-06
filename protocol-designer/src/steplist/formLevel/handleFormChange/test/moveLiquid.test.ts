@@ -372,6 +372,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
+        preWetTip: false,
       })
     })
   })

@@ -1,4 +1,5 @@
 """A script for updating pre-existing V2 Pipette configurations."""
+
 import os
 import json
 import argparse
@@ -36,7 +37,7 @@ from ..types import PipetteModel
 """
 Instructions:
 
-To run this script, you must be in `shared-data/python`. To invoke, use the command:
+To run this script, you must be in `shared-data`. To invoke, use the command:
 
 `pipenv run python -m opentrons_shared_data.pipette.scripts.update_configuration_files`
 

@@ -90,7 +90,10 @@ const mockRobotState: TimelineFrame = {
       },
     },
     pipettes: {
-      mockPipette: false,
+      mockPipette: {
+        hasTip: false,
+        tiprackURI: null,
+      },
     },
   },
   liquidState: {
@@ -298,23 +301,25 @@ pipette.drop_tip()
 # CONSOLIDATE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    flow_rate=56,
-)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["B1"].bottom(z=-1),
-    flow_rate=56,
-)
-pipette.dispense(
-    volume=20,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    flow_rate=80,
-)
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["B1"].top(z=2))
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].top(z=2))
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=20, flow_rate=80)
+pipette.move_to(mock_trash_bin_1)
 pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
+pipette.blow_out()
 pipette.drop_tip()
 `.trim()
     )
@@ -417,7 +422,7 @@ pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.dispense(volume=10, flow_rate=80)
 pipette.move_to(mock_labware_2["B1"].bottom())
-pipette.move_to(mock_labware_1["A1"].top())
+pipette.move_to(mock_labware_1["A1"].top(z=-1))
 pipette.flow_rate.blow_out = 50
 pipette.blow_out()
 pipette.drop_tip()

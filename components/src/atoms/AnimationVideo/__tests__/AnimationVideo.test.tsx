@@ -10,6 +10,8 @@ describe('AnimationVideo', () => {
     expect(videoNode).toHaveAttribute('autoplay')
     expect(videoNode).toHaveAttribute('loop')
     expect(videoNode).not.toHaveAttribute('controls')
+    expect(videoNode).toHaveAttribute('disableRemotePlayback')
+    expect(videoNode).toHaveAttribute('disablePictureInPicture')
     expect((videoNode as HTMLVideoElement).muted).toBeTruthy()
   })
 
@@ -19,6 +21,8 @@ describe('AnimationVideo', () => {
     expect(videoNode).toHaveAttribute('autoplay')
     expect(videoNode).not.toHaveAttribute('loop') // Default overridden by custom.
     expect(videoNode).not.toHaveAttribute('controls')
+    expect(videoNode).toHaveAttribute('disableRemotePlayback')
+    expect(videoNode).toHaveAttribute('disablePictureInPicture')
     expect((videoNode as HTMLVideoElement).muted).toBeTruthy()
     expect(videoNode).toHaveAttribute('preload', 'auto') // Custom-only.
   })

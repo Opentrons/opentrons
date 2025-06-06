@@ -133,7 +133,7 @@ export interface LiquidEntity {
   description: string | null
   pythonName: string
   liquidGroupId: string
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export interface LiquidEntities {
@@ -637,7 +637,10 @@ export interface TimelineFrame {
       }
     }
     pipettes: {
-      [pipetteId: string]: boolean // true if pipette has tip(s)
+      [pipetteId: string]: {
+        hasTip: boolean
+        tiprackURI: string | null
+      } // true if pipette has tip(s)
     }
   }
   liquidState: {
@@ -700,7 +703,9 @@ export type ErrorType =
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
+  | 'RETRACT_BELOW_DISPENSE'
   | 'SUBMERGE_BELOW_ASPIRATE'
+  | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

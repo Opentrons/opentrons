@@ -21,6 +21,7 @@ export const SECTIONS = {
 } as const
 
 export const ACTIONS = {
+  RESTART_FLOW: 'RESTART_FLOW',
   BUILD_FLOW: 'BUILD_FLOW',
   PROCEED: 'PROCEED',
   GO_BACK: 'GO_BACK',

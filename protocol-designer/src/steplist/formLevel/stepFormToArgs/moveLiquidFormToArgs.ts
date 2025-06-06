@@ -119,6 +119,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
           disposalByVolume: null,
         })
@@ -128,6 +130,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
             (liquidClassValuesForTip.multiDispense
               ?.conditioningByVolume as Array<[number, number]>) ?? null,
@@ -389,7 +393,7 @@ export const moveLiquidFormToArgs = (
     dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position ?? 0,
     dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom ?? 0,
     dispenseRetractPositionReference:
-      hydratedFormData.dispense_position_reference,
+      hydratedFormData.dispense_retract_position_reference,
     dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
     pushOut: pushOut_checkbox ? pushOut_volume : 0,
     liquidClass:

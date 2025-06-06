@@ -60,9 +60,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     prevRobotState.liquidState != null
       ? getLabwareHasLiquid(prevRobotState.liquidState, labwareId)
       : false
-  const hasTipOnPipettes = Object.values(
-    prevRobotState.tipState.pipettes
-  ).includes(true)
+  const hasTipOnPipettes = Object.values(prevRobotState.tipState.pipettes).some(
+    ({ hasTip }) => hasTip
+  )
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
   const warnings: CommandCreatorWarning[] = []

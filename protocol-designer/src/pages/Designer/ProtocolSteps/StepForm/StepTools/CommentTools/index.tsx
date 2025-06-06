@@ -32,6 +32,7 @@ export function CommentTools(props: StepFormProps): JSX.Element {
           propsForFields.message.updateValue(e.currentTarget.value)
         }}
         height="7rem"
+        error={propsForFields.message.errorToShow}
       />
     </Flex>
   )

@@ -20,7 +20,7 @@ if ($IsWindows) {
 }
 
 Write-Output "Installing packages..."
-pip install -U ../shared-data/python ../api
+pip install -U ../shared-data ../api
 
 Write-Output "Validating that opentrons-hardware is not installed..."
 $pipList = pip list 2>&1
