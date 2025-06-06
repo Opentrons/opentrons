@@ -180,65 +180,45 @@ On any category screen, return to the "Prepare to run" screen by tapping the bac
 
 ### Runtime parameters
 
-Runtime parameters customize protocols during setup, letting you adjust
-pipette types, mount positions, aspirate/dispense volumes, labware
-types, and more—all without writing a new protocol.
+Runtime parameters customize protocols during setup, letting you adjust pipette types, mount positions, aspirate/dispense volumes, labware types, and more—all without writing a new protocol.
 
-![image](7204d7bfd9ab88e892ec1cb38e56af7a6b8a7161.jpg){width="12.135416666666666in"
-height="7.322916666666667in"}
+<figure class="screenshot" markdown>
+![Parameter modification screen. This example includes a CSV file and numeric parameters.](images/touchscreen-run-setup-parameters.png "Runtime parameters")
+</figure>
 
-Tap a configurable parameter to modify it. Different types of
-touchscreen controls are used for different parameter types.
+Tap a configurable parameter to modify it. Different types of touchscreen controls are used for different parameter types.
 
 - **Boolean:** Tap the parameter to toggle its value between On and Off.
 
 - **String and numeric choices:** Choose from a menu of possible values.
 
-- **Numeric range:** Use the onscreen keypad to enter a value within the
-  acceptable range.
+- **Numeric range:** Use the onscreen keypad to enter a value within the acceptable range.
 
 - **CSV:** Choose from a file picker.
 
 #### Using CSV data
 
-Flex looks for CSV files in the root directory of an attached USB drive
-or files that were used in a previous run of the same protocol. You can
-connect a USB drive to any open USB port on Flex, but we recommend using
-the port below the touchscreen. As shown here, this protocol has no CSV
-files saved on this robot, but there are several on an attached USB
-drive. Tap the desired CSV file to use its data into your protocol.
+Flex looks for CSV files in the root directory of an attached USB drive or files that were used in a previous run of the same protocol. You can connect a USB drive to any open USB port on Flex, but we recommend using the port below the touchscreen. As shown here, this protocol has no CSV files saved on this robot, but there are several on an attached USB drive. Tap the desired CSV file to use its data into your protocol.
+
+<figure class="screenshot" markdown>
+![CSV file picker, showing no files on the robot and three files on an attached USB drive.](images/touchscreen-run-setup-csv.png "CSV file picker")
+</figure>
 
 When working with CSV files, keep in mind that:
 
-- The touchscreen truncates file names that are longer than 52
-  characters. You can still upload files with names that exceed the
-  limit.
+- The touchscreen truncates file names that are longer than 52 characters. You can still upload files with names that exceed the limit.
 
-- The USB drive must use a file system that's readable by the robot.
-  FAT32, NTFS, and ext4 file systems are supported. The HFS+ and APFS
-  file systems are not.
+- The USB drive must use a file system that's readable by the robot. FAT32, NTFS, and ext4 file systems are supported. The HFS+ and APFS file systems are not.
 
-- You must leave the USB drive attached until you start the run, or Flex
-  won't be able to access the CSV data that you chose.
+- You must leave the USB drive attached until you start the run, or Flex won't be able to access the CSV data that you chose.
 
 #### Confirming runtime parameters
 
-Parameter and CSV file selections are still editable until you tap
-**Confirm values**. Modifications become read-only after that. To make
-further adjustments, you'll have to cancel the protocol run and start
-over.
+Parameter and CSV file selections are still editable until you tap **Confirm values**. Modifications become read-only after that. To make further adjustments, you'll have to cancel the protocol run and start over.
 
 ### Labware Position Check
 
-Opentrons recommends performing Labware Position Check before your
-protocol run. This process fine- tunes the positioning of instruments,
-relative to specific types of labware in specific slots on the deck. The
-results of Labware Position Check are saved as labware offsets, which
-are measured to the nearest 0.1
-
-mm\. You can apply saved labware offsets to future runs of the same
-protocol (or other protocols that use the same labware in the same
-positions) to save time.
+Opentrons recommends performing Labware Position Check before your protocol run. This process fine- tunes the positioning of instruments, relative to specific types of labware in specific slots on the deck. The results of Labware Position Check are saved as labware offsets, which are measured to the nearest 0.1 mm. You can apply saved labware offsets to future runs of the same protocol (or other protocols that use the same labware in the same positions) to save time.
 
 Labware Position Check guides you through these steps:
 
@@ -248,188 +228,90 @@ Labware Position Check guides you through these steps:
 
 3.  Place a specific type of labware in a specific deck slot.
 
-4.  Align the probe to the labware using the on-screen jog controls.
-    Then confirm the position.
+4.  Align the probe to the labware using the on-screen jog controls. Then confirm the position.
 
-5.  Repeat steps 3 and 4 for each labware--slot combination used in your
-    protocol.
+5.  Repeat steps 3 and 4 for each labware--slot combination used in your protocol.
 
 6.  Review and save your new labware offset data.
 
 7.  Remove the calibration probe from the pipette.
 
-8.  ![image](6d61bb756b7e705b810606be3003ec20ce5f95bd.png){width="10.59375in"
-    height="5.510416666666667in"}
-
-Jog controls used in Labware Position Check. Use larger jump sizes to
+<figure class="screenshot" markdown>
+![Jog controls, with three options for jump size on the left, toggle between axes in the middle, and arrow buttons on the right.](images/touchscreen-lpc-jog-controls.png "Labware Position Check jog controls")
+<figcaption>Jog controls used in Labware Position Check. Use larger jump sizes to
 move the pipette quickly, but beware of crashing the pipette into
-labware.
+labware.</figcaption>
+</figure>
 
-![image](f19dcbf5b47d434af391adff6f25260dd229b812.png){width="11.239583333333334in"
-height="6.0625in"}
+<figure class="screenshot" markdown>
+TK image of 8.4 LPC
+<figcaption>Summary of new labware offsets ready to be applied to a protocol.</figcaption>
+</figure>
 
-Summary of new labware offsets ready to be applied to a protocol.
+When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
 
-When you run Labware Position Check for the first time, the pipette will
-start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On
-subsequent runs, the pipette will start at the previously saved offset
-locations. This lets you quickly confirm offset data before every
-protocol run.
-
-**Note:** The pipette will always start at the default position if you
-turn off Apply Labware Offsets in the robot settings.
+!!! note
+    The pipette will always start at the default position if you turn off Apply Labware Offsets in the robot settings.
 
 ### Run progress
 
-Once everything is set up, begin your run by tapping the play button ▶
-on the "Prepare to run" screen. Flex will begin the protocol and you'll
-see the Running screen.
+Once everything is set up, begin your run by tapping the play button :material-play-circle: on the "Prepare to run" screen. Flex will begin the protocol and you'll see the Running screen.
 
-The Running screen gives you quick access to stop and play/pause
-controls, in case you need to intervene in your protocol. On the default
-view, these controls are large and only the current step of the protocol
-is shown.
+The Running screen gives you quick access to stop and play/pause controls, in case you need to intervene in your protocol. On the default view, these controls are large and only the current step of the protocol is shown.
 
-![image](3eee8368a01301510ca623cc5cdfef20dbf739a1.jpg){width="11.322916666666666in"
-height="6.25in"}
+<figure class="screenshot" markdown>
+![Running screen with large stop and pause buttons, and a description of a single aspirate step.](images/touchscreen-running-one-step.png "touchscreen-running-one-step.png")
+</figure>
 
-Swipe from right to left to see an alternative view with smaller
-controls and more protocol steps. The current step will always be at the
-top of the list.
+Swipe from right to left to see an alternative view with smaller controls and more protocol steps. The current step will always be at the top of the list.
 
-![image](2da69e68647578b98d60f673ccf857fda130e7cd.jpg){width="11.322916666666666in"
-height="6.25in"}
+<figure class="screenshot" markdown>
+![Running screen with small stop and pause buttons in the top right, and a list of several protocol steps.](images/touchscreen-running-multi-step.png "touchscreen-running-multi-step.png")
+</figure>
 
-Starting in robot software version 8.0.0, if something unexpected
-happens during the protocol run, Flex will pause and give you the option
-to enter error recovery mode. In earlier versions, Flex cancels the run
-when an error occurs.
+Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter error recovery mode. In earlier versions, Flex cancels the run when an error occurs.
 
 ### Error recovery
 
 Flex error recovery allows you to continue a protocol run even when
 problems arise.
 
-![image](b82825e98dc9e68ddab5967c8d99ec2d919515b2.jpg){width="11.333333333333334in"
-height="6.645833333333333in"}
+![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](images/touchscreen-error-recovery.png "Error recovery")
 
-Tap **Launch recovery mode** to see options for the particular type of
-error that has occurred. Instead of just canceling the protocol and
-forcing a restart, this feature gives you a chance to correct problems
-like replacing a damaged tip or filling an empty well. Even if you have
-to cancel a protocol run, error recovery will let you preserve liquids
-in the pipette and control where tips are dropped. After all, an
-occasional mistake or problem shouldn't end a procedure with the loss of
-expensive reagents or valuable samples.
+Tap **Launch recovery mode** to see options for the particular type of error that has occurred. Instead of just canceling the protocol and forcing a restart, this feature gives you a chance to correct problems like replacing a damaged tip or filling an empty well. Even if you have to cancel a protocol run, error recovery will let you preserve liquids in the pipette and control where tips are dropped. After all, an occasional mistake or problem shouldn't end a procedure with the loss of expensive reagents or valuable samples.
 
-Flex provides a protocol recovery path for the following error
-conditions.
+Flex provides a protocol recovery path for the following error conditions.
 
-**Error type Description Recovery options**
+| Error type | Description {style="width: 30%;"} | Recovery options |
+| :--------- | :---------- | :--------------- |
+| No liquid detected | Occurs when a pipette encounters an empty well and expects a liquid to be present. | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul> |
+| Pipette overpressure | Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips. | <ul><li>For aspiration:</li><ul><li>Retry with new tips.</li><li>Cancel protocol run.</li></ul><li>For dispense:</li><ul><li>Skip to the next step with the same tips.</li><li>Skip to the next step with new tips.</li><li>Cancel protocol run.</li></ul></ul> |
+| General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
 
-+-----------------------+-----------------------+----------------------+
-| No liquid detected    | Occurs when a pipette |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Manually refill     |                      |
-|                       |   well and skip to    |                      |
-|                       |   the next step.      |                      |
-|                       |                       |                      |
-|                       | encounters an empty   |                      |
-|                       | well                  |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Ignore the error    |                      |
-|                       |   and skip to the     |                      |
-|                       |   next step.          |                      |
-|                       |                       |                      |
-|                       | and expects a liquid  |                      |
-|                       | to be                 |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Cancel protocol     |                      |
-|                       |   run.                |                      |
-|                       |                       |                      |
-|                       | present.              |                      |
-+-----------------------+-----------------------+----------------------+
-| Pipette overpressure  | Occurs when pressure  | For aspiration:      |
-+-----------------------+-----------------------+----------------------+
-|                       | inside the pipette    |                      |
-|                       | exceeds               |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Retry with new      |                      |
-|                       |   tips.               |                      |
-|                       |                       |                      |
-|                       | the normal range      |                      |
-|                       | while                 |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Cancel protocol     |                      |
-|                       |   run.                |                      |
-|                       |                       |                      |
-|                       | aspirating or         |                      |
-|                       | dispensing            |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | liquid.               | For dispense:        |
-+-----------------------+-----------------------+----------------------+
-|                       |                       |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Skip to the next    |                      |
-|                       |   step with the same  |                      |
-|                       |   tips.               |                      |
-|                       |                       |                      |
-|                       | Caused by clogged,    |                      |
-|                       | bent,                 |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Skip to the next    |                      |
-|                       |   step with new tips. |                      |
-|                       |                       |                      |
-|                       | or sealed tips.       |                      |
-+-----------------------+-----------------------+----------------------+
-| - Cancel protocol     | A catch-all category  |                      |
-|   run.                | for                   |                      |
-|                       |                       |                      |
-| General errors        |                       |                      |
-+-----------------------+-----------------------+----------------------+
-|                       | - Retry step.         |                      |
-|                       |                       |                      |
-|                       | other errors.         |                      |
-+-----------------------+-----------------------+----------------------+
-|                       |                       | - Skip to next step. |
-+-----------------------+-----------------------+----------------------+
+!!! note
+    The tip presence sensor is disabled for [partial tip pickup][partial-tip-pickup] of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
 
-- Cancel protocol run.
-
-You can view the status of a finished protocol and review any resolved
-errors on the run completion screen.
+You can view the status of a finished protocol and review any resolved errors on the run completion screen.
 
 ### Run completion
 
-At the end of your protocol, a large "Run completed" or "Run failed"
-message will take over the touchscreen. These color-coded messages match
-the LED status bar at the top of the robot and are visible at a
-distance.
+At the end of your protocol, a large "Run completed" or "Run failed" message will take over the touchscreen. These color-coded messages match the LED status bar at the top of the robot and are visible at a distance.
 
-![image](ff60a9e75e08c00b389d1bc2799b4ae2d9224eef.jpg){width="8.854166666666666in"
-height="5.1875in"}
+<figure class="side-by-side" markdown>
+![Green run completed screen.](images/touchscreen-run-completed.png "Run completed")
+![Red run failed screen.](images/touchscreen-run-failed.png "Run failed")
+</figure>
 
-![image](84fc9b0944e549b9bcaebdcf4feae3aa918456d7.png){width="8.854166666666666in"
-height="5.1875in"}
+Tap anywhere on either of these screens to go to the run summary screen, which shows information about the protocol run time and next steps. The summary screen always gives you the options to **Return to dashboard** or have the protocol **Run again**. If the run failed, you can also **View error details** and begin the troubleshooting process.
 
-Tap anywhere on either of these screens to go to the run summary screen,
-which shows information about the protocol run time and next steps. The
-summary screen always gives you the options to **Return to dashboard**
-or have the protocol **Run again**. If the run failed, you can also
-**View error details** and begin the troubleshooting process.
-
-![image](749574ea4e3d4a787ae5800bc42d556cda8aaac2.jpg){width="8.0625in"
-height="4.5in"}![image](4107d9ca7c17cade85375f145df2d52fbd80753a.jpg){width="8.0625in"
-height="4.5in"}
+<figure class="screenshot side-by-side" markdown>
+![Summary of a completed run with options to return to dashboard (left) or run again (right).](images/touchscreen-run-summary-failed.png "touchscreen-run-summary-failed.png")
+![Summary of a failed run with options to return to dashboard (left), run again (center), or view error details (right).](images/touchscreen-run-summary-completed.png "touchscreen-run-summary-completed.png")
+</figure>
 
 ### Quick transfer
 
-Quick transfer is a touchscreen-only feature that lets you create, save,
-and run simple procedures that move liquid from a source to a
-destination, all without creating a protocol or writing code. Available
-starting in robot software version 8.0.0, this feature is ideal for
-preparing labware you need to use in other, more complex procedures. For
-example, you can use quick transfers to:
+Quick transfer is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
 
 - Provision well plates with a reagent, buffer, or other liquid.
 
@@ -441,162 +323,92 @@ example, you can use quick transfers to:
 
 There are two sections of the quick transfer screen:
 
-- Pinned transfers: Large cards on a horizontal carousel. You can pin 8
-  cards, maximum.
+- **Pinned transfers**: Large cards on a horizontal carousel. You can pin 8 cards, maximum.
 
-- Saved transfers: A vertical list at the bottom of the screen. Flex can
-  save a maximum of 20 quick transfers. You have to delete older quick
-  transfers to maintain this limit.
+- **Saved transfers**: A vertical list at the bottom of the screen. Flex can save a maximum of 20 quick transfers. You have to delete older quick transfers to maintain this limit.
 
-- ![image](61922755e84c4e77d655355d8b95e4940ae8cd96.jpg){width="5.46875in"
-  height="3.1875in"}
+<figure class="screenshot" markdown>
+![Quick transfer screen with two pinned quick transfers at the top and a longer list of quick transfers at the bottom.](images/quick-transfer-list.png "Quick transfers")
+</figure>
 
-The remainder of this section goes through quick transfer features in
-detail.
+The remainder of this section goes through quick transfer features in detail.
 
 #### Creating a quick transfer
 
-From the Quick Transfer tab on the touchscreen, tap **+ Quick
-transfer.** This starts a guided setup. Follow the instructions on the
-screen. You can run, save, pin, or delete the transfer when finished.
+From the Quick Transfer tab on the touchscreen, tap **+ Quick transfer.** This starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 #### Deck slots and hardware requirements
 
-Quick transfers require a Flex pipette, a tip rack in slot B2, source
-labware in slot C2, and destination labware in slot D2. For tip
-disposal, quick transfer relies on the robot's to determine where the
-trash bin or waste chute is on the deck. It shows the trash bin in slot
-A3 if no trash container is configured. You cannot use the gripper,
-modules, and custom labware in a quick transfer.
+Quick transfers require a Flex pipette, a tip rack in slot B2, source labware in slot C2, and destination labware in slot D2. For tip disposal, quick transfer relies on the robot's [deck configuration][deck-configuration] to determine where the trash bin or waste chute is on the deck. It shows the trash bin in slot A3 if no trash container is configured. You cannot use the gripper, modules, and custom labware in a quick transfer.
 
-![image](5bc64adf5b29a65c14fc43eff73ed5948efce3ec.jpg){width="4.3125in"
-height="3.3645833333333335in"}
+<figure class="screenshot" markdown>
+![Quick transfer deck setup with trash bin in A3, tip rack in B2, source labware in C2, and destination labware in D2.](images/quick-transfer-deck.png "Quick transfer deck setup")
+</figure>
 
-If everything is set up correctly, you'll move on to selecting pipettes
-and tips.
+If everything is set up correctly, you'll move on to selecting pipettes and tips.
 
 #### Pipettes and tips
 
-Creating a quick transfer involves selecting a pipette and appropriate
-tips. Quick transfer can use any
-
-1-, 8-, or 96-channel pipette that's attached to the robot. When
-selecting a pipette tip, try to match the tip to a pipette of the same
-capacity or larger. For best performance, use the smallest tips that can
-hold the amount of liquid you need to aspirate.
+Creating a quick transfer involves selecting a pipette and appropriate tips. Quick transfer can use any 1-, 8-, or 96-channel pipette that's attached to the robot. When selecting a pipette tip, try to match the tip to a pipette of the same capacity or larger. For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
 
 #### Labware
 
-Quick transfer works with most of the labware in the . It omits labware
-from the source and destination menus when those items are incompatible
-with the selected pipette. For example, only the 1-channel pipette can
-aspirate or dispense from tube racks. If you select a multi-channel
-pipette, quick transfer won't let you choose a tube rack as a source or
-destination.
+Quick transfer works with most of the labware in the [Opentrons Labware Library](https://labware.opentrons.com/). It omits labware from the source and destination menus when those items are incompatible with the selected pipette. For example, only the 1-channel pipette can aspirate or dispense from tube racks. If you select a multi-channel pipette, quick transfer won't let you choose a tube rack as a source or destination.
 
 #### Well selection
 
-Well selection depends upon the pipette and labware you're using. When
-using a 1-or 8-channel pipette and a 96-well plate, you select
-individual wells by tapping or tapping and dragging on the touchscreen.
-Or, when using multi-channel pipettes and high-density well plates,
-quick transfer provides button controls that let you select columns and
-well groups instead of individual wells.
+Well selection depends upon the pipette and labware you're using. When using a 1-or 8-channel pipette and a 96-well plate, you select individual wells by tapping or tapping and dragging on the touchscreen. Or, when using multi-channel pipettes and high-density well plates, quick transfer provides button controls that let you select columns and well groups instead of individual wells.
 
-For example, these controls let you select wells and columns with an
-8-channel pipette and a 384-well plate.
+For example, these controls let you select wells and columns with an 8-channel pipette and a 384-well plate.
 
-![image](76935861bf9f7118fda51bec6987539a505516aa.jpg){width="14.458333333333334in"
-height="7.083333333333333in"}
+<figure class="screenshot" markdown>
+![384 well selection screen with 8 wells selected, starting with A1.](images/quick-transfer-well-selection-8-channel.png "8-channel quick transfer")
+</figure>
 
-And these controls let you select wells and columns with a 96-channel
-pipette and 384-well plate.
+And these controls let you select wells and columns with a 96-channel pipette and 384-well plate.
 
-![image](bd0d334f7f630a96f9f9f4b3b4f5487a596b00e2.jpg){width="14.197916666666666in"
-height="5.927083333333333in"}
+<figure class="screenshot" markdown>
+![384 well selection screen with 96 wells selected, starting with A1.](images/quick-transfer-well-selection-96-channel.png "96-channel quick transfer")
+</figure>
 
-Quick transfer checks your pipette, source, and destination choices to
-prevent incompatible combinations. If you make a mistake while selecting
-wells, or want to start over, tap **Reset** to clear your selections.
+Quick transfer checks your pipette, source, and destination choices to prevent incompatible combinations. If you make a mistake while selecting wells, or want to start over, tap **Reset** to clear your selections.
 
-After making instrument and well selections, you'll set the transfer
-volume and give your new quick transfer a name.
+After making instrument and well selections, you'll set the transfer volume and give your new quick transfer a name.
 
 #### Transfer volumes and name
 
-You'll set the amount of liquid to transfer (in μL) after specifying the
-source and destination wells. You'll also have a chance to name the
-transfer after setting the transfer volume. A good, concise name helps
-you find a quick transfer in a list of saved or pinned transfers and
-indicates what it does.
+You'll set the amount of liquid to transfer (in μL) after specifying the source and destination wells. You'll also have a chance to name the transfer after setting the transfer volume. A good, concise name helps you find a quick transfer in a list of saved or pinned transfers and indicates what it does.
 
 #### Advanced settings
 
-These are available after you name a quick transfer and before you save
-it. If some settings are familiar to you that's because they're the same
-as those offered in Protocol Designer. Advanced settings are optional;
-select any that you need or just save or run the transfer.
+These are available after you name a quick transfer and before you save it. If some settings are familiar to you that's because they're the same as those offered in Protocol Designer. Advanced settings are optional; select any that you need or just save or run the transfer.
 
-**Setting Description**
-
-Aspirate and dispense Set how quickly the pipette will aspirate or
-dispense, in μL/s. flow rates
-
-Pipette path Choose how the pipette moves between wells. Options
-include:
-
-- single transfer (1 well to 1 well)
-
-- multi-aspirate (many wells to 1 well)
-
-- multi-dispense (1 well to many wells)
-
-Tip position Change where in the well the pipette aspirates or
-dispenses. By default, the robot positions the tip 1 mm from the bottom
-center of a well.
-
-Pre-wet tip Pre-wet the pipette tip by aspirating and dispensing ⅔ of
-the tip's maximum volume.
-
-Mix Aspirate and dispense repeatedly from a single location. Used to mix
-the contents of a well together.
-
-Delay Adds a timed delay (in seconds) before an aspirate or dispense
-action.
-
-Touch tip Move the pipette so the tip touches the wall of a well. Used
-to help knock off any droplets that might cling to the pipette's tip.
-Not supported on all labware.
-
-Air gap When used during aspiration, draw in extra air after the liquid.
-When used during dispense, draw in extra air before moving to the trash
-container to dispose of the tip. Used to prevent liquid from leaking out
-of the pipette tip.
-
-Blowout Blow an extra amount of air through the tip to clear it. The
-pipette can blow out into the trash bin, source well, or destination
-well.
-
-Change tip Replace the tip at the start of the transfer, before every
-aspirate, or per source well.
+| Setting {style="width: 25%;"} | Description |
+|----------|-------------|
+| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in μL/s.|
+| Pipette path           | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul> |
+| Tip position           | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well. |
+| Pre-wet tip            | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume. |
+| Mix                    | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together. |
+| Delay                  | Adds a timed delay (in seconds) before an aspirate or dispense action. |
+| Touch tip              | Move the pipette so the tip touches the wall of a well. Used to help knock off any droplets that might cling to the pipette's tip. Not supported on all labware. |
+| Air gap                | When used during aspiration, draw in extra air after the liquid. When used during dispense, draw in extra air before moving to the trash container to dispose of the tip. Used to prevent liquid from leaking out of the pipette tip. |
+| Blowout                | Blow an extra amount of air through the tip to clear it. The pipette can blow out into the trash bin, source well, or destination well. |
+| Change tip             | Replace the tip at the start of the transfer, before every aspirate, or per source well. |
 
 #### Managing transfers
 
-Click **Create Transfer** when you're satisfied with your transfer
-settings. After creating a quick transfer, you can run, save, or delete
-it.
+Click **Create Transfer** when you're satisfied with your transfer settings. After creating a quick transfer, you can run, save, or delete it.
 
-- Flex saves a maximum of 20 transfers in a vertical list under the
-  Quick Transfer tab.
+- Flex saves a maximum of 20 transfers in a vertical list under the Quick Transfer tab.
 
-- Long press a saved transfer to run it, pin it, or delete it. Flex pins
-  a maximum of 8 quick transfers.
+- Long press a saved transfer to run it, pin it, or delete it. Flex pins a maximum of 8 quick transfers.
 
-- Long press a pinned transfer to run it, un-pin it (returns it to the
-  saved list), or delete it.
+- Long press a pinned transfer to run it, un-pin it (returns it to the saved list), or delete it.
 
-![image](3006d03a17fb14f85a820fcbec1e0ed24462dbcc.jpg){width="5.760416666666667in"
-height="3.4375in"}
+<figure class="screenshot" markdown>
+![Menu with options to run, pin, or delete a quick transfer.](images/quick-transfer-menu.png "Quick transfer menu")
+</figure>
 
 ### Instrument management
 
