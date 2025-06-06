@@ -36,6 +36,7 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAADisplayName,
+  getAAFromCutoutFixtureId,
   getDeckDefAAWithFakeAA,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -68,6 +69,7 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { CALIBRATION_SOURCE_LEGACY } from '/app/redux/calibration'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -611,17 +613,42 @@ export function AddFixtureModal({
     console.log('addedCutoutConfigs: ', addedCutoutConfigs)
     const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
       console.log('fixture.cutoutFixtureId: ', fixture.cutoutFixtureId)
-      if (COMBO_FIXTURES.includes(fixture.cutoutFixtureId)) {
-        // get current deck def
-        // is the adjecent slot empty? simple fixture id
-        // if not empty look for match with following fixutre.
-        // update both to the same fixture if match found.
-      } else {
-        return (
-          addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId) ??
-          fixture
-        )
-      }
+      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+        cutoutId
+      )
+      console.log('addressableAreasById: ', addressableAreasById)
+      const addedToDef = addedCutoutConfigs.filter(aaCutoutItem => {
+        // filter addressableAreasById go only show props for the cutoutFixtureId
+        // check each adjcent slot to see whats in there
+        // if there is a match with one of the combos replace
+        // const filters = addressableAreasById.filter(aaByUd => {
+        //   aaByUd[cutoutId]
+        // })
+      console.log("addressableAreasById[aaCutoutItem.fixtureId] ?? []: ", addressableAreasById[aaCutoutItem.cutoutFixtureId] ?? [])
+        return aaCutoutItem.cutoutFixtureId == fixture.cutoutFixtureId
+      })
+      console.log("addedToDef: ", addedToDef)
+      const fixturesForCUtout = addressableAreasById[aaCutoutItem.fixtureId] ?? []
+      console.log("fixturesForCUtout: ", fixturesForCUtout)
+      // const aa =
+      //     aaListForFixtureId.find(
+      //       (aa: AddressableAreaNamesWithFakes) =>
+      //         aa in aaNameMapToSlotId &&
+      //         aaNameMapToSlotId[aa] == addressableAreaId
+      // ) ?? null
+      // find all fixtures related to cutoutId
+      // check if match with cutoutFixure
+      // if match check the next slot if empty continue if not add logic for checking what fixture to use 
+      const what = deckConfig.find(
+        dc => dc.cutoutFixtureId == fixture.cutoutFixtureId
+      )
+      console.log('what: ', what)
+      // is the adjecent slot empty? simple fixture id
+      // if not empty look for match with following fixutre.
+      // update both to the same fixture if match found.
+      return (
+        addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId) ?? fixture
+      )
     }) as CutoutConfig[] // we can do this bc we are going to map each aa to the proper fixture
 
     updateDeckConfiguration(newDeckConfig)
