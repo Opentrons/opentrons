@@ -1252,11 +1252,26 @@ class FlexStackerContext(ModuleContext):
           will fit, use the return value of :py:method:`.get_max_storable_labware_from_list`.
 
         :param labware: A list of labware to load into the stacker.
-        :param stacking_offset_z: The amount of overlap between the labware when stacked
-            on top of each other. This is used to determine the max number of labware that
-            the Flex Stacker can store. The API uses the stacking offsets defined in
-            the labware definition, but you can override this by providing a value here.
+        :param stacking_offset_z: Stacking offset in mm between labware units to override the
+            calculated value from labware definitions.
+        
+        .. note::
+        The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
+        labware unit and the topside of the unit below. This offset is used to determine how many
+        units can fit in the stacker and calculates the Z position of the shuttle when retrieving
+        or storing labware. The stacking offset is calculated automatically from the labware
+        definitions, but you can override it by providing a value here.
 
+        There are four possible stacking configurations, each with a different way of calculating
+        the stacking offset:
+        - Bare labware: labware (bottomside) overlaps with labware (topside)
+        - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+            of the unit below.
+        - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+            of the unit below.
+        - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+            lid (topside) of the unit below.
+            
         """
         self._core.set_stored_labware_items(
             self._labware_to_cores(labware),
@@ -1303,10 +1318,25 @@ class FlexStackerContext(ModuleContext):
         :param count: The number of labware that the Flex Stacker should start the protocol
             storing. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
-        :param stacking_offset_z: The amount of overlap between the labware when stacked
-            on top of each other. This is used to determine the max number of labware that
-            the Flex Stacker can store. The API uses the stacking offsets defined in
-            the labware definition, but you can override this by providing a value here.
+        :param stacking_offset_z: Stacking offset in mm between labware units to override the
+            calculated value from labware definitions.
+        
+        .. note::
+        The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
+        labware unit and the topside of the unit below. This offset is used to determine how many
+        units can fit in the stacker and calculates the Z position of the shuttle when retrieving
+        or storing labware. The stacking offset is calculated automatically from the labware
+        definitions, but you can override it by providing a value here.
+
+        There are four possible stacking configurations, each with a different way of calculating
+        the stacking offset:
+        - Bare labware: labware (bottomside) overlaps with labware (topside)
+        - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+            of the unit below.
+        - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+            of the unit below.
+        - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+            lid (topside) of the unit below.
 
         """
         self._core.set_stored_labware(
