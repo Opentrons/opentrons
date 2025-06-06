@@ -19,9 +19,18 @@ const TALL = 'TALL'
 const TEXT_MARGIN = 5
 
 interface CalibrationBlockRenderProps {
+  /**
+   * Must be a calibration block definition, e.g.
+   * opentrons_calibrationblock_short_side_left or ..._short_side_right.
+   */
   labwareDef: LabwareDefinition
 }
 
+/**
+ * Render a top-down view of an OT-2 calibration block. This displays features specific
+ * to calibration blocks, which the more general <Labware> component doesn't know
+ * about.
+ */
 export function CalibrationBlockRender(
   props: CalibrationBlockRenderProps
 ): JSX.Element | null {
