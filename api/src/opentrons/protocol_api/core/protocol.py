@@ -312,7 +312,7 @@ class AbstractProtocol(
 
     @abstractmethod
     def get_liquid_class(self, name: str, version: int) -> LiquidClass:
-        """Return a liquid class for use in transfer functions."""
+        """Get an instance of a built-in liquid class."""
 
     @abstractmethod
     def get_labware_location(

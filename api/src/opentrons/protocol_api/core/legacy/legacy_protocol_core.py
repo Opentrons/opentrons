@@ -600,7 +600,7 @@ class LegacyProtocolCore(
         assert False, "define_liquid only supported on engine core"
 
     def get_liquid_class(self, name: str, version: int) -> LiquidClass:
-        """Define a liquid class."""
+        """Get an instance of a built-in liquid class."""
         assert False, "define_liquid_class is only supported on engine core"
 
     def get_labware_location(

@@ -1095,7 +1095,7 @@ class ProtocolCore(
         )
 
     def get_liquid_class(self, name: str, version: int) -> LiquidClass:
-        """Fetch a liquid class for use in transfer functions."""
+        """Get an instance of a built-in liquid class."""
         try:
             # Check if we have already loaded this liquid class' definition
             liquid_class_def = self._liquid_class_def_cache[(name, version)]

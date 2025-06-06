@@ -1377,7 +1377,7 @@ class ProtocolContext(CommandPublisher):
         name: str,
     ) -> LiquidClass:
         """
-        Get a liquid class instance for use in the protocol.
+        Get an instance of a built-in liquid class for use in the protocol.
 
         Args:
             name: Name of an Opentrons-defined liquid class.
