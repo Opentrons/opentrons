@@ -74,8 +74,12 @@ OFFSET_SM = 5.0
 OFFSET_MD = 10.0
 OFFSET_LG = 20.0
 
-# height limit in mm of labware to use OFFSET_SM used when storing labware.
-LARGE_LABWARE_Z_LIMIT = 100.0
+# The distance to compensate for Labware Stacking overlap when storing labware.
+STACKING_OFFSET_SM = 4.0
+STACKING_OFFSET_LG = 40.0
+# The height limit in mm of tall labware (tipracks) to use STACKING_OFFSET
+# used when storing labware.
+TALL_LABWARE_Z_LIMIT = 99.0
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -451,8 +455,18 @@ class FlexStacker(mod_abc.AbstractModule):
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
+        # NOTE:
+        # This uses a fixed stacking overlap offset that works for the labware
+        # we have tested when storing labware. This should probably be revised
+        # once we take into account stacking offsets when calculating the
+        # labware height. We have a STACKING_OFFSET_LG to deal with the side flaps
+        # of the tipracks which get caught by the latch, causing a stall.
+        offset = (
+            STACKING_OFFSET_SM
+            if labware_height < TALL_LABWARE_Z_LIMIT
+            else STACKING_OFFSET_LG
+        )
         # Move the Z so the labware sits right under any labware already stored
-        offset = OFFSET_SM if labware_height < LARGE_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
