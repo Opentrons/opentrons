@@ -376,7 +376,7 @@ async def _cycle_plunger(
                 )
                 failed_cycles = failed_cycles + 1
                 if continue_after_stall:
-                    break
+                    continue
                 else:
                     return failed_cycles
 
