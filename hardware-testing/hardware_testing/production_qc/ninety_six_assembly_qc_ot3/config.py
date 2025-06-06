@@ -13,6 +13,7 @@ from . import (
     test_environmental_sensor,
     test_tip_sensor,
     test_droplets,
+    test_fixturepressure
 )
 
 
@@ -26,6 +27,8 @@ class TestSection(enum.Enum):
     ENVIRONMENT_SENSOR = "ENVIRONMENT-SENSOR"
     TIP_SENSOR = "TIP-SENSOR"
     DROPLETS = "DROPLETS"
+    FIXTUREPRESSURE = "FIXTUREPRESSURE"
+
 
 
 @dataclass
@@ -66,6 +69,10 @@ TESTS = [
         TestSection.DROPLETS,
         test_droplets.run,
     ),
+    (
+        TestSection.FIXTUREPRESSURE,
+        test_fixturepressure.run,
+    ),
 ]
 
 
@@ -95,6 +102,9 @@ def build_report(test_name: str) -> CSVReport:
             ),
             CSVSection(
                 title=TestSection.DROPLETS.value, lines=test_droplets.build_csv_lines()
+            ),
+            CSVSection(
+                title=TestSection.FIXTUREPRESSURE.value, lines=test_fixturepressure.build_csv_lines()
             ),
         ],
     )

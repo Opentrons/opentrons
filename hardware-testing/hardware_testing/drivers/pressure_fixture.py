@@ -18,6 +18,7 @@ FIXTURE_NUM_CHANNELS: Final[int] = 8
 FIXTURE_NUM_CHANNELS_96: Final[int] = 96
 FIXTURE_BAUD_RATE: Final[int] = 115200
 FIXTURE_VERSION_REQUIRED = "1.0.0"
+FIXTURE_VERSION_REQUIRED2 = "0.0.1"
 
 FIXTURE_CMD_TERMINATOR = "\r\n"
 FIXTURE_CMD_GET_VERSION = "VERSION"
@@ -39,6 +40,11 @@ class PressureFixtureBase(ABC):
 
     @abstractmethod
     def connect(self) -> None:
+        """Connect to the Mark10 Force Gauge."""
+        ...
+
+    @abstractmethod
+    def connect_96(self) -> None:
         """Connect to the Mark10 Force Gauge."""
         ...
 
@@ -147,6 +153,38 @@ def connect_to_fixture(
     ui.print_info("no fixture found returning simulator")
     return SimPressureFixture()
 
+def connect_to_fixture96(
+    simulate: bool, side: str = "left", autosearch: bool = True
+) -> PressureFixtureBase:
+    """Try to find and return an presure fixture, if not found return a simulator."""
+    ui.print_title("Connecting to presure fixture")
+    if not simulate:
+        if not autosearch:
+            port = list_ports_and_select(device_name="Pressure fixture")
+            fixture = PressureFixture.create(port=port, slot_side=side)
+            fixture.connect_96()
+            ui.print_info(f"Found fixture on port {port}")
+            return fixture
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(
+                        f"Trying to connect to Pressure fixture on port {port}"
+                    )
+                    fixture = PressureFixture.create(port=port, slot_side=side)
+                    fixture.connect_96()
+                    ui.print_info(f"Found fixture on port {port}")
+                    return fixture
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No pressure sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no fixture found returning simulator")
+    return SimPressureFixture()
 
 class PressureFixture(PressureFixtureBase):
     """OT3 Pressure Fixture Driver."""
@@ -174,9 +212,21 @@ class PressureFixture(PressureFixtureBase):
         sleep(FIXTURE_REBOOT_TIME)
         fw_version = self.firmware_version()
         print(f"unexpected pressure-fixture version: {fw_version}")
-        # assert (
-        #     fw_version == FIXTURE_VERSION_REQUIRED
-        # ), f"unexpected pressure-fixture version: {fw_version}"
+        assert (
+            fw_version == FIXTURE_VERSION_REQUIRED
+        ), f"unexpected pressure-fixture version: {fw_version}"
+    
+    def connect_96(self) -> None:
+        """Connect."""
+        self._port.open()
+        self._port.flushInput()
+        # NOTE: device might take a few seconds to boot up
+        sleep(FIXTURE_REBOOT_TIME)
+        fw_version = self.firmware_version()
+        print(f"unexpected pressure-fixture version: {fw_version}")
+        assert (
+            fw_version == FIXTURE_VERSION_REQUIRED2
+        ), f"unexpected pressure-fixture version: {fw_version}"
 
     def disconnect(self) -> None:
         """Disconnect."""
@@ -208,8 +258,6 @@ class PressureFixture(PressureFixtureBase):
         cmd_str = f"{FIXTURE_CMD_GET_ALL_PRESSURE_96}{FIXTURE_CMD_TERMINATOR}"
         self._port.write(cmd_str.encode("utf-8"))
         response = self._port.readlines()#.decode("utf-8")
-        sleep(0.01)
-        print("response=",response)
         datalist = []
         for res in response:
             res_list = res.decode("utf-8").split(",")[:-1]  # ignore the last comma
@@ -218,8 +266,8 @@ class PressureFixture(PressureFixtureBase):
                 if data_str[i] == "-0.00":
                     data_str[i] = "0.00"
             data = [float(d) for d in data_str]  # convert to float
-            print(data)
-            datalist.append(data)
+            #print(data)
+            datalist.extend(data)
         # if self._slot_side == "left":
         #     data.reverse()  # reverse order, so pipette channel 1 is at index 0
         return datalist
@@ -229,9 +277,9 @@ if __name__ == "__main__":
     port_name = list_ports_and_select(device_name="Pressure fixture")
     #port_name = input("type the port of the device (eg: COM1): ")
     fixture = PressureFixture.create(port=port_name, slot_side="left")
-    fixture.connect()
+    fixture.connect_96()
     print(f"Device firmware version: {fixture.firmware_version()}")
     while True:
         readings = fixture.read_all_pressure_channel_96()
-        print(readings)
+        print("zuihoujieguo:",readings)
         sleep(0.1)
