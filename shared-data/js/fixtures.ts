@@ -408,7 +408,7 @@ export const filterAAByAreaType = (
   })
 }
 
-const getDeckDefAAWithFakeAA = (
+export const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
 ): DeckDefinitionWithFakes => {
   const locationsWithFakeAA = [
