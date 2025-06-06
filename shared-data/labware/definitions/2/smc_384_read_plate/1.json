@@ -438,7 +438,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "SMC 384well Commercial Read Plate",
+    "displayName": "SMC 384 Well Commercial Read Plate",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -4684,7 +4684,7 @@
     }
   ],
   "parameters": {
-    "format": "384standard",
+    "format": "384Standard",
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
