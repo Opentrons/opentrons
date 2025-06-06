@@ -119,7 +119,7 @@ describe('Transfer stepform testing P1000M', () => {
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
-    const protocol = getTestFile(TestFilePath.P1000MultiTransferLiquid)
+    const protocol = getTestFile(TestFilePath.P1000MTransferMulti)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
     cy.openSettingsPage()

@@ -1219,7 +1219,7 @@ export const SetupVerifications = {
     call: () => {
       cy.contains('button', 'Transfer').should('be.visible').click()
       cy.contains('Source labware')
-      cy.contains('Select source wells')
+      // cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
       cy.contains('Tip management')

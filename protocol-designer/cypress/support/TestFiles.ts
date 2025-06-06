@@ -46,13 +46,17 @@ export enum TestFilePath {
   Example_1_1_0V5 = 'fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
   ThermocyclerOnOt2V7 = 'fixtures/protocol/7/thermocyclerOnOt2V7.json',
   ThermocyclerOnOt2V7MigratedToV8 = 'fixtures/protocol/8/thermocyclerOnOt2V7MigratedToV8.json',
+  P50_Single_Import_T_Liquid = 'fixtures/protocol/8/P50_Single_Import_T_Liquid.json',
+  P1000MTransferMulti = 'fixtures/protocol/8/P1000MTransferMulti.json',
+  P1000STransferSingle = 'fixtures/protocol/8/P1000STransferSingle.json',
+  P50MTransferMulti = 'fixtures/protocol/8/P50MTransferMulti.json',
   // cypress fixtures
   GarbageTextFile = 'cypress/fixtures/garbage.txt',
   Generic96TipRack200ul = 'cypress/fixtures/generic_96_tiprack_200ul.json',
   InvalidLabware = 'cypress/fixtures/invalid_labware.json',
   InvalidTipRack = 'cypress/fixtures/invalid_tip_rack.json',
   InvalidTipRackTxt = 'cypress/fixtures/invalid_tip_rack.txt',
-  InvalidJson = 'cypress/fixtures/invalid_json.txt', // a file with invalid JSON may not have .json extension because cy.readfile will not read it.
+  InvalidJson = 'cypress/fixtures/invalid_json.txt',
 }
 
 export interface TestFile {

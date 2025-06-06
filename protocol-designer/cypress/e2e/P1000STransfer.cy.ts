@@ -135,7 +135,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
-    const protocol = getTestFile(TestFilePath.P10000SingleTransferLiquid)
+    const protocol = getTestFile(TestFilePath.P1000STransferSingle)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
     cy.openSettingsPage()
@@ -143,6 +143,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     /*
+    // WORKS FOR REMOVING UNUSED TIP RACKS 
     cy.contains('Add Step').click()
     cy.contains('Move').click()
     // source
@@ -160,60 +161,13 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
       .click()
     cy.contains('D3').click()
     cy.contains('Save').click({ force: true })
+    // BACK THE REGULARLY SCHEDULED PROGRAMMING
     */
     const steps = new StepBuilder()
-    steps.add(SetupSteps.MoveLabware('A2', 'D3', true))
-    steps.add(SetupSteps.MoveLabware('B2', 'D3', false))
-    steps.add(SetupSteps.MoveLabware('C2', 'D3', false))
-    steps.add(SetupSteps.MoveLabwareNoGripper('off deck Flex', 'A2'))
 
-    /*
-    steps.add(SetupVerifications.OnStep1())
-    steps.add(SetupVerifications.FlexSelected())
-    steps.add(SetupVerifications.OnStep2())
-    steps.add(SetupSteps.SinglePipette1000())
-    // steps.add(SetupVerifications.StepTwo50uL())
-    // steps.add(SetupSteps.SinglePipette1000())
-    // steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.Save())
-    // steps.add(SetupVerifications.StepTwoPart3())
-    // steps.add(UniversalSteps.Snapshot())
-    // steps.add(SetupVerifications.OnStep3())
-    steps.add(SetupSteps.YesGripper())
-    steps.add(SetupSteps.NoThermocycler())
-    steps.add(SetupSteps.NoWasteChute())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.Confirm())
-    steps.add(SetupSteps.EditProtocolA())
-    steps.add(
-      CompositeSetupSteps.AddLabwareToDeckSlot(
-        'C1',
-        'Thermo Scientific Nunc 96 Well Plate 1300 µL'
-      )
-    )
-    steps.add(SetupSteps.ChoseDeckSlotC1Labware())
-    steps.add(SetupSteps.AddLiquid())
-    steps.add(SetupSteps.ClickLiquidButton())
-    steps.add(SetupSteps.DefineLiquid())
-    steps.add(SetupSteps.LiquidSaveWIP())
-    const allWellsForLiquid: string[] = getAllWells()
-    steps.add(SetupSteps.WellSelector(allWellsForLiquid))
-    steps.add(SetupSteps.LiquidDropdown())
-    steps.add(SetupVerifications.LiquidPage())
-    steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.SelectLiquidWells())
-    steps.add(SetupSteps.SetVolumeAndSaveForWells('1200'))
-    steps.add(
-      CompositeSetupSteps.AddLabwareToDeckSlot(
-        'C3',
-        'Thermo Scientific Nunc 96 Well Plate 2000 µL'
-      )
-    )
-    */
     // New Transfer form
-    /*
-    // THIS IS THE NEW TRANSFER FORM PLEASE USE 
+
+    // THIS IS THE NEW TRANSFER FORM PLEASE USE
     GenerateMultipleTransferStepsForSingleChannel(
       steps,
       'Thermo Scientific Nunc 96 Well Plate 2000 µL',
@@ -221,7 +175,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
       'Thermo Scientific Nunc 96 Well Plate 1300 µL',
       'NEST 96 Deep Well Plate 2mL'
     )
-    */
+
     steps.execute()
     // ToDo fix running out of tips
     /*
