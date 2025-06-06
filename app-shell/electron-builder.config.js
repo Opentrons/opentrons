@@ -67,12 +67,12 @@ module.exports = async () => ({
     target: ['nsis'],
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
     forceCodeSigning: WINDOWS_SIGN,
-    azureSignOptions: {
+    azureSignOptions: WINDOWS_SIGN ? {
       publisherName: 'OPENTRONS LABWORKS INC.',
       codeSigningAccountName: 'desktop-app-signing',
       certificateProfileName: 'OpentronsDesktopApp',
       endpoint: 'https://eus.codesigning.azure.net',
-    },
+    } : undefined,
   },
   nsis: {
     oneClick: false,
