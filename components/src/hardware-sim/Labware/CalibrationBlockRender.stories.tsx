@@ -16,6 +16,7 @@ const DEFS_BY_URI = Object.fromEntries(
 )
 
 const meta: Meta<typeof CalibrationBlockRender> = {
+  title: 'Library/Molecules/Simulation/CalibrationBlockRender',
   component: CalibrationBlockRender,
   decorators: [
     (Story, context) => {
