@@ -247,6 +247,11 @@ export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
   'cutoutD2',
 ]
 
+export const LEFT_AND_CENTER_CUTOUTS = [
+  ...SINGLE_LEFT_CUTOUTS,
+  ...SINGLE_CENTER_CUTOUTS,
+]
+
 export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',

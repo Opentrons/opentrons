@@ -25,33 +25,24 @@ import {
 } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_V1,
-  AddressableArea,
-  AddressableAreaName,
   AddressableAreaNamesWithFakes,
-  AddressableAreaWithFakes,
   CutoutConfigMap,
-  CutoutFixtureIdsWithFakes,
   CutoutIdToCutoutFixtureId,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-  getAAByAAId,
   getAADisplayName,
-  getAAFromCutoutFixtureId,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   HEATERSHAKER_MODULE_V1,
+  LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
-  SINGLE_LEFT_CUTOUTS,
   SINGLE_RIGHT_CUTOUTS,
-  STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  TEMPERATURE_MODULE_CUTOUTS,
   TEMPERATURE_MODULE_V2,
-  TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -134,7 +125,7 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const aaNameMapToSlotId: Record<AddressableAreaNamesWithFakes, string> = {
+  const aaNameMapToSlotId = {
     D4: 'fakeD4',
     C4: 'fakeC4',
     B4: 'fakeB4',
@@ -143,14 +134,6 @@ export function AddFixtureModal({
     flexStackerModuleV1C4: 'fakeC4',
     flexStackerModuleV1B4: 'fakeB4',
     flexStackerModuleV1A4: 'fakeA4',
-    magneticBlockV1D1: 'D1',
-    magneticBlockV1C1: 'C1',
-    magneticBlockV1B1: 'B1',
-    magneticBlockV1A1: 'A1',
-    magneticBlockV1D2: 'D2',
-    magneticBlockV1C2: 'C2',
-    magneticBlockV1B2: 'B2',
-    magneticBlockV1A2: 'A2',
     magneticBlockV1A3: 'A3',
     magneticBlockV1B3: 'B3',
     magneticBlockV1C3: 'C3',
@@ -159,26 +142,14 @@ export function AddFixtureModal({
     '8ChannelWasteChute': 'D3',
     '96ChannelWasteChute': 'D3',
     gripperWasteChute: 'D3',
-    temperatureModuleV2D1: 'D1',
-    temperatureModuleV2C1: 'C2',
-    temperatureModuleV2B1: 'B1',
-    temperatureModuleV2A1: 'A1',
     temperatureModuleV2D3: 'D3',
     temperatureModuleV2C3: 'C3',
     temperatureModuleV2B3: 'B3',
     temperatureModuleV2A3: 'A3',
-    heaterShakerV1D1: 'D1',
-    heaterShakerV1C1: 'C1',
-    heaterShakerV1B1: 'B1',
-    heaterShakerV1A1: 'A1',
     heaterShakerV1D3: 'D3',
     heaterShakerV1C3: 'C3',
     heaterShakerV1B3: 'B3',
     heaterShakerV1A3: 'A3',
-    movableTrashD1: 'D1',
-    movableTrashC1: 'C1',
-    movableTrashB1: 'B1',
-    movableTrashA1: 'A1',
     movableTrashD3: 'D3',
     movableTrashC3: 'C3',
     movableTrashB3: 'B3',
@@ -204,7 +175,6 @@ export function AddFixtureModal({
     const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(cf =>
       cf.mayMountTo.includes(cutoutId)
     )
-
     return availableCutoutFixtuers.reduce(
       (acc, { id, providesAddressableAreas }) => {
         return { ...acc, [id]: providesAddressableAreas[cutoutId] }
@@ -220,13 +190,25 @@ export function AddFixtureModal({
     const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
       cutoutId
     )
+    console.log('cutoutId: ', cutoutId)
+    console.log('fixtureId: ', fixtureId)
     const aaListForFixtureId = addressableAreasById[fixtureId] ?? []
-    return (
-      aaListForFixtureId.find(
-        (aa: AddressableAreaNamesWithFakes) =>
-          aaNameMapToSlotId[aa] == addressableAreaId
-      ) ?? null
-    )
+    console.log('aaListForFixtureId: ', aaListForFixtureId)
+    if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
+      console.log('if aaListForFixtureId[0]: ', aaListForFixtureId[0])
+      return aaListForFixtureId[0]
+    } else {
+      console.log('else aaListForFixtureId: ', aaListForFixtureId)
+      return (
+        aaListForFixtureId.find(
+          (aa: AddressableAreaNamesWithFakes) =>
+            aa in aaNameMapToSlotId &&
+            aaNameMapToSlotId[aa] == addressableAreaId
+        ) ??
+        null ??
+        null
+      )
+    }
   }
 
   const getModuleUnconfiguredFixtures = (
@@ -248,9 +230,11 @@ export function AddFixtureModal({
     let stackerOptions: CutoutConfigMap[][] = []
     if (moduleModel === FLEX_STACKER_MODULE_V1) {
       filteredMods.forEach((mod: AttachedModule) => {
-        const aaStackerMagBlockId = getAddressableAreaIdForCutout(cutoutId,FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE )
-        if (aaStackerMagBlockId != null)
-        {
+        const aaStackerMagBlockId = getAddressableAreaIdForCutout(
+          cutoutId,
+          FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+        )
+        if (aaStackerMagBlockId != null) {
           stackerOptions.push([
             {
               cutoutId,
@@ -261,41 +245,47 @@ export function AddFixtureModal({
           ])
         }
         if (cutoutId == 'cutoutD3') {
-          const aaWithCover = getAddressableAreaIdForCutout(cutoutId,FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE ) 
+          const aaWithCover = getAddressableAreaIdForCutout(
+            cutoutId,
+            FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+          )
 
-          const aaWithNoCover = getAddressableAreaIdForCutout(cutoutId,FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE )
+          const aaWithNoCover = getAddressableAreaIdForCutout(
+            cutoutId,
+            FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+          )
 
-          if(aaWithCover != null)
-          {          
-            stackerOptions.push(
-            [
+          if (aaWithCover != null) {
+            stackerOptions.push([
               {
                 cutoutId,
                 cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
                 addressableAreaId: aaWithCover,
                 opentronsModuleSerialNumber: mod.serialNumber,
               },
-            ],
-            )
+            ])
           }
-          if (aaWithNoCover != null){
-            stackerOptions.push(
-              [
+          if (aaWithNoCover != null) {
+            stackerOptions.push([
               {
                 cutoutId,
                 cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
                 addressableAreaId: aaWithNoCover,
                 opentronsModuleSerialNumber: mod.serialNumber,
               },
-            ]
+            ])
+          }
+          const cutoutFixtureId = keys.find(
+            key => key == moduleModel
+          ) as CutoutFixtureId
+          const aaForModule = getAddressableAreaIdForCutout(
+            cutoutId,
+            cutoutFixtureId
           )
-        }
-        const cutoutFixtureId = keys.find(
-          key => key == moduleModel
-        ) as CutoutFixtureId
-          const aaForModule = getAddressableAreaIdForCutout(cutoutId,cutoutFixtureId )
-          if (aaForModule == undefined) {
-            console.error(`Was not able to find aa for ${addressableAreaId} and module ${moduleModel}`)
+          if (aaForModule == null) {
+            console.error(
+              `Was not able to find aa for ${addressableAreaId} and module ${moduleModel}`
+            )
           } else {
             stackerOptions.push([
               {
@@ -314,21 +304,25 @@ export function AddFixtureModal({
         const cutoutFixtureId = keys.find(
           key => key == moduleModel
         ) as CutoutFixtureId
-        const aaforModule = getAddressableAreaIdForCutout(cutoutId,cutoutFixtureId )
-        if (aaforModule != undefined) {
-        return [
-          {
-            cutoutId,
-            addressableAreaId: aaforModule,
-            cutoutFixtureId,
-            opentronsModuleSerialNumber: serialNumber,
-          },
-        ]
-      }
-      return []
-    })
+        const aaforModule = getAddressableAreaIdForCutout(
+          cutoutId,
+          cutoutFixtureId
+        )
+        console.log('aaforModule: ', aaforModule)
+        if (aaforModule != null) {
+          return [
+            {
+              cutoutId,
+              addressableAreaId: aaforModule,
+              cutoutFixtureId,
+              opentronsModuleSerialNumber: serialNumber,
+            },
+          ]
+        }
+        return []
+      })
+    }
   }
-}
 
   const getThermoUnconfiguredFixtures = (
     unconfiguredMods: AttachedModule[],
@@ -344,18 +338,17 @@ export function AddFixtureModal({
     const fixtureGroup = availableCutoutFixtuers.map(
       mod => mod.fixtureGroup[cutoutId] ?? []
     )
-    console.log("availableCutoutFixtuers: ", availableCutoutFixtuers)
+    console.log('availableCutoutFixtuers: ', availableCutoutFixtuers)
     const fixtureGroupItem = fixtureGroup.filter(x => x.length > 0)
-     //Object.keys(
-       console.log("fixtureGroupItem: ", fixtureGroupItem)
-    const fixtureGroupMatch =  fixtureGroupItem[0][0] as CutoutIdToCutoutFixtureId[]
+    //Object.keys(
+    console.log('fixtureGroupItem: ', fixtureGroupItem)
+    const fixtureGroupMatch = fixtureGroupItem[0][0] as CutoutIdToCutoutFixtureId[]
     const fixtureGroupKeys = Object.keys(fixtureGroupMatch) as CutoutId[]
-    console.log("fixtureGroupKeys: ", fixtureGroupKeys)
+    console.log('fixtureGroupKeys: ', fixtureGroupKeys)
     const matrix = unconfiguredMods
       .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
       .map(item =>
-        fixtureGroupKeys
-        .map((mod: CutoutId) => ({
+        fixtureGroupKeys.map((mod: CutoutId) => ({
           cutoutId: mod,
           addressableAreaId: THERMOCYCLER_MODULE_V2,
           cutoutFixtureId: fixtureGroupItem[0][0][mod] as CutoutFixtureId,
@@ -415,46 +408,34 @@ export function AddFixtureModal({
     unconfiguredMods: AttachedModule[]
   ): CutoutConfigMap[][] => {
     let availableOptions: CutoutConfigMap[][] = []
-
-    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
-      cutoutId
+    const aaMagBlockId = getAddressableAreaIdForCutout(
+      cutoutId,
+      MAGNETIC_BLOCK_V1_FIXTURE
     )
-    const aaListMagBlock = addressableAreasById[MAGNETIC_BLOCK_V1_FIXTURE]
-    if (aaListMagBlock != null) {
-      const aaMagBlock = aaListMagBlock.find(
-        (aa: AddressableAreaNamesWithFakes) =>
-          aaNameMapToSlotId[aa] == addressableAreaId
-      ) as AddressableAreaNamesWithFakes
+    if (aaMagBlockId != null) {
       availableOptions.push([
         {
           cutoutId,
           cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-          addressableAreaId: aaMagBlock,
+          addressableAreaId: aaMagBlockId,
         },
       ])
     }
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
-        cutoutId
-      )
-      const aaListStagingAndMagBlock =
-        addressableAreasById[STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE]
-      if (aaListStagingAndMagBlock != null) {
-        const aaMagBlockWithStaging = aaListMagBlock.find(
-          (aa: AddressableAreaNamesWithFakes) =>
-            aaNameMapToSlotId[aa] == addressableAreaId
-        ) as AddressableAreaNamesWithFakes
-        availableOptions = [
-          ...availableOptions,
-          [
-            {
-              cutoutId,
-              cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-              addressableAreaId: aaMagBlockWithStaging,
-            },
-          ],
-        ]
-      }
+    const aaMagBlockWithStaging = getAddressableAreaIdForCutout(
+      cutoutId,
+      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+    )
+    if (aaMagBlockWithStaging != null) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+            addressableAreaId: aaMagBlockWithStaging,
+          },
+        ],
+      ]
     }
     if (unconfiguredMods.length > 0) {
       availableOptions = [
@@ -483,22 +464,28 @@ export function AddFixtureModal({
 
   const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
     let availableOptions: CutoutConfigMap[][] = []
-    const TrashBinAA = getAddressableAreaIdForCutout(cutoutId, TRASH_BIN_ADAPTER_FIXTURE)
+    const TrashBinAA = getAddressableAreaIdForCutout(
+      cutoutId,
+      TRASH_BIN_ADAPTER_FIXTURE
+    )
     if (TrashBinAA != null) {
-        availableOptions = [
-          ...availableOptions,
-          [
-            {
-              cutoutId,
-              cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-              addressableAreaId: TrashBinAA,
-            },
-          ],
-        ]
-      }
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+            addressableAreaId: TrashBinAA,
+          },
+        ],
+      ]
+    }
 
-    const stagingAreaAA = getAddressableAreaIdForCutout(cutoutId, STAGING_AREA_RIGHT_SLOT_FIXTURE)
-    if (stagingAreaAA != null){
+    const stagingAreaAA = getAddressableAreaIdForCutout(
+      cutoutId,
+      STAGING_AREA_RIGHT_SLOT_FIXTURE
+    )
+    if (stagingAreaAA != null) {
       availableOptions = [
         ...availableOptions,
         [
@@ -527,7 +514,7 @@ export function AddFixtureModal({
         const aaProvidedFixtureOptions = addressableAreasById[o]
         if (aaProvidedFixtureOptions != null) {
           const aaForFixture = getAddressableAreaIdForCutout(cutoutId, o)
-          if (aaForFixture != null){
+          if (aaForFixture != null) {
             return [
               {
                 cutoutId,
