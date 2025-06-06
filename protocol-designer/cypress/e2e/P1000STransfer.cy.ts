@@ -142,32 +142,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
-    /*
-    // WORKS FOR REMOVING UNUSED TIP RACKS 
-    cy.contains('Add Step').click()
-    cy.contains('Move').click()
-    // source
-    cy.contains('p', 'Select labware')
-      .parent()
-      .parent()
-      .contains('Choose option')
-      .click()
-    cy.contains('B2').click()
-    // destination
-    cy.contains('p', 'New location')
-      .parent()
-      .parent()
-      .contains('Choose option')
-      .click()
-    cy.contains('D3').click()
-    cy.contains('Save').click({ force: true })
-    // BACK THE REGULARLY SCHEDULED PROGRAMMING
-    */
     const steps = new StepBuilder()
-
-    // New Transfer form
-
-    // THIS IS THE NEW TRANSFER FORM PLEASE USE
     GenerateMultipleTransferStepsForSingleChannel(
       steps,
       'Thermo Scientific Nunc 96 Well Plate 2000 µL',

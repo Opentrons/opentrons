@@ -6,11 +6,19 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      /**
+       * Custom Cypress command to choose a deck slot.
+       * @param slot The name of the deck slot (e.g., 'A1').
+       */
       chooseDeckSlot: (slot: string) => Cypress.Chainable<void>
     }
   }
 }
 
+/**
+ * Enum for various content strings used in the setup process.
+ * These are typically text labels or titles found in the UI.
+ */
 export enum SetupContent {
   Step1Title = 'Step 1',
   Step2Title = 'Step 2',
@@ -67,6 +75,9 @@ export enum SetupContent {
   Save = 'Save',
 }
 
+/**
+ * Enum for various CSS selectors and data-testids used to locate elements in the UI.
+ */
 export enum SetupLocators {
   Confirm = 'button:contains("Confirm")',
   GoBack = 'button:contains("Go back")',
@@ -96,6 +107,9 @@ export enum SetupLocators {
   AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU',
 }
 
+/**
+ * Regular expressions used for matching text content in the UI.
+ */
 export const RegexSetupContent = {
   slotText: /Edit (slot|labware)/i,
 }
@@ -109,6 +123,7 @@ export const RegexSetupContent = {
 /**
  * Helper function to select a labware by display name.
  * No longer clicks "Done" after selecting.
+ * @param displayName The display name of the labware to select.
  */
 function selectLabwareByDisplayName(displayName: string): void {
   cy.contains(displayName).click({ force: true })
@@ -116,6 +131,8 @@ function selectLabwareByDisplayName(displayName: string): void {
 /**
  * chooseDeckSlot is a helper returning a chainable
  * that finds the correct deck slot based on x,y coords in your markup.
+ * @param slot The name of the deck slot (e.g., 'A1').
+ * @returns A Cypress Chainable that resolves to the deck slot element.
  */
 function chooseDeckSlot(slot: string): Cypress.Chainable<JQuery<HTMLElement>> {
   const deckSlots: Record<
@@ -157,7 +174,8 @@ function chooseDeckSlot(slot: string): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 /**
- * Helper function to select multiple wells (like A1, B3, H12).
+ * Helper function to select multiple circular wells (like A1, B3, H12).
+ * @param wells An array of well names (e.g., ['A1', 'B3']).
  */
 function selectWells(wells: string[]): void {
   const wellSelectors: Record<
@@ -188,6 +206,10 @@ function selectWells(wells: string[]): void {
 }
 
 // For Rectangular wells
+/**
+ * Helper function to select multiple rectangular wells.
+ * @param wells An array of well names (e.g., ['A1', 'B3']).
+ */
 function selectRectWells(wells: string[]): void {
   const wellSelectors: Record<
     string,
@@ -219,10 +241,13 @@ function selectRectWells(wells: string[]): void {
   })
 }
 /**
- * Each function returns a StepThunk
- * Add a comment to all records
+ * Each function returns a StepThunk representing a UI interaction or a series of interactions.
  */
 export const SetupSteps = {
+  /**
+   * Selects a tip strategy (e.g., 'Always', 'Once').
+   * @param tipsy The tip strategy to select.
+   */
   SelectTipStrategy: (tipsy: string): StepThunk => ({
     call: () => {
       cy.contains('Always').click()
@@ -230,6 +255,10 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects a specific tip rack by name.
+   * @param tip The tip rack name or part of it (e.g., '50' for 'Tip Rack 50 µL').
+   */
   SelecTip: (tip: string): StepThunk => ({
     call: () => {
       cy.contains('Opentrons Flex 96 Filter Tip Rack').click()
@@ -285,6 +314,19 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Defines a step to move labware without using the gripper, from a source deck slot to a destination deck slot.
+   * This involves clicking "Add Step", selecting "Move", de-selecting "Use gripper", and then choosing
+   * the source labware and its new destination using dropdowns.
+   *
+   * @param sourceDeckSlot The name of the source deck slot (e.g., 'A1').
+   * @param destDeckSlot The name of the destination deck slot (e.g., 'B2').
+   * @param trashLabwareFirstTime (Optional) If true, an additional 'Confirm' click is performed,
+   * typically used when moving labware to a trash location that requires confirmation.
+   * Defaults to `false`.
+   * @returns A StepThunk object that, when its `call` method is invoked,
+   * executes the Cypress commands to perform the labware move.
+   */
   MoveLabwareNoGripper: (
     sourceDeckSlot: string,
     destDeckSlot: string,
@@ -314,6 +356,10 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects a liquid class by its given name.
+   * @param LiquidClass The ID or label text of the liquid class to select.
+   */
   SelectLiquidClassT: (LiquidClass: string): StepThunk => ({
     call: () => {
       // eslint-disable-next-line no-template-curly-in-string
@@ -324,6 +370,7 @@ export const SetupSteps = {
   }),
   /**
    * Select a labware by display name, then click "Done".
+   * @param displayName The display name of the labware to select.
    */
   SelectLabwareByDisplayName: (displayName: string): StepThunk => ({
     call: () => {
@@ -333,6 +380,10 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects a labware by its display name from a dropdown.
+   * @param displayName The display name of the labware to select.
+   */
   selectDropdownLabware: (displayName: string): StepThunk => ({
     call: () => {
       selectLabwareByDisplayName(displayName)
@@ -376,7 +427,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Select a single-channel pipette with volume 50 µL.
+   * Selects a single-channel pipette with volume 50 µL and corresponding tip rack.
    */
   SingleChannelPipette50: (): StepThunk => ({
     call: () => {
@@ -391,6 +442,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects an eight-channel pipette with volume 50 µL and corresponding tip rack.
+   */
   EightChannelPipette50: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.AddPipette).click()
@@ -403,6 +457,10 @@ export const SetupSteps = {
       // optional: cy.contains(SetupContent.FilterTiprack50).click()
     },
   }),
+
+  /**
+   * Selects an eight-channel pipette with volume 1000 µL and corresponding tip racks.
+   */
   EightChannelPipette1000: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.AddPipette).click()
@@ -418,6 +476,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects a single-channel pipette with volume 1000 µL and corresponding tip racks.
+   */
   SinglePipette1000: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.AddPipette).click()
@@ -434,7 +495,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Add a Thermocycler Module GEN2.
+   * Adds a Thermocycler Module GEN2 to the deck.
    */
   AddThermocycler: (): StepThunk => ({
     call: () => {
@@ -444,7 +505,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Add a Heater-Shaker Module GEN1.
+   * Adds a Heater-Shaker Module GEN1 to the deck.
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
@@ -457,7 +518,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Add a Temperature Module GEN2.
+   * Adds a Temperature Module GEN2 to the deck.
    */
   AddTempdeck2: (): StepThunk => ({
     call: () => {
@@ -469,7 +530,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Add a Magnetic Block GEN1.
+   * Adds a Magnetic Block GEN1 to the deck.
    */
   AddMagBlock: (): StepThunk => ({
     call: () => {
@@ -480,7 +541,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Click "Yes" for gripper.
+   * Clicks "Yes" for gripper presence.
    */
   YesGripper: (): StepThunk => ({
     call: () => {
@@ -489,7 +550,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Click "No" for gripper.
+   * Clicks "No" for gripper presence.
    */
   NoGripper: (): StepThunk => ({
     call: () => {
@@ -498,7 +559,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Click "No" for thermocycler.
+   * Clicks "No" for thermocycler presence.
    */
   NoThermocycler: (): StepThunk => ({
     call: () => {
@@ -507,7 +568,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Click "No" for wasteChute.
+   * Clicks "No" for wasteChute presence.
    */
   NoWasteChute: (): StepThunk => ({
     call: () => {
@@ -515,6 +576,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Adds an Absorbance Plate Reader Module GEN1 to the deck.
+   */
   AddPlateReader: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="cutoutD3"]').click()
@@ -527,7 +591,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Click "Edit protocol".
+   * Clicks "Edit protocol".
    */
   EditProtocolA: (): StepThunk => ({
     call: () => {
@@ -562,6 +626,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Chooses deck slot C2 specifically for labware, interacting with a specific UI element.
+   */
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
@@ -572,7 +639,8 @@ export const SetupSteps = {
     },
   }),
   /**
-   * Choose deck slot.
+   * Choose a specified deck slot.
+   * @param deckSlot The name of the deck slot to choose.
    */
   ChoseDeckSlot: (deckSlot: string): StepThunk => ({
     call: () => {
@@ -581,7 +649,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds labware to a deck slot.
+   * Clicks the "Add labware" button or similar to add hardware labware.
    */
   AddHardwareLabware: (): StepThunk => ({
     call: () => {
@@ -589,6 +657,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Clicks the "Edit labware" button on a deck slot.
+   */
   EditHardwareLabwareOnDeck: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
@@ -605,7 +676,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Clicks the "Well plates" section.
+   * Clicks the "Well plates" section within the labware selection.
    */
   ClickWellPlatesSection: (): StepThunk => ({
     call: () => {
@@ -613,6 +684,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Clicks the "Tip racks" section within the labware selection.
+   */
   ClickTiprack: (): StepThunk => ({
     call: () => {
       cy.contains('Tip racks').click()
@@ -620,7 +694,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Open SelectLabwareModal to a deck slot.
+   * Opens the "Select Labware Modal".
    */
   OpenSelectLabwareModal: (): StepThunk => ({
     call: () => {
@@ -629,15 +703,19 @@ export const SetupSteps = {
   }),
 
   /**
-   * Choose deck slot C2 with a labware-locating approach.
+   * Chooses a specific deck slot by clicking on it, enforcing the click.
+   * @param deckslot The name of the deck slot to choose.
    */
-
   ChoseDeckSlotLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot).click({ force: true })
     },
   }),
 
+  /**
+   * Chooses a specific deck slot that already contains labware, clicking on its "Edit/Add labware" option.
+   * @param deckslot The name of the deck slot.
+   */
   ChoseDeckSlotWithLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot)
@@ -657,7 +735,7 @@ export const SetupSteps = {
     },
   }),
   /**
-   * Start making a move step
+   * Starts a new "Move" step in the protocol.
    */
 
   AddMoveStep: (): StepThunk => ({
@@ -666,7 +744,7 @@ export const SetupSteps = {
     },
   }),
   /**
-   * Select gripper to move with
+   * Selects the option to use the gripper for a move step.
    */
 
   UseGripperinMove: (): StepThunk => ({
@@ -675,7 +753,7 @@ export const SetupSteps = {
     },
   }),
   /**
-   * Select gripper to move labware
+   * Selects the option to move labware to the Plate Reader. (Likely redundant with `UseGripperinMove` or `MoveLabware`)
    */
 
   MoveToPlateReader: (): StepThunk => ({
@@ -685,7 +763,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Clicks the "Liquid" button.
+   * Clicks the "Liquids" button.
    */
   ClickLiquidButton: (): StepThunk => ({
     call: () => {
@@ -703,7 +781,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Type a sample liquid name, then save.
+   * Types a sample liquid name and saves the liquid definition.
    */
   LiquidSaveWIP: (): StepThunk => ({
     call: () => {
@@ -723,7 +801,8 @@ export const SetupSteps = {
   }),
 
   /**
-   * Select an array of wells (A1, B2, etc.)
+   * Selects an array of wells (circular shape).
+   * @param wells An array of well names (e.g., ['A1', 'B2']).
    */
   WellSelector: (wells: string[]): StepThunk => ({
     call: () => {
@@ -734,6 +813,11 @@ export const SetupSteps = {
       }
     },
   }),
+
+  /**
+   * Selects an array of rectangular wells.
+   * @param wells An array of well names (e.g., ['A1', 'B2']).
+   */
   RectWellSelector: (wells: string[]): StepThunk => ({
     call: () => {
       if (Array.isArray(wells) && wells.length > 0) {
@@ -753,6 +837,10 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Selects a liquid by its name from a dropdown.
+   * @param liquidName The name of the liquid to select.
+   */
   selectLiquidbyname: (liquidName: string): StepThunk => ({
     call: () => {
       cy.contains(liquidName).click()
@@ -760,7 +848,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Select "My liquid!" from the dropdown.
+   * Selects "My liquid!" from the liquid dropdown.
    */
   SelectLiquidWells: (): StepThunk => ({
     call: () => {
@@ -769,7 +857,8 @@ export const SetupSteps = {
   }),
 
   /**
-   * Sets volume then saves and clicks "Done".
+   * Sets the volume for wells and then saves and clicks "Done".
+   * @param volume The volume to set as a string.
    */
   SetVolumeAndSaveForWells: (volume: string): StepThunk => ({
     call: () => {
@@ -780,7 +869,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Clicks "Protocol steps" header.
+   * Clicks the "Protocol steps" header.
    */
   ProtocolStepsH: (): StepThunk => ({
     call: () => {
@@ -845,7 +934,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Chose source labware on a step form
+   * Chooses the source labware from a dropdown on a step form.
    */
   ChoseSourceLabware: (): StepThunk => ({
     call: () => {
@@ -853,25 +942,33 @@ export const SetupSteps = {
     },
   }),
 
-  // Chose source to move labware on a stepform
+  /**
+   * Chooses the source labware for a move step.
+   */
   ChoseSourceMoveLabware: (): StepThunk => ({
     call: () => {
       cy.contains('Choose option').eq(0).click()
     },
   }),
-  // Chose destination to move labware
+  /**
+   * Chooses the destination for a move labware step.
+   */
   ChoseDestinationMoveLabware: (): StepThunk => ({
     call: () => {
       cy.contains('Choose option').click()
     },
   }),
-  // Chose labware being moved to
+  /**
+   * Chooses the labware being moved to (destination).
+   */
   ChoseDestinationLabware: (): StepThunk => ({
     call: () => {
       cy.contains('Choose option').click()
     },
   }),
-  // Add source labware on stepform
+  /**
+   * Clicks the dropdown to add source labware on a step form.
+   */
   AddSourceLabwareDropdown: (): StepThunk => ({
     call: () => {
       cy.contains('Source labware')
@@ -882,7 +979,9 @@ export const SetupSteps = {
     },
   }),
 
-  // Select destination wells
+  /**
+   * Clicks the "Choose wells" input for source wells.
+   */
   SelectSourceWells: (): StepThunk => ({
     call: () => {
       cy.get('input[name="aspirate_wells"]')
@@ -891,7 +990,9 @@ export const SetupSteps = {
     },
   }),
 
-  // Select destination wells
+  /**
+   * Clicks the "Choose wells" input for destination wells.
+   */
   SelectDestinationWells: (): StepThunk => ({
     call: () => {
       cy.get('input[name="dispense_wells"]')
@@ -899,13 +1000,17 @@ export const SetupSteps = {
         .click({ force: true })
     },
   }),
-  // Save selected wells
+  /**
+   * Saves the selected wells.
+   */
   SaveSelectedWells: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.Save).click({ force: true })
     },
   }),
-  // Generic save button
+  /**
+   * Clicks the generic "Save" button.
+   */
   Save: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.Save).click({ force: true })
@@ -913,12 +1018,18 @@ export const SetupSteps = {
   }),
   // ToDo Refactor to input any volume
 
+  /**
+   * Inputs a transfer volume into the corresponding field.
+   * @param TransferVolume The volume to type as a string.
+   */
   InputTransferVolume: (TransferVolume: string): StepThunk => ({
     call: () => {
       cy.get('input[name="volume"]').type(TransferVolume)
     },
   }),
-  // Continue to the next part of the transfer form
+  /**
+   * Clicks the "Continue" button to proceed to the next part of a form.
+   */
   Continue: (): StepThunk => ({
     call: () => {
       cy.contains('Continue').click({ force: true })
@@ -927,7 +1038,9 @@ export const SetupSteps = {
 
   // ToDo @alexjoel42, please combine into one transfer
 
-  // Step 1 Transfer form prewet checkbox
+  /**
+   * Clicks the "Pre-wet tip" checkbox on the Transfer form (aspirate section).
+   */
   PrewetAspirate: (): StepThunk => ({
     call: () => {
       cy.contains('Pre-wet tip')
@@ -936,7 +1049,9 @@ export const SetupSteps = {
         .click()
     },
   }),
-  // Step 1 Transfer form Delay
+  /**
+   * Clicks the "Delay" checkbox on the Transfer form (aspirate section).
+   */
 
   Delay: (): StepThunk => ({
     call: () => {
@@ -946,7 +1061,9 @@ export const SetupSteps = {
         .click()
     },
   }),
-  // Step 1 Transfer form touch tip
+  /**
+   * Clicks the "Touch tip" checkbox on the Transfer form (aspirate section).
+   */
   TouchTipAspirate: (): StepThunk => ({
     call: () => {
       cy.contains('Touch tip')
@@ -955,7 +1072,9 @@ export const SetupSteps = {
         .click()
     },
   }),
-  // Step 1 Transfer form mix checkbox
+  /**
+   * Clicks the "Mix" checkbox on the Transfer form (aspirate section).
+   */
   MixAspirate: (): StepThunk => ({
     call: () => {
       cy.contains('Mix')
@@ -964,7 +1083,9 @@ export const SetupSteps = {
         .click()
     },
   }),
-  // Step 1 Transfer form airgap checkbox
+  /**
+   * Clicks the "Air gap" checkbox on the Transfer form (aspirate section).
+   */
   AirGap: (): StepThunk => ({
     call: () => {
       cy.contains('Air gap')
@@ -973,19 +1094,30 @@ export const SetupSteps = {
         .click()
     },
   }),
-  // Step 1 Transfer form mix volume
+  /**
+   * Inputs the mix volume for aspirate on the Transfer form.
+   * @param MixAspirateVolume The volume to type as a string.
+   */
   AspirateMixVolume: (MixAspirateVolume: string): StepThunk => ({
     call: () => {
       cy.get('input[name = "aspirate_mix_volume"]').type(MixAspirateVolume)
     },
   }),
 
+  /**
+   * Inputs the number of mix times for aspirate on the Transfer form.
+   * @param MixTimesAspirate The number of times to type as a string.
+   */
   AspirateMixTimes: (MixTimesAspirate: string): StepThunk => ({
     call: () => {
       cy.get('input[name = "aspirate_mix_times"]').type(MixTimesAspirate)
     },
   }),
 
+  /**
+   * Inputs the air gap volume for aspirate on the Transfer form.
+   * @param AirGapAspirateVolume The volume to type as a string.
+   */
   AspirateAirGapVolume: (AirGapAspirateVolume: string): StepThunk => ({
     call: () => {
       cy.get('input[name = "aspirate_airGap_volume"]').type(
@@ -993,26 +1125,38 @@ export const SetupSteps = {
       )
     },
   }),
-  // Select dispense on the transfer form
+  /**
+   * Selects the "Dispense" section on the transfer form.
+   */
 
   SelectDispense: (): StepThunk => ({
     call: () => {
       cy.contains('Dispense').click()
     },
   }),
-  // Dispense mix volume
+  /**
+   * Inputs the mix volume for dispense on the Transfer form.
+   * @param DispenseMixVolume The volume to type as a string.
+   */
   DispenseMixVolume: (DispenseMixVolume: string): StepThunk => ({
     call: () => {
       cy.get('input[name = "dispense_mix_volume"]').type(DispenseMixVolume)
     },
   }),
 
+  /**
+   * Inputs the number of mix times for dispense on the Transfer form.
+   */
   DispenseMixTimes: (): StepThunk => ({
     call: () => {
       cy.get('input[name = "dispense_mix_times"]').type('2')
     },
   }),
 
+  /**
+   * Inputs the air gap volume for dispense on the Transfer form.
+   * @param DispenseAirGapVolume The volume to type as a string.
+   */
   DispenseAirGapVolume: (DispenseAirGapVolume: string): StepThunk => ({
     call: () => {
       cy.get('input[name = "dispense_airGap_volume"]').type(
@@ -1021,6 +1165,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Clicks the "Blowout" option and selects "Destination Well" for blowout location.
+   */
   BlowoutTransferDestination: (): StepThunk => ({
     call: () => {
       cy.contains('Blowout')
@@ -1032,6 +1179,9 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Deletes a step from the protocol by clicking the three dots menu and confirming deletion.
+   */
   DeleteSteps: (): StepThunk => ({
     call: () => {
       cy.get(SetupLocators.StepOptionsTestIDThreeDots).click()
@@ -1039,11 +1189,15 @@ export const SetupSteps = {
       cy.contains('button', 'Delete step').click()
     },
   }),
+  TransferPopOut: (): StepThunk => ({
+    call: () => {
+      cy.contains('button', 'Transfer').should('be.visible').click()
+    },
+  }),
 }
 
 /**
- * Each function returns a StepThunk
- * Add a comment to all records
+ * Each function returns a StepThunk for verifying UI states or content.
  */
 export const SetupVerifications = {
   /**
@@ -1092,7 +1246,7 @@ export const SetupVerifications = {
   }),
 
   /**
-   * Verify 96-Channel option is visible.
+   * Verify 96-Channel option is visible after clicking "Add Pipette".
    */
   NinetySixChannel: (): StepThunk => ({
     call: () => {
@@ -1203,6 +1357,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that the Absorbance Plate Reader Module is not selectable or has a closed modal.
+   */
   AbsorbanceNotSelectable: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="cutoutD3"]').click()
@@ -1215,18 +1372,10 @@ export const SetupVerifications = {
   /**
    * Verify you can open the "Transfer" pop-out panel.
    */
-  TransferPopOut: (): StepThunk => ({
-    call: () => {
-      cy.contains('button', 'Transfer').should('be.visible').click()
-      cy.contains('Source labware')
-      // cy.contains('Select source wells')
-      cy.contains('Destination labware')
-      cy.contains('Volume per well')
-      cy.contains('Tip management')
-      cy.contains('Tip drop location')
-    },
-  }),
 
+  /**
+   * Verifies that the "Delay" checkbox has an associated SVG icon with proper attributes.
+   */
   Delay: (): StepThunk => ({
     // Verifies that the "Delay" button has an associated SVG icon with proper attributes
     call: () => {
@@ -1236,6 +1385,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that the "Pre-wet tip" checkbox has an associated SVG icon with proper attributes.
+   */
   PreWet: (): StepThunk => ({
     // Verifies that the "Pre-wet tip" button has an associated SVG icon with proper attributes
     call: () => {
@@ -1245,6 +1397,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that the "Touch tip" checkbox has an associated SVG icon with proper attributes.
+   */
   TouchTip: (): StepThunk => ({
     // Verifies that the "Touch tip" button has an associated SVG icon with proper attributes
     call: () => {
@@ -1254,6 +1409,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that the "Mix" checkbox has an associated SVG icon with proper attributes.
+   */
   MixT: (): StepThunk => ({
     // Verifies that the "Mix" button has an associated SVG icon with proper attributes
     call: () => {
@@ -1263,6 +1421,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that the "Air gap" checkbox has an associated SVG icon with proper attributes.
+   */
   AirGap: (): StepThunk => ({
     // Verifies that the "Air gap" button has an associated SVG icon with proper attributes
     call: () => {
@@ -1272,6 +1433,9 @@ export const SetupVerifications = {
     },
   }),
 
+  /**
+   * Verifies that all key elements related to "Blowout" in transfer settings are present.
+   */
   ExtraDispenseTransfer: (): StepThunk => ({
     // Verifies that all key elements related to "Blowout" in transfer settings are present
     call: () => {
@@ -1308,7 +1472,8 @@ export const verifyCreateProtocolPage = (): void => {
  */
 export const CompositeSetupSteps = {
   /**
-   * Sets up a Flex protocol with optional modules
+   * Sets up a Flex protocol with optional modules.
+   * @param options An object specifying which optional modules to include (thermocycler, heatershaker, magblock, tempdeck, plateReader).
    */
   FlexSetup: (options: {
     thermocycler?: boolean
@@ -1373,7 +1538,9 @@ export const CompositeSetupSteps = {
     },
   }),
   /**
-   * Adds labware to a specific deck slot
+   * Adds labware to a specific deck slot.
+   * @param deckSlot (Optional) The name of the deck slot to add labware to. Defaults to 'C3'.
+   * @param labwareName (Optional) The name of the labware to add. Defaults to 'Bio-Rad 96 Well Plate'.
    */
   AddLabwareToDeckSlot: (
     deckSlot?: string | undefined,
@@ -1392,6 +1559,11 @@ export const CompositeSetupSteps = {
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()
     },
   }),
+  /**
+   * Adds a tiprack to a specific deck slot.
+   * @param deckSlot (Optional) The name of the deck slot to add the tiprack to. Defaults to 'C3'.
+   * @param labwareName (Optional) The name of the tiprack to add. Defaults to 'Bio-Rad 96 Well Plate' (Note: This default seems incorrect for a tiprack, consider updating).
+   */
   AddTiprackToDeckSlot: (
     deckSlot?: string | undefined,
     labwareName?: string | undefined
@@ -1455,7 +1627,7 @@ export const CompositeSetupSteps = {
       cy.log(`  Volume: ${volumeToUse}`)
       cy.log(`  Liquid Class: ${liquidClassToUse}`)
       SetupSteps.AddStep().call()
-      SetupVerifications.TransferPopOut().call()
+      SetupSteps.TransferPopOut().call()
       UniversalSteps.Snapshot()
       SetupSteps.SelecTip(Tip)
       SetupSteps.InputTransferVolume(volumeToUse).call()
@@ -1528,7 +1700,7 @@ export const CompositeSetupSteps = {
       const liquidClassToUse = liquidClass ?? 'Aqueous'
       const sourceShapeToUse = sourceWellShape ?? 'circle'
       const destShapeToUse = destWellShape ?? 'circle'
-
+      /*
       cy.log('Executing Test_LC step with the following parameters:')
       cy.log(`  tip: ${Tip}`) // Using Tip directly after default is applied
       cy.log(`  Source Labware: ${sourceLabwareToUse}`)
@@ -1537,9 +1709,10 @@ export const CompositeSetupSteps = {
       cy.log(`  Destination Well: ${destWellToUse} (Shape: ${destShapeToUse})`)
       cy.log(`  Volume: ${volumeToUse}`)
       cy.log(`  Liquid Class: ${liquidClassToUse}`)
+      */
 
       SetupSteps.AddStep().call()
-      SetupVerifications.TransferPopOut().call()
+      SetupSteps.TransferPopOut().call()
       UniversalSteps.Snapshot()
       SetupSteps.SelecTip(Tip)
       SetupSteps.InputTransferVolume(volumeToUse).call()
@@ -1588,36 +1761,16 @@ export const CompositeSetupSteps = {
     },
   }),
 
-  /**
-   * @function Test_LC_tipsy
-   * @description Creates a StepThunk to perform a liquid handling transfer operation with explicit tip and strategy selection.
-   * It takes optional parameters for source and destination labware and wells,
-   * transfer volume, liquid class, the specific tip to use, and the tip strategy.
-   * It orchestrates the necessary SetupSteps to configure the transfer in the application UI,
-   * including selecting the tip and tip strategy.
-   *
-   * @param {string | undefined} sourceLabware - The name or identifier of the source labware.
-   * @param {string | undefined} sourceWell - The identifier of the source well (e.g., 'A1').
-   * @param {string | undefined} destinationLabware - The name or identifier of the destination labware.
-   * @param {string | undefined} destWell - The identifier of the destination well (e.g., 'B2').
-   * @param {string | undefined} volume - The volume to transfer as a string (e.g., '50').
-   * @param {string | undefined} liquidClass - The name or identifier of the liquid class to use (e.g., 'Aqueous').
-   * @param {string | undefined} tip - The specific tip to use for the transfer (e.g., '50'). Defaults to '50' if not provided.
-   * @param {string | undefined} tipstrat - The strategy for tip handling (e.g., 'Always', 'Once'). If you use never, modify the function to do once first
-   * @returns {StepThunk} A StepThunk object containing the 'call' function that executes the transfer setup steps in the UI.
-   */
-
-  Test_LC_tipsy: (
+  Test_LC_new_rectangleOT2: (
     sourceLabware?: string | undefined,
     sourceWell?: string | undefined,
     destinationLabware?: string | undefined,
     destWell?: string | undefined,
     volume?: string | undefined,
-    liquidClass?: string | undefined,
     tip?: string | undefined,
-    tipstrat?: string | undefined
+    sourceWellShape?: 'circle' | 'rect',
+    destWellShape?: 'circle' | 'rect'
   ): StepThunk => ({
-    // Corrected return type annotation: StepThunk before =>
     call: () => {
       const Tip = tip ?? '50'
       const volumeToUse = volume ?? '1'
@@ -1627,40 +1780,50 @@ export const CompositeSetupSteps = {
         destinationLabware ??
         'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt'
       const destWellToUse = destWell ?? 'A1'
-      const liquidClassToUse = liquidClass ?? 'Aqueous'
-      const tipstratToUse = tipstrat ?? 'Always'
-      cy.log('Executing Test_LC_tipsy step with the following parameters:')
-      cy.log(`  tip: ${Tip}`)
-      cy.log(`  Source Labware: ${sourceLabwareToUse}`)
-      cy.log(`  Source Well: ${sourceWellToUse}`)
-      cy.log(`  Destination Labware: ${destinationLabwareToUse}`)
-      cy.log(`  Destination Well: ${destWellToUse}`)
-      cy.log(`  Volume: ${volumeToUse}`)
-      cy.log(`  Liquid Class: ${liquidClassToUse}`)
+      const sourceShapeToUse = sourceWellShape ?? 'circle'
+      const destShapeToUse = destWellShape ?? 'circle'
       SetupSteps.AddStep().call()
-      SetupVerifications.TransferPopOut().call()
+      SetupSteps.TransferPopOut().call()
       UniversalSteps.Snapshot()
-      SetupSteps.SelecTip(Tip).call()
-      SetupSteps.SelectTipStrategy(tipstratToUse).call()
+      SetupSteps.SelecTip(Tip)
       SetupSteps.InputTransferVolume(volumeToUse).call()
+      // --- Source Well Selection Logic ---
       SetupSteps.ChoseSourceLabware().call()
       SetupSteps.selectDropdownLabware(sourceLabwareToUse).call()
       SetupSteps.SelectSourceWells().call()
-      SetupSteps.WellSelector([sourceWellToUse]).call()
-      SetupSteps.WellSelector([sourceWellToUse]).call()
-      // console.log('We will fix this eventually need to double click for now')
-      // SetupSteps.WellSelector([sourceWellToUse]).call(); // Removed likely redundant call
+
+      if (sourceShapeToUse === 'circle') {
+        SetupSteps.WellSelector([sourceWellToUse]).call()
+        SetupSteps.WellSelector([sourceWellToUse]).call() // Intentional double call
+      } else if (sourceShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([sourceWellToUse]).call()
+        SetupSteps.RectWellSelector([sourceWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid sourceWellShape: ${sourceShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
       SetupSteps.Save().call()
+
+      // --- Destination Well Selection Logic ---
       SetupSteps.ChoseDestinationLabware().call()
       SetupSteps.selectDropdownLabware(destinationLabwareToUse).call()
       SetupSteps.SelectDestinationWells().call()
-      SetupSteps.WellSelector([destWellToUse]).call()
-      SetupSteps.WellSelector([destWellToUse]).call()
-      // ToDo fix this bug please
-      // SetupSteps.WellSelector([destWellToUse]).call(); // Removed likely redundant call
+
+      if (destShapeToUse === 'circle') {
+        SetupSteps.WellSelector([destWellToUse]).call()
+        SetupSteps.WellSelector([destWellToUse]).call() // Intentional double call
+      } else if (destShapeToUse === 'rect') {
+        SetupSteps.RectWellSelector([destWellToUse]).call()
+        SetupSteps.RectWellSelector([destWellToUse]).call() // Intentional double call
+      } else {
+        throw new Error(
+          `Invalid destWellShape: ${destShapeToUse}. Expected 'circle' or 'rect'.`
+        )
+      }
+
       SetupSteps.Save().call()
-      SetupSteps.Continue().call()
-      SetupSteps.SelectLiquidClassT(liquidClassToUse).call()
       SetupSteps.Continue().call()
       SetupSteps.Save().call()
     },

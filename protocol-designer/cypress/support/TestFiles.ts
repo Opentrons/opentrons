@@ -50,6 +50,11 @@ export enum TestFilePath {
   P1000MTransferMulti = 'fixtures/protocol/8/P1000MTransferMulti.json',
   P1000STransferSingle = 'fixtures/protocol/8/P1000STransferSingle.json',
   P50MTransferMulti = 'fixtures/protocol/8/P50MTransferMulti.json',
+  GEN2P20MultiOT2 = 'fixtures/protocol/8/GEN2P20MultiOT2.json',
+  GEN2P20SingleOT2 = 'fixtures/protocol/8/GEN2P20SingleOT2.json',
+  GEN2P300MultiOT2 = 'fixtures/protocol/8/GEN2P300MultiOT2.json',
+  GEN2P300SingleOT2 = 'fixtures/protocol/8/GEN2P300SingleOT2.json',
+  GEN2P1000SingleOT2 = 'fixtures/protocol/8/GEN2P1000SingleOT2.json',
   // cypress fixtures
   GarbageTextFile = 'cypress/fixtures/garbage.txt',
   Generic96TipRack200ul = 'cypress/fixtures/generic_96_tiprack_200ul.json',
