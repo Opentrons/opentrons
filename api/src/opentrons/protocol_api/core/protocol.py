@@ -311,8 +311,8 @@ class AbstractProtocol(
         """Define a liquid to load into a well."""
 
     @abstractmethod
-    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
-        """Define a liquid class for use in transfer functions."""
+    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+        """Get an instance of a built-in liquid class."""
 
     @abstractmethod
     def get_labware_location(
