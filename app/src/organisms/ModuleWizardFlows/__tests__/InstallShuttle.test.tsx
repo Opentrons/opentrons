@@ -119,7 +119,8 @@ describe('CloseDoorInstallShuttle', () => {
   })
 
   it('should render the install shuttle instruction screen followed by a fail screen', () => {
-    props = {
+    let installProps: React.ComponentProps<typeof InstallShuttle>
+    installProps = {
       proceed: vi.fn(),
       goBack: vi.fn(),
       chainRunCommands: vi.fn(),
@@ -131,8 +132,11 @@ describe('CloseDoorInstallShuttle', () => {
       isOnDevice: false,
       deckConfig: mockDeckConfig,
       maintenanceRunId: null,
+      restartSetup: vi.fn(),
+      isModuleUpdating: false,
+      setIsModuleUpdating: vi.fn(),
     }
-    installRender(props)
+    installRender(installProps)
     screen.getByText('Place labware shuttle on track')
     screen.getByText(
       'Place the magnetic labware shuttle flush on the top of the track.'
