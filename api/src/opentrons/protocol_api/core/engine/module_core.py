@@ -908,6 +908,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     def set_stored_labware_items(
         self,
         labware: Sequence[LabwareCore],
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the stacker to contain a set of labware."""
         core_groups = [self._core_groups_from_primary_core(core) for core in labware]
@@ -927,6 +928,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 primaryLabware=self._ssld_from_core(core_groups[0].primary),
                 lidLabware=self._ssld_from_core(core_groups[0].lid),
                 adapterLabware=self._ssld_from_core(core_groups[0].adapter),
+                poolOverlapOverride=stacking_offset_z,
             )
         )
 
@@ -942,6 +944,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         adapter_namespace: str | None,
         adapter_version: int | None,
         count: int | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""
 
@@ -997,5 +1000,6 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 primaryLabware=main_labware,
                 lidLabware=lid_labware,
                 adapterLabware=adapter_labware,
+                poolOverlapOverride=stacking_offset_z,
             )
         )

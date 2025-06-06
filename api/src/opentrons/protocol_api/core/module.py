@@ -435,6 +435,7 @@ class AbstractFlexStackerCore(
     def set_stored_labware_items(
         self,
         labware: Sequence[LabwareCoreType],
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the stacker to contain a set of labware."""
 
@@ -477,5 +478,6 @@ class AbstractFlexStackerCore(
         adapter_namespace: str | None,
         adapter_version: int | None,
         count: int | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""

@@ -1230,7 +1230,11 @@ class FlexStackerContext(ModuleContext):
         return self._core.get_current_storable_labware()
 
     @requires_version(2, 24)
-    def set_stored_labware_items(self, labware: list[Labware]) -> None:
+    def set_stored_labware_items(
+        self,
+        labware: list[Labware],
+        stacking_offset_z: float | None = None,
+    ) -> None:
         """Configure a Flex Stacker by providing an initial list of stored labware objects.
 
         The kind of labware stored by the Flex Stacker will be calculated from the list of labware
@@ -1248,8 +1252,16 @@ class FlexStackerContext(ModuleContext):
           will fit, use the return value of :py:method:`.get_max_storable_labware_from_list`.
 
         :param labware: A list of labware to load into the stacker.
+        :param stacking_offset_z: The amount of overlap between the labware when stacked
+            on top of each other. This is used to determine the max number of labware that
+            the Flex Stacker can store. The API uses the stacking offsets defined in
+            the labware definition, but you can override this by providing a value here.
+
         """
-        self._core.set_stored_labware_items(self._labware_to_cores(labware))
+        self._core.set_stored_labware_items(
+            self._labware_to_cores(labware),
+            stacking_offset_z=stacking_offset_z,
+        )
 
     @requires_version(2, 23)
     def set_stored_labware(
@@ -1260,6 +1272,7 @@ class FlexStackerContext(ModuleContext):
         adapter: str | None = None,
         lid: str | None = None,
         count: int | None = None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure what kind of labware the Flex Stacker will store.
 
@@ -1290,6 +1303,10 @@ class FlexStackerContext(ModuleContext):
         :param count: The number of labware that the Flex Stacker should start the protocol
             storing. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
+        :param stacking_offset_z: The amount of overlap between the labware when stacked
+            on top of each other. This is used to determine the max number of labware that
+            the Flex Stacker can store. The API uses the stacking offsets defined in
+            the labware definition, but you can override this by providing a value here.
 
         """
         self._core.set_stored_labware(
@@ -1303,6 +1320,7 @@ class FlexStackerContext(ModuleContext):
             adapter_namespace=namespace,
             adapter_version=version,
             count=count,
+            stacking_offset_z=stacking_offset_z,
         )
 
     @requires_version(2, 23)
