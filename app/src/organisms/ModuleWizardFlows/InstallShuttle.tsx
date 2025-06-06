@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { AttachedModule } from '@opentrons/api-client'
 import {
   AnimationVideo,
   COLORS,
@@ -26,6 +27,7 @@ import type { ModuleSetupWizardStepProps } from './types'
 
 interface InstallShuttleProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
+  attachedModules: AttachedModule[]
 }
 
 const BODY_STYLE = css`
@@ -50,15 +52,23 @@ const BUTTON_STYLE = css`
   `
 
 export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
-  const { proceed, isOnDevice } = props
+  const { proceed, isOnDevice, attachedModules } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 
   const [shuttleNotInstalled, setShuttleNotInstalled] = useState(false)
 
+  const attachedStacker =
+    attachedModules.find(
+      (i): i is AttachedModule =>
+        i.moduleType === FLEX_STACKER_MODULE_TYPE &&
+        i.serialNumber === props.attachedModule.serialNumber
+    ) ?? null
+
   const handleShuttleValidation = (): void => {
     if (
-      props.attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE &&
-      props.attachedModule.data.platformState === 'extended'
+      attachedStacker != null &&
+      attachedStacker.moduleType === FLEX_STACKER_MODULE_TYPE &&
+      attachedStacker.data.platformState === 'extended'
     ) {
       proceed()
     } else {

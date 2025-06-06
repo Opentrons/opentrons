@@ -134,6 +134,7 @@ describe('CloseDoorInstallShuttle', () => {
       restartSetup: vi.fn(),
       isModuleUpdating: false,
       setIsModuleUpdating: vi.fn(),
+      attachedModules: [mockFlexStackerMissingShuttle],
     }
     installRender(installProps)
     screen.getByText('Place labware shuttle on track')

@@ -25,6 +25,8 @@ import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
+import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void
@@ -76,6 +78,12 @@ export function ModuleWizardFlows(
     showSetupLauncher
   )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
+
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: wizardFlowBaseProps.attachedModule != null,
+    })?.data?.data ?? []
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
@@ -317,6 +325,7 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
