@@ -6,9 +6,11 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
     ParameterContext,
+    OFF_DECK,
 )
-from opentrons.types import Point
-
+from opentrons.types import Point, Dict
+from opentrons.protocols.labware import get_all_labware_definitions
+from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 ###########################################
 #  VARIABLES - START
@@ -22,40 +24,58 @@ from opentrons.types import Point
 #        volume estimations. No need for us to include Solidworks
 #        in this testing loop.
 
-# Default tube volumes are for 50 ml
-VOLUMES_3MM_TOP_BOTTOM = {
-    "corning_96_wellplate_360ul_flat": [257.1, 97.2, 0.0],
-    "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
-    "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
-    "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
-    "nest_12_reservoir_15ml": [13687.8, 1260.6, 0.0],
-    "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
-    "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
-    "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
-    "thermoscientificnunc_96_wellplate_2000ul": [1828.4, 76.0, 0.0],
-    "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
-    "nest_1_reservoir_290ml": [16570.4, 271690.5, 0.0],
-    "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
-    "corning_24_wellplate_3.4ml_flat": [2853.4, 1701.37, 579.0, 0.0],
-    "corning_6_wellplate_16.8ml_flat": [13901.9, 2862.1, 0.0],
-    "corning_48_wellplate_1.6ml_flat": [1327.0, 790.63, 268.9, 0.0],
-    "opentrons_24_tuberack_nest_0.5ml_screwcap": [795.4, 21.95, 0.0],
-    "opentrons_24_tuberack_nest_1.5ml_screwcap": [19.5, 735.89, 1750.8, 0.0],
-    "opentrons_24_tuberack_nest_1.5ml_snapcap": [28.7, 1739.7, 658.2, 0.0],
-    "opentrons_24_tuberack_nest_2ml_screwcap": [2104.9, 66.6, 0.0],
-    "opentrons_24_tuberack_nest_2ml_snapcap": [2148.5, 69.6, 0.0],
-    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [115.0, 26117.4, 56110.3, 0.0],
-    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": [169.5, 57720.5, 0.0],
-    "nest_1_reservoir_195ml": [14513.1, 178181.9, 0.0],
-    "axygen_1_reservoir_90ml": [23136.9, 72854.8, 0.0],
-    "agilent_1_reservoir_290ml": [15652.9, 141945.59, 268813.8],
-    "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap": [26.6, 593.7, 1629.9],
-    "corning_384_wellplate_112ul_flat": [23.2, 50.1, 80.0],
-    "biorad_384_wellplate_50ul": [28.7, 8.0, 0.0],
-    "usascientific_12_reservoir_22ml": [68.4, 11356.9, 19797.4],
-    "usascientific_96_wellplate_2.4ml_deep": [74.7, 1151.9, 2317.8],
-    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap": [63.0, 2237.8, 0.0],
-}
+
+def create_dict_of_heights_for_labware(
+    protocol: ProtocolContext,
+) -> Dict[str, List[float | SimulatedProbeResult]]:
+    """Create a dictionary of labware and their heights."""
+    labware_definitions = get_all_labware_definitions()
+    volumes_dict = {}
+    for labware in labware_definitions:
+        labware_loaded = protocol.load_labware(labware, OFF_DECK)
+        well = labware_loaded["A1"]
+        volumes_dict[labware] = [
+            well.volume_from_height(height=3),
+            well.volume_from_height(height=well.depth / 2),
+            well.volume_from_height(height=well.depth - 3),
+            0.0,
+        ]
+    return volumes_dict
+
+
+# VOLUMES_3MM_TOP_BOTTOM = {
+#     "corning_96_wellplate_360ul_flat": [257.1, 97.2, 0.0],
+#     "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
+#     "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
+#     "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
+#     "nest_12_reservoir_15ml": [13687.8, 1260.6, 0.0],
+#     "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
+#     "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
+#     "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
+#     "thermoscientificnunc_96_wellplate_2000ul": [1828.4, 76.0, 0.0],
+#     "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
+#     "nest_1_reservoir_290ml": [16570.4, 271690.5, 0.0],
+#     "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
+#     "corning_24_wellplate_3.4ml_flat": [2853.4, 1701.37, 579.0, 0.0],
+#     "corning_6_wellplate_16.8ml_flat": [13901.9, 2862.1, 0.0],
+#     "corning_48_wellplate_1.6ml_flat": [1327.0, 790.63, 268.9, 0.0],
+#     "opentrons_24_tuberack_nest_0.5ml_screwcap": [795.4, 21.95, 0.0],
+#     "opentrons_24_tuberack_nest_1.5ml_screwcap": [19.5, 735.89, 1750.8, 0.0],
+#     "opentrons_24_tuberack_nest_1.5ml_snapcap": [28.7, 1739.7, 658.2, 0.0],
+#     "opentrons_24_tuberack_nest_2ml_screwcap": [2104.9, 66.6, 0.0],
+#     "opentrons_24_tuberack_nest_2ml_snapcap": [2148.5, 69.6, 0.0],
+#     "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [115.0, 26117.4, 56110.3, 0.0],
+#     "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": [169.5, 57720.5, 0.0],
+#     "nest_1_reservoir_195ml": [14513.1, 178181.9, 0.0],
+#     "axygen_1_reservoir_90ml": [23136.9, 72854.8, 0.0],
+#     "agilent_1_reservoir_290ml": [15652.9, 141945.59, 268813.8],
+#     "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap": [26.6, 593.7, 1629.9],
+#     "corning_384_wellplate_112ul_flat": [23.2, 50.1, 80.0],
+#     "biorad_384_wellplate_50ul": [28.7, 8.0, 0.0],
+#     "usascientific_12_reservoir_22ml": [68.4, 11356.9, 19797.4],
+#     "usascientific_96_wellplate_2.4ml_deep": [74.7, 1151.9, 2317.8],
+#     "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap": [63.0, 2237.8, 0.0],
+# }
 
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = False
@@ -91,6 +111,36 @@ def add_parameters(parameters: ParameterContext) -> None:
     protocols.create_labware_parameters(parameters)
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
+    parameters.add_float(
+        variable_name="height_3mm_from_bottom",
+        display_name="Height 3 mm from bottom",
+        description="Height of liquid 3 mm from bottom of labware.",
+        default=0.0,
+        maximum=100.0,
+        minimum=-100.0,
+    )
+    parameters.add_float(
+        variable_name="height_3mm_from_top",
+        display_name="Height 3 mm from top",
+        description="Height of liquid 3 mm from top of labware.",
+        default=0.0,
+        maximum=100.0,
+        minimum=-100.0,
+    )
+    parameters.add_float(
+        variable_name="height_of_middle",
+        display_name="Height of Middle",
+        description="Height of liquid when well is half full.",
+        default=0.0,
+        maximum=100.0,
+        minimum=-100.0,
+    )
+    parameters.add_bool(
+        variable_name="measure_middle_height",
+        display_name="Measure Middle Height",
+        description="Measure middle height of liquid in well.",
+        default=False,
+    )
     parameters.add_bool(
         variable_name="liquid_pipette_probe_every_time",
         display_name="Liq Pipette Probe Every Time",
@@ -158,6 +208,7 @@ def _setup(
     int,
     int,
     bool,
+    Dict[str, List[float | SimulatedProbeResult]],
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -168,6 +219,20 @@ def _setup(
     num_trials: int = ctx.params.num_of_trials  # type: ignore[attr-defined]
     LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
     tube_volume: int = ctx.params.tube_volume  # type: ignore[attr-defined]
+    height_3mm_from_bottom = ctx.params.height_3mm_from_bottom  # type: ignore[attr-defined]
+    height_3mm_from_top = ctx.params.height_3mm_from_top  # type: ignore[attr-defined]
+    height_of_middle = ctx.params.height_of_middle  # type: ignore[attr-defined]
+    VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
+
+    if LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
+        volumes_testing = [
+            height_3mm_from_bottom,
+            height_of_middle,
+            height_3mm_from_top,
+            0.0,
+        ]
+        VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
+
     labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     labware.load_empty(labware.wells())
     labware_max_volume = labware["A1"].max_volume
@@ -233,7 +298,7 @@ def _setup(
         )
     total_volume_to_aspirate = 0.0
     for one_vols in volumes:
-        total_volume_to_aspirate += one_vols * num_trials
+        total_volume_to_aspirate += one_vols * num_trials  # type: ignore[assignment]
     if liquid_pip_channels == 1 and total_volume_to_aspirate < 1000:
         RESERVOIR = "opentrons_15_tuberack_nest_15ml_conical"
     else:
@@ -274,6 +339,7 @@ def _setup(
         tube_volume,
         num_trials,
         liquid_pipette_probe_every_time,
+        VOLUMES_3MM_TOP_BOTTOM,
     )
 
 
@@ -512,7 +578,9 @@ def _test_for_finding_liquid_height(  # noqa: C901
     _write_line_to_csv(ctx, ["error (%)", str(round(error_percent * 100, 1))])
 
 
-def run(ctx: ProtocolContext) -> None:
+def run(
+    ctx: ProtocolContext,
+) -> None:
     """Run."""
     (
         liq_pipette,
@@ -524,24 +592,11 @@ def run(ctx: ProtocolContext) -> None:
         tube_volume,
         num_trials,
         liquid_pipette_probe_every_time,
+        VOLUMES_3MM_TOP_BOTTOM,
     ) = _setup(ctx)
     channels_probe = probe_pipette.channels
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
-    # FIXME: calculate nominal volumes at +3mm from bottom and -3mm from top
-    #        using Opentrons API (not Solidworks)
-    try:
-        if tube_volume == 15:
-            # Replace volumes with 15 ml volumes
-            VOLUMES_3MM_TOP_BOTTOM[
-                "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
-            ] = [17.3, 7090.6, 16077.5, 0.0]
-            VOLUMES_3MM_TOP_BOTTOM[
-                "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
-            ] = [42.2, 15956.6, 0.0]
-        volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
-    except KeyError:
-        volumes = [0.0, 0.0, 0.0]
-        ctx.comment(f"No volumes loaded for labware {labware.load_name}")
+    volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     total_test_wells = len(volumes) * num_trials
     test_wells = _get_test_wells(
         labware, channels=1, tube_volume=tube_volume, total_test_wells=total_test_wells
@@ -549,7 +604,8 @@ def run(ctx: ProtocolContext) -> None:
     stuff_lengths = len(test_tips_probe), len(test_wells)
 
     assert min(stuff_lengths) >= num_trials * len(volumes), f"{stuff_lengths}"
-    for _vol in volumes:
+    float_volumes = [v for v in volumes if isinstance(v, float)]
+    for _vol in float_volumes:
         _test_for_finding_liquid_height(
             ctx,
             _vol,
