@@ -235,14 +235,14 @@ export const _incompatiblePipettePathWarning = (): FormWarning => ({
   location: 'form',
 })
 
-export const _incompatibleAllPipetteLabwareWarning = (): FormWarning => ({
+export const _incompatibleAllPipetteWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_ALL_PIPETTE',
   title: `The selected pipette is incompatible with liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
   location: 'form',
 })
 
-export const _incompatibleSomePipetteLabwareWarning = (): FormWarning => ({
+export const _incompatibleSomePipetteWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_SOME_PIPETTE',
   title: `The selected pipette is incompatible with some liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
@@ -281,8 +281,8 @@ const mappedLiquidClassReasonToWarning: Record<
   ReasonForWarning,
   () => FormWarning
 > = {
-  pipetteAll: _incompatibleAllPipetteLabwareWarning,
-  pipetteSome: _incompatibleSomePipetteLabwareWarning,
+  pipetteAll: _incompatibleAllPipetteWarning,
+  pipetteSome: _incompatibleSomePipetteWarning,
   tipRackAll: _incompatibleAllTipRackWarning,
   tipRackSome: _incompatibleSomeTipRackWarning,
   volume: _lowVolumeTransferWarning,
