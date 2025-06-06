@@ -119,8 +119,7 @@ describe('CloseDoorInstallShuttle', () => {
   })
 
   it('should render the install shuttle instruction screen followed by a fail screen', () => {
-    let installProps: React.ComponentProps<typeof InstallShuttle>
-    installProps = {
+    const installProps = {
       proceed: vi.fn(),
       goBack: vi.fn(),
       chainRunCommands: vi.fn(),
