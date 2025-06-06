@@ -640,21 +640,12 @@ class OT3PipetteHandler:
                 "remaining liquid ({}uL) from pipette".format(disp_vol)
             )
         else:
-            disp_vol = volume
-
-        # Ensure we don't dispense more than the current volume.
-        #
-        # This clamping is inconsistent with plan_check_aspirate(), which asserts
-        # that its input is in bounds instead of clamping it. This is to match a quirk
-        # of the OT-2 version of this class. Protocol Engine does its own clamping,
-        # so we don't expect this to trigger in practice.
-        disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
+            disp_vol = min(volume, instrument.current_volume)
 
         if disp_vol == 0:
             return None
-
-        if is_full_dispense:
+        elif numpy.isclose(instrument.current_volume - disp_vol, 0, rtol=0, atol=0.05):
+            disp_vol = instrument.current_volume
             if push_out is None:
                 push_out_ul = instrument.push_out_volume
             else:
