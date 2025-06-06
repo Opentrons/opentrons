@@ -412,185 +412,122 @@ Click **Create Transfer** when you're satisfied with your transfer settings. Aft
 
 ### Instrument management
 
-The Instruments screen is an interactive list of all instruments that
-you've connected to your Flex. The list is organized by mount: left
-pipette mount, right pipette mount, and extension mount.
+The Instruments screen is an interactive list of all instruments that you've connected to your Flex. The list is organized by mount: left pipette mount, right pipette mount, and extension mount.
 
-![image](750d36735f61627b5c0f774df81f5f0cc88de49f.jpg){width="6.75in"
-height="2.5833333333333335in"}
+<figure class="screenshot" markdown>
+![Instruments screen showing a Flex 8-Channel 50 µL pipette on the left mount. The right mount and extension mount are empty.](images/touchscreen-instruments.png "Instruments list")
+</figure>
 
-For an empty mount, tap anywhere on the row to begin the process of
-attaching an instrument.
+For an empty mount, tap anywhere on the row to begin the process of attaching an instrument.
 
-For an occupied mount, the row lists its current contents. Tap anywhere
-on the row to get more details about the instrument, detach it, or
-recalibrate it.
+For an occupied mount, the row lists its current contents. Tap anywhere on the row to get more details about the instrument, detach it, or recalibrate it.
 
-![image](5cb23c39b9cf26387e3706b8241c37259c7df318.png){width="9.833333333333334in"
-height="5.395833333333333in"}
+<figure class="screenshot" markdown>
+![Details for a Flex 8-Channel 50 µL, including calibration, firmware, and serial number.](images/touchscreen-instrument-detail.png "Instrument details")
+</figure>
 
-- **Last Calibrated:** The date and time of the instrument's most recent
-  calibration.
+- **Last Calibrated:** The date and time of the instrument's most recent calibration.
 
-- **Firmware Version:** The version of the firmware running on the
-  instrument. Flex automatically updates instrument firmware whenever
-  the instrument is attached, depending on the robot system version.
+- **Firmware Version:** The version of the firmware running on the instrument. Flex automatically updates instrument firmware whenever the instrument is attached, depending on the robot system version.
 
-- **Serial Number:** A unique identifier for the instrument. If you are
-  having problems with an instrument, Opentrons Support will want to
-  know the serial number.
+- **Serial Number:** A unique identifier for the instrument. If you are having problems with an instrument, Opentrons Support will want to know the serial number.
 
 #### Attach an instrument
 
-Choose an empty mount and then choose the type of instrument to install.
-Then connect and secure the instrument using its captive mounting
-screws. For more details, follow the instructions on the touchscreen or
-see the of the Installation and Relocation chapter.
+Choose an empty mount and then choose the type of instrument to install. Then connect and secure the instrument using its captive mounting screws. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section][instrument-installation-and-calibration] of the Installation and Relocation chapter.
 
-Exact installation steps depend on the instrument you choose and the
-current setup of your robot. For example, if you have an 8-channel
-pipette already attached and you attempt to install the 96-channel
-pipette on the other mount, the touchscreen will give you instructions
-for detaching the 8-channel so the 96-channel can occupy both mounts.
+Exact installation steps depend on the instrument you choose and the current setup of your robot. For example, if you have an 8-channel pipette already attached and you attempt to install the 96-channel pipette on the other mount, the touchscreen will give you instructions for detaching the 8-channel so the 96-channel can occupy both mounts.
 
 #### Detach an instrument
 
-Choose an attached instrument that you want to detach. Then loosen the
-instrument's captive mounting screws and remove it from the gantry. For
-more details, follow the instructions on the touchscreen. Exact removal
-steps depend on the instrument you choose and the current setup of your
-robot.
+Choose an attached instrument that you want to detach. Then loosen the instrument's captive mounting screws and remove it from the gantry. For more details, follow the instructions on the touchscreen. Exact removal steps depend on the instrument you choose and the current setup of your robot.
 
 #### Recalibrate an instrument
 
-Choose an attached instrument that you want to recalibrate. Then connect
-the instrument's calibration probe or pin and begin the automated
-calibration process. For more details, follow the instructions on the
-touchscreen or see the of the Installation and Relocation chapter.
+Choose an attached instrument that you want to recalibrate. Then connect the instrument's calibration probe or pin and begin the automated calibration process. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section][instrument-installation-and-calibration] of the Installation and Relocation chapter.
 
-**Note:** The new calibration data will overwrite any previous
-calibration data for that instrument.
+!!! note
+    The new calibration data will overwrite any previous calibration data for that instrument.
 
 ### Robot settings
 
-The Settings screen lists all the ways you can customize the behavior of
-your Flex.
+The Settings screen lists all the ways you can customize the behavior of your Flex.
 
-![image](4c930d4231c3970677d3992e591b7354f2cba9da.jpg){width="9.354166666666666in"
-height="14.197916666666666in"}All settings available on Flex. On the
-touchscreen, scroll the list to see all the settings.
+<figure class="screenshot" markdown>
+![List of all settings on Flex.](images/touchscreen-settings.png "Flex settings")
+<figcaption>All settings available on Flex. On the touchscreen, scroll the list to see all the settings.</figcaption>
+</figure>
 
-Although they are presented in a single list, they roughly break down
-into four categories.
+Although they are presented in a single list, they roughly break down into four categories.
 
-##### SETUP
+#### Setup
 
-All of these settings are covered when you . However, you can change
-them at any time.
+All of these settings are covered when you [first set up your Flex][first-run]. However, you can change them at any time.
 
-- **Network Settings:** View the status of or set up a Wi-Fi, Ethernet,
-  or USB connection. Multiple connections can be active simultaneously.
+- **Network Settings:** View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
-- **Robot Name:** Change the name of your Flex. The robot name appears
-  on the touchscreen dashboard and in the Opentrons App.
+- **Robot Name:** Change the name of your Flex. The robot name appears on the touchscreen dashboard and in the Opentrons App.
 
-- **Robot System Version:** See the current version of the robot
-  software or check for updates. If Flex has already automatically
-  checked for updates and found one, this item will have an "Update
-  available" badge in the settings list.
+- **Robot System Version:** See the current version of the robot software or check for updates. If Flex has already automatically checked for updates and found one, this item will have an "Update available" badge in the settings list.
 
-##### DISPLAY
+#### Display
 
-Control how Flex displays information to meet the needs of your lab and
-users.
+Control how Flex displays information to meet the needs of your lab and users.
 
-- **Status Light:** Turn on or off the strip of color lights on the
-  front of the robot.
+- **Status Light:** Turn on or off the strip of color lights on the front of the robot.
 
-- **Touchscreen Sleep:** Set how long the touchscreen should remain on
-  when idle. The default is for the display to never go to sleep. When
-  the screen is asleep, tap it once to wake it.
+- **Touchscreen Sleep:** Set how long the touchscreen should remain on when idle. The default is for the display to never go to sleep. When the screen is asleep, tap it once to wake it.
 
-- **Touchscreen Brightness:** Set the screen's brightness to one of six
-  levels by tapping **−** or **+**.
+- **Touchscreen Brightness:** Set the screen's brightness to one of six levels by tapping **−** or **+**.
 
-##### PRIVACY
+#### Privacy
 
-Choose what data you want Flex to share with Opentrons. This information
-is always anonymized and we only use it to improve our products.
+Choose what data you want Flex to share with Opentrons. This information is always anonymized and we only use it to improve our products.
 
-Flex records what it's doing in several log files that are stored on the
-robot. These logs are grouped into two categories for privacy opt-in
-purposes:
+Flex records what it's doing in several log files that are stored on the robot. These logs are grouped into two categories for privacy opt-in purposes:
 
-- **Robot Logs:** Data about robot server activities, executed API
-  commands, and interactions with attached modules.
+- **Robot Logs:** Data about robot server activities, executed API commands, and interactions with attached modules.
 
 - **Display Usage:** Data about how the touchscreen draws its graphics.
 
-If you opt out of automatic data sharing, you can still for your own use
-or to manually send them to Opentrons Support for troubleshooting.
+If you opt out of automatic data sharing, you can still [download your Flex log files](https://support.opentrons.com/s/article/How-to-download-the-logs-on-Opentrons-Flex) for your own use or to manually send them to Opentrons Support for troubleshooting.
 
-**Note:** There are separate privacy controls in the Opentrons App.
-Turning sharing on or off from the touchscreen only affects data
-collected and sent by the robot. Your laptop or desktop computer will
-still automatically share data if this feature is enabled in the
-Opentrons App.
+!!! note
+    There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
 
-##### ADVANCED
+#### Advanced
 
-You shouldn't need these settings for everyday operation, but they may
-be useful for troubleshooting or testing pre-release features.
+You shouldn't need these settings for everyday operation, but they may be useful for troubleshooting or testing pre-release features.
 
-- **Apply Labware Offsets:** Choose whether to use saved offset data
-  from Labware Position Check in subsequent protocol runs. This setting
-  is on by default. Opentrons recommends running Labware Position Check
-  before every run, and applying previous labware offsets at the
-  beginning of Labware Position Check can make the process quicker.
+- **Apply Labware Offsets:** Choose whether to use saved offset data from Labware Position Check in subsequent protocol runs. This setting is on by default. Opentrons recommends running Labware Position Check before every run, and applying previous labware offsets at the beginning of Labware Position Check can make the process quicker.
 
-- **Device Reset:** Batch delete certain types of information from the
-  robot, such as calibrations, run history, or protocols.
+- **Device Reset:** Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
 
-- **Home Gantry on Restart:** By default, the gantry moves to its home
-  position any time you turn on Flex. Only disable this behavior if you
-  have a reason that the gantry must remain stationary after powering
-  on.
+- **Home Gantry on Restart:** By default, the gantry moves to its home position any time you turn on Flex. Only disable this behavior if you have a reason that the gantry must remain stationary after powering on.
 
-- **Update Channel:** Choose whether to receive stable or beta software
-  updates.
+- **Update Channel:** Choose whether to receive stable or beta software updates.
 
-- **Developer Tools:** Enable additional tools and features designed for
-  developers. Not recommended unless instructed by Opentrons Support.
+- **Developer Tools:** Enable additional tools and features designed for developers. Not recommended unless instructed by Opentrons Support.
 
 ### Deck configuration
 
-Deck configuration tells your Flex what fixtures are attached to the
-deck, in what locations. You need to inform the robot about installed
-fixtures because they're unpowered attachments. They do not contain
-electronic or mechanical components that communicate with the robot.
-Flex won't know what's attached and where it is until you configure deck
-fixtures via the touchscreen or Opentrons App.
+Deck configuration tells your Flex what fixtures are attached to the deck, in what locations. You need to inform the robot about installed fixtures because they're unpowered attachments. They do not contain electronic or mechanical components that communicate with the robot. Flex won't know what's attached and where it is until you configure deck fixtures via the touchscreen or Opentrons App.
 
-Mapping fixtures to deck slots allows the robot to find discrepancies
-between the hardware used in a protocol and what it thinks is attached
-to the deck. Flex detects potential conflicts between the hardware setup
-of a protocol and the robot's current deck configuration (see below).
+Mapping fixtures to deck slots allows the robot to find discrepancies between the hardware used in a protocol and what it thinks is attached to the deck. Flex detects potential conflicts between the hardware setup of a protocol and the robot's current deck configuration (see [Resolving Deck Conflicts][resolving-deck-conflicts] below).
 
 Running protocols with proper deck configuration helps avoid collisions
 among the various components installed on the robot.
 
 For more information on which fixtures you can configure in which slots,
-see the in the System Description chapter.
+see the [Deck Fixtures section][deck-fixtures] in the System Description chapter.
 
 #### Adding and removing fixtures
 
 To add deck fixtures via the touchscreen:
 
-1.  Tap the three-dot (**⋮**) menu and then tap **Deck configuration**.
-    This opens the interactive deck map.
+1.  Tap the three-dot (⋮) menu and then tap **Deck configuration**. This opens the interactive deck map.
 
-2.  Tap a blue deck slot that you want to configure. This opens the
-    fixture menu.
+2.  Tap a blue deck slot that you want to configure. This opens the fixture menu.
 
 3.  From the fixture menu, select the item you want to add.
 
@@ -598,80 +535,56 @@ To add deck fixtures via the touchscreen:
 
 5.  Tap **Confirm**.
 
-Click the **X** on a fixture on the deck map to remove it from the deck
-configuration.
+Click the :octicons-x-circle-fill-16: on a fixture on the deck map to remove it from the deck configuration.
 
-![image](e4d2cc23c342469560ebfd2fd2444cc99e5149da.jpg){width="12.4375in"
-height="6.947916666666667in"}
+<figure class="screenshot" markdown>
+![Deck configuration screen showing the deck map. Slots A1 through D1 and A3 through C3 are blue and have plus icons. Slot C3 is dark grey and is labeled "Staging area".](images/deck-configuration-one-staging-slot.png "Deck configuration with staging slot in D3")
+<figcaption>A Flex configured with a staging area slot in D3, and no other fixtures.</figcaption>
+</figure>
 
-A Flex configured with a staging area slot in D3, and no other fixtures.
-
-You can also configure the deck in the Opentrons App, on the robot
-details page for your Flex.
+You can also configure the deck in the Opentrons App, on the robot details page for your Flex.
 
 #### Resolving deck conflicts
 
-Flex displays orange warning prompts when setting up a protocol run that
-conflicts with the current deck configuration. To resolve the conflict:
+Flex displays orange warning prompts when setting up a protocol run that conflicts with the current deck configuration. To resolve the conflict:
 
-1.  Tap the prompt for more information on what the protocol specifies,
-    compared to the current deck configuration.
+1.  Tap the prompt for more information on what the protocol specifies, compared to the current deck configuration.
 
-2.  Inspect the hardware configuration of your Flex and attach, move, or
-    remove the deck fixtures or modules as needed.
+2.  Inspect the hardware configuration of your Flex and attach, move, or remove the deck fixtures or modules as needed.
 
 3.  Tap **Update deck** to clear the conflict warning.
 
-Alternatively, you can modify your protocol to fit your current deck
-configuration, and then resend it to your Flex.
+Alternatively, you can modify your protocol to fit your current deck configuration, and then resend it to your Flex.
 
-Your Flex won't run a protocol until you resolve all deck conflict
-warnings.
+Your Flex won't run a protocol until you resolve all deck conflict warnings.
 
-![image](01b0670e9883a293cb6c3d72b9d0bae012b3fcda.jpg){width="14.822916666666666in"
-height="8.6875in"}
-
-This protocol requires a Heater-Shaker in slot D3, but the deck
-configuration indicates that the waste chute is in that location.
+<figure class="screenshot" markdown>
+![Deck location conflict modal.](images/deck-configuration-conflict.png "Deck location conflict")
+<figcaption>This protocol requires a Heater-Shaker in slot D3, but the deck
+configuration indicates that the waste chute is in that location.</figcaption>
+</figure>
 
 #### Fixture statuses
 
 The following table defines the statuses the robot generates when it
 compares its configured deck fixtures to your protocol.
 
-**Status Description**
+| Status              | Description |
+|---------------------|-------------|
+| **Configured**          | A fixture is specified in the correct location. Always verify that the fixture is physically attached before running the protocol. |
+| **Location conflict**   | A deck slot is configured with a fixture different from the fixture specified in your protocol (e.g., the protocol specifies a waste chute, but deck slot D3 is occupied by a staging area slot). |
+| **Not configured**      | A fixture required by your protocol is missing from the deck configuration (e.g., the protocol requires a staging area slot but that fixture is not configured in the specified location). |
 
-**Configured** A fixture is specified in the correct location. Always
-verify that the fixture is physically attached before running the
-protocol.
+The following table defines the deck configuration statuses the robot generates when it compares its attached instruments and attached modules to its deck configuration and your protocol.
 
-**Location conflict** A deck slot is configured with a fixture different
-from the fixture specified in your protocol (e.g., the protocol
-specifies a waste chute, but deck slot D3 is occupied by a staging area
-slot).
-
-**Not configured** A fixture required by your protocol is missing from
-the deck configuration (e.g., the protocol requires a staging area slot
-but that fixture is not configured in the specified location).
-
-The following table defines the deck configuration statuses the robot
-generates when it compares its attached instruments and attached modules
-to its deck configuration and your protocol.
-
-**Attach pipette** A required pipette is not attached.
-
-**Calibrate** A module needs calibration. It is in the right location
-and connected to the robot.
-
-**Calibrate pipette** An attached pipette requires calibration.
-
-**Connected** Modules are connected, calibrated, and in the right
-locations. Configuration status is good.
-
-**Location conflict** A module location conflicts with a deck fixture.
-
-**Not connected** The module is not connected to the robot or is powered
-off. Once connected, there will be no location conflict.
+| Status             | Description |
+|--------------------|-------------|
+| **Attach pipette**     | A required pipette is not attached.                                                                            |
+| **Calibrate**          | A module needs calibration. It is in the right location and connected to the robot.                            |
+| **Calibrate pipette**  | An attached pipette requires calibration.                                                                      |
+| **Connected**          | Modules are connected, calibrated, and in the right locations. Configuration status is good.                   |
+| **Location conflict**  | A module location conflicts with a deck fixture.                                                               |
+| **Not connected**      | The module is not connected to the robot or is powered off. Once connected, there will be no location conflict.|
 
 ## Opentrons App
 
@@ -760,7 +673,7 @@ are no errors, your protocol is ready to transfer to Flex.
 ![image](96b1b8e37eee1acc67b7886125a82ecdce44af8e.jpg){width="19.135416666666668in"
 height="4.864583333333333in"}
 
-Actions available in the three-dot menu (**⋮**) for imported protocols.
+Actions available in the three-dot menu (⋮) for imported protocols.
 
 **Note:** In-app protocol analysis is only a preliminary check of the
 validity of your protocol. Protocol analysis will run again on the robot
@@ -771,7 +684,7 @@ if you have customized the Python environment on your Flex.
 
 ##### RUN IMMEDIATELY
 
-Click the three-dot menu (**⋮**) on your protocol and choose **Start
+Click the three-dot menu (⋮) on your protocol and choose **Start
 setup**. Choose a connected and available Flex from the list to transfer
 the protocol and begin run setup immediately. The run setup screen will
 appear both in the app and on the touchscreen, and you can continue from
@@ -786,7 +699,7 @@ If you move to the touchscreen, follow the steps in the above.
 
 ##### RUN LATER
 
-Click the three-dot menu (**⋮**) on your protocol and choose **Send to
+Click the three-dot menu (⋮) on your protocol and choose **Send to
 Opentrons Flex**. Choose a connected and available Flex from the list to
 transfer the protocol. A message indicating a successful transfer
 
@@ -808,7 +721,7 @@ height="4.916666666666667in"}
 
 Module card for the Heater-Shaker Module.
 
-Click the three-dot menu (**⋮**) on the module card to choose from
+Click the three-dot menu (⋮) on the module card to choose from
 available commands. You can always choose **About module** to see the
 firmware version and serial number of the module. (This information is
 very useful when contacting Opentrons Support!) The other commands
@@ -838,7 +751,7 @@ Each entry in the recent protocol runs list includes the protocol name,
 its timestamp, whether the run was canceled or completed, and the
 duration of the run. Click the disclosure triangle next to any run to
 show its associated labware offset data. Click the three-dot menu
-(**⋮**) for related actions:
+(⋮) for related actions:
 
 - **View protocol run record:** Show the protocol run screen as it
   appeared when the protocol ended (succeeded, failed, or was canceled),
