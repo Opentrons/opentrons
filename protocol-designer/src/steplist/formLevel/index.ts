@@ -74,6 +74,7 @@ import {
 import {
   belowPipetteMinimumVolume,
   composeWarnings,
+  incompatibleLiquidClass,
   maxDispenseWellVolume,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
@@ -179,7 +180,8 @@ const stepFormHelperMap: {
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
-      mixTipPositionInTube
+      mixTipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   pause: {
@@ -233,7 +235,8 @@ const stepFormHelperMap: {
       minDisposalVolume,
       minAspirateAirGapVolume,
       minDispenseAirGapVolume,
-      tipPositionInTube
+      tipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   magnet: {
