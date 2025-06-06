@@ -1382,8 +1382,7 @@ class ProtocolContext(CommandPublisher):
         Args:
             name: Name of an Opentrons-defined liquid class.
 
-        Raises:
-            LiquidClassDefinitionDoesNotExist: if the specified liquid class does not exist.
+        :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
         """
         return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
