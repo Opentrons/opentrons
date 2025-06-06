@@ -374,18 +374,13 @@ export const reduxActionToAnalyticsEvent = (
       {}
     )
 
-    const liquidClasses = Object.values(ingredients).reduce(
-      (acc: string[], ingredient) => {
-        const { liquidClass } = ingredient
-        if (liquidClass != null) {
-          acc.push(liquidClass)
-        } else {
-          acc.push('none')
-        }
-        return acc
-      },
-      []
-    )
+    const liquidClasses = {
+      liquidClasses: Object.values(ingredients).map(ingredient =>
+        'liquidClass' in ingredient && ingredient.liquidClass != null
+          ? ingredient.liquidClass
+          : 'none'
+      ),
+    }
 
     const fixtureInfo = {
       trashBin: hasTrashBin,
