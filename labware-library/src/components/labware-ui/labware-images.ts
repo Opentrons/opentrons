@@ -488,21 +488,14 @@ export const labwareImages: Record<string, string[]> = {
     ).href,
   ],
   axygen_96_well_plate_500_µL: [
-  new URL(
-    '../../images/Axygen_96_Well_Plate_500uL.jpg',
-    import.meta.url
-  ).href,
+    new URL('../../images/Axygen_96_Well_Plate_500uL.jpg', import.meta.url)
+      .href,
   ],
   smc_384_read_plate: [
-  new URL(
-    '../../images/smc_384_read_plate.jpg',
-    import.meta.url
-  ).href,
+    new URL('../../images/smc_384_read_plate.jpg', import.meta.url).href,
   ],
   ibidi_96_square_well_plate_300ul: [
-  new URL(
-    '../../images/ibidi_96_square_well_plate_300ul',
-    import.meta.url
-  ).href,
-  ]
+    new URL('../../images/ibidi_96_square_well_plate_300ul', import.meta.url)
+      .href,
+  ],
 }

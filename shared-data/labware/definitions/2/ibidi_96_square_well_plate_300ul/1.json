@@ -1099,7 +1099,7 @@
   "schemaVersion": 2,
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "stackingOffsetWithLabware": {
-    "opentrons_universal_flat_adapter": { "x": 0, "y": 0, "z": 8.25}
+    "opentrons_universal_flat_adapter": { "x": 0, "y": 0, "z": 8.25 }
   },
   "gripHeightFromLabwareBottom": 5.2
 }
