@@ -151,6 +151,9 @@ export function CalibrationBlockRender(
     }
     default: {
       // should never reach this case
+      console.warn(
+        '<CalibrationBlockRender> given a non-calibration-block labware definition. Rendering nothing.'
+      )
       return null
     }
   }
