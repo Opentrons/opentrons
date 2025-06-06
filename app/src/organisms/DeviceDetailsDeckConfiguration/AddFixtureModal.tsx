@@ -300,7 +300,18 @@ export function AddFixtureModal({
       })
       return [...stackerOptions]
     } else {
-      return filteredMods.map(({ serialNumber, moduleModel }) => {
+      const filteredModsNoMatch = filteredMods.filter(({ moduleModel }) => {
+        const cutoutFixtureId = keys.find(
+          key => key == moduleModel
+        ) as CutoutFixtureId
+        const aaforModule = getAddressableAreaIdForCutout(
+          cutoutId,
+          cutoutFixtureId
+        )
+        console.log('aaforModule: ', aaforModule)
+        return aaforModule != null
+        })
+      return filteredModsNoMatch.map(({ serialNumber, moduleModel }) => {
         const cutoutFixtureId = keys.find(
           key => key == moduleModel
         ) as CutoutFixtureId
