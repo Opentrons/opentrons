@@ -8,8 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
+  getLabwareViewBox,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
@@ -76,16 +75,14 @@ export const LabwareLiquidsDetailModal = (
     selectedLiquidId
   )
 
-  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
-    labwareDefinition
-  )
-  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
 
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedLiquidId)
   const labwareRender = (
     <LabwareRender
       definition={labwareDefinition}
+      positioningMode="passThrough"
       wellFill={wellFill}
       wellLabelOption="SHOW_LABEL_INSIDE"
       highlightedWells={
@@ -114,8 +111,7 @@ export const LabwareLiquidsDetailModal = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing32}>
         <Flex>
           <LabwareThumbnail
-            // TODO BEFORE MERGE
-            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
+            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
           >
             {labwareRender}
           </LabwareThumbnail>
