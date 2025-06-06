@@ -32,7 +32,6 @@ import {
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
-import { getRobotStateTimeline } from '../../file-data/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { useProtocolExportHandler } from '../../resources/hooks'
@@ -93,8 +92,8 @@ export function ProtocolOverview(): JSX.Element {
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const robotTimeline = useSelector(getRobotStateTimeline)
-  const hasCommands = robotTimeline.timeline.length > 0
+  const { timeline } = useSelector(fileSelectors.getRobotStateTimeline)
+  const hasCommands = timeline.length > 0
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
     false

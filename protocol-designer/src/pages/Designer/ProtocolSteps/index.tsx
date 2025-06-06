@@ -98,8 +98,6 @@ export function ProtocolSteps({
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const robotTimeline = useSelector(getRobotStateTimeline)
-  const hasCommands = robotTimeline.timeline.length > 0
   const { labware, additionalEquipmentOnDeck } = deckSetup
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
@@ -123,7 +121,11 @@ export function ProtocolSteps({
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
   const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
-  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
+  const { errors: timelineErrors, timeline } = useSelector(
+    getRobotStateTimeline
+  )
+  const hasCommands = timeline.length > 0
+
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<

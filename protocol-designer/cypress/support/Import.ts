@@ -19,7 +19,6 @@ export const ContentStrings = {
   v8_1: 'The default dispense height is now 1 mm from the bottom of the well',
   noBehaviorChange:
     'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior',
-  noStepsWarning: 'Protocol has no steps',
   exportButton: 'Export',
   continueButton: 'continue',
   continueWithExport: 'Continue with export',
