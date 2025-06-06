@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -62,7 +62,7 @@ const mockOffsetData = {
 describe('useModuleCalibrationStatus hook', () => {
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const store = createStore(vi.fn(), {})
+    const store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     store.getState = vi.fn(() => {})
 
