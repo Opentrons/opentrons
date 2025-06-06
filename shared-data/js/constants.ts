@@ -679,6 +679,13 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
 
+export const COMBO_FIXTURES: CutoutFixtureId[] = [
+  ...FLEX_STACKER_FIXTURES,
+  ...MAGNETIC_BLOCK_FIXTURES,
+  ...WASTE_CHUTE_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+]
+
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
 
 // default hex values for liquid colors

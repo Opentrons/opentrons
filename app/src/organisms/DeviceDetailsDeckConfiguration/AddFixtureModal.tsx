@@ -26,12 +26,15 @@ import {
 import {
   ABSORBANCE_READER_V1,
   AddressableAreaNamesWithFakes,
+  COMBO_FIXTURES,
   CutoutConfigMap,
   CutoutIdToCutoutFixtureId,
+  FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAADisplayName,
   getDeckDefAAWithFakeAA,
   getDeckDefFromRobotType,
@@ -41,6 +44,7 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_RIGHT_CUTOUTS,
+  STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2,
@@ -606,10 +610,18 @@ export function AddFixtureModal({
   const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
     console.log('addedCutoutConfigs: ', addedCutoutConfigs)
     const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
-      const replacementCutoutConfig = addedCutoutConfigs.find(
-        c => c.cutoutId === fixture.cutoutId
-      )
-      return replacementCutoutConfig ?? fixture
+      console.log('fixture.cutoutFixtureId: ', fixture.cutoutFixtureId)
+      if (COMBO_FIXTURES.includes(fixture.cutoutFixtureId)) {
+        // get current deck def
+        // is the adjecent slot empty? simple fixture id
+        // if not empty look for match with following fixutre.
+        // update both to the same fixture if match found.
+      } else {
+        return (
+          addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId) ??
+          fixture
+        )
+      }
     }) as CutoutConfig[] // we can do this bc we are going to map each aa to the proper fixture
 
     updateDeckConfiguration(newDeckConfig)
