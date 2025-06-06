@@ -12,7 +12,6 @@ export type ModuleSetupWizardStep =
   | SuccessStep
   | CloseDoorStep
   | InstallShuttleStep
-  | ValidateShuttleStep
   | UpdateFirmwareStep
 
 export type ModuleWizardAction =
@@ -69,9 +68,6 @@ export interface CloseDoorStep {
 }
 export interface InstallShuttleStep {
   section: typeof SECTIONS.INSTALL_SHUTTLE
-}
-export interface ValidateShuttleStep {
-  section: typeof SECTIONS.SHUTTLE_VALIDATION
 }
 export interface UpdateFirmwareStep {
   section: typeof SECTIONS.UPDATE_FIRMWARE
