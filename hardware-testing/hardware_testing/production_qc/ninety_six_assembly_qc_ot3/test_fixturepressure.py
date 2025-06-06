@@ -44,7 +44,7 @@ DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
 
-TIP_RACK_96_SLOT = 3
+TIP_RACK_96_SLOT = 6
 TIP_RACK_PARTIAL_SLOT = 5
 RESERVOIR_SLOT = 2
 TRASH_SLOT = 12
@@ -277,7 +277,8 @@ async def _fixture_check_pressure(
     await api.pick_up_tip(
         OT3Mount.LEFT, helpers_ot3.get_default_tip_length(1000)
     )
-    await asyncio.sleep(15)
+    await api.move_rel(OT3Mount.LEFT,Point(z=24))
+    await asyncio.sleep(10)
     r, inserted_pressure_data = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -291,6 +292,7 @@ async def _fixture_check_pressure(
     results.append(r)
     # aspirate 50uL
     await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    #await api.aspirate(OT3Mount.LEFT, volume)
     if pip_vol == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
     elif pip_vol == 1000:
@@ -325,6 +327,7 @@ async def _fixture_check_pressure(
     # retract out of fixture
     #await api.move_rel(mount, Point(z=fixture_depth))
     await api.drop_tip(OT3Mount.LEFT)
+    await asyncio.sleep(10)
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,

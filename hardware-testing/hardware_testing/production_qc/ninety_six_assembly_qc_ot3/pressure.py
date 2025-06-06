@@ -36,7 +36,7 @@ class PressureEventConfig:
     sample_delay: float
 
 
-PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0,200:12.0}
+PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0,200:200.0}
 PRESSURE_FIXTURE_INSERT_DEPTH = {50: 30.0, 1000: 30.0, 200:30}
 
 PRESSURE_ASPIRATE_DELTA_SPEC = {
@@ -62,7 +62,7 @@ DEFAULT_STABILIZE_SECONDS = 1
 # but we want to keep the number of samples constant between test runs,
 # so that is why we don't specify a sample duration (b/c frequency is unpredictable)
 DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE = int(
-    (1 * 60) / DEFAULT_PRESSURE_SAMPLE_DELAY
+    (1 * 15) / DEFAULT_PRESSURE_SAMPLE_DELAY
 )
 PRESSURE_NONE = PressureEventConfig(
     min=-8000.0,
