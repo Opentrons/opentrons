@@ -1,5 +1,6 @@
 """Tests for Protocol API Flex Stacker contexts."""
 
+from numpy import stack
 import pytest
 from decoy import Decoy, matchers
 
@@ -127,7 +128,7 @@ def test_set_stored_labware(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
     """It should route arguments appropriately."""
-    subject.set_stored_labware("load_name", "namespace", 1, "adapter", "lid", 2)
+    subject.set_stored_labware("load_name", "namespace", 1, "adapter", "lid", 2, stacking_offset_z=1.0)
     decoy.verify(
         mock_core.set_stored_labware(
             main_load_name="load_name",
@@ -140,6 +141,7 @@ def test_set_stored_labware(
             adapter_namespace="namespace",
             adapter_version=1,
             count=2,
+            stacking_offset_z=1.0,
         )
     )
 
@@ -323,5 +325,5 @@ def test_set_stored_labware_items(
         )
         for core in base_cores
     ]
-    subject.set_stored_labware_items(base_lw)
-    decoy.verify(mock_core.set_stored_labware_items(base_cores))
+    subject.set_stored_labware_items(base_lw, stacking_offset_z=1.0)
+    decoy.verify(mock_core.set_stored_labware_items(base_cores, 1.0))

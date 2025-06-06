@@ -5073,6 +5073,19 @@
           "title": "Moduleid",
           "type": "string"
         },
+        "poolOverlapOverride": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Override for the Z stacking overlap of the labware pool. If not provided, the protocol engine will calculate the overlap based on the stacking offsets provided in the labware definitions.",
+          "title": "Pooloverlapoverride"
+        },
         "primaryLabware": {
           "$ref": "#/$defs/StackerStoredLabwareDetails",
           "description": "The details of the primary labware (i.e. not the lid or adapter, if any) stored in the stacker."
