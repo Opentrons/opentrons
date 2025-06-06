@@ -6,7 +6,6 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Well,
-    OFF_DECK,
     Labware,
 )
 from typing import List, Any
@@ -118,9 +117,7 @@ def run(protocol: ProtocolContext) -> None:
     col_tips = [col_tips_1, col_tips_2]
 
     if ninety_six:
-        tip_adap = protocol.load_adapter(
-            "opentrons_flex_96_tiprack_adapter", "A3" 
-        )
+        tip_adap = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "A3")
         full_tips_ = tip_adap.load_labware(
             "opentrons_flex_96_filtertiprack_50ul", "Full 96 ch Tips"
         )
@@ -191,6 +188,7 @@ def run(protocol: ProtocolContext) -> None:
     ifp_primer_dests = []
     for well in prim_dest_list:
         ifp_primer_dests.append(ifp_plate.wells()[well])
+    input(len(ifp_primer_dests))
 
     samp_dest_list = (
         [96, 97, 112, 113, 128, 129, 144, 145, 160, 161, 176, 177]
