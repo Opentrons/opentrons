@@ -223,106 +223,103 @@ export function AddFixtureModal({
       mod => mod.moduleModel === moduleModel
     )
 
-    let stackerOptions: CutoutConfigMap[][] = []
-    if (moduleModel === FLEX_STACKER_MODULE_V1) {
-      filteredMods.forEach((mod: AttachedModule) => {
-        const aaStackerMagBlockId = getAddressableAreaIdForCutout(
-          cutoutId,
-          FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
-        )
-        if (aaStackerMagBlockId != null) {
-          stackerOptions.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-              addressableAreaId: aaStackerMagBlockId,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        }
-        if (cutoutId == 'cutoutD3') {
-          const aaWithCover = getAddressableAreaIdForCutout(
-            cutoutId,
-            FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
-          )
+    // if (moduleModel === FLEX_STACKER_MODULE_V1) {
+    //   filteredMods.forEach((mod: AttachedModule) => {
+    // const aaStackerMagBlockId = getAddressableAreaIdForCutout(
+    //   cutoutId,
+    //   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+    // )
+    // if (aaStackerMagBlockId != null) {
+    //   stackerOptions.push([
+    //     {
+    //       cutoutId,
+    //       cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+    //       addressableAreaId: aaStackerMagBlockId,
+    //       opentronsModuleSerialNumber: mod.serialNumber,
+    //     },
+    //   ])
+    // }
+    // if (cutoutId == 'cutoutD3') {
+    //   const aaWithCover = getAddressableAreaIdForCutout(
+    //     cutoutId,
+    //     FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+    //   )
 
-          const aaWithNoCover = getAddressableAreaIdForCutout(
-            cutoutId,
-            FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
-          )
+    //   const aaWithNoCover = getAddressableAreaIdForCutout(
+    //     cutoutId,
+    //     FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+    //   )
 
-          if (aaWithCover != null) {
-            stackerOptions.push([
-              {
-                cutoutId,
-                cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-                addressableAreaId: aaWithCover,
-                opentronsModuleSerialNumber: mod.serialNumber,
-              },
-            ])
-          }
-          if (aaWithNoCover != null) {
-            stackerOptions.push([
-              {
-                cutoutId,
-                cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-                addressableAreaId: aaWithNoCover,
-                opentronsModuleSerialNumber: mod.serialNumber,
-              },
-            ])
-          }
-          const cutoutFixtureId = keys.find(
-            key => key == moduleModel
-          ) as CutoutFixtureId
-          const aaForModule = getAddressableAreaIdForCutout(
-            cutoutId,
-            cutoutFixtureId
-          )
-          if (aaForModule == null) {
-            console.error(
-              `Was not able to find aa for ${addressableAreaId} and module ${moduleModel}`
-            )
-          } else {
-            stackerOptions.push([
-              {
-                cutoutId,
-                addressableAreaId: aaForModule,
-                cutoutFixtureId,
-                opentronsModuleSerialNumber: mod.serialNumber,
-              },
-            ])
-          }
-        }
-      })
-      return [...stackerOptions]
-    } else {
-      const mappedWithAA = filteredMods.map(({ serialNumber, moduleModel }) => {
-        const cutoutFixtureId = keys.find(
-          key => key === moduleModel
-        ) as CutoutFixtureId
-        const aaforModule = getAddressableAreaIdForCutout(
-          cutoutId,
-          cutoutFixtureId
-        )
-        return {
-          serialNumber,
-          cutoutFixtureId,
-          aaforModule,
-        }
-      })
-
-      const filteredModsNoMatch = mappedWithAA.filter(
-        ({ aaforModule }) => aaforModule != null
+    //   if (aaWithCover != null) {
+    //     stackerOptions.push([
+    //       {
+    //         cutoutId,
+    //         cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+    //         addressableAreaId: aaWithCover,
+    //         opentronsModuleSerialNumber: mod.serialNumber,
+    //       },
+    //     ])
+    //   }
+    //   if (aaWithNoCover != null) {
+    //     stackerOptions.push([
+    //       {
+    //         cutoutId,
+    //         cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+    //         addressableAreaId: aaWithNoCover,
+    //         opentronsModuleSerialNumber: mod.serialNumber,
+    //       },
+    //     ])
+    //     //   }
+    //       const cutoutFixtureId = keys.find(
+    //         key => key == moduleModel
+    //       ) as CutoutFixtureId
+    //       const aaForModule = getAddressableAreaIdForCutout(
+    //         cutoutId,
+    //         cutoutFixtureId
+    //       )
+    //       if (aaForModule == null) {
+    //         console.error(
+    //           `Was not able to find aa for ${addressableAreaId} and module ${moduleModel}`
+    //         )
+    //       } else {
+    //         stackerOptions.push([
+    //           {
+    //             cutoutId,
+    //             addressableAreaId: aaForModule,
+    //             cutoutFixtureId,
+    //             opentronsModuleSerialNumber: mod.serialNumber,
+    //           },
+    //         ])
+    //       }
+    //   })
+    //   return [...stackerOptions]
+    // } else {
+    const mappedWithAA = filteredMods.map(({ serialNumber, moduleModel }) => {
+      const cutoutFixtureId = keys.find(
+        key => key === moduleModel
+      ) as CutoutFixtureId
+      const aaforModule = getAddressableAreaIdForCutout(
+        cutoutId,
+        cutoutFixtureId
       )
-      return filteredModsNoMatch.map((mod: any) => [
-        {
-          cutoutId,
-          addressableAreaId: mod.aaforModule,
-          cutoutFixtureId: mod.cutoutFixtureId,
-          opentronsModuleSerialNumber: mod.serialNumber,
-        },
-      ])
-    }
+      return {
+        serialNumber,
+        cutoutFixtureId,
+        aaforModule,
+      }
+    })
+
+    const filteredModsNoMatch = mappedWithAA.filter(
+      ({ aaforModule }) => aaforModule != null
+    )
+    return filteredModsNoMatch.map((mod: any) => [
+      {
+        cutoutId,
+        addressableAreaId: mod.aaforModule,
+        cutoutFixtureId: mod.cutoutFixtureId,
+        opentronsModuleSerialNumber: mod.serialNumber,
+      },
+    ])
   }
 
   const getThermoUnconfiguredFixtures = (
@@ -421,22 +418,22 @@ export function AddFixtureModal({
         },
       ])
     }
-    const aaMagBlockWithStaging = getAddressableAreaIdForCutout(
-      cutoutId,
-      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-    )
-    if (aaMagBlockWithStaging != null) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-            addressableAreaId: aaMagBlockWithStaging,
-          },
-        ],
-      ]
-    }
+    // const aaMagBlockWithStaging = getAddressableAreaIdForCutout(
+    //   cutoutId,
+    //   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+    // )
+    // if (aaMagBlockWithStaging != null) {
+    //   availableOptions = [
+    //     ...availableOptions,
+    //     [
+    //       {
+    //         cutoutId,
+    //         cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+    //         addressableAreaId: aaMagBlockWithStaging,
+    //       },
+    //     ],
+    //   ]
+    // }
     if (unconfiguredMods.length > 0) {
       availableOptions = [
         ...availableOptions,
