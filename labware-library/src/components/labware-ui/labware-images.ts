@@ -495,7 +495,9 @@ export const labwareImages: Record<string, string[]> = {
     new URL('../../images/smc_384_read_plate.jpg', import.meta.url).href,
   ],
   ibidi_96_square_well_plate_300ul: [
-    new URL('../../images/ibidi_96_square_well_plate_300ul.jpg', import.meta.url)
-      .href,
+    new URL(
+      '../../images/ibidi_96_square_well_plate_300ul.jpg',
+      import.meta.url
+    ).href,
   ],
 }
