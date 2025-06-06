@@ -590,31 +590,23 @@ The following table defines the deck configuration statuses the robot generates 
 
 ### App installation
 
-Download the Opentrons App at . The app requires Windows 10, macOS
-10.10, or Ubuntu 12.04 or later. The app may run on other Linux
-distributions, but Opentrons does not officially support them.
+Download the Opentrons App at <https://opentrons.com/ot-app/>. The app requires Windows 10, macOS 10.10, or Ubuntu 12.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 
-##### WINDOWS
+#### Windows
 
-The Windows version of the Opentrons App is packaged as an installer. To
-use it:
+The Windows version of the Opentrons App is packaged as an installer. To use it:
 
 - Open the .exe file you downloaded from opentrons.com.
 
-- Follow the instructions in the installer. You can install the app for
-  a single user or all users of the computer.
+- Follow the instructions in the installer. You can install the app for a single user or all users of the computer.
 
-The app opens automatically once installed. Grant the app security or
-firewall permissions, if prompted, to make sure it can launch and
-communicate with Flex over your network.
+The app opens automatically once installed. Grant the app security or firewall permissions, if prompted, to make sure it can launch and communicate with Flex over your network.
 
-##### MACOS
+#### macOS
 
-The macOS version of the Opentrons App is packaged as a disk image. To
-use it:
+The macOS version of the Opentrons App is packaged as a disk image. To use it:
 
-1.  Open the .dmg file you downloaded from opentrons.com. A window for
-    the disk image will open in Finder.
+1.  Open the .dmg file you downloaded from opentrons.com. A window for the disk image will open in Finder.
 
 2.  Drag the Opentrons icon onto the Applications icon in the window.
 
@@ -622,233 +614,140 @@ use it:
 
 4.  Double-click on the Opentrons icon in the Applications folder.
 
-Grant the app security or firewall permissions, if prompted, to make
-sure it can launch and communicate with Flex over your network.
+Grant the app security or firewall permissions, if prompted, to make sure it can launch and communicate with Flex over your network.
 
-##### UBUNTU
+#### Ubuntu
 
-The Ubuntu version of the Opentrons App is packaged as an AppImage. To
-use it:
+The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 
-1.  Move the .AppImage file you downloaded from opentrons.com to your
-    Desktop or Applications folder.
+1.  Move the .AppImage file you downloaded from opentrons.com to your Desktop or Applications folder.
 
 2.  Right-click the .AppImage file and choose **Properties**.
 
-3.  Click the **Permissions** tab. Then check **Allow executing file as
-    a program**. Close the Properties window.
+3.  Click the **Permissions** tab. Then check **Allow executing file as a program**. Close the Properties window.
 
 4.  Double-click the .AppImage file.
 
-**Note:** Do not use third-party AppImage launchers with the Opentrons
-App. They may interfere with app updates. Opentrons does not support
-using third-party launchers to control Opentrons robots.
+!!! note
+    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 ### Transferring protocols to Flex
 
-Every protocol will begin as a file on your computer, regardless of what
-method of you use. You need to import the protocol into the Opentrons
-App and then transfer it to your Flex. When transferring a protocol, you
-can choose to begin run setup immediately or later.
+Every protocol will begin as a file on your computer, regardless of what method of [Protocol Development](protocol-development.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
 
-##### IMPORT A PROTOCOL
+#### Import a protocol
 
-When you first launch the Opentrons App, you will see the Protocols
-screen. (Click **Protocols** in the left sidebar to access it at any
-other time.) Click **Import** in the top right corner to reveal the
-Import a Protocol pane. Then click **Choose File** and find your
-protocol in the system file picker, or drag and drop your protocol file
-into the well.
+When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
 
-The Opentrons App will analyze your protocol as soon as you import it.
-*Protocol analysis* is the process of taking the JSON object or Python
-code contained in the protocol file and turning it into a series of
-commands that the robot can execute in order. If there are any errors in
-your protocol file, or if you're
+The Opentrons App will analyze your protocol as soon as you import it. *Protocol analysis* is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
 
-missing custom labware definitions, a warning banner will appear on the
-protocol's card. Correct the errors and re-import the protocol. If there
-are no errors, your protocol is ready to transfer to Flex.
+<figure class="screenshot" markdown>
+![Expanded three-dot menu for a protocol, showing these options: Start setup, Reanalyze, Send to Opentrons Flex, Show in folder, and Delete](images/app-protocol-menu.png "Screenshot")
+<figcaption>Actions available in the three-dot menu (⋮) for imported protocols.</figcaption>
+</figure>
 
-![image](96b1b8e37eee1acc67b7886125a82ecdce44af8e.jpg){width="19.135416666666668in"
-height="4.864583333333333in"}
+!!! note
+    In-app protocol analysis is only a preliminary check of the validity of your protocol. Protocol analysis will run again on the robot once you transfer the protocol to it. It's possible for analysis to fail in the app and succeed on the robot, or vice versa. Analysis mismatches may occur when your app and robot software versions are out of sync, or if you have customized the Python environment on your Flex.
 
-Actions available in the three-dot menu (⋮) for imported protocols.
+#### Run immediately
 
-**Note:** In-app protocol analysis is only a preliminary check of the
-validity of your protocol. Protocol analysis will run again on the robot
-once you transfer the protocol to it. It's possible for analysis to fail
-in the app and succeed on the robot, or vice versa. Analysis mismatches
-may occur when your app and robot software versions are out of sync, or
-if you have customized the Python environment on your Flex.
+Click the three-dot menu (⋮) on your protocol and choose **Start setup**. Choose a connected and available Flex from the list to transfer the protocol and begin run setup immediately. The run setup screen will appear both in the app and on the touchscreen, and you can continue from either place.
 
-##### RUN IMMEDIATELY
+If you stay in the app, expand the sections under the Setup tab and follow the instructions in each one: Robot Calibration, Module Setup (if your protocol uses modules), Labware Position Check (recommended), and Labware Setup. Then click :material-play-circle: **Start run** to to begin the protocol.
 
-Click the three-dot menu (⋮) on your protocol and choose **Start
-setup**. Choose a connected and available Flex from the list to transfer
-the protocol and begin run setup immediately. The run setup screen will
-appear both in the app and on the touchscreen, and you can continue from
-either place.
+If you move to the touchscreen, follow the steps in the [Run Setup section][run-setup] above.
 
-If you stay in the app, expand the sections under the Setup tab and
-follow the instructions in each one: Robot Calibration, Module Setup (if
-your protocol uses modules), Labware Position Check (recommended), and
-Labware Setup. Then click ▶ **Start run** to to begin the protocol.
+#### Run later
 
-If you move to the touchscreen, follow the steps in the above.
-
-##### RUN LATER
-
-Click the three-dot menu (⋮) on your protocol and choose **Send to
-Opentrons Flex**. Choose a connected and available Flex from the list to
-transfer the protocol. A message indicating a successful transfer
-
-will pop up both in the app and on the touchscreen. To set up your
-protocol, you need to move to the touchscreen and follow the steps in
-the above.
+Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons Flex**. Choose a connected and available Flex from the list to transfer the protocol. A message indicating a successful transfer will pop up both in the app and on the touchscreen. To set up your protocol, you need to move to the touchscreen and follow the steps in the [Run Setup section][run-setup] above.
 
 ### Module status and controls
 
-Use the Opentrons App to view the status of modules connected to your
-Flex and control them outside of protocols. Click **Devices** and then
-click on your Flex to view its robot details page. Under Instruments and
-Modules, there is a card for each attached module. The card shows the
-type of module, what USB port it is connected to, and its current
-status.
+Use the Opentrons App to view the status of modules connected to your Flex and control them outside of protocols. Click **Devices** and then click on your Flex to view its robot details page. Under Instruments and Modules, there is a card for each attached module. The card shows the type of module, what USB port it is connected to, and its current status.
 
-![image](06530fd39eaad0799a2518fd6c3031ecfdc6fa3c.jpg){width="8.645833333333334in"
-height="4.916666666666667in"}
+<figure markdown>
+![Card showing the status of a Heater-Shaker module, including a banner showing that it is currently hot.](images/app-module-status.png "Heater-Shaker status card")
+<figcaption>Module card for the Heater-Shaker Module.</figcaption>
+</figure>
 
-Module card for the Heater-Shaker Module.
+!!! note
+    The Magnetic Block does not have a card in Instruments and Modules, since it is unpowered and does not connect to Flex via USB.
 
-Click the three-dot menu (⋮) on the module card to choose from
-available commands. You can always choose **About module** to see the
-firmware version and serial number of the module. (This information is
-very useful when contacting Opentrons Support!) The other commands
-depend on the type of the module and its current status:
+Click the three-dot menu (⋮) on the module card to choose from available commands. You can always choose **About module** to see the firmware version and serial number of the module. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of the module and its current status:
 
-**Module type Commands**
-
-**Heater-Shaker** Set module temperature/Deactivate heater
-
-Open labware latch/Close labware latch Test shake/Deactivate shaker
-
-**Temperature** Set module temperature/Deactivate module
-
-**Thermocycler** Set lid temperature/Deactivate lid
-
-Open lid/Close lid
-
-Set block temperature/Deactivate block
+| Module type    | Commands |
+| -------------- | -------- |
+| **Heater-Shaker** | <ul><li>Set module temperature / Deactivate heater</li><li>Open labware latch / Close labware latch</li><li>Test shake / Deactivate shaker</li></ul> |
+| **Temperature**   | <ul><li>Set module temperature / Deactivate module</li></ul>                            |
+| **Thermocycler**  | <ul><li>Set lid temperature / Deactivate lid</li><li>Open lid / Close lid</li><li>Set block temperature / Deactivate block</li></ul> |
 
 ### Recent protocol runs
 
-The robot details page lists up to 20 recent protocol runs. This
-provides additional information compared to the touchscreen, which only
-shows the most recent run for each unique protocol.
+The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
 
-Each entry in the recent protocol runs list includes the protocol name,
-its timestamp, whether the run was canceled or completed, and the
-duration of the run. Click the disclosure triangle next to any run to
-show its associated labware offset data. Click the three-dot menu
-(⋮) for related actions:
+Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
 
-- **View protocol run record:** Show the protocol run screen as it
-  appeared when the protocol ended (succeeded, failed, or was canceled),
-  including all performed steps.
+- **View protocol run record:** Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
 
-- **Rerun protocol now:** The same as choosing **Start setup** on the
-  corresponding protocol.
+- **Rerun protocol now:** The same as choosing **Start setup** on the corresponding protocol.
 
-- **Download run log:** Save to your computer a JSON file containing
-  information about the protocol run, including all performed steps.
+- **Download run log:** Save to your computer a JSON file containing information about the protocol run, including all performed steps.
 
-- **Delete protocol run record:** Delete all information about this
-  protocol run from Flex, including labware offset data. When you choose
-  this option, it's as though the protocol run never happened.
+- **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
-**Note:** If you need to maintain a comprehensive record of all runs
-performed on your Flex, you must use the **Download run log** feature to
-save this information to your computer.
+!!! note
+    If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
-Flex *will not* retain information about more than 20 runs on the robot.
-Proceeding to the Run Setup screen generates an entry in the list and
-counts towards the maximum of 20 runs, even if you never begin the
-protocol.
+Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
 ## Advanced operation
 
 ### Jupyter Notebook
 
-Flex runs a server on port 48888, which you can connect to with your web
-browser. Use Jupyter to individually run discrete chunks of Python code,
-called *cells*. This is a convenient environment for writing and
-debugging protocols, since you can define different parts of your
-protocol in different notebook cells, and run a single cell at a time.
+Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called *cells*. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
 
 Access your robot's Jupyter Notebook either:
 
-- In the Opentrons App. Go to **Devices** \> your robot \> **Robot
-  Settings** \> **Advanced** and then click **Launch Jupyter Notebook**.
+- In the Opentrons App. Go to **Devices** > your robot > **Robot Settings** > **Advanced** and then click **Launch Jupyter Notebook**.
 
-- In your web browser. Navigate directly to http://\<robot-ip\>:48888,
-  replacing \<robot-ip\> with the local IP address of your Flex.
+- In your web browser. Navigate directly to `http://<robot-ip>:48888`, replacing `<robot-ip>` with the local IP address of your Flex.
 
 For more details on using Jupyter, including preparing executable cells
-of code and running them on a robot, see the of the Python Protocol API
-documentation.
+of code and running them on a robot, see the [Jupyter Notebook section](https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook) of the Python Protocol API documentation.
 
 ### Command-line operation over SSH
 
-You can work with your Flex through a Secure Shell (SSH) terminal
-connection. Terminal access lets you or perform advanced tasks, such as
-customizing the Python environment on the robot. Protocols that
-reference external files on disk (apart from custom labware definition
-files) must be run from the command line.
+You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
-SSH keys are required to connect to Flex and issue commands from a
-terminal. Setup requires a bash or
-
-zsh shell with openssh installed.
+SSH keys are required to connect to Flex and issue commands from a terminal. Setup requires a `bash` or `zsh` shell with `openssh` installed.
 
 Follow these steps to authenticate to your Flex via SSH:
 
-1.  Open a terminal on your computer and type ssh-keygen -f robot_key
-    ecdsa.
+1.  Open a terminal on your computer and type `ssh-keygen -f robot_key ecdsa`.
 
-2.  Create a passphrase when prompted. A passphrase is not required, but
-    you should always create one. This process generates a file,
-    robot_key.pub.
+2.  Create a passphrase when prompted. A passphrase is not required, but you should always create one. This process generates a file, `robot_key.pub`.
 
-3.  Find the robot_key.pub file and copy it to the root of a USB-A flash
-    drive.
+3.  Find the `robot_key.pub` file and copy it to the root of a USB-A flash drive.
 
-**Note:** The flash drive must have a single partition formatted with a
-file system readable by the embedded Linux system on Flex. FAT32, NTFS,
-and ext4 file systems are supported. The macOS HFS+ and APFS file
-systems are not. (macOS can read and write to FAT-formatted drives.)
+    !!! note
+        The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. (macOS can read and write to FAT-formatted drives.)
 
-1.  Eject the drive and connect it to an open USB-A port on your Flex.
-    Make sure that it is the only drive attached to your Flex, or the
-    key file may not be accessible.
+4.  Eject the drive and connect it to an open USB-A port on your Flex. Make sure that it is the only drive attached to your Flex, or the key file may not be accessible.
 
-2.  On your computer, type the following command in your terminal.
-    Replace ROBOT_IP with the local IP address of your Flex.
+5.  On your computer, type the following command in your terminal. Replace `ROBOT_IP` with the local IP address of your Flex.
 
-curl \\
+    ``` bash
+    curl \
+    --location --request POST \
+    'http://ROBOT_IP:31950/server/ssh_keys/from_local'
+    ```
+    
+    The command is successful if you get a 201 response with a message indicating how many keys were added. The command failed if you get a 404 response.
 
-\--location \--request POST \\
-'http://ROBOT_IP:3195/server/ssh_keys/from_local'
+6.  After successfully adding the key, type the following command. Again, replace `ROBOT_IP` with the local IP address of your Flex.
 
-The command is successful if you get a 201 response with a message
-indicating how many keys were added. The command failed if you get a 404
-response.
+    ``` bash
+    ssh -i robot_key root@ROBOT_IP
+    ```
 
-1.  After successfully adding the key, type the following command.
-    Again, replace ROBOT_IP with the local IP address of your Flex.
-
-ssh -i robot_key root@ROBOT_IP
-
-The connection works if you see an ASCII art version of the Opentrons
-logo. You can now browse the Flex file system and issue commands from
-the terminal.
+The connection works if you see an ASCII art version of the Opentrons logo. You can now browse the Flex file system and issue commands from the terminal.
