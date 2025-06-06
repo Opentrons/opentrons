@@ -7,6 +7,7 @@ import {
   getFlexNameConversion,
 } from '@opentrons/shared-data'
 
+import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../../../../../constants'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormUnsavedChangedFields,
@@ -137,8 +138,6 @@ export function useAssignLiquidClass(
 
   return orderedLiquidClassOptions
 }
-
-const MINIMUM_LIQUID_CLASS_VOLUME = 1
 
 export const useSupportedLiquidClassOptions = (
   liquidClassOptions: LiquidClassOption[],

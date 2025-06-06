@@ -4,6 +4,8 @@ import {
   getWellTotalVolume,
 } from '@opentrons/shared-data'
 
+import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../constants'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PathOption } from '@opentrons/step-generation'
 import type {
@@ -33,8 +35,6 @@ export type FormWarningType =
 export type FormWarning = FormError & {
   type: FormWarningType
 }
-
-const MINIMUM_LIQUID_CLASS_VOLUME = 1
 
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_AIR_GAP_VOLUME',
