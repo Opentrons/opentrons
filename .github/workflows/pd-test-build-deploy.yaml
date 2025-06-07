@@ -102,15 +102,16 @@ jobs:
     needs: ['build-pd']
     runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
-
-    uses: getsentry/action-release@v3
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-    with:
-      name: pd-artifact
-      sourcemaps: ./dist
+    steps:
+      - name: 'upload sourcemaps to Sentry'
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          name: pd-artifact
+          sourcemaps: ./dist
 
   deploy-pd:
     timeout-minutes: 10
