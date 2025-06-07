@@ -142,6 +142,7 @@ def test_set_stored_labware_all_elements(
         adapter_namespace="adapter-namespace",
         adapter_version=2,
         count=5,
+        stacking_offset_z=2.0,
     )
     decoy.verify(
         mock_engine_client.execute_command(
@@ -161,6 +162,7 @@ def test_set_stored_labware_all_elements(
                     namespace="adapter-namespace-verified",
                     version=20,
                 ),
+                poolOverlapOverride=2.0,
             )
         )
     )

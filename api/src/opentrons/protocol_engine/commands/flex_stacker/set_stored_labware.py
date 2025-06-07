@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Annotated
+from opentrons.protocols.api_support import definitions
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -204,22 +205,21 @@ class SetStoredLabwareImpl(
                 version=params.adapterLabware.version,
             )
 
-        self._state_view.labware.raise_if_stacker_labware_pool_is_not_valid(
-            labware_def, lid_def, adapter_def
+        pool_definitions = (
+            self._state_view._labware.stacker_labware_pool_to_ordered_list(
+                labware_def, lid_def, adapter_def
+            )
         )
 
         pool_height = self._state_view.geometry.get_height_of_labware_stack(
-            [x for x in [lid_def, labware_def, adapter_def] if x is not None]
+            pool_definitions
         )
-        pool_definitions = [
-            x for x in [lid_def, labware_def, adapter_def] if x is not None
-        ]
 
         pool_overlap = (
             params.poolOverlapOverride
             if params.poolOverlapOverride
-            else self._state_view._labware.get_labware_overlap_offsets(
-                pool_definitions[-1], pool_definitions[0].parameters.loadName
+            else self._state_view._labware.get_stacker_labware_pool_overlap(
+                pool_definitions
             ).z
         )
 
