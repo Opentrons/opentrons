@@ -824,12 +824,21 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     def get_current_storable_labware(self) -> int:
         """Get the amount of space currently available for labware."""
         max_lw = self.get_max_storable_labware()
+        if max_lw is None:
+            location = self._engine_client.state.modules.get_location(self._module_id)
+            raise FlexStackerLabwarePoolNotYetDefinedError(
+                message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
+            )
         current = len(
             self._engine_client.state.modules.stacker_contained_labware(self._module_id)
         )
         return max_lw - current
 
-    def _predict_storable_count(self, labwares: _CoreTrio) -> int:
+    def _predict_storable_count(
+        self,
+        labwares: _CoreTrio,
+        overlap_offset: float | None = None,
+    ) -> int:
         definitions = [
             x.get_engine_definition()
             for x in [labwares.adapter, labwares.primary, labwares.lid]
@@ -838,23 +847,38 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         pool_height = self._engine_client.state.geometry.get_height_of_labware_stack(
             definitions
         )
-        overlap = self._engine_client.state.labware.get_labware_overlap_offsets(
-            definitions[-1], definitions[0].parameters.loadName
+        pool_overlap = (
+            overlap_offset
+            if overlap_offset is not None
+            else self._engine_client.state.labware.get_labware_overlap_offsets(
+                definitions[-1], definitions[0].parameters.loadName
+            ).z
         )
         return self._engine_client.state.modules.stacker_max_pool_count_by_height(
-            self._module_id, pool_height, overlap.z
+            self._module_id, pool_height, pool_overlap
         )
 
     def get_max_storable_labware_from_list(
         self,
         labware: Sequence[LabwareCore],
+        overlap_offset: float | None = None,
     ) -> Sequence[LabwareCore]:
         """Limit the passed list to how many labware can fit in a stacker."""
         if not labware:
             return labware
-        max_count = self._predict_storable_count(
-            self._core_groups_from_primary_core(labware[0])
-        )
+        max_count: int
+        try:
+            # if the stacker has been configured, make sure the provided overlap
+            # offset, if any, matches the configured one
+            max_count = self.get_max_storable_labware()
+            if overlap_offset is not None:
+                self._engine_client.state.modules.validate_stacker_overlap_offset(
+                    self._module_id, overlap_offset
+                )
+        except FlexStackerLabwarePoolNotYetDefinedError:
+            max_count = self._predict_storable_count(
+                self._core_groups_from_primary_core(labware[0]), overlap_offset
+            )
         return labware[:max_count]
 
     def get_current_storable_labware_from_list(
@@ -864,14 +888,8 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         """Limit the passed list to how many labware can fit in the stacker right now."""
         if not labware:
             return labware
-        max_count = self._predict_storable_count(
-            self._core_groups_from_primary_core(labware[0])
-        )
-        current = len(
-            self._engine_client.state.modules.stacker_contained_labware(self._module_id)
-        )
-        total = max_count - current
-        return labware[:total]
+        storable = self.get_current_storable_labware()
+        return labware[:storable]
 
     def get_stored_labware(self) -> Sequence[LabwareCore]:
         """Get the currently-stored primary labware from the stacker."""

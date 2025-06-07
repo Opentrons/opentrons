@@ -381,7 +381,7 @@ def test_get_max_storable_labware_from_list_full_group(
     )
 
 
-def test_get_current_storable_labware_from_list_primary_only(
+def test_get_current_storable_labware_from_list_primary(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,

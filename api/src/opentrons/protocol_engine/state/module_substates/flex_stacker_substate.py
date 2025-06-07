@@ -97,6 +97,10 @@ class FlexStackerSubState:
             return None
         return self.max_pool_count
 
+    def get_pool_overlap(self) -> float:
+        """Get the overlap of the currently-configured labware."""
+        return self.pool_overlap
+
     def get_pool_definition(self) -> StackerPoolDefinition | None:
         """Get the labware definitions of the stacker pool."""
         if not self.pool_primary_definition:

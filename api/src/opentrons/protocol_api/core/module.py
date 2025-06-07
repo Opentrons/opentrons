@@ -451,6 +451,7 @@ class AbstractFlexStackerCore(
     def get_max_storable_labware_from_list(
         self,
         labware: Sequence[LabwareCoreType],
+        overlap_offset: float | None = None,
     ) -> Sequence[LabwareCoreType]:
         """Limit the passed list to how many labware can fit in a stacker."""
 

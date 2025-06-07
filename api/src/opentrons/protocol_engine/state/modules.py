@@ -1482,3 +1482,17 @@ class ModuleView:
         """Get the max stored labware in this stacker configuration."""
         substate = self.get_flex_stacker_substate(module_id)
         return substate.get_max_pool_count()
+
+    def validate_stacker_overlap_offset(
+        self,
+        module_id: str,
+        overlap_offset: float,
+    ) -> None:
+        """The overlap offset provided should match the stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        configured = substate.get_pool_overlap()
+        if not math.isclose(overlap_offset, configured, rel_tol=1e-9):
+            raise ValueError(
+                f"Provided overlap offset {overlap_offset} does not match "
+                f"configured {configured}."
+            )

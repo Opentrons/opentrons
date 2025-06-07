@@ -1166,7 +1166,9 @@ class FlexStackerContext(ModuleContext):
 
     @requires_version(2, 24)
     def get_max_storable_labware_from_list(
-        self, labware: list[Labware]
+        self,
+        labware: list[Labware],
+        stacking_offset_z: float | None = None,
     ) -> list[Labware]:
         """Limit a list of labware instances to the number that can be stored in a Flex Stacker.
 
@@ -1183,22 +1185,31 @@ class FlexStackerContext(ModuleContext):
         can hold and will not change as labware is added or removed. To limit a list of labware to
         the amount that will currently fit in the Flex Stacker, use
         :py:meth:`.get_current_storable_labware_from_list`.
+
+        .. note::
+
+            If a stacking offset is provided, make sure the same value is used when
+            configuring the Flex Stacker with :py:meth:`.set_stored_labware_items`.
+
+            See :py:meth:`.set_stored_labware_items` for more details on stacking offset.
+
         """
         return self._cores_to_labware(
             self._core.get_max_storable_labware_from_list(
-                self._labware_to_cores(labware)
-            )
+                self._labware_to_cores(labware), stacking_offset_z
+            ),
         )
 
     @requires_version(2, 24)
     def get_current_storable_labware_from_list(
         self, labware: list[Labware]
     ) -> list[Labware]:
-        """Limit a list of labware instances to the number that the Flex Stacker currently has space for.
+        """Limit a list of labware instances to the number that the Flex Stacker currently has space for,
+        based on the labware that is already stored in the Flex Stacker.
 
         You can use this function to take a list of labware and return the elements that the
         stacker can currently store from it. The returned list is then guaranteed to be suitable
-        for passing to :py:meth:`.fill` or :py:meth:`.set_stored_labware_items`.
+        for passing to :py:meth:`.fill`.
 
         The number of elements in the returned list will change as labware is added to or removed from
         the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
@@ -1254,24 +1265,25 @@ class FlexStackerContext(ModuleContext):
         :param labware: A list of labware to load into the stacker.
         :param stacking_offset_z: Stacking offset in mm between labware units to override the
             calculated value from labware definitions.
-        
-        .. note::
-        The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
-        labware unit and the topside of the unit below. This offset is used to determine how many
-        units can fit in the stacker and calculates the Z position of the shuttle when retrieving
-        or storing labware. The stacking offset is calculated automatically from the labware
-        definitions, but you can override it by providing a value here.
 
-        There are four possible stacking configurations, each with a different way of calculating
-        the stacking offset:
-        - Bare labware: labware (bottomside) overlaps with labware (topside)
-        - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
-            of the unit below.
-        - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
-            of the unit below.
-        - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
-            lid (topside) of the unit below.
-            
+        .. note::
+
+            The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
+            labware unit and the topside of the unit below. This offset is used to determine how many
+            units can fit in the stacker and calculates the Z position of the shuttle when retrieving
+            or storing labware. The stacking offset is calculated automatically from the labware
+            definitions, but you can override it by providing a value here.
+
+            There are four possible stacking configurations, each with a different way of calculating
+            the stacking offset:
+            - Bare labware: labware (bottomside) overlaps with labware (topside)
+            - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+                of the unit below.
+            - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+                of the unit below.
+            - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+                lid (topside) of the unit below.
+
         """
         self._core.set_stored_labware_items(
             self._labware_to_cores(labware),
@@ -1320,23 +1332,24 @@ class FlexStackerContext(ModuleContext):
             labware that the Flex Stacker is capable of storing.
         :param stacking_offset_z: Stacking offset in mm between labware units to override the
             calculated value from labware definitions.
-        
-        .. note::
-        The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
-        labware unit and the topside of the unit below. This offset is used to determine how many
-        units can fit in the stacker and calculates the Z position of the shuttle when retrieving
-        or storing labware. The stacking offset is calculated automatically from the labware
-        definitions, but you can override it by providing a value here.
 
-        There are four possible stacking configurations, each with a different way of calculating
-        the stacking offset:
-        - Bare labware: labware (bottomside) overlaps with labware (topside)
-        - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
-            of the unit below.
-        - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
-            of the unit below.
-        - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
-            lid (topside) of the unit below.
+        .. note::
+
+            The stacking offset is the amount of vertical overlap (in mm) between the bottomside of a
+            labware unit and the topside of the unit below. This offset is used to determine how many
+            units can fit in the stacker and calculates the Z position of the shuttle when retrieving
+            or storing labware. The stacking offset is calculated automatically from the labware
+            definitions, but you can override it by providing a value here.
+
+            There are four possible stacking configurations, each with a different way of calculating
+            the stacking offset:
+            - Bare labware: labware (bottomside) overlaps with labware (topside)
+            - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+                of the unit below.
+            - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+                of the unit below.
+            - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+                lid (topside) of the unit below.
 
         """
         self._core.set_stored_labware(
