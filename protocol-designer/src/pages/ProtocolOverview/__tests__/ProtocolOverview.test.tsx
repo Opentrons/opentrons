@@ -6,7 +6,11 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
-import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
+import {
+  getFileMetadata,
+  getRobotStateTimeline,
+  getRobotType,
+} from '../../../file-data/selectors'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import {
   getAdditionalEquipmentEntities,
@@ -55,6 +59,7 @@ const render = () => {
 
 describe('ProtocolOverview', () => {
   beforeEach(() => {
+    vi.mocked(getRobotStateTimeline).mockReturnValue({ timeline: [] })
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(getSavedStepForms).mockReturnValue({
       __INITIAL_DECK_SETUP_STEP__: {} as any,

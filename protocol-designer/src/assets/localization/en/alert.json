@@ -29,9 +29,6 @@
   },
   "hint": {
     "dont_show_again": "Don't show me again",
-    "unused_hardware": {
-      "title": "Protocol has unused hardware"
-    },
     "no_commands": {
       "title": "Protocol has no steps"
     },

@@ -99,6 +99,10 @@ teardown-py: $(PYTHON_TEARDOWN_TARGETS)
 %-py-teardown: %-py-clean
 	$(MAKE) -C $* teardown
 
+# Specialize the %-py-teardown pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-teardown: $(SHARED_DATA_DIR)-py-clean
+	$(MAKE) -C $(SHARED_DATA_DIR) teardown-py
+
 # clean all project output
 .PHONY: clean
 clean: clean-js clean-py
@@ -116,6 +120,10 @@ clean-py: $(PYTHON_CLEAN_TARGETS)
 
 %-py-clean:
 	$(MAKE) -C $* clean
+
+# Specialize the %-py-clean pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-clean:
+	$(MAKE) -C $(SHARED_DATA_DIR) clean-py
 
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
