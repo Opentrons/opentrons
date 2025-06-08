@@ -66,6 +66,10 @@ MAX_TRAVEL = {
     StackerAxis.L: 22.0,
 }
 
+# Min/Max height in mm of labware stack to store/dispense
+MIN_LABWARE_HEIGHT = 1.0
+MAX_LABWARE_HEIGHT = 110.0
+
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
 # This lets us use `move_axis` to move fast, leaving the axis OFFSET mm
 # from the limit switch. Then we can use `home_axis` to move the axis the rest
@@ -417,6 +421,7 @@ class FlexStacker(mod_abc.AbstractModule):
         enforce_shuttle_lw_sensing: bool = True,
     ) -> bool:
         """Dispenses the next labware in the stacker."""
+        self.verify_labware_height(labware_height)
         if enforce_hopper_lw_sensing:
             await self.verify_hopper_labware_presence(True)
 
@@ -446,12 +451,11 @@ class FlexStacker(mod_abc.AbstractModule):
         enforce_shuttle_lw_sensing: bool = True,
     ) -> bool:
         """Stores a labware in the stacker."""
+        self.verify_labware_height(labware_height)
         await self._prepare_for_action()
 
-        # Move X
+        # Move the X and check that labware is detected
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
-
-        # Check that labware was detected
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
@@ -470,7 +474,9 @@ class FlexStacker(mod_abc.AbstractModule):
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
-        # Transfer
+        # Transfer the labware by opening the latch, moving the Z up at half
+        # speed to increase torque, and closing the latch once the
+        # labware bottom is above the latch.
         await self.open_latch()
         z_speed = (
             STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
@@ -480,11 +486,12 @@ class FlexStacker(mod_abc.AbstractModule):
         )
         await self.close_latch()
 
-        # Move Z then X axis
-        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_LG)
-
+        # Move the Z down and check that labware is not detected.
+        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_MD)
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
+
+        # Move the X to the gripper position
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
         return True
 
@@ -504,14 +511,13 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.move_axis(axis, direction, distance, speed)
         return await self.home_axis(axis, direction, speed)
 
-    async def _prepare_for_action(self) -> bool:
+    async def _prepare_for_action(self) -> None:
         """Helper to prepare axis for dispensing or storing labware."""
         # TODO: check if we need to home first
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.close_latch()
         await self.verify_shuttle_location(PlatformState.EXTENDED)
-        return True
 
     async def home_all(self, ignore_latch: bool = False) -> None:
         """Home all axes based on current state, assuming normal operation.
@@ -611,6 +617,14 @@ class FlexStacker(mod_abc.AbstractModule):
             raise FlexStackerHopperLabwareError(
                 self.device_info["serial"],
                 labware_expected=labware_expected,
+            )
+
+    def verify_labware_height(self, labware_height: float) -> None:
+        """Check that the labware height is within valid range."""
+        if labware_height < MIN_LABWARE_HEIGHT or labware_height > MAX_LABWARE_HEIGHT:
+            raise ValueError(
+                f"Labware height must be between {MIN_LABWARE_HEIGHT}-{MAX_LABWARE_HEIGHT}mm."
+                "Received {labware_height}mm."
             )
 
     def event_listener(self, event: Any) -> None:
