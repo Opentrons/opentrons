@@ -35,7 +35,7 @@ jobs:
           echo "| should_create_prs                  | $should_create_prs            |" >> $GITHUB_STEP_SUMMARY
           echo "| github.event_name                  | ${{ github.event_name }}      |" >> $GITHUB_STEP_SUMMARY
           echo "| github.actor                       | ${{ github.actor }}           |" >> $GITHUB_STEP_SUMMARY
-          echo "\n" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           if [ "$downstream_branches_display" = "-" ] || [ "$should_create_prs_display" != "true" ]; then
               echo "### No downstream PRs to open." >> $GITHUB_STEP_SUMMARY
           else
