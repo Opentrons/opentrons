@@ -288,9 +288,10 @@ export const getCustomLiquidClassProperties = (
     },
   }
 
-  const stringifiedCustomLiquidClassProperties = JSON.parse(
-    JSON.stringify(customLiquidClassProperties)
-  )
+  const stringifiedCustomLiquidClassProperties: Record<
+    string,
+    any
+  > = JSON.parse(JSON.stringify(customLiquidClassProperties))
   //    TODO: python name should be dynamic, will fix that later
   return `custom_liquid_class_properties = ${formatPyDict(
     stringifiedCustomLiquidClassProperties,
