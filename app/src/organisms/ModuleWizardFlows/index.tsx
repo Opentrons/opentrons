@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
@@ -9,6 +10,7 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
 import { CloseDoor } from './CloseStackerDoor'
@@ -25,8 +27,6 @@ import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import { useModulesQuery } from '@opentrons/react-api-client'
-import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void

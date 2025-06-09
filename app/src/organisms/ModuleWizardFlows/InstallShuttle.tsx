@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { AttachedModule } from '@opentrons/api-client'
 import {
   AnimationVideo,
   COLORS,
@@ -22,6 +21,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardStepProps } from './types'
 
