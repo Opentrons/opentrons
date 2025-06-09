@@ -160,14 +160,6 @@ export function Landing(): JSX.Element {
           <BasicButton onClick={handleImportClick} underLine>
             {t('import_existing_protocol')}
           </BasicButton>
-          <button
-            onClick={() => {
-              throw new Error('This is your first error!')
-            }}
-          >
-            Break the world
-          </button>
-          ;
           <StyledInput
             type="file"
             onChange={loadFile}
@@ -175,6 +167,13 @@ export function Landing(): JSX.Element {
             aria-label={t('import')}
           />
         </StyledLabel>
+        <button
+          onClick={() => {
+            throw new Error('This is your first error!')
+          }}
+        >
+          Break the world
+        </button>
       </Flex>
       <EndUserAgreementFooter />
     </>
