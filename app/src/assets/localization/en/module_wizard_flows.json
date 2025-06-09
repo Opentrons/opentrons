@@ -59,6 +59,8 @@
   "recalibrate": "Recalibrate",
   "select_location": "Select module location",
   "select_the_slot": "Select the slot where you installed the {{module}} on the deck map to the right. The location must be correct for successful calibration.",
+  "shuttle_install_fail": "Shuttle installed incorrectly",
+  "shuttle_install_fail_description": "There was an issue with the install of the shuttle. Please try installing again or contact support.",
   "setup_another_module": "Setup another module",
   "skip": "Skip",
   "slot_unavailable": "Slot unavailable",

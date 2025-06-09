@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
@@ -9,6 +10,7 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
 import { CloseDoor } from './CloseStackerDoor'
@@ -76,6 +78,12 @@ export function ModuleWizardFlows(
     showSetupLauncher
   )
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
+
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: wizardFlowBaseProps.attachedModule != null,
+    })?.data?.data ?? []
 
   if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
@@ -317,6 +325,7 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
