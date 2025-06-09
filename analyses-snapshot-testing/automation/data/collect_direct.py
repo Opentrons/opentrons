@@ -22,6 +22,12 @@ class ProtocolAudit:
     version: Optional[str]
     expected: Optional[str]
     folder: Path
+    key: Optional[str] = None
+
+    @property
+    def file_path(self) -> Path:
+        """Path of the file."""
+        return self.folder / self.filename
 
 
 def extract_version(filename: str) -> Optional[str]:

@@ -49,7 +49,7 @@ def extract_first_json_object(text: str) -> dict[str, Any] | None:
     Attempts to extract the first valid JSON object from the given text string.
     Returns the parsed dict, or None if extraction fails.
     """
-    match = re.search(r'(\{.*\})', text, re.DOTALL)
+    match = re.search(r"(\{.*\})", text, re.DOTALL)
     if not match:
         return None
     try:

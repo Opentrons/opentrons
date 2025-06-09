@@ -203,3 +203,21 @@ collect-audit:
 
 .PHONY: prep
 prep: format ruff-check clean collect-audit
+
+ANALYSIS_REFS := v8.4.1 v8.3.2 v8.2.0
+
+.PHONY: build-stables
+build-stables: build-base-image
+	@echo "Building all stable versions in parallel"
+	$(MAKE) -j $(shell nproc) $(foreach ref,$(ANALYSIS_REFS),build-opentrons-analysis-$(ref))
+	@echo "All stable versions built successfully."
+	docker images | grep $(ANALYZER_IMAGE_NAME)
+
+# pattern rule for each version
+.PHONY: build-opentrons-analysis-%
+build-opentrons-analysis-%:
+	$(MAKE) build-opentrons-analysis ANALYSIS_REF=$*
+
+.PHONY: unit-test
+unit-test:
+	uv run python -m pytest -m "unit" -vv

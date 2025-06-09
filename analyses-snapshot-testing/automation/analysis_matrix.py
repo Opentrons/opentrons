@@ -7,49 +7,50 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from citools.generate_analyses import TargetProtocol, generate_analyses_from_test
 from packaging import version
+from packaging.version import InvalidVersion
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.table import Table
 
-from automation.data.protocol import Protocol
+from automation.data.collect_direct import ProtocolAudit, collect_protocols
+from automation.data.protocol import (
+    GENERATED_PROTOCOLS_FOLDER,
+    MANUAL_PROTOCOL_LIBRARY_PROTOCOLS_FOLDER,
+    PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
+    PROTOCOL_LIBRARY_PROTOCOLS_FOLDER,
+    PROTOCOLS_FOLDER,
+    Protocol,
+)
 from automation.data.protocol_registry import ProtocolRegistry
 
 console = Console()
 
-mapping = {
-    "2.22": "8.3.0",
-    "2.21": "8.2.0",
-    "2.20": "8.0.0",
-    "2.19": "7.3.1",
-    "2.18": "7.3.0",
-    "2.17": "7.2.0",
-}
-
 tags = [
-    "v8.3.0",
+    "v8.4.1",
+    "v8.3.2",
     "v8.2.0",
-    "v8.0.0",
-    "v7.3.1",
-    "v7.3.0",
-    "v7.2.0",
 ]
 
+ROBOT_STACK_VERSION_MAP: Dict[str, Dict[str, str]] = {
+    """Robot stack version mapping to maximum PAPI and PD versions."""
+    "8.4.1": {"api": "2.23", "pd": "8.4.4"},
+    "8.3.2": {"api": "2.22", "pd": "?"},
+    "8.2.0": {"api": "2.21", "pd": "?"},
+}
 
-def is_version_compatible(min_version: str, version_under_test: str) -> bool:
+
+def determine_expect_no_errors(filename: str) -> bool:
     """
-    Check if the minimum version is less than or equal to the version under test.
+    Determine if no errors are expected based on the filename.
 
     Args:
-        min_version: The minimum version required.
-        version_under_test: The version to be tested.
+        filename: The name of the file.
 
     Returns:
-        True if min_version <= version_under_test, else False.
+        True if filename starts with 'Flex_S', 'OT2_S', or 'pl_', else False.
     """
-    console.print(f"Checking if {min_version} >= {version_under_test}")
-    console.print(f"Parsed versions: {version.parse(min_version)} >= {version.parse(version_under_test)}")
-    return version.parse(min_version) >= version.parse(version_under_test)
+    return filename.startswith("Flex_S") or filename.startswith("OT2_S")
 
 
 @dataclass
@@ -73,14 +74,73 @@ class ProtocolInfo:
     api_level: Optional[Any] = None
     pd_version: Optional[str] = None
     robot: Optional[str] = None
-    min_robot_stack_version: Optional[str] = None
 
+    @property
+    def pd_protocol(self) -> bool:
+        """Return True if this is a Protocol Designer protocol (.json)."""
+        return self.filepath.suffix == ".json"
 
-@dataclass
-class ProtocolPaths:
-    analyzable_protocols: List[Path]
-    non_override_protocol_paths: List[Path]
-    override_protocol_paths: List[Path]
+    def min_robot_stack_version(self) -> Optional[str]:  # noqa: C901
+        """
+        Return the minimum robot stack version supporting this protocol's api_level or pd_version.
+        Returns:
+            The minimum robot stack version as a string, or None if no mapping exists.
+        """
+        if self.pd_protocol:
+            if not self.pd_version:
+                return None
+            # Try to parse pd_version, handle errors
+            for stack_version, ver_map in sorted(ROBOT_STACK_VERSION_MAP.items(), reverse=True):
+                max_pd = ver_map["pd"]
+                if max_pd == "?":
+                    continue
+                try:
+                    # Try both as PEP440
+                    if version.parse(self.pd_version) <= version.parse(max_pd):
+                        return stack_version
+                except InvalidVersion:
+                    # Try stripping non-numeric suffixes for loose match
+                    pd_clean = self.pd_version.split("-")[0]
+                    max_pd_clean = max_pd.split("-")[0]
+                    try:
+                        if version.parse(pd_clean) <= version.parse(max_pd_clean):
+                            return stack_version
+                    except InvalidVersion:
+                        continue  # Just skip if both are invalid
+            return None
+        else:
+            if not self.api_level:
+                return None
+            for stack_version, ver_map in sorted(ROBOT_STACK_VERSION_MAP.items(), reverse=True):
+                max_api = ver_map["api"]
+                try:
+                    if version.parse(self.api_level) <= version.parse(max_api):
+                        return stack_version
+                except InvalidVersion:
+                    # Same trick if you ever see a weird api_level (rare)
+                    continue
+            return None
+
+    def is_compatible_with_stack(self, stack_version: str) -> bool:
+        """
+        Check if this protocol is compatible with a given robot stack version.
+        Args:
+            stack_version: The robot stack version to test against.
+        Returns:
+            True if compatible, False otherwise.
+        """
+        if stack_version not in ROBOT_STACK_VERSION_MAP:
+            return False
+        if self.pd_protocol:
+            max_pd = ROBOT_STACK_VERSION_MAP[stack_version]["pd"]
+            if max_pd == "?" or not self.pd_version:
+                return False
+            return version.parse(self.pd_version) <= version.parse(max_pd)
+        else:
+            max_api = ROBOT_STACK_VERSION_MAP[stack_version]["api"]
+            if not self.api_level:
+                return False
+            return version.parse(self.api_level) <= version.parse(max_api)
 
 
 def protocols_under_test(protocol_names: List[str]) -> List[Protocol]:
@@ -91,19 +151,6 @@ def protocols_under_test(protocol_names: List[str]) -> List[Protocol]:
     if not protocol_registry.protocols_to_test:
         exit("No protocols were resolved from the protocol names provided. Exiting.")
     return protocol_registry.protocols_to_test
-
-
-def determine_expect_no_errors(filename: str) -> bool:
-    """
-    Determine if no errors are expected based on the filename.
-
-    Args:
-        filename: The name of the file.
-
-    Returns:
-        True if filename starts with 'Flex_S', 'OT2_S', or 'pl_', else False.
-    """
-    return filename.startswith("Flex_S") or filename.startswith("OT2_S") or filename.startswith("pl_")
 
 
 def extract_py_fields(filepath: Path) -> Tuple[Optional[Any], Optional[str]]:  # noqa: C901
@@ -206,33 +253,7 @@ def extract_robot_from_json(filepath: Path) -> Optional[str]:
     return None
 
 
-def map_api_version_to_robot_version(api_version: Optional[Any]) -> Optional[str]:
-    """
-    Map the API version to the corresponding robot app version.
-
-    The mapping is as follows:
-      2.22 -> 8.3.0
-      2.21 -> 8.2.0
-      2.20 -> 8.0.0
-      2.19 -> 7.3.1
-      2.18 -> 7.3.0
-      2.17 -> 7.2.0
-
-    Args:
-        api_version: The API version value.
-
-    Returns:
-        The corresponding robot app version as a string, or None if no mapping exists.
-    """
-    # Create all these images
-    # make build-opentrons-analysis ANALYSIS_REF=v8.3.0
-
-    if api_version is None:
-        return "7.2.0"
-    return mapping.get(str(api_version)) or "7.2.0"
-
-
-def gather_protocol_files(directory: Path) -> ProtocolPaths:
+def gather_protocol_files() -> List[ProtocolAudit]:
     """
     Gather all .json and .py files in the specified directory.
 
@@ -242,14 +263,14 @@ def gather_protocol_files(directory: Path) -> ProtocolPaths:
     Returns:
         A list of Path objects for each protocol file found.
     """
-    files = list(directory.glob("*.py")) + list(directory.glob("*.json"))
-    # remove the base generated protocol files that will not analyze
-    override_protocols = [f for f in files if "Overrides" in str(f)]
-    files = [f for f in files if "Overrides" not in str(f)]
-    generated_protocols_directory = Path(directory, "generated_protocols")
-    generated_files = list(generated_protocols_directory.glob("*.py")) + list(generated_protocols_directory.rglob("*.json"))
-    files.extend(generated_files)
-    return ProtocolPaths(analyzable_protocols=files, override_protocol_paths=override_protocols, non_override_protocol_paths=files)
+    dirs = [
+        PROTOCOLS_FOLDER,
+        PROTOCOL_LIBRARY_PROTOCOLS_FOLDER,
+        GENERATED_PROTOCOLS_FOLDER,
+        MANUAL_PROTOCOL_LIBRARY_PROTOCOLS_FOLDER,
+        PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
+    ]
+    return collect_protocols(dirs)
 
 
 def display_protocols_table(protocols: List[ProtocolInfo]) -> None:
@@ -277,7 +298,7 @@ def display_protocols_table(protocols: List[ProtocolInfo]) -> None:
             str(protocol.api_level) if protocol.api_level is not None else "-",
             protocol.pd_version if protocol.pd_version is not None else "-",
             protocol.robot if protocol.robot is not None else "-",
-            protocol.min_robot_stack_version if protocol.min_robot_stack_version is not None else "-",
+            protocol.min_robot_stack_version() if protocol.min_robot_stack_version() is not None else "-",
         )
     console.print(table)
 
@@ -330,12 +351,9 @@ class AnalysisOutcome:
 @dataclass
 class AnalysisMatrix:
     filename: str
-    v8_3_0: str = AnalysisOutcome.NA
+    v8_4_1: str = AnalysisOutcome.NA
+    v8_3_2: str = AnalysisOutcome.NA
     v8_2_0: str = AnalysisOutcome.NA
-    v8_0_0: str = AnalysisOutcome.NA
-    v7_3_1: str = AnalysisOutcome.NA
-    v7_3_0: str = AnalysisOutcome.NA
-    v7_2_0: str = AnalysisOutcome.NA
     expect_no_errors: bool = False
 
     def set_result(self, tag: str, protocol: TargetProtocol) -> None:
@@ -350,18 +368,12 @@ class AnalysisMatrix:
             result = AnalysisOutcome.ERRORS
 
         tag_version = tag.lower()
-        if tag_version == "v8.3.0":
-            self.v8_3_0 = result
+        if tag_version == "v8.4.1":
+            self.v8_4_1 = result
+        elif tag_version == "v8.3.2":
+            self.v8_3_2 = result
         elif tag_version == "v8.2.0":
             self.v8_2_0 = result
-        elif tag_version == "v8.0.0":
-            self.v8_0_0 = result
-        elif tag_version == "v7.3.1":
-            self.v7_3_1 = result
-        elif tag_version == "v7.3.0":
-            self.v7_3_0 = result
-        elif tag_version == "v7.2.0":
-            self.v7_2_0 = result
 
 
 def main() -> None:  # noqa: C901
@@ -373,42 +385,38 @@ def main() -> None:  # noqa: C901
         console.print(f"[red]Directory {protocols_dir} does not exist or is not a directory.[/red]")
         return
 
-    file_paths = gather_protocol_files(protocols_dir)
-    if not file_paths.non_override_protocol_paths:
-        console.print(f"[red]No protocol files (.py or .json) found in {protocols_dir}.[/red]")
-        return
+    protocols = gather_protocol_files()
 
-    protocols: List[ProtocolInfo] = []
-    for file_path in file_paths.non_override_protocol_paths:
-        filename = file_path.name
+    final_protocols: List[ProtocolInfo] = []
+    for protocol in protocols:
+        filename = protocol.filename
         expect_no_errors = determine_expect_no_errors(filename)
         api_level: Optional[Any] = None
         pd_version: Optional[str] = None
         robot: Optional[str] = None
 
-        if file_path.suffix == ".py":
-            api_level, robot = extract_py_fields(file_path)
-        elif file_path.suffix == ".json":
-            pd_version = extract_pd_version_from_json(file_path)
-            robot = extract_robot_from_json(file_path)
+        if protocol.ext == "py":
+            api_level, robot = extract_py_fields(protocol.file_path)
+        elif protocol.ext == "json":
+            pd_version = extract_pd_version_from_json(protocol.file_path)
+            robot = extract_robot_from_json(protocol.file_path)
 
-        protocols.append(
+        final_protocols.append(
             ProtocolInfo(
-                filepath=file_path,
+                filepath=protocol.file_path,
                 filename=filename,
                 expect_no_errors=expect_no_errors,
                 api_level=api_level,
                 pd_version=pd_version,
                 robot=robot,
-                min_robot_stack_version=map_api_version_to_robot_version(api_level),
             )
         )
 
     # Sort protocols
-    protocols = sorted(protocols, key=lambda p: (p.expect_no_errors, p.robot or "", p.api_level or "", p.pd_version or ""))
+    final_protocols = sorted(final_protocols, key=lambda p: (p.expect_no_errors, p.robot or "", p.api_level or "", p.pd_version or ""))
 
     # Assign keys after sorting
-    for i, protocol in enumerate(protocols):
+    for i, protocol in enumerate(final_protocols):
         protocol.key = str(i)
 
     choice = Prompt.ask(
@@ -417,9 +425,9 @@ def main() -> None:  # noqa: C901
         default="some",
     )
     if choice == "some":
-        selected_protocols = interactive_protocol_selection(protocols)
+        selected_protocols = interactive_protocol_selection(final_protocols)
     else:
-        selected_protocols = protocols
+        selected_protocols = final_protocols
 
     if not selected_protocols:
         console.print("[yellow]No protocols selected for analysis.[/yellow]")
@@ -436,12 +444,9 @@ def main() -> None:  # noqa: C901
     result_matrix = [
         AnalysisMatrix(
             filename=p.filename,
-            v8_3_0=AnalysisOutcome.NA,
+            v8_4_1=AnalysisOutcome.NA,
+            v8_3_2=AnalysisOutcome.NA,
             v8_2_0=AnalysisOutcome.NA,
-            v8_0_0=AnalysisOutcome.NA,
-            v7_3_1=AnalysisOutcome.NA,
-            v7_3_0=AnalysisOutcome.NA,
-            v7_2_0=AnalysisOutcome.NA,
             expect_no_errors=p.expect_no_errors,
         )
         for p in selected_protocols
@@ -450,7 +455,7 @@ def main() -> None:  # noqa: C901
         compatible_protocols = [
             p
             for p in selected_protocols
-            if p.min_robot_stack_version is not None and is_version_compatible(tag[1:], p.min_robot_stack_version)
+            if p.min_robot_stack_version() is not None and p.is_compatible_with_stack(p.min_robot_stack_version())
         ]
         console.print(f"Testing {len(compatible_protocols)} protocols for {tag}")
         if not compatible_protocols:
@@ -470,22 +475,16 @@ def main() -> None:  # noqa: C901
     # Display the result_matrix
     table = Table(title="Analysis Matrix Results")
     table.add_column("Filename", style="magenta")
-    table.add_column("v8.3.0", justify="center")
+    table.add_column("v8.4.1", justify="center")
+    table.add_column("v8.3.2", justify="center")
     table.add_column("v8.2.0", justify="center")
-    table.add_column("v8.0.0", justify="center")
-    table.add_column("v7.3.1", justify="center")
-    table.add_column("v7.3.0", justify="center")
-    table.add_column("v7.2.0", justify="center")
     table.add_column("Expect No Errors", justify="center")
     for matrix in result_matrix:
         table.add_row(
             matrix.filename,
-            str(matrix.v8_3_0),
+            str(matrix.v8_4_1),
+            str(matrix.v8_3_2),
             str(matrix.v8_2_0),
-            str(matrix.v8_0_0),
-            str(matrix.v7_3_1),
-            str(matrix.v7_3_0),
-            str(matrix.v7_2_0),
             str(matrix.expect_no_errors),
         )
     console.print(table)

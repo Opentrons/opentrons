@@ -100,3 +100,8 @@ You have the option to specify one or many protocols to run the analyses on. Thi
 ### Add a protocol with overrides to the analyses battery
 
 > TODO when we have a more straight forward example
+
+### Matrix
+
+1. make build-stables
+2. make matrix
