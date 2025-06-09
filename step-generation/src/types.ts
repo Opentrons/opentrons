@@ -229,7 +229,7 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number
+  mmFromBottom: number // TODO: deprecate this
 }
 
 interface CommonArgs {
@@ -271,7 +271,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm: number
+  aspirateOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   aspirateXOffset: number
   /** y offset mm */
@@ -293,7 +293,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  dispenseOffsetFromBottomMm: number
+  dispenseOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   dispenseXOffset: number
   /** y offset mm */
