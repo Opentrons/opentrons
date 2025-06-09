@@ -82,8 +82,6 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
             }}
           />
         </Flex>
-
-        {/* ToDo add reset button for aspirate settings */}
         <MediumButton
           buttonText={t('reset_settings', { transferName: 'aspirate' })}
           onClick={handleResetSettings}

@@ -85,5 +85,5 @@ describe('ResetAdvancedSettingsModal', () => {
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
   })
-  // Todo add continu button test
+  // Todo add continue button test
 })

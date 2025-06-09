@@ -79,7 +79,6 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
             }}
           />
         </Flex>
-        {/* ToDo add reset button for aspirate settings */}
         <MediumButton
           buttonText={t('reset_settings', { transferName: 'dispense' })}
           onClick={handleResetSettings}
