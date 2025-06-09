@@ -40,6 +40,19 @@ export function formatPyValue(value: any): string {
       if (value === null) {
         return 'None'
       } else if (Array.isArray(value)) {
+        // Detect nested tuple: e.g., [[10, 4], [12, 2]]
+        if (
+          value.length > 0 &&
+          value.every(
+            element =>
+              Array.isArray(element) &&
+              element.length === 2 &&
+              element.every(number => typeof number === 'number')
+          )
+        ) {
+          // Format as list of tuples: [(10, 4), (12, 2)]
+          return `[${value.map(([a, b]) => `(${a}, ${b})`).join(', ')}]`
+        }
         return formatPyList(value)
       } else {
         return formatPyDict(value as Record<string, any>)
@@ -62,10 +75,13 @@ export function formatPyList(list: any[]): string {
 }
 
 /** Render an object as a Python dict. */
-export function formatPyDict(dict: Record<string, any>): string {
+export function formatPyDict(
+  dict: Record<string, any>,
+  allSingleLine?: boolean
+): string {
   const dictEntries = Object.entries(dict)
   // Render dict on single line if it has 1 entry, else render 1 entry per line.
-  if (dictEntries.length <= 1) {
+  if (dictEntries.length <= 1 && !allSingleLine) {
     return `{${dictEntries
       .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
       .join(', ')}}`
