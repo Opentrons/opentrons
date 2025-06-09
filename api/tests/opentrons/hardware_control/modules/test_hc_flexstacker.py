@@ -1,7 +1,6 @@
 import asyncio
 import pytest
 import mock
-from decoy import Decoy
 from typing import AsyncGenerator
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
