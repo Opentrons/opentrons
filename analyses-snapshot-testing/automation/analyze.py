@@ -1,6 +1,7 @@
 import asyncio
 import io
 import json
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -43,6 +44,20 @@ class AnalysisResult:
         return not bool(self.analysis.get("errors")) if isinstance(self.analysis, dict) else False
 
 
+def extract_first_json_object(text: str) -> dict[str, Any] | None:
+    """
+    Attempts to extract the first valid JSON object from the given text string.
+    Returns the parsed dict, or None if extraction fails.
+    """
+    match = re.search(r'(\{.*\})', text, re.DOTALL)
+    if not match:
+        return None
+    try:
+        return json.loads(match.group(1))
+    except Exception:
+        return None
+
+
 def _subprocess_entrypoint():
     """
     Entrypoint for subprocess: runs _analyze for a single protocol file, prints JSON to stdout, and exits.
@@ -63,16 +78,19 @@ def _subprocess_entrypoint():
         exit_code = asyncio.run(_analyze(files, args.rtp_values, args.rtp_files, outputs, args.check))
     except Exception as e:
         print(json.dumps({"error": f"Exception: {str(e)}"}), file=sys.stdout)
-        # Fail Fast: exit with code 1 if any exception occurs
         sys.exit(1)
     json_output_stream.seek(0)
     json_bytes = json_output_stream.read()
     try:
         json_str = json_bytes.decode("utf-8")
-        result_json = json.loads(json_str)
+        try:
+            result_json = json.loads(json_str)
+        except Exception:
+            result_json = extract_first_json_object(json_str)
+            if result_json is None:
+                result_json = {"error": "Failed to decode JSON output"}
     except Exception:
         result_json = {"error": "Failed to decode JSON output"}
-    # Only print the JSON result to stdout!
     print(json.dumps(result_json), file=sys.stdout)
     sys.exit(exit_code)
 
@@ -105,10 +123,13 @@ async def run_analysis(
         proc = await anyio.to_thread.run_sync(lambda: subprocess.run(cmd, capture_output=True, text=True, timeout=ANALYSIS_TIMEOUT))
         stdout = proc.stdout
         stderr = proc.stderr
+        result_json = None
         try:
             result_json = json.loads(stdout)
         except Exception:
-            result_json = {"error": "Failed to decode JSON output", "raw": stdout}
+            result_json = extract_first_json_object(stdout)
+            if result_json is None:
+                result_json = {"error": "Failed to decode JSON output", "raw": stdout}
         logs = stderr
     except subprocess.TimeoutExpired:
         result_json = {"error": f"Analysis timed out after {ANALYSIS_TIMEOUT} seconds"}
