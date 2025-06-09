@@ -839,10 +839,12 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         labwares: _CoreTrio,
         overlap_offset: float | None = None,
     ) -> int:
-        definitions = self._engine_client.state.labware.stacker_labware_pool_to_ordered_list(
-            labwares.primary.get_engine_definition(),
-            labwares.lid.get_engine_definition() if labwares.lid else None,
-            labwares.adapter.get_engine_definition() if labwares.adapter else None,
+        definitions = (
+            self._engine_client.state.labware.stacker_labware_pool_to_ordered_list(
+                labwares.primary.get_engine_definition(),
+                labwares.lid.get_engine_definition() if labwares.lid else None,
+                labwares.adapter.get_engine_definition() if labwares.adapter else None,
+            )
         )
         pool_height = self._engine_client.state.geometry.get_height_of_labware_stack(
             definitions
