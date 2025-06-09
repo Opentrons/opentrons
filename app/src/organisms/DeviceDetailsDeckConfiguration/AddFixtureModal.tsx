@@ -43,6 +43,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  replaceStagingFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_RIGHT_CUTOUTS,
   STAGING_AREA_CUTOUTS,
@@ -96,6 +97,13 @@ export function AddFixtureModal({
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
+
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
+    deckConfig,
+    deckDef
+  )
+  console.log("deckConfigWithAA: ", deckConfigWithAA)
   const unconfiguredMods =
     modulesData?.data.filter(
       attachedMod =>
@@ -177,7 +185,7 @@ export function AddFixtureModal({
 
   const getFlexDeckDefAAByFixtureIdForCutoutId = (
     cutoutId: CutoutId
-  ): Record<CutoutFixtureId, AddressableAreaNamesWithFakes[]> => {
+  ): {CutoutFixtureId: AddressableAreaNamesWithFakes[]} => {
     const deckDef = getDeckDefFromRobotType('OT-3 Standard')
     const deckDefWithFakes = getDeckDefAAWithFakeAA(deckDef)
     // replace staging area aaId to fake ones
@@ -188,7 +196,7 @@ export function AddFixtureModal({
       (acc, { id, providesAddressableAreas }) => {
         return { ...acc, [id]: providesAddressableAreas[cutoutId] }
       },
-      {} as Record<CutoutFixtureId, AddressableAreaNamesWithFakes[]>
+      {} as {CutoutFixtureId: AddressableAreaNamesWithFakes[]}
     )
   }
 
@@ -619,17 +627,26 @@ export function AddFixtureModal({
       console.log('addressableAreasById: ', addressableAreasById)
       const addedToDef = addedCutoutConfigs.filter(aaCutoutItem => {
         // filter addressableAreasById go only show props for the cutoutFixtureId
+        // check if there are slots that have the matching indexes. 
         // check each adjcent slot to see whats in there
         // if there is a match with one of the combos replace
-        // const filters = addressableAreasById.filter(aaByUd => {
-        //   aaByUd[cutoutId]
-        // })
+        const values = Object.values(addressableAreasById)
+        console.log("values: ", values)
+        console.log("aaCutoutItem.addressableAreaId: ", aaCutoutItem.addressableAreaId)
+        const filters = values.filter(aaByUd => {
+          console.log("aaByUd: ", aaByUd)
+          console.log("aaByUd.includes(aaCutoutItem.addressableAreaId): ", aaByUd.includes(aaCutoutItem.addressableAreaId))
+          return aaByUd.includes(aaCutoutItem.addressableAreaId)
+        })
+        filters.filter(f => )
+        console.log("filters: ", filters)
+        console.log("deckConfig: ", deckConfig)
       console.log("addressableAreasById[aaCutoutItem.fixtureId] ?? []: ", addressableAreasById[aaCutoutItem.cutoutFixtureId] ?? [])
         return aaCutoutItem.cutoutFixtureId == fixture.cutoutFixtureId
       })
       console.log("addedToDef: ", addedToDef)
-      const fixturesForCUtout = addressableAreasById[aaCutoutItem.fixtureId] ?? []
-      console.log("fixturesForCUtout: ", fixturesForCUtout)
+      const fixturesForCutout = addressableAreasById[aaCutoutItem.fixtureId] ?? []
+      console.log("fixturesForCutout: ", fixturesForCutout)
       // const aa =
       //     aaListForFixtureId.find(
       //       (aa: AddressableAreaNamesWithFakes) =>
@@ -639,13 +656,6 @@ export function AddFixtureModal({
       // find all fixtures related to cutoutId
       // check if match with cutoutFixure
       // if match check the next slot if empty continue if not add logic for checking what fixture to use 
-      const what = deckConfig.find(
-        dc => dc.cutoutFixtureId == fixture.cutoutFixtureId
-      )
-      console.log('what: ', what)
-      // is the adjecent slot empty? simple fixture id
-      // if not empty look for match with following fixutre.
-      // update both to the same fixture if match found.
       return (
         addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId) ?? fixture
       )
