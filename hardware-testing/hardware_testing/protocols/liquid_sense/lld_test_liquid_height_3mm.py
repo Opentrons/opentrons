@@ -108,7 +108,15 @@ def add_parameters(parameters: ParameterContext) -> None:
     from hardware_testing import protocols
 
     protocols.create_pipette_parameters(parameters)
-    protocols.create_labware_parameters(parameters)
+    # protocols.create_labware_parameters(parameters)
+    parametes.add_str(
+        variable_name="labware_type",
+        display_name="Labware Type",
+        choices=
+        [{"display_name": "axygen", value: "axygen_96_wellplate_500ul"},
+        {"display_name": "smc 384", value: "smc_384_read_plate"},
+        {"display_name": "ibidi", value: "ibidi_96_square_well_plate_300ul"}],
+        default = "ibidi_96_square_well_plate_300ul")
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
     parameters.add_float(
