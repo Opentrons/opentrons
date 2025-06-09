@@ -21,11 +21,12 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import Coordin
 from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.config import infer_config_base_dir
 from opentrons.types import Point
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": str(MAX_SUPPORTED_VERSION)}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
