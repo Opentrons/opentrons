@@ -262,31 +262,33 @@ export const _incompatibleSomeTipRackWarning = (): FormWarning => ({
   dependentFields: ['pipette', 'tipRack'],
   location: 'form',
 })
-type ReasonForWarning =
-  | 'pipetteAll'
-  | 'pipetteSome'
-  | 'tipRackAll'
-  | 'tipRackSome'
-  | 'volume'
-  | 'path'
+
+enum ReasonForWarning {
+  PipetteAll = 'PIPETTE_ALL',
+  PipetteSome = 'PIPETTE_SOME',
+  TipRackAll = 'TIP_RACK_ALL',
+  TipRackSome = 'TIP_RACK_SOME',
+  Volume = 'VOLUME',
+  Path = 'PATH',
+}
 const priorityMap: Record<ReasonForWarning, number> = {
-  pipetteAll: 0,
-  tipRackAll: 1,
-  pipetteSome: 2,
-  tipRackSome: 3,
-  volume: 4,
-  path: 5,
+  [ReasonForWarning.PipetteAll]: 0,
+  [ReasonForWarning.TipRackAll]: 1,
+  [ReasonForWarning.PipetteSome]: 2,
+  [ReasonForWarning.TipRackSome]: 3,
+  [ReasonForWarning.Volume]: 4,
+  [ReasonForWarning.Path]: 5,
 }
 const mappedLiquidClassReasonToWarning: Record<
   ReasonForWarning,
   () => FormWarning
 > = {
-  pipetteAll: _incompatibleAllPipetteWarning,
-  pipetteSome: _incompatibleSomePipetteWarning,
-  tipRackAll: _incompatibleAllTipRackWarning,
-  tipRackSome: _incompatibleSomeTipRackWarning,
-  volume: _lowVolumeTransferWarning,
-  path: _incompatiblePipettePathWarning,
+  [ReasonForWarning.PipetteAll]: _incompatibleAllPipetteWarning,
+  [ReasonForWarning.PipetteSome]: _incompatibleSomePipetteWarning,
+  [ReasonForWarning.TipRackAll]: _incompatibleAllTipRackWarning,
+  [ReasonForWarning.TipRackSome]: _incompatibleSomeTipRackWarning,
+  [ReasonForWarning.Volume]: _lowVolumeTransferWarning,
+  [ReasonForWarning.Path]: _incompatiblePipettePathWarning,
 }
 export const incompatibleLiquidClass: (
   fields: HydratedMoveLiquidFormData | HydratedMixFormData
@@ -314,7 +316,7 @@ export const incompatibleLiquidClass: (
       ({ pipetteModel }) => pipetteModel === pipetteName
     )
     if (pipetteObject == null) {
-      updatedReasonForWarning('pipetteSome')
+      updatedReasonForWarning(ReasonForWarning.PipetteSome)
       numIncompatibleLiquidClassesForPipette += 1
       return
     }
@@ -324,27 +326,24 @@ export const incompatibleLiquidClass: (
     )
 
     if (tipRackObject == null) {
-      updatedReasonForWarning('tipRackSome')
+      updatedReasonForWarning(ReasonForWarning.TipRackSome)
       numIncompatibleLiquidClassesForTiprack += 1
       return
     }
     if (path === 'multiDispense' && !('multiDispense' in tipRackObject)) {
-      updatedReasonForWarning('path')
+      updatedReasonForWarning(ReasonForWarning.Path)
     }
   })
 
   if (volume < MINIMUM_LIQUID_CLASS_VOLUME) {
-    updatedReasonForWarning('volume')
+    updatedReasonForWarning(ReasonForWarning.Volume)
   }
 
-  if (
-    numIncompatibleLiquidClassesForPipette === Object.keys(liquidClasses).length
-  ) {
-    reasonForWarning = 'pipetteAll'
-  } else if (
-    numIncompatibleLiquidClassesForTiprack === Object.keys(liquidClasses).length
-  ) {
-    reasonForWarning = 'tipRackAll'
+  const numLiquidClasses = Object.keys(liquidClasses).length
+  if (numIncompatibleLiquidClassesForPipette === numLiquidClasses) {
+    reasonForWarning = ReasonForWarning.PipetteAll
+  } else if (numIncompatibleLiquidClassesForTiprack === numLiquidClasses) {
+    reasonForWarning = ReasonForWarning.TipRackAll
   }
 
   return reasonForWarning != null
