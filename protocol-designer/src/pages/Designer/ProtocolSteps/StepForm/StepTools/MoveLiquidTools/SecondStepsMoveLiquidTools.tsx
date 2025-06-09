@@ -434,6 +434,7 @@ export const SecondStepsMoveLiquidTools = ({
               >
                 {formData.pushOut_checkbox === true ? (
                   <InputStepFormField
+                    {...propsForFields.pushOut_volume}
                     showTooltip={false}
                     padding="0"
                     title={t(
@@ -443,7 +444,6 @@ export const SecondStepsMoveLiquidTools = ({
                       'form:step_edit_form.field.pushOut.pushOut_volume.caption',
                       { min: 0, max: maxPushoutVolume }
                     )}
-                    {...propsForFields.pushOut_volume}
                     units={t('application:units.microliter')}
                   />
                 ) : null}
@@ -557,17 +557,17 @@ export const SecondStepsMoveLiquidTools = ({
           </CheckboxExpandStepFormField>
           <CheckboxExpandStepFormField
             title={i18n.format(
-              t('form:step_edit_form.field.airGap.label'),
+              t('form:step_edit_form.field.airGap.title'),
               'capitalize'
             )}
             fieldProps={propsForFields[`${tab}_airGap_checkbox`]}
           >
             {formData[`${tab}_airGap_checkbox`] === true ? (
               <InputStepFormField
+                {...propsForFields[`${tab}_airGap_volume`]}
                 showTooltip={false}
                 padding="0"
-                title={t('protocol_steps:air_gap_volume')}
-                {...propsForFields[`${tab}_airGap_volume`]}
+                title={t('form:step_edit_form.field.airGap.label')}
                 units={t('application:units.microliter')}
               />
             ) : null}

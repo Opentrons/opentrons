@@ -1068,8 +1068,8 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str, version: int) -> LiquidClass:
-        """Define a liquid class for use in transfer functions."""
+    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+        """Get an instance of a built-in liquid class."""
         try:
             # Check if we have already loaded this liquid class' definition
             liquid_class_def = self._liquid_class_def_cache[(name, version)]
