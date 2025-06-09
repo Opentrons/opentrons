@@ -145,9 +145,9 @@ class FixtureSettings:
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
         if pipette_channels == 8:
-            channels = [1, 2, 3, 4, 5, 6, 7, 8]
+            channels = [0, 1, 2, 3, 4, 5, 6, 7]
         else:
-            channels = [1]
+            channels = [0]
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
         trials = int(lookup_key("trials", csv_params)[0])
         return_tip = bool(lookup_key("return_tip", csv_params)[0] == "TRUE")
@@ -410,7 +410,7 @@ def retract_and_wait(
     tip: int,
     volume: float,
     trial: int,
-    channel: int = 1,  # TODO hookup
+    channel: int = 0,  # TODO hookup
     blank: bool = False,
 ) -> MeasurementData:
     """Retract away from the scale and record the weight."""
@@ -498,7 +498,7 @@ def run_blank_test(
     fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
-    channel = 1
+    channel = 0
     next_tip = fixture_settings.tips[tip][
         0
     ]  # this is the next tip we're gonna use we just need the uri
@@ -574,18 +574,19 @@ def run_one_test(
         tip,
         volume,
         trial,
+        channel=channel
     )
     aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
     )
     post_aspirate = retract_and_wait(
-        fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial
+        fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, channel=channel
     )
     dispense_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
     )
     post_dispense = retract_and_wait(
-        fixture_settings, MeasurementType.DISPENSE, tip, volume, trial
+        fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel
     )
     remove_tip(fixture_settings)
     return [pre_aspirate, post_aspirate, post_dispense]
