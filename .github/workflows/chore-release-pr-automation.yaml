@@ -13,9 +13,7 @@ on:
                 description: 'Target branch for testing'
                 required: true
                 default: 'chore_release-8.5.0'
-    push:
-        branches:
-            - 'hydra-20250609'
+
 
 jobs:
   handle-chore-release:
@@ -64,10 +62,12 @@ jobs:
           echo "| chore_release_branches | $chore_release_branches_display |" >> $GITHUB_STEP_SUMMARY
           echo "| target_branch          | $target_branch_display         |" >> $GITHUB_STEP_SUMMARY
           echo "| downstream_branches    | $downstream_branches_display   |" >> $GITHUB_STEP_SUMMARY
-
+          echo "| github.event_name      | ${{ github.event_name }}         |" >> $GITHUB_STEP_SUMMARY
+          echo "| github.actor           | ${{ github.actor }}              |" >> $GITHUB_STEP_SUMMARY
+          echo "\n"
           if [ "$downstream_branches_display" = "-" ]; then
-            echo "\n### No downstream PRs to open." >> $GITHUB_STEP_SUMMARY
+            echo "### No downstream PRs to open." >> $GITHUB_STEP_SUMMARY
           else
-            echo "\n### Downstream PRs should be opened for:" >> $GITHUB_STEP_SUMMARY
+            echo "### Downstream PRs should be opened for:" >> $GITHUB_STEP_SUMMARY
             echo "\`$downstream_branches_display\`" >> $GITHUB_STEP_SUMMARY
           fi
