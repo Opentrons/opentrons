@@ -20,7 +20,7 @@ jobs:
       - name: Determine downstream chore release PRs and necessity
         id: downstream
         run: |
-          python scripts/chore_release_pr.py \
+          python scripts/chore_release_pr_gen.py \
             --branch-list "${{ vars.CHORE_RELEASE_BRANCHES }}" \
             --target-branch "${{ github.event.pull_request.base.ref }}" \
             --output-file "$GITHUB_ENV"
