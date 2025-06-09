@@ -249,10 +249,15 @@ class FixtureSettings:
             scale,
             simulate=simulating,
         )
+        if simulating:
+            recorder.set_simulation_mass(10)
         recorder.record(in_thread=True)
         env_sensor = AsairDriver.BuildAsairSensor(simulating)
         env_serial = env_sensor.get_serial()
-        pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
+        if simulating:
+            pipette_tag = "pipette"
+        else:
+            pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
         ot3api = ctx._core.get_hardware()
         robot_serial = str(ot3api.get_serial_number())
         fw_version = ot3api.fw_version
@@ -419,6 +424,15 @@ def retract_and_wait(
     """Retract away from the scale and record the weight."""
     m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
     fixture_settings.pipette._retract()
+    if fixture_settings.recorder and not blank:
+        if mode == MeasurementType.ASPIRATE:
+            fixture_settings.recorder.add_simulation_mass(
+                volume * -0.001
+            )
+        elif mode == MeasurementType.DISPENSE:
+            fixture_settings.recorder.add_simulation_mass(
+                volume * 0.001
+            )
     m_data = record_measurement_data(
         fixture_settings.ctx,
         m_tag,
@@ -685,7 +699,10 @@ def run(ctx: ProtocolContext) -> None:
                         )
                         + avg_disp_evap
                     )
-                    cur_height = fixture_settings.liquid_source.current_liquid_height()
+                    if fixture_settings.ctx.is_simulating():
+                        cur_height = 10
+                    else:
+                        cur_height = fixture_settings.liquid_source.current_liquid_height()
                     report.store_trial(
                         fixture_settings.test_report,
                         trial,
