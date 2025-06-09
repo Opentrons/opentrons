@@ -2,7 +2,8 @@ name: Chore Release PR Automation
 
 on:
   pull_request:
-    types: [opened, reopened]
+    # edited is necessary so this runs if a PR is re-targeted
+    types: [opened, reopened, edited]
 
 jobs:
   handle-chore-release:
