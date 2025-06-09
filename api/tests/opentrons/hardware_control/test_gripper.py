@@ -73,9 +73,6 @@ def test_load_gripper_cal_offset(fake_offset: GripperCalibrationOffset) -> None:
     )
 
 
-# need a test for update_open_position_from_closed_position
-
-
 @pytest.mark.ot3_only
 def test_gripper_default_jaw_width_calibration(
     fake_jaw_cal: GripperJawWidthData,
