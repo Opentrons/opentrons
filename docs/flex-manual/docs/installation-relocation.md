@@ -14,7 +14,8 @@ Space is a valuable commodity in almost every lab. Your Flex is going to need so
 
 - **Operating space:** The robot's base dimensions are 87 cm W x 69 cm D x 84 cm H (about 34" x 27" x 33"). Flex needs 20 cm (8") of side and back clearance for cables, USB connections, and to dissipate exhaust from modules that heat and cool.
 
-!!! warning *Do not* position the sides or back of the Flex flush against a wall.
+!!! warning
+    *Do not* position the sides or back of the Flex flush against a wall.
 
 ![Opentrons Flex with arrows labeling width, height, and depth](images/flex-dimensions.png "Opentrons Flex base dimensions") Opentrons Flex base dimensions.
 
@@ -48,7 +49,8 @@ Along with the conditions described above, total power consumption also depends 
 
 - How many instruments are attached.
 
-!!! note Always account for other electronics that consume power on the same circuit, including Flex modules with their own power supplies. For example, the Thermocycler Module has a peak power consumption (630 W) that is much greater than the Flex robot itself. If necessary, consult the manager of your facility to make sure it meets your equipment's peak power requirements.
+!!! note 
+    Always account for other electronics that consume power on the same circuit, including Flex modules with their own power supplies. For example, the Thermocycler Module has a peak power consumption (630 W) that is much greater than the Flex robot itself. If necessary, consult the manager of your facility to make sure it meets your equipment's peak power requirements.
 
 ### Environmental conditions
 
@@ -95,7 +97,8 @@ Congratulations! Your Opentrons Flex has arrived and you've prepared a space for
 
 You'll want to ask a lab partner to assist with the unboxing, lifting, moving, and assembly process. You'll need to budget about 30 minutes to an hour for this effort.
 
-!!! note The Flex requires two people to lift it properly. Also, lifting and carrying the Flex by its handles is the best way to move the robot.
+!!! note
+    The Flex requires two people to lift it properly. Also, lifting and carrying the Flex by its handles is the best way to move the robot.
 
 ### Crate and packing material
 
@@ -147,26 +150,28 @@ The Flex ships with the components listed below. Pipettes, the gripper, and modu
 
 Opentrons ships your Flex in a sturdy plywood crate. The shipping crate uses hook and latch clamps to secure the top, side, and bottom panels together. Using latches, instead of nails or screws, means you won't need a crowbar (or a lot of force) to disassemble the crate, and you can reassemble it later, if needed.
 
-!!! note Crate edges can get roughed up during shipping. You may want to use work gloves to protect your hands from wood splinters.
+!!! note 
+    Crate edges can get roughed up during shipping. You may want to use work gloves to protect your hands from wood splinters.
 
 To release the latches, flip the latch tab up and turn it to the left (counterclockwise). This action moves the clamp arm out of its corresponding retaining bracket. You can then flip the latch arm away from the crate.
 
+<div class="instruction-list" markdown>
+
 1. Unlock the eight latches holding the top to the sides.
 
-![Location of the eight Flex crate latches, with inset showing to turn them counterclockwise.](images/unboxing/1-crate-latches.svg "Unboxing step 1")
+    ![Location of the eight Flex crate latches, with inset showing to turn them counterclockwise.](images/unboxing/1-crate-latches.svg "Unboxing step 1")
 
 2. Remove the top panel after releasing the latches.
 
-
 3. Cut open the blue shipping bag, remove these items from the padding, and set them aside:
 
-- User Kit
+    - User Kit
+    
+    - Power, Ethernet, and USB cables
+    
+    - Emergency Stop Pendant
 
-- Power, Ethernet, and USB cables
-
-- Emergency Stop Pendant
-
-![Exploded view of the locations of the user kit, cables, and Emergency Stop Pendant in the top foam padding.](images/unboxing/3-remove-items.svg "Unboxing step 3")
+    ![Exploded view of the locations of the user kit, cables, and Emergency Stop Pendant in the top foam padding.](images/unboxing/3-remove-items.svg "Unboxing step 3")
 
 4. Remove the top piece of foam padding. The padding protects the installed top window panel.
 
@@ -174,13 +179,17 @@ To release the latches, flip the latch tab up and turn it to the left (countercl
 
 6. Remove the side panels and set them aside.
 
-![Exploded view of the crate side panels.](images/unboxing/6-crate-side-panels.svg "Unboxing step 6")
+    ![Exploded view of the crate side panels.](images/unboxing/6-crate-side-panels.svg "Unboxing step 6")
+
+</div>
 
 ### Part 2: Release the Flex
 
 After completing the steps in Part 1, you should now see a robot that's in a protective bag and attached to orange steel mounting components. The bag encloses the robot and protects it from the outside environment. Steel brackets secure the robot to the bottom of the crate. Two shipping frames support the robot, distributing its weight evenly, and keeping it rigid so it doesn't warp during shipping.
 
 Continue to unpack the Flex and get it off the crate base.
+
+<div class="instruction-list" markdown>
 
 7. Using the 19 mm wrench from the User Kit, unbolt the brackets from the crate bottom. You can discard the brackets, or save them for future use.
 
@@ -206,9 +215,13 @@ Continue to unpack the Flex and get it off the crate base.
 
     ![Flex robot on top of a workbench.](images/unboxing/12-flex-on-bench.svg "Unboxing step 12")
 
+</div>
+
 ### Part 3: Final assembly and power on
 
 After moving the Flex to a temporary work area, or its permanent home, it's time to put the finishing touches on your new robot.
+
+<div class="instruction-list" markdown>
 
 13. If you have moved the robot to its final, working location, remove the carrying handles and replace them with the finishing caps. The caps close the handle openings in the frame and give the robot a clean appearance. Return the handles to the User Kit for storage.
 
@@ -231,6 +244,8 @@ After moving the Flex to a temporary work area, or its permanent home, it's time
 16. Attach the power cord to Flex and plug it into the wall outlet. Make sure the deck area is free of obstructions. Flip the power switch on the back left of the robot. Once powered on, the gantry moves to its home location and the touchscreen displays additional configuration instructions.
 
     ![Location and orientation of the power plug on the back of the Flex robot.](images/unboxing/16-attach-power.svg "Unboxing step 16")
+
+</div>
 
 Now that your Flex is out of the box and ready to go, continue to the First Run section below.
 

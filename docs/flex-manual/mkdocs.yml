@@ -45,3 +45,4 @@ markdown_extensions:
 
 extra_css:
   - manual.css
+  - opentrons-theme.css
