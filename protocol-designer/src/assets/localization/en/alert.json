@@ -246,11 +246,6 @@
         "body1": "The Flex Gripper is not used in any step. You won't be able to run this protocol unless the gripper is attached to your robot.",
         "body2": "If you don’t intend to use the gripper, remove it from your protocol."
       },
-      "unused_hardware_content": {
-        "heading": "Protocol has unused hardware",
-        "body1": "The hardware listed below is not used in any step. You won't be able to run this protocol unless the hardware is attached to your robot.",
-        "body2": "If you don’t intend to use this hardware, remove it from your protocol."
-      },
       "unused_module_content": {
         "heading": "Protocol has unused module",
         "body1": "The {{module}} in slot {{slot}} is not used in any step. You won't be able to run this protocol unless the module is attached to your robot.",
