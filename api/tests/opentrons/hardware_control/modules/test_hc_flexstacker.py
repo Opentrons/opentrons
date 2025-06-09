@@ -300,7 +300,6 @@ async def test_platform_state_unknown(
     ],
 )
 async def test_stacker_status_bar_event_handler(
-    decoy: Decoy,
     subject: modules.FlexStacker,
     mock_driver: mock.AsyncMock,
     should_identify: bool,

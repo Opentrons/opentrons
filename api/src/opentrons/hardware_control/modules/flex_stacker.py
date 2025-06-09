@@ -67,8 +67,8 @@ MAX_TRAVEL = {
 }
 
 # Min/Max height in mm of labware stack to store/dispense
-MIN_LABWARE_HEIGHT = 1.0
-MAX_LABWARE_HEIGHT = 110.0
+MIN_LABWARE_HEIGHT = 4.0
+MAX_LABWARE_HEIGHT = 102.5
 
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
 # This lets us use `move_axis` to move fast, leaving the axis OFFSET mm
