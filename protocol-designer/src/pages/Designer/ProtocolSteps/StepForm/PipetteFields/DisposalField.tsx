@@ -12,7 +12,6 @@ import { selectors as stepFormSelectors } from '../../../../../step-forms'
 import { getMaxDisposalVolumeForMultidispense } from '../../../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import { BlowoutOffsetField } from './BlowoutOffsetField'
 import { FlowRateField } from './FlowRateField'
 
 import type { FormData, PathOption, StepType } from '../../../../../form-types'
@@ -105,12 +104,6 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
             padding="0"
             tiprack={propsForFields.tipRack.value}
             formData={formData}
-          />
-          <BlowoutOffsetField
-            {...propsForFields.blowout_z_offset}
-            sourceLabwareId={propsForFields.aspirate_labware.value}
-            destLabwareId={propsForFields.dispense_labware.value}
-            blowoutLabwareId={propsForFields.blowout_location.value}
           />
         </Flex>
       ) : null}
