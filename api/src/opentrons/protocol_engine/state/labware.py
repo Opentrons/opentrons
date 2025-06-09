@@ -1184,7 +1184,7 @@ class LabwareView:
             if x is not None
         ]
 
-    def get_stacker_labware_pool_overlap(
+    def get_stacker_labware_overlap_offset(
         self, definitions: list[LabwareDefinition]
     ) -> OverlapOffset:
         """

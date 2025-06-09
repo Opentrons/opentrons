@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Annotated
-from opentrons.protocols.api_support import definitions
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -206,7 +205,7 @@ class SetStoredLabwareImpl(
             )
 
         pool_definitions = (
-            self._state_view._labware.stacker_labware_pool_to_ordered_list(
+            self._state_view.labware.stacker_labware_pool_to_ordered_list(
                 labware_def, lid_def, adapter_def
             )
         )
@@ -218,7 +217,7 @@ class SetStoredLabwareImpl(
         pool_overlap = (
             params.poolOverlapOverride
             if params.poolOverlapOverride
-            else self._state_view._labware.get_stacker_labware_pool_overlap(
+            else self._state_view.labware.get_stacker_labware_overlap_offset(
                 pool_definitions
             ).z
         )

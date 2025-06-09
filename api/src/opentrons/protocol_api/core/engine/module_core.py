@@ -852,7 +852,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         pool_overlap = (
             overlap_offset
             if overlap_offset is not None
-            else self._engine_client.state.labware.get_stacker_labware_pool_overlap(
+            else self._engine_client.state.labware.get_stacker_labware_overlap_offset(
                 definitions
             ).z
         )

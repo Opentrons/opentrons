@@ -280,7 +280,9 @@ def test_get_max_storable_labware_from_list_unconfigured_primary_only(
         mock_engine_client.state.geometry.get_height_of_labware_stack([primary_def])
     ).then_return(10)
     decoy.when(
-        mock_engine_client.state.labware.get_stacker_labware_pool_overlap([primary_def])
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
+            [primary_def]
+        )
     ).then_return(OverlapOffset(x=0, y=0, z=2))
     decoy.when(
         mock_engine_client.state.modules.stacker_max_pool_count_by_height("1234", 10, 2)
@@ -329,7 +331,7 @@ def test_get_max_storable_labware_from_list_unconfigured_no_lid(
         )
     ).then_return(16)
     decoy.when(
-        mock_engine_client.state.labware.get_stacker_labware_pool_overlap(
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
             [primary_def, adapter_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=3.0))
@@ -384,7 +386,7 @@ def test_get_max_storable_labware_from_list_unconfigured_no_adapter(
         )
     ).then_return(11)
     decoy.when(
-        mock_engine_client.state.labware.get_stacker_labware_pool_overlap(
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
             [lid_def, primary_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=1.0))
@@ -438,7 +440,7 @@ def test_get_max_storable_labware_from_list_unconfigured_full_group(
         )
     ).then_return(20)
     decoy.when(
-        mock_engine_client.state.labware.get_stacker_labware_pool_overlap(
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
             [lid_def, primary_def, adapter_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=2))
