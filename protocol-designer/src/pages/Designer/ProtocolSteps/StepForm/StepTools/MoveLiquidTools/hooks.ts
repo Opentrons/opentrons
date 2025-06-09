@@ -164,6 +164,10 @@ export const useSupportedLiquidClassOptions = (
   const supportedOptions = liquidClassOptions.reduce<LiquidClassOption[]>(
     (acc, option) => {
       const liquidClass = liquidClasses[option.value]
+      if (liquidClass == null) {
+        // 'none' option
+        return [...acc, option]
+      }
       const byTipLookup = liquidClass?.byPipette
         .find(({ pipetteModel }) => pipetteModel === pipetteName)
         ?.byTipType.find(({ tiprack }) => tiprack === tipRack)
