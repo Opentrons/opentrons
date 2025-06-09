@@ -4,7 +4,6 @@ import {
   FIXED_TRASH_ID,
   fixtureTiprack300ul,
   getLabwareDefURI,
-  LabwareDefinition2,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
@@ -17,6 +16,8 @@ import {
   SOURCE_LABWARE,
 } from '../fixtures'
 import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 describe('getCustomLiquidClassProperties', () => {
   it('returns all args populated', () => {
@@ -86,138 +87,141 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
         },
-        pipetteName: 'p1000_single',
-        tiprackUri: 'fixture/opentrons_1000uL',
+        pipetteName: 'p20_single_gen2',
+        tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
         aspirateCorrectionVolume: 5,
         dispenseCorrectionVolume: 5,
+        volumes: [10],
       })
     ).toEqual(
       `
-custom_liquid_class_properties = {"p1000_single": {"fixture/opentrons_1000uL": {
-    "aspirate": {
-        "aspirate_position": {
-            "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 2,
-            },
-            "position_reference": "well-bottom",
-        },
-        "flow_rate_by_volume": [2.1, 10],
-        "pre_wet": True,
-        "correction_by_volume": [5, 10],
-        "delay": {
-            "enabled": True,
-            "duration": 12,
-        },
-        "mix": {
-            "enabled": True,
-            "repetitions": 4,
-            "volume": 10,
-        },
-        "submerge": {
-            "delay": {
-                "enabled": True,
-                "duration": 5,
-            },
-            "speed": 50,
-            "start_position": {
+custom_liquid_class_properties = {
+    "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
+        "aspirate": {
+            "aspirate_position": {
                 "offset": {
-                    "x": 1,
+                    "x": 0,
                     "y": 0,
-                    "z": 5,
+                    "z": 2,
                 },
                 "position_reference": "well-bottom",
             },
-        },
-        "retract": {
-            "air_gap_by_volume": [2, 10],
+            "flow_rate_by_volume": [(2.1, 10)],
+            "pre_wet": True,
+            "correction_by_volume": [(5, 10)],
             "delay": {
                 "enabled": True,
-                "duration": 10,
+                "duration": 12,
             },
-            "end_position": {
-                "offset": {
-                    "x": 2,
-                    "y": -1,
-                    "z": -4,
-                },
-                "position_reference": "well-top",
-            },
-            "speed": 51,
-            "touch_tip": {
+            "mix": {
                 "enabled": True,
-                "z_offset": -3.4,
-                "mm_from_edge": 10,
-                "speed": 11,
+                "repetitions": 4,
+                "volume": 10,
+            },
+            "submerge": {
+                "delay": {
+                    "enabled": True,
+                    "duration": 5,
+                },
+                "speed": 50,
+                "start_position": {
+                    "offset": {
+                        "x": 1,
+                        "y": 0,
+                        "z": 5,
+                    },
+                    "position_reference": "well-bottom",
+                },
+            },
+            "retract": {
+                "air_gap_by_volume": [(2, 10)],
+                "delay": {
+                    "enabled": True,
+                    "duration": 10,
+                },
+                "end_position": {
+                    "offset": {
+                        "x": 2,
+                        "y": -1,
+                        "z": -4,
+                    },
+                    "position_reference": "well-top",
+                },
+                "speed": 51,
+                "touch_tip": {
+                    "enabled": True,
+                    "z_offset": -3.4,
+                    "mm_from_edge": 10,
+                    "speed": 11,
+                },
             },
         },
-    },
-    "dispense": {
-        "dispense_position": {
-            "offset": {
-                "x": 0,
-                "y": 0,
-                "z": 3,
+        "dispense": {
+            "dispense_position": {
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3,
+                },
+                "position_reference": "well-bottom",
             },
-            "position_reference": "well-bottom",
-        },
-        "push_out_by_volume": [0, 10],
-        "flow_rate_by_volume": [2.2, 10],
-        "correction_by_volume": [5, 10],
-        "delay": {
-            "enabled": True,
-            "duration": 20,
-        },
-        "mix": {
-            "enabled": True,
-            "repetitions": 3,
-            "volume": 10,
-        },
-        "submerge": {
+            "push_out_by_volume": [(0, 10)],
+            "flow_rate_by_volume": [(2.2, 10)],
+            "correction_by_volume": [(5, 10)],
             "delay": {
                 "enabled": True,
-                "duration": 50,
+                "duration": 20,
             },
-            "speed": 52,
-            "start_position": {
-                "offset": {
-                    "x": 2,
-                    "y": 1,
-                    "z": -2,
+            "mix": {
+                "enabled": True,
+                "repetitions": 3,
+                "volume": 10,
+            },
+            "submerge": {
+                "delay": {
+                    "enabled": True,
+                    "duration": 50,
                 },
-                "position_reference": "well-center",
+                "speed": 52,
+                "start_position": {
+                    "offset": {
+                        "x": 2,
+                        "y": 1,
+                        "z": -2,
+                    },
+                    "position_reference": "well-center",
+                },
+            },
+            "retract": {
+                "air_gap_by_volume": [(0, 10)],
+                "delay": {
+                    "enabled": True,
+                    "duration": 40,
+                },
+                "end_position": {
+                    "offset": {
+                        "x": 3,
+                        "y": -2,
+                        "z": -5,
+                    },
+                    "position_reference": "well-top",
+                },
+                "speed": 53,
+                "touch_tip": {
+                    "enabled": True,
+                    "z_offset": -3.4,
+                    "mm_from_edge": 3,
+                    "speed": 5,
+                },
+                "blowout": {
+                    "enabled": True,
+                    "location": "source",
+                    "flow_rate": 2.3,
+                },
             },
         },
-        "retract": {
-            "air_gap_by_volume": [0, 10],
-            "delay": {
-                "enabled": True,
-                "duration": 40,
-            },
-            "end_position": {
-                "offset": {
-                    "x": 3,
-                    "y": -2,
-                    "z": -5,
-                },
-                "position_reference": "well-top",
-            },
-            "speed": 53,
-            "touch_tip": {
-                "enabled": True,
-                "z_offset": -3.4,
-                "mm_from_edge": 3,
-                "speed": 5,
-            },
-            "blowout": {
-                "enabled": True,
-                "location": "source",
-                "flow_rate": 2.3,
-            },
-        },
-    },
-}}}
+    }},
+}
     `.trim()
     )
   })
