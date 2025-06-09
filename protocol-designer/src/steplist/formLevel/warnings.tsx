@@ -1,6 +1,13 @@
-import { getWellTotalVolume } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  getWellTotalVolume,
+} from '@opentrons/shared-data'
+
+import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PathOption } from '@opentrons/step-generation'
 import type {
   HydratedFormData,
   HydratedMixFormData,
@@ -16,10 +23,15 @@ export type FormWarningType =
   | 'BELOW_MIN_AIR_GAP_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
-  | 'OVER_MAX_WELL_VOLUME'
+  | 'INCOMPATIBLE_ALL_PIPETTE'
+  | 'INCOMPATIBLE_PIPETTE_PATH'
+  | 'INCOMPATIBLE_SOME_PIPETTE'
+  | 'INCOMPATIBLE_TIP_RACK_ALL'
+  | 'INCOMPATIBLE_TIP_RACK_SOME'
+  | 'LOW_VOLUME_TRANSFER'
   | 'MIX_TIP_POSITIONED_LOW_IN_TUBE'
+  | 'OVER_MAX_WELL_VOLUME'
   | 'TIP_POSITIONED_LOW_IN_TUBE'
-
 export type FormWarning = FormError & {
   type: FormWarningType
 }
@@ -208,6 +220,136 @@ export const minDispenseAirGapVolume: (
   'dispense_airGap_checkbox',
   'dispense_airGap_volume'
 )
+
+export const _lowVolumeTransferWarning = (): FormWarning => ({
+  type: 'LOW_VOLUME_TRANSFER',
+  title: `Transfer volumes of ${MINIMUM_LIQUID_CLASS_VOLUME} µL or less are incompatible with liquid classes.`,
+  dependentFields: ['volume'],
+  location: 'form',
+})
+
+export const _incompatiblePipettePathWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_PIPETTE_PATH',
+  title: 'The selected pipette path is incompatible with some liquid classes.',
+  dependentFields: ['path', 'pipette', 'tipRack'],
+  location: 'form',
+})
+
+export const _incompatibleAllPipetteWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_ALL_PIPETTE',
+  title: `The selected pipette is incompatible with liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
+  location: 'form',
+})
+
+export const _incompatibleSomePipetteWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_SOME_PIPETTE',
+  title: `The selected pipette is incompatible with some liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
+  location: 'form',
+})
+
+export const _incompatibleAllTipRackWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_TIP_RACK_ALL',
+  title: `The selected tiprack is incompatible with all liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
+  location: 'form',
+})
+
+export const _incompatibleSomeTipRackWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_TIP_RACK_SOME',
+  title: `The selected tiprack is incompatible with some liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
+  location: 'form',
+})
+
+enum ReasonForWarning {
+  PipetteAll = 'PIPETTE_ALL',
+  PipetteSome = 'PIPETTE_SOME',
+  TipRackAll = 'TIP_RACK_ALL',
+  TipRackSome = 'TIP_RACK_SOME',
+  Volume = 'VOLUME',
+  Path = 'PATH',
+}
+const priorityMap: Record<ReasonForWarning, number> = {
+  [ReasonForWarning.PipetteAll]: 0,
+  [ReasonForWarning.TipRackAll]: 1,
+  [ReasonForWarning.PipetteSome]: 2,
+  [ReasonForWarning.TipRackSome]: 3,
+  [ReasonForWarning.Volume]: 4,
+  [ReasonForWarning.Path]: 5,
+}
+const mappedLiquidClassReasonToWarning: Record<
+  ReasonForWarning,
+  () => FormWarning
+> = {
+  [ReasonForWarning.PipetteAll]: _incompatibleAllPipetteWarning,
+  [ReasonForWarning.PipetteSome]: _incompatibleSomePipetteWarning,
+  [ReasonForWarning.TipRackAll]: _incompatibleAllTipRackWarning,
+  [ReasonForWarning.TipRackSome]: _incompatibleSomeTipRackWarning,
+  [ReasonForWarning.Volume]: _lowVolumeTransferWarning,
+  [ReasonForWarning.Path]: _incompatiblePipettePathWarning,
+}
+export const incompatibleLiquidClass: (
+  fields: HydratedMoveLiquidFormData | HydratedMixFormData
+) => FormWarning | null = formData => {
+  const { pipette, tipRack, volume: rawVolume } = formData
+  const liquidClasses = getAllLiquidClassDefs()
+
+  const pipetteName = getFlexNameConversion(pipette.spec)
+  const volume = Number(rawVolume)
+  const path = 'path' in formData ? (formData.path as PathOption) : null
+
+  let reasonForWarning: ReasonForWarning | null = null
+  let numIncompatibleLiquidClassesForPipette = 0
+  let numIncompatibleLiquidClassesForTiprack = 0
+  const updatedReasonForWarning = (newReason: ReasonForWarning): void => {
+    if (
+      reasonForWarning == null ||
+      priorityMap[newReason] < priorityMap[reasonForWarning]
+    ) {
+      reasonForWarning = newReason
+    }
+  }
+  Object.values(liquidClasses).forEach(liquidClass => {
+    const pipetteObject = liquidClass.byPipette.find(
+      ({ pipetteModel }) => pipetteModel === pipetteName
+    )
+    if (pipetteObject == null) {
+      updatedReasonForWarning(ReasonForWarning.PipetteSome)
+      numIncompatibleLiquidClassesForPipette += 1
+      return
+    }
+
+    const tipRackObject = pipetteObject.byTipType.find(
+      ({ tiprack }) => tiprack === tipRack
+    )
+
+    if (tipRackObject == null) {
+      updatedReasonForWarning(ReasonForWarning.TipRackSome)
+      numIncompatibleLiquidClassesForTiprack += 1
+      return
+    }
+    if (path === 'multiDispense' && !('multiDispense' in tipRackObject)) {
+      updatedReasonForWarning(ReasonForWarning.Path)
+    }
+  })
+
+  if (volume < MINIMUM_LIQUID_CLASS_VOLUME) {
+    updatedReasonForWarning(ReasonForWarning.Volume)
+  }
+
+  const numLiquidClasses = Object.keys(liquidClasses).length
+  if (numIncompatibleLiquidClassesForPipette === numLiquidClasses) {
+    reasonForWarning = ReasonForWarning.PipetteAll
+  } else if (numIncompatibleLiquidClassesForTiprack === numLiquidClasses) {
+    reasonForWarning = ReasonForWarning.TipRackAll
+  }
+
+  return reasonForWarning != null
+    ? mappedLiquidClassReasonToWarning[reasonForWarning]()
+    : null
+}
 
 /*******************
  **     Helpers    **
