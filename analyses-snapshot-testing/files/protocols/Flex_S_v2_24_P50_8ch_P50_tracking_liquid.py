@@ -180,9 +180,9 @@ def run(ctx):
     pipette_8ch_50 = ctx.load_instrument("flex_8channel_50", "left", tip_racks=tipracks)
 
     # Stock liquid classes
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
 
     volume = 44
 
@@ -193,7 +193,7 @@ def run(ctx):
         dest=water_dest_well,
         new_tip="always",
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     dest_volume = water_dest_well.current_liquid_volume()

@@ -3339,7 +3339,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "disposalByVolume": [
               [
@@ -3445,7 +3445,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "flowRateByVolume": [
               [
@@ -3779,7 +3779,7 @@
             "y": 0,
             "z": 2
           },
-          "positionReference": "well-top"
+          "positionReference": "well-bottom"
         },
         "disposalByVolume": [
           [
@@ -3885,7 +3885,7 @@
             "y": 0,
             "z": 2
           },
-          "positionReference": "well-top"
+          "positionReference": "well-bottom"
         },
         "flowRateByVolume": [
           [

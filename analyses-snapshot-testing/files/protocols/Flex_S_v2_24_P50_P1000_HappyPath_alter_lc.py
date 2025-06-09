@@ -86,12 +86,12 @@ def run(ctx: protocol_api.ProtocolContext):
     # Let us change the liquid classes of the pipettes
 
     # Stock liquid classes
-    water_class_p50_tr50 = ctx.define_liquid_class("water")
-    water_class_p1000_tr50 = ctx.define_liquid_class("water")
-    ethanol_class_p50_tr50 = ctx.define_liquid_class("ethanol_80")
-    ethanol_class_p1000_tr50 = ctx.define_liquid_class("ethanol_80")
-    glycerol_class_p50_tr50 = ctx.define_liquid_class("glycerol_50")
-    glycerol_class_p1000_tr50 = ctx.define_liquid_class("glycerol_50")
+    water_class_p50_tr50 = ctx.get_liquid_class("water")
+    water_class_p1000_tr50 = ctx.get_liquid_class("water")
+    ethanol_class_p50_tr50 = ctx.get_liquid_class("ethanol_80")
+    ethanol_class_p1000_tr50 = ctx.get_liquid_class("ethanol_80")
+    glycerol_class_p50_tr50 = ctx.get_liquid_class("glycerol_50")
+    glycerol_class_p1000_tr50 = ctx.get_liquid_class("glycerol_50")
 
     water_config_p50_tr50 = water_class_p50_tr50.get_for(pipette_50, tiprack_50)
     water_config_p1000_tr50 = water_class_p1000_tr50.get_for(pipette_1000, tiprack_50)

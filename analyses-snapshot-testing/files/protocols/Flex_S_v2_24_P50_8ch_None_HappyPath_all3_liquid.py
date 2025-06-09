@@ -4,9 +4,9 @@ metadata = {"protocolName": "P50 8ch volume < tip volume - transfer, distribute,
 
 def run(ctx):
     # Stock liquid classes
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
 
     tiprack_1 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B2")
     tiprack_2 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B3")

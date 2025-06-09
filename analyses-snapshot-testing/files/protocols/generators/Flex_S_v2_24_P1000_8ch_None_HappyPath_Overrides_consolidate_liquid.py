@@ -46,9 +46,9 @@ def run(ctx):
     test = get_test(key=key)
     comment = f"Test: {test.key}, Tiprack: {test.tiprack_loadname}, Volume: {test.volume}"
     ctx.comment(comment)
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
 
     tiprack_1 = ctx.load_labware(test.tiprack_loadname, "B2")
     tiprack_2 = ctx.load_labware(test.tiprack_loadname, "B3")

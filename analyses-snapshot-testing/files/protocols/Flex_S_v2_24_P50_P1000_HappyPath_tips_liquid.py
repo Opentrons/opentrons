@@ -8,9 +8,9 @@ metadata = {"protocolName": "P50 & P1000 transfer, distribute, consolidate, _liq
 
 def run(ctx):
     # Stock liquid classes
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
 
     tiprack_50 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B2")
     tiprack_200 = ctx.load_labware("opentrons_flex_96_tiprack_200ul", "B3")
@@ -79,7 +79,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.transfer_with_liquid_class(
@@ -89,7 +89,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.transfer_with_liquid_class(
@@ -99,7 +99,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -109,7 +109,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -119,7 +119,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -129,7 +129,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     # Distribute with tiprack_50
@@ -141,7 +141,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.distribute_with_liquid_class(
@@ -151,7 +151,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.distribute_with_liquid_class(
@@ -161,7 +161,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -171,7 +171,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -181,7 +181,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -191,7 +191,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     # Consolidate with tiprack_50
@@ -204,7 +204,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.consolidate_with_liquid_class(
@@ -214,7 +214,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.consolidate_with_liquid_class(
@@ -224,7 +224,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -234,7 +234,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -244,7 +244,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -254,7 +254,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     # Now with filter tips !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -272,7 +272,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.transfer_with_liquid_class(
@@ -282,7 +282,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.transfer_with_liquid_class(
@@ -292,7 +292,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -302,7 +302,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -312,7 +312,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.transfer_with_liquid_class(
@@ -322,7 +322,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     # Distribute with filter_tiprack_50
@@ -334,7 +334,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.distribute_with_liquid_class(
@@ -344,7 +344,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.distribute_with_liquid_class(
@@ -354,7 +354,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -364,7 +364,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -374,7 +374,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.distribute_with_liquid_class(
@@ -384,7 +384,7 @@ def run(ctx):
         dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     # Consolidate with filter_tiprack_50
@@ -397,7 +397,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.consolidate_with_liquid_class(
@@ -407,7 +407,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_50.consolidate_with_liquid_class(
@@ -417,7 +417,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -427,7 +427,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -437,7 +437,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     pipette_1000.consolidate_with_liquid_class(
@@ -447,7 +447,7 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        visit_every_well=True,
+        # visit_every_well=True,
     )
 
     #### Now all the other tipracks for the p1000
@@ -478,7 +478,7 @@ def run(ctx):
             dest=target.wells_by_name()[WATER_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.transfer_with_liquid_class(
@@ -488,7 +488,7 @@ def run(ctx):
             dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.transfer_with_liquid_class(
@@ -498,7 +498,7 @@ def run(ctx):
             dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.distribute_with_liquid_class(
@@ -508,7 +508,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in WATER_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.distribute_with_liquid_class(
@@ -518,7 +518,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in ETHANOL_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.distribute_with_liquid_class(
@@ -528,7 +528,7 @@ def run(ctx):
             dest=[target.wells_by_name()[well] for well in GLYCEROL_TARGET_WELLS],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.consolidate_with_liquid_class(
@@ -538,7 +538,7 @@ def run(ctx):
             dest=target.wells_by_name()[WATER_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.consolidate_with_liquid_class(
@@ -548,7 +548,7 @@ def run(ctx):
             dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )
 
         pipette_1000.consolidate_with_liquid_class(
@@ -558,5 +558,5 @@ def run(ctx):
             dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
             new_tip=new_tip,
             trash_location=trash,
-            visit_every_well=True,
+            # visit_every_well=True,
         )

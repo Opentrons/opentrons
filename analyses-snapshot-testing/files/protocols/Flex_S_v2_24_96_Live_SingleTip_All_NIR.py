@@ -538,7 +538,7 @@ def run(ctx):
 
     for liquid_class_name in liquid_class_names:
         ctx.comment(f"Liquid class: {liquid_class_name}")
-        liquid_class = ctx.define_liquid_class(liquid_class_name)
+        liquid_class = ctx.get_liquid_class(liquid_class_name)
 
         if liquid_class_name == "water":
             liquid_type = water

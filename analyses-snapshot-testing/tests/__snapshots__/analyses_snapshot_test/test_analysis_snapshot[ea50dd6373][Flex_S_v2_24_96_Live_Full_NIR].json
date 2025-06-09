@@ -4867,7 +4867,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "disposalByVolume": [
               [
@@ -4973,7 +4973,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "flowRateByVolume": [
               [
@@ -5357,7 +5357,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -36.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -5368,7 +5368,7 @@
         "position": {
           "x": 14.3,
           "y": 181.15,
-          "z": 43.0
+          "z": 5.0
         }
       },
       "startedAt": "TIMESTAMP",
@@ -5730,7 +5730,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "disposalByVolume": [
               [
@@ -5836,7 +5836,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "flowRateByVolume": [
               [
@@ -6220,7 +6220,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -36.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -6231,7 +6231,7 @@
         "position": {
           "x": 178.3,
           "y": 181.15,
-          "z": 43.0
+          "z": 5.0
         }
       },
       "startedAt": "TIMESTAMP",
@@ -6651,7 +6651,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -36.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -6662,7 +6662,7 @@
         "position": {
           "x": 178.3,
           "y": 181.15,
-          "z": 43.0
+          "z": 5.0
         }
       },
       "startedAt": "TIMESTAMP",
@@ -7052,7 +7052,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "disposalByVolume": [
               [
@@ -7158,7 +7158,7 @@
                 "y": 0,
                 "z": 2
               },
-              "positionReference": "well-top"
+              "positionReference": "well-bottom"
             },
             "flowRateByVolume": [
               [
@@ -7542,7 +7542,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -36.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -7553,7 +7553,7 @@
         "position": {
           "x": 14.3,
           "y": 181.15,
-          "z": 43.0
+          "z": 5.0
         }
       },
       "startedAt": "TIMESTAMP",
@@ -7973,7 +7973,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0
+            "z": -36.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -7984,7 +7984,7 @@
         "position": {
           "x": 178.3,
           "y": 181.15,
-          "z": 43.0
+          "z": 5.0
         }
       },
       "startedAt": "TIMESTAMP",
@@ -12070,7 +12070,7 @@
             "y": 0,
             "z": 2
           },
-          "positionReference": "well-top"
+          "positionReference": "well-bottom"
         },
         "disposalByVolume": [
           [
@@ -12176,7 +12176,7 @@
             "y": 0,
             "z": 2
           },
-          "positionReference": "well-top"
+          "positionReference": "well-bottom"
         },
         "flowRateByVolume": [
           [

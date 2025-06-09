@@ -199,9 +199,9 @@ def comment_labware_well_volume_status(ctx, labware):
 
 def run(ctx):
     # Stock liquid classes
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
 
     tiprack_1 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B2")
     tiprack_2 = ctx.load_labware("opentrons_flex_96_tiprack_50ul", "B3")
@@ -311,7 +311,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[WATER_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     visit_every_well=True,
+    #     # visit_every_well=True,
     # )
     comment_labware_well_volume_status(ctx, dest)
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
@@ -323,7 +323,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[ETHANOL_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     visit_every_well=True,
+    #     # visit_every_well=True,
     # )
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
@@ -335,7 +335,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[GLYCEROL_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     visit_every_well=True,
+    #     # visit_every_well=True,
     # )
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])

@@ -80,9 +80,9 @@ def run(protocol_context):
     test = get_test(key=key)
     comment = f"Test: {test.key}, Tiprack: {test.tiprack_loadname}, Volume: {test.transfer_volume}"
     protocol_context.comment(comment)
-    water_class = protocol_context.define_liquid_class("water")
-    ethanol_class = protocol_context.define_liquid_class("ethanol_80")
-    glycerol_class = protocol_context.define_liquid_class("glycerol_50")
+    water_class = protocol_context.get_liquid_class("water")
+    ethanol_class = protocol_context.get_liquid_class("ethanol_80")
+    glycerol_class = protocol_context.get_liquid_class("glycerol_50")
 
     tiprack_1 = protocol_context.load_labware(test.tiprack_loadname, "A1", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_2 = protocol_context.load_labware(test.tiprack_loadname, "A2", adapter="opentrons_flex_96_tiprack_adapter")

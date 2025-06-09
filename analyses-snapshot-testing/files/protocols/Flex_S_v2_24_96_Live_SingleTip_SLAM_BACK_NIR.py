@@ -435,7 +435,7 @@ def set_configure_nozzle_layout(ctx, pipette, tip_racks, tip_config):
 def run(ctx):
     # Stock liquid classes
     liquid_class_name = ctx.params.liquid_class
-    liquid_class = ctx.define_liquid_class(liquid_class_name)
+    liquid_class = ctx.get_liquid_class(liquid_class_name)
     volume = 105
     new_tip = "once"
     tip_config = find_partial_tip_config(ctx.params.partial_tip_config_key)

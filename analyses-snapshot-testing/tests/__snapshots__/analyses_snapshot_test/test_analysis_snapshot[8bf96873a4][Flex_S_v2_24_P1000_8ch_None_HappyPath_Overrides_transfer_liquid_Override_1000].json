@@ -5338,7 +5338,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "TypeError [line 89]: InstrumentContext.transfer_with_liquid_class() got an unexpected keyword argument 'visit_every_well'",
+      "detail": "ValueError [line 89]: Could not target all wells provided without aspirating or dispensing from other wells. Other wells that would be targeted: ['B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1']",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -5347,12 +5347,12 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "TypeError: InstrumentContext.transfer_with_liquid_class() got an unexpected keyword argument 'visit_every_well'",
+          "detail": "ValueError: Could not target all wells provided without aspirating or dispensing from other wells. Other wells that would be targeted: ['B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1']",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "(\"InstrumentContext.transfer_with_liquid_class() got an unexpected keyword argument 'visit_every_well'\",)",
-            "class": "TypeError",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid_Override_1000.py\", line N, in run\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n"
+            "args": "(\"Could not target all wells provided without aspirating or dispensing from other wells. Other wells that would be targeted: ['B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1']\",)",
+            "class": "ValueError",
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid_Override_1000.py\", line N, in run\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in transfer_with_liquid_class\n    transfer_args = verify_and_normalize_transfer_args(\n\n  File \"<PATH>\", line N, in verify_and_normalize_transfer_args\n    flat_dests_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(\n\n  File \"<PATH>\", line N, in group_wells_for_multi_channel_transfer\n    return _group_wells_for_nozzle_configuration(list(targets), nozzle_map)\n\n  File \"<PATH>\", line N, in _group_wells_for_nozzle_configuration\n    raise ValueError(\n"
           },
           "errorType": "PythonException",
           "id": "UUID",

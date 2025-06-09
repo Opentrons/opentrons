@@ -150,9 +150,9 @@ def run(ctx: protocol_api.ProtocolContext):
     test = get_test(key=key)
     comment = f"Test: {test.key}, Tiprack: {test.tiprack_loadname}, Volume: {test.volume}"
     ctx.comment(comment)
-    water_class = ctx.define_liquid_class("water")
-    ethanol_class = ctx.define_liquid_class("ethanol_80")
-    glycerol_class = ctx.define_liquid_class("glycerol_50")
+    water_class = ctx.get_liquid_class("water")
+    ethanol_class = ctx.get_liquid_class("ethanol_80")
+    glycerol_class = ctx.get_liquid_class("glycerol_50")
     pipette_96 = ctx.load_instrument("flex_96channel_1000")
     waste_chute = ctx.load_waste_chute()
     tiprack_adapter_1 = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", "A1")
