@@ -52,6 +52,10 @@ export function getSchema2CornerOffsetFromSlot(
   if (definition.schemaVersion === 2) {
     return definition.cornerOffsetFromSlot
   } else {
+    console.warn(
+      `getSchema2CornerOffsetFromSlot() called on schema-3 labware ${definition.parameters.loadName}.` +
+        ` Returning bogus data. The labware will render in the wrong place.`
+    )
     return {
       x: 12,
       y: 34,
