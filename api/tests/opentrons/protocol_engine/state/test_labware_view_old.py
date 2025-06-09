@@ -1514,7 +1514,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["primary_def", "lid_def", "adapter_def", "exception"],
+    argnames=["primary_def", "lid_def", "adapter_def", "exception", "ordered_list"],
     argvalues=[
         pytest.param(
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -1538,6 +1538,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             does_not_raise(),
+            ["lid", "primary", "adapter"],
             id="all-valid-and-present",
         ),
         pytest.param(
@@ -1556,6 +1557,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             does_not_raise(),
+            ["primary", "adapter"],
             id="adapter-valid-and-present",
         ),
         pytest.param(
@@ -1575,6 +1577,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
             ),
             None,
             does_not_raise(),
+            ["lid", "primary"],
             id="lid-valid-and-present",
         ),
         pytest.param(
@@ -1588,6 +1591,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
             None,
             None,
             does_not_raise(),
+            ["primary"],
             id="primary-only",
         ),
         pytest.param(
@@ -1612,6 +1616,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="lid-may-not-stack-on-primary",
         ),
         pytest.param(
@@ -1636,6 +1641,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="primary-may-not-stack-on-adapter",
         ),
         pytest.param(
@@ -1660,6 +1666,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="adapter-wrong-role",
         ),
         pytest.param(
@@ -1684,6 +1691,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="lid-wrong-role",
         ),
     ],
@@ -1693,6 +1701,7 @@ def test_stacker_labware_pool_passes_or_raises(
     lid_def: LabwareDefinition | None,
     adapter_def: LabwareDefinition | None,
     exception: ContextManager[None],
+    ordered_list: List[str] | None,
 ) -> None:
     """It should raise if a stacker labware pool configuration is invalid."""
     subject = get_labware_view()
@@ -1700,6 +1709,12 @@ def test_stacker_labware_pool_passes_or_raises(
         subject.raise_if_stacker_labware_pool_is_not_valid(
             primary_def, lid_def, adapter_def
         )
+    if exception is does_not_raise():
+        result = subject.stacker_labware_pool_to_ordered_list(
+            primary_def, lid_def, adapter_def
+        )
+        result_load_names = [labware_def.parameters.loadName for labware_def in result]
+        assert result_load_names == ordered_list
 
 
 @pytest.mark.parametrize(

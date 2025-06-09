@@ -1187,8 +1187,7 @@ class LabwareView:
     def get_stacker_labware_overlap_offset(
         self, definitions: list[LabwareDefinition]
     ) -> OverlapOffset:
-        """
-        Get the overlap amount between each labware pool.
+        """Get the overlap amount between each labware pool.
 
         The definitions must be in top-first order, ideally created by
         `stacker_labware_pool_to_ordered_list`.
