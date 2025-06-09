@@ -90,16 +90,6 @@ interface CustomLiquidClassPropertiesProps {
   tiprackUri: string
   aspirateCorrectionVolume: number
   dispenseCorrectionVolume: number
-  volumes: number[]
-}
-interface SettingByVolume {
-  flowRateByVolumeAspirate: number[][]
-  flowRateByVolumeDispense: number[][]
-  correctionByVolumeAspirate: number[][]
-  correctionByVolumeDispense: number[][]
-  pushOutByVolume: number[][]
-  airGapByVolume: number[][]
-  airGapByVolumeRetract: number[][]
 }
 
 export const getCustomLiquidClassProperties = (
@@ -111,50 +101,7 @@ export const getCustomLiquidClassProperties = (
     tiprackUri,
     aspirateCorrectionVolume,
     dispenseCorrectionVolume,
-    volumes,
   } = props
-
-  const {
-    flowRateByVolumeAspirate,
-    flowRateByVolumeDispense,
-    correctionByVolumeAspirate,
-    correctionByVolumeDispense,
-    pushOutByVolume,
-    airGapByVolume,
-    airGapByVolumeRetract,
-  } = volumes.reduce(
-    (acc: SettingByVolume, volume) => {
-      acc.flowRateByVolumeAspirate.push([
-        args.aspirateFlowRateUlSec ?? 0,
-        volume,
-      ])
-      acc.flowRateByVolumeDispense.push([
-        args.dispenseFlowRateUlSec ?? 0,
-        volume,
-      ])
-      acc.correctionByVolumeAspirate.push([
-        aspirateCorrectionVolume ?? 0,
-        volume,
-      ])
-      acc.correctionByVolumeDispense.push([
-        dispenseCorrectionVolume ?? 0,
-        volume,
-      ])
-      acc.pushOutByVolume.push([args.pushOut ?? 0, volume])
-      acc.airGapByVolume.push([args.aspirateAirGapVolume ?? 0, volume])
-      acc.airGapByVolumeRetract.push([args.dispenseAirGapVolume ?? 0, volume])
-      return acc
-    },
-    {
-      flowRateByVolumeAspirate: [],
-      flowRateByVolumeDispense: [],
-      correctionByVolumeAspirate: [],
-      correctionByVolumeDispense: [],
-      pushOutByVolume: [],
-      airGapByVolume: [],
-      airGapByVolumeRetract: [],
-    }
-  )
 
   const customLiquidClassProperties: CustomLiquidClassProperties = {
     [pipetteName]: {
@@ -168,10 +115,10 @@ export const getCustomLiquidClassProperties = (
             },
             position_reference: args.aspiratePositionReference,
           },
-          flow_rate_by_volume: flowRateByVolumeAspirate,
+          flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
 
           pre_wet: args.preWetTip,
-          correction_by_volume: correctionByVolumeAspirate,
+          correction_by_volume: [[0, aspirateCorrectionVolume ?? 0]],
           delay: {
             enabled: args.aspirateDelay != null,
             duration: args.aspirateDelay?.seconds ?? undefined,
@@ -197,7 +144,7 @@ export const getCustomLiquidClassProperties = (
             },
           },
           retract: {
-            air_gap_by_volume: airGapByVolume,
+            air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
             delay: {
               enabled: args.aspirateRetractDelay != null,
               duration: args.aspirateRetractDelay?.seconds ?? undefined,
@@ -228,9 +175,9 @@ export const getCustomLiquidClassProperties = (
             },
             position_reference: args.dispensePositionReference,
           },
-          push_out_by_volume: pushOutByVolume,
-          flow_rate_by_volume: flowRateByVolumeDispense,
-          correction_by_volume: correctionByVolumeDispense,
+          push_out_by_volume: [[0, args.pushOut ?? 0]],
+          flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
+          correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
 
           delay: {
             enabled: args.dispenseDelay != null,
@@ -257,7 +204,7 @@ export const getCustomLiquidClassProperties = (
             },
           },
           retract: {
-            air_gap_by_volume: airGapByVolumeRetract,
+            air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
             delay: {
               enabled: args.dispenseRetractDelay != null,
               duration: args.dispenseRetractDelay?.seconds ?? undefined,

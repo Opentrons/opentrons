@@ -91,7 +91,6 @@ describe('getCustomLiquidClassProperties', () => {
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
         aspirateCorrectionVolume: 5,
         dispenseCorrectionVolume: 5,
-        volumes: [10],
       })
     ).toEqual(
       `
@@ -106,9 +105,9 @@ custom_liquid_class_properties = {
                 },
                 "position_reference": "well-bottom",
             },
-            "flow_rate_by_volume": [(2.1, 10)],
+            "flow_rate_by_volume": [(0, 2.1)],
             "pre_wet": True,
-            "correction_by_volume": [(5, 10)],
+            "correction_by_volume": [(0, 5)],
             "delay": {
                 "enabled": True,
                 "duration": 12,
@@ -134,7 +133,7 @@ custom_liquid_class_properties = {
                 },
             },
             "retract": {
-                "air_gap_by_volume": [(2, 10)],
+                "air_gap_by_volume": [(0, 2)],
                 "delay": {
                     "enabled": True,
                     "duration": 10,
@@ -165,9 +164,9 @@ custom_liquid_class_properties = {
                 },
                 "position_reference": "well-bottom",
             },
-            "push_out_by_volume": [(0, 10)],
-            "flow_rate_by_volume": [(2.2, 10)],
-            "correction_by_volume": [(5, 10)],
+            "push_out_by_volume": [(0, 0)],
+            "flow_rate_by_volume": [(0, 2.2)],
+            "correction_by_volume": [(0, 5)],
             "delay": {
                 "enabled": True,
                 "duration": 20,
@@ -193,7 +192,7 @@ custom_liquid_class_properties = {
                 },
             },
             "retract": {
-                "air_gap_by_volume": [(0, 10)],
+                "air_gap_by_volume": [(0, 0)],
                 "delay": {
                     "enabled": True,
                     "duration": 40,
