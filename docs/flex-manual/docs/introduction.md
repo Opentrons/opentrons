@@ -264,7 +264,7 @@ If you or your business have Opentrons products that are at end of life
 or need to be discarded for a separate purpose, contact Opentrons for
 proper disposal and recycling.
 
-### Wi-Fi precertifcation
+### Wi-Fi precertification
 
 The Wi-Fi module is precertified for use in many regions:
 
