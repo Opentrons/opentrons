@@ -1797,11 +1797,11 @@ def test_define_liquid_class(
     expected_liquid_class = LiquidClass(
         _name="volatile_100", _display_name="volatile 100%", _by_pipette_setting={}
     )
-    decoy.when(mock_core.define_liquid_class("volatile_90", 1)).then_return(
+    decoy.when(mock_core.get_liquid_class("volatile_90", 1)).then_return(
         expected_liquid_class
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)
-    assert subject.define_liquid_class("volatile_90") == expected_liquid_class
+    assert subject.get_liquid_class("volatile_90") == expected_liquid_class
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
@@ -1813,7 +1813,7 @@ def test_define_new_custom_liquid_class_from_dict(
     minimal_transfer_properties_dict: Dict[str, Dict[str, TransferPropertiesDict]],
 ) -> None:
     """It should define a custom liquid class."""
-    my_liquid_class = subject.define_custom_liquid_class(
+    my_liquid_class = subject.define_liquid_class(
         name="my_liquid",
         properties=minimal_transfer_properties_dict,
         display_name="My liquid",
@@ -1857,7 +1857,7 @@ def test_customize_existing_liquid_class(
         == 4
     )
 
-    my_liquid_class = subject.define_custom_liquid_class(
+    my_liquid_class = subject.define_liquid_class(
         name="my_liquid",
         properties=minimal_transfer_properties_dict,
         base_liquid_class=existing_glycerol_class,
@@ -1878,7 +1878,7 @@ def test_customize_existing_liquid_class(
     )
 
     # Test that new entries are created for pipettes and tipracks not present in the base liquid class
-    lc_with_custom_pip_n_tip = subject.define_custom_liquid_class(
+    lc_with_custom_pip_n_tip = subject.define_liquid_class(
         name="my_liquid_2",
         properties=custom_pip_n_tip_transfer_properties_dict,
         base_liquid_class=existing_glycerol_class,
@@ -1899,7 +1899,7 @@ def test_customize_existing_liquid_class(
             "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ]
     }
-    lc_with_new_tip_entry = subject.define_custom_liquid_class(
+    lc_with_new_tip_entry = subject.define_liquid_class(
         name="my_liquid_3",
         properties=modified_custom_dict,
         base_liquid_class=lc_with_custom_pip_n_tip,

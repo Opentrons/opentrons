@@ -1876,13 +1876,13 @@ def test_define_liquid_class(
     decoy.when(liquid_classes.load_definition("water", version=123)).then_return(
         minimal_liquid_class_def1
     )
-    assert subject.define_liquid_class("water", 123) == expected_liquid_class
+    assert subject.get_liquid_class("water", 123) == expected_liquid_class
 
     # Test that different version number works
     decoy.when(liquid_classes.load_definition("water", version=456)).then_return(
         minimal_liquid_class_def2
     )
-    different_liquid_class = subject.define_liquid_class("water", 456)
+    different_liquid_class = subject.get_liquid_class("water", 456)
     assert different_liquid_class.name == "water2"
     assert different_liquid_class.display_name == "water 2"
 
@@ -1890,7 +1890,7 @@ def test_define_liquid_class(
     decoy.when(liquid_classes.load_definition("water", version=123)).then_return(
         minimal_liquid_class_def2
     )
-    assert subject.define_liquid_class("water", 123) == expected_liquid_class
+    assert subject.get_liquid_class("water", 123) == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(
