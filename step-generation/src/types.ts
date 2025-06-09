@@ -304,7 +304,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null

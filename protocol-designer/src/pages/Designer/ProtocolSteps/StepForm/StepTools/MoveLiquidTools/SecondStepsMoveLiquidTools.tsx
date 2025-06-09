@@ -34,7 +34,6 @@ import {
 } from '../../../../../../utils'
 import {
   BlowoutLocationField,
-  BlowoutOffsetField,
   DisposalField,
   FlowRateField,
   PositionField,
@@ -478,12 +477,6 @@ export const SecondStepsMoveLiquidTools = ({
                       tiprack={propsForFields.tipRack.value}
                       padding="0"
                       formData={formData}
-                    />
-                    <BlowoutOffsetField
-                      {...propsForFields.blowout_z_offset}
-                      sourceLabwareId={propsForFields.aspirate_labware.value}
-                      destLabwareId={propsForFields.dispense_labware.value}
-                      blowoutLabwareId={propsForFields.blowout_location.value}
                     />
                   </Flex>
                 ) : null}
