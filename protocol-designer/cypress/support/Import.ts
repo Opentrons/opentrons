@@ -57,7 +57,13 @@ export const verifyImportProtocolPage = (protocol: TestFile): void => {
     cy.contains(ContentStrings.protocolMetadata).should('be.visible')
     cy.contains(ContentStrings.instruments).should('be.visible')
     cy.contains(ContentStrings.protocolStartingDeck).should('be.visible')
-    cy.contains(String(protocolRead.metadata.protocolName)).should('be.visible')
+    if (!protocolRead.metadata.protocolName) {
+      cy.contains('Some name!').should('be.visible')
+    } else {
+      cy.contains(String(protocolRead.metadata.protocolName)).should(
+        'be.visible'
+      )
+    }
   })
 }
 
@@ -82,15 +88,13 @@ export const migrateAndMatchSnapshot = ({
       .click({ force: true })
   }
 
-  cy.get('button')
-    .contains('Edit protocol', { matchCase: false })
-    .click({ force: true })
+  verifyImportProtocolPage(uploadProtocol)
+  cy.contains('Edit protocol').click()
 
   cy.screenshot('protocol-designer/migration-snapshot', {
     capture: 'viewport',
     overwrite: true,
   })
-  // cypres back button
 
   cy.get(LocatorStrings.exportProtocol).click({ force: true })
 
