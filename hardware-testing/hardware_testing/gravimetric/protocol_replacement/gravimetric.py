@@ -133,7 +133,7 @@ class FixtureSettings:
         def lookup_key(key: str, csv: List[List[str]]) -> List[str]:
             for line in csv:
                 if line[0] == key:
-                    return line[1:]
+                    return [e for e in line[1:] if e != ""]
             raise ValueError(f"{key} is not defined in the csv params.")
 
         csv_params = (
