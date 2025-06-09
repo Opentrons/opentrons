@@ -35,12 +35,48 @@ export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition
   /**
+   * How the rendered labware should be positioned. Use `passThrough` for new code.
+   *
+   * `passThrough` -
+   *   The origin of the labware will be at the SVG origin.
+   *
+   *   To render a labware on its own, use the `getLabwareViewBox()` util from
+   *   shared-data to compute the SVG's viewBox around that origin.
+   *
+   *   To render a labware aligned to something like a deck slot or module, wrap this
+   *   component in an SVG transform. Use a util like shared-data's
+   *   `getDeckSlotOriginToLabwareOrigin()` to compute it.
+   *
+   * `offsetInSlot` -
+   *   The SVG origin will be treated as the origin of the slot enclosing the labware.
+   *   The labware will be offset from that origin according to the labware def's
+   *   cornerOffsetFromSlot.
+   *
+   *   To render a labware on its own, set the SVG viewBox's origin to
+   *   definition.cornerOffsetFromSlot.
+   *
+   *   To render a labware aligned to something like a deck slot or module, wrap this
+   *   component in an SVG transform that places the origin of this component at the
+   *   origin of the slot.
+   *
+   *   This is deprecated because it relies on labware schema 2's slot-centric ideas of
+   *   how labware are positioned. It's also clunky when rendering a labware on its
+   *   own.
+   */
+  // todo(mm, 2025-06-09): Make this prop required after the dust settles on
+  // v8.5.0/PD-v8.5.0 mergebacks, to force new callers to consider passThrough mode.
+  // Remove uses of offsetInSlot mode as we're able, and delete it when none are left.
+  positioningMode?: 'passThrough' | 'offsetInSlot'
+  /**
    * Special handling for opentrons_universal_flat_adapter. Unlike other labware,
    * it rotates to match the underlying module, and that rotation actually matters
    * because it's asymmetrical.
    *
    * This should be true if this is that adapter and we're on the left side of the deck,
    * and false otherwise.
+   *
+   * Ignored if positioningMode is passThrough, in which case it's the caller's
+   * responsibility to do this rotation.
    */
   shouldRotateAdapterOrientation?: boolean
   /** option to show well labels inside or outside of labware outline */
@@ -76,28 +112,31 @@ export interface LabwareRenderProps {
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition } = props
+  const { gRef, definition, positioningMode = 'offsetInSlot' } = props
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
+  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
 
-  if (labwareAdapterLoadNames.includes(labwareLoadName)) {
+  if (isAdapter) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g
         transform={
-          shouldRotateAdapterOrientation
+          positioningMode === 'offsetInSlot' && shouldRotateAdapterOrientation
             ? `rotate(180, ${xDimension / 2}, ${yDimension / 2})`
-            : 'rotate(0, 0, 0)'
+            : undefined
         }
       >
         <g
           transform={
-            shouldRotateAdapterOrientation
-              ? `translate(${-cornerOffsetFromSlot.x}, ${-cornerOffsetFromSlot.y})`
-              : `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+            positioningMode === 'offsetInSlot'
+              ? shouldRotateAdapterOrientation
+                ? `translate(${-cornerOffsetFromSlot.x}, ${-cornerOffsetFromSlot.y})`
+                : `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+              : undefined
           }
           ref={gRef}
           onClick={props.onLabwareClick}
@@ -114,7 +153,11 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   }
   return (
     <g
-      transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+      transform={
+        positioningMode === 'offsetInSlot'
+          ? `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+          : undefined
+      }
       ref={gRef}
     >
       <StaticLabware

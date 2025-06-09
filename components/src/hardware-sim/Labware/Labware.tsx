@@ -29,6 +29,8 @@ import type {
 export interface LabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition
+  /* See docs on LabwareRender. */
+  positioningMode?: 'passThrough' | 'offsetInSlot'
   /** See docs on LabwareRender. */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
@@ -87,6 +89,7 @@ const LabwareDetailGroup = styled.g`
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
     definition,
+    positioningMode = 'offsetInSlot',
     gRef,
     hideOutline = false,
     highlight,
@@ -103,21 +106,26 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
+  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
 
-  if (labwareAdapterLoadNames.includes(labwareLoadName)) {
+  if (isAdapter) {
     const { shouldRotateAdapterOrientation = false } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g
         transform={
-          shouldRotateAdapterOrientation
+          positioningMode === 'offsetInSlot' && shouldRotateAdapterOrientation
             ? `rotate(180, ${xDimension / 2}, ${yDimension / 2})`
-            : 'rotate(0, 0, 0)'
+            : undefined
         }
       >
         <g
-          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+          transform={
+            positioningMode === 'offsetInSlot'
+              ? `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+              : undefined
+          }
           ref={gRef}
         >
           <LabwareAdapter
@@ -132,7 +140,11 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   return (
     <g
-      transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+      transform={
+        positioningMode === 'offsetInSlot'
+          ? `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+          : undefined
+      }
       ref={gRef}
     >
       <g onClick={onLabwareClick}>
