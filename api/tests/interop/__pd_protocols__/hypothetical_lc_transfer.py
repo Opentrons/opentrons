@@ -52,7 +52,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
     # This hypothetical transfer_with_liquid_class() call (which PD doesn't emit yet)
     # should produce the same engine commands as the PD JSON step generator.
-    liquid_class = protocol.define_liquid_class("ethanol_80")
+    liquid_class = protocol.get_liquid_class("ethanol_80")
     pipette_left.transfer_with_liquid_class(
         liquid_class=liquid_class,
         volume=99,
