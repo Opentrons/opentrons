@@ -82,6 +82,16 @@ export const migrateAndMatchSnapshot = ({
       .click({ force: true })
   }
 
+  cy.get('button')
+    .contains('Edit protocol', { matchCase: false })
+    .click({ force: true })
+
+  cy.screenshot('protocol-designer/migration-snapshot', {
+    capture: 'viewport',
+    overwrite: true,
+  })
+  // cypres back button
+
   cy.get(LocatorStrings.exportProtocol).click({ force: true })
 
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)
