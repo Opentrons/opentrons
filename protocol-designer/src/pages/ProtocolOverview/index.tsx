@@ -94,6 +94,7 @@ export function ProtocolOverview(): JSX.Element {
   )
   const { timeline } = useSelector(fileSelectors.getRobotStateTimeline)
   const hasCommands = timeline.length > 0
+
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
     false

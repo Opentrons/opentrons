@@ -21,11 +21,12 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import Coordin
 from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.config import infer_config_base_dir
 from opentrons.types import Point
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": str(MAX_SUPPORTED_VERSION)}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -222,7 +223,7 @@ class FixtureSettings:
         source_well = ctx.load_labware(labware_on_scale, slot_scale)[
             labware_on_scale_well_name
         ]
-        liquid_class = ctx.define_liquid_class(liquid_name)
+        liquid_class = ctx.get_liquid_class(liquid_name)
         liquid = ctx.define_liquid(liquid_name, liquid_desc, liquid_col)
         source_well.load_liquid(liquid, liquid_vol_estimate)
 

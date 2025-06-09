@@ -65,6 +65,7 @@ import {
   temperatureRequired,
   timesRequired,
   transferVolumeMax,
+  transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
   wavelengthOutOfRange,
@@ -74,6 +75,7 @@ import {
 import {
   belowPipetteMinimumVolume,
   composeWarnings,
+  incompatibleLiquidClass,
   maxDispenseWellVolume,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
@@ -175,11 +177,13 @@ const stepFormHelperMap: {
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
       transferVolumeMax,
+      transferVolumeMin,
       pipetteRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
-      mixTipPositionInTube
+      mixTipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   pause: {
@@ -225,6 +229,7 @@ const stepFormHelperMap: {
       conditioningVolumeOutOfRange,
       blowoutFlowRateRequired,
       transferVolumeMax,
+      transferVolumeMin,
       pipetteRequired
     ),
     getWarnings: composeWarnings(
@@ -233,7 +238,8 @@ const stepFormHelperMap: {
       minDisposalVolume,
       minAspirateAirGapVolume,
       minDispenseAirGapVolume,
-      tipPositionInTube
+      tipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   magnet: {

@@ -12,7 +12,10 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { useAssignLiquidClass } from '../MoveLiquidTools/hooks'
+import {
+  useAssignLiquidClass,
+  useSupportedLiquidClassOptions,
+} from '../MoveLiquidTools/hooks'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
@@ -57,6 +60,11 @@ export function MixTools(
     propsForFields.liquidClass.updateValue
   )
 
+  const orderedSupportedLiquidClassOptions = useSupportedLiquidClassOptions(
+    orderedLiquidClassOptions,
+    formData
+  )
+
   const stepComponents: Record<number, () => JSX.Element> = {
     0: () => (
       <FirstStepMixTools
@@ -76,7 +84,7 @@ export function MixTools(
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
             formData={formData}
-            orderedLiquidClassOptions={orderedLiquidClassOptions}
+            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
             type="mix"
           />
         ) : (
