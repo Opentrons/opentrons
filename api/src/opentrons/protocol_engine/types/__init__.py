@@ -43,6 +43,7 @@ from .deck_configuration import (
     AddressableArea,
     DeckConfigurationType,
     DeckType,
+    DeckLocationDefinition,
 )
 from .liquid_class import LiquidClassRecord, LiquidClassRecordWithId
 from .module import (
@@ -183,6 +184,7 @@ __all__ = [
     "AddressableArea",
     "DeckConfigurationType",
     "DeckType",
+    "DeckLocationDefinition",
     # Liquid classes
     "LiquidClassRecord",
     "LiquidClassRecordWithId",

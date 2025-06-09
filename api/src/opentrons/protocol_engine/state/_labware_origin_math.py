@@ -9,14 +9,12 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareDefinition3,
 )
-from opentrons_shared_data.deck.types import (
-    DeckDefinitionV5,
-)
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from ..types import (
     LabwareParentDefinition,
-    AddressableArea,
     ModuleDefinition,
     ModuleModel,
+    AddressableArea,
 )
 
 
@@ -98,7 +96,7 @@ def _get_parent_to_child_offset(
 
             return parent_as_module_to_child_offset - stacking_overlap
 
-    elif isinstance(parent_def, AddressableArea):
+    elif _is_deck_location(parent_def):
         return Point(x=0, y=0, z=0)
 
     else:
@@ -147,3 +145,21 @@ def _is_thermocycler_on_ot2(
         in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
         and robot_model == "OT-2 Standard"
     )
+
+
+def _is_deck_location(parent_def: LabwareParentDefinition) -> bool:
+    """Check if parent_def is a deck location (AddressableArea or SlotDefV3)."""
+    if isinstance(parent_def, AddressableArea):
+        return True
+
+    elif (
+        isinstance(parent_def, dict)
+        and "id" in parent_def
+        and "position" in parent_def
+        and "position" in parent_def
+        and "boundingBox" in parent_def
+        and "compatibleModuleTypes" in parent_def
+    ):
+        return True
+
+    return False

@@ -37,7 +37,9 @@ from ..errors import (
     InvalidLabwarePositionError,
     LabwareNotOnDeckError,
 )
-from ..errors.exceptions import InvalidLiquidHeightFound
+from ..errors.exceptions import (
+    InvalidLiquidHeightFound,
+)
 from ..resources import (
     fixture_validation,
     labware_validation,
@@ -464,7 +466,7 @@ class GeometryView:
         """Get the parent's definition given the labware's location."""
         if isinstance(location, DeckSlotLocation):
             addressable_area_name = location.slotName.id
-            return self._addressable_areas.get_addressable_area(addressable_area_name)
+            return self._addressable_areas.get_slot_definition(addressable_area_name)
 
         elif isinstance(location, AddressableAreaLocation):
             addressable_area_name = location.addressableAreaName
