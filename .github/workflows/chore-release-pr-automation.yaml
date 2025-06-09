@@ -1,0 +1,70 @@
+name: Chore Release PR Automation
+
+on:
+    pull_request:
+        types: [opened, reopened]
+    workflow_dispatch:
+        inputs:
+            chore_release_branches:
+                description: 'Comma-separated list of chore release branches'
+                required: true
+                default: 'chore_release-8.5.0,chore_release-pd-8.5.0'
+            target_branch:
+                description: 'Target branch for testing'
+                required: true
+                default: 'chore_release-8.5.0'
+
+jobs:
+  handle-chore-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Set variables for branch and target
+        id: set-vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "chore_release_branches=${{ github.event.inputs.chore_release_branches }}" >> $GITHUB_ENV
+            echo "target_branch=${{ github.event.inputs.target_branch }}" >> $GITHUB_ENV
+          else
+            echo "chore_release_branches=${{ secrets.CHORE_RELEASE_BRANCHES }}" >> $GITHUB_ENV
+            echo "target_branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+          fi
+
+      - name: Determine downstream chore release PRs
+        id: downstream
+        run: |
+          python scripts/chore_release_pr_gen.py \
+            --branch-list "$chore_release_branches" \
+            --target-branch "$target_branch" \
+            --output-file "$GITHUB_ENV"
+
+      - name: Display summary of inputs and downstream branches
+        run: |
+          # Set variables for display, using dash if empty
+          chore_release_branches_display="$chore_release_branches"
+          if [ -z "$chore_release_branches_display" ]; then chore_release_branches_display='-'; fi
+          target_branch_display="$target_branch"
+          if [ -z "$target_branch_display" ]; then target_branch_display='-'; fi
+          downstream_branches_display="$downstream_branches"
+          if [ -z "$downstream_branches_display" ]; then downstream_branches_display='-'; fi
+
+          echo "| Input                  | Value                    |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------------------|--------------------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| chore_release_branches | $chore_release_branches_display |" >> $GITHUB_STEP_SUMMARY
+          echo "| target_branch          | $target_branch_display         |" >> $GITHUB_STEP_SUMMARY
+          echo "| downstream_branches    | $downstream_branches_display   |" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$downstream_branches_display" = "-" ]; then
+            echo "\n### No downstream PRs to open." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "\n### Downstream PRs should be opened for:" >> $GITHUB_STEP_SUMMARY
+            echo "\`$downstream_branches_display\`" >> $GITHUB_STEP_SUMMARY
+          fi
