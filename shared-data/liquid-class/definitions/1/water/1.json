@@ -1126,7 +1126,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1210,7 +1210,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1372,7 +1372,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1456,7 +1456,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1614,7 +1614,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1694,7 +1694,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1848,7 +1848,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -1928,7 +1928,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2082,7 +2082,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2162,7 +2162,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2316,7 +2316,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2396,7 +2396,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2559,7 +2559,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2643,7 +2643,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2805,7 +2805,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -2889,7 +2889,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -3047,7 +3047,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -3127,7 +3127,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -3212,7 +3212,11 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -3225,7 +3229,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.75
+                "duration": 0.5
               }
             }
           },
@@ -3281,14 +3285,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -3297,7 +3305,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 15.0]],
+            "pushOutByVolume": [[1.0, 20.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -3342,7 +3350,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -3361,14 +3369,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3515,7 +3527,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -3595,7 +3607,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -3680,7 +3692,11 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -3749,14 +3765,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -3810,7 +3830,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -3829,14 +3849,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 716.0]],
+            "flowRateByVolume": [
+              [5.0, 318.0],
+              [10.0, 478.0],
+              [50.0, 478.0]
+            ],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3988,7 +4012,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4068,7 +4092,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4222,7 +4246,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4302,7 +4326,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4456,7 +4480,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4536,7 +4560,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4690,7 +4714,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4770,7 +4794,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -4924,7 +4948,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5004,7 +5028,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5158,7 +5182,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5219,7 +5243,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -5238,7 +5262,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
