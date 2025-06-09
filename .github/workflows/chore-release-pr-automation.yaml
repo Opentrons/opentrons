@@ -13,6 +13,9 @@ on:
                 description: 'Target branch for testing'
                 required: true
                 default: 'chore_release-8.5.0'
+    push:
+        branches:
+            - 'hydra-20250609'
 
 jobs:
   handle-chore-release:
