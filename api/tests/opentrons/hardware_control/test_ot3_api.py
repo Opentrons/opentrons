@@ -39,6 +39,7 @@ from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHa
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
+    GripperJawWidthData
 )
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
@@ -1602,44 +1603,56 @@ async def test_gripper_action_works_with_gripper(
     gripper = managed_obj._gripper_handler._gripper
     assert gripper
     calibration_offset = 5
-    gripper._jaw_max_offset = None if needs_calibration else calibration_offset
-    await ot3_hardware.home_gripper_jaw()
-    if needs_calibration:
-        assert mock_ungrip.call_count == 2
-        mock_grip.assert_called_once()
-    else:
+    with patch(
+        "opentrons.hardware_control.instruments.ot3.gripper.load_gripper_jaw_width",
+        return_value=GripperJawWidthData(
+            source=SourceType.default,
+            status=CalibrationStatus(),
+            encoder_position_at_jaw_closed=None if needs_calibration else 16.555,
+            last_modified=None,
+        ),
+        autospec=True,
+    ):
+        gripper._jaw_max_offset = None if needs_calibration else calibration_offset
+        gripper._encoder_position_at_jaw_closed = None if needs_calibration else 18.5
+        await ot3_hardware.home_gripper_jaw()
+        if needs_calibration:
+            assert mock_ungrip.call_count == 2
+            mock_grip.assert_called_once()
+        else:
+            mock_ungrip.assert_called_once()
+        mock_ungrip.reset_mock()
+        mock_grip.reset_mock()
+        gripper._jaw_max_offset = None if needs_calibration else 5
+        gripper._encoder_position_at_jaw_closed = None if needs_calibration else 18.5
+        await ot3_hardware.home([Axis.G])
+        if needs_calibration:
+            assert mock_ungrip.call_count == 2
+            mock_grip.assert_called_once()
+        else:
+            mock_ungrip.assert_called_once()
+
+        mock_grip.reset_mock()
+        mock_ungrip.reset_mock()
+        await ot3_hardware.grip(5.0)
+        expected_displacement = 16.0
+        if not needs_calibration:
+            expected_displacement += calibration_offset / 2
+        mock_grip.assert_called_once_with(
+            duty_cycle=gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+            expected_displacement=expected_displacement,
+            stay_engaged=True,
+        )
+
+        await ot3_hardware.ungrip()
         mock_ungrip.assert_called_once()
-    mock_ungrip.reset_mock()
-    mock_grip.reset_mock()
-    gripper._jaw_max_offset = None if needs_calibration else 5
-    await ot3_hardware.home([Axis.G])
-    if needs_calibration:
-        assert mock_ungrip.call_count == 2
-        mock_grip.assert_called_once()
-    else:
-        mock_ungrip.assert_called_once()
 
-    mock_grip.reset_mock()
-    mock_ungrip.reset_mock()
-    await ot3_hardware.grip(5.0)
-    expected_displacement = 16.0
-    if not needs_calibration:
-        expected_displacement += calibration_offset / 2
-    mock_grip.assert_called_once_with(
-        duty_cycle=gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
-        expected_displacement=expected_displacement,
-        stay_engaged=True,
-    )
+        with pytest.raises(ValueError, match="Setting gripper jaw width out of bounds"):
+            await ot3_hardware.hold_jaw_width(200)
+        mock_hold_jaw_width.reset_mock()
 
-    await ot3_hardware.ungrip()
-    mock_ungrip.assert_called_once()
-
-    with pytest.raises(ValueError, match="Setting gripper jaw width out of bounds"):
-        await ot3_hardware.hold_jaw_width(200)
-    mock_hold_jaw_width.reset_mock()
-
-    await ot3_hardware.hold_jaw_width(80)
-    mock_hold_jaw_width.assert_called_once()
+        await ot3_hardware.hold_jaw_width(80)
+        mock_hold_jaw_width.assert_called_once()
 
 
 async def test_gripper_move_fails_with_no_gripper(
