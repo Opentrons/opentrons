@@ -617,49 +617,51 @@ export function AddFixtureModal({
     )
   }
 
-  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
-    console.log('addedCutoutConfigs: ', addedCutoutConfigs)
-    const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
-      console.log('fixture.cutoutFixtureId: ', fixture.cutoutFixtureId)
-      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
-        cutoutId
-      )
-      console.log('addressableAreasById: ', addressableAreasById)
-      const addedToDef = addedCutoutConfigs.filter(aaCutoutItem => {
-        // filter addressableAreasById go only show props for the cutoutFixtureId
-        // check if there are slots that have the matching indexes. 
-        // check each adjcent slot to see whats in there
-        // if there is a match with one of the combos replace
-        const values = Object.values(addressableAreasById)
-        console.log("values: ", values)
-        console.log("aaCutoutItem.addressableAreaId: ", aaCutoutItem.addressableAreaId)
-        const filters = values.filter(aaByUd => {
-          console.log("aaByUd: ", aaByUd)
-          console.log("aaByUd.includes(aaCutoutItem.addressableAreaId): ", aaByUd.includes(aaCutoutItem.addressableAreaId))
-          return aaByUd.includes(aaCutoutItem.addressableAreaId)
+  const replaceCutoutFixtureWithComboFixture = (addedCutoutConfigs: CutoutConfigMap[]): CutoutConfigMap[] => {
+    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      cutoutId
+    )// negative filter aa to getFlexDeckDefAAByFixtureIdForCutoutId and filter by that for trash chute
+    const addedCutoutFixtures : CutoutConfigMap[] = addedCutoutConfigs.map((aaCutoutItem: CutoutConfigMap) => {
+      console.log("aaCutoutItem: ", aaCutoutItem)
+      if (SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId)){
+        const comboFixturesOptions =  Object.entries(addressableAreasById).filter(([key, value])=> {
+          return value.includes(aaCutoutItem.addressableAreaId)
         })
-        filters.filter(f => )
-        console.log("filters: ", filters)
-        console.log("deckConfig: ", deckConfig)
-      console.log("addressableAreasById[aaCutoutItem.fixtureId] ?? []: ", addressableAreasById[aaCutoutItem.cutoutFixtureId] ?? [])
-        return aaCutoutItem.cutoutFixtureId == fixture.cutoutFixtureId
-      })
-      console.log("addedToDef: ", addedToDef)
-      const fixturesForCutout = addressableAreasById[aaCutoutItem.fixtureId] ?? []
-      console.log("fixturesForCutout: ", fixturesForCutout)
-      // const aa =
-      //     aaListForFixtureId.find(
-      //       (aa: AddressableAreaNamesWithFakes) =>
-      //         aa in aaNameMapToSlotId &&
-      //         aaNameMapToSlotId[aa] == addressableAreaId
-      // ) ?? null
-      // find all fixtures related to cutoutId
-      // check if match with cutoutFixure
-      // if match check the next slot if empty continue if not add logic for checking what fixture to use 
-      return (
-        addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId) ?? fixture
-      )
+        console.log("comboFixturesOptions: ", comboFixturesOptions)
+        console.log("Object.entries(comboFixturesOptions): ", Object.entries(comboFixturesOptions))
+        for (const dc of deckConfigWithAA){
+          const match = comboFixturesOptions.filter(([key, value]) => (value.includes(dc.addressableAreaId)))
+          console.log("match:", match)
+          if (match.length > 0){
+            const moduleSn = match[0][1].filter(m => m != aaCutoutItem.addressableAreaId)
+            const sn = deckConfigWithAA.find(x => x.addressableAreaId == moduleSn)?.opentronsModuleSerialNumber
+            console.log("moduleSn: ", moduleSn)
+            return {
+              ...aaCutoutItem,
+              cutoutFixtureId: match[0][0] as CutoutFixtureId,
+              opentronsModuleSerialNumber: sn
+            } as CutoutConfigMap
+          }
+        }
+      }
+      else{
+        return {
+          ...aaCutoutItem
+        }
+      }
+    }) ?? []
+    console.log("addedCutoutFixtures: ", addedCutoutFixtures)
+    return addedCutoutFixtures
+  }
+
+  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
+    const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(addedCutoutConfigs)
+    const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
+        return (
+          addedCutoutConfigsWithCombo.find(c => c.cutoutId === fixture.cutoutId) ?? fixture
+        )
     }) as CutoutConfig[] // we can do this bc we are going to map each aa to the proper fixture
+    console.log("newDeckConfig: ", newDeckConfig)
 
     updateDeckConfiguration(newDeckConfig)
     closeModal()
