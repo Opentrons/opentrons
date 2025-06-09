@@ -17,30 +17,30 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	cd .. && yarn shx rm -rf storybook-static
+	cd .. && pnpm exec shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
 dist:
-	cd .. && yarn sb build
+	cd .. && pnpm sb build
 
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	yarn vite build
+	pnpm vite build
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build --emitDeclarationOnly
+	pnpm tsc --build --emitDeclarationOnly
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	cd .. && yarn sb dev --port $(port)
+	cd .. && pnpm sb dev --port $(port)
 
 .PHONY: test
 test:

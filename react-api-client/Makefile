@@ -18,7 +18,7 @@ all: clean build
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf dist
+	pnpm exec shx rm -rf \"dist\"
 
 .PHONY: build
 build:

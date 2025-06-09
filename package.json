@@ -25,7 +25,7 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "packageManager": "yarn@1.22.19",
+  "packageManager": "pnpm@8.15.1",
   "engines": {
     "node": ">=22.11.0"
   },

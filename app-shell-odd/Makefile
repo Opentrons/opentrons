@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 5173
@@ -21,11 +21,11 @@ noop := cd .
 # Other SSH args for robots
 ssh_opts ?= $(default_ssh_opts)
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--publish never
 
-electron := yarn electron . \
+electron := pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -44,11 +44,11 @@ all: package
 # must be wrapped in yarn run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist opentrons-robot-app.tar.gz
+	pnpm exec shx rm -rf lib dist opentrons-robot-app.tar.gz
 
 # artifacts
 #####################################################################

@@ -16,7 +16,7 @@ all: clean lib
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf $(main_out) $(cli_out)
+	pnpm exec shx rm -rf $(main_out) $(cli_out)
 
 # artifacts
 #####################################################################

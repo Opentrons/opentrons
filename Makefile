@@ -47,7 +47,7 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell yarn -s discovery find -i 169.254)
+usb_host=$(shell pnpm -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
@@ -64,8 +64,8 @@ setup-py-toolchain:
 .PHONY: setup-js
 setup-js:
 setup-js: setup-py-toolchain
-	yarn config set network-timeout 60000
-	yarn
+	pnpm config set network-timeout 60000
+	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
@@ -87,7 +87,7 @@ teardown:
 
 .PHONY: teardown-js
 teardown-js: clean-js
-	yarn shx rm -rf "**/node_modules"
+	pnpm exec shx rm -rf "**/node_modules"
 
 PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
 
@@ -220,20 +220,20 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	pnpm eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 .PHONY: lint-json
 lint-json:
-	yarn eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	pnpm eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
-	yarn stylelint "**/*.css" "**/*.js"
+	pnpm stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py
@@ -248,18 +248,18 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 .PHONY: format-js
 format-js:
-	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: check-js
 check-js: build-ts
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build
+	pnpm tsc --build
 
 .PHONY: clean-ts
 clean-ts:
-	yarn tsc --build --clean
+	pnpm tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 JS_CIRCULAR_DEPENDENCIES_ROOTS := \
@@ -275,11 +275,11 @@ JS_CIRCULAR_DEPENDENCIES_TARGETS := $(addsuffix -circular-dependencies-js, $(JS_
 circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 %-circular-dependencies-js:
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular $*
+	pnpm madge $(and $(CI),--no-spinner --no-color) --circular $*
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn vitest $(tests) $(test_opts) $(cov_opts)
+	pnpm vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%: 

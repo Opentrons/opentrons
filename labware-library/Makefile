@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest

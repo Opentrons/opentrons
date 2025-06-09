@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
@@ -22,7 +22,7 @@ all: clean build
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
@@ -85,29 +85,29 @@ cy-lint-fix: cy-lint-eslint-fix cy-lint-prettier-fix
 
 .PHONY: cy-lint-eslint-check
 cy-lint-eslint-check: clean-downloads clean-screenshots
-	yarn eslint --ignore-path ../.eslintignore $(CYPRESS_ESLINT_GLOB)
+	pnpm eslint --ignore-path ../.eslintignore $(CYPRESS_ESLINT_GLOB)
 	@echo "Cypress ESLint check completed."
 
 .PHONY: cy-lint-eslint-fix
 cy-lint-eslint-fix: clean-downloads clean-screenshots
-	yarn eslint --fix --ignore-pattern ../.eslintignore $(CYPRESS_ESLINT_GLOB)
+	pnpm eslint --fix --ignore-pattern ../.eslintignore $(CYPRESS_ESLINT_GLOB)
 	@echo "Cypress ESLint fix applied."
 
 .PHONY: cy-lint-prettier-check
 cy-lint-prettier-check: clean-downloads clean-screenshots
-	yarn prettier --ignore-path ../.eslintignore --check $(CYPRESS_PRETTIER_GLOB)
+	pnpm prettier --ignore-path ../.eslintignore --check $(CYPRESS_PRETTIER_GLOB)
 	@echo "Cypress Prettier check completed."
 
 .PHONY: cy-lint-prettier-fix
 cy-lint-prettier-fix: clean-downloads clean-screenshots
-	yarn prettier --ignore-path ../.eslintignore --write $(CYPRESS_PRETTIER_GLOB)
+	pnpm prettier --ignore-path ../.eslintignore --write $(CYPRESS_PRETTIER_GLOB)
 	@echo "Cypress Prettier fix applied."
 
 .PHONY: cy-ui
 cy-ui:
 	@echo "Running Cypress UI"
 	@echo "Dev environment must be running"
-	yarn cypress open
+	pnpm cypress open
 
 .PHONY: clean-downloads
 clean-downloads:
