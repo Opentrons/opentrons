@@ -5,6 +5,7 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 
+import { ResetAdvancedSettingsModal } from '../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal'
 import { AspirateSettingDetail } from './AspirateSettingDetail'
 import { AspirateSettingItem } from './AspirateSettingItem'
 import { useAspirateSettingsConfig } from './hooks/useAspirateSettingsConfig'
@@ -29,6 +30,10 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     selectedSetting,
     setSelectedSetting,
   ] = useState<AspirateSettingOption | null>(null)
+  const [
+    showResetAdvancedSettingsModal,
+    setShowResetAdvancedSettingsModal,
+  ] = useState<boolean>(false)
 
   const aspirateSettingsItems = useAspirateSettingsConfig({
     state,
@@ -36,40 +41,52 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     setSelectedSetting,
   })
 
+  const handleResetSettings = (): void => {
+    setShowResetAdvancedSettingsModal(true)
+  }
+  const handleClose = (): void => {
+    setShowResetAdvancedSettingsModal(false)
+  }
+
   return (
-    <Flex
-      gap={SPACING.spacing40}
-      flexDirection={DIRECTION_COLUMN}
-      paddingTop={PADDING_TOP_FOR_NAV}
-    >
-      <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        {selectedSetting == null ? (
-          <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-            {aspirateSettingsItems.map(displayItem => (
-              <AspirateSettingItem
-                key={displayItem.value}
-                displayItem={displayItem}
-              />
-            ))}
-          </Flex>
-        ) : null}
-        <AspirateSettingDetail
-          selectedSetting={selectedSetting}
-          state={state}
-          dispatch={dispatch}
-          onBack={() => {
-            setSelectedSetting(null)
-          }}
+    <>
+      {showResetAdvancedSettingsModal ? (
+        <ResetAdvancedSettingsModal
+          kind="aspirate"
+          liquidClass={state.liquidClass}
+          onClose={handleClose}
+        />
+      ) : null}
+      <Flex
+        gap={SPACING.spacing40}
+        flexDirection={DIRECTION_COLUMN}
+        paddingTop={PADDING_TOP_FOR_NAV}
+      >
+        <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          {selectedSetting == null ? (
+            <Flex gap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+              {aspirateSettingsItems.map(displayItem => (
+                <AspirateSettingItem
+                  key={displayItem.option}
+                  displayItem={displayItem}
+                />
+              ))}
+            </Flex>
+          ) : null}
+          <AspirateSettingDetail
+            selectedSetting={selectedSetting}
+            state={state}
+            dispatch={dispatch}
+            onBack={() => {
+              setSelectedSetting(null)
+            }}
+          />
+        </Flex>
+        <MediumButton
+          buttonText={t('reset_settings', { transferName: 'aspirate' })}
+          onClick={handleResetSettings}
         />
       </Flex>
-
-      {/* ToDo add reset button for aspirate settings */}
-      <MediumButton
-        buttonText={t('reset_settings', { transferName: 'aspirate' })}
-        onClick={() => {
-          console.log('reset aspirate settings')
-        }}
-      />
-    </Flex>
+    </>
   )
 }
