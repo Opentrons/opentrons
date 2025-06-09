@@ -188,21 +188,24 @@ class FixtureSettings:
             + volumes_to_test_200ul
             + volumes_to_test_1000ul
         )
+        adapter: Optional[str] = (
+            "opentrons_flex_96_tiprack_adapter" if pipette_channels == 96 else None
+        )
 
         tipracks_20ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_20uL", slot)
+            ctx.load_labware("opentrons_flex_96_tiprack_20uL", slot, adapter=adapter)
             for slot in tipracks_20ul
         ]
         tipracks_50ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_50uL", slot)
+            ctx.load_labware("opentrons_flex_96_tiprack_50uL", slot, adapter=adapter)
             for slot in tipracks_50ul
         ]
         tipracks_200ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_200uL", slot)
+            ctx.load_labware("opentrons_flex_96_tiprack_200uL", slot, adapter=adapter)
             for slot in tipracks_200ul
         ]
         tipracks_1000ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_1000uL", slot)
+            ctx.load_labware("opentrons_flex_96_tiprack_1000uL", slot, adapter=adapter)
             for slot in tipracks_1000ul
         ]
         tips = {}
