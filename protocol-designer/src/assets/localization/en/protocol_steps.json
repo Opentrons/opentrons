@@ -22,7 +22,7 @@
     "targetHeaterShakerTemperature": "Must be between 37 and 95˚C",
     "blockTargetTempHold": "Must be between 4 and 99˚C",
     "lidTargetTempHold": "Must be between 37 and 110˚C",
-    "volume": "Must be between 0 and {{max}}"
+    "volume": "Must be between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
   "column": "Column",

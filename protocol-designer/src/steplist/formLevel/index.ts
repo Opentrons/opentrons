@@ -65,6 +65,7 @@ import {
   temperatureRequired,
   timesRequired,
   transferVolumeMax,
+  transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
   wavelengthOutOfRange,
@@ -175,6 +176,7 @@ const stepFormHelperMap: {
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
       transferVolumeMax,
+      transferVolumeMin,
       pipetteRequired
     ),
     getWarnings: composeWarnings(
@@ -225,6 +227,7 @@ const stepFormHelperMap: {
       conditioningVolumeOutOfRange,
       blowoutFlowRateRequired,
       transferVolumeMax,
+      transferVolumeMin,
       pipetteRequired
     ),
     getWarnings: composeWarnings(
