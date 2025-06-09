@@ -1,5 +1,7 @@
-from typing import Optional, Callable, TYPE_CHECKING
+from typing import Optional, Callable
 import pytest
+from unittest import mock
+from datetime import datetime
 
 from opentrons.types import Point
 from opentrons.calibration_storage import types as cal_types
@@ -9,26 +11,29 @@ from opentrons.config import gripper_config
 from opentrons_shared_data.gripper import GripperModel
 from opentrons_shared_data.errors.exceptions import MotionFailedError
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-        GripperCalibrationOffset,
-    )
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    GripperJawWidthData,
+)
 
 fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
 
 @pytest.mark.ot3_only
 @pytest.fixture
-def fake_offset() -> "GripperCalibrationOffset":
-    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-        load_gripper_calibration_offset,
-    )
+def fake_offset() -> GripperCalibrationOffset:
 
-    return load_gripper_calibration_offset("fakeid123")
+    return instrument_calibration.load_gripper_calibration_offset("fakeid123")
 
 
 @pytest.mark.ot3_only
-def test_id_get_added_to_dict(fake_offset: "GripperCalibrationOffset") -> None:
+@pytest.fixture
+def fake_jaw_cal() -> GripperJawWidthData:
+    return instrument_calibration.load_gripper_jaw_width("fakeid123")
+
+
+@pytest.mark.ot3_only
+def test_id_get_added_to_dict(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
@@ -53,14 +58,14 @@ def test_id_get_added_to_dict(fake_offset: "GripperCalibrationOffset") -> None:
 def test_critical_point(
     override: Optional[CriticalPoint],
     result_accessor: Callable[[gripper.Gripper], Point],
-    fake_offset: "GripperCalibrationOffset",
+    fake_offset: GripperCalibrationOffset,
 ) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.critical_point(override) == result_accessor(gripr)
 
 
 @pytest.mark.ot3_only
-def test_load_gripper_cal_offset(fake_offset: "GripperCalibrationOffset") -> None:
+def test_load_gripper_cal_offset(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if offset data do not exist, loaded values should match DEFAULT
     assert gripr._calibration_offset.offset == Point(
@@ -68,8 +73,68 @@ def test_load_gripper_cal_offset(fake_offset: "GripperCalibrationOffset") -> Non
     )
 
 
+# need a test for update_open_position_from_closed_position
+
+
 @pytest.mark.ot3_only
-def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> None:
+def test_gripper_default_jaw_width_calibration(
+    fake_jaw_cal: GripperJawWidthData,
+    fake_offset: GripperCalibrationOffset,
+) -> None:
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    assert gripr._jaw_max_offset is None
+    assert gripr._encoder_position_at_jaw_closed is None
+
+
+@pytest.mark.parametrize("loaded_encoder_pos", [24.4, None])
+@pytest.mark.parametrize("existing_encoder_pos", [24.4, None])
+@pytest.mark.ot3_only
+def test_gripper_has_jaw_width_calibration(
+    fake_jaw_cal: GripperJawWidthData,
+    fake_offset: GripperCalibrationOffset,
+    loaded_encoder_pos: float,
+    existing_encoder_pos: float,
+) -> None:
+
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    gripr._encoder_position_at_jaw_closed = existing_encoder_pos
+    with mock.patch(
+        "opentrons.hardware_control.instruments.ot3.gripper.load_gripper_jaw_width",
+        return_value=GripperJawWidthData(
+            source=fake_jaw_cal.source,
+            status=fake_jaw_cal.status,
+            encoder_position_at_jaw_closed=loaded_encoder_pos,
+            last_modified=datetime.now(),
+        ),
+        autospec=True,
+    ) as fake_load_jaw_width:
+        has_cal = gripr.has_jaw_width_calibration
+        mock_save_gripper_jaw_width_data = mock.Mock()
+        mock.patch(
+            "opentrons.hardware_control.instruments.ot3.gripper.save_gripper_jaw_width_data",
+            return_value=mock_save_gripper_jaw_width_data(),
+        )
+        # if gripper._encoder_position_at_jaw_closed has no value:
+        if existing_encoder_pos is None:
+            # gripper should try to load jaw width from the robot fs
+            fake_load_jaw_width.assert_called_once()
+            if loaded_encoder_pos is None:
+                assert has_cal is False
+            else:
+                # if robot fs has gripper jaw width data,
+                # it should get saved to the gripper object and has_cal return true
+                mock_save_gripper_jaw_width_data.assert_called_once()
+                assert has_cal is True
+        # if gripper._encoder_position_at_jaw_closed has a value:
+        else:
+            # gripper doesn't try to load from the robot and returns true
+            fake_load_jaw_width.assert_not_called()
+            assert has_cal is True
+            mock_save_gripper_jaw_width_data.assert_called_once()
+
+
+@pytest.mark.ot3_only
+def test_reload_instrument_cal_ot3(fake_offset: GripperCalibrationOffset) -> None:
     old_gripper = gripper.Gripper(
         fake_gripper_conf,
         fake_offset,
@@ -96,7 +161,7 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
 
 @pytest.mark.ot3_only
 def test_reload_instrument_cal_ot3_conf_changed(
-    fake_offset: "GripperCalibrationOffset",
+    fake_offset: GripperCalibrationOffset,
 ) -> None:
     old_gripper = gripper.Gripper(
         fake_gripper_conf,

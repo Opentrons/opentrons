@@ -22,6 +22,7 @@ from .instrument_calibration import (
     save_gripper_jaw_width_data,
     load_gripper_jaw_width,
 )
+
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 from opentrons_shared_data.errors.exceptions import (
@@ -196,6 +197,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         """
         if jaw_at_closed is None:
             self._encoder_position_at_jaw_closed = jaw_at_closed
+            self._jaw_max_offset = None
             return
         jaw_min = self._config.geometry.jaw_width["min"]
         jaw_nominal_max = self._config.geometry.jaw_width["max"]
