@@ -130,7 +130,6 @@ def test_submerge(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
-            logger=matchers.Anything(),
         ),
         mock_instrument_core.move_to(
             location=Location(Point(x=2, y=4, z=7), labware=None),
@@ -201,7 +200,6 @@ def test_submerge_without_starting_air_gap(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
-            logger=matchers.Anything(),
         ),
         mock_instrument_core.move_to(
             location=Location(Point(x=2, y=4, z=7), labware=None),
@@ -312,7 +310,6 @@ def test_submerge_raises_when_submerge_point_is_invalid(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
-            logger=matchers.Anything(),
         )
     ).then_raise(RuntimeError("Oh no!"))
     with pytest.raises(RuntimeError, match="Oh no!"):
@@ -756,7 +753,6 @@ def test_retract_after_aspiration(
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
-            logger=matchers.Anything(),
         ),
         mock_instrument_core.move_to(
             location=Location(Point(x=4, y=4, z=4), labware=None),
@@ -818,7 +814,6 @@ def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
-            logger=matchers.Anything(),
         )
     ).then_raise(RuntimeError("Oh no!"))
     with pytest.raises(RuntimeError, match="Oh no!"):
@@ -1689,7 +1684,6 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
-            logger=matchers.Anything(),
         )
     ).then_raise(RuntimeError("Oh no!"))
     with pytest.raises(RuntimeError, match="Oh no!"):
@@ -1768,7 +1762,6 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
-            logger=matchers.Anything(),
         ),
         mock_instrument_core.move_to(
             location=Location(Point(3, 5, 4), labware=None),
@@ -1883,7 +1876,6 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
-            logger=matchers.Anything(),
         ),
         mock_instrument_core.move_to(
             location=Location(Point(3, 5, 4), labware=None),
@@ -1972,7 +1964,6 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
-            logger=matchers.Anything(),
         )
     ).then_raise(RuntimeError("Oh no!"))
     with pytest.raises(RuntimeError, match="Oh no!"):

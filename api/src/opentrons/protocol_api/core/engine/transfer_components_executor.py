@@ -194,7 +194,6 @@ class TransferComponentsExecutor:
                     location_type="submerge start",
                     pipetting_action=post_submerge_action,
                 ),
-                logger=log,
             )
         else:
             submerge_start_location = self._target_location
@@ -370,7 +369,6 @@ class TransferComponentsExecutor:
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
-            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,
@@ -475,7 +473,6 @@ class TransferComponentsExecutor:
                     location_type="retract end",
                     pipetting_action="dispense",
                 ),
-                logger=log,
             )
             self._instrument.move_to(
                 location=retract_location,
@@ -628,7 +625,6 @@ class TransferComponentsExecutor:
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
-            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,

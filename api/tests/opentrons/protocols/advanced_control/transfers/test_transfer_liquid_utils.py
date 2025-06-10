@@ -1,6 +1,5 @@
 """Tests for transfer_liquid_utils."""
 import pytest
-from logging import Logger
 from decoy import Decoy
 from typing import ContextManager, Any
 from contextlib import nullcontext as does_not_raise
@@ -208,7 +207,6 @@ def test_raise_only_if_pip_location_below_target(
             well_location=well_location,
             well_core=well_core,
             location_check_descriptors=location_descriptors,
-            logger=logger,
         )
 
 
@@ -265,8 +263,6 @@ def test_raise_only_if_pip_location_inside_liquid(
         location_type="retract end",
         pipetting_action="aspirate",
     )
-    logger = decoy.mock(cls=Logger)
-
     decoy.when(well_core.current_liquid_height()).then_return(liquid_height)
     decoy.when(well_core.get_bottom(0)).then_return(well_bottom)
     decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
@@ -276,41 +272,7 @@ def test_raise_only_if_pip_location_inside_liquid(
             well_location=well_location,
             well_core=well_core,
             location_check_descriptors=location_descriptors,
-            logger=logger,
         )
-
-
-def test_log_warning_if_pip_location_cannot_be_validated(
-    decoy: Decoy,
-) -> None:
-    """It should log a warning if we don't have access to liquid height."""
-    pip_location = Location(point=Point(1, 2, 3), labware=None)
-    well_location = Location(point=Point(1, 1, 1), labware=None)
-    well_core = decoy.mock(cls=WellCore)
-    location_descriptors = LocationCheckDescriptors(
-        location_type="retract end",
-        pipetting_action="aspirate",
-    )
-    logger = decoy.mock(cls=Logger)
-
-    decoy.when(well_core.current_liquid_height()).then_raise(LiquidHeightUnknownError())
-    decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
-    decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
-    raise_if_location_inside_liquid(
-        location=pip_location,
-        well_location=well_location,
-        well_core=well_core,
-        location_check_descriptors=location_descriptors,
-        logger=logger,
-    )
-    decoy.verify(
-        logger.warning(
-            "Could not verify height of liquid in well Well A1 of test_labware, either"
-            " because the liquid in this well has not been probed or because"
-            " liquid was not loaded in this well using `load_liquid`."
-            " Proceeding without verifying if retract end location is outside the liquid."
-        )
-    )
 
 
 @pytest.mark.parametrize(

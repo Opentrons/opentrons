@@ -28,14 +28,12 @@ def raise_if_location_inside_liquid(
     well_location: Location,
     well_core: WellCore,
     location_check_descriptors: LocationCheckDescriptors,
-    logger: Logger,
 ) -> None:
     """Raise an error if the location in question would be inside the liquid.
 
     This checker will raise an error if:
     - the location in question is below the target well location during aspirate/dispense or,
     - if we can find the liquid height AND the location in question is below this height.
-      If we can't find the liquid height, then we simply log a warning and no error is raised.
     """
     if location.point.z < well_location.point.z:
         raise RuntimeError(
@@ -48,6 +46,9 @@ def raise_if_location_inside_liquid(
         liquid_height_from_bottom = well_core.current_liquid_height()
     except LiquidHeightUnknownError:
         liquid_height_from_bottom = None
+    # Raise an error only when LPD is enabled or when liquids are
+    # loaded in protocols using `load_liquid`.
+    # Do nothing if we can't be sure of the target position with respect to the liquid.
     if isinstance(liquid_height_from_bottom, (int, float)):
         if liquid_height_from_bottom + well_core.get_bottom(0).z > location.point.z:
             raise RuntimeError(
@@ -55,18 +56,6 @@ def raise_if_location_inside_liquid(
                 f" inside the liquid in well {well_core.get_display_name()} when it should be outside"
                 f"(above) the liquid."
             )
-    else:
-        # We could raise an error here but that would restrict the use of
-        # liquid classes-based transfer to only when LPD is enabled or when liquids are
-        # loaded in protocols using `load_liquid`. This can be quite restrictive
-        # so we will not raise but just log a warning.
-        logger.warning(
-            f"Could not verify height of liquid in well {well_core.get_display_name()}, either"
-            f" because the liquid in this well has not been probed or because"
-            f" liquid was not loaded in this well using `load_liquid`."
-            f" Proceeding without verifying if {location_check_descriptors.location_type}"
-            f" location is outside the liquid."
-        )
 
 
 def group_wells_for_multi_channel_transfer(
