@@ -11,7 +11,6 @@ from opentrons.protocol_engine.state._well_math import (
 from opentrons.types import NozzleMapInterface, NozzleConfigurationType
 
 if TYPE_CHECKING:
-    from logging import Logger
     from opentrons.types import Location
     from opentrons.protocol_api.core.engine import WellCore
     from opentrons.protocol_api.labware import Well, Labware

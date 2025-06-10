@@ -1,6 +1,6 @@
 """Tests for complex commands executor."""
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
     PositionReference,
