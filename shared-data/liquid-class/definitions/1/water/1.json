@@ -3277,7 +3277,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.75
+                "duration": 0.5
               }
             }
           },
@@ -3353,7 +3353,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 15.0]],
+            "pushOutByVolume": [[1.0, 20.0]],
             "delay": {
               "enable": false,
               "params": {
