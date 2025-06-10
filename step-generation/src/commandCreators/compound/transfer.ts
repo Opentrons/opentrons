@@ -734,15 +734,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             args.mixInDestination != null && destinationWell != null
               ? 0
               : pushOut
-          const dispenseCorrectionVolumeForSubtransferTarget = getCorrectionVolume(
-            {
-              liquidClass: args.liquidClass,
-              pipetteSpecs,
-              tiprackDefUri: args.tipRack,
-              targetVolume: subTransferVol,
-              liquidHandlingAction: 'singleDispense',
-            }
-          )
           const dispenseCommands = [
             curryWithoutPython(dispenseInPlace, {
               pipetteId: args.pipette,
