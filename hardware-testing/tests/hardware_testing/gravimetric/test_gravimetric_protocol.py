@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 from pathlib import Path
 
 from click.testing import CliRunner
-from opentrons.cli.analyze import analyze, AnalysisResult
+from opentrons.cli.analyze import analyze
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 
