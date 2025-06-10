@@ -25,6 +25,7 @@ import {
   delay,
   dispenseInPlace,
   moveToWell,
+  prepareToAspirate,
   touchTip,
 } from '../atomic'
 import { replaceTip } from './replaceTip'
@@ -272,8 +273,8 @@ export const mix: CommandCreator<MixArgs> = (
 
   // Errors
   if (
-    !prevRobotState.pipettes[pipette] ||
-    !invariantContext.pipetteEntities[pipette]
+    prevRobotState.pipettes[pipette] == null ||
+    invariantContext.pipetteEntities[pipette] == null
   ) {
     // bail out before doing anything else
     return {
@@ -285,7 +286,7 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  if (!prevRobotState.labware[labware]) {
+  if (prevRobotState.labware[labware] == null) {
     return {
       errors: [
         errorCreators.labwareDoesNotExist({
@@ -345,12 +346,17 @@ export const mix: CommandCreator<MixArgs> = (
     invariantContext.pipetteEntities[pipette].name
   )
     ? [
-        curryCommandCreator(configureForVolume, {
+        curryWithoutPython(configureForVolume, {
           pipetteId: pipette,
-          volume: volume,
+          volume,
         }),
       ]
     : []
+  const prepareToAspirateCommand: CurriedCommandCreator[] = [
+    curryWithoutPython(prepareToAspirate, {
+      pipetteId: pipette,
+    }),
+  ]
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -388,6 +394,19 @@ export const mix: CommandCreator<MixArgs> = (
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
       })
+      const trashLikeEntityIds = [
+        ...Object.keys(invariantContext.wasteChuteEntities),
+        ...Object.keys(invariantContext.trashBinEntities),
+      ]
+      console.log({ trashLikeEntityIds, blowoutLocation: data.blowoutLocation })
+      const isBlowoutLocationTrashLikeEntity = trashLikeEntityIds.some(
+        id => id === data.blowoutLocation
+      )
+      console.log(isBlowoutLocationTrashLikeEntity)
+      const advancedDispenseCommands = isBlowoutLocationTrashLikeEntity
+        ? [...touchTipCommands, ...blowoutCommand]
+        : [...blowoutCommand, ...touchTipCommands]
+
       const mixCommands = mixInPlaceUtil({
         pipette,
         volume,
@@ -417,9 +436,9 @@ export const mix: CommandCreator<MixArgs> = (
       return [
         ...tipCommands,
         ...configureForVolumeCommand,
+        ...prepareToAspirateCommand,
         ...mixCommands,
-        ...blowoutCommand,
-        ...touchTipCommands,
+        ...advancedDispenseCommands,
       ]
     }
   )

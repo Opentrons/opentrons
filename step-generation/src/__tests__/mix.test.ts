@@ -21,6 +21,7 @@ import {
   makeContext,
   makeDispenseInPlaceHelper,
   makeTouchTipHelper,
+  prepareAndConfigureCommands,
   replaceTipCommands,
   SOURCE_LABWARE,
 } from '../fixtures'
@@ -96,6 +97,7 @@ describe('mix: change tip', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -169,6 +171,7 @@ mock_pipette.mix(
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -211,6 +214,7 @@ mock_pipette.mix(
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -264,6 +268,7 @@ describe('mix: advanced options', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
+      ...prepareAndConfigureCommands(volume, false),
       ...aspirateInPlaceHelper(
         {
           pipetteId: 'p300SingleId',
@@ -321,6 +326,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -373,6 +379,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -434,6 +441,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -494,6 +502,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -547,6 +556,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
+        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -612,6 +622,7 @@ describe('mix: advanced options', () => {
       expect(res.commands).toEqual(
         flatMap(args.wells, (well, idx) => [
           ...replaceTipCommands(idx),
+          ...prepareAndConfigureCommands(volume, false),
           ...aspirateInPlaceHelper(
             {
               pipetteId: 'p300SingleId',

@@ -451,7 +451,7 @@ export const moveLiquidFormToArgs = (
         disposalVolume,
         conditioningVolume,
         // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
-        blowoutLocation: hydratedFormData.blowout_location,
+        blowoutLocation,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         // cannot distribute into a waste chute so if destWells is null

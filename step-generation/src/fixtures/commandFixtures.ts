@@ -61,6 +61,33 @@ export const replaceTipCommands = (tip: number | string): CreateCommand[] => [
   ...dropTipHelper(),
   pickUpTipHelper(tip),
 ]
+export const prepareAndConfigureCommands = (
+  volume: number,
+  configure: boolean = true
+): CreateCommand[] => {
+  const configureCommands: CreateCommand[] = configure
+    ? [
+        {
+          commandType: 'configureForVolume',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume,
+          },
+        },
+      ]
+    : []
+  return [
+    ...configureCommands,
+    {
+      commandType: 'prepareToAspirate',
+      key: expect.any(String),
+      params: {
+        pipetteId: 'p300SingleId',
+      },
+    },
+  ]
+}
 // NOTE: make sure none of these numbers match each other!
 const ASPIRATE_FLOW_RATE = 2.1
 const DISPENSE_FLOW_RATE = 2.2

@@ -263,6 +263,7 @@ describe('generateRobotStateTimeline', () => {
         ],
         [
           "pickUpTip",
+          "prepareToAspirate",
           "moveToWell",
           "aspirateInPlace",
           "dispenseInPlace",
@@ -271,6 +272,7 @@ describe('generateRobotStateTimeline', () => {
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
           "pickUpTip",
+          "prepareToAspirate",
           "moveToWell",
           "aspirateInPlace",
           "dispenseInPlace",
