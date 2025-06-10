@@ -126,11 +126,11 @@ export const transfer: CommandCreator<TransferArgs> = (
     liquidClass,
     mixBeforeAspirate,
     mixInDestination,
-    nozzles,
     pipette,
     preWetTip,
     pushOut,
     sourceLabware,
+    nozzles,
     sourceWells,
     tipRack,
     touchTipAfterAspirate,
@@ -426,7 +426,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette,
                   dropTipLocation,
                   tipRack,
-                  ...(args.nozzles != null ? { nozzles: args.nozzles } : {}),
+                  ...(nozzles != null ? { nozzles } : {}),
                 }),
               ]
             : []
