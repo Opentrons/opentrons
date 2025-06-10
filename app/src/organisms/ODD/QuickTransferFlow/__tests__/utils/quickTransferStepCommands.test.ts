@@ -150,7 +150,6 @@ describe('quickTransferStepCommands', () => {
       dispenseRetractYOffset: 0,
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
-      blowoutOffsetFromTopMm: -1,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       mixInDestination: null,
@@ -250,7 +249,6 @@ pipette.drop_tip()
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       touchTipAfterAspirateMmFromEdge: null,
-      blowoutOffsetFromTopMm: -1,
       blowoutLocation: 'mockTrashBin',
       mixFirstAspirate: null,
       mixInDestination: null,
@@ -357,7 +355,6 @@ pipette.drop_tip()
       dispenseRetractYOffset: 0,
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
-      blowoutOffsetFromTopMm: -1,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -422,7 +419,7 @@ pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.move_to(mock_labware_2["B1"].bottom())
 pipette.dispense(volume=10, flow_rate=80)
 pipette.move_to(mock_labware_2["B1"].bottom())
-pipette.move_to(mock_labware_1["A1"].top(z=-1))
+pipette.move_to(mock_labware_1["A1"].top())
 pipette.flow_rate.blow_out = 50
 pipette.blow_out()
 pipette.drop_tip()

@@ -93,7 +93,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     destLabware,
     destWell,
@@ -825,11 +824,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             wellName: destWell,
             wellLocation: {
               origin: WELL_ORIGIN_TOP,
-              offset: {
-                x: 0,
-                y: 0,
-                z: blowoutOffsetFromTopMm,
-              },
             },
           }),
 
