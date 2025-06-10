@@ -74,13 +74,13 @@ const PYTHON_BY_PLATFORM = {
   win32: {
     fallback: {
       file:
-        '20250529/cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
+        'cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
       sha256:
         '775558a9ad71d42afb168ff76f6db6fa4bf512e933b888e55c8f0557860eac83',
     },
     x64: {
       file:
-        '20250529/cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
+        'cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
       sha256:
         '775558a9ad71d42afb168ff76f6db6fa4bf512e933b888e55c8f0557860eac83',
     },
