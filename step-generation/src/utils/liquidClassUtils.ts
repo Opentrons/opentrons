@@ -91,7 +91,10 @@ export const getCustomLiquidClassProperties = (
                 args.touchTipAfterAspirateMmFromEdge != null
                   ? args.touchTipAfterAspirateMmFromEdge
                   : undefined,
-              speed: args.touchTipAfterAspirateSpeed ?? undefined,
+              speed:
+                args.touchTipAfterAspirate != null
+                  ? args.touchTipAfterAspirateSpeed
+                  : undefined,
             },
           },
         },
@@ -157,7 +160,10 @@ export const getCustomLiquidClassProperties = (
                 args.touchTipAfterDispenseMmFromEdge != null
                   ? args.touchTipAfterDispenseMmFromEdge
                   : undefined,
-              speed: args.touchTipAfterDispenseSpeed ?? undefined,
+              speed:
+                args.touchTipAfterDispense != null
+                  ? args.touchTipAfterDispenseSpeed
+                  : undefined,
             },
             blowout: {
               enabled: args.blowoutLocation != null,
