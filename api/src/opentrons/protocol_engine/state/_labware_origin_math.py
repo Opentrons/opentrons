@@ -27,6 +27,7 @@ def get_parent_placement_origin_to_lw_origin(
     parent_entity: ModuleDefinition,
     module_parent_to_child_offset: LabwareOffsetVector,
     deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool,
 ) -> Point:
     ...
 
@@ -37,6 +38,7 @@ def get_parent_placement_origin_to_lw_origin(
     parent_entity: DeckLocationDefinition,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool,
 ) -> Point:
     ...
 
@@ -47,6 +49,7 @@ def get_parent_placement_origin_to_lw_origin(
     parent_entity: LabwareDefinition,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool,
 ) -> Point:
     ...
 
@@ -56,6 +59,7 @@ def get_parent_placement_origin_to_lw_origin(
     parent_entity: LabwareParentDefinition,
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool,
 ) -> Point:
     """Returns the offset from parent entity's placement origin to child labware origin.
 
@@ -65,12 +69,31 @@ def get_parent_placement_origin_to_lw_origin(
     Only parent-child specific offsets are calculated. Offsets that apply to a single entity
     (ex., module cal) or the entire stackup (ex., LPC) are handled elsewhere.
     """
+    parent_entity_origin_to_child_labware_placement_origin = (
+        _get_parent_entity_origin_to_child_labware_placement_origin(
+            child_labware=child_labware,
+            parent_entity=parent_entity,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+    )
+
     if isinstance(child_labware, LabwareDefinition2):
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
-        parent_entity_origin_to_child_labware_origin = Point(
-            child_labware.cornerOffsetFromSlot.x,
-            child_labware.cornerOffsetFromSlot.y,
-            child_labware.cornerOffsetFromSlot.z,
+        # We only consider it when the child labware is the topmost labware in a stackup.
+        parent_entity_origin_to_child_labware_origin = (
+            Point(
+                child_labware.cornerOffsetFromSlot.x,
+                child_labware.cornerOffsetFromSlot.y,
+                child_labware.cornerOffsetFromSlot.z,
+            )
+            if is_topmost_labware
+            else Point(0, 0, 0)
+        )
+
+        return (
+            parent_entity_origin_to_child_labware_placement_origin
+            + parent_entity_origin_to_child_labware_origin
         )
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
@@ -81,19 +104,10 @@ def get_parent_placement_origin_to_lw_origin(
             z=-1 * child_labware.extents.total.backLeftBottom.z,
         )
 
-    parent_entity_origin_to_child_labware_placement_origin = (
-        _get_parent_entity_origin_to_child_labware_placement_origin(
-            child_labware=child_labware,
-            parent_entity=parent_entity,
-            module_parent_to_child_offset=module_parent_to_child_offset,
-            deck_definition=deck_definition,
+        return (
+            parent_entity_origin_to_child_labware_placement_origin
+            + parent_entity_origin_to_child_labware_origin
         )
-    )
-
-    return (
-        parent_entity_origin_to_child_labware_placement_origin
-        + parent_entity_origin_to_child_labware_origin
-    )
 
 
 def _get_parent_entity_origin_to_child_labware_placement_origin(

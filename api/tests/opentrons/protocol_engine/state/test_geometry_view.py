@@ -1145,8 +1145,11 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
     ).then_return(Point(11, 22, 33))
 
     expected_highest_z = (
-        33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
-    )  # Both the adapter and the top labware.
+        33
+        + 1000
+        + 3
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 3  # The entire labware stackup.
+    )
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
