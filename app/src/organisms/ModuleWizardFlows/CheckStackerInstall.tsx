@@ -16,8 +16,6 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
-
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardStepProps } from './types'
@@ -27,14 +25,6 @@ interface CheckStackerInstallProps extends ModuleSetupWizardStepProps {
   attachedModules: AttachedModule[]
   doorOpenStatus: boolean
 }
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 const BUTTON_STYLE = css`
     width: 100%;
