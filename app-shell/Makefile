@@ -98,7 +98,11 @@ setup:
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib dist python
+	yarn shx rm -rf lib dist python/install
+
+.PHONY: cleanall
+cleanall: clean
+	yarn shx rm -rf python
 
 # artifacts
 #####################################################################

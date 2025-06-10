@@ -46,7 +46,6 @@ module.exports = async () => ({
     ).versionForProject(project),
     productName: project === 'robot-stack' ? 'Opentrons' : 'Opentrons-OT3',
   },
-  extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
@@ -91,5 +90,5 @@ module.exports = async () => ({
   },
   publish: publishConfig,
   generateUpdatesFilesForAllChannels: true,
-  beforePack: path.join(__dirname, './scripts/before-pack.js'),
+  afterPack: path.join(__dirname, './scripts/after-pack.js'),
 })
