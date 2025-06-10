@@ -18,6 +18,44 @@ export function getSchema2Dimensions(
 }
 
 /**
+ * Return a bounding box, in coordinates relative to the labware's origin,
+ * that encloses the labware when viewed from the top down.
+ */
+export function getLabwareViewBox(
+  definition: LabwareDefinition
+): {
+  /** The minimum x-coord, i.e. the left of the labware. */
+  minX: number
+  /** The minimum y-coord, i.e. the front of the labware. */
+  minY: number
+  xDimension: number
+  yDimension: number
+} {
+  if (definition.schemaVersion === 2) {
+    const { xDimension, yDimension } = definition.dimensions
+    return {
+      // In labware schema 2, the front-left is always at (0, 0) by definition.
+      minX: 0,
+      minY: 0,
+      xDimension,
+      yDimension,
+    }
+  } else {
+    const { backLeftBottom, frontRightTop } = definition.extents.total
+    const minX = backLeftBottom.x
+    const maxX = frontRightTop.x
+    const minY = frontRightTop.y
+    const maxY = backLeftBottom.y
+    return {
+      minX,
+      minY,
+      xDimension: maxX - minX,
+      yDimension: maxY - minY,
+    }
+  }
+}
+
+/**
  * Return a definition's cornerOffsetFromSlot in the style of labware schema 2.
  *
  * @deprecated This is probably an inherently wrong interface to attempt, for a couple
