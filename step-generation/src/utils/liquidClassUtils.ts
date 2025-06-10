@@ -16,27 +16,35 @@ interface Position {
 
 interface Delay {
   enabled: boolean
-  duration?: number
+  params: {
+    duration?: number
+  }
 }
 
 interface TouchTip {
   enabled: boolean
-  z_offset?: number
-  mm_from_edge?: number
-  speed?: number
+  params: {
+    z_offset?: number
+    mm_from_edge?: number
+    speed?: number
+  }
 }
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface BlowOut {
   enabled: boolean
-  location?: BlowoutLocation
-  flow_rate?: number
+  params: {
+    location?: BlowoutLocation
+    flow_rate?: number
+  }
 }
 
 interface Mix {
   enabled: boolean
-  repetitions?: number
-  volume?: number
+  params: {
+    repetitions?: number
+    volume?: number
+  }
 }
 
 interface Retract {
@@ -103,135 +111,202 @@ export const getCustomLiquidClassProperties = (
     dispenseCorrectionVolume,
   } = props
 
-  const customLiquidClassProperties: CustomLiquidClassProperties = {
-    [pipetteName]: {
-      [tiprackUri]: {
-        aspirate: {
-          aspirate_position: {
-            offset: {
-              x: args.aspirateXOffset,
-              y: args.aspirateYOffset,
-              z: args.aspirateZOffset,
-            },
-            position_reference: args.aspiratePositionReference,
-          },
-          flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
-
-          pre_wet: args.preWetTip,
-          correction_by_volume: [[0, aspirateCorrectionVolume ?? 0]],
-          delay: {
-            enabled: args.aspirateDelay != null,
-            duration: args.aspirateDelay?.seconds ?? undefined,
-          },
-          mix: {
-            enabled: args.mixBeforeAspirate != null,
-            repetitions: args.mixBeforeAspirate?.times ?? undefined,
-            volume: args.mixBeforeAspirate?.volume ?? undefined,
-          },
-          submerge: {
-            delay: {
-              enabled: args.aspirateSubmergeDelay != null,
-              duration: args.aspirateSubmergeDelay?.seconds ?? undefined,
-            },
-            speed: args.aspirateSubmergeSpeed ?? undefined,
-            start_position: {
-              offset: {
-                x: args.aspirateSubmergeXOffset,
-                y: args.aspirateSubmergeYOffset,
-                z: args.aspirateSubmergeZOffset,
-              },
-              position_reference: args.aspirateSubmergePositionReference,
-            },
-          },
-          retract: {
-            air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
-            delay: {
-              enabled: args.aspirateRetractDelay != null,
-              duration: args.aspirateRetractDelay?.seconds ?? undefined,
-            },
-            end_position: {
-              offset: {
-                x: args.aspirateRetractXOffset,
-                y: args.aspirateRetractYOffset,
-                z: args.aspirateRetractZOffset,
-              },
-              position_reference: args.aspirateRetractPositionReference,
-            },
-            speed: args.aspirateRetractSpeed ?? undefined,
-            touch_tip: {
-              enabled: args.touchTipAfterAspirate,
-              z_offset: args.touchTipAfterAspirateOffsetMmFromTop,
-              mm_from_edge: args.touchTipAfterAspirateMmFromEdge ?? undefined,
-              speed: args.touchTipAfterAspirateSpeed ?? undefined,
-            },
-          },
+  const properties = {
+    aspirate: {
+      aspirate_position: {
+        offset: {
+          x: args.aspirateXOffset,
+          y: args.aspirateYOffset,
+          z: args.aspirateZOffset,
         },
-        dispense: {
-          dispense_position: {
-            offset: {
-              x: args.dispenseXOffset,
-              y: args.dispenseYOffset,
-              z: args.dispenseZOffset,
-            },
-            position_reference: args.dispensePositionReference,
-          },
-          push_out_by_volume: [[0, args.pushOut ?? 0]],
-          flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
-          correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
+        position_reference: args.aspiratePositionReference,
+      },
+      flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
 
-          delay: {
-            enabled: args.dispenseDelay != null,
-            duration: args.dispenseDelay?.seconds ?? undefined,
-          },
-          mix: {
-            enabled: args.mixInDestination != null,
-            repetitions: args.mixInDestination?.times ?? undefined,
-            volume: args.mixInDestination?.volume ?? undefined,
-          },
-          submerge: {
+      pre_wet: args.preWetTip,
+      correction_by_volume: [[0, aspirateCorrectionVolume]],
+      ...(args.aspirateDelay == null
+        ? {}
+        : {
             delay: {
-              enabled: args.dispenseSubmergeDelay != null,
-              duration: args.dispenseSubmergeDelay?.seconds ?? undefined,
+              enable: true,
+              params: { duration: args.aspirateDelay?.seconds ?? undefined },
             },
-            speed: args.dispenseSubmergeSpeed ?? undefined,
-            start_position: {
-              offset: {
-                x: args.dispenseSubmergeXOffset,
-                y: args.dispenseSubmergeYOffset,
-                z: args.dispenseSubmergeZOffset,
+          }),
+      ...(args.mixBeforeAspirate == null
+        ? {}
+        : {
+            mix: {
+              enable: true,
+              params: {
+                repetitions: args.mixBeforeAspirate?.times ?? undefined,
+                volume: args.mixBeforeAspirate?.volume ?? undefined,
               },
-              position_reference: args.dispenseSubmergePositionReference,
             },
-          },
-          retract: {
-            air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
-            delay: {
-              enabled: args.dispenseRetractDelay != null,
-              duration: args.dispenseRetractDelay?.seconds ?? undefined,
-            },
-            end_position: {
-              offset: {
-                x: args.dispenseRetractXOffset,
-                y: args.dispenseRetractYOffset,
-                z: args.dispenseRetractZOffset,
+          }),
+      submerge: {
+        ...(args.aspirateSubmergeDelay == null
+          ? {}
+          : {
+              delay: {
+                enable: true,
+                params: {
+                  duration: args.aspirateSubmergeDelay?.seconds ?? undefined,
+                },
               },
-              position_reference: args.dispenseRetractPositionReference,
-            },
-            speed: args.dispenseRetractSpeed ?? undefined,
-            touch_tip: {
-              enabled: args.touchTipAfterDispense,
-              z_offset: args.touchTipAfterDispenseOffsetMmFromTop,
-              mm_from_edge: args.touchTipAfterDispenseMmFromEdge ?? undefined,
-              speed: args.touchTipAfterDispenseSpeed ?? undefined,
-            },
-            blowout: {
-              enabled: args.blowoutLocation != null,
-              location: (args.blowoutLocation as BlowoutLocation) ?? undefined,
-              flow_rate: args.blowoutFlowRateUlSec,
-            },
+            }),
+        speed: args.aspirateSubmergeSpeed ?? undefined,
+        start_position: {
+          offset: {
+            x: args.aspirateSubmergeXOffset,
+            y: args.aspirateSubmergeYOffset,
+            z: args.aspirateSubmergeZOffset,
           },
+          position_reference: args.aspirateSubmergePositionReference,
         },
       },
+      retract: {
+        air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
+        ...(args.aspirateRetractDelay == null
+          ? {}
+          : {
+              delay: {
+                enable: true,
+                params: {
+                  duration: args.aspirateRetractDelay?.seconds ?? undefined,
+                },
+              },
+            }),
+
+        end_position: {
+          offset: {
+            x: args.aspirateRetractXOffset,
+            y: args.aspirateRetractYOffset,
+            z: args.aspirateRetractZOffset,
+          },
+          position_reference: args.aspirateRetractPositionReference,
+        },
+        speed: args.aspirateRetractSpeed ?? undefined,
+        ...(!args.touchTipAfterAspirate
+          ? {}
+          : {
+              touch_tip: {
+                enable: true,
+                params: {
+                  z_offset: args.touchTipAfterAspirateOffsetMmFromTop,
+                  mm_from_edge:
+                    args.touchTipAfterAspirateMmFromEdge ?? undefined,
+                  speed: args.touchTipAfterAspirateSpeed ?? undefined,
+                },
+              },
+            }),
+      },
+    },
+    dispense: {
+      dispense_position: {
+        offset: {
+          x: args.dispenseXOffset,
+          y: args.dispenseYOffset,
+          z: args.dispenseZOffset,
+        },
+        position_reference: args.dispensePositionReference,
+      },
+      push_out_by_volume: [[0, args.pushOut ?? 0]],
+      flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
+      correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
+      ...(args.dispenseDelay == null
+        ? {}
+        : {
+            delay: {
+              enable: true,
+              params: { duration: args.dispenseDelay?.seconds ?? undefined },
+            },
+          }),
+      ...(args.mixInDestination == null
+        ? {}
+        : {
+            mix: {
+              enable: true,
+              params: {
+                repetitions: args.mixInDestination?.times ?? undefined,
+                volume: args.mixInDestination?.volume ?? undefined,
+              },
+            },
+          }),
+      submerge: {
+        ...(args.dispenseSubmergeDelay == null
+          ? {}
+          : {
+              delay: {
+                enable: true,
+                params: {
+                  duration: args.dispenseSubmergeDelay?.seconds ?? undefined,
+                },
+              },
+            }),
+        speed: args.dispenseSubmergeSpeed ?? undefined,
+        start_position: {
+          offset: {
+            x: args.dispenseSubmergeXOffset,
+            y: args.dispenseSubmergeYOffset,
+            z: args.dispenseSubmergeZOffset,
+          },
+          position_reference: args.dispenseSubmergePositionReference,
+        },
+      },
+      retract: {
+        air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
+        ...(args.dispenseRetractDelay == null
+          ? {}
+          : {
+              delay: {
+                enable: true,
+                params: {
+                  duration: args.dispenseRetractDelay?.seconds ?? undefined,
+                },
+              },
+            }),
+        end_position: {
+          offset: {
+            x: args.dispenseRetractXOffset,
+            y: args.dispenseRetractYOffset,
+            z: args.dispenseRetractZOffset,
+          },
+          position_reference: args.dispenseRetractPositionReference,
+        },
+        speed: args.dispenseRetractSpeed ?? undefined,
+        ...(!args.touchTipAfterDispense
+          ? {}
+          : {
+              touch_tip: {
+                enable: true,
+                params: {
+                  z_offset: args.touchTipAfterDispenseOffsetMmFromTop,
+                  mm_from_edge:
+                    args.touchTipAfterDispenseMmFromEdge ?? undefined,
+                  speed: args.touchTipAfterDispenseSpeed ?? undefined,
+                },
+              },
+            }),
+        ...(args.blowoutLocation == null
+          ? {}
+          : {
+              blowout: {
+                enable: true,
+                params: {
+                  location:
+                    (args.blowoutLocation as BlowoutLocation) ?? undefined,
+                  flow_rate: args.blowoutFlowRateUlSec,
+                },
+              },
+            }),
+      },
+    },
+  }
+
+  const customLiquidClassProperties = {
+    [pipetteName]: {
+      [tiprackUri]: properties,
     },
   }
 
@@ -239,9 +314,5 @@ export const getCustomLiquidClassProperties = (
     string,
     any
   > = JSON.parse(JSON.stringify(customLiquidClassProperties))
-  //    TODO: python name should be dynamic, will fix that later
-  return `custom_liquid_class_properties = ${formatPyDict(
-    stringifiedCustomLiquidClassProperties,
-    true
-  )}`
+  return formatPyDict(stringifiedCustomLiquidClassProperties, true)
 }

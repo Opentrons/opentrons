@@ -128,6 +128,7 @@ export const mixInPlaceUtil = (args: {
   invariantContext: InvariantContext
   liquidClass: string | null
   tiprack: string
+  generatePython: boolean
   moveToWellParams?: MoveToWellParams
 }): CurriedCommandCreator[] => {
   const {
@@ -143,6 +144,7 @@ export const mixInPlaceUtil = (args: {
     liquidClass,
     tiprack,
     moveToWellParams,
+    generatePython,
   } = args
 
   const pythonCommandCreator = makePythonCommandCreator({
@@ -227,7 +229,7 @@ export const mixInPlaceUtil = (args: {
       ]
     )
   }
-  return [...commandCreators, pythonCommandCreator]
+  return [...commandCreators, ...(generatePython ? [pythonCommandCreator] : [])]
 }
 
 export const mix: CommandCreator<MixArgs> = (
@@ -413,6 +415,7 @@ export const mix: CommandCreator<MixArgs> = (
             },
           },
         },
+        generatePython: true,
       })
       return [
         ...tipCommands,

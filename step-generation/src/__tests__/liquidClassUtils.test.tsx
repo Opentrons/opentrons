@@ -86,6 +86,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
+          stepId: 'mockStepId',
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
@@ -94,7 +95,7 @@ describe('getCustomLiquidClassProperties', () => {
       })
     ).toEqual(
       `
-custom_liquid_class_properties = {
+{
     "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
         "aspirate": {
             "aspirate_position": {
@@ -109,18 +110,20 @@ custom_liquid_class_properties = {
             "pre_wet": True,
             "correction_by_volume": [(0, 5)],
             "delay": {
-                "enabled": True,
-                "duration": 12,
+                "enable": True,
+                "params": {"duration": 12},
             },
             "mix": {
-                "enabled": True,
-                "repetitions": 4,
-                "volume": 10,
+                "enable": True,
+                "params": {
+                    "repetitions": 4,
+                    "volume": 10,
+                },
             },
             "submerge": {
                 "delay": {
-                    "enabled": True,
-                    "duration": 5,
+                    "enable": True,
+                    "params": {"duration": 5},
                 },
                 "speed": 50,
                 "start_position": {
@@ -135,8 +138,8 @@ custom_liquid_class_properties = {
             "retract": {
                 "air_gap_by_volume": [(0, 2)],
                 "delay": {
-                    "enabled": True,
-                    "duration": 10,
+                    "enable": True,
+                    "params": {"duration": 10},
                 },
                 "end_position": {
                     "offset": {
@@ -148,10 +151,12 @@ custom_liquid_class_properties = {
                 },
                 "speed": 51,
                 "touch_tip": {
-                    "enabled": True,
-                    "z_offset": -3.4,
-                    "mm_from_edge": 10,
-                    "speed": 11,
+                    "enable": True,
+                    "params": {
+                        "z_offset": -3.4,
+                        "mm_from_edge": 10,
+                        "speed": 11,
+                    },
                 },
             },
         },
@@ -168,18 +173,20 @@ custom_liquid_class_properties = {
             "flow_rate_by_volume": [(0, 2.2)],
             "correction_by_volume": [(0, 5)],
             "delay": {
-                "enabled": True,
-                "duration": 20,
+                "enable": True,
+                "params": {"duration": 20},
             },
             "mix": {
-                "enabled": True,
-                "repetitions": 3,
-                "volume": 10,
+                "enable": True,
+                "params": {
+                    "repetitions": 3,
+                    "volume": 10,
+                },
             },
             "submerge": {
                 "delay": {
-                    "enabled": True,
-                    "duration": 50,
+                    "enable": True,
+                    "params": {"duration": 50},
                 },
                 "speed": 52,
                 "start_position": {
@@ -194,8 +201,8 @@ custom_liquid_class_properties = {
             "retract": {
                 "air_gap_by_volume": [(0, 0)],
                 "delay": {
-                    "enabled": True,
-                    "duration": 40,
+                    "enable": True,
+                    "params": {"duration": 40},
                 },
                 "end_position": {
                     "offset": {
@@ -207,15 +214,19 @@ custom_liquid_class_properties = {
                 },
                 "speed": 53,
                 "touch_tip": {
-                    "enabled": True,
-                    "z_offset": -3.4,
-                    "mm_from_edge": 3,
-                    "speed": 5,
+                    "enable": True,
+                    "params": {
+                        "z_offset": -3.4,
+                        "mm_from_edge": 3,
+                        "speed": 5,
+                    },
                 },
                 "blowout": {
-                    "enabled": True,
-                    "location": "source",
-                    "flow_rate": 2.3,
+                    "enable": True,
+                    "params": {
+                        "location": "source",
+                        "flow_rate": 2.3,
+                    },
                 },
             },
         },

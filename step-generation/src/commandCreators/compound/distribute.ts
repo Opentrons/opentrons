@@ -509,6 +509,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             invariantContext,
             liquidClass,
             tiprack: tipRack,
+            generatePython: true,
           })
         : []
       const mixBeforeAspirateCommands =
@@ -525,6 +526,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const delayAfterAspirateCommands =
