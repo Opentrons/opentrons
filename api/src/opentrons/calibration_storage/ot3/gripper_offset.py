@@ -37,6 +37,27 @@ def clear_gripper_calibration_offsets() -> None:
     io._remove_json_files_in_directories(offset_dir)
 
 
+# Delete Gripper Jaw Width Calibration
+
+
+def delete_gripper_jaw_width_data_file(gripper: str) -> None:
+    """
+    Delete gripper jaw width data file based on gripper serial number
+
+    :param gripper: gripper serial number
+    """
+    offset_path = config.get_opentrons_path("gripper_jaw_width_dir") / f"{gripper}.json"
+    io.delete_file(offset_path)
+
+
+def clear_gripper_jaw_width_data() -> None:
+    """
+    Delete all gripper jaw width data files.
+    """
+    offset_dir = config.get_opentrons_path("gripper_jaw_width_dir")
+    io._remove_json_files_in_directories(offset_dir)
+
+
 # Save Gripper Offset Calibrations
 
 

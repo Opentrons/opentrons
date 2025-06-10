@@ -39,7 +39,7 @@ from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHa
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
-    GripperJawWidthData
+    GripperJawWidthData,
 )
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
@@ -1603,18 +1603,23 @@ async def test_gripper_action_works_with_gripper(
     gripper = managed_obj._gripper_handler._gripper
     assert gripper
     calibration_offset = 5
+    fake_jaw_encoder_val = 18.5
     with patch(
         "opentrons.hardware_control.instruments.ot3.gripper.load_gripper_jaw_width",
         return_value=GripperJawWidthData(
             source=SourceType.default,
             status=CalibrationStatus(),
-            encoder_position_at_jaw_closed=None if needs_calibration else 16.555,
+            encoder_position_at_jaw_closed=None
+            if needs_calibration
+            else fake_jaw_encoder_val,
             last_modified=None,
         ),
         autospec=True,
     ):
         gripper._jaw_max_offset = None if needs_calibration else calibration_offset
-        gripper._encoder_position_at_jaw_closed = None if needs_calibration else 18.5
+        gripper._encoder_position_at_jaw_closed = (
+            None if needs_calibration else fake_jaw_encoder_val
+        )
         await ot3_hardware.home_gripper_jaw()
         if needs_calibration:
             assert mock_ungrip.call_count == 2
@@ -1624,7 +1629,9 @@ async def test_gripper_action_works_with_gripper(
         mock_ungrip.reset_mock()
         mock_grip.reset_mock()
         gripper._jaw_max_offset = None if needs_calibration else 5
-        gripper._encoder_position_at_jaw_closed = None if needs_calibration else 18.5
+        gripper._encoder_position_at_jaw_closed = (
+            None if needs_calibration else fake_jaw_encoder_val
+        )
         await ot3_hardware.home([Axis.G])
         if needs_calibration:
             assert mock_ungrip.call_count == 2

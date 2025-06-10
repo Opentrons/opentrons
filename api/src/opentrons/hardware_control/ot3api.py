@@ -2552,9 +2552,6 @@ class OT3API(
         else:
             self._pipette_handler.reset_instrument_offset(checked_mount, to_default)
 
-    async def reset_gripper_jaw_width_data(self, to_default: bool = True) -> None:
-        self._gripper_handler.reset_gripper_jaw_width_data(to_default)
-
     async def save_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], delta: top_types.Point
     ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary]:
