@@ -26,7 +26,7 @@ from opentrons.config import infer_config_base_dir
 from opentrons.types import Point
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": str(MAX_SUPPORTED_VERSION)}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
