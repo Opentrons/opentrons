@@ -1,7 +1,19 @@
+"""
+This script generates a list of downstream branches for a given branch list and target branch.
+Run locally with:
+python chore_release_pr_gen.py --branch-list "branch1, branch2, branch3" --target-branch "branch2"
+outputs:
+downstream_branches=branch3
+should_create_prs=true
+"""
+
 import argparse
 import os
+import sys
 from typing import List
 import unittest
+
+is_ci = os.environ.get("CI") == "true"
 
 
 def parse_branch_list(branch_list_str: str) -> List[str]:
@@ -36,6 +48,49 @@ def get_downstream_branches(
     return branch_list[index + 1 :]
 
 
+def write_output(downstream_str: str, should_create_prs: str, output_file: str):
+    summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+
+    output_lines = [
+        f"downstream_branches={downstream_str}",
+        f"should_create_prs={should_create_prs}",
+    ]
+
+    if output_file == "-":
+        output_stream = sys.stdout
+    else:
+        output_stream = open(output_file, "w")
+
+    with output_stream as f:
+        for line in output_lines:
+            f.write(line + "\n")
+
+        lines = [
+            "| Input                              | Value                         |",
+            "|------------------------------------|-------------------------------|",
+            f"| vars.CHORE_RELEASE_BRANCHES        | {os.environ.get('CHORE_RELEASE_BRANCHES', '')} |",
+            f"| github.event.pull_request.base.ref | {os.environ.get('PR_TARGET_BRANCH', '')} |",
+            f"| downstream_branches                | {downstream_str}          |",
+            f"| should_create_prs                  | {should_create_prs}            |",
+            f"| github.event_name                  | {os.environ.get('GITHUB_EVENT_NAME', '')}      |",
+            f"| github.actor                       | {os.environ.get('GITHUB_ACTOR', '')}           |",
+            "",
+        ]
+        if not downstream_str:
+            lines.append("### No downstream PRs to open.")
+        else:
+            lines.append("### Downstream PRs should be opened for:")
+            lines.append(f"`{downstream_str}`")
+
+        if summary_file and is_ci:
+            with open(summary_file, "a") as f:
+                for line in lines:
+                    f.write(line + "\n")
+        else:
+            for line in lines:
+                print(line)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -48,7 +103,10 @@ def main():
         "--target-branch", type=str, required=False, help="Branch this PR is targeting"
     )
     parser.add_argument(
-        "--output-file", type=str, help="Write outputs to this file for GitHub Actions"
+        "--output-file",
+        type=str,
+        default="-",
+        help="Write outputs to this file for GitHub Actions. Use '-' for stdout.",
     )
     args = parser.parse_args()
 
@@ -60,25 +118,11 @@ def main():
     downstream_str = ",".join(downstream)
     should_create_prs = "true" if downstream else "false"
 
-    # Output for GitHub Actions
-    output_lines = [
-        f"downstream_branches={downstream_str}",
-        f"should_create_prs={should_create_prs}",
-    ]
-
-    if args.output_file:
-        with open(args.output_file, "a") as f:
-            for line in output_lines:
-                f.write(line + "\n")
-    else:
-        # For local/manual runs
-        for line in output_lines:
-            print(f"::set-output name={line}")
+    write_output(downstream_str, should_create_prs, args.output_file)
 
 
 # ============================================================
 # Unit tests for the get_downstream_branches function
-# cd scripts
 # python chore_release_pr_gen.py test
 # ============================================================
 

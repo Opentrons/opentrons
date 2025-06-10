@@ -25,35 +25,19 @@ jobs:
             --branch-list "${{ vars.CHORE_RELEASE_BRANCHES }}" \
             --target-branch "${{ github.event.pull_request.base.ref }}" \
             --output-file "$GITHUB_ENV"
-      - name: Display summary of inputs and downstream branches
-        run: |
-          echo "| Input                              | Value                         |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------------------------------|-------------------------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| vars.CHORE_RELEASE_BRANCHES        | ${{ vars.CHORE_RELEASE_BRANCHES }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| github.event.pull_request.base.ref | ${{ github.event.pull_request.base.ref }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| downstream_branches                | $downstream_branches          |" >> $GITHUB_STEP_SUMMARY
-          echo "| should_create_prs                  | $should_create_prs            |" >> $GITHUB_STEP_SUMMARY
-          echo "| github.event_name                  | ${{ github.event_name }}      |" >> $GITHUB_STEP_SUMMARY
-          echo "| github.actor                       | ${{ github.actor }}           |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "$downstream_branches_display" = "-" ] || [ "$should_create_prs_display" != "true" ]; then
-              echo "### No downstream PRs to open." >> $GITHUB_STEP_SUMMARY
-          else
-              echo "### Downstream PRs should be opened for:" >> $GITHUB_STEP_SUMMARY
-              echo "\`$downstream_branches_display\`" >> $GITHUB_STEP_SUMMARY
-          fi
 
       - name: Open downstream PRs
         if: env.should_create_prs == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for branch in $(echo "$downstream_branches" | tr ',' ' '); do
+          IFS=, 
+          for branch in $downstream_branches; do
             pr_url=$(gh pr create \
               --base "$branch" \
               --head "${{ github.event.pull_request.head.ref }}" \
               --title "${{ github.event.pull_request.title }} into $branch" \
-              --body "Automated PR of #${{ github.event.pull_request.number }} into downstream branch: $branch." \
+              --body "${{ github.event.pull_request.body }} \
               --assignee "${{ github.event.pull_request.user.login }}" \
               --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)
             if [ -n "$pr_url" ]; then
