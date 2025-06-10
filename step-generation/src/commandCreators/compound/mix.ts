@@ -398,11 +398,9 @@ export const mix: CommandCreator<MixArgs> = (
         ...Object.keys(invariantContext.wasteChuteEntities),
         ...Object.keys(invariantContext.trashBinEntities),
       ]
-      console.log({ trashLikeEntityIds, blowoutLocation: data.blowoutLocation })
       const isBlowoutLocationTrashLikeEntity = trashLikeEntityIds.some(
         id => id === data.blowoutLocation
       )
-      console.log(isBlowoutLocationTrashLikeEntity)
       const advancedDispenseCommands = isBlowoutLocationTrashLikeEntity
         ? [...touchTipCommands, ...blowoutCommand]
         : [...blowoutCommand, ...touchTipCommands]
