@@ -54,7 +54,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       sourceWells: stepArgs.sourceWells,
@@ -71,7 +70,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       disposalVolume: stepArgs.disposalVolume,
@@ -89,7 +87,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWell: stepArgs.destWell,
       sourceWells: stepArgs.sourceWells,
