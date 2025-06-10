@@ -2665,13 +2665,12 @@
       }
     }
   },
-  "liquidSchemaId": "opentronsLiquidSchemaV2",
+  "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {
     "0": {
       "displayName": "Water",
       "description": "",
-      "displayColor": "#b925ff",
-      "liquidClass": null
+      "displayColor": "#b925ff"
     }
   },
   "commandSchemaId": "opentronsCommandSchemaV10",
