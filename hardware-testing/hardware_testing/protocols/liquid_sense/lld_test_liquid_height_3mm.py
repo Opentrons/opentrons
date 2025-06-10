@@ -188,6 +188,7 @@ def _setup(
     int,
     bool,
     Dict[str, List[float | SimulatedProbeResult]],
+    bool
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -328,6 +329,7 @@ def _setup(
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
+        pause_to_check_well
     )
 
 
@@ -451,6 +453,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
     src_well: Well,
     wells: List[Well],
     liquid_pipette_probe_every_time: bool,
+    pause_to_check_well: bool
 ) -> None:
     global _src_meniscus_height
     trial_counter = 0
@@ -469,6 +472,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
             probing_pipette.aspirate().dispense().prepare_to_aspirate()
         tip_z_error = _get_tip_z_error(ctx, probing_pipette, dial)
         if volume:
+            commented_height = 0.0
             # transfer over and over until all volume is moved
             if volume < 15650:
                 need_to_transfer_per_ch = volume / liquid_pipette.channels
@@ -483,12 +487,14 @@ def _test_for_finding_liquid_height(  # noqa: C901
                 liquid_pipette.flow_rate.blow_out = 100
                 dispense_loc = well.bottom(z=1)
                 if not liquid_pipette.has_tip:
-                    liquid_pipette.pick_up_tip()
                     # NOTE: only use new, dry tips to probe
                     if not ctx.is_simulating() and trial_counter == 1:
+                        liquid_pipette.pick_up_tip()
                         _src_meniscus_height = liquid_pipette.measure_liquid_height(
                             src_well
                         )  # type: ignore[assignment]
+                        print("PROBED SOURCE")
+                        liquid_pipette.drop_tip()
                     else:
                         _src_meniscus_height = 1
                     if isinstance(_src_meniscus_height, float):
@@ -574,6 +580,7 @@ def run(
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
+        pause_to_check_well
     ) = _setup(ctx)
     channels_probe = probe_pipette.channels
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
@@ -597,6 +604,7 @@ def run(
             src_well=reservoir["A1"],
             wells=test_wells[:num_trials],
             liquid_pipette_probe_every_time=liquid_pipette_probe_every_time,
+            pause_to_check_well=pause_to_check_well
         )
         test_wells = test_wells[num_trials:]
         # test_tips_liquid = test_tips_liquid[num_trials:]
