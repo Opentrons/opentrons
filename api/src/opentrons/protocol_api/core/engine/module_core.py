@@ -928,7 +928,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     def set_stored_labware_items(
         self,
         labware: Sequence[LabwareCore],
-        stacking_offset_z: float | None = None,
+        stacking_offset_z: float | None,
     ) -> None:
         """Configure the stacker to contain a set of labware."""
         core_groups = [self._core_groups_from_primary_core(core) for core in labware]

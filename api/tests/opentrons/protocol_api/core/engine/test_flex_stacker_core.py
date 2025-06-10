@@ -527,7 +527,7 @@ def test_set_stored_labware_items_happypath_primary_only(
         decoy.when(primary.labware_id).then_return(f"primary-{idx}")
     primary_definition = _prime_definition(decoy, "primary")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -573,7 +573,7 @@ def test_set_stored_labware_items_happypath_no_adapter(
     lid_definition = _prime_definition(decoy, "lid")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -621,7 +621,7 @@ def test_set_stored_labware_items_happypath_no_lid(
     adapter_definition = _prime_definition(decoy, "adapter")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -677,7 +677,7 @@ def test_set_stored_labware_items_happypath_all_elements(
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_definition)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -714,7 +714,7 @@ def test_set_stored_items_labware_fails_if_empty(
 ) -> None:
     """It should fail if given an empty list."""
     with pytest.raises(CommandPreconditionViolated):
-        subject.set_stored_labware_items([])
+        subject.set_stored_labware_items([], None)
 
 
 def test_fill_items_happypath(

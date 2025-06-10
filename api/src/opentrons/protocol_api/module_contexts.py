@@ -1244,7 +1244,7 @@ class FlexStackerContext(ModuleContext):
     def set_stored_labware_items(
         self,
         labware: list[Labware],
-        stacking_offset_z: float | None = None,
+        stacking_offset_z: float | None,
     ) -> None:
         """Configure a Flex Stacker by providing an initial list of stored labware objects.
 
