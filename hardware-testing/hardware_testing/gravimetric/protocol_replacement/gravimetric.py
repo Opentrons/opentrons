@@ -281,7 +281,7 @@ class FixtureSettings:
             test_report,
             robot=robot_serial,
             pipette=pipette_tag,
-            tips={"tips_50ul":ctx.params.tip_batch},  # type: ignore [attr-defined]
+            tips={"tips_50ul": ctx.params.tip_batch},  # type: ignore [attr-defined]
             scale=recorder.serial_number,
             environment=env_serial,
             liquid=liquid_name,
@@ -427,13 +427,9 @@ def retract_and_wait(
     fixture_settings.pipette._retract()
     if fixture_settings.recorder and not blank:
         if mode == MeasurementType.ASPIRATE:
-            fixture_settings.recorder.add_simulation_mass(
-                volume * -0.001
-            )
+            fixture_settings.recorder.add_simulation_mass(volume * -0.001)
         elif mode == MeasurementType.DISPENSE:
-            fixture_settings.recorder.add_simulation_mass(
-                volume * 0.001
-            )
+            fixture_settings.recorder.add_simulation_mass(volume * 0.001)
     m_data = record_measurement_data(
         fixture_settings.ctx,
         m_tag,
@@ -470,7 +466,10 @@ def aspirate_with_liquid_class(
     )
     fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
-        source=(fixture_settings.liquid_source.meniscus(-1.5), fixture_settings.liquid_source._core),
+        source=(
+            fixture_settings.liquid_source.meniscus(-1.5),
+            fixture_settings.liquid_source._core,
+        ),
         transfer_properties=transfer_properties,
         transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
         tip_contents=[
@@ -498,7 +497,10 @@ def dispense_with_liquid_class(
     )
     fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
-        dest=(fixture_settings.liquid_source.meniscus(-1.5), fixture_settings.liquid_source._core),
+        dest=(
+            fixture_settings.liquid_source.meniscus(-1.5),
+            fixture_settings.liquid_source._core,
+        ),
         source=None,
         transfer_properties=transfer_properties,
         transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
@@ -532,7 +534,13 @@ def run_blank_test(
     )
 
     pre_aspirate = retract_and_wait(
-        fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel,  blank=True
+        fixture_settings,
+        MeasurementType.INIT,
+        tip,
+        volume,
+        trial,
+        channel=channel,
+        blank=True,
     )
     aspirate_with_liquid_class(
         fixture_settings,
@@ -544,7 +552,13 @@ def run_blank_test(
         submerge_depth_override=15,
     )
     post_aspirate = retract_and_wait(
-        fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, channel=channel,  blank=True
+        fixture_settings,
+        MeasurementType.ASPIRATE,
+        tip,
+        volume,
+        trial,
+        channel=channel,
+        blank=True,
     )
     dispense_with_liquid_class(
         fixture_settings,
@@ -556,7 +570,13 @@ def run_blank_test(
         submerge_depth_override=15,
     )
     post_dispense = retract_and_wait(
-        fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel, blank=True
+        fixture_settings,
+        MeasurementType.DISPENSE,
+        tip,
+        volume,
+        trial,
+        channel=channel,
+        blank=True,
     )
     return [pre_aspirate, post_aspirate, post_dispense]
 
@@ -576,8 +596,16 @@ def run_one_test(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
     offset = _get_offset_for_channel(fixture_settings, channel)
-    transfer_properties.aspirate._aspirate_position.offset = [offset.x, offset.y, offset.z]
-    transfer_properties.dispense._dispense_position.offset = [offset.x, offset.y, offset.z]
+    transfer_properties.aspirate._aspirate_position.offset = [
+        offset.x,
+        offset.y,
+        offset.z,
+    ]
+    transfer_properties.dispense._dispense_position.offset = [
+        offset.x,
+        offset.y,
+        offset.z,
+    ]
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
         name=fixture_settings.liquid_class.name,
         transfer_properties=transfer_properties,
@@ -585,12 +613,7 @@ def run_one_test(
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
     pre_aspirate = retract_and_wait(
-        fixture_settings,
-        MeasurementType.INIT,
-        tip,
-        volume,
-        trial,
-        channel=channel
+        fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
     aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
@@ -701,7 +724,9 @@ def run(ctx: ProtocolContext) -> None:
                     if fixture_settings.ctx.is_simulating():
                         cur_height = 10
                     else:
-                        cur_height = fixture_settings.liquid_source.current_liquid_height()
+                        cur_height = (
+                            fixture_settings.liquid_source.current_liquid_height()
+                        )
                     report.store_trial(
                         fixture_settings.test_report,
                         trial,
