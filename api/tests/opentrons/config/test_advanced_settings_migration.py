@@ -439,7 +439,6 @@ def v37_config(v36_config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @pytest.fixture(
-    scope="session",
     params=[
         lazy_fixture("empty_settings"),
         lazy_fixture("version_less"),
