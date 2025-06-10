@@ -61,27 +61,26 @@ def write_output(downstream_str: str, should_create_prs: str, output_file: str):
     else:
         output_stream = open(output_file, "w")
 
+    lines = [
+        "| Input                              | Value                         |",
+        "|------------------------------------|-------------------------------|",
+        f"| vars.CHORE_RELEASE_BRANCHES        | {os.environ.get('CHORE_RELEASE_BRANCHES', '')} |",
+        f"| github.event.pull_request.base.ref | {os.environ.get('PR_TARGET_BRANCH', '')} |",
+        f"| downstream_branches                | {downstream_str}          |",
+        f"| should_create_prs                  | {should_create_prs}            |",
+        f"| github.event_name                  | {os.environ.get('GITHUB_EVENT_NAME', '')}      |",
+        f"| github.actor                       | {os.environ.get('GITHUB_ACTOR', '')}           |",
+        "",
+    ]
+    if not downstream_str:
+        lines.append("### No downstream PRs to open.")
+    else:
+        lines.append("### Downstream PRs should be opened for:")
+        lines.append(f"`{downstream_str}`")
+
     with output_stream as f:
         for line in output_lines:
             f.write(line + "\n")
-
-        lines = [
-            "| Input                              | Value                         |",
-            "|------------------------------------|-------------------------------|",
-            f"| vars.CHORE_RELEASE_BRANCHES        | {os.environ.get('CHORE_RELEASE_BRANCHES', '')} |",
-            f"| github.event.pull_request.base.ref | {os.environ.get('PR_TARGET_BRANCH', '')} |",
-            f"| downstream_branches                | {downstream_str}          |",
-            f"| should_create_prs                  | {should_create_prs}            |",
-            f"| github.event_name                  | {os.environ.get('GITHUB_EVENT_NAME', '')}      |",
-            f"| github.actor                       | {os.environ.get('GITHUB_ACTOR', '')}           |",
-            "",
-        ]
-        if not downstream_str:
-            lines.append("### No downstream PRs to open.")
-        else:
-            lines.append("### Downstream PRs should be opened for:")
-            lines.append(f"`{downstream_str}`")
-
         if summary_file and is_ci:
             with open(summary_file, "a") as f:
                 for line in lines:
