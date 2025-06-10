@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def fake_offset() -> "GripperCalibrationOffset":
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
