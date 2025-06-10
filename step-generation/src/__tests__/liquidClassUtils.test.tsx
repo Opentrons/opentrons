@@ -190,7 +190,6 @@ describe('getCustomLiquidClassProperties', () => {
                 },
             },
             "retract": {
-                "air_gap_by_volume": [(0, 0)],
                 "delay": {
                     "enable": True,
                     "params": {"duration": 40},

@@ -44,8 +44,8 @@ export const getCustomLiquidClassProperties = (
     dispenseCorrectionVolume,
   } = props
 
-  //    properties object is based off of
-  //    liquid class schema: shared-data/liquid-class/schemas/1.json
+  //    properties object is based off of liquid class schema
+  //    shared-data/liquid-class/schemas/1.json
   const properties = {
     aspirate: {
       aspirate_position: {
@@ -56,10 +56,17 @@ export const getCustomLiquidClassProperties = (
         ),
         position_reference: args.aspiratePositionReference,
       },
-      flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
-
-      pre_wet: args.preWetTip,
-      correction_by_volume: [[0, aspirateCorrectionVolume]],
+      ...(args.aspirateFlowRateUlSec === 0
+        ? {}
+        : {
+            flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
+          }),
+      ...(args.preWetTip ? { pre_wet: args.preWetTip } : {}),
+      ...(aspirateCorrectionVolume === 0
+        ? {}
+        : {
+            correction_by_volume: [[0, aspirateCorrectionVolume]],
+          }),
       ...(args.aspirateDelay == null
         ? {}
         : {
@@ -101,7 +108,11 @@ export const getCustomLiquidClassProperties = (
         },
       },
       retract: {
-        air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
+        ...(args.aspirateAirGapVolume == null || args.aspirateAirGapVolume === 0
+          ? {}
+          : {
+              air_gap_by_volume: [[0, args.aspirateAirGapVolume]],
+            }),
         ...(args.aspirateRetractDelay == null
           ? {}
           : {
@@ -146,9 +157,21 @@ export const getCustomLiquidClassProperties = (
         ),
         position_reference: args.dispensePositionReference,
       },
-      push_out_by_volume: [[0, args.pushOut ?? 0]],
-      flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
-      correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
+      ...(args.pushOut == null
+        ? {}
+        : {
+            push_out_by_volume: [[0, args.pushOut]],
+          }),
+      ...(args.dispenseFlowRateUlSec == null || args.dispenseFlowRateUlSec === 0
+        ? {}
+        : {
+            flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec]],
+          }),
+      ...(dispenseCorrectionVolume === 0
+        ? {}
+        : {
+            correction_by_volume: [[0, dispenseCorrectionVolume]],
+          }),
       ...(args.dispenseDelay == null
         ? {}
         : {
@@ -190,7 +213,11 @@ export const getCustomLiquidClassProperties = (
         },
       },
       retract: {
-        air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
+        ...(args.dispenseAirGapVolume == null || args.dispenseAirGapVolume === 0
+          ? {}
+          : {
+              air_gap_by_volume: [[0, args.dispenseAirGapVolume]],
+            }),
         ...(args.dispenseRetractDelay == null
           ? {}
           : {
