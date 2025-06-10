@@ -7,7 +7,6 @@ import {
   getLabwareDefURI,
   isFlexPipette,
   OT2_ROBOT_TYPE,
-  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import {
@@ -330,10 +329,7 @@ export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
 
   return uniqueLiquidClasses.length > 0
     ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
-    : //  default to loading water liquid class to use as base_liquid_class
-      `# Load Liquid Class:\n${WATER_LIQUID_CLASS_NAME}=${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
-        'water'
-      )})`
+    : ''
 }
 
 export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {

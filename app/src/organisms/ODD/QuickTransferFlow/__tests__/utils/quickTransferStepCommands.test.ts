@@ -207,29 +207,90 @@ pipette.transfer_with_liquid_class(
         properties={
             "p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
                 "aspirate": {
-                    "aspirate_position": {"position_reference": "well-bottom"},
+                    "aspirate_position": {
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                        },
+                        "position_reference": "well-bottom",
+                    },
                     "flow_rate_by_volume": [(0, 56)],
-                    "submerge": {"start_position": {"position_reference": "well-bottom"}},
-                    "retract": {"end_position": {"position_reference": "well-bottom"}},
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "start_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                        "touch_tip": {"enabled": False},
+                    },
                 },
                 "dispense": {
-                    "dispense_position": {"position_reference": "well-bottom"},
+                    "dispense_position": {
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                        },
+                        "position_reference": "well-bottom",
+                    },
+                    "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 80)],
-                    "submerge": {"start_position": {"position_reference": "well-bottom"}},
-                    "retract": {
-                        "end_position": {"position_reference": "well-bottom"},
-                        "blowout": {
-                            "enable": True,
-                            "params": {
-                                "location": "source_well",
-                                "flow_rate": 50,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "start_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
                             },
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                        "touch_tip": {"enabled": False},
+                        "blowout": {
+                            "enabled": True,
+                            "location": "source_well",
+                            "flow_rate": 50,
                         },
                     },
                 },
             }},
         },
-        base_liquid_class=waterV1,
     ),
     volume=10,
     source=[mock_labware_1["A1"]],

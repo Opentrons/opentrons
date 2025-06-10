@@ -518,13 +518,6 @@ waste_chute = protocol.load_waste_chute()`.trimStart()
 })
 
 describe('getLoadLiquidClasses', () => {
-  it('should load just the default water liquid class', () => {
-    expect(getLoadLiquidClasses({})).toBe(
-      `
-# Load Liquid Class:
-waterV1=protocol.get_liquid_class("water")`.trimStart()
-    )
-  })
   it('should load a liquid class for each liquid class types', () => {
     const liquid3 = 'liquid3'
     mockLiquidEntities = {

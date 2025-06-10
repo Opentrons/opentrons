@@ -169,21 +169,33 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {"z": 2},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 2,
+                        },
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 50,
                         "start_position": {
                             "offset": {
                                 "x": 1,
+                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
                         },
                     },
                     "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 2,
@@ -193,15 +205,25 @@ mock_pipette.transfer_with_liquid_class(
                             "position_reference": "well-top",
                         },
                         "speed": 51,
+                        "touch_tip": {"enabled": False},
                     },
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {"z": 3},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 3,
+                        },
                         "position_reference": "well-bottom",
                     },
+                    "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 12)],
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 52,
                         "start_position": {
                             "offset": {
@@ -214,6 +236,7 @@ mock_pipette.transfer_with_liquid_class(
                     },
                     "retract": {
                         "air_gap_by_volume": [(0, 5)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 3,
@@ -223,11 +246,12 @@ mock_pipette.transfer_with_liquid_class(
                             "position_reference": "well-top",
                         },
                         "speed": 53,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
                     },
                 },
             }},
         },
-        base_liquid_class=waterV1,
     ),
     volume=30,
     source=[mock_source_plate["A1"]],
@@ -361,21 +385,33 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {"z": 2},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 2,
+                        },
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 50,
                         "start_position": {
                             "offset": {
                                 "x": 1,
+                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
                         },
                     },
                     "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 2,
@@ -385,15 +421,25 @@ mock_pipette.transfer_with_liquid_class(
                             "position_reference": "well-top",
                         },
                         "speed": 51,
+                        "touch_tip": {"enabled": False},
                     },
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {"z": 3},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 3,
+                        },
                         "position_reference": "well-bottom",
                     },
+                    "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 12)],
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 52,
                         "start_position": {
                             "offset": {
@@ -405,6 +451,8 @@ mock_pipette.transfer_with_liquid_class(
                         },
                     },
                     "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 3,
@@ -414,11 +462,12 @@ mock_pipette.transfer_with_liquid_class(
                             "position_reference": "well-top",
                         },
                         "speed": 53,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
                     },
                 },
             }},
         },
-        base_liquid_class=waterV1,
     ),
     volume=30,
     source=[mock_source_plate["A1"]],
@@ -607,28 +656,40 @@ test('transfer with multiple sets of wells', () => {
   const res = getSuccessResult(result)
   expect(res.python).toEqual(
     `
- mock_pipette.transfer_with_liquid_class(
+mock_pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
         name="1234_transfer",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {"z": 2},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 2,
+                        },
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 50,
                         "start_position": {
                             "offset": {
                                 "x": 1,
+                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
                         },
                     },
                     "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 2,
@@ -638,15 +699,25 @@ test('transfer with multiple sets of wells', () => {
                             "position_reference": "well-top",
                         },
                         "speed": 51,
+                        "touch_tip": {"enabled": False},
                     },
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {"z": 3},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 3,
+                        },
                         "position_reference": "well-bottom",
                     },
+                    "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 12)],
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 52,
                         "start_position": {
                             "offset": {
@@ -658,6 +729,8 @@ test('transfer with multiple sets of wells', () => {
                         },
                     },
                     "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 3,
@@ -667,11 +740,12 @@ test('transfer with multiple sets of wells', () => {
                             "position_reference": "well-top",
                         },
                         "speed": 53,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
                     },
                 },
             }},
         },
-        base_liquid_class=waterV1,
     ),
     volume=30,
     source=[mock_source_plate["A1"], mock_source_plate["A2"]],
@@ -5515,27 +5589,32 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {"z": 2},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 2,
+                        },
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
                     "pre_wet": True,
+                    "correction_by_volume": [(0, 0)],
                     "delay": {
-                        "enable": True,
-                        "params": {"duration": 11},
+                        "enabled": True,
+                        "duration": 11,
                     },
                     "mix": {
-                        "enable": True,
-                        "params": {
-                            "repetitions": 1,
-                            "volume": 35,
-                        },
+                        "enabled": True,
+                        "repetitions": 1,
+                        "volume": 35,
                     },
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 50,
                         "start_position": {
                             "offset": {
                                 "x": 1,
+                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
@@ -5543,6 +5622,7 @@ mock_pipette.transfer_with_liquid_class(
                     },
                     "retract": {
                         "air_gap_by_volume": [(0, 31)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 2,
@@ -5553,29 +5633,34 @@ mock_pipette.transfer_with_liquid_class(
                         },
                         "speed": 51,
                         "touch_tip": {
-                            "enable": True,
-                            "params": {"z_offset": -14.5},
+                            "enabled": True,
+                            "z_offset": -14.5,
                         },
                     },
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {"z": 3},
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 3,
+                        },
                         "position_reference": "well-bottom",
                     },
+                    "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 12)],
+                    "correction_by_volume": [(0, 0)],
                     "delay": {
-                        "enable": True,
-                        "params": {"duration": 12},
+                        "enabled": True,
+                        "duration": 12,
                     },
                     "mix": {
-                        "enable": True,
-                        "params": {
-                            "repetitions": 1,
-                            "volume": 36,
-                        },
+                        "enabled": True,
+                        "repetitions": 1,
+                        "volume": 36,
                     },
                     "submerge": {
+                        "delay": {"enabled": False},
                         "speed": 52,
                         "start_position": {
                             "offset": {
@@ -5588,6 +5673,7 @@ mock_pipette.transfer_with_liquid_class(
                     },
                     "retract": {
                         "air_gap_by_volume": [(0, 3)],
+                        "delay": {"enabled": False},
                         "end_position": {
                             "offset": {
                                 "x": 3,
@@ -5598,21 +5684,18 @@ mock_pipette.transfer_with_liquid_class(
                         },
                         "speed": 53,
                         "touch_tip": {
-                            "enable": True,
-                            "params": {"z_offset": -3.4},
+                            "enabled": True,
+                            "z_offset": -3.4,
                         },
                         "blowout": {
-                            "enable": True,
-                            "params": {
-                                "location": "fixedTrash",
-                                "flow_rate": 2.3,
-                            },
+                            "enabled": True,
+                            "location": "fixedTrash",
+                            "flow_rate": 2.3,
                         },
                     },
                 },
             }},
         },
-        base_liquid_class=waterV1,
     ),
     volume=350,
     source=[mock_source_plate["A1"]],

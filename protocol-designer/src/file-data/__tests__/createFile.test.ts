@@ -183,9 +183,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Pipettes:
     mock_python_name_1 = protocol.load_instrument("p10_single", "left", tip_racks=[mock_python_name_2])
 
-    # Load Liquid Class:
-    waterV1=protocol.get_liquid_class("water")
-
     # PROTOCOL STEPS
 
     # Step 1:

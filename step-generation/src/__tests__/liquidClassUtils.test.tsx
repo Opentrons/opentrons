@@ -99,32 +99,35 @@ describe('getCustomLiquidClassProperties', () => {
     "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
         "aspirate": {
             "aspirate_position": {
-                "offset": {"z": 2},
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 2,
+                },
                 "position_reference": "well-bottom",
             },
             "flow_rate_by_volume": [(0, 2.1)],
             "pre_wet": True,
             "correction_by_volume": [(0, 5)],
             "delay": {
-                "enable": True,
-                "params": {"duration": 12},
+                "enabled": True,
+                "duration": 12,
             },
             "mix": {
-                "enable": True,
-                "params": {
-                    "repetitions": 4,
-                    "volume": 10,
-                },
+                "enabled": True,
+                "repetitions": 4,
+                "volume": 10,
             },
             "submerge": {
                 "delay": {
-                    "enable": True,
-                    "params": {"duration": 5},
+                    "enabled": True,
+                    "duration": 5,
                 },
                 "speed": 50,
                 "start_position": {
                     "offset": {
                         "x": 1,
+                        "y": 0,
                         "z": 5,
                     },
                     "position_reference": "well-bottom",
@@ -133,8 +136,8 @@ describe('getCustomLiquidClassProperties', () => {
             "retract": {
                 "air_gap_by_volume": [(0, 2)],
                 "delay": {
-                    "enable": True,
-                    "params": {"duration": 10},
+                    "enabled": True,
+                    "duration": 10,
                 },
                 "end_position": {
                     "offset": {
@@ -146,38 +149,38 @@ describe('getCustomLiquidClassProperties', () => {
                 },
                 "speed": 51,
                 "touch_tip": {
-                    "enable": True,
-                    "params": {
-                        "z_offset": -3.4,
-                        "mm_from_edge": 10,
-                        "speed": 11,
-                    },
+                    "enabled": True,
+                    "z_offset": -3.4,
+                    "mm_from_edge": 10,
+                    "speed": 11,
                 },
             },
         },
         "dispense": {
             "dispense_position": {
-                "offset": {"z": 3},
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3,
+                },
                 "position_reference": "well-bottom",
             },
             "push_out_by_volume": [(0, 0)],
             "flow_rate_by_volume": [(0, 2.2)],
             "correction_by_volume": [(0, 5)],
             "delay": {
-                "enable": True,
-                "params": {"duration": 20},
+                "enabled": True,
+                "duration": 20,
             },
             "mix": {
-                "enable": True,
-                "params": {
-                    "repetitions": 3,
-                    "volume": 10,
-                },
+                "enabled": True,
+                "repetitions": 3,
+                "volume": 10,
             },
             "submerge": {
                 "delay": {
-                    "enable": True,
-                    "params": {"duration": 50},
+                    "enabled": True,
+                    "duration": 50,
                 },
                 "speed": 52,
                 "start_position": {
@@ -190,9 +193,10 @@ describe('getCustomLiquidClassProperties', () => {
                 },
             },
             "retract": {
+                "air_gap_by_volume": [(0, 0)],
                 "delay": {
-                    "enable": True,
-                    "params": {"duration": 40},
+                    "enabled": True,
+                    "duration": 40,
                 },
                 "end_position": {
                     "offset": {
@@ -204,19 +208,15 @@ describe('getCustomLiquidClassProperties', () => {
                 },
                 "speed": 53,
                 "touch_tip": {
-                    "enable": True,
-                    "params": {
-                        "z_offset": -3.4,
-                        "mm_from_edge": 3,
-                        "speed": 5,
-                    },
+                    "enabled": True,
+                    "z_offset": -3.4,
+                    "mm_from_edge": 3,
+                    "speed": 5,
                 },
                 "blowout": {
-                    "enable": True,
-                    "params": {
-                        "location": "source",
-                        "flow_rate": 2.3,
-                    },
+                    "enabled": True,
+                    "location": "source",
+                    "flow_rate": 2.3,
                 },
             },
         },
