@@ -93,7 +93,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     conditioningVolume,
     destLabware,
@@ -889,11 +888,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: destinationWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,
@@ -913,11 +907,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: sourceWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,

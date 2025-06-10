@@ -40,7 +40,7 @@ import type {
   CommandV10Mixin,
   CreateCommand,
   LabwareV2Mixin,
-  LiquidV2Mixin,
+  LiquidV1Mixin,
   OT2RobotMixin,
   OT3RobotMixin,
   ProtocolBase,
@@ -196,7 +196,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const liquids: LiquidV2Mixin['liquids'] = reduce(
+    const liquids: LiquidV1Mixin['liquids'] = reduce(
       liquidEntities,
       (acc, liquidData, liquidId) => {
         return {
@@ -205,7 +205,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             displayName: liquidData.displayName,
             description: liquidData.description ?? '',
             displayColor: liquidData.displayColor ?? swatchColors(liquidId),
-            liquidClass: liquidData.liquidClass ?? null,
           },
         }
       },
@@ -245,8 +244,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    const liquidV2Mixin: LiquidV2Mixin = {
-      liquidSchemaId: 'opentronsLiquidSchemaV2',
+    const liquidV2Mixin: LiquidV1Mixin = {
+      liquidSchemaId: 'opentronsLiquidSchemaV1',
       liquids,
     }
 

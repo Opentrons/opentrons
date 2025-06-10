@@ -90,27 +90,19 @@ jobs:
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
         run: |
           make -C protocol-designer NODE_ENV=development
+      - name: 'upload sourcemaps to Sentry'
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          sourcemaps: protocol-designer/dist
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v4
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
-
-  upload-sourcemaps-pd:
-    timeout-minutes: 10
-    name: 'upload protocol designer source maps'
-    needs: ['build-pd']
-    runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
-
-    uses: getsentry/action-release@v3
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-    with:
-      name: pd-artifact
-      sourcemaps: ./dist
 
   deploy-pd:
     timeout-minutes: 10
@@ -146,3 +138,12 @@ jobs:
           # invalidate both sandbox.opentrons.com and www.sandbox.opentrons.com cloudfront caches
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_DISTRIBUTION_ID }} --paths "/*"
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_WWW_DISTRIBUTION_ID }} --paths "/*"
+      - name: 'notify Sentry of prod deploy'
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          version: ${{ steps.resolve-tag.outputs.tag }}
+          environment: production
