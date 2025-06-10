@@ -14,17 +14,17 @@ module.exports = function afterPack(context) {
     appOutDir,
     packager,
   } = context
+  const archStr = eblib.Arch[arch]
   console.log('after-pack: context', context)
   console.log(
-    `after-pack: outDir: ${outDir}, applicationOutDir: ${appOutDir}, archStr ${eblib.Arch[arch]}`
+    `after-pack: outDir: ${outDir}, applicationOutDir: ${appOutDir}, archStr ${archStr}`
   )
-  console.log(`arch: ${eblib.Arch}`)
   const platformName = electronPlatformName ?? platform.nodeName
   // arch 4 is universal. sorry. it's not in the arch enum of the builder-util we have for some reason.
   if (platformName === 'darwin') {
     if (arch !== 4) {
       console.log(
-        `After-pack: on darwin we only pack python on final universal app creation, not intermediate ${eblib.Arch[arch]} app creation`
+        `After-pack: on darwin we only pack python on final universal app creation, not intermediate ${archStr} app creation`
       )
       return true
     } else {
@@ -41,6 +41,6 @@ module.exports = function afterPack(context) {
     console.log(
       `After-pack: Packing python for ${platformName}/${archStr} to ${appOutDir}`
     )
-    return installPython(platformName, archStr, appOutDir)
+    return installPython(platformName, [archStr], appOutDir)
   }
 }
