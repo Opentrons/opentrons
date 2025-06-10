@@ -9,7 +9,6 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
 )
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
 from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.labware import Well, Labware
@@ -198,7 +197,6 @@ def test_raise_only_if_pip_location_below_target(
 ) -> None:
     """It should raise appropriately based on heights of given location and target location."""
     well_core = decoy.mock(cls=WellCore)
-    logger = decoy.mock(cls=Logger)
     decoy.when(well_core.current_liquid_height()).then_return(0)
     decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
     with expected_raise:
