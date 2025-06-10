@@ -634,9 +634,6 @@ class Protocols:
         file_stem="Flex_S_v2_20_96_Reservoir", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_v2_20_P50_LPD: Protocol = Protocol(file_stem="Flex_S_v2_20_P50_LPD", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER)
-    Flex_S_v2_20_P50_LPD_wet_tip_scenarios: Protocol = Protocol(
-        file_stem="Flex_S_v2_20_P50_LPD_wet_tip_scenarios", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
-    )
     Flex_S_v2_20_P50_touch_tip_directly: Protocol = Protocol(
         file_stem="Flex_S_v2_20_P50_touch_tip_directly", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
@@ -825,6 +822,9 @@ class Protocols:
     )
     Flex_X_v2_19_Illumina_Stranded_total_RNA_Ribo_Zero: Protocol = Protocol(
         file_stem="Flex_X_v2_19_Illumina_Stranded_total_RNA_Ribo_Zero", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_X_v2_20_P50_LPD_wet_tip_scenarios: Protocol = Protocol(
+        file_stem="Flex_X_v2_20_P50_LPD_wet_tip_scenarios", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_X_v2_21_plate_reader_bad_slot: Protocol = Protocol(
         file_stem="Flex_X_v2_21_plate_reader_bad_slot", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER

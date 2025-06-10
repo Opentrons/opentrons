@@ -18,6 +18,9 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
                 # Replace absolute paths (macOS, Linux, CI, etc.) with <PATH>
                 (r"(/Users/[^/]+/github/opentrons/opentrons|/home/runner/work/opentrons/opentrons)[^\s\"]*", "<PATH>"),
             ],
+            "obj": [
+                (r"(<[\w\.]+ object at 0x)[0-9a-fA-F]+(>)", r"\1UUID\2"),
+            ],
         }
         self.id_keys_to_replace = [
             "id",

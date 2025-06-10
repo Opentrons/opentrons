@@ -6,7 +6,7 @@ from opentrons import protocol_api
 metadata = {
     "protocolName": "LPD with wet tip scenarios",
     "author": "Josh McVey",
-    "description": "http://sandbox.docs.opentrons.com/edge/v2/pipettes/loading.html#liquid-presence-detection",
+    "description": "http://sandbox.docs.opentrons.com/edge/v2/pipettes/loading.html#liquid-presence-detection expected fail",
 }
 
 requirements = {

@@ -27,6 +27,7 @@ from automation.data.protocol_registry import ProtocolRegistry
 console = Console()
 
 tags = [
+    "chore_release-8.5.0",
     "v8.4.1",
     "v8.3.2",
     "v8.2.0",
@@ -34,6 +35,7 @@ tags = [
 
 ROBOT_STACK_VERSION_MAP: Dict[str, Dict[str, str]] = {
     """Robot stack version mapping to maximum PAPI and PD versions."""
+    "chore_release-8.5.0": {"api": "2.24", "pd": "8.5.0"},
     "8.4.1": {"api": "2.23", "pd": "8.4.4"},
     "8.3.2": {"api": "2.22", "pd": "?"},
     "8.2.0": {"api": "2.21", "pd": "?"},
@@ -351,6 +353,7 @@ class AnalysisOutcome:
 @dataclass
 class AnalysisMatrix:
     filename: str
+    v8_5_0: str = AnalysisOutcome.NA
     v8_4_1: str = AnalysisOutcome.NA
     v8_3_2: str = AnalysisOutcome.NA
     v8_2_0: str = AnalysisOutcome.NA
@@ -368,7 +371,9 @@ class AnalysisMatrix:
             result = AnalysisOutcome.ERRORS
 
         tag_version = tag.lower()
-        if tag_version == "v8.4.1":
+        if tag_version == "chore_release-8.5.0":
+            self.v8_5_0 = result
+        elif tag_version == "v8.4.1":
             self.v8_4_1 = result
         elif tag_version == "v8.3.2":
             self.v8_3_2 = result
@@ -444,6 +449,7 @@ def main() -> None:  # noqa: C901
     result_matrix = [
         AnalysisMatrix(
             filename=p.filename,
+            v8_5_0=AnalysisOutcome.NA,
             v8_4_1=AnalysisOutcome.NA,
             v8_3_2=AnalysisOutcome.NA,
             v8_2_0=AnalysisOutcome.NA,
@@ -455,7 +461,7 @@ def main() -> None:  # noqa: C901
         compatible_protocols = [
             p
             for p in selected_protocols
-            if p.min_robot_stack_version() is not None and p.is_compatible_with_stack(p.min_robot_stack_version())
+            if p.min_robot_stack_version() is not None and p.is_compatible_with_stack(p.min_robot_stack_version() or "")
         ]
         console.print(f"Testing {len(compatible_protocols)} protocols for {tag}")
         if not compatible_protocols:
@@ -475,6 +481,7 @@ def main() -> None:  # noqa: C901
     # Display the result_matrix
     table = Table(title="Analysis Matrix Results")
     table.add_column("Filename", style="magenta")
+    table.add_column("v8.5.0", justify="center")
     table.add_column("v8.4.1", justify="center")
     table.add_column("v8.3.2", justify="center")
     table.add_column("v8.2.0", justify="center")
@@ -482,6 +489,7 @@ def main() -> None:  # noqa: C901
     for matrix in result_matrix:
         table.add_row(
             matrix.filename,
+            str(matrix.v8_5_0),
             str(matrix.v8_4_1),
             str(matrix.v8_3_2),
             str(matrix.v8_2_0),

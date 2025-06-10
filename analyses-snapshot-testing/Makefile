@@ -202,12 +202,12 @@ collect-audit:
 	uv run python -m automation.data.collect_audit
 
 .PHONY: prep
-prep: format ruff-check clean collect-audit
+prep: format ruff-check clean audit-registry collect-audit
 
-ANALYSIS_REFS := v8.4.1 v8.3.2 v8.2.0
+ANALYSIS_REFS := chore_release-8.5.0 v8.4.1 v8.3.2 v8.2.0
 
-.PHONY: build-stables
-build-stables: build-base-image
+.PHONY: build-matrix
+build-matrix: build-base-image
 	@echo "Building all stable versions in parallel"
 	$(MAKE) -j $(shell nproc) $(foreach ref,$(ANALYSIS_REFS),build-opentrons-analysis-$(ref))
 	@echo "All stable versions built successfully."

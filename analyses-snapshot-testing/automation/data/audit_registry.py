@@ -17,6 +17,7 @@ from automation.data.protocol import (
 )
 
 PROTOCOLS_PY = Path(__file__).parent / "protocols.py"
+SNAPSHOT_DIR = Path(__file__).parent.parent.parent / "tests" / "__snapshots__" / "analyses_snapshot_test"
 
 
 def get_protocol_stems_from_files():
@@ -154,6 +155,62 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
         f.write(new_code)
 
 
+def extract_stem_from_snapshot(filename):
+    # Example: test_analysis_snapshot[0160301f8a][Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid_Override_200_filter].json
+    match = re.match(r"test_analysis_snapshot\[[^\]]+\]\[([^\]]+)\]\\.json", filename)
+    if not match:
+        match = re.match(r"test_analysis_snapshot\[[^\]]+\]\[([^\]]+)\]\.json", filename)
+    return match.group(1) if match else None
+
+
+def audit_snapshots_against_registry(console, file_stem_set):
+    snapshot_files = list(SNAPSHOT_DIR.glob("*.json"))
+    # remove overrides
+    snapshot_files = [f for f in snapshot_files if "_Overrides_" not in f.name]
+    console.print(
+        Panel(
+            f"Found [info]{len(snapshot_files)}[/] snapshot files in [path]{SNAPSHOT_DIR}[/]",
+            title="Snapshot Files",
+            expand=False,
+        )
+    )
+    snapshot_stems = set()
+    file_by_stem = {}
+    for f in snapshot_files:
+        stem = extract_stem_from_snapshot(f.name)
+        if stem:
+            snapshot_stems.add(stem)
+            file_by_stem[stem] = f
+    registered_stems = {stem for (stem, _) in file_stem_set}
+    missing_snapshots = registered_stems - snapshot_stems
+    extra_snapshots = snapshot_stems - registered_stems
+
+    summary = (
+        f"[bold]Registered protocols:[/bold] {len(registered_stems)} | "
+        f"[bold]Snapshots:[/bold] {len(snapshot_stems)} | "
+        f"[bold]Missing Snapshots:[/bold] {len(missing_snapshots)} | "
+        f"[bold]Extra Snapshots:[/bold] {len(extra_snapshots)}"
+    )
+    console.print(Panel(summary, title="Snapshot Audit", expand=False))
+
+    if missing_snapshots:
+        console.print(Panel("\n".join(sorted(missing_snapshots)), title="[red]Missing Snapshots[/red]"))
+    if extra_snapshots:
+        console.print(Panel("\n".join(sorted(extra_snapshots)), title="[yellow]Extra Snapshots (will be deleted)[/yellow]"))
+        # Delete extra snapshot files
+        for stem in extra_snapshots:
+            f = file_by_stem.get(stem)
+            if f and f.exists():
+                f.unlink()
+                console.print(f"[yellow]Deleted extra snapshot:[/yellow] {f}")
+    if not missing_snapshots and not extra_snapshots:
+        console.print(
+            Panel(
+                "[green]All registered protocols have matching snapshots. No extra snapshots found![/green]", title="Snapshot Audit Result"
+            )
+        )
+
+
 def main():
     console = Console()
     file_stems = get_protocol_stems_from_files()
@@ -200,6 +257,8 @@ def main():
                         title="Audit Result (Post-Edit)",
                     )
                 )
+    # --- Snapshot audit ---
+    audit_snapshots_against_registry(console, file_stem_set)
 
 
 if __name__ == "__main__":
