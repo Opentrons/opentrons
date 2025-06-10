@@ -12,6 +12,9 @@ from opentrons.types import Point, Dict
 from opentrons.protocols.labware import get_all_labware_definitions
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
+metadata = {"protocolName": "lld-test-liquid-height-3mm"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+
 ###########################################
 #  VARIABLES - START
 ###########################################
@@ -29,53 +32,20 @@ def create_dict_of_heights_for_labware(
     protocol: ProtocolContext,
 ) -> Dict[str, List[float | SimulatedProbeResult]]:
     """Create a dictionary of labware and their heights."""
-    labware_definitions = get_all_labware_definitions()
     volumes_dict = {}
-    for labware in labware_definitions:
-        labware_loaded = protocol.load_labware(labware, OFF_DECK)
-        well = labware_loaded["A1"]
-        volumes_dict[labware] = [
-            well.volume_from_height(height=3),
-            well.volume_from_height(height=well.depth / 2),
-            well.volume_from_height(height=well.depth - 3),
-            0.0,
-        ]
+    if requirements["apiLevel"] == "2.24":
+        labware_definitions = get_all_labware_definitions()
+        for labware in labware_definitions:
+            labware_loaded = protocol.load_labware(labware, OFF_DECK)
+            well = labware_loaded["A1"]
+            volumes_dict[labware] = [
+                well.volume_from_height(height=3),
+                well.volume_from_height(height=well.depth / 2),
+                well.volume_from_height(height=well.depth - 3),
+                0.0,
+            ]
     return volumes_dict
 
-
-# VOLUMES_3MM_TOP_BOTTOM = {
-#     "corning_96_wellplate_360ul_flat": [257.1, 97.2, 0.0],
-#     "nest_96_wellplate_200ul_flat": [259.8, 96.3, 0.0],
-#     "opentrons_96_wellplate_200ul_pcr_full_skirt": [150.2, 14.3, 0.0],
-#     "nest_96_wellplate_2ml_deep": [2060.4, 118.3, 0.0],
-#     "nest_12_reservoir_15ml": [13687.8, 1260.6, 0.0],
-#     "nest_96_wellplate_100ul_pcr_full_skirt": [150.8, 15.5, 0.0],
-#     "appliedbiosystemsmicroamp_384_wellplate_40ul": [26.2, 7.44, 0.0],
-#     "thermoscientificnunc_96_wellplate_1300ul": [1155.1, 73.5, 0.0],
-#     "thermoscientificnunc_96_wellplate_2000ul": [1828.4, 76.0, 0.0],
-#     "biorad_96_wellplate_200ul_pcr": [161.2, 71.32, 17.9, 0.0],
-#     "nest_1_reservoir_290ml": [16570.4, 271690.5, 0.0],
-#     "corning_12_wellplate_6.9ml_flat": [5654.8, 1156.3, 0.0],
-#     "corning_24_wellplate_3.4ml_flat": [2853.4, 1701.37, 579.0, 0.0],
-#     "corning_6_wellplate_16.8ml_flat": [13901.9, 2862.1, 0.0],
-#     "corning_48_wellplate_1.6ml_flat": [1327.0, 790.63, 268.9, 0.0],
-#     "opentrons_24_tuberack_nest_0.5ml_screwcap": [795.4, 21.95, 0.0],
-#     "opentrons_24_tuberack_nest_1.5ml_screwcap": [19.5, 735.89, 1750.8, 0.0],
-#     "opentrons_24_tuberack_nest_1.5ml_snapcap": [28.7, 1739.7, 658.2, 0.0],
-#     "opentrons_24_tuberack_nest_2ml_screwcap": [2104.9, 66.6, 0.0],
-#     "opentrons_24_tuberack_nest_2ml_snapcap": [2148.5, 69.6, 0.0],
-#     "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": [115.0, 26117.4, 56110.3, 0.0],
-#     "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": [169.5, 57720.5, 0.0],
-#     "nest_1_reservoir_195ml": [14513.1, 178181.9, 0.0],
-#     "axygen_1_reservoir_90ml": [23136.9, 72854.8, 0.0],
-#     "agilent_1_reservoir_290ml": [15652.9, 141945.59, 268813.8],
-#     "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap": [26.6, 593.7, 1629.9],
-#     "corning_384_wellplate_112ul_flat": [23.2, 50.1, 80.0],
-#     "biorad_384_wellplate_50ul": [28.7, 8.0, 0.0],
-#     "usascientific_12_reservoir_22ml": [68.4, 11356.9, 19797.4],
-#     "usascientific_96_wellplate_2.4ml_deep": [74.7, 1151.9, 2317.8],
-#     "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap": [63.0, 2237.8, 0.0],
-# }
 
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = False
@@ -90,7 +60,7 @@ PROBING_PIPETTE_SIZE = 50
 
 SLOT_LIQUID_TIPRACK = ["C3", "C2"]
 SLOT_PROBING_TIPRACK = "D3"
-SLOT_LABWARE = "D1"
+SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B2"
 
@@ -98,49 +68,44 @@ SLOT_DIAL = "B2"
 #  VARIABLES - END
 ###########################################
 
-
-metadata = {"protocolName": "lld-test-liquid-height-3mm-w/meniscus relative"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
-
-
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     from hardware_testing import protocols
 
     protocols.create_pipette_parameters(parameters)
     # protocols.create_labware_parameters(parameters)
-    parametes.add_str(
+    parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
         choices=
-        [{"display_name": "axygen", value: "axygen_96_wellplate_500ul"},
-        {"display_name": "smc 384", value: "smc_384_read_plate"},
-        {"display_name": "ibidi", value: "ibidi_96_square_well_plate_300ul"}],
-        default = "ibidi_96_square_well_plate_300ul")
+        [{"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
+        {"display_name": "smc 384", "value": "smc_384_read_plate"},
+        {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"}],
+        default = "axygen_96_wellplate_500ul")
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
     parameters.add_float(
-        variable_name="height_3mm_from_bottom",
-        display_name="Height 3 mm from bottom",
-        description="Height of liquid 3 mm from bottom of labware.",
+        variable_name="volume_3mm_from_bottom",
+        display_name="Volume 3 mm from bottom",
+        description="Volume of liquid 3 mm from bottom of labware.",
         default=0.0,
-        maximum=100.0,
+        maximum=10000.0,
         minimum=-100.0,
     )
     parameters.add_float(
-        variable_name="height_3mm_from_top",
-        display_name="Height 3 mm from top",
-        description="Height of liquid 3 mm from top of labware.",
+        variable_name="volume_3mm_from_top",
+        display_name="Volume 3 mm from top",
+        description="Volume of liquid 3 mm from top of labware.",
         default=0.0,
-        maximum=100.0,
+        maximum=10000.0,
         minimum=-100.0,
     )
     parameters.add_float(
-        variable_name="height_of_middle",
-        display_name="Height of Middle",
-        description="Height of liquid when well is half full.",
+        variable_name="volume_of_middle",
+        display_name="Volume of Middle",
+        description="Volume of liquid when well is half full.",
         default=0.0,
-        maximum=100.0,
+        maximum=10000.0,
         minimum=-100.0,
     )
     parameters.add_bool(
@@ -153,7 +118,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="liquid_pipette_probe_every_time",
         display_name="Liq Pipette Probe Every Time",
         description="Liq pipette probes every time.",
-        default=True,
+        default=False,
     )
     parameters.add_float(
         variable_name="DISPENSE_MM_FROM_MENISCUS",
@@ -175,7 +140,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="calculate_height_from_api",
         display_name="Calculate height from API",
         description="Calculate height from API.",
-        default=True,
+        default=False,
+    )
+    parameters.add_bool(
+        variable_name="pause_to_check_well",
+        display_name="Pause to Check Well",
+        description="If True, protocol will pause after each measurement",
+        default=False
     )
 
 
@@ -227,18 +198,27 @@ def _setup(
     num_trials: int = ctx.params.num_of_trials  # type: ignore[attr-defined]
     LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
     tube_volume: int = ctx.params.tube_volume  # type: ignore[attr-defined]
-    height_3mm_from_bottom = ctx.params.height_3mm_from_bottom  # type: ignore[attr-defined]
-    height_3mm_from_top = ctx.params.height_3mm_from_top  # type: ignore[attr-defined]
-    height_of_middle = ctx.params.height_of_middle  # type: ignore[attr-defined]
+    volume_3mm_from_bottom = ctx.params.volume_3mm_from_bottom  # type: ignore[attr-defined]
+    volume_3mm_from_top = ctx.params.volume_3mm_from_top  # type: ignore[attr-defined]
+    volume_of_middle = ctx.params.volume_of_middle  # type: ignore[attr-defined]
+    measure_middle_height = ctx.params.measure_middle_height  # type: ignore[attr-defined]
+    pause_to_check_well = ctx.params.pause_to_check_well # type: ignore[attr-defined]
     VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
 
     if LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
-        volumes_testing = [
-            height_3mm_from_bottom,
-            height_of_middle,
-            height_3mm_from_top,
-            0.0,
-        ]
+        if measure_middle_height:
+            volumes_testing = [
+                volume_3mm_from_bottom,
+                volume_of_middle,
+                volume_3mm_from_top,
+                0.0,
+            ]
+        else:
+            volumes_testing = [
+                volume_3mm_from_bottom,
+                volume_3mm_from_top,
+                0.0,
+            ]
         VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
 
     labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
@@ -501,26 +481,26 @@ def _test_for_finding_liquid_height(  # noqa: C901
                     liquid_pipette.flow_rate.aspirate, 50
                 )
                 liquid_pipette.flow_rate.blow_out = 100
-                dispense_loc = well.meniscus(z=DISPENSE_MM_FROM_MENISCUS, target="end")
+                dispense_loc = well.bottom(z=1)
                 if not liquid_pipette.has_tip:
                     liquid_pipette.pick_up_tip()
                     # NOTE: only use new, dry tips to probe
-                    if not ctx.is_simulating():
+                    if not ctx.is_simulating() and trial_counter == 1:
                         _src_meniscus_height = liquid_pipette.measure_liquid_height(
                             src_well
                         )  # type: ignore[assignment]
                     else:
-                        _src_meniscus_height = 1.0
+                        _src_meniscus_height = 1
                     if isinstance(_src_meniscus_height, float):
                         commented_height = round(
                             _src_meniscus_height or 0.0,
                             2,
                         )
-                    liquid_pipette.drop_tip()
                 else:
                     # try and get any remaining droplets out of the way
                     liquid_pipette.move_to(src_well.top(10))
                     liquid_pipette.aspirate().blow_out().prepare_to_aspirate()
+                    liquid_pipette.drop_tip()
                 liquid_pipette.transfer(
                     need_to_transfer_per_ch,
                     src_well.meniscus(z=ASPIRATE_MM_FROM_MENISCUS, target="end"),
@@ -536,14 +516,6 @@ def _test_for_finding_liquid_height(  # noqa: C901
                         f"Aspirated {round(volume, 2)} from src, "
                         f"aspirating from {commented_height} from bottom."
                     )
-                # liquid_pipette.move_to(src_well.bottom(_src_meniscus_height + 5))
-                ctx.delay(seconds=1.5)
-                # default will be to dispense from top
-                ctx.delay(seconds=1.5)
-                liquid_pipette.move_to(well.top())
-                ctx.delay(seconds=1.5)
-                liquid_pipette.blow_out(well.top())
-                ctx.delay(seconds=1.5)
             # get height of liquid
             else:
                 ctx.pause("Fill well.")
@@ -558,7 +530,8 @@ def _test_for_finding_liquid_height(  # noqa: C901
         corrected_height = height + tip_z_error
         if not ctx.is_simulating():
             all_corrected_heights.append(corrected_height)  # type: ignore[arg-type]
-        ctx.pause("CHECK LABWARE")
+        if pause_to_check_well:
+            ctx.pause("CHECK LABWARE")
         # drop tips
         if not SAME_TIP:
             if liquid_pipette.has_tip:
