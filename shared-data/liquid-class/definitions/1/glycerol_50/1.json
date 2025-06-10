@@ -205,9 +205,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 25.0
                 }
               },
@@ -457,9 +457,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 25.0
                 }
               },
@@ -714,9 +714,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 25.0
                 }
               },
@@ -966,9 +966,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 25.0
                 }
               },
@@ -1222,9 +1222,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -1473,9 +1473,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -1720,9 +1720,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -1967,9 +1967,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -2214,9 +2214,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 250.0
                 }
               },
@@ -2461,9 +2461,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 250.0
                 }
               },
@@ -2717,9 +2717,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -2968,9 +2968,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -3215,9 +3215,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -3462,9 +3462,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -3709,9 +3709,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 250.0
                 }
               },
@@ -3956,9 +3956,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 250.0
                 }
               },
@@ -4216,9 +4216,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 40.0
                 }
               },
@@ -4475,9 +4475,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 40.0
                 }
               },
@@ -4726,9 +4726,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -4973,9 +4973,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 50.0
                 }
               },
@@ -5221,9 +5221,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 200.0
                 }
               },
@@ -5469,9 +5469,9 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
-                  "location": "destination",
+                  "location": "trash",
                   "flowRate": 200.0
                 }
               },
