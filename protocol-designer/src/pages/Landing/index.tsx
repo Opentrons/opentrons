@@ -167,13 +167,6 @@ export function Landing(): JSX.Element {
             aria-label={t('import')}
           />
         </StyledLabel>
-        <button
-          onClick={() => {
-            throw new Error('This is your first error!')
-          }}
-        >
-          Break the world
-        </button>
       </Flex>
       <EndUserAgreementFooter />
     </>
