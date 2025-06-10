@@ -37,7 +37,7 @@ jobs:
               --base "$branch" \
               --head "${{ github.event.pull_request.head.ref }}" \
               --title "${{ github.event.pull_request.title }} into $branch" \
-              --body "${{ github.event.pull_request.body }} \
+              --body "Created from #${{ github.event.pull_request.number }} \n ${{ github.event.pull_request.body }}" \
               --assignee "${{ github.event.pull_request.user.login }}" \
               --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)
             if [ -n "$pr_url" ]; then
