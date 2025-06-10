@@ -11,6 +11,12 @@ code, pre {
   font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
+/* Colors */
+
+th {
+    background-color: #D0E6FE;
+}
+
 /* Square bullets for unordered lists */
 
 article ul li {
