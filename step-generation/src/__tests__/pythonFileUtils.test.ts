@@ -86,19 +86,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.24"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "Flex",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "Flex", "apiLevel": "2.24"}`
     )
   })
 })
