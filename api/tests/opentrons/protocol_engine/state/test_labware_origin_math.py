@@ -237,7 +237,7 @@ def test_get_parent_origin_to_lw_origin_with_module(
     result = get_parent_origin_to_lw_origin(
         definition=child_definition,
         parent_def=module_definition,
-        parent_as_module_to_child_offset=parent_as_module_to_child_offset,
+        default_module_stacking_offset=parent_as_module_to_child_offset,
         deck_definition=spec_deck_definition,
     )
 
@@ -257,7 +257,7 @@ def test_get_parent_origin_to_lw_origin_with_labware(
     result = get_parent_origin_to_lw_origin(
         definition=child_definition,
         parent_def=parent_definition,
-        parent_as_module_to_child_offset=None,
+        default_module_stacking_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
@@ -277,7 +277,7 @@ def test_get_parent_origin_to_lw_origin_with_addressable_area(
     result = get_parent_origin_to_lw_origin(
         definition=child_definition,
         parent_def=addressable_area,
-        parent_as_module_to_child_offset=None,
+        default_module_stacking_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
@@ -289,7 +289,7 @@ def test_get_parent_origin_to_lw_origin_v3_definition() -> None:
     result = get_parent_origin_to_lw_origin(
         definition=_LABWARE_DEF_V3,
         parent_def=_ADDRESSABLE_AREA,
-        parent_as_module_to_child_offset=None,
+        default_module_stacking_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
@@ -303,6 +303,6 @@ def test_get_parent_origin_to_lw_origin_module_without_offset_raises_error() -> 
         get_parent_origin_to_lw_origin(
             definition=_LABWARE_DEF_V2,
             parent_def=_MODULE_DEF_TEMP_V2,
-            parent_as_module_to_child_offset=None,
+            default_module_stacking_offset=None,
             deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         )

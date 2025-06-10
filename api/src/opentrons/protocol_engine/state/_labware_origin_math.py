@@ -1,5 +1,5 @@
 """Utilities for calculating the labware origin offset position."""
-from typing import Union
+from typing import Union, overload
 
 from typing_extensions import assert_type
 
@@ -15,13 +15,35 @@ from ..types import (
     ModuleDefinition,
     ModuleModel,
     AddressableArea,
+    LabwareOffsetVector,
+    DeckLocationDefinition,
 )
+
+
+@overload
+def get_parent_origin_to_lw_origin(
+    definition: LabwareDefinition,
+    parent_def: ModuleDefinition,
+    module_parent_to_child_offset: LabwareOffsetVector,
+    deck_definition: DeckDefinitionV5,
+) -> Point:
+    ...
+
+
+@overload
+def get_parent_origin_to_lw_origin(
+    definition: LabwareDefinition,
+    parent_def: DeckLocationDefinition,
+    module_parent_to_child_offset: None,
+    deck_definition: DeckDefinitionV5,
+) -> Point:
+    ...
 
 
 def get_parent_origin_to_lw_origin(
     definition: LabwareDefinition,
-    parent_def: LabwareParentDefinition,
-    parent_as_module_to_child_offset: Union[Point, None],
+    parent_def: LabwareDefinition,
+    module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """Returns the offset from parent origin to labware origin.
@@ -48,7 +70,7 @@ def get_parent_origin_to_lw_origin(
     parent_to_child_offset = _get_parent_to_child_offset(
         child_def=definition,
         parent_def=parent_def,
-        parent_as_module_to_child_offset=parent_as_module_to_child_offset,
+        module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=deck_definition,
     )
 
@@ -58,7 +80,7 @@ def get_parent_origin_to_lw_origin(
 def _get_parent_to_child_offset(
     child_def: LabwareDefinition,
     parent_def: LabwareParentDefinition,
-    parent_as_module_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """Get the offset vector of a labware placed on a given location."""
@@ -85,16 +107,17 @@ def _get_parent_to_child_offset(
         )
 
     elif isinstance(parent_def, ModuleDefinition):
-        if parent_as_module_to_child_offset is None:
-            raise ValueError("Expected parent_as_module_to_child_offset")
-        else:
-            stacking_overlap = _get_module_overlap_offsets(
-                lw_def=child_def,
-                module_model=parent_def.model,
-                deck_definition=deck_definition,
-            )
+        stacking_overlap = _get_module_overlap_offsets(
+            lw_def=child_def,
+            module_model=parent_def.model,
+            deck_definition=deck_definition,
+        )
 
-            return parent_as_module_to_child_offset - stacking_overlap
+        return Point(
+            module_parent_to_child_offset.x - stacking_overlap.x,
+            module_parent_to_child_offset.y - stacking_overlap.y,
+            module_parent_to_child_offset.z - stacking_overlap.z,
+        )
 
     elif _is_deck_location(parent_def):
         return Point(x=0, y=0, z=0)

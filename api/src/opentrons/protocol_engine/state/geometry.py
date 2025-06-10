@@ -91,6 +91,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
+    OverlapOffset,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -445,18 +446,17 @@ class GeometryView:
         self, labware_location: LabwareLocation, labware_definition: LabwareDefinition
     ) -> Point:
         if isinstance(labware_location, ModuleLocation):
-            offset = self._modules.get_nominal_offset_to_child(
+            module_parent_to_child_offset = self._modules.get_nominal_offset_to_child(
                 module_id=labware_location.moduleId,
                 addressable_areas=self._addressable_areas,
             )
-            parent_as_module_to_child_offset = Point(x=offset.x, y=offset.y, z=offset.z)
         else:
-            parent_as_module_to_child_offset = None
+            module_parent_to_child_offset = None
 
         return get_parent_origin_to_lw_origin(
             definition=labware_definition,
             parent_def=self._get_parent_definition(labware_location),
-            parent_as_module_to_child_offset=parent_as_module_to_child_offset,
+            module_parent_to_child_offset=module_parent_to_child_offset,
             deck_definition=self._addressable_areas.deck_definition,
         )
 
