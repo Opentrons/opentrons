@@ -3,7 +3,7 @@
   "displayName": "Aqueous",
   "description": "Deionized water",
   "schemaVersion": 1,
-  "version": 2,
+  "version": 1,
   "namespace": "opentrons",
   "byPipette": [
     {

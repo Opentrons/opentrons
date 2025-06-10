@@ -2,7 +2,7 @@
   "liquidClassName": "ethanol_80",
   "displayName": "Volatile",
   "description": "80% ethanol",
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "version": 1,
   "namespace": "opentrons",
   "byPipette": [
