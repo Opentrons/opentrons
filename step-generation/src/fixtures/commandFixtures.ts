@@ -62,21 +62,21 @@ export const replaceTipCommands = (tip: number | string): CreateCommand[] => [
   pickUpTipHelper(tip),
 ]
 export const prepareAndConfigureCommands = (
-  volume: number,
-  configure: boolean = true
+  volumeToConfigure?: number
 ): CreateCommand[] => {
-  const configureCommands: CreateCommand[] = configure
-    ? [
-        {
-          commandType: 'configureForVolume',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            volume,
+  const configureCommands: CreateCommand[] =
+    volumeToConfigure != null
+      ? [
+          {
+            commandType: 'configureForVolume',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              volume: volumeToConfigure,
+            },
           },
-        },
-      ]
-    : []
+        ]
+      : []
   return [
     ...configureCommands,
     {

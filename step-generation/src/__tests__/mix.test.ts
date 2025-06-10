@@ -97,7 +97,6 @@ describe('mix: change tip', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -171,7 +170,6 @@ mock_pipette.mix(
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -214,7 +212,6 @@ mock_pipette.mix(
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -268,7 +265,6 @@ describe('mix: advanced options', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
-      ...prepareAndConfigureCommands(volume, false),
       ...aspirateInPlaceHelper(
         {
           pipetteId: 'p300SingleId',
@@ -326,7 +322,6 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -379,7 +374,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
+        ...(idx > 0 ? prepareAndConfigureCommands() : []),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -441,7 +436,7 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
+        ...(idx > 0 ? prepareAndConfigureCommands() : []),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -502,7 +497,6 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -556,7 +550,6 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        ...prepareAndConfigureCommands(volume, false),
         ...aspirateInPlaceHelper(
           {
             pipetteId: 'p300SingleId',
@@ -622,7 +615,7 @@ describe('mix: advanced options', () => {
       expect(res.commands).toEqual(
         flatMap(args.wells, (well, idx) => [
           ...replaceTipCommands(idx),
-          ...prepareAndConfigureCommands(volume, false),
+          ...(idx > 0 ? prepareAndConfigureCommands() : []),
           ...aspirateInPlaceHelper(
             {
               pipetteId: 'p300SingleId',
@@ -690,6 +683,7 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,
@@ -705,6 +699,7 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,
@@ -754,6 +749,7 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,
@@ -766,6 +762,7 @@ mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
 mock_pipette.mix(
     repetitions=2,
     volume=8,

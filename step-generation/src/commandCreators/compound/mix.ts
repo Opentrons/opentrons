@@ -342,21 +342,17 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+  const shouldConfigureForVolume = LOW_VOLUME_PIPETTES.includes(
     invariantContext.pipetteEntities[pipette].name
   )
+  const configureForVolumeCommand: CurriedCommandCreator[] = shouldConfigureForVolume
     ? [
-        curryWithoutPython(configureForVolume, {
+        curryCommandCreator(configureForVolume, {
           pipetteId: pipette,
           volume,
         }),
       ]
     : []
-  const prepareToAspirateCommand: CurriedCommandCreator[] = [
-    curryWithoutPython(prepareToAspirate, {
-      pipetteId: pipette,
-    }),
-  ]
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -372,6 +368,17 @@ export const mix: CommandCreator<MixArgs> = (
           }),
         ]
       }
+
+      // need to prepare to aspirate if configuring for volume or have previously blown out (after the first well)
+      const prepareToAspirateCommand: CurriedCommandCreator[] =
+        shouldConfigureForVolume ||
+        (data.blowoutLocation != null && wellIndex > 0)
+          ? [
+              curryCommandCreator(prepareToAspirate, {
+                pipetteId: pipette,
+              }),
+            ]
+          : []
 
       const touchTipCommands = data.touchTip
         ? [
