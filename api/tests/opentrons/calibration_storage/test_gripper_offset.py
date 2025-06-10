@@ -19,6 +19,12 @@ def starting_calibration_data(
     """
     gripper.save_gripper_calibration(Point(1, 1, 1), "gripper1")
     gripper.save_gripper_calibration(Point(1, 2, 1), "gripper2")
+    gripper.save_gripper_jaw_width_data(
+        15.5, "gripper1"
+    )
+    gripper.save_gripper_jaw_width_data(
+        15.5, "gripper2"
+    )
 
 
 def test_delete_all_gripper_calibration(starting_calibration_data: typing.Any) -> None:
@@ -27,9 +33,14 @@ def test_delete_all_gripper_calibration(starting_calibration_data: typing.Any) -
     """
     assert gripper.get_gripper_calibration_offset("gripper1") is not None
     assert gripper.get_gripper_calibration_offset("gripper2") is not None
+    assert gripper.get_gripper_jaw_width_data("gripper1") is not None
+    assert gripper.get_gripper_jaw_width_data("gripper2") is not None
     gripper.clear_gripper_calibration_offsets()
+    gripper.clear_gripper_jaw_width_data()
     assert gripper.get_gripper_calibration_offset("gripper1") is None
     assert gripper.get_gripper_calibration_offset("gripper2") is None
+    assert gripper.get_gripper_jaw_width_data("gripper1") is None
+    assert gripper.get_gripper_jaw_width_data("gripper2") is None
 
 
 def test_delete_gripper_calibration(starting_calibration_data: typing.Any) -> None:
