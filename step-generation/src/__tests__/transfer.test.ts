@@ -163,6 +163,11 @@ describe('pick up tip if no tip on pipette', () => {
     expect(res.python).toEqual(
       `
 mock_pipette.transfer_with_liquid_class(
+    volume=30,
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B2"]],
+    new_tip="always",
+    trash_location=waste_chute,
     liquid_class=protocol.define_liquid_class(
         name="1234_transfer",
         properties={
@@ -253,11 +258,6 @@ mock_pipette.transfer_with_liquid_class(
             }},
         },
     ),
-    volume=30,
-    source=[mock_source_plate["A1"]],
-    dest=[mock_dest_plate["B2"]],
-    new_tip="always",
-    trash_location=waste_chute,
 )`.trimStart()
     )
     expect(res.commands).toEqual([
@@ -379,6 +379,11 @@ it('single transfer: 1 source & 1 dest', () => {
   expect(res.python).toEqual(
     `
 mock_pipette.transfer_with_liquid_class(
+    volume=30,
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B2"]],
+    new_tip="never",
+    trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="1234_transfer",
         properties={
@@ -469,11 +474,6 @@ mock_pipette.transfer_with_liquid_class(
             }},
         },
     ),
-    volume=30,
-    source=[mock_source_plate["A1"]],
-    dest=[mock_dest_plate["B2"]],
-    new_tip="never",
-    trash_location=trash_bin_1,
 )`.trimStart()
   )
   expect(res.commands).toEqual([
@@ -657,6 +657,11 @@ test('transfer with multiple sets of wells', () => {
   expect(res.python).toEqual(
     `
 mock_pipette.transfer_with_liquid_class(
+    volume=30,
+    source=[mock_source_plate["A1"], mock_source_plate["A2"]],
+    dest=[mock_dest_plate["B2"], mock_dest_plate["C2"]],
+    new_tip="never",
+    trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="1234_transfer",
         properties={
@@ -747,11 +752,6 @@ mock_pipette.transfer_with_liquid_class(
             }},
         },
     ),
-    volume=30,
-    source=[mock_source_plate["A1"], mock_source_plate["A2"]],
-    dest=[mock_dest_plate["B2"], mock_dest_plate["C2"]],
-    new_tip="never",
-    trash_location=trash_bin_1,
 )`.trimStart()
   )
   expect(res.commands).toEqual([
@@ -5583,6 +5583,11 @@ describe('advanced options', () => {
       expect(res.python).toEqual(
         `
 mock_pipette.transfer_with_liquid_class(
+    volume=350,
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B1"]],
+    new_tip="never",
+    trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="1234_transfer",
         properties={
@@ -5697,11 +5702,6 @@ mock_pipette.transfer_with_liquid_class(
             }},
         },
     ),
-    volume=350,
-    source=[mock_source_plate["A1"]],
-    dest=[mock_dest_plate["B1"]],
-    new_tip="never",
-    trash_location=trash_bin_1,
 )`.trimStart()
       )
       expect(res.commands).toEqual([

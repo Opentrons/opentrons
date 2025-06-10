@@ -24,7 +24,10 @@ import {
   reduceCommandCreators,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
-import { getCustomLiquidClassProperties } from '../../utils/liquidClassUtils'
+import {
+  getCustomLiquidClassProperties,
+  getPythonLiquidClassName,
+} from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
   aspirateInPlace,
@@ -340,6 +343,9 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${stepId}_${args.commandCreatorFnName}`)}`,
+    ...(args.liquidClass != null
+      ? [`base_liquid_class=${getPythonLiquidClassName(args.liquidClass)}`]
+      : []),
     `properties=${getCustomLiquidClassProperties({
       args,
       pipetteName,
@@ -347,21 +353,18 @@ export const transfer: CommandCreator<TransferArgs> = (
       aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
     })}`,
-    ...(args.liquidClass != null
-      ? [`base_liquid_class=${args.liquidClass}`]
-      : []),
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
   const pythonArgs = [
-    `liquid_class=${customLiquidClass}`,
     `volume=${args.volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
     `new_tip=${formatPyStr(args.changeTip)}`,
     `trash_location=${trashPipetteName}`,
+    `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],

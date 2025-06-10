@@ -9,6 +9,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { getPythonLiquidClassName } from './liquidClassUtils'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
@@ -321,8 +322,10 @@ export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
       if (liquidClass == null) {
         return ''
       }
-      return `${liquidClass}=${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
-        allLiquidClassDefs[liquidClass]?.liquidClassName
+      return `${getPythonLiquidClassName(
+        liquidClass
+      )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
+        allLiquidClassDefs[liquidClass].liquidClassName
       )})`
     })
     .join('\n')

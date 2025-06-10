@@ -201,6 +201,11 @@ describe('quickTransferStepCommands', () => {
 # TRANSFER STEP
 
 pipette.transfer_with_liquid_class(
+    volume=10,
+    source=[mock_labware_1["A1"]],
+    dest=[mock_labware_2["B1"]],
+    new_tip="always",
+    trash_location=mock_trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="mockStepId_transfer",
         properties={
@@ -291,11 +296,6 @@ pipette.transfer_with_liquid_class(
             }},
         },
     ),
-    volume=10,
-    source=[mock_labware_1["A1"]],
-    dest=[mock_labware_2["B1"]],
-    new_tip="always",
-    trash_location=mock_trash_bin_1,
 )
 `.trimStart()
     )

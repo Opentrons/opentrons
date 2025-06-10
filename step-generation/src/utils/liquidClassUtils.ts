@@ -1,3 +1,5 @@
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+
 import { formatPyDict } from './pythonFormat'
 
 import type { PipetteName } from '@opentrons/shared-data'
@@ -182,4 +184,10 @@ export const getCustomLiquidClassProperties = (
     any
   > = JSON.parse(JSON.stringify(customLiquidClassProperties))
   return formatPyDict(stringifiedCustomLiquidClassProperties, true)
+}
+
+export const getPythonLiquidClassName = (liquidClass: string): string => {
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassDef = allLiquidClassDefs[liquidClass]
+  return `${liquidClassDef.liquidClassName}_v${liquidClassDef.schemaVersion}`
 }

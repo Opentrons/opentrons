@@ -534,9 +534,9 @@ describe('getLoadLiquidClasses', () => {
     expect(getLoadLiquidClasses(mockLiquidEntities)).toBe(
       `
 # Load Liquid Classes:
-waterV1=protocol.get_liquid_class("water")
-ethanol80V1=protocol.get_liquid_class("ethanol_80")
-glycerol50V1=protocol.get_liquid_class("glycerol_50")`.trimStart()
+water_v1 = protocol.get_liquid_class("water")
+ethanol_80_v1 = protocol.get_liquid_class("ethanol_80")
+glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })
