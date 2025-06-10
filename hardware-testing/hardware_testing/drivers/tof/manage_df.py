@@ -200,38 +200,20 @@ def update_sheet(data: dict, sheet_name):
     values = list(data.values())
     sheet.write_to_row(values, 'TOF_raw_data_df')
 
-def create_df_csv(df_name, drive_folder_path):
-    columns = [
-        "Hash_id",
-        "Labware_Name",
-        "Stacker_SN",
-        "Axis",
-        "Platform_Position",
-        "Labware_Num_X",
-        "Labware_Num_Z",
-        "Sample",
-        "Zone",
-    ]
-    df = pd.DataFrame(columns=columns)
+def append_df(df, drive_folder_path, data_folder):
+    data_path = os.path.join(drive_folder_path, data_folder)
+    data_files = os.listdir(data_path)
 
-    # Baseline data
-    Labware_Name = "baseline"
-    Labware_Num_X = 0
-    baseline_path = os.path.join(drive_folder_path, "TOF BASELINE")
-    baseline_files = os.listdir(baseline_path)
-    for file in baseline_files:
-        full_path = os.path.join(baseline_path, file)
+    for file in data_files:
+        full_path = os.path.join(data_path, file)
         if os.path.isdir(full_path):
-            Stacker_SN = file
             stacker_files = os.listdir(full_path)
             for stacker_file in stacker_files:
-                print(stacker_file)
                 if not stacker_file.endswith('.csv'):
                     continue
 
                 # Read the downloaded file into a DataFrame
                 csv_file_path = os.path.join(full_path, stacker_file)
-                print(csv_file_path)
                 file_df = pd.read_csv(csv_file_path, skiprows=1, header=None)
                 bin_labels = ['Time', 'Sample', 'Zone'] + [str(i) for i in range(1, 129)]
                 # print(file_df.shape)
@@ -239,8 +221,16 @@ def create_df_csv(df_name, drive_folder_path):
 
                 # new_row = {col: None for col in columns}
                 file_df['Hash_id'] = generate_hash(stacker_file)
-                file_df['Labware_Name'] = Labware_Name
-                file_df['Stacker_SN'] = Stacker_SN
+                
+                file_df['Test'] = data_folder
+
+                pattern = r"LW=([^_]+)_"
+                match = re.search(pattern, stacker_file)
+                file_df['Labware_Name'] = match.group(1)
+
+                pattern = r"FSTA(\d+)"
+                match = re.search(pattern, stacker_file)
+                file_df['Stacker_SN'] = "FSTA" + match.group(1)
 
                 pattern = r"_(x|z)-axis_"
                 match = re.search(pattern, stacker_file)
@@ -252,38 +242,75 @@ def create_df_csv(df_name, drive_folder_path):
                     file_df['Platform_Position'] = "retract"
                 else:
                     file_df['Platform_Position'] = "unknown"
+                
+                pattern = r"labx(\d+)"
+                match = re.search(pattern, stacker_file)
+                file_df['Labware_Num_X'] = match.group(1)
 
-                file_df['Labware_Num_X'] = Labware_Num_X
-
-                pattern = r"lab(\d+)"
+                pattern = r"labz(\d+)"
                 match = re.search(pattern, stacker_file)
                 file_df['Labware_Num_Z'] = match.group(1)  
 
+                print(f"Create df for {stacker_file}")
+                print(f"--- {file_df.shape}")
                 df = pd.concat([df, file_df], ignore_index=True)
+    
+    return df
 
+def create_df_csv(df_name, drive_folder_path):
+    columns = [
+        "Hash_id",
+        "Test",
+        "Labware_Name",
+        "Stacker_SN",
+        "Axis",
+        "Platform_Position",
+        "Labware_Num_X",
+        "Labware_Num_Z",
+        "Sample",
+        "Zone",
+    ]
+    df = pd.DataFrame(columns=columns)
+    
+    print(os.listdir(drive_folder_path))
+    for data_folder in os.listdir(drive_folder_path):
+        folder_path = os.path.join(drive_folder_path, data_folder)
+        if os.path.isdir(folder_path):
+            print(f"Appending data from folder: {data_folder}")
+            df = append_df(df, drive_folder_path, data_folder)
 
     df.to_csv(df_name, index=False)
     print(f"Created {df_name} with shape: {df.shape}")
 
 
 if __name__ == '__main__':
-    local_files, drive_folder, credentials_path, email, sheet = get_configs()
+    local_files = True
+    # local_files, drive_folder, credentials_path, email, sheet = get_configs()
+    email = input("Enter your email (without @opentrons.com): ")
+    email = email + "@opentrons.com"
+    drive_folder = f"~/Library/CloudStorage/GoogleDrive-{email}" \
+        "/Shared drives/1 - Hardware/1 - Hardware Engineering /1 - NPI Programs" \
+            "/23 - Flex Stacker/5 - Testing/DVT Flex Stacker Testing/TOF TEST"
+
     df_name = 'TOF_raw_data_df.csv'
     df_path = os.path.join(os.curdir, df_name)
-    if(not os.path.exists(df_path)):
-        print("Dataframe CSV Found")
-        # df_file = open(df_path, 'w+')
-        # df_file.flush()
-    else:
-        print("Dataframe CSV not Found")
-        if local_files:
-            print("Creating Dataframe CSV from Local files")
-            create_df_csv(df_name, drive_folder)
-        else:
-            print(drive_folder)
-            print(credentials_path)
-            print(email)
-            download_data(df_name, credentials_path, sheet)
+    print("Creating Dataframe CSV from Local files")
+    create_df_csv(df_name, os.path.expanduser(drive_folder))
+
+    # if(not os.path.exists(df_path)):
+    #     print("Dataframe CSV Found")
+    #     # df_file = open(df_path, 'w+')
+    #     # df_file.flush()
+    # else:
+    #     print("Dataframe CSV not Found")
+    #     if local_files:
+    #         print("Creating Dataframe CSV from Local files")
+    #         create_df_csv(df_name, drive_folder)
+    #     else:
+    #         print(drive_folder)
+    #         print(credentials_path)
+    #         print(email)
+    #         download_data(df_name, credentials_path, sheet)
 
     df = pd.read_csv(df_name)
     stackers = df['Stacker_SN'].unique()
