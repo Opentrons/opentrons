@@ -21,7 +21,7 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
-    get_parent_origin_to_lw_origin,
+    get_parent_placement_origin_to_lw_origin,
 )
 from opentrons.protocol_engine.types import (
     ModuleModel,
@@ -234,7 +234,7 @@ def test_get_parent_origin_to_lw_origin_with_module(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from module parent to labware origin."""
-    result = get_parent_origin_to_lw_origin(
+    result = get_parent_placement_origin_to_lw_origin(
         definition=child_definition,
         parent_def=module_definition,
         default_module_stacking_offset=parent_as_module_to_child_offset,
@@ -254,7 +254,7 @@ def test_get_parent_origin_to_lw_origin_with_labware(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from labware parent to labware origin."""
-    result = get_parent_origin_to_lw_origin(
+    result = get_parent_placement_origin_to_lw_origin(
         definition=child_definition,
         parent_def=parent_definition,
         default_module_stacking_offset=None,
@@ -274,7 +274,7 @@ def test_get_parent_origin_to_lw_origin_with_addressable_area(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from addressable area to labware origin."""
-    result = get_parent_origin_to_lw_origin(
+    result = get_parent_placement_origin_to_lw_origin(
         definition=child_definition,
         parent_def=addressable_area,
         default_module_stacking_offset=None,
@@ -286,7 +286,7 @@ def test_get_parent_origin_to_lw_origin_with_addressable_area(
 
 def test_get_parent_origin_to_lw_origin_v3_definition() -> None:
     """It should handle LabwareDefinition3 correctly."""
-    result = get_parent_origin_to_lw_origin(
+    result = get_parent_placement_origin_to_lw_origin(
         definition=_LABWARE_DEF_V3,
         parent_def=_ADDRESSABLE_AREA,
         default_module_stacking_offset=None,
@@ -300,7 +300,7 @@ def test_get_parent_origin_to_lw_origin_v3_definition() -> None:
 def test_get_parent_origin_to_lw_origin_module_without_offset_raises_error() -> None:
     """It should raise ValueError when module parent is provided without parent_as_module_to_child_offset."""
     with pytest.raises(ValueError, match="Expected parent_as_module_to_child_offset"):
-        get_parent_origin_to_lw_origin(
+        get_parent_placement_origin_to_lw_origin(
             definition=_LABWARE_DEF_V2,
             parent_def=_MODULE_DEF_TEMP_V2,
             default_module_stacking_offset=None,

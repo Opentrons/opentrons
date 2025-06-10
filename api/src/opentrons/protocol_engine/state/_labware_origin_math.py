@@ -21,7 +21,7 @@ from ..types import (
 
 
 @overload
-def get_parent_origin_to_lw_origin(
+def get_parent_placement_origin_to_lw_origin(
     definition: LabwareDefinition,
     parent_def: ModuleDefinition,
     module_parent_to_child_offset: LabwareOffsetVector,
@@ -31,7 +31,7 @@ def get_parent_origin_to_lw_origin(
 
 
 @overload
-def get_parent_origin_to_lw_origin(
+def get_parent_placement_origin_to_lw_origin(
     definition: LabwareDefinition,
     parent_def: DeckLocationDefinition,
     module_parent_to_child_offset: None,
@@ -40,44 +40,47 @@ def get_parent_origin_to_lw_origin(
     ...
 
 
-def get_parent_origin_to_lw_origin(
+def get_parent_placement_origin_to_lw_origin(
     definition: LabwareDefinition,
     parent_def: LabwareDefinition,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
-    """Returns the offset from parent origin to labware origin.
+    """Returns the offset from parent's placement origin to labware origin.
+
+    Placement origin varies depending on the parent entity type (labware v3 are the back left bottom, and
+    labware v2, modules, & deck location types are the front left bottom).
 
     Only parent-child specific offsets are calculated. Offsets that apply to a single entity
     (ex., module cal) or the entire stackup (ex., LPC) are handled elsewhere.
     """
     if isinstance(definition, LabwareDefinition2):
-        # For v2 definitions, cornerOffsetFromSlot is the parent origin to labware origin offset.
+        # For v2 definitions, cornerOffsetFromSlot is the parent placement origin to labware origin offset.
         parent_origin_to_labware_origin = Point(
             definition.cornerOffsetFromSlot.x,
             definition.cornerOffsetFromSlot.y,
             definition.cornerOffsetFromSlot.z,
         )
     else:
+        # For v3 definitions, get the vector from the back left bottom to the front right bottom.
         assert_type(definition, LabwareDefinition3)
-        labware_origin_to_parent_origin = Point(
-            x=definition.extents.footprint.backLeft.x,
-            y=definition.extents.footprint.frontRight.y,
-            z=definition.extents.total.backLeftBottom.z,
+        parent_origin_to_labware_origin = Point(
+            x=-1 * definition.extents.footprint.backLeft.x,
+            y=-1 * definition.extents.footprint.frontRight.y,
+            z=-1 * definition.extents.total.backLeftBottom.z,
         )
-        parent_origin_to_labware_origin = -1 * labware_origin_to_parent_origin
 
-    parent_to_child_offset = _get_parent_to_child_offset(
+    parent_origin_to_child_origin = _get_parent_origin_to_child_origin(
         child_def=definition,
         parent_def=parent_def,
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=deck_definition,
     )
 
-    return parent_origin_to_labware_origin + parent_to_child_offset
+    return parent_origin_to_child_origin + parent_origin_to_labware_origin
 
 
-def _get_parent_to_child_offset(
+def _get_parent_origin_to_child_origin(
     child_def: LabwareDefinition,
     parent_def: LabwareParentDefinition,
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
@@ -123,7 +126,7 @@ def _get_parent_to_child_offset(
         return Point(x=0, y=0, z=0)
 
     else:
-        raise ValueError(f"Unsupported parent location info: {parent_def}")
+        raise TypeError(f"Unsupported parent location info: {parent_def}")
 
 
 def _get_labware_overlap_offsets(
@@ -131,9 +134,7 @@ def _get_labware_overlap_offsets(
 ) -> Point:
     """Get the labware's overlap with requested labware's load name."""
     if below_labware_name in definition.stackingOffsetWithLabware.keys():
-        stacking_overlap = definition.stackingOffsetWithLabware.get(
-            below_labware_name, Point(x=0, y=0, z=0)
-        )
+        stacking_overlap = definition.stackingOffsetWithLabware[below_labware_name]
     else:
         stacking_overlap = definition.stackingOffsetWithLabware.get(
             "default", Point(x=0, y=0, z=0)

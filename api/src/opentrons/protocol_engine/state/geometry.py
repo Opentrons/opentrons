@@ -105,7 +105,7 @@ from .frustum_helpers import (
     find_height_at_well_volume,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
-from ._labware_origin_math import get_parent_origin_to_lw_origin
+from ._labware_origin_math import get_parent_placement_origin_to_lw_origin
 
 
 _LOG = getLogger(__name__)
@@ -453,7 +453,7 @@ class GeometryView:
         else:
             module_parent_to_child_offset = None
 
-        return get_parent_origin_to_lw_origin(
+        return get_parent_placement_origin_to_lw_origin(
             definition=labware_definition,
             parent_def=self._get_parent_definition(labware_location),
             module_parent_to_child_offset=module_parent_to_child_offset,
