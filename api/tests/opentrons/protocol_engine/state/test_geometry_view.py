@@ -395,7 +395,7 @@ _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
 def mock_labware_origin_math(monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock labware origin math's main export."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
         lambda *args, **kwargs: _PARENT_ORIGIN_TO_LABWARE_ORIGIN,
     )
 
@@ -841,7 +841,7 @@ def test_get_obstacle_highest_z_with_labware(
         "flexStackerModuleV1D4"
     ).z
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(10, 20, shuttle_height),
     )
 
@@ -905,7 +905,7 @@ def test_get_obstacle_highest_z_with_lid(
     # The labware's highest z is the z dimension of the lid + labware's height
     labware_height = labware_view.get_dimensions(labware_id="labware-id").z
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(10, 20, labware_height),
     )
 
@@ -1632,7 +1632,7 @@ def test_get_well_position_with_center_offset(
 ) -> None:
     """It should be able to get the position of a well center in a labware."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(
@@ -2216,7 +2216,7 @@ def test_get_relative_well_location(
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(

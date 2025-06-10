@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     AreaType,
     AddressableOffsetVector,
     Dimensions as AddressableAreaDimensions,
+    LabwareOffsetVector,
 )
 from opentrons.types import DeckSlotName
 
@@ -137,17 +138,17 @@ _ADDRESSABLE_AREA = AddressableArea(
 
 
 class ModuleOverlapSpec(NamedTuple):
-    """Spec data to test module overlap behavior through get_parent_origin_to_lw_origin."""
+    """Spec data to test module overlap behavior through get_parent_placement_origin_to_lw_origin."""
 
     spec_deck_definition: DeckDefinitionV5
     module_definition: ModuleDefinition
     child_definition: LabwareDefinition2
-    parent_as_module_to_child_offset: Point
+    module_parent_to_child_offset: LabwareOffsetVector
     expected_total_offset: Point
 
 
 class LabwareOverlapSpec(NamedTuple):
-    """Spec data to test labware stacking behavior through get_parent_origin_to_lw_origin."""
+    """Spec data to test labware stacking behavior through get_parent_placement_origin_to_lw_origin."""
 
     child_definition: LabwareDefinition2
     parent_definition: LabwareDefinition2
@@ -155,7 +156,7 @@ class LabwareOverlapSpec(NamedTuple):
 
 
 class AddressableAreaSpec(NamedTuple):
-    """Spec data to test addressable area behavior through get_parent_origin_to_lw_origin."""
+    """Spec data to test addressable area behavior through get_parent_placement_origin_to_lw_origin."""
 
     child_definition: LabwareDefinition2
     addressable_area: AddressableArea
@@ -167,35 +168,35 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_definition=_MODULE_DEF_TEMP_V2,
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
-        parent_as_module_to_child_offset=Point(x=450, y=550, z=650),
+        module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         expected_total_offset=Point(x=550, y=700, z=850),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_definition=_MODULE_DEF_TC_V1,
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
-        parent_as_module_to_child_offset=Point(x=450, y=550, z=650),
+        module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         expected_total_offset=Point(x=400, y=500, z=600),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LABWARE_DEF_V2,
-        parent_as_module_to_child_offset=Point(x=450, y=550, z=650),
+        module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         expected_total_offset=Point(x=600, y=800, z=989.3),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LABWARE_DEF_V2,
-        parent_as_module_to_child_offset=Point(x=450, y=550, z=650),
+        module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         expected_total_offset=Point(x=600, y=800, z=1000),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
-        parent_as_module_to_child_offset=Point(x=450, y=550, z=650),
+        module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         expected_total_offset=Point(x=100, y=200, z=300),
     ),
 ]
@@ -226,18 +227,18 @@ ADDRESSABLE_AREA_SPECS: List[AddressableAreaSpec] = [
     argnames=ModuleOverlapSpec._fields,
     argvalues=MODULE_OVERLAP_SPECS,
 )
-def test_get_parent_origin_to_lw_origin_with_module(
+def test_get_parent_placement_origin_to_lw_origin_with_module(
     spec_deck_definition: DeckDefinitionV5,
     module_definition: ModuleDefinition,
     child_definition: LabwareDefinition2,
-    parent_as_module_to_child_offset: Point,
+    module_parent_to_child_offset: LabwareOffsetVector,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from module parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
-        definition=child_definition,
-        parent_def=module_definition,
-        default_module_stacking_offset=parent_as_module_to_child_offset,
+        child_labware=child_definition,
+        parent_entity=module_definition,
+        module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
     )
 
@@ -248,16 +249,16 @@ def test_get_parent_origin_to_lw_origin_with_module(
     argnames=LabwareOverlapSpec._fields,
     argvalues=LABWARE_OVERLAP_SPECS,
 )
-def test_get_parent_origin_to_lw_origin_with_labware(
+def test_get_parent_placement_origin_to_lw_origin_with_labware(
     child_definition: LabwareDefinition2,
     parent_definition: LabwareDefinition2,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from labware parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
-        definition=child_definition,
-        parent_def=parent_definition,
-        default_module_stacking_offset=None,
+        child_labware=child_definition,
+        parent_entity=parent_definition,
+        module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
@@ -268,41 +269,30 @@ def test_get_parent_origin_to_lw_origin_with_labware(
     argnames=AddressableAreaSpec._fields,
     argvalues=ADDRESSABLE_AREA_SPECS,
 )
-def test_get_parent_origin_to_lw_origin_with_addressable_area(
+def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     child_definition: LabwareDefinition2,
     addressable_area: AddressableArea,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from addressable area to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
-        definition=child_definition,
-        parent_def=addressable_area,
-        default_module_stacking_offset=None,
+        child_labware=child_definition,
+        parent_entity=addressable_area,
+        module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
     assert result == expected_total_offset
 
 
-def test_get_parent_origin_to_lw_origin_v3_definition() -> None:
+def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
     """It should handle LabwareDefinition3 correctly."""
     result = get_parent_placement_origin_to_lw_origin(
-        definition=_LABWARE_DEF_V3,
-        parent_def=_ADDRESSABLE_AREA,
-        default_module_stacking_offset=None,
+        child_labware=_LABWARE_DEF_V3,
+        parent_entity=_ADDRESSABLE_AREA,
+        module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
     expected_offset = Point(x=-100, y=800, z=-300)
     assert result == expected_offset
-
-
-def test_get_parent_origin_to_lw_origin_module_without_offset_raises_error() -> None:
-    """It should raise ValueError when module parent is provided without parent_as_module_to_child_offset."""
-    with pytest.raises(ValueError, match="Expected parent_as_module_to_child_offset"):
-        get_parent_placement_origin_to_lw_origin(
-            definition=_LABWARE_DEF_V2,
-            parent_def=_MODULE_DEF_TEMP_V2,
-            default_module_stacking_offset=None,
-            deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        )

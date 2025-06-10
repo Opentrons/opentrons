@@ -23,6 +23,8 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -91,7 +93,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
-    OverlapOffset,
+    ModuleDefinition,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -419,11 +421,11 @@ class GeometryView:
         if isinstance(
             location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
         ):
-            return self._get_parent_origin_to_lw_origin(
+            return self._get_parent_placement_origin_to_lw_origin(
                 labware_location=location, labware_definition=parent_definition
             )
         elif isinstance(location, OnLabwareLocation):
-            parent_origin_to_entity_origin = self._get_parent_origin_to_lw_origin(
+            parent_origin_to_entity_origin = self._get_parent_placement_origin_to_lw_origin(
                 labware_location=location, labware_definition=parent_definition
             )
             parent_location = self._labware.get(location.labwareId).location
@@ -431,7 +433,7 @@ class GeometryView:
 
             return (
                 parent_origin_to_entity_origin
-                + self._get_parent_origin_to_lw_origin(
+                + self._get_parent_placement_origin_to_lw_origin(
                     labware_location=parent_location,
                     labware_definition=parent_definition,
                 )
@@ -442,23 +444,37 @@ class GeometryView:
                 "Either it has been loaded off-deck or its been moved off-deck."
             )
 
-    def _get_parent_origin_to_lw_origin(
+    def _get_parent_placement_origin_to_lw_origin(
         self, labware_location: LabwareLocation, labware_definition: LabwareDefinition
     ) -> Point:
-        if isinstance(labware_location, ModuleLocation):
+        parent_entity = self._get_parent_definition(labware_location)
+
+        if isinstance(parent_entity, ModuleDefinition):
+            assert isinstance(labware_location, ModuleLocation)
             module_parent_to_child_offset = self._modules.get_nominal_offset_to_child(
                 module_id=labware_location.moduleId,
                 addressable_areas=self._addressable_areas,
             )
+            return get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_entity=parent_entity,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=self._addressable_areas.deck_definition,
+            )
+        elif isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3)):
+            return get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_entity=parent_entity,
+                module_parent_to_child_offset=None,
+                deck_definition=self._addressable_areas.deck_definition,
+            )
         else:
-            module_parent_to_child_offset = None
-
-        return get_parent_placement_origin_to_lw_origin(
-            definition=labware_definition,
-            parent_def=self._get_parent_definition(labware_location),
-            module_parent_to_child_offset=module_parent_to_child_offset,
-            deck_definition=self._addressable_areas.deck_definition,
-        )
+            return get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_entity=parent_entity,
+                module_parent_to_child_offset=None,
+                deck_definition=self._addressable_areas.deck_definition,
+            )
 
     def _get_parent_definition(
         self, location: LabwareLocation
@@ -1041,7 +1057,7 @@ class GeometryView:
             self._labware.get_grip_height_from_labware_bottom(labware_definition)
         )
         location_name = self._get_underlying_addressable_area_name(location)
-        parent_to_lw_offset = self._get_parent_origin_to_lw_origin(
+        parent_to_lw_offset = self._get_parent_placement_origin_to_lw_origin(
             labware_location=location, labware_definition=labware_definition
         )
         mod_cal_offset = self._get_calibrated_module_offset(location)
