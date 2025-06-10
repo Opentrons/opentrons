@@ -186,17 +186,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
     const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
       (acc, [labwareId, labwareOnDeck]) => {
-        const hasLabwareAboveAdapter = Object.values(labware).reduce(
-          (acc, temporalProperties) => {
-            if (temporalProperties.stack.includes(labwareId)) {
-              const topId = getTopLocationInStack(temporalProperties.stack)
-              if (topId !== labwareId) {
-                return true
-              }
-            }
-            return acc
-          },
-          false
+        const hasLabwareAboveAdapter = Object.values(labware).some(
+          ({ stack }) =>
+            stack.includes(labwareId) &&
+            getTopLocationInStack(stack) !== labwareId
         )
         const adapterSlot = getSlotInLocationStack(labwareOnDeck.stack)
         const modIdWithAdapter = Object.keys(modules).find(modId =>
