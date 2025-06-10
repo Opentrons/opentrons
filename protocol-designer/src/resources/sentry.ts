@@ -5,17 +5,16 @@ import {
 } from '@sentry/react'
 
 import { getHasOptedIn } from '../analytics/selectors'
-
-// import { getIsProduction } from '../networking/opentronsWebApi'
+import { getIsProduction } from '../networking/opentronsWebApi'
 
 import type { BaseState } from '../types'
 
 let isSentryInitialized = false
-const dummy = true
+
 // Note (kk: 06/09/2025) at this moment, we are not using a dev DSN
 // because we are not using Sentry in development. If we decide to use it
 // in the future, we can add a dev DSN here.
-const sentryDsn = dummy
+const sentryDsn = getIsProduction()
   ? process.env.OT_PD_SENTRY_DSN
   : process.env.OT_PD_SENTRY_DEV_DSN
 

@@ -146,6 +146,4 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           version: ${{ steps.resolve-tag.outputs.tag }}
-          deploy: true
-          environment: sandbox
-          url: https://sandbox.designer.opentrons.com/${{ steps.resolve-tag.outputs.tag }}
+          environment: production
