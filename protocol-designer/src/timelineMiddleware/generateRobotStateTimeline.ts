@@ -57,7 +57,7 @@ export const generateRobotStateTimeline = (
       const pipetteId = getPipetteIdFromCCArgs(args)
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
-      
+
       // TODO: update to only mix requiring curryCommandCreator
       const commandCreator =
         args.commandCreatorFnName !== 'transfer'
