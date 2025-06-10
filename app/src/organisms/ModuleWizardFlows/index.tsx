@@ -11,6 +11,7 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 
 import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
+import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
 import { CheckStackerInstall } from './CheckStackerInstall'
@@ -28,7 +29,6 @@ import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
 
 interface ModuleWizardFlowsProps {
   closeFlow: () => void

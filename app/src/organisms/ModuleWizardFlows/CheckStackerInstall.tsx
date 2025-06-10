@@ -9,7 +9,6 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
@@ -43,7 +42,11 @@ export function CheckStackerInstall(
   props: CheckStackerInstallProps
 ): JSX.Element {
   const { proceed, isOnDevice, doorOpenStatus, attachedModules } = props
-  const { t, i18n } = useTranslation(['module_wizard_flows'])
+  const { t, i18n } = useTranslation([
+    'module_wizard_flows',
+    'shared',
+    'branded',
+  ])
 
   const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
 
@@ -73,7 +76,7 @@ export function CheckStackerInstall(
         isSuccess={false}
         iconColor={COLORS.red50}
         header={t('door_circuit_error')}
-        subHeader={t('door_circuit_error_description')}
+        subHeader={t('branded:door_circuit_error_description')}
       >
         <Flex css={BUTTON_STYLE}>
           {isOnDevice ? (
@@ -102,7 +105,7 @@ export function CheckStackerInstall(
         isSuccess={false}
         iconColor={COLORS.yellow50}
         header={t('close_stacker_doors')}
-        subHeader={t('close_stacker_doors_description')}
+        subHeader={t('branded:close_stacker_doors_description')}
       >
         <Flex css={BUTTON_STYLE}>
           {isOnDevice ? (
