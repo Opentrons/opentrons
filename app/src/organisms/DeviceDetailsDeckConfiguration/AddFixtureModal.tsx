@@ -25,9 +25,11 @@ import {
 } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_V1,
+  AddressableAreaName,
   AddressableAreaNamesWithFakes,
   COMBO_FIXTURES,
   CutoutConfigMap,
+  CutoutFixtureIdsWithFakes,
   CutoutIdToCutoutFixtureId,
   FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_V1,
@@ -140,7 +142,7 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const aaNameMapToSlotId = {
+  const aaNameMapToSlotId: Record<string, AddressableAreaNamesWithFakes> = {
     D4: 'fakeD4',
     C4: 'fakeC4',
     B4: 'fakeB4',
@@ -169,7 +171,7 @@ export function AddFixtureModal({
     movableTrashC3: 'C3',
     movableTrashB3: 'B3',
     movableTrashA3: 'A3',
-  } as const
+  }
 
   const MODULE_CUTOUT_FIXTURE_ID = [
     'heaterShakerModuleV1',
@@ -185,7 +187,7 @@ export function AddFixtureModal({
 
   const getFlexDeckDefAAByFixtureIdForCutoutId = (
     cutoutId: CutoutId
-  ): {CutoutFixtureId: AddressableAreaNamesWithFakes[]} => {
+  ): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
     const deckDef = getDeckDefFromRobotType('OT-3 Standard')
     const deckDefWithFakes = getDeckDefAAWithFakeAA(deckDef)
     // replace staging area aaId to fake ones
@@ -196,7 +198,7 @@ export function AddFixtureModal({
       (acc, { id, providesAddressableAreas }) => {
         return { ...acc, [id]: providesAddressableAreas[cutoutId] }
       },
-      {} as {CutoutFixtureId: AddressableAreaNamesWithFakes[]}
+      {} as Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]>
     )
   }
 
