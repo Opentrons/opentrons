@@ -3,7 +3,7 @@
   "displayName": "Aqueous",
   "description": "Deionized water",
   "schemaVersion": 1,
-  "version": 1,
+  "version": 2,
   "namespace": "opentrons",
   "byPipette": [
     {
@@ -48,7 +48,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -60,11 +60,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -122,13 +122,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -140,11 +144,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -204,9 +208,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 50.0
                 }
               },
@@ -214,7 +218,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -226,11 +230,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[50.0, 50.0]],
@@ -292,7 +296,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -304,11 +308,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -366,13 +370,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -384,11 +392,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -448,9 +456,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 50.0
                 }
               },
@@ -458,7 +466,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -470,11 +478,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[50.0, 50.0]],
@@ -541,7 +549,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -553,11 +561,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -615,13 +623,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -633,11 +645,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -697,9 +709,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 50.0
                 }
               },
@@ -707,7 +719,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -719,11 +731,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -785,7 +797,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -797,11 +809,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -859,13 +871,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -877,11 +893,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -941,9 +957,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 50.0
                 }
               },
@@ -951,7 +967,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -963,11 +979,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 50.0]],
@@ -1034,7 +1050,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1046,11 +1062,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1108,13 +1124,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 478.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1126,11 +1146,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1188,9 +1208,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 478.0
                 }
               },
@@ -1198,7 +1218,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1210,11 +1230,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1280,7 +1300,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1292,11 +1312,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1354,13 +1374,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 478.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1372,11 +1396,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1434,9 +1458,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 478.0
                 }
               },
@@ -1444,7 +1468,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1456,11 +1480,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -1526,7 +1550,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1538,11 +1562,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1596,13 +1620,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1614,11 +1642,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1672,9 +1700,9 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -1682,7 +1710,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1694,11 +1722,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1760,7 +1788,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1772,11 +1800,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1830,13 +1858,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1848,11 +1880,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1906,9 +1938,9 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -1916,7 +1948,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -1928,11 +1960,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -1994,7 +2026,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2006,11 +2038,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2064,13 +2096,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2082,11 +2118,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2140,9 +2176,9 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -2150,7 +2186,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2162,11 +2198,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2228,7 +2264,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2240,11 +2276,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2298,13 +2334,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2316,11 +2356,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2374,9 +2414,9 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -2384,7 +2424,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2396,11 +2436,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -2467,7 +2507,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2479,11 +2519,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2541,13 +2581,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 478.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2559,11 +2603,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2621,9 +2665,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 478.0
                 }
               },
@@ -2631,7 +2675,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2643,11 +2687,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2713,7 +2757,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2725,11 +2769,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2787,13 +2831,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 478.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2805,11 +2853,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2867,9 +2915,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 478.0
                 }
               },
@@ -2877,7 +2925,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2889,11 +2937,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [
@@ -2959,7 +3007,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -2971,11 +3019,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3029,13 +3077,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3047,11 +3099,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3105,9 +3157,9 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -3115,7 +3167,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3127,11 +3179,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3193,7 +3245,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3205,18 +3257,14 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -3229,7 +3277,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.5
+                "duration": 0.75
               }
             }
           },
@@ -3267,13 +3315,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3285,18 +3337,14 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -3305,7 +3353,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 15.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -3347,17 +3395,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
-                  "flowRate": 478.0
+                  "location": "destination",
+                  "flowRate": 716.0
                 }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3369,18 +3417,14 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3439,7 +3483,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3451,11 +3495,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3509,13 +3553,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3527,11 +3575,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3585,9 +3633,9 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 716.0
                 }
               },
@@ -3595,7 +3643,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3607,11 +3655,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 716.0]],
@@ -3673,7 +3721,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3685,18 +3733,14 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -3747,13 +3791,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 716.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3765,18 +3813,14 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -3827,17 +3871,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
-                  "flowRate": 478.0
+                  "location": "destination",
+                  "flowRate": 716.0
                 }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3849,18 +3893,14 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
-            "flowRateByVolume": [
-              [5.0, 318.0],
-              [10.0, 478.0],
-              [50.0, 478.0]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3924,7 +3964,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -3936,11 +3976,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -3994,13 +4034,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4012,11 +4056,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4070,9 +4114,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 200.0
                 }
               },
@@ -4080,7 +4124,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4092,11 +4136,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4158,7 +4202,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4170,11 +4214,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4228,13 +4272,17 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4246,11 +4294,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4304,9 +4352,9 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 200.0
                 }
               },
@@ -4314,7 +4362,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4326,11 +4374,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4392,7 +4440,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4404,11 +4452,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4462,13 +4510,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4480,11 +4532,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4538,9 +4590,9 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 200.0
                 }
               },
@@ -4548,7 +4600,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4560,11 +4612,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4626,7 +4678,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4638,11 +4690,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4696,13 +4748,17 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4714,11 +4770,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4772,9 +4828,9 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 200.0
                 }
               },
@@ -4782,7 +4838,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4794,11 +4850,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4860,7 +4916,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4872,11 +4928,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -4930,13 +4986,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -4948,11 +5008,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -5006,9 +5066,9 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
+                  "location": "destination",
                   "flowRate": 200.0
                 }
               },
@@ -5016,7 +5076,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -5028,11 +5088,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -5094,7 +5154,7 @@
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -5106,11 +5166,11 @@
               }
             },
             "aspiratePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -5164,13 +5224,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -5182,11 +5246,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
@@ -5240,17 +5304,17 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": true,
+                "enable": false,
                 "params": {
-                  "location": "trash",
-                  "flowRate": 478.0
+                  "location": "destination",
+                  "flowRate": 200.0
                 }
               },
               "touchTip": {
                 "enable": false,
                 "params": {
                   "zOffset": -1,
-                  "mmFromEdge": 0.5,
+                  "mmToEdge": 0.5,
                   "speed": 30
                 }
               },
@@ -5262,11 +5326,11 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-bottom",
+              "positionReference": "liquid-meniscus",
               "offset": {
                 "x": 0,
                 "y": 0,
-                "z": 2
+                "z": -1.5
               }
             },
             "flowRateByVolume": [[1.0, 200.0]],
