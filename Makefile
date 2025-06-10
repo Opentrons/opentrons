@@ -59,6 +59,8 @@ setup: setup-js setup-py
 setup-py-toolchain:
 	$(OT_PYTHON) -m pip install --upgrade pip
 	$(OT_PYTHON) -m pip install pipenv==2023.12.1
+    # this needs to be installed AFTER pipenv or pipenv will update this to the bad version
+	$(OT_PYTHON) -m pip install virtualenv==20.30.0
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js

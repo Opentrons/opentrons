@@ -13,6 +13,8 @@ export interface SetupLabwarePositionCheckProps {
   robotType: RobotType
   runId: string
   lpcUtils: UseLPCFlowsResult
+  hasMissingModulesForFlex: boolean
+  hasMissingCalForFlex: boolean
 }
 
 export function SetupLabwarePositionCheck(

@@ -180,7 +180,11 @@ async def prepare_for_aspirate(
     else:
         return SuccessData(
             public=EmptyResult(),
-            state_update=StateUpdate().set_fluid_empty(pipette_id=pipette_id),
+            state_update=StateUpdate()
+            .set_fluid_empty(pipette_id=pipette_id)
+            .set_pipette_ready_to_aspirate(
+                pipette_id=pipette_id, ready_to_aspirate=True
+            ),
         )
 
 

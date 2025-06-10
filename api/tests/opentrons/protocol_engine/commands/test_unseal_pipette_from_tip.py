@@ -7,6 +7,12 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
+from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
+
 from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
@@ -26,12 +32,7 @@ from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, GantryMover, TipHandler
-
-from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    labware_definition_type_adapter,
-)
+from opentrons.protocol_engine.types import TipGeometry
 
 from opentrons.types import Point
 
@@ -125,6 +126,10 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
+        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+    ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
+
+    decoy.when(
         mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
     ).then_return(False)
 
@@ -134,6 +139,7 @@ async def test_drop_tip_implementation(
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
             partially_configured=False,
+            override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -207,6 +213,9 @@ async def test_tip_attached_error(
         wellName="A3",
         wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
+    decoy.when(
+        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+    ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
     decoy.when(mock_state_view.labware.get_definition("123")).then_return(
         evotips_definition
     )
@@ -221,6 +230,7 @@ async def test_tip_attached_error(
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
             partially_configured=False,
+            override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -282,6 +292,9 @@ async def test_stall_error(
     decoy.when(mock_state_view.labware.get_definition("123")).then_return(
         evotips_definition
     )
+    decoy.when(
+        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+    ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
 
     decoy.when(
         mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
@@ -293,6 +306,7 @@ async def test_stall_error(
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
             partially_configured=False,
+            override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 

@@ -1,8 +1,8 @@
-import reduce from 'lodash/reduce'
 import type {
   LoadLiquidRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
 import type { LabwareByLiquidId } from '../types'
 
 export function getLabwareInfoByLiquidId(
@@ -12,7 +12,8 @@ export function getLabwareInfoByLiquidId(
     commands.length !== 0
       ? commands.filter(
           (command): command is LoadLiquidRunTimeCommand =>
-            command.commandType === 'loadLiquid'
+            command.commandType === 'loadLiquid' &&
+            command.params.liquidId !== 'EMPTY'
         )
       : []
 

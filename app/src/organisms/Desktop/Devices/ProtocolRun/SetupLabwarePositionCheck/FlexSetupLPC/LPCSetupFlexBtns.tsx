@@ -34,10 +34,17 @@ export function LPCSetupFlexBtns({
   launchLPC,
   runId,
   robotName,
+  hasMissingModulesForFlex,
+  hasMissingCalForFlex,
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
-  const lpcDisabledReason = useLPCDisabledReason({ robotName, runId })
+  const lpcDisabledReason = useLPCDisabledReason({
+    robotName,
+    runId,
+    hasMissingCalForFlex: hasMissingCalForFlex,
+    hasMissingModulesForFlex: hasMissingModulesForFlex,
+  })
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )

@@ -60,7 +60,7 @@ This example measures the liquid height in well A2 of a plate and then immediate
     pipette.measure_liquid_height(plate["A2"])
     pipette.aspirate(
         volume=200, 
-        location=plate["A2"].meniscus(target="end", z=-1)
+        location=plate["A2"].meniscus(z=-1, target="end")
         ) 
     # aspirates at 1 mm below the liquid meniscus
 
@@ -138,7 +138,7 @@ This example measures the liquid height in well B1 of a plate and then immediate
     pipette.measure_liquid_height(plate["B1"])
     pipette.dispense(
         volume=200, 
-        location=plate["B1"].meniscus(target="start", z=-1)
+        location=plate["B1"].meniscus(z=-1, target="start")
         ) 
     # dispenses at 1 mm below the liquid meniscus
 
@@ -381,7 +381,7 @@ The :py:meth:`~.InstrumentContext.measure_liquid_height` method tells a Flex pip
     pipette.pick_up_tip()
     pipette.measure_liquid_height(plate["A1"])
     pipette.aspirate(
-        volume=200, location=plate["A1"].meniscus(target="end", z=-1)
+        volume=200, location=plate["A1"].meniscus(z=-1, target="end")
     )  # aspirates from 1 mm below the liquid meniscus
 
 You don't have to aspirate after measuring liquid height, but you should always pick up a tip immediately prior to measuring the liquid height, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination. 

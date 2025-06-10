@@ -1,36 +1,36 @@
-import uuidv1 from 'uuid/v4'
-import intersection from 'lodash/intersection'
 import {
-  orderWells,
   getAllDefinitions,
   getLabwareDefURI,
   getTipTypeFromTipRackDefinition,
+  orderWells,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  DeckConfiguration,
+  LabwareDefinition2,
+  NozzleConfigurationStyle,
+  PipetteName,
+} from '@opentrons/shared-data'
 import { makeInitialRobotState } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentEntities,
+  ConsolidateArgs,
+  DistributeArgs,
+  InvariantContext,
+  LabwareEntities,
+  PipetteEntities,
+  RobotState,
+  TransferArgs,
+} from '@opentrons/step-generation'
+import intersection from 'lodash/intersection'
+import uuidv1 from 'uuid/v4'
 import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
-import type {
-  CutoutConfig,
-  LabwareDefinition2,
-  DeckConfiguration,
-  PipetteName,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from '../types'
-import type {
-  ConsolidateArgs,
-  DistributeArgs,
-  TransferArgs,
-  InvariantContext,
-  PipetteEntities,
-  LabwareEntities,
-  RobotState,
-  AdditionalEquipmentEntities,
-} from '@opentrons/step-generation'
 
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
@@ -50,7 +50,11 @@ function getInvariantContextAndRobotState(
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
-  if (quickTransferState.pipette.channels === 1) {
+  // we have to special case the peek pipette as it doesn't follow
+  // our pipette definition naming conventions
+  if (quickTransferState.pipette.displayName === 'FLEX 8-Channel EM 1000 µL') {
+    pipetteName = 'p1000_multi_em_flex'
+  } else if (quickTransferState.pipette.channels === 1) {
     pipetteName = pipetteName + `_single_flex`
   } else if (quickTransferState.pipette.channels === 8) {
     pipetteName = pipetteName + `_multi_flex`

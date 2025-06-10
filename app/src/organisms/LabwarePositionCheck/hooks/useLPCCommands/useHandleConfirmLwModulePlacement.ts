@@ -27,6 +27,11 @@ export interface UseHandleConfirmPlacementResult {
     pipetteId: string,
     initialVectorOffset?: VectorOffset | null
   ) => Promise<Coordinates>
+  handleMoveToInitialOffsetPosition: (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ) => Promise<Coordinates>
 }
 
 export function useHandleConfirmLwModulePlacement({
@@ -70,7 +75,41 @@ export function useHandleConfirmLwModulePlacement({
     })
   }
 
-  return { handleConfirmLwModulePlacement }
+  const handleMoveToInitialOffsetPosition = (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    initialVectorOffset: VectorOffset | null
+  ): Promise<Coordinates> => {
+    const moveCommands: CreateCommand[] = [
+      ...moveToWellCommands(
+        offsetLocationDetails,
+        pipetteId,
+        initialVectorOffset
+      ),
+      ...savePositionCommands(pipetteId),
+    ]
+
+    return chainLPCCommands(moveCommands, false).then(responses => {
+      const finalResponse = responses[responses.length - 1]
+      if (
+        finalResponse.data.commandType === 'savePosition' &&
+        finalResponse.data.result != null
+      ) {
+        const { position } = finalResponse.data.result
+
+        return Promise.resolve(position)
+      } else {
+        setErrorMessage(
+          'CheckItem failed to save position for initial placement.'
+        )
+        return Promise.reject(
+          new Error('CheckItem failed to save position for initial placement.')
+        )
+      }
+    })
+  }
+
+  return { handleConfirmLwModulePlacement, handleMoveToInitialOffsetPosition }
 }
 
 function buildMoveLabwareCommand(

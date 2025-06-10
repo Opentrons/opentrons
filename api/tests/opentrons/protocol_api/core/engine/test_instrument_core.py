@@ -1776,6 +1776,53 @@ def test_liquid_probe_without_recovery(
         subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
 
 
+def test_liquid_probe_without_recovery_unsafe(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_engine_client.state,
+            pipette_id=subject.pipette_id,
+            labware_id=well_core.labware_id,
+            well_name=well_core.get_name(),
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            ),
+        )
+    ).then_raise(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError(
+            "Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette."
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.LiquidProbeResult(position=DeckPoint(x=0, y=0, z=0), z_position=0)
+    )
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError,
+        match="Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette.",
+    ):
+        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
+
+
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1799,6 +1846,53 @@ def test_liquid_probe_with_recovery(
             )
         )
     )
+
+
+def test_liquid_probe_with_recovery_unsafe(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_engine_client.state,
+            pipette_id=subject.pipette_id,
+            labware_id=well_core.labware_id,
+            well_name=well_core.get_name(),
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            ),
+        )
+    ).then_raise(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError(
+            "Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette."
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.LiquidProbeResult(position=DeckPoint(x=0, y=0, z=0), z_position=0)
+    )
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError,
+        match="Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette.",
+    ):
+        subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
