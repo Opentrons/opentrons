@@ -207,67 +207,25 @@ pipette.transfer_with_liquid_class(
         properties={
             "p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
                 "aspirate": {
-                    "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 0,
-                        },
-                        "position_reference": "well-bottom",
-                    },
+                    "aspirate_position": {"position_reference": "well-bottom"},
                     "flow_rate_by_volume": [(0, 56)],
                     "pre_wet": False,
                     "correction_by_volume": [(0, 0)],
-                    "submerge": {"start_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 0,
-                        },
-                        "position_reference": "well-bottom",
-                    }},
+                    "submerge": {"start_position": {"position_reference": "well-bottom"}},
                     "retract": {
                         "air_gap_by_volume": [(0, 0)],
-                        "end_position": {
-                            "offset": {
-                                "x": 0,
-                                "y": 0,
-                                "z": 0,
-                            },
-                            "position_reference": "well-bottom",
-                        },
+                        "end_position": {"position_reference": "well-bottom"},
                     },
                 },
                 "dispense": {
-                    "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 0,
-                        },
-                        "position_reference": "well-bottom",
-                    },
+                    "dispense_position": {"position_reference": "well-bottom"},
                     "push_out_by_volume": [(0, 0)],
                     "flow_rate_by_volume": [(0, 80)],
                     "correction_by_volume": [(0, 0)],
-                    "submerge": {"start_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 0,
-                        },
-                        "position_reference": "well-bottom",
-                    }},
+                    "submerge": {"start_position": {"position_reference": "well-bottom"}},
                     "retract": {
                         "air_gap_by_volume": [(0, 0)],
-                        "end_position": {
-                            "offset": {
-                                "x": 0,
-                                "y": 0,
-                                "z": 0,
-                            },
-                            "position_reference": "well-bottom",
-                        },
+                        "end_position": {"position_reference": "well-bottom"},
                         "blowout": {
                             "enable": True,
                             "params": {

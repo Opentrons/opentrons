@@ -382,7 +382,7 @@ export function generateQuickTransferArgs(
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const commonFields = {
-    stepId: 'step 1',
+    stepId: 'step_1',
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id as string,

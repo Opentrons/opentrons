@@ -99,11 +99,7 @@ describe('getCustomLiquidClassProperties', () => {
     "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
         "aspirate": {
             "aspirate_position": {
-                "offset": {
-                    "x": 0,
-                    "y": 0,
-                    "z": 2,
-                },
+                "offset": {"z": 2},
                 "position_reference": "well-bottom",
             },
             "flow_rate_by_volume": [(0, 2.1)],
@@ -129,7 +125,6 @@ describe('getCustomLiquidClassProperties', () => {
                 "start_position": {
                     "offset": {
                         "x": 1,
-                        "y": 0,
                         "z": 5,
                     },
                     "position_reference": "well-bottom",
@@ -162,11 +157,7 @@ describe('getCustomLiquidClassProperties', () => {
         },
         "dispense": {
             "dispense_position": {
-                "offset": {
-                    "x": 0,
-                    "y": 0,
-                    "z": 3,
-                },
+                "offset": {"z": 3},
                 "position_reference": "well-bottom",
             },
             "push_out_by_volume": [(0, 0)],

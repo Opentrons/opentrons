@@ -169,11 +169,7 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+                        "offset": {"z": 2},
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
@@ -184,7 +180,6 @@ mock_pipette.transfer_with_liquid_class(
                         "start_position": {
                             "offset": {
                                 "x": 1,
-                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
@@ -205,11 +200,7 @@ mock_pipette.transfer_with_liquid_class(
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
+                        "offset": {"z": 3},
                         "position_reference": "well-bottom",
                     },
                     "push_out_by_volume": [(0, 0)],
@@ -374,11 +365,7 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+                        "offset": {"z": 2},
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
@@ -389,7 +376,6 @@ mock_pipette.transfer_with_liquid_class(
                         "start_position": {
                             "offset": {
                                 "x": 1,
-                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
@@ -410,11 +396,7 @@ mock_pipette.transfer_with_liquid_class(
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
+                        "offset": {"z": 3},
                         "position_reference": "well-bottom",
                     },
                     "push_out_by_volume": [(0, 0)],
@@ -641,11 +623,7 @@ test('transfer with multiple sets of wells', () => {
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+                        "offset": {"z": 2},
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
@@ -656,7 +634,6 @@ test('transfer with multiple sets of wells', () => {
                         "start_position": {
                             "offset": {
                                 "x": 1,
-                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
@@ -677,11 +654,7 @@ test('transfer with multiple sets of wells', () => {
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
+                        "offset": {"z": 3},
                         "position_reference": "well-bottom",
                     },
                     "push_out_by_volume": [(0, 0)],
@@ -5556,11 +5529,7 @@ mock_pipette.transfer_with_liquid_class(
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
                     "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+                        "offset": {"z": 2},
                         "position_reference": "well-bottom",
                     },
                     "flow_rate_by_volume": [(0, 10)],
@@ -5582,7 +5551,6 @@ mock_pipette.transfer_with_liquid_class(
                         "start_position": {
                             "offset": {
                                 "x": 1,
-                                "y": 0,
                                 "z": 5,
                             },
                             "position_reference": "well-bottom",
@@ -5607,11 +5575,7 @@ mock_pipette.transfer_with_liquid_class(
                 },
                 "dispense": {
                     "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
+                        "offset": {"z": 3},
                         "position_reference": "well-bottom",
                     },
                     "push_out_by_volume": [(0, 0)],

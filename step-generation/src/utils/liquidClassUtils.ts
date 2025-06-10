@@ -4,93 +4,13 @@ import type { PipetteName } from '@opentrons/shared-data'
 import type { TransferArgs } from '../types'
 
 interface Offset {
-  x: number
-  y: number
-  z: number
-}
-
-interface Position {
-  offset: Offset
-  position_reference: string // ex. "well-bottom"
-}
-
-interface Delay {
-  enabled: boolean
-  params: {
-    duration?: number
+  offset: {
+    x?: number
+    y?: number
+    z?: number
   }
 }
-
-interface TouchTip {
-  enabled: boolean
-  params: {
-    z_offset?: number
-    mm_from_edge?: number
-    speed?: number
-  }
-}
-
 type BlowoutLocation = 'source' | 'destination' | 'trash'
-interface BlowOut {
-  enabled: boolean
-  params: {
-    location?: BlowoutLocation
-    flow_rate?: number
-  }
-}
-
-interface Mix {
-  enabled: boolean
-  params: {
-    repetitions?: number
-    volume?: number
-  }
-}
-
-interface Retract {
-  air_gap_by_volume: number[][]
-  delay: Delay
-  end_position: Position
-  speed?: number
-  touch_tip?: TouchTip
-  blowout?: BlowOut
-}
-
-interface Submerge {
-  delay: Delay
-  start_position: Position
-  speed?: number
-}
-
-interface CommonLiquidSettings {
-  correction_by_volume: number[][]
-  delay: Delay
-  mix: Mix
-  retract: Retract
-  submerge: Submerge
-  flow_rate_by_volume: number[][]
-}
-
-interface AspirateSettings extends CommonLiquidSettings {
-  aspirate_position: Position
-  pre_wet?: boolean
-}
-
-interface DispenseSettings extends CommonLiquidSettings {
-  dispense_position: Position
-  push_out_by_volume: number[][]
-}
-
-interface AspirateAndDispenseSettings {
-  aspirate: AspirateSettings
-  dispense: DispenseSettings
-}
-
-export interface CustomLiquidClassProperties {
-  [pipetteName: string]: {
-    [tiprackUri: string]: AspirateAndDispenseSettings
-  }
-}
 
 interface CustomLiquidClassPropertiesProps {
   args: TransferArgs
@@ -98,6 +18,19 @@ interface CustomLiquidClassPropertiesProps {
   tiprackUri: string
   aspirateCorrectionVolume: number
   dispenseCorrectionVolume: number
+}
+
+const getOffset = (x: number, y: number, z: number): Offset | {} => {
+  if (x === 0 && y === 0 && z === 0) {
+    return {}
+  }
+  return {
+    offset: {
+      ...(x === 0 ? {} : { x }),
+      ...(y === 0 ? {} : { y }),
+      ...(z === 0 ? {} : { z }),
+    },
+  }
 }
 
 export const getCustomLiquidClassProperties = (
@@ -111,14 +44,16 @@ export const getCustomLiquidClassProperties = (
     dispenseCorrectionVolume,
   } = props
 
+  //    properties object is based off of
+  //    liquid class schema: shared-data/liquid-class/schemas/1.json
   const properties = {
     aspirate: {
       aspirate_position: {
-        offset: {
-          x: args.aspirateXOffset,
-          y: args.aspirateYOffset,
-          z: args.aspirateZOffset,
-        },
+        ...getOffset(
+          args.aspirateXOffset,
+          args.aspirateYOffset,
+          args.aspirateZOffset
+        ),
         position_reference: args.aspiratePositionReference,
       },
       flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
@@ -157,11 +92,11 @@ export const getCustomLiquidClassProperties = (
             }),
         speed: args.aspirateSubmergeSpeed ?? undefined,
         start_position: {
-          offset: {
-            x: args.aspirateSubmergeXOffset,
-            y: args.aspirateSubmergeYOffset,
-            z: args.aspirateSubmergeZOffset,
-          },
+          ...getOffset(
+            args.aspirateSubmergeXOffset,
+            args.aspirateSubmergeYOffset,
+            args.aspirateSubmergeZOffset
+          ),
           position_reference: args.aspirateSubmergePositionReference,
         },
       },
@@ -179,11 +114,11 @@ export const getCustomLiquidClassProperties = (
             }),
 
         end_position: {
-          offset: {
-            x: args.aspirateRetractXOffset,
-            y: args.aspirateRetractYOffset,
-            z: args.aspirateRetractZOffset,
-          },
+          ...getOffset(
+            args.aspirateRetractXOffset,
+            args.aspirateRetractYOffset,
+            args.aspirateRetractZOffset
+          ),
           position_reference: args.aspirateRetractPositionReference,
         },
         speed: args.aspirateRetractSpeed ?? undefined,
@@ -204,11 +139,11 @@ export const getCustomLiquidClassProperties = (
     },
     dispense: {
       dispense_position: {
-        offset: {
-          x: args.dispenseXOffset,
-          y: args.dispenseYOffset,
-          z: args.dispenseZOffset,
-        },
+        ...getOffset(
+          args.dispenseXOffset,
+          args.dispenseYOffset,
+          args.dispenseZOffset
+        ),
         position_reference: args.dispensePositionReference,
       },
       push_out_by_volume: [[0, args.pushOut ?? 0]],
@@ -246,11 +181,11 @@ export const getCustomLiquidClassProperties = (
             }),
         speed: args.dispenseSubmergeSpeed ?? undefined,
         start_position: {
-          offset: {
-            x: args.dispenseSubmergeXOffset,
-            y: args.dispenseSubmergeYOffset,
-            z: args.dispenseSubmergeZOffset,
-          },
+          ...getOffset(
+            args.dispenseSubmergeXOffset,
+            args.dispenseSubmergeYOffset,
+            args.dispenseSubmergeZOffset
+          ),
           position_reference: args.dispenseSubmergePositionReference,
         },
       },
@@ -267,11 +202,11 @@ export const getCustomLiquidClassProperties = (
               },
             }),
         end_position: {
-          offset: {
-            x: args.dispenseRetractXOffset,
-            y: args.dispenseRetractYOffset,
-            z: args.dispenseRetractZOffset,
-          },
+          ...getOffset(
+            args.dispenseRetractXOffset,
+            args.dispenseRetractYOffset,
+            args.dispenseRetractZOffset
+          ),
           position_reference: args.dispenseRetractPositionReference,
         },
         speed: args.dispenseRetractSpeed ?? undefined,
