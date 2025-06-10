@@ -103,6 +103,7 @@ jobs:
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
+          ignore_missing: true
 
   deploy-pd:
     timeout-minutes: 10
