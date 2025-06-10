@@ -10,9 +10,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
-  AddressableAreaName,
-  AddressableAreaNamesWithFakes,
-  AddressableAreaWithFakes,
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getSimplestDeckConfigForProtocol,
@@ -33,6 +30,7 @@ import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeck
 import type { Dispatch, SetStateAction } from 'react'
 import type { ModuleOnDeck } from '@opentrons/components'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureId,
   CutoutId,
   ModuleModel,

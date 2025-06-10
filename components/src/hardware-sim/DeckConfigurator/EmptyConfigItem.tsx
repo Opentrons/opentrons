@@ -1,9 +1,6 @@
 import { css } from 'styled-components'
 
 import {
-  AddressableArea,
-  AddressableAreaWithFakes,
-  getAAByAAId,
   getAALocationForCutoutAndFixtureId,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'

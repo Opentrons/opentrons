@@ -2,9 +2,6 @@ import { useState } from 'react'
 
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  AddressableArea,
-  AddressableAreaNamesWithFakes,
-  AddressableAreaWithFakes,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
@@ -18,6 +15,7 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 
 import type { ReactNode } from 'react'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
 } from '@opentrons/shared-data'

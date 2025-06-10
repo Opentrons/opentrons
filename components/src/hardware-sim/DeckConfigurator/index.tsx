@@ -1,8 +1,4 @@
 import {
-  AddressableArea,
-  AddressableAreaName,
-  AddressableAreaNamesWithFakes,
-  AddressableAreaWithFakes,
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -28,6 +24,7 @@ import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
 import type { ReactNode } from 'react'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,

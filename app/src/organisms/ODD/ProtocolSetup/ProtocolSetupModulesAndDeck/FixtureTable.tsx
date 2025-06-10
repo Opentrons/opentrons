@@ -16,7 +16,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  AddressableAreaNamesWithFakes,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
@@ -36,6 +35,7 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
+  AddressableAreaNamesWithFakes,
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,

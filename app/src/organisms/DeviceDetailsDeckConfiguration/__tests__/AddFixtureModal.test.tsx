@@ -6,7 +6,6 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  AddressableAreaWithFakes,
   getFixtureDisplayName,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'

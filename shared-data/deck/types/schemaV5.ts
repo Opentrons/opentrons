@@ -144,38 +144,6 @@ export type FlexModuleCutoutFixtureId =
   | 'flexStackerModuleV1'
   | 'flexStackerModuleV1WithMagneticBlockV1'
 
-const MODULE_MODUEL_TO_CUTOUT_FIXURE_ID = [
-  {
-    HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1',
-  },
-  {
-    temperatureModuleV2: 'temperatureModuleV2',
-  },
-  {
-    magneticBlockV1: 'magneticBlockV1',
-  },
-  {
-    stagingAreaSlotWithMagneticBlockV1: 'stagingAreaSlotWithMagneticBlockV1',
-  },
-  {
-    thermocyclerModuleV2Rear: 'thermocyclerModuleV2Rear',
-  },
-  {
-    thermocyclerModuleV2Front: 'thermocyclerModuleV2Front',
-  },
-  {
-    absorbanceReaderV1: 'absorbanceReaderV1',
-  },
-  {
-    flexStackerModuleV1: 'flexStackerModuleV1',
-  },
-  {
-    flexStackerModuleV1WithMagneticBlockV1:
-      'flexStackerModuleV1WithMagneticBlockV1',
-  },
-]
-// const test = typeof FLEX_MODULE_CUTOUT_FIXURE_ID[keyof typeof FLEX_MODULE_CUTOUT_FIXURE_ID]
-
 export type OT2SingleStandardSlot = 'singleStandardSlot'
 
 export type OT2FixedTrashSlot = 'fixedTrashSlot'

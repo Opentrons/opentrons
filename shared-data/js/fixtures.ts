@@ -370,19 +370,19 @@ export const getReplacementFixtureForFakeFixture = (
 }
 
 export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
-  cutoutFixtures: CutoutConfig[],
-  deckDefinition: DeckDefinition
+  cutoutFixtures: CutoutConfig[]
 ): CutoutConfigMap[] => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
   return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
     const cutoutFixtureReplacment = getCutoutFixtureReplacementIfNeeded(
       obj.cutoutFixtureId,
-      deckDefinition
+      deckDef
     )
 
     const aaPerCutoutFixture = getAAFromCutoutFixtureId(
       obj.cutoutId,
       cutoutFixtureReplacment,
-      deckDefinition
+      deckDef
     )
     aaPerCutoutFixture?.forEach(item => {
       acc.push({

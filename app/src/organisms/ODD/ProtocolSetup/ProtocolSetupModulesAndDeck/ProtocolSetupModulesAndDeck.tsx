@@ -15,7 +15,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  AddressableAreaNamesWithFakes,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
@@ -41,7 +40,11 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureId,
+  CutoutId,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000

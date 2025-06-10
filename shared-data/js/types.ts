@@ -413,7 +413,7 @@ export type CutoutIdToCutoutFixtureId = {
 }
 
 export type CutoutFixtureGroup = {
-  [cutoutId in CutoutId]?: Array<CutoutIdToCutoutFixtureId>
+  [cutoutId in CutoutId]?: CutoutIdToCutoutFixtureId[]
 }
 
 export interface CutoutFixture {

@@ -28,7 +28,6 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
-  AddressableAreaNamesWithFakes,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getModuleDisplayName,
@@ -105,7 +104,11 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureId,
+  CutoutId,
+} from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,
