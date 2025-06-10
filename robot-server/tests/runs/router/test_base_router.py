@@ -885,6 +885,7 @@ async def test_get_current_state_success(
                 StackerStoredLabwareGroup(primaryLabwareId="heeheehoohoo")
             ],
             pool_overlap=0,
+            pool_height=0,
         ),
     }
 
