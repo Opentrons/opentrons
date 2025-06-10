@@ -5,7 +5,8 @@ import {
 } from '@sentry/react'
 
 import { getHasOptedIn } from '../analytics/selectors'
-import { getIsProduction } from '../networking/opentronsWebApi'
+
+// import { getIsProduction } from '../networking/opentronsWebApi'
 
 import type { BaseState } from '../types'
 
