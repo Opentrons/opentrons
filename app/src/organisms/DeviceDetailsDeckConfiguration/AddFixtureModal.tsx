@@ -37,6 +37,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
@@ -448,35 +449,18 @@ export function AddFixtureModal({
   }
 
   const getWasteChuteOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
-    const filteredWasteChuteInAA = WASTE_CHUTE_FIXTURES.map(fixture => {
-      const wasteCuteId = getAddressableAreaIdForCutout(cutoutId, fixture)
-      console.log('wasteCuteId: ', wasteCuteId)
-      console.log('fixture: ', fixture)
-      if (wasteCuteId != null) {
-        return {
-          cutoutFixtureId: fixture,
-          addressableAreaId: wasteCuteId,
-        }
-      }
-    })
-
-    console.log('filteredWasteChuteInAA: ', filteredWasteChuteInAA)
-    return filteredWasteChuteInAA
-      .filter(
-        (
-          item
-        ): item is {
-          cutoutFixtureId: CutoutFixtureId
-          addressableAreaId: AddressableAreaNamesWithFakes
-        } => item !== undefined
-      )
-      .map(({ addressableAreaId, cutoutFixtureId }) => [
-        {
-          cutoutId,
-          addressableAreaId,
-          cutoutFixtureId,
-        },
-      ])
+    const wasteCuteId = getAddressableAreaIdForCutout(
+      cutoutId,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
+    console.log('wasteCuteId: ', wasteCuteId)
+    return [
+      {
+        cutoutId,
+        cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        addressableAreaId: wasteCuteId ?? '1ChannelWasteChute', // or add a default fo waste chute
+      },
+    ]
   }
 
   const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
