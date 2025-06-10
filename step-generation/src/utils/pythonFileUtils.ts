@@ -1,11 +1,13 @@
 import {
   FLEX_ROBOT_TYPE,
+  getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   isFlexPipette,
   OT2_ROBOT_TYPE,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import {
@@ -307,6 +309,33 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
+export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const allLiquidClasses = Object.values(liquidEntities)
+    .map(liquid => liquid.liquidClass)
+    .filter(liquidClass => liquidClass != null)
+  const uniqueLiquidClasses = Array.from(new Set(allLiquidClasses))
+  const pythonLoadLiquidClasses = uniqueLiquidClasses
+    .map(liquidClass => {
+      // we check that liquidClass is not null earlier but i got a check error
+      // without specifying it here
+      if (liquidClass == null) {
+        return ''
+      }
+      return `${liquidClass}=${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
+        allLiquidClassDefs[liquidClass]?.liquidClassName
+      )})`
+    })
+    .join('\n')
+
+  return uniqueLiquidClasses.length > 0
+    ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
+    : //  default to loading water liquid class to use as base_liquid_class
+      `# Load Liquid Class:\n${WATER_LIQUID_CLASS_NAME}=${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
+        'water'
+      )})`
+}
+
 export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {
   const pythonLoadTrashBins = Object.values(trashBinEntities)
     ?.map(trashBin => {
@@ -380,6 +409,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
+    getLoadLiquidClasses(liquidEntities),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

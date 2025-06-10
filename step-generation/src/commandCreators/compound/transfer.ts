@@ -323,9 +323,7 @@ export const transfer: CommandCreator<TransferArgs> = (
       aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
     })}`,
-    `base_liquid_class=${formatPyStr(
-      args.liquidClass ?? WATER_LIQUID_CLASS_NAME
-    )}`,
+    `base_liquid_class=${args.liquidClass ?? WATER_LIQUID_CLASS_NAME}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
     pythonLiquidClassArgs.join(',\n')
