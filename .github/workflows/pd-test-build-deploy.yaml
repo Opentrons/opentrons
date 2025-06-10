@@ -120,8 +120,6 @@ jobs:
           aws-region: us-east-2
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: ./.github/actions/git/resolve-tag
 
@@ -148,3 +146,4 @@ jobs:
         with:
           version: ${{ steps.resolve-tag.outputs.tag }}
           environment: production
+          ignore_missing: true
