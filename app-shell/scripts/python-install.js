@@ -120,8 +120,7 @@ const PYTHON_BY_PLATFORM = {
 
 const PYTHON_BASE = path.join(__dirname, '..', 'python')
 const PYTHON_STAGING_BASE = path.join(PYTHON_BASE, 'staging')
-const pythonStaging = arch =>
-  path.join(PYTHON_STAGING_BASE, 'staging', 'python', arch)
+const pythonStaging = arch => path.join(PYTHON_STAGING_BASE, 'python', arch)
 const pythonSitePackagesStagingPosix = arch =>
   path.join(pythonStaging(arch), 'lib', 'python3.10', 'site-packages')
 const pythonSitePackagesStagingWindows = arch =>
@@ -130,6 +129,10 @@ const pythonSitePackagesStaging = (platform, arch) =>
   platform === 'win32'
     ? pythonSitePackagesStagingWindows(arch)
     : pythonSitePackagesStagingPosix(arch)
+const executablePython = (platform, arch) =>
+  platform === 'win32'
+    ? path.join(pythonStaging(arch), 'python.exe')
+    : path.join(pythonStaging(arch), 'bin', 'python3.10')
 
 const PYTHON_DOWNLOAD_BASE = path.join(PYTHON_BASE, 'download')
 const pythonDownloadDestination = (arch, platform) =>
@@ -246,11 +249,7 @@ function pythonInstallOne(platformName, archStr, targetDir) {
 
       const sitePackages = pythonSitePackagesStaging(platformName, archStr)
 
-      const invokablePython = path.join(
-        pythonStaging(archStr),
-        'bin',
-        'python3.10'
-      )
+      const invokablePython = executablePython(platformName, archStr)
       // TODO(mc, 2022-05-16): explore virtualenvs for a more reliable
       // implementation of this install
       log(`Installing python native deps using ${invokablePython}`)
