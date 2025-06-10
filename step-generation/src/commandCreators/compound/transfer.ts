@@ -323,7 +323,7 @@ export const transfer: CommandCreator<TransferArgs> = (
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
     })}`,
     ...(args.liquidClass != null
-      ? `base_liquid_class=${args.liquidClass}`
+      ? [`base_liquid_class=${args.liquidClass}`]
       : []),
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
