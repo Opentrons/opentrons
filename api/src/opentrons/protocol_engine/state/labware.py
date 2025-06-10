@@ -1162,6 +1162,40 @@ class LabwareView:
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
 
+    def stacker_labware_pool_to_ordered_list(
+        self,
+        primary_labware_definition: LabwareDefinition,
+        lid_labware_definition: LabwareDefinition | None,
+        adapter_labware_definition: LabwareDefinition | None,
+    ) -> List[LabwareDefinition]:
+        """Get the pool definitions in the top-first order suitable for geometry calculations."""
+        self.raise_if_stacker_labware_pool_is_not_valid(
+            primary_labware_definition,
+            lid_labware_definition,
+            adapter_labware_definition,
+        )
+        return [
+            x
+            for x in [
+                lid_labware_definition,
+                primary_labware_definition,
+                adapter_labware_definition,
+            ]
+            if x is not None
+        ]
+
+    def get_stacker_labware_overlap_offset(
+        self, definitions: list[LabwareDefinition]
+    ) -> OverlapOffset:
+        """Get the overlap amount between each labware pool.
+
+        The definitions must be in top-first order, ideally created by
+        `stacker_labware_pool_to_ordered_list`.
+        """
+        return self.get_labware_overlap_offsets(
+            definitions[-1], definitions[0].parameters.loadName
+        )
+
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
