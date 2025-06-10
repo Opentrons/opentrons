@@ -93,7 +93,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     destLabware,
     destWell,
@@ -200,7 +199,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     spec: pipetteSpecs,
     name: pipetteName,
   } = invariantContext.pipetteEntities[pipette]
-  const multiDispenseValuesForTip = getAllLiquidClassDefs()
+  const liquidClassValuesForTip = getAllLiquidClassDefs()
     [
       liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
         ? WATER_LIQUID_CLASS_NAME
@@ -208,17 +207,18 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     ].byPipette?.find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)?.multiDispense
+    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const { aspirate } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     volume,
     path: 'multiAspirate',
     numDispenseWells: sourceWells.length,
-    conditioningByVolume: (multiDispenseValuesForTip?.conditioningByVolume ??
-      []) as Array<[number, number]>,
-    disposalByVolume: (multiDispenseValuesForTip?.disposalByVolume ??
-      []) as Array<[number, number]>,
+    aspirateAirGapByVolume:
+      (aspirate?.retract.airGapByVolume as Array<[number, number]>) ?? [],
+    conditioningByVolume: null,
+    disposalByVolume: null,
   })
 
   const { numWellsToFitInTip } = multiWellHandling
@@ -824,11 +824,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             wellName: destWell,
             wellLocation: {
               origin: WELL_ORIGIN_TOP,
-              offset: {
-                x: 0,
-                y: 0,
-                z: blowoutOffsetFromTopMm,
-              },
             },
           }),
 

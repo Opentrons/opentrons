@@ -1371,22 +1371,23 @@ class ProtocolContext(CommandPublisher):
             display_color=display_color,
         )
 
-    @requires_version(2, 23)
-    def define_liquid_class(
+    @requires_version(2, 24)
+    def get_liquid_class(
         self,
         name: str,
     ) -> LiquidClass:
         """
-        Define a liquid class for use in the protocol.
-        ..
-            This is intended for Opentrons internal use only and is not a guaranteed API.
+        Get an instance of a built-in liquid class for use in the protocol.
 
-        :meta private:
+        Args:
+            name: Name of an Opentrons-defined liquid class.
+
+        :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
         """
-        return self._core.define_liquid_class(name=name, version=DEFAULT_LC_VERSION)
+        return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
     @requires_version(2, 24)
-    def define_custom_liquid_class(
+    def define_liquid_class(
         self,
         name: str,
         properties: Dict[str, Dict[str, TransferPropertiesDict]],

@@ -10,7 +10,6 @@ import {
 } from '@opentrons/step-generation'
 
 import {
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
@@ -119,6 +118,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
           disposalByVolume: null,
         })
@@ -128,6 +129,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
             (liquidClassValuesForTip.multiDispense
               ?.conditioningByVolume as Array<[number, number]>) ?? null,
@@ -169,7 +172,6 @@ export const moveLiquidFormToArgs = (
     dispense_x_position,
     aspirate_y_position,
     dispense_y_position,
-    blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
   } = hydratedFormData
@@ -289,10 +291,6 @@ export const moveLiquidFormToArgs = (
       hydratedFormData.blowout_location) ||
     null
 
-  const blowoutOffsetFromTopMm =
-    blowoutLocation != null
-      ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-      : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
     hydratedFormData,
     'aspirate_airGap_checkbox',
@@ -333,7 +331,6 @@ export const moveLiquidFormToArgs = (
     blowoutFlowRateUlSec:
       hydratedFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
-    blowoutOffsetFromTopMm,
     changeTip: hydratedFormData.changeTip,
     preWetTip: Boolean(hydratedFormData.preWetTip),
     aspirateDelay,

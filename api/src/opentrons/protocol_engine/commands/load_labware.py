@@ -165,25 +165,6 @@ class LoadLabwareImplementation(
                 top_labware_definition=loaded_labware.definition,
                 bottom_labware_id=verified_location.labwareId,
             )
-            # Validate load location is valid for lids
-            if labware_validation.validate_definition_is_lid(
-                definition=loaded_labware.definition
-            ):
-                # This parent is assumed to be compatible, unless the lid enumerates
-                # all its compatible parents and this parent is missing from the list.
-                parent_is_incompatible = (
-                    loaded_labware.definition.compatibleParentLabware is not None
-                    and self._state_view.labware.get_load_name(
-                        verified_location.labwareId
-                    )
-                    not in loaded_labware.definition.compatibleParentLabware
-                )
-
-                if parent_is_incompatible:
-                    raise ValueError(
-                        f"Labware Lid {params.loadName} may not be loaded on parent labware"
-                        f" {self._state_view.labware.get_display_name(verified_location.labwareId)}."
-                    )
 
         # Validate labware for the absorbance reader
         if self._is_loading_to_module(

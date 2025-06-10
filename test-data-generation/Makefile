@@ -24,7 +24,7 @@ clean:
 
 .PHONY: wheel
 wheel:
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	rm -rf build
 
 .PHONY: debug-test

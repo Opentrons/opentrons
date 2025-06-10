@@ -196,7 +196,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const liquids: ProtocolFile['liquids'] = reduce(
+    const liquids: LiquidV1Mixin['liquids'] = reduce(
       liquidEntities,
       (acc, liquidData, liquidId) => {
         return {
@@ -244,7 +244,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    const liquidV1Mixin: LiquidV1Mixin = {
+    const liquidV2Mixin: LiquidV1Mixin = {
       liquidSchemaId: 'opentronsLiquidSchemaV1',
       liquids,
     }
@@ -305,7 +305,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...protocolBase,
       ...deckStructure,
       ...labwareV2Mixin,
-      ...liquidV1Mixin,
+      ...liquidV2Mixin,
       ...commandv10Mixin,
       ...commandAnnotionaV1Mixin,
     }

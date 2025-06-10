@@ -19,6 +19,7 @@
   "copyright": "Copyright © {{year}} Opentrons",
   "create_a_protocol": "Create a protocol",
   "create_new": "Create new",
+  "deck_hardware": "Deck Hardware",
   "destination_well": "Destination Well",
   "developer_ff": "Developer Feature Flags",
   "done": "Done",

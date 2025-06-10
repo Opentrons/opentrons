@@ -4,28 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useBlockingHint } from '../../../components/organisms'
 import { useProtocolExportHandler } from '../useProtocolExportHandler'
 
-import type { USeProtocolExportHandlerProps } from '../useProtocolExportHandler'
+import type { UseProtocolExportHandlerProps } from '../useProtocolExportHandler'
 
-vi.mock('../../../pages/ProtocolOverview/UnusedModalContent')
 vi.mock('../../../components/organisms/BlockingHintModal/useBlockingHint')
 
 const mockOnConfirmExport = vi.fn()
 const mockModal = <div>mock Modal</div>
 
 describe('useProtocolExportHandler', () => {
-  let props: USeProtocolExportHandlerProps
+  let props: UseProtocolExportHandlerProps
 
   beforeEach(() => {
     props = {
-      noCommands: false,
-      modulesWithoutStep: [],
-      pipettesWithoutStep: [],
-      gripperWithoutStep: false,
-      fixtureWithoutStep: {
-        trashBin: false,
-        wasteChute: false,
-        stagingAreaSlots: [],
-      },
+      hasCommands: true,
       onConfirmExport: mockOnConfirmExport,
     }
 
@@ -46,7 +37,7 @@ describe('useProtocolExportHandler', () => {
   it('should return null initially, then the modal element after clicking export when warnings ARE present', () => {
     props = {
       ...props,
-      noCommands: true,
+      hasCommands: false,
     }
 
     const { result } = renderHook(() => useProtocolExportHandler(props))

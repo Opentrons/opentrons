@@ -1,0 +1,6 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+
+otupdate/_version.py

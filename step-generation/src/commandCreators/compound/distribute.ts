@@ -93,7 +93,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     conditioningVolume,
     destLabware,
@@ -211,7 +210,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     spec: pipetteSpecs,
     name: pipetteName,
   } = invariantContext.pipetteEntities[pipette]
-  const multiDispenseValuesForTip = getAllLiquidClassDefs()
+  const liquidClassValuesForTip = getAllLiquidClassDefs()
     [
       liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
         ? WATER_LIQUID_CLASS_NAME
@@ -219,18 +218,22 @@ export const distribute: CommandCreator<DistributeArgs> = (
     ].byPipette?.find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)?.multiDispense
+    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const { aspirate, multiDispense } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     volume,
     path: 'multiDispense',
     numDispenseWells: destWells.length,
-    conditioningByVolume: (multiDispenseValuesForTip?.conditioningByVolume ??
-      []) as Array<[number, number]>,
-    disposalByVolume: (multiDispenseValuesForTip?.disposalByVolume ??
-      []) as Array<[number, number]>,
-    aspirateAirGap: aspirateAirGapVolume,
+    conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
+      [number, number]
+    >,
+    disposalByVolume: (multiDispense?.disposalByVolume ?? []) as Array<
+      [number, number]
+    >,
+    aspirateAirGapByVolume:
+      (aspirate?.retract.airGapByVolume as Array<[number, number]>) ?? [],
   })
   const { numWellsToFitInTip } = multiWellHandling
 
@@ -885,11 +888,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: destinationWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,
@@ -909,11 +907,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: sourceWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,

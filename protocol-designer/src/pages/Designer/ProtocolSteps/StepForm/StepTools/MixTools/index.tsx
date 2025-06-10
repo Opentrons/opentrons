@@ -12,8 +12,10 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField } from '../../utils'
-import { useAssignLiquidClass } from '../MoveLiquidTools/hooks'
+import {
+  useAssignLiquidClass,
+  useSupportedLiquidClassOptions,
+} from '../MoveLiquidTools/hooks'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
@@ -30,7 +32,6 @@ export function MixTools(
     propsForFields,
     formData,
     toolboxStep,
-    visibleFormErrors,
     tab,
     setTab,
     setShowFormErrors,
@@ -52,13 +53,16 @@ export function MixTools(
     dropTipLocationValue != null &&
     labwares[String(dropTipLocationValue)] != null
 
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
-
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'labware',
     'wells',
     propsForFields.liquidClass.updateValue
+  )
+
+  const orderedSupportedLiquidClassOptions = useSupportedLiquidClassOptions(
+    orderedLiquidClassOptions,
+    formData
   )
 
   const stepComponents: Record<number, () => JSX.Element> = {
@@ -68,8 +72,6 @@ export function MixTools(
         formData={formData}
         enablePartialTip={enablePartialTip}
         pipettes={pipettes}
-        mappedErrorsToField={mappedErrorsToField}
-        visibleFormErrors={visibleFormErrors}
         enableReturnTip={enableReturnTip}
         userSelectedPickUpTipLocation={userSelectedPickUpTipLocation}
         userSelectedDropTipLocation={userSelectedDropTipLocation}
@@ -82,14 +84,13 @@ export function MixTools(
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}
             formData={formData}
-            orderedLiquidClassOptions={orderedLiquidClassOptions}
+            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
             type="mix"
           />
         ) : (
           <SecondStepMixTools
             propsForFields={propsForFields}
             formData={formData}
-            mappedErrorsToField={mappedErrorsToField}
             tab={tab}
             setTab={setTab}
           />
@@ -101,7 +102,6 @@ export function MixTools(
       <SecondStepMixTools
         propsForFields={propsForFields}
         formData={formData}
-        mappedErrorsToField={mappedErrorsToField}
         tab={tab}
         setTab={setTab}
       />

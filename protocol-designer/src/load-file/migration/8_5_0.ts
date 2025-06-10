@@ -24,6 +24,7 @@ import type {
   PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
+import type { Ingredients } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
 import type { FormData } from '../../form-types'
 
@@ -46,7 +47,7 @@ export const migrateFile = (
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms } = designerApplication.data
+  const { savedStepForms, ingredients } = designerApplication.data
   const { model: robotType } = robot
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
@@ -56,6 +57,16 @@ export const migrateFile = (
     commands,
     labwareDefinitions
   )
+
+  const migratedIngredients: Ingredients = Object.entries(
+    ingredients
+  ).reduce<Ingredients>((acc, [id, ingredient]) => {
+    acc[id] = {
+      ...ingredient,
+      liquidClass: null,
+    }
+    return acc
+  }, {})
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
@@ -294,6 +305,7 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
+        ingredients: migratedIngredients,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
           ...savedStepsWithUpdatedMoveLiquidFields,

@@ -131,9 +131,9 @@ export function TimelineToolbox({
       maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
       width={`${sidebarWidth / 16}rem`}
       title={
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
-            desktopStyle="bodyDefaultSemiBold"
+            desktopStyle="bodyLargeSemiBold"
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             css={LINE_CLAMP_TEXT_STYLE(1)}
           >

@@ -45,10 +45,11 @@ import {
   getCurrentFormIsPresaved,
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
-  getLabwareEntities,
-  getPipetteEntities,
+  getInvariantContext,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
+import { actions } from '../../../../steplist'
+import { maskField } from '../../../../steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '../../../../steplist/formLevel/handleFormChange/utils'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import {
@@ -74,20 +75,20 @@ import {
   getSaveStepSnackbarText,
   getVisibleFormErrors,
   getVisibleFormWarnings,
+  makeSingleEditFieldProps,
 } from './utils'
 
 import type { ComponentType } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
-import type { FormData, StepType } from '../../../../form-types'
+import type {
+  FormData,
+  HydratedFormData,
+  StepType,
+} from '../../../../form-types'
 import type { FormWarningType } from '../../../../steplist'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type {
-  FieldPropsByName,
-  FocusHandlers,
-  LiquidHandlingTab,
-  StepFormProps,
-} from './types'
+import type { FocusHandlers, LiquidHandlingTab, StepFormProps } from './types'
 
 type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null
@@ -121,7 +122,7 @@ interface StepFormToolboxProps {
   focusHandlers: FocusHandlers
   focusedField: StepFieldName | null
   formData: FormData
-  propsForFields: FieldPropsByName
+  hydratedForm: HydratedFormData
   handleClose: () => void
   handleSave: () => void
 }
@@ -133,9 +134,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     canSave,
     handleClose,
     handleSave,
-    propsForFields,
     dirtyFields,
     focusedField,
+    hydratedForm,
   } = props
   const { t, i18n } = useTranslation([
     'application',
@@ -149,8 +150,13 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(
     false
   )
-  const pipetteEntities = useSelector(getPipetteEntities)
-  const labwareEntities = useSelector(getLabwareEntities)
+
+  const handleChangeFormInput = (name: string, value: unknown): void => {
+    const maskedValue = maskField(name, value)
+    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
+  }
+
+  const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -169,6 +175,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     title: error.title,
     body: error.body,
     dependentFields: error.dependentProfileFields,
+    location: error.location,
   }))
   const timeline = useSelector(getRobotStateTimeline)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
@@ -226,8 +233,17 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       ...dynamicFormLevelErrorsForUnsavedForm,
     ],
     page: toolboxStep,
-    showErrors: showFormErrors,
+    showErrors: !currentFormIsPresaved || showFormErrors,
   })
+  const propsForFields = makeSingleEditFieldProps(
+    focusHandlers,
+    formData,
+    handleChangeFormInput,
+    hydratedForm,
+    t,
+    visibleFormErrors
+  )
+
   const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
@@ -491,7 +507,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           <FormAlerts
             focusedField={focusedField}
             dirtyFields={dirtyFields}
-            showFormErrors={showFormErrors}
+            showFormErrors={!currentFormIsPresaved || showFormErrors}
             page={toolboxStep}
           />
           <ToolsComponent
@@ -500,7 +516,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               propsForFields,
               focusHandlers,
               toolboxStep,
-              visibleFormErrors,
               showFormErrors,
               focusedField,
               setShowFormErrors,

@@ -37,13 +37,15 @@
           "displayName": "Water",
           "description": null,
           "displayColor": "#b925ff",
-          "liquidGroupId": "0"
+          "liquidGroupId": "0",
+          "liquidClass": null
         },
         "1": {
           "displayName": "Samples",
           "description": null,
           "displayColor": "#ffd600",
-          "liquidGroupId": "1"
+          "liquidGroupId": "1",
+          "liquidClass": null
         }
       },
       "ingredLocations": {

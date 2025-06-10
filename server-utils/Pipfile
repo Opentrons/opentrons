@@ -32,6 +32,7 @@ types-mock = "~=5.1.0"
 sqlalchemy2-stubs = "==0.0.2a21"
 # the same version as robot-server, which is limited by tavern
 python-box = "==6.1.0"
+build = "~=1.2.0"
 
 [packages]
 idna = "==3.3"
