@@ -28,7 +28,7 @@ import {
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
 import {
-  getEnablePythonExport,
+  getEnableJsonExport,
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
@@ -81,7 +81,7 @@ export function ProtocolOverview(): JSX.Element {
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
   ] = useState<boolean>(false)
-  const enablePythonExport = useSelector(getEnablePythonExport)
+  const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
     false
@@ -225,12 +225,12 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
-            {enablePythonExport ? (
+            {enableJsonExport ? (
               <LargeButton
                 buttonType="stroke"
-                buttonText="Export Python"
+                buttonText="Export JSON"
                 onClick={() => {
-                  dispatch(loadFileActions.savePythonProtocolFile())
+                  dispatch(loadFileActions.saveJSONProtocolFile())
                 }}
                 whiteSpace={NO_WRAP}
                 height="3.5rem"

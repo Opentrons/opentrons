@@ -2,7 +2,7 @@ import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../file-data'
 import { migration } from './migration'
-import { saveFile, savePythonFile } from './utils'
+import { saveFile, saveJSONFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
 import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
@@ -162,11 +162,15 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
   const fileData = fileDataSelectors.createFile(state)
   const protocolName =
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
-  const fileName = `${protocolName}.json`
+  const fileName = `${protocolName
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^A-Za-z0-9_]/g, '')}.py`
   saveFile(fileData, fileName)
 }
-// Eventually this will replace saveProtocolFile:
-export const savePythonProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
+
+// Eventually this will be deprecated:
+export const saveJSONProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
   dispatch,
   getState
 ) => {
@@ -175,13 +179,9 @@ export const savePythonProtocolFile: () => ThunkAction<SaveProtocolFileAction> =
     type: 'SAVE_PROTOCOL_FILE',
   })
   const state = getState()
-  const fileData = fileDataSelectors.createPythonFile(state)
+  const fileData = fileDataSelectors.createJSONFile(state)
   const protocolName =
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
-  // unlike JSON files, Python filenames can't have funny characters
-  const fileName = `${protocolName
-    .trim()
-    .replace(/\S+/g, '_')
-    .replace(/[^A-Za-z0-9_]/g, '')}.py`
-  savePythonFile(fileData, fileName)
+  const fileName = `${protocolName}.json`
+  saveJSONFile(fileData, fileName)
 }
