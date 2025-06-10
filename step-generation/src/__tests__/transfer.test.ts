@@ -164,7 +164,7 @@ describe('pick up tip if no tip on pipette', () => {
       `
 mock_pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
-        name=1234_transfer,
+        name="1234_transfer",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -229,8 +229,8 @@ mock_pipette.transfer_with_liquid_class(
         },
     ),
     volume=30,
-    source=[A1],
-    dest=[B2],
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B2"]],
     new_tip="always",
     trash_location=waste_chute,
 )`.trimStart()
@@ -355,7 +355,7 @@ it('single transfer: 1 source & 1 dest', () => {
     `
 mock_pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
-        name=1234_transfer,
+        name="1234_transfer",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -419,8 +419,8 @@ mock_pipette.transfer_with_liquid_class(
         },
     ),
     volume=30,
-    source=[A1],
-    dest=[B2],
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B2"]],
     new_tip="never",
     trash_location=trash_bin_1,
 )`.trimStart()
@@ -607,7 +607,7 @@ test('transfer with multiple sets of wells', () => {
     `
  mock_pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
-        name=1234_transfer,
+        name="1234_transfer",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -671,8 +671,8 @@ test('transfer with multiple sets of wells', () => {
         },
     ),
     volume=30,
-    source=[A1,A2],
-    dest=[B2,C2],
+    source=[mock_source_plate["A1"], mock_source_plate["A2"]],
+    dest=[mock_dest_plate["B2"], mock_dest_plate["C2"]],
     new_tip="never",
     trash_location=trash_bin_1,
 )`.trimStart()
@@ -5507,7 +5507,7 @@ describe('advanced options', () => {
         `
 mock_pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
-        name=1234_transfer,
+        name="1234_transfer",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -5611,8 +5611,8 @@ mock_pipette.transfer_with_liquid_class(
         },
     ),
     volume=350,
-    source=[A1],
-    dest=[B1],
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B1"]],
     new_tip="never",
     trash_location=trash_bin_1,
 )`.trimStart()

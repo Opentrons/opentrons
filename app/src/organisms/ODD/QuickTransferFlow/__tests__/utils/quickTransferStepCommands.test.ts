@@ -203,7 +203,7 @@ describe('quickTransferStepCommands', () => {
 
 pipette.transfer_with_liquid_class(
     liquid_class=protocol.define_liquid_class(
-        name=mockStepId_transfer,
+        name="mockStepId_transfer",
         properties={
             "p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
                 "aspirate": {
@@ -231,8 +231,8 @@ pipette.transfer_with_liquid_class(
         },
     ),
     volume=10,
-    source=[A1],
-    dest=[B1],
+    source=[mock_labware_1["A1"]],
+    dest=[mock_labware_2["B1"]],
     new_tip="always",
     trash_location=mock_trash_bin_1,
 )

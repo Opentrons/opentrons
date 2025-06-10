@@ -301,8 +301,20 @@ export const transfer: CommandCreator<TransferArgs> = (
   const trashPipetteName =
     trashBinEntities[args.dropTipLocation]?.pythonName ??
     wasteChuteEntities[args.dropTipLocation]?.pythonName
+  const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
+  const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
+  const pythonSourceWells = args.sourceWells
+    .map(well => `${sourceLabwarePythonName}[${formatPyStr(well)}]`)
+    .join(', ')
+  const pythonDestWells =
+    args.destWells != null && destLabwarePythonName != null
+      ? args.destWells
+          .map(well => `${destLabwarePythonName}[${formatPyStr(well)}]`)
+          .join(', ')
+      : null
+
   const pythonLiquidClassArgs = [
-    `name=${`${stepId}_${args.commandCreatorFnName}`}`,
+    `name=${formatPyStr(`${stepId}_${args.commandCreatorFnName}`)}`,
     `properties=${getCustomLiquidClassProperties({
       args,
       pipetteName,
@@ -314,7 +326,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       ? `base_liquid_class=${args.liquidClass}`
       : []),
   ]
-  //  TODO: update name to `define_liquid_class`
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
@@ -322,8 +333,8 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pythonArgs = [
     `liquid_class=${customLiquidClass}`,
     `volume=${args.volume}`,
-    `source=[${args.sourceWells}]`,
-    `dest=[${args.destWells ?? destTrashPipetteName}]`,
+    `source=[${pythonSourceWells}]`,
+    `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
     `new_tip=${formatPyStr(args.changeTip)}`,
     `trash_location=${trashPipetteName}`,
   ]
