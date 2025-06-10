@@ -59,6 +59,8 @@ import type {
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 import type { ModuleEntities } from '../../step-forms'
 
+const MIN_TRANSFER_VOLUME = 0.1
+
 /*******************
  ** Error Messages **
  ********************/
@@ -474,6 +476,12 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   tab: 'aspirate',
 }
 const VOLUME_OUT_OF_RANGE: FormError = {
+  title: RANGE_TITLE,
+  dependentFields: ['volume'],
+  location: 'field',
+  page: 0,
+}
+const VOLUME_UNDER_MINIMUM: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['volume'],
   location: 'field',
@@ -1410,6 +1418,14 @@ export const transferVolumeMax = (
     ? VOLUME_OUT_OF_RANGE
     : null
 }
+
+export const transferVolumeMin = (
+  fields: HydratedMoveLiquidFormData | HydratedMixFormData
+): FormError | null => {
+  const { volume } = fields
+  return volume < MIN_TRANSFER_VOLUME ? VOLUME_UNDER_MINIMUM : null
+}
+
 export const messageRequired = (
   fields: HydratedCommentFormData
 ): FormError | null => {
