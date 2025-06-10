@@ -229,6 +229,7 @@ pipette.transfer_with_liquid_class(
                 },
             }},
         },
+        base_liquid_class="waterV1",
     ),
     volume=10,
     source=[mock_labware_1["A1"]],

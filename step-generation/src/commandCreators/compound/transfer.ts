@@ -8,6 +8,7 @@ import {
   LOW_VOLUME_PIPETTES,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
+  WATER_LIQUID_CLASS_NAME,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -322,9 +323,9 @@ export const transfer: CommandCreator<TransferArgs> = (
       aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
     })}`,
-    ...(args.liquidClass != null
-      ? [`base_liquid_class=${args.liquidClass}`]
-      : []),
+    `base_liquid_class=${formatPyStr(
+      args.liquidClass ?? WATER_LIQUID_CLASS_NAME
+    )}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
     pythonLiquidClassArgs.join(',\n')
