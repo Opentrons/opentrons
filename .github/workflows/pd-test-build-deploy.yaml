@@ -92,8 +92,6 @@ jobs:
           make -C protocol-designer NODE_ENV=development
       - name: 'upload sourcemaps to Sentry'
         uses: getsentry/action-release@v3
-        with:
-          fetch-depth: 0 # Fetch entire history
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
