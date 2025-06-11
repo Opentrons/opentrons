@@ -20,19 +20,23 @@ export function useSendIdentifyModule(): sendIdentifyModuleType {
       start: boolean,
       color: IdentifyColor | null = null
     ) => {
-      createLiveCommand({
-        command: {
-          commandType: 'identifyModule',
-          params: {
-            model: module.moduleModel,
-            moduleId: module.id,
-            start,
-            ...(color != null ? { color } : {}),
+      // Only send identify command for flex stacker modules,
+      // other module types are not currently supported
+      if (module.moduleType === 'flexStackerModuleType') {
+        createLiveCommand({
+          command: {
+            commandType: 'identifyModule',
+            params: {
+              model: module.moduleModel,
+              moduleId: module.id,
+              start,
+              ...(color != null ? { color } : {}),
+            },
           },
-        },
-      }).catch(error => {
-        console.log(error.message)
-      })
+        }).catch(error => {
+          console.log(error.message)
+        })
+      }
     },
     [createLiveCommand]
   )
