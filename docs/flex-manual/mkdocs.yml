@@ -18,6 +18,10 @@ nav:
 
 theme:
   name: material
+  palette:
+    primary: custom
+    accent: custom
+  logo: images/opentrons-logo-white.png
   icon:
     admonition:
       tip: material/lightbulb-on-outline
@@ -46,3 +50,6 @@ markdown_extensions:
 extra_css:
   - manual.css
   - opentrons-theme.css
+
+extra:
+  generator: false

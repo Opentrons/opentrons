@@ -13,6 +13,10 @@ code, pre {
 
 /* Colors */
 
+:root {
+  --md-primary-fg-color: #006CFA; /* Opentrons Blue */
+}
+
 .opentrons-blue, .blue-50 {
     color: #006CFA;
 }
@@ -21,8 +25,14 @@ code, pre {
     color: #4A4C4E;
 }
 
+/* Applying colors to elements */
+
 th {
     background-color: #D0E6FE;
+}
+
+.md-footer {
+  background-color: var(--md-primary-fg-color);
 }
 
 /* Square bullets for unordered lists */

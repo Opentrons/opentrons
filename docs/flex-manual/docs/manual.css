@@ -17,9 +17,9 @@ figure.side-by-side p {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start; 
-  gap: 20px; 
+  gap: 2%; 
 }
 
 figure.side-by-side img {
-  width: 300px;
+  width: 48%;
 }
