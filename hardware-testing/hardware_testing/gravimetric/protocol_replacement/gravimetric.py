@@ -604,16 +604,8 @@ def run_one_test(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
     offset = _get_offset_for_channel(fixture_settings, channel)
-    transfer_properties.aspirate._aspirate_position.offset = [
-        offset.x,
-        offset.y,
-        offset.z,
-    ]
-    transfer_properties.dispense._dispense_position.offset = [
-        offset.x,
-        offset.y,
-        offset.z,
-    ]
+    transfer_properties.aspirate.aspirate_position.offset = offset
+    transfer_properties.dispense.dispense_position.offset = offset
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
         name=fixture_settings.liquid_class.name,
         transfer_properties=transfer_properties,

@@ -118,6 +118,10 @@ class TipPosition:
     def position_reference(self, new_position: str) -> None:
         self._position_reference = PositionReference(new_position)
 
+    @position_reference.setter
+    def position_reference(self, new_position: PositionReference) -> None:
+        self._position_reference = new_position
+
     @property
     def offset(self) -> Coordinate:
         return self._offset
@@ -125,6 +129,13 @@ class TipPosition:
     @offset.setter
     def offset(self, new_offset: Sequence[float]) -> None:
         x, y, z = validation.validate_coordinates(new_offset)
+        self._offset = Coordinate(x=x, y=y, z=z)
+
+    @offset.setter
+    def offset(self, new_offset: Coordinate) -> None:
+        x, y, z = validation.validate_coordinates(
+            [new_offset.x, new_offset.y, new_offset.z]
+        )
         self._offset = Coordinate(x=x, y=y, z=z)
 
     def as_shared_data_model(self) -> SharedDataTipPosition:
