@@ -15,6 +15,7 @@ import {
   getFlowRateAndOffsetParamsTransferLike,
   SOURCE_LABWARE,
 } from '../fixtures'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
 import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -55,7 +56,7 @@ describe('getCustomLiquidClassProperties', () => {
           aspirateAirGapVolume: 2,
           touchTipAfterDispense: true,
           mixInDestination: { volume: 10, times: 3 },
-          blowoutLocation: 'source',
+          blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
           dropTipLocation: FIXED_TRASH_ID,
           aspirateXOffset: 0,
           dispenseXOffset: 0,

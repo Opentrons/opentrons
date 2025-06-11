@@ -430,7 +430,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ]
       : []
 
-  const commandCreators = flatMap(
+  const jsonCommandCreators = flatMap(
     sourceWellChunks,
     (
       sourceWellChunk: string[],
@@ -936,6 +936,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       ]
     }
   )
+  const commandCreators = [...jsonCommandCreators, pythonCommandCreator]
   return reduceCommandCreators(
     commandCreators,
     invariantContext,

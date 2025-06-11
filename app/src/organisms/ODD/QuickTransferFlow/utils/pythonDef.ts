@@ -69,7 +69,10 @@ export function quickTransferStepCommands(
 
   let finalDropTipCommand = ''
 
-  if (stepArgs?.commandCreatorFnName !== 'transfer') {
+  if (
+    stepArgs?.commandCreatorFnName !== 'transfer' &&
+    stepArgs?.commandCreatorFnName !== 'consolidate'
+  ) {
     if (Object.values(trashBinEntities).length > 0) {
       finalDropTipCommand = `${pipettePythonName}.drop_tip()`
     } else if (Object.values(wasteChuteEntities).length > 0) {
