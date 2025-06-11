@@ -307,7 +307,9 @@ export type FlexFakeAddressableAreaName =
   | 'fakeC4'
   | 'fakeD4'
 
-export type FakeCutoutFixtureId = 'fakeStagingAreaRightSlot' | 'fakeWasteChuteWithEmptySlot'
+export type FakeCutoutFixtureId =
+  | 'fakeStagingAreaRightSlot'
+  | 'fakeWasteChuteWithEmptySlot'
 
 export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
@@ -315,9 +317,7 @@ export type AddressableAreaNamesWithFakes =
 
 export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
 
-export type CutoutFixtureIdsWithFakes =
-  | CutoutFixtureId
-  | FakeCutoutFixtureId
+export type CutoutFixtureIdsWithFakes = CutoutFixtureId | FakeCutoutFixtureId
 
 export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
 
@@ -586,7 +586,8 @@ export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
 export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
   'fakeStagingAreaRightSlot'
 
-export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' = 'fakeWasteChuteWithEmptySlot'
+export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' =
+  'fakeWasteChuteWithEmptySlot'
 
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'

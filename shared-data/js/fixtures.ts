@@ -25,6 +25,7 @@ import {
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
   FAKE_STAGING_AREA_RIGHT_SLOT,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
@@ -43,17 +44,13 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
 } from './constants'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -365,9 +362,10 @@ export const getCutoutFixtureReplacementIfNeeded = (
     deckDefinition.robot.model === FLEX_ROBOT_TYPE
   ) {
     return FAKE_STAGING_AREA_RIGHT_SLOT
-  }
-  else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE && deckDefinition.robot.model === FLEX_ROBOT_TYPE)
-  {
+  } else if (
+    cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
+    deckDefinition.robot.model === FLEX_ROBOT_TYPE
+  ) {
     return FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT
   }
   return cutoutFixtureId
@@ -393,8 +391,7 @@ export const getReplacementFixtureForFakeFixture = (
   if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   }
-  if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT)
-  {
+  if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT) {
     return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
   }
   return cutoutFixtureId

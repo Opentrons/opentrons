@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
-  LegacyStyledText,
   ListTable,
   Modal,
   SPACING,
@@ -373,7 +372,7 @@ export function AddFixtureModal({
         {
           cutoutId,
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE
+          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
         },
       ],
     ]
@@ -541,29 +540,37 @@ export function AddFixtureModal({
           areaIds.includes(dc.addressableAreaId)
         )
 
-        if (!match || !Array.isArray(match[1])) {
-          console.warn('Invalid match structure or missing area list:', match)
+        if (match) {
+          if (match[0] === aaCutoutItem.cutoutFixtureId) {
+            return { ...aaCutoutItem }
+          } else {
+            const [fixtureId, areaList] = match
+            console.log('match: ', match)
+            console.log('areaList: ', areaList)
+
+            const otherModules = areaList.filter(
+              id => id !== aaCutoutItem.addressableAreaId
+            )
+            console.log('otherModules: ', otherModules)
+            const matchedModule = deckConfigWithAA.find(dc =>
+              otherModules.includes(dc.addressableAreaId)
+            )
+            const sn = matchedModule?.opentronsModuleSerialNumber
+            console.log('matchedModule: ', matchedModule)
+            console.log('Matched fixture:', fixtureId, 'Module SN:', sn)
+
+            return {
+              ...aaCutoutItem,
+              cutoutFixtureId: fixtureId as CutoutFixtureId,
+              opentronsModuleSerialNumber:
+                sn ?? aaCutoutItem.opentronsModuleSerialNumber,
+            }
+          }
+        } else {
+          console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
           continue
         }
-
-        const [fixtureId, areaList] = match
-        const otherModules = areaList.filter(
-          id => id !== aaCutoutItem.addressableAreaId
-        )
-        const matchedModule = deckConfigWithAA.find(dc =>
-          otherModules.includes(dc.addressableAreaId)
-        )
-        const sn = matchedModule?.opentronsModuleSerialNumber
-
-        console.log('Matched fixture:', fixtureId, 'Module SN:', sn)
-
-        return {
-          ...aaCutoutItem,
-          cutoutFixtureId: fixtureId as CutoutFixtureId,
-          opentronsModuleSerialNumber: sn,
-        }
       }
-
       // Fallback if no match found
       return { ...aaCutoutItem }
     })
@@ -621,7 +628,7 @@ export function AddFixtureModal({
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText oddStyle='bodyTextRegular'>
+            <StyledText oddStyle="bodyTextRegular">
               {t('add_fixture_description')}
             </StyledText>
             <ListTable>
@@ -633,13 +640,13 @@ export function AddFixtureModal({
       ) : (
         <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <StyledText desktopStyle='bodyDefaultRegular'>
+            <StyledText desktopStyle="bodyDefaultRegular">
               {t('add_fixture_description')}
             </StyledText>
             <ListTable>
               {fixtureOptions}
               {nextStageOptions}
-              </ListTable>
+            </ListTable>
           </Flex>
           {optionStage === 'wasteChuteOptions' ? (
             <Btn
