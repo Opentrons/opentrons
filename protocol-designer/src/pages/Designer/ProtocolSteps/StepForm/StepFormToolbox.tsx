@@ -31,7 +31,7 @@ import {
 } from '../../../../components/atoms'
 import { FormAlerts } from '../../../../components/organisms'
 import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'

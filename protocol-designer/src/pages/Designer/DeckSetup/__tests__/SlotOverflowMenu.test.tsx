@@ -12,7 +12,7 @@ import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
 } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import {
   deleteContainer,
   duplicateLabware,
@@ -38,7 +38,7 @@ vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../components/organisms')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/utils')
-vi.mock('../../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/useKitchen')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

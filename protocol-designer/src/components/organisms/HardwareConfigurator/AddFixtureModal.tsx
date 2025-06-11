@@ -30,7 +30,7 @@ import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
 import { editDeckConfiguration } from '../../../step-forms/actions'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { useKitchen } from '../Kitchen/hooks'
+import { useKitchen } from '../Kitchen/useKitchen'
 import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'

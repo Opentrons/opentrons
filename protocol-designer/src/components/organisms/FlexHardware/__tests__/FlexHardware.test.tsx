@@ -16,10 +16,10 @@ import {
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
-import { useKitchen } from '../../Kitchen/hooks'
+import { useKitchen } from '../../Kitchen/useKitchen'
 
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../Kitchen/hooks')
+vi.mock('../../Kitchen/useKitchen')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof DeckConfigurator>()
   return {
