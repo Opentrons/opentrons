@@ -9,6 +9,7 @@ import {
   FixtureOption,
   Flex,
   LegacyStyledText,
+  ListTable,
   Modal,
   SPACING,
   TYPOGRAPHY,
@@ -228,78 +229,6 @@ export function AddFixtureModal({
     const filteredMods = unconfiguredMods.filter(
       mod => mod.moduleModel === moduleModel
     )
-
-    // if (moduleModel === FLEX_STACKER_MODULE_V1) {
-    //   filteredMods.forEach((mod: AttachedModule) => {
-    // const aaStackerMagBlockId = getAddressableAreaIdForCutout(
-    //   cutoutId,
-    //   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
-    // )
-    // if (aaStackerMagBlockId != null) {
-    //   stackerOptions.push([
-    //     {
-    //       cutoutId,
-    //       cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-    //       addressableAreaId: aaStackerMagBlockId,
-    //       opentronsModuleSerialNumber: mod.serialNumber,
-    //     },
-    //   ])
-    // }
-    // if (cutoutId == 'cutoutD3') {
-    //   const aaWithCover = getAddressableAreaIdForCutout(
-    //     cutoutId,
-    //     FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
-    //   )
-
-    //   const aaWithNoCover = getAddressableAreaIdForCutout(
-    //     cutoutId,
-    //     FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
-    //   )
-
-    //   if (aaWithCover != null) {
-    //     stackerOptions.push([
-    //       {
-    //         cutoutId,
-    //         cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-    //         addressableAreaId: aaWithCover,
-    //         opentronsModuleSerialNumber: mod.serialNumber,
-    //       },
-    //     ])
-    //   }
-    //   if (aaWithNoCover != null) {
-    //     stackerOptions.push([
-    //       {
-    //         cutoutId,
-    //         cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-    //         addressableAreaId: aaWithNoCover,
-    //         opentronsModuleSerialNumber: mod.serialNumber,
-    //       },
-    //     ])
-    //     //   }
-    //       const cutoutFixtureId = keys.find(
-    //         key => key == moduleModel
-    //       ) as CutoutFixtureId
-    //       const aaForModule = getAddressableAreaIdForCutout(
-    //         cutoutId,
-    //         cutoutFixtureId
-    //       )
-    //       if (aaForModule == null) {
-    //         console.error(
-    //           `Was not able to find aa for ${addressableAreaId} and module ${moduleModel}`
-    //         )
-    //       } else {
-    //         stackerOptions.push([
-    //           {
-    //             cutoutId,
-    //             addressableAreaId: aaForModule,
-    //             cutoutFixtureId,
-    //             opentronsModuleSerialNumber: mod.serialNumber,
-    //           },
-    //         ])
-    //       }
-    //   })
-    //   return [...stackerOptions]
-    // } else {
     const mappedWithAA = filteredMods.map(({ serialNumber, moduleModel }) => {
       const cutoutFixtureId = keys.find(
         key => key === moduleModel
@@ -423,22 +352,6 @@ export function AddFixtureModal({
         },
       ])
     }
-    // const aaMagBlockWithStaging = getAddressableAreaIdForCutout(
-    //   cutoutId,
-    //   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-    // )
-    // if (aaMagBlockWithStaging != null) {
-    //   availableOptions = [
-    //     ...availableOptions,
-    //     [
-    //       {
-    //         cutoutId,
-    //         cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-    //         addressableAreaId: aaMagBlockWithStaging,
-    //       },
-    //     ],
-    //   ]
-    // }
     if (unconfiguredMods.length > 0) {
       availableOptions = [
         ...availableOptions,
@@ -666,7 +579,7 @@ export function AddFixtureModal({
           c => c.cutoutId === fixture.cutoutId
         ) ?? fixture
       )
-    }) as CutoutConfig[] // we can do this bc we are going to map each aa to the proper fixture
+    }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
     console.log('newDeckConfig: ', newDeckConfig)
 
     updateDeckConfiguration(newDeckConfig)
@@ -711,10 +624,10 @@ export function AddFixtureModal({
             <LegacyStyledText as="p">
               {t('add_fixture_description')}
             </LegacyStyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <ListTable>
               {fixtureOptions}
               {nextStageOptions}
-            </Flex>
+            </ListTable>
           </Flex>
         </OddModal>
       ) : (
@@ -723,10 +636,10 @@ export function AddFixtureModal({
             <LegacyStyledText as="p">
               {t('add_fixture_description')}
             </LegacyStyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <ListTable>
               {fixtureOptions}
               {nextStageOptions}
-            </Flex>
+              </ListTable>
           </Flex>
           {optionStage === 'wasteChuteOptions' ? (
             <Btn
