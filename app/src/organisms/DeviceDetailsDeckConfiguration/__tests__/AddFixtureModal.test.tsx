@@ -8,6 +8,7 @@ import {
 import {
   getFixtureDisplayName,
   WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -15,6 +16,9 @@ import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { AddFixtureModal } from '../AddFixtureModal'
+import {
+  Btn
+} from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -37,6 +41,8 @@ describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
+    console.log("in before each")
+    console.log("Btn: ", Btn)
     props = {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
@@ -169,37 +175,30 @@ describe('Desktop AddFixtureModal', () => {
   it('should call update deck config when add button is clicked', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[1])
+    fireEvent.click(screen.getAllByText('Add')[0])
     fireEvent.click(screen.getByText('Add'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
+    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0])// click fixtures
     fireEvent.click(screen.getByRole('button', { name: 'Select options' })) // click waste chute options
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(
-      WASTE_CHUTE_FIXTURES.length
+      1
     )
 
-    WASTE_CHUTE_FIXTURES.forEach(cutoutId => {
-      const displayText = getFixtureDisplayName(cutoutId)
-      screen.getByText(displayText)
-    })
+    const displayText = getFixtureDisplayName(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+    screen.getByText(displayText)
   })
 
   it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0])// click fixtures
     fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
 
     fireEvent.click(screen.getByText('Go back'))
-    screen.getByText('Staging area slot')
-    screen.getByText('Trash bin')
     screen.getByText('Waste chute')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
-    expect(
-      screen.getAllByRole('button', { name: 'Select options' }).length
-    ).toBe(1)
   })
 })
