@@ -80,12 +80,10 @@ export function Condition(props: DelayProps): JSX.Element {
     switch (currentStep) {
       case 1:
         if (!conditionIsEnabled) {
-          console.log('Condition is disabled, skipping to next step')
           dispatch({
             type: ACTIONS.SET_CONDITION_ASPIRATE,
             conditionAspirate: 0,
           })
-          console.log('dispatched')
           onBack()
         } else {
           setCurrentStep(2)
@@ -113,17 +111,6 @@ export function Condition(props: DelayProps): JSX.Element {
     conditionIsEnabled && currentStep === 1
       ? t('shared:continue')
       : t('shared:save')
-
-  // allow a maximum of 10 digits for delay duration
-  // const durationRange = { min: 1, max: 9999999999 }
-  // const durationError =
-  //   delayDuration != null &&
-  //   (delayDuration < durationRange.min || delayDuration > durationRange.max)
-  //     ? t(`value_out_of_range`, {
-  //         min: durationRange.min,
-  //         max: durationRange.max,
-  //       })
-  //     : null
 
   let buttonIsDisabled = false
   if (currentStep === 1) {
@@ -187,7 +174,6 @@ export function Condition(props: DelayProps): JSX.Element {
             <InputField
               type="number"
               value={conditionVolume}
-              // error={durationError}
               title={t('condition_volume')}
               readOnly
             />
