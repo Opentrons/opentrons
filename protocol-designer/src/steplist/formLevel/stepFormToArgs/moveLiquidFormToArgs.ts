@@ -174,6 +174,7 @@ export const moveLiquidFormToArgs = (
     dispense_y_position,
     pushOut_checkbox,
     pushOut_volume,
+    stepNumber,
   } = hydratedFormData
   let sourceWells = getOrderedWells(
     hydratedFormData.aspirate_wells,
@@ -312,7 +313,9 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.conditioning_volume > 0
       ? hydratedFormData.conditioning_volume
       : 0
+
   const commonFields = {
+    stepId: stepNumber,
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,

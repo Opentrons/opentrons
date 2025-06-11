@@ -242,6 +242,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
