@@ -259,9 +259,9 @@ function pythonInstallOne(platformName, archStr, targetDir) {
         'pip',
         'install',
         `--target=${sitePackages}`,
-        path.join(__dirname, '../../shared-data/python'),
-        path.join(__dirname, '../../hardware[flex]'),
-        path.join(__dirname, '../../api'),
+        path.join(__dirname, '..', '..', 'shared-data'),
+        path.join(__dirname, '..', '..', 'hardware[flex]'),
+        path.join(__dirname, '..', '..', 'api'),
         'pandas==1.4.3',
       ])
     })
