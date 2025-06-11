@@ -409,94 +409,32 @@ Once you have added your labware to the Opentrons App, it's available to the Pyt
 
 A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema. 
 
-A schema is a framework for organizing data. It sets the rules about what information is required or optional and how it's organized in the JSON file. If you're interested, take a moment to review our labware schema. For an actual example, see the definition for the Opentrons 96 PCR Adapter. The following table lists and defines the items in the Opentrons labware schema. 
-
-| Property            | Data type | Definition                                   |
+| Property {style="width: 20%;"} | Data type | Definition                                   |
 | :------------------ | :-------- | :------------------------------------------- |
 | `schemaVersion`     | Number    | Schema version used by a labware. The current version is 2. |
 | `version`           | Integer   | An incrementing integer that identifies the labware version. Minimum version is 1. |
 | `namespace`         | String    | See `safeString` in the JSON definitions section below. |
-| `metadata`          | Object    | Properties used for search and display. Accepts only:  |
-|                     |           | • `displayName` (String): An easy-to-remember labware name. |
-|                     |           | • `displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below. |
-|                     |           | • `displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either µL, mL, or L. |
+| `metadata`          | Object    | <ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either µL, mL, or L.</li></ul> |
 | `brand`             | Object    | Information about the labware manufacturer or those products the labware is compatible with. |
-| `parameters`        | Object    | Internal parameters that describe labware characteristics. Accepts only:  |
-|                     |           | • `format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`. |
-|                     |           | • `quirks` (Array): Strings describing labware behavior. See the Opentrons 96 Deep Well Adapter definition. |
-|                     |           | • `isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`). |
-|                     |           | • `tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers. |
-|                     |           | • `tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate. |
-|                     |           | • `loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`). |
-|                     |           | • `isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module. |
-|                     |           | • `magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below. |
+| `parameters`        | Object    | <ul><li>`format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`.</li><li>`quirks` (Array): Strings describing labware behavior. See the Opentrons 96 Deep Well Adapter definition.</li><li>`isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`).</li><li>`tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li><li>`tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li><li>`loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`).</li><li>`isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module.</li><li>`magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below.</li></ul> |
 | `ordering`          | Array     | An array that tracks how wells should be ordered on a piece of labware. See the Opentrons 96 PCR Adapter example. |
-| `cornerOffsetFromSlot` | Object    | Used for labware that spans multiple deck slots. Offset is the distance from the left-front-bottom corner of the slot to the left-front-bottom corner of the labware bounding box. Accepts only:  |
-|                     |           | • `x` (number)  |
-|                     |           | • `y` (number)  |
-|                     |           | • `z` (number)  |
-|                     |           | For labware that does not span multiple slots, these values should be zero. See `positiveNumber` in the JSON definitions section below. |
-| `dimensions`        | Object    | Outer dimensions (in mm) of a piece of labware. Accepts only:  |
-|                     |           | • `xDimension` (length)  |
-|                     |           | • `yDimension` (width)  |
-|                     |           | • `zDimension` (height)  |
-|                     |           | See the Opentrons 96 PCR Adapter example. |
-| `wells`             | Object    | An unordered object of well objects, including position and dimensions. |
-|                     |           | Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12. |
-|                     |           | Each well object accepts the following properties:  |
-|                     |           | • `depth` (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of `tipLength`, but the values should match. |
-|                     |           | • `x` (Number): Location of the center-bottom of a well in reference to the left of the labware. |
-|                     |           | • `y` (Number): Location of the center-bottom of a well in reference to the front of the labware. |
-|                     |           | • `z` (Number): Location of the center-bottom of a well in reference to the bottom of the labware. |
-|                     |           | • `totalLiquidVolume` (Number): Total well, tube, or tip volume in µL. |
-|                     |           | • `xDimension` (Number): Length of a rectangular well. |
-|                     |           | • `yDimension` (Number): Width of a rectangular well. |
-|                     |           | • `diameter` (Number): Diameter of a circular well. |
-|                     |           | • `shape` (String): Either `rectangular` or `circular`. |
-|                     |           | If `rectangular`, specify `xDimension` and `yDimension`. If `circular`, specify `diameter`. |
-|                     |           | For a circular well example, see the Opentrons 96 PCR Adapter. For a rectangular well example, see the NEST 96 Deep Well Plate 2mL. |
-|                     |           | For dimension, depth, and volume, see `positiveNumber` in the JSON definitions section below. |
-| `groups`            | Array     | Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution. Each item in the array accepts:  |
-|                     |           | • `wells` (Array): An array of wells (e.g., `["A1", "B1", "C1"]`) that share the same metadata. Array elements are strings. |
-|                     |           | • `metadata` (Object): Metadata specific to a grid of wells. Accepts only:  |
-|                     |           | • `displayName` (String): Human-readable name for the well group. |
-|                     |           | • `displayCategory`: Labels used to categorize well groups. See `displayCategory` in the JSON definitions section below. |
-|                     |           | • `wellBottomShape` (String): Bottom shape of a well. Available shapes are `flat`, `u`, or `v` only. |
-|                     |           | • `brand`: Brand information for the well group. See `brandData` in the JSON definitions section below. |
-| `allowedRoles`      | Array     | Defines an item's role or purpose. If the `allowedRoles` field is missing from a definition, an item is treated as labware. Possible array items are only the following strings:  |
-|                     |           | • `labware` (standard labware items)  |
-|                     |           | • `adapter` (items designed to hold labware)  |
-|                     |           | • `fixture` (items that are affixed to the deck)  |
-|                     |           | • `maintenance` (items not used in normal protocol runs)  |
+| `cornerOffsetFromSlot` | Object    | <ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> For labware that does not span multiple slots, these values should be zero. See `positiveNumber` in the JSON definitions section below. |
+| `dimensions`        | Object    | <ul><li>`xDimension` (length)</li><li>`yDimension` (width)</li><li>`zDimension` (height)</li></ul> See the Opentrons 96 PCR Adapter example. |
+| `wells`             | Object    | An unordered object of well objects, including position and dimensions.<ul><li>Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12.</li><li>Each well object accepts the following properties:</li><ul><li>`depth` (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of `tipLength`, but the values should match.</li><li>`x` (Number): Location of the center-bottom of a well in reference to the left of the labware.</li><li>`y` (Number): Location of the center-bottom of a well in reference to the front of the labware.</li><li>`z` (Number): Location of the center-bottom of a well in reference to the bottom of the labware.</li><li>`totalLiquidVolume` (Number): Total well, tube, or tip volume in µL.</li><li>`xDimension` (Number): Length of a rectangular well.</li><li>`yDimension` (Number): Width of a rectangular well.</li><li>`diameter` (Number): Diameter of a circular well.</li><li>`shape` (String): Either `rectangular` or `circular`.<ul><li>If `rectangular`, specify `xDimension` and `yDimension`.</li><li>If `circular`, specify `diameter`.</li></ul></li></ul><li>For a circular well example, see the Opentrons 96 PCR Adapter. For a rectangular well example, see the NEST 96 Deep Well Plate 2mL.</li><li>For dimension, depth, and volume, see `positiveNumber` in the JSON definitions section below.</li></ul> |
+| `groups`            | Array     | Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution.<ul><li>Each item in the array accepts:</li><ul><li>`wells` (Array): An array of wells (e.g., `["A1", "B1", "C1"]`) that share the same metadata. Array elements are strings.</li><li>`metadata` (Object): Metadata specific to a grid of wells. Accepts only:</li><ul><li>`displayName` (String): Human-readable name for the well group.</li><li>`displayCategory`: Labels used to categorize well groups. See `displayCategory` in the JSON definitions section below.</li><li>`wellBottomShape` (String): Bottom shape of a well. Available shapes are `flat`, `u`, or `v` only.</li><li>`brand`: Brand information for the well group. See `brandData` in the JSON definitions section below.</li></ul></ul></ul> |
+| `allowedRoles`      | Array     | Defines an item's role or purpose. If the `allowedRoles` field is missing from a definition, an item is treated as labware.<ul><li>Possible array items are only the following strings:</li><ul><li>`labware` (standard labware items)</li><li>`adapter` (items designed to hold labware)</li><li>`fixture` (items that are affixed to the deck)</li><li>`maintenance` (items not used in normal protocol runs)</li></ul></ul> |
 | `stackingOffsetWithLabware` | Object    | For labware that can stack on top of another piece of labware. Used to determine z-height (labware z height + adapter z height - overlap). See `coordinates` in the JSON definitions section below. |
 | `stackingOffsetWithModule` | Object    | For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See `coordinates` in the JSON definitions section below. |
-| `gripperOffsets`    | Object    | Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a default object that includes two properties:  |
-|                     |           | • `pickUpOffset`: Offset added to calculate the pick-up coordinates of labware placed on this labware. |
-|                     |           | • `dropOffset`: Offset added to calculate the drop-off coordinates of labware placed on this labware. |
-|                     |           | See `coordinates` in the JSON definitions section below. |
+| `gripperOffsets`    | Object    | Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware.<ul><li>Includes a default object that includes two properties:</li><ul><li>`pickUpOffset`: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li><li>`dropOffset`: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li></ul></ul> See `coordinates` in the JSON definitions section below. |
 | `gripForce`         | Number    | Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16. |
 | `gripHeightFromLabwareBottom` | Number    | Recommended z-axis height, from the labware bottom to the center of the gripper pads. |
 
 ### JSON labware definitions 
 
-| Property        | Data type | Definition                                   |
+| Property {style="width: 20%;"}       | Data type | Definition                                   |
 | :-------------- | :-------- | :------------------------------------------- |
 | `positiveNumber` | Number    | Minimum: 0.                      |
-| `brandData`     | Object    | Information about branded items. Accepts only:  |
-|                 |           | • `brand` (String): Brand/manufacturer's name. |
-|                 |           | • `brandId` (Array): OEM part numbers or IDs. |
-|                 |           | • `links` (Array): Manufacturer URLs. Array items are strings. |
-| `displayCategory` | String    | Must be one of:                   |
-|                 |           | • `tipRack`                       |
-|                 |           | • `tubeRack`                      |
-|                 |           | • `reservoir`                     |
-|                 |           | • `trash`                         |
-|                 |           | • `wellPlate`                     |
-|                 |           | • `aluminumBlock`                 |
-|                 |           | • `adapter`                       |
-|                 |           | • `other`                         |
+| `brandData`     | Object    | Information about branded items. Accepts only:<br><ul><li>`brand` (String): Brand/manufacturer's name.</li><li>`brandId` (Array): OEM part numbers or IDs.</li><li>`links` (Array): Manufacturer URLs. Array items are strings.</li></ul> |
+| `displayCategory` | String    | Must be one of:<br><ul><li>`tipRack`</li><li>`tubeRack`</li><li>`reservoir`</li><li>`trash`</li><li>`wellPlate`</li><li>`aluminumBlock`</li><li>`adapter`</li><li>`other`</li></ul> |
 | `safeString`    | String    | A string safe to use for load names and namespaces. Lowercase letters, numerals, periods, and underscores only. |
-| `coordinates`   | Object    | Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:  |
-|                 |           | • `x` (number)                    |
-|                 |           | • `y` (number)                    |
-|                 |           | • `z` (number)                    |
+| `coordinates`   | Object    | Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:<br><ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> |
