@@ -1,12 +1,29 @@
 """Production QC User Interface."""
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import StatusBarState
+from typing import Optional
 
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
 PRINT_TITLE_POUNDS = "#" * PRINT_HEADER_NUM_SPACES
 PRINT_HEADER_SPACES = " " * (PRINT_HEADER_NUM_SPACES - 1)
 PRINT_HEADER_ASTERISK = "*"
+
+outfile: Optional[str] = None
+
+
+def set_output_file(new_outfile: Optional[str]) -> None:
+    global outfile
+    outfile = new_outfile
+
+
+def output(msg: str) -> None:
+    global outfile
+    if outfile:
+        with open(outfile, "a") as f:
+            f.write(msg)
+    else:
+        print(msg)
 
 
 def get_user_answer(question: str) -> bool:
@@ -43,7 +60,7 @@ def print_title(title: str) -> None:
     length = len(title)
     pounds = PRINT_TITLE_POUNDS + ("#" * length) + PRINT_TITLE_POUNDS
     middle = f"#{PRINT_HEADER_SPACES}" f"{title}" f"{PRINT_HEADER_SPACES}#"
-    print(f"\n{pounds}\n{middle}\n{pounds}\n")
+    output(f"\n{pounds}\n{middle}\n{pounds}\n")
 
 
 def print_header(header: str) -> None:
@@ -56,19 +73,19 @@ def print_header(header: str) -> None:
     length = len(header)
     dashes = PRINT_HEADER_DASHES + ("-" * length) + PRINT_HEADER_DASHES
     middle = f"|{PRINT_HEADER_SPACES}{header}{PRINT_HEADER_SPACES}|"
-    print(f"\n{dashes}\n{middle}\n{dashes}\n")
+    output(f"\n{dashes}\n{middle}\n{dashes}\n")
 
 
 def print_error(message: str) -> None:
     """Print error."""
-    print(f"ERROR: {message}")
+    output(f"ERROR: {message}")
 
 
 def print_warning(message: str) -> None:
     """Print warning."""
-    print(f"WARNING: {message}")
+    output(f"WARNING: {message}")
 
 
 def print_info(message: str) -> None:
     """Print information."""
-    print(message)
+    output(message)

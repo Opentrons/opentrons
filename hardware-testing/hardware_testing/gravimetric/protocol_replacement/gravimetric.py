@@ -67,6 +67,14 @@ if os.getenv("RUNNING_ON_VERDIN") is None:
     sys.path.append(base_dir)
 
 from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
+from hardware_testing.data.ui import (
+    set_output_file,
+    print_info,
+    print_title,
+    print_header,
+    print_warning,
+    print_error,
+)
 from hardware_testing.gravimetric.measurement import (  # noqa: E402
     create_measurement_tag,
     record_measurement_data,
@@ -232,8 +240,7 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
-        # simulating = ctx.is_simulating()
-        simulating = True
+        simulating = ctx.is_simulating()
         run_id = create_run_id()
         scale = Scale.build(simulating)
         scale_serial = scale.read_serial_number()
@@ -273,6 +280,7 @@ class FixtureSettings:
             run_id=run_id,
         )
         os.makedirs(f"{test_report.parent}/{test_report._run_id}", exist_ok=True)
+        set_output_file(f"{test_report.parent}/{test_report._run_id}/run_output.txt")
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
@@ -644,6 +652,7 @@ def run(ctx: ProtocolContext) -> None:
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
     )
     for i in range(fixture_settings.blank_trials):
+        print_info(f"Running blank trial {i}")
         blank_measurments.append(
             run_blank_test(
                 fixture_settings,
@@ -722,10 +731,10 @@ def run(ctx: ProtocolContext) -> None:
                         + avg_disp_evap
                     )
                     if fixture_settings.ctx.is_simulating():
-                        cur_height = 10
+                        cur_height: float = 10.0
                     else:
                         cur_height = (
-                            fixture_settings.liquid_source.current_liquid_height()
+                            fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
                         )
                     report.store_trial(
                         fixture_settings.test_report,
