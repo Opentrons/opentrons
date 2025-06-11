@@ -17,7 +17,6 @@ import {
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
-  formatPyValue,
   getSlotInLocationStack,
   getTrashOrLabware,
   indentPyLines,
