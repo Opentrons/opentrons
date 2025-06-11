@@ -33,6 +33,16 @@ describe('getErrorKind', () => {
       expectedError: ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING,
     },
     {
+      commandType: 'blowout',
+      errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+      expectedError: ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING,
+    },
+    {
+      commandType: 'blowOutInPlace',
+      errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
+      expectedError: ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING,
+    },
+    {
       commandType: 'dropTip',
       errorType: DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
       expectedError: ERROR_KINDS.TIP_DROP_FAILED,
