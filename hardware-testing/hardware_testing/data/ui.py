@@ -13,11 +13,17 @@ outfile: Optional[str] = None
 
 
 def set_output_file(new_outfile: Optional[str]) -> None:
+    """Change the output location of the UI output.
+
+    If it is a string it will output to that as a file.
+    if it is None it will default back to stdout
+    """
     global outfile
     outfile = new_outfile
+    _output(f"Setting UI output to file {outfile}")
 
 
-def output(msg: str) -> None:
+def _output(msg: str) -> None:
     global outfile
     if outfile:
         with open(outfile, "a") as f:
@@ -60,7 +66,7 @@ def print_title(title: str) -> None:
     length = len(title)
     pounds = PRINT_TITLE_POUNDS + ("#" * length) + PRINT_TITLE_POUNDS
     middle = f"#{PRINT_HEADER_SPACES}" f"{title}" f"{PRINT_HEADER_SPACES}#"
-    output(f"\n{pounds}\n{middle}\n{pounds}\n")
+    _output(f"\n{pounds}\n{middle}\n{pounds}\n")
 
 
 def print_header(header: str) -> None:
@@ -73,19 +79,19 @@ def print_header(header: str) -> None:
     length = len(header)
     dashes = PRINT_HEADER_DASHES + ("-" * length) + PRINT_HEADER_DASHES
     middle = f"|{PRINT_HEADER_SPACES}{header}{PRINT_HEADER_SPACES}|"
-    output(f"\n{dashes}\n{middle}\n{dashes}\n")
+    _output(f"\n{dashes}\n{middle}\n{dashes}\n")
 
 
 def print_error(message: str) -> None:
     """Print error."""
-    output(f"ERROR: {message}")
+    _output(f"ERROR: {message}")
 
 
 def print_warning(message: str) -> None:
     """Print warning."""
-    output(f"WARNING: {message}")
+    _output(f"WARNING: {message}")
 
 
 def print_info(message: str) -> None:
     """Print information."""
-    output(message)
+    _output(message)

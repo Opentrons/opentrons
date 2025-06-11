@@ -67,7 +67,7 @@ if os.getenv("RUNNING_ON_VERDIN") is None:
     sys.path.append(base_dir)
 
 from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
-from hardware_testing.data.ui import (
+from hardware_testing.data.ui import (  # noqa: F401, E402
     set_output_file,
     print_info,
     print_title,
@@ -733,9 +733,8 @@ def run(ctx: ProtocolContext) -> None:
                     if fixture_settings.ctx.is_simulating():
                         cur_height: float = 10.0
                     else:
-                        cur_height = (
-                            fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
-                        )
+                        lh = fixture_settings.liquid_source.current_liquid_height()
+                        cur_height = lh  # type: ignore[assignment]
                     report.store_trial(
                         fixture_settings.test_report,
                         trial,
