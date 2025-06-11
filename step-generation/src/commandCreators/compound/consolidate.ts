@@ -4,7 +4,7 @@ import flatMap from 'lodash/flatMap'
 import {
   ALL,
   getAllLiquidClassDefs,
-  getCorrectionVolume,
+  getByVolumeValue,
   getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -334,13 +334,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           }),
         ]
       : []
-  const aspirateCorrectionVolumeForDispenseAirGap = getCorrectionVolume({
-    liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: tipRack,
-    targetVolume: dispenseAirGapVolume,
-    liquidHandlingAction: 'aspirate',
-  })
+  const aspirateCorrectionVolumeForDispenseAirGap =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVolume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
   const delayAfterDispenseCommands =
     dispenseDelay != null
       ? [
@@ -349,6 +352,47 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           }),
         ]
       : []
+
+  const aspirateAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVolume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const aspirateAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVolume,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
+  const dispenseAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVolume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const dispenseAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVolume,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -369,7 +413,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               curryCommandCreator(airGapInPlace, {
                 pipetteId: pipette,
                 volume: dispenseAirGapVolume,
-                flowRate: aspirateFlowRateUlSec,
+                flowRate: dispenseAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                   ? {
                       correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
@@ -436,10 +480,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         (sourceWell: string, wellIndex: number): CurriedCommandCreator[] => {
           const isFirstWellInChunk = wellIndex === 0
           let airGapInTip = 0
+          let airGapDispenseFlowRate = dispenseFlowRateUlSec
           if (isFirstWellInChunk && !changeTipNow && !isFirstChunk) {
             airGapInTip = dispenseAirGapVolume
+            airGapDispenseFlowRate = dispenseAirGapDispenseFlowRate
           } else if (!isFirstWellInChunk) {
             airGapInTip = aspirateAirGapVolume
+            airGapDispenseFlowRate = aspirateAirGapDispenseFlowRate
           }
           const aspirateSubmergeLocation: WellLocation = {
             origin:
@@ -463,15 +510,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               z: aspirateRetractZOffset,
             },
           }
-          const dispenseCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
-            {
+          const dispenseCorrectionVolumeForDispenseAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: airGapInTip,
               liquidHandlingAction: 'singleDispense',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const configureForVolumeAndPrepareToAspirateCommands: CurriedCommandCreator[] = isFirstWellInChunk
             ? [
                 ...(LOW_VOLUME_PIPETTES.includes(
@@ -495,7 +543,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   curryCommandCreator(dispenseInPlace, {
                     pipetteId: pipette,
                     volume: airGapInTip,
-                    flowRate: dispenseFlowRateUlSec,
+                    flowRate: airGapDispenseFlowRate,
                     ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
@@ -594,22 +642,23 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   : []),
               ]
             : []
-          const aspirateCorrectionVolumeForAspirateAirGap = getCorrectionVolume(
-            {
+          const aspirateCorrectionVolumeForAspirateAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: aspirateAirGapVolume,
               liquidHandlingAction: 'aspirate',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const airGapAfterAspirateRetractCommands =
             aspirateAirGapVolume > 0
               ? [
                   curryCommandCreator(airGapInPlace, {
                     pipetteId: pipette,
                     volume: aspirateAirGapVolume,
-                    flowRate: aspirateFlowRateUlSec,
+                    flowRate: aspirateAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
@@ -619,15 +668,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   ...delayAfterAspirateCommands,
                 ]
               : []
-          const aspirateCorrectionVolumeForSampleAspiration = getCorrectionVolume(
-            {
+          const aspirateCorrectionVolumeForSampleAspiration =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: volume,
               liquidHandlingAction: 'aspirate',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const aspirateCommands = [
             curryCommandCreator(aspirateInPlace, {
               pipetteId: pipette,
@@ -701,20 +751,23 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               }),
             ]
 
-      const dispenseCorrectionVolumeForAspirateAirGap = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume: aspirateAirGapVolume,
-        liquidHandlingAction: 'singleDispense',
-      })
+      const dispenseCorrectionVolumeForAspirateAirGap =
+        getByVolumeValue({
+          liquidClass,
+          pipetteSpecs,
+          tiprackDefUri: tipRack,
+          targetVolume: aspirateAirGapVolume,
+          liquidHandlingAction: 'singleDispense',
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
       const voidAirGapAtDispenseWellCommands =
         aspirateAirGapVolume > 0
           ? [
               curryCommandCreator(dispenseInPlace, {
                 pipetteId: pipette,
                 volume: aspirateAirGapVolume,
-                flowRate: dispenseFlowRateUlSec,
+                flowRate: aspirateAirGapDispenseFlowRate,
                 pushOut: 0,
                 correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
               }),
@@ -761,13 +814,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
-      const dispenseCorrectionForTotalDispense = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume: totalSampleDispenseVolume,
-        liquidHandlingAction: 'singleDispense',
-      })
+      const dispenseCorrectionForTotalDispense =
+        getByVolumeValue({
+          liquidClass,
+          pipetteSpecs,
+          tiprackDefUri: tipRack,
+          targetVolume: totalSampleDispenseVolume,
+          liquidHandlingAction: 'singleDispense',
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
       // don't push out if mixing in destination
       const effectivePushOut = mixInDestination != null ? 0 : pushOut
       const dispenseCommands = [
@@ -780,14 +836,38 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         }),
         ...delayAfterDispenseCommands,
       ]
+      const mixAspirateFlowRate =
+        (mixInDestination != null
+          ? getByVolumeValue({
+              liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: tipRack,
+              targetVolume: mixInDestination.volume,
+              liquidHandlingAction: 'aspirate',
+              byVolumeProperty: 'flowRateByVolume',
+              defaultValue: null,
+            })
+          : aspirateFlowRateUlSec) ?? aspirateFlowRateUlSec
+      const mixDispenseFlowRate =
+        (mixInDestination != null
+          ? getByVolumeValue({
+              liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: tipRack,
+              targetVolume: mixInDestination.volume,
+              liquidHandlingAction: 'singleDispense',
+              byVolumeProperty: 'flowRateByVolume',
+              defaultValue: null,
+            })
+          : dispenseFlowRateUlSec) ?? dispenseFlowRateUlSec
       const mixInDestinationCommands =
         mixInDestination != null
           ? mixInPlaceUtil({
               pipette,
               volume: mixInDestination.volume,
               times: mixInDestination.times,
-              aspirateFlowRateUlSec,
-              dispenseFlowRateUlSec,
+              aspirateFlowRateUlSec: mixAspirateFlowRate,
+              dispenseFlowRateUlSec: mixDispenseFlowRate,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
               finalPushOut: pushOut,
