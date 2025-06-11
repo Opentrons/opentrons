@@ -221,7 +221,7 @@ export const ASPIRATE_SETTING_OPTIONS = {
   ASPIRATE_AIR_GAP: 'aspirate_air_gap',
   ASPIRATE_SUBMERGE: 'aspirate_submerge',
   ASPIRATE_RETRACT: 'aspirate_retract',
-  ASPIRATE_CONDITION: 'condition_aspirate',
+  ASPIRATE_CONDITION: 'aspirate_condition',
 } as const
 
 export const DISPENSE_SETTING_OPTIONS = {

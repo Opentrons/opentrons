@@ -84,6 +84,7 @@ describe('Dispense', () => {
         },
       } as any,
       dispatch: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(DispenseSettingItem).mockReturnValue(
       <div>mock DispenseSettingItem</div>
