@@ -35,7 +35,7 @@ vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
-vi.mock('../../MoveLiquidTools/hooks')
+vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
