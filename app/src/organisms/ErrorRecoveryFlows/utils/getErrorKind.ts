@@ -1,7 +1,6 @@
-import { ERROR_KINDS, DEFINED_ERROR_TYPES } from '../constants'
-
-import type { ErrorKind } from '../types'
 import type { FailedCommandBySource } from '/app/organisms/ErrorRecoveryFlows/hooks'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../constants'
+import type { ErrorKind } from '../types'
 
 /**
  * Given server-side information about a failed command,
@@ -19,45 +18,45 @@ export function getErrorKind(
   const errorType = failedCommandByRunRecord?.error?.errorType
 
   if (Boolean(errorIsDefined)) {
-    if (
-      commandType === 'prepareToAspirate' &&
-      errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
-    ) {
-      return ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE
-    } else if (
-      (commandType === 'aspirate' || commandType === 'aspirateInPlace') &&
-      errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
-    ) {
-      return ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
-    } else if (
-      (commandType === 'dispense' || commandType === 'dispenseInPlace') &&
-      errorType === DEFINED_ERROR_TYPES.OVERPRESSURE
-    ) {
-      return ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING
-    } else if (
-      commandType === 'liquidProbe' &&
-      errorType === DEFINED_ERROR_TYPES.LIQUID_NOT_FOUND
-    ) {
-      return ERROR_KINDS.NO_LIQUID_DETECTED
-    } else if (
-      commandType === 'pickUpTip' &&
-      errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_MISSING
-    ) {
-      return ERROR_KINDS.TIP_NOT_DETECTED
-    } else if (
-      (commandType === 'dropTip' || commandType === 'dropTipInPlace') &&
-      errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED
-    ) {
-      return ERROR_KINDS.TIP_DROP_FAILED
-    } else if (
-      commandType === 'moveLabware' &&
-      errorType === DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT
-    ) {
-      return ERROR_KINDS.GRIPPER_ERROR
-    } else if (errorType === DEFINED_ERROR_TYPES.STALL_OR_COLLISION) {
-      return ERROR_KINDS.STALL_OR_COLLISION
+    switch (errorType) {
+      case DEFINED_ERROR_TYPES.OVERPRESSURE:
+        // The recovery flow varies dependent on the exact failed command.
+        switch (commandType) {
+          case 'prepareToAspirate':
+            return ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE
+          case 'aspirate':
+          case 'aspirateInPlace': {
+            return ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
+          }
+          case 'dispense':
+          case 'dispenseInPlace':
+          case 'blowout':
+          case 'blowOutInPlace':
+            return ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING
+          default: {
+            console.error(`Unhandled overpressure command ${commandType}`)
+            return ERROR_KINDS.GENERAL_ERROR
+          }
+        }
+      case DEFINED_ERROR_TYPES.LIQUID_NOT_FOUND:
+        return ERROR_KINDS.NO_LIQUID_DETECTED
+      case DEFINED_ERROR_TYPES.TIP_PHYSICALLY_MISSING:
+        return ERROR_KINDS.TIP_NOT_DETECTED
+      case DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED:
+        return ERROR_KINDS.TIP_DROP_FAILED
+      case DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT:
+        return ERROR_KINDS.GRIPPER_ERROR
+      case DEFINED_ERROR_TYPES.STALL_OR_COLLISION:
+        return ERROR_KINDS.STALL_OR_COLLISION
+      default: {
+        console.error(`Unhandled error type ${errorType}`)
+        return ERROR_KINDS.GENERAL_ERROR
+      }
     }
+  } else {
+    console.warn(
+      `Run status is "awaiting for recovery", but error is not defined: ${failedCommandByRunRecord}`
+    )
+    return ERROR_KINDS.GENERAL_ERROR
   }
-
-  return ERROR_KINDS.GENERAL_ERROR
 }
