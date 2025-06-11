@@ -7,12 +7,17 @@ import {
 import { formatPyDict } from './pythonFormat'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { ConsolidateArgs, InnerMixArgs, TransferArgs } from '../types'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  InnerMixArgs,
+  TransferArgs,
+} from '../types'
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
-  args: TransferArgs | ConsolidateArgs
+  args: TransferArgs | ConsolidateArgs | DistributeArgs
   pipetteName: PipetteName
   tiprackUri: string
   aspirateCorrectionVolume: number
@@ -121,16 +126,20 @@ export const getCustomLiquidClassProperties = (
           push_out_by_volume: [[0, args.pushOut ?? 0]],
           flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
           correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
-
           delay: {
             enabled: args.dispenseDelay != null,
             duration: args.dispenseDelay?.seconds ?? undefined,
           },
-          mix: {
-            enabled: args.mixInDestination != null,
-            repetitions: args.mixInDestination?.times ?? undefined,
-            volume: args.mixInDestination?.volume ?? undefined,
-          },
+          //  distribute does not allow mixInDestination
+          ...('mixInDestination' in args
+            ? {
+                mix: {
+                  enabled: args.mixInDestination != null,
+                  repetitions: args.mixInDestination?.times ?? undefined,
+                  volume: args.mixInDestination?.volume ?? undefined,
+                },
+              }
+            : {}),
           submerge: {
             delay: {
               enabled: args.dispenseSubmergeDelay != null,
@@ -183,6 +192,17 @@ export const getCustomLiquidClassProperties = (
                   ? args.blowoutFlowRateUlSec
                   : undefined,
             },
+            //  distribute specific args
+            ...('conditioningVolume' in args
+              ? {
+                  conditioning_by_volume: [[0, args.conditioningVolume ?? 0]],
+                }
+              : {}),
+            ...('disposalVolume' in args
+              ? {
+                  disposal_by_volume: [[0, args.disposalVolume ?? 0]],
+                }
+              : {}),
           },
         },
       },
