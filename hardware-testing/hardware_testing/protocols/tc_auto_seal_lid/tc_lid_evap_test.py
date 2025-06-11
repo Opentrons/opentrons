@@ -115,11 +115,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="tc_lid_temp",
         display_name="TC Lid Temp",
         description="Max temp of TC Lid",
-        default=105,
+        default=120,
         choices=[
             {"display_name": "105", "value": 105},
             {"display_name": "107", "value": 107},
             {"display_name": "110", "value": 110},
+            {"display_name": "120", "value": 120},
+            
         ],
     )
     parameters.add_str(
@@ -171,7 +173,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # DEFINE TESTS #
     thermocycler.set_block_temperature(4)
-    thermocycler.set_lid_temperature(105)
+    thermocycler.set_lid_temperature(tc_lid_temp)
 
     # hold at 95° for 3 minutes
     profile_TAG: List[ThermocyclerStep] = [{"temperature": 95, "hold_time_minutes": 3}]
