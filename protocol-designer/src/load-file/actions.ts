@@ -165,7 +165,7 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
   const fileName = `${protocolName
     .trim()
     .replace(/\s+/g, '_')
-    .replace(/[^A-Za-z0-9_]/g, '')}.py`
+    .replace(/[^\p{L}\p{N}_]/gu, '')}.py`
   saveFile(fileData, fileName)
 }
 
