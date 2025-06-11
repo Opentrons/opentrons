@@ -255,6 +255,12 @@ export const SetupSteps = {
     },
   }),
 
+  ExportProtocol: (): StepThunk => ({
+    call: () => {
+      cy.contains('Export')
+    },
+  }),
+
   /**
    * Selects a specific tip rack by name.
    * @param tip The tip rack name or part of it (e.g., '50' for 'Tip Rack 50 µL').
