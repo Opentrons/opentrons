@@ -2,19 +2,19 @@
   "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
-    "brand": "Corning",
+    "brand": "ibidi",
     "brandId": []
   },
   "metadata": {
-    "displayName": "Corning 96 Wellplate 360ul Lid",
+    "displayName": "ibidi 96 Square Well Flat Bottom Plate 300 µL Lid",
     "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127,
-    "yDimension": 85,
-    "zDimension": 10
+    "yDimension": 84.5,
+    "zDimension": 6.95
   },
   "wells": {},
   "groups": [
@@ -26,35 +26,33 @@
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
-    "z": -0.71
+    "z": 0
   },
   "parameters": {
     "format": "irregular",
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "corning_96_wellplate_360ul_lid"
+    "loadName": "ibidi_96_square_well_plate_300ul_lid"
   },
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
-  "stackingOffsetWithModule": {
-    "thermocyclerModuleV2": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    }
-  },
   "stackingOffsetWithLabware": {
     "default": {
       "x": 0,
       "y": 0,
       "z": 8.193
     },
-    "corning_96_wellplate_360ul_flat": {
+    "ibidi_96_square_well_plate_300ul_lid": {
       "x": 0,
       "y": 0,
-      "z": 6.5
+      "z": 1.2
+    },
+    "ibidi_96_square_well_plate_300ul": {
+      "x": 0,
+      "y": 0,
+      "z": 4.75
     },
     "opentrons_flex_deck_riser": {
       "x": 0,
@@ -69,7 +67,7 @@
   },
   "stackLimit": 5,
   "gripForce": 10,
-  "gripHeightFromLabwareBottom": 7,
+  "gripHeightFromLabwareBottom": 5,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
