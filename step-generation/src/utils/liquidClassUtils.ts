@@ -33,8 +33,8 @@ export const getCustomLiquidClassProperties = (
   let aspirateMixArgs: InnerMixArgs | null = null
   if ('mixBeforeApirate' in args) {
     aspirateMixArgs = args.mixBeforeApirate as InnerMixArgs | null
-  } else if ('mixBeforeAspirate' in args) {
-    aspirateMixArgs = args.mixBeforeAspirate as InnerMixArgs | null
+  } else if ('mixFirstAspirate' in args) {
+    aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
   }
   //    properties object is based off of liquid class schema
   //    shared-data/liquid-class/schemas/1.json
