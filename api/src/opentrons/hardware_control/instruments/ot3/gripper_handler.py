@@ -56,7 +56,6 @@ class GripperHandler:
         self._gripper = new_gripper
 
     async def reset(self) -> None:
-        # TODO(cm): do we want to reset the gripper jaw width here as well?
         self._gripper = None
 
     @property

@@ -1661,6 +1661,19 @@ async def test_gripper_action_works_with_gripper(
         await ot3_hardware.hold_jaw_width(80)
         mock_hold_jaw_width.assert_called_once()
 
+        # test that recalibrate_jaw_width works regardless of
+        # gripper jaw width values if recalibrate_jaw_width is
+        # specified
+        mock_ungrip.reset_mock()
+        mock_grip.reset_mock()
+        gripper._jaw_max_offset = None if needs_calibration else 5
+        gripper._encoder_position_at_jaw_closed = (
+            None if needs_calibration else fake_jaw_encoder_val
+        )
+        await ot3_hardware.home_gripper_jaw(recalibrate_jaw_width=True)
+        assert mock_ungrip.call_count == 2
+        mock_grip.assert_called_once()
+
 
 async def test_gripper_move_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
