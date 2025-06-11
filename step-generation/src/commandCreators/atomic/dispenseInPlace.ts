@@ -43,7 +43,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceAtomicParams> = (
         ...(pushOut != null ? { pushOut } : {}),
         ...(correctionVolume != null ? { correctionVolume } : {}),
       },
-      ...(isAirGap && { meta: { isAirGap } }),
+      ...(isAirGap ? { meta: { isAirGap } } : {}),
     },
   ]
   const pipettePythonName =

@@ -208,7 +208,7 @@ export const mergeSubstepRowsMultiChannel = (args: {
       })
       //  this is for a mixing step
       const hasNoSourceOrDest = row.every(
-        item => item.source === undefined && item.dest === undefined
+        ({ source, dest }) => source === undefined && dest === undefined
       )
 
       if (!hasNoSourceOrDest) {
