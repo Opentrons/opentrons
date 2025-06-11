@@ -7,7 +7,6 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  _minAirGapVolume,
   belowPipetteMinimumVolume,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
@@ -27,84 +26,6 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 
-type CheckboxFields = 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox'
-type VolumeFields = 'aspirate_airGap_volume' | 'dispense_airGap_volume'
-describe('Min air gap volume', () => {
-  const aspDisp = ['aspirate', 'dispense']
-  aspDisp.forEach(aspOrDisp => {
-    const checkboxField = `${aspDisp}_airGap_checkbox` as CheckboxFields
-    const volumeField = `${aspDisp}_airGap_volume` as VolumeFields
-
-    describe(`${aspOrDisp} -> air gap`, () => {
-      let pipette: { spec: { liquids: { default: { minVolume: number } } } }
-      beforeEach(() => {
-        pipette = {
-          spec: {
-            liquids: {
-              default: {
-                minVolume: 100,
-              },
-            },
-          },
-        }
-      })
-
-      const minAirGapVolume = _minAirGapVolume(checkboxField, volumeField)
-
-      it('should NOT return a warning when the air gap checkbox is not selected', () => {
-        const fields = {
-          [checkboxField]: false,
-          [volumeField]: null,
-          ...{ pipette },
-        } as any
-        expect(minAirGapVolume({ ...fields })).toBe(null)
-      })
-      it('should NOT return a warning when there is no air gap volume specified', () => {
-        const fields = {
-          [checkboxField]: true,
-          [volumeField]: null,
-          ...{ pipette },
-        } as any
-        expect(minAirGapVolume({ ...fields })).toBe(null)
-      })
-      it('should NOT return a warning when the air gap volume is greater than the pipette min volume', () => {
-        const fields = {
-          [checkboxField]: true,
-          [volumeField]: '150',
-          ...{ pipette },
-        } as any
-        expect(minAirGapVolume(fields)).toBe(null)
-      })
-
-      it('should NOT return a warning when the air gap volume is equal to the the pipette min volume', () => {
-        const fields = {
-          [checkboxField]: true,
-          [volumeField]: '100',
-          ...{ pipette },
-        } as any
-        expect(minAirGapVolume(fields)).toBe(null)
-      })
-      it('should return a warning when the air gap volume is less than the pipette min volume', () => {
-        const fields = {
-          [checkboxField]: true,
-          [volumeField]: '0',
-          ...{ pipette },
-        }
-        // @ts-expect-error(sa, 2021-6-15): minAirGapVolume might return null, need to null check before property access
-        expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
-      })
-      it('should return a warning when the transfer volume is less than the pipette min volume', () => {
-        const fields = {
-          [checkboxField]: true,
-          [volumeField]: '0',
-          ...{ pipette },
-        }
-        // @ts-expect-error(sa, 2021-6-15): minAirGapVolume might return null, need to null check before property access
-        expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
-      })
-    })
-  })
-})
 describe('Below pipette minimum volume', () => {
   let fieldsWithPipette: {
     pipette: { spec: { liquids: { default: { minVolume: number } } } }

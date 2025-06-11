@@ -440,6 +440,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         blowoutLocation == null
           ? [
               curryCommandCreator(dispenseInPlace, {
+                isAirGap: true,
                 pipetteId: pipette,
                 volume: dispenseAirGapVolume,
                 flowRate: dispenseFlowRateUlSec,
@@ -508,6 +509,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             invariantContext,
             liquidClass,
             tiprack: tipRack,
+            generatePython: true,
           })
         : []
       const mixBeforeAspirateCommands =
@@ -524,6 +526,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const delayAfterAspirateCommands =
@@ -694,6 +697,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   ...(airGapInTip > 0
                     ? [
                         curryCommandCreator(dispenseInPlace, {
+                          isAirGap: true,
                           pipetteId: pipette,
                           volume: airGapInTip,
                           flowRate: dispenseFlowRateUlSec,

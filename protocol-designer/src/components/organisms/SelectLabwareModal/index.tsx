@@ -432,6 +432,7 @@ export function SelectLabwareModal(
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
                       <CustomizeExpandButton
+                        enableStackingFF={enableStacking}
                         loadName={customLabwareDefs[uri].parameters.loadName}
                         allowInputField={onFlexStacker}
                         key={`${index}_${uri}`}
@@ -537,6 +538,7 @@ export function SelectLabwareModal(
                                   key={`${index}_${category}_${loadName}`}
                                 >
                                   <CustomizeExpandButton
+                                    enableStackingFF={enableStacking}
                                     loadName={loadName}
                                     allowInputField={
                                       onFlexStacker ||
@@ -611,6 +613,9 @@ export function SelectLabwareModal(
                                                     defs[tiprackDefUri]
                                                   return (
                                                     <CustomizeExpandButton
+                                                      enableStackingFF={
+                                                        enableStacking
+                                                      }
                                                       loadName={loadName}
                                                       allowInputField={false}
                                                       key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
@@ -665,6 +670,30 @@ export function SelectLabwareModal(
                                                     null && slot !== 'offDeck'
                                                     ? {
                                                         ...stackingPropsShared,
+                                                        checkboxCaption: t(
+                                                          'with_lid',
+                                                          {
+                                                            name:
+                                                              defs[
+                                                                stackingLabwareDefUri
+                                                              ].metadata
+                                                                .displayName,
+                                                          }
+                                                        ),
+                                                        checked:
+                                                          selectedLidLabware !=
+                                                          null,
+                                                        onCheckboxChange: () => {
+                                                          dispatch(
+                                                            selectLid({
+                                                              labwareDefURI:
+                                                                selectedLidLabware ===
+                                                                stackingLabwareDefUri
+                                                                  ? null
+                                                                  : stackingLabwareDefUri,
+                                                            })
+                                                          )
+                                                        },
                                                         inputCaption: t(
                                                           'valid_range',
                                                           {
@@ -700,6 +729,9 @@ export function SelectLabwareModal(
 
                                                 return (
                                                   <CustomizeExpandButton
+                                                    enableStackingFF={
+                                                      enableStacking
+                                                    }
                                                     loadName={
                                                       nestedDef.parameters
                                                         .loadName
