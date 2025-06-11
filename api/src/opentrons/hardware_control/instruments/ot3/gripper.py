@@ -228,16 +228,16 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         if self._encoder_position_at_jaw_closed is not None:
             return True
         else:
-            gripper_jaw_width_data = load_gripper_jaw_width(gripper_id=self._gripper_id)
-            if gripper_jaw_width_data.encoder_position_at_jaw_closed is not None:
+            load_gripper_jaw_width_data = load_gripper_jaw_width(
+                gripper_id=self._gripper_id
+            )
+            if load_gripper_jaw_width_data.encoder_position_at_jaw_closed is not None:
                 # update class members with data from the robot
                 self.update_jaw_open_position_from_closed_position(
-                    jaw_at_closed=gripper_jaw_width_data.encoder_position_at_jaw_closed
+                    jaw_at_closed=load_gripper_jaw_width_data.encoder_position_at_jaw_closed
                 )
                 return True
         return False
-
-        return self._jaw_max_offset is not None
 
     def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""

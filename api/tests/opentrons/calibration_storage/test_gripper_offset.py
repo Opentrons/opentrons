@@ -19,12 +19,8 @@ def starting_calibration_data(
     """
     gripper.save_gripper_calibration(Point(1, 1, 1), "gripper1")
     gripper.save_gripper_calibration(Point(1, 2, 1), "gripper2")
-    gripper.save_gripper_jaw_width_data(
-        15.5, "gripper1"
-    )
-    gripper.save_gripper_jaw_width_data(
-        15.5, "gripper2"
-    )
+    gripper.save_gripper_jaw_width_data(15.5, "gripper1")
+    gripper.save_gripper_jaw_width_data(15.5, "gripper2")
 
 
 def test_delete_all_gripper_calibration(starting_calibration_data: typing.Any) -> None:
