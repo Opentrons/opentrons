@@ -528,10 +528,10 @@ export interface ModuleDimensions {
   overLabwareHeight: number
   xDimension: number
   yDimension: number
+  labwareInterfaceXDimension: number
+  labwareInterfaceYDimension: number
   footprintXDimension?: number
   footprintYDimension?: number
-  labwareInterfaceXDimension?: number
-  labwareInterfaceYDimension?: number
   lidHeight?: number
 }
 

@@ -107,10 +107,22 @@
         "lidHeight": { "type": "number" },
         "xDimension": { "type": "number" },
         "yDimension": { "type": "number" },
-        "footprintXDimension": { "type": "number" },
-        "footprintYDimension": { "type": "number" },
-        "labwareInterfaceXDimension": { "type": "number" },
-        "labwareInterfaceYDimension": { "type": "number" },
+        "footprintXDimension": {
+          "type": "number",
+          "description": "The x dimension of the module's top-most plane."
+        },
+        "footprintYDimension": {
+          "type": "number",
+          "description": "The y dimension of the module's top-most plane."
+        },
+        "labwareInterfaceXDimension": {
+          "type": "number",
+          "description": "The x dimension of the module's interaction plane (where labware is placed)."
+        },
+        "labwareInterfaceYDimension": {
+          "type": "number",
+          "description": "The y dimension of the module's interaction plane (where labware is placed)."
+        },
         "maxStackerFillHeight": { "type": "number" },
         "maxStackerRetrievableHeight": { "type": "number" }
       }
