@@ -84,33 +84,6 @@ build-opentrons-analysis:
 	@echo "If you want to build a different version, run 'make build-opentrons-analysis ANALYSIS_REF=<tag, branch, or commit>'"
 	docker build --build-arg BASE_IMAGE_NAME=$(BASE_IMAGE_NAME) --build-arg ANALYSIS_REF=$(ANALYSIS_REF) --build-arg CACHEBUST=$(CACHEBUST) -t $(ANALYZER_IMAGE_NAME):$(ANALYSIS_REF) -f citools/Dockerfile.analyze citools/.
 
-.PHONY: build-local
-build-local:
-	@echo "Building docker image for your local opentrons code"
-	@echo "This image will be named $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG)"
-	docker build --build-arg BASE_IMAGE_NAME=$(BASE_IMAGE_NAME) -t $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG) -f citools/Dockerfile.local ..
-	@echo "Build complete"
-
-.PHONY: snapshot-test-local
-snapshot-test-local: ANALYSIS_REF=$(LOCAL_IMAGE_TAG)
-snapshot-test-local: build-base-image build-local
-	@echo "This target is overriding the ANALYSIS_REF to the LOCAL_IMAGE_TAG: $(LOCAL_IMAGE_TAG)"
-	@echo "ANALYSIS_REF is $(ANALYSIS_REF). The the test maps this env variable to the image tag."
-	@echo "The image the test will use is $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG)"
-	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
-	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	uv run python -m pytest -k analyses_snapshot_test -vv
-
-.PHONY: snapshot-test-update-local
-snapshot-test-update-local: ANALYSIS_REF=$(LOCAL_IMAGE_TAG)
-snapshot-test-update-local: build-base-image build-local
-	@echo "This target is overriding the ANALYSIS_REF to the LOCAL_IMAGE_TAG: $(LOCAL_IMAGE_TAG)"
-	@echo "ANALYSIS_REF is $(ANALYSIS_REF). The the test maps this env variable to the image tag."
-	@echo "The image the test will use is $(ANALYZER_IMAGE_NAME):$(LOCAL_IMAGE_TAG)"
-	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
-	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	uv run python -m pytest -k analyses_snapshot_test --snapshot-update
-
 .PHONY: generate-protocols
 generate-protocols:
 	uv run python -m automation.data.protocol_registry
@@ -202,7 +175,11 @@ collect-audit:
 	uv run python -m automation.data.collect_audit
 
 .PHONY: prep
-prep: format ruff-check clean audit-registry collect-audit
+prep: format ruff-check clean audit-registry collect-audit 
+	@echo "Preparation complete.________________________________"
+	@echo "Look above to see if you need to update the snapshot tests."
+	@echo "Running format to get protocols in the correct format"
+	make format
 
 ANALYSIS_REFS := chore_release-8.5.0 v8.4.1 v8.3.2 v8.2.0 v8.0.0
 

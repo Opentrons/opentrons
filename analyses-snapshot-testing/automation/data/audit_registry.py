@@ -112,6 +112,9 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
         return (file_stem, file_extension) in file_stem_set
 
     class ProtocolsEditor(ast.NodeTransformer):
+        def __init__(self):
+            self.added_names = []
+
         def visit_ClassDef(self, node):
             if node.name != "Protocols":
                 return node
@@ -138,6 +141,7 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
                     simple=1,
                 )
                 new_assignments.append(assign)
+                self.added_names.append(prop_name)
             # Sort all assignments by property name
             new_assignments.sort(key=lambda a: a.target.id)
             # Remove all AnnAssign nodes (protocol entries)
@@ -148,11 +152,13 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
     with open(PROTOCOLS_PY, "r") as f:
         lines = f.readlines()
     tree = ast.parse("".join(lines))
-    new_tree = ProtocolsEditor().visit(tree)
+    editor = ProtocolsEditor()
+    new_tree = editor.visit(tree)
     ast.fix_missing_locations(new_tree)
     new_code = ast.unparse(new_tree)
     with open(PROTOCOLS_PY, "w") as f:
         f.write(new_code)
+    return editor.added_names
 
 
 def extract_stem_from_snapshot(filename):
@@ -229,7 +235,23 @@ def main():
         console.print(Panel("[green]Protocols registry matches protocol files. No changes needed![/green]", title="Audit Result"))
     else:
         if missing or extra:
-            add_missing_protocols_to_class_ast(missing, file_stem_set)
+            added_names = add_missing_protocols_to_class_ast(missing, file_stem_set)
+            # --- Print big panel with names of added protocols and a command with names in it ---
+            if added_names:
+                command_placeholder = f"make snapshot-test-update PROTOCOL_NAMES={','.join(added_names)} OVERRIDE_PROTOCOL_NAMES=none"
+                panel_content = (
+                    f"[bold red]You need to run this command:[/bold red]\n\n"
+                    f"[bold yellow]{command_placeholder}[/bold yellow]\n\n"
+                    f"[bold]Protocols added:[/bold]\n" + "\n".join(added_names)
+                )
+                console.print(
+                    Panel(
+                        panel_content,
+                        title="[red]Manual Action Required[/red]",
+                        expand=True,
+                        style="bold red",
+                    )
+                )
             console.print(
                 Panel(
                     f"[yellow]Added {len(missing)} missing protocols and removed {len(extra)} extra protocols. "
