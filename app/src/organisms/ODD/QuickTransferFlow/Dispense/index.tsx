@@ -22,6 +22,7 @@ const PADDING_TOP_FOR_NAV = '12rem'
 interface DispenseProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
+  isMultiTransfer: boolean // ToDo (kk: 06/10/25) this will be used by disposal volume setting
 }
 
 export function Dispense(props: DispenseProps): JSX.Element | null {

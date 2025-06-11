@@ -266,5 +266,11 @@ export function quickTransferSummaryReducer(
         pushOut: action.pushOut,
       }
     }
+    case 'SET_CONDITION_ASPIRATE': {
+      return {
+        ...state,
+        conditionAspirate: action.conditionAspirate,
+      }
+    }
   }
 }

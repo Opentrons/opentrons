@@ -109,6 +109,7 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass
+  conditionAspirate?: number
 }
 
 export type TransferType =
@@ -152,6 +153,7 @@ export type QuickTransferSummaryAction =
   | SetChangeTip
   | SetDropTipLocation
   | SetPushOut
+  | SetConditionAspirate
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -298,4 +300,9 @@ interface SetVolumeAction {
 interface SetPushOut {
   type: typeof ACTIONS.SET_PUSH_OUT
   pushOut: boolean
+}
+
+interface SetConditionAspirate {
+  type: typeof ACTIONS.SET_CONDITION_ASPIRATE
+  conditionAspirate: number
 }
