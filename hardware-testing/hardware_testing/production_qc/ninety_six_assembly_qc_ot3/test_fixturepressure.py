@@ -269,6 +269,8 @@ async def _fixture_check_pressure(
         pip_channels,
     )
     results.append(r)
+ 
+    
     # insert into the fixture
     # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
     # fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
@@ -340,6 +342,7 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     return False not in results
+
 async def _read_pressure_and_check_results(
     api: OT3API,
     pipette_channels: int,
@@ -351,6 +354,27 @@ async def _read_pressure_and_check_results(
     channels: int = 1,
     previous: Optional[List[List[float]]] = None,
 ) -> Tuple[bool, List[List[float]]]:
+    
+    def format_pressure_datas(data_list):
+        number_to_row = ["A", "B", "C", "D", "E", "F", "G", "H"]
+        # 将列表重新组织为12列，每列8行
+        columns = []
+        for col in range(12):
+            column_start = col * 8
+            column_end = column_start + 8
+            column = data_list[column_start:column_end]
+            columns.append(column)
+            
+        # 按行输出（每行包含12列的数据）
+        print( f'   {" ".join([str(i+1)+ " "*(8 - len(str(i+1))) for i in range(12)])}')
+        row_number = 0
+        for row in range(8):
+            row_data = []
+            for col in range(12):
+                row_data.append(columns[col][row]+ " "* (8- len(columns[col][row])))
+            print(f'{number_to_row[row_number]}: {" ".join(row_data)}')
+            row_number += 1
+    
     pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
         await asyncio.sleep(pressure_event_config.stability_delay)
@@ -359,9 +383,12 @@ async def _read_pressure_and_check_results(
         _samples.append(fixture.read_all_pressure_channel_96())
         next_sample_time = time() + pressure_event_config.sample_delay
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
+        
+        ui.print_header(f"{i + 1}/{pressure_event_config.sample_count}: {tag.value}")
+        format_pressure_datas(_sample_as_strings)
         csv_data_sample = [tag.value] + _sample_as_strings
-        print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
-        ##accumulate_raw_data_cb(csv_data_sample)
+        # print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
+        #accumulate_raw_data_cb(csv_data_sample)
         delay_time = next_sample_time - time()
         if (
             not api.is_simulator
@@ -497,7 +524,7 @@ async def run(
         )
     await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
     
-    input("pick")
+    ui.get_user_ready("Starting to pick up")
     #await api.move_rel(OT3Mount.LEFT,Point(z=30))
     accumulate_raw_data_cb = cre_class()
     test_passed = await _fixture_check_pressure(
@@ -506,3 +533,4 @@ async def run(
 
     await api.drop_tip(OT3Mount.LEFT)
     input("_drop_tip")
+    
