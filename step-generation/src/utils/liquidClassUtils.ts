@@ -3,12 +3,12 @@ import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import { formatPyDict } from './pythonFormat'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { TransferArgs } from '../types'
+import type { ConsolidateArgs, TransferArgs } from '../types'
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
-  args: TransferArgs
+  args: TransferArgs | ConsolidateArgs
   pipetteName: PipetteName
   tiprackUri: string
   aspirateCorrectionVolume: number
@@ -49,9 +49,16 @@ export const getCustomLiquidClassProperties = (
             duration: args.aspirateDelay?.seconds ?? undefined,
           },
           mix: {
-            enabled: args.mixBeforeAspirate != null,
-            repetitions: args.mixBeforeAspirate?.times ?? undefined,
-            volume: args.mixBeforeAspirate?.volume ?? undefined,
+            enabled:
+              'mixBeforeAspirate' in args && args.mixBeforeAspirate != null,
+            repetitions:
+              'mixBeforeAspirate' in args
+                ? args.mixBeforeAspirate?.times ?? undefined
+                : undefined,
+            volume:
+              'mixBeforeAspirate' in args
+                ? args.mixBeforeAspirate?.volume ?? undefined
+                : undefined,
           },
           submerge: {
             delay: {
