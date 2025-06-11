@@ -11,10 +11,10 @@ type sendIdentifyModuleType = (
   color?: IdentifyColor
 ) => void
 
-export function useSendIdentifyModule(): sendIdentifyModuleType {
+export function useSendIdentifyStacker(): sendIdentifyModuleType {
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  const sendIdentifyModule = useCallback(
+  const sendIdentifyStacker = useCallback(
     (
       module: AttachedModule,
       start: boolean,
@@ -36,9 +36,13 @@ export function useSendIdentifyModule(): sendIdentifyModuleType {
         }).catch(error => {
           console.log(error.message)
         })
+      } else {
+        console.warn(
+          `Module type ${module.moduleType} does not support identify command`
+        )
       }
     },
     [createLiveCommand]
   )
-  return sendIdentifyModule
+  return sendIdentifyStacker
 }
