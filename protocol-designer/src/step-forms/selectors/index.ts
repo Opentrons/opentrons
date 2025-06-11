@@ -822,13 +822,16 @@ export const getArgsAndErrorsByStepId: Selector<
   (stepForms, contextualState) => {
     return reduce(
       stepForms,
-      (acc, stepForm) => {
+      (acc, stepForm, index) => {
         const hydratedForm = getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
-              stepArgs: stepFormToArgs(hydratedForm, contextualState),
+              stepArgs: stepFormToArgs(
+                { ...hydratedForm, stepNumber: index + 1 },
+                contextualState
+              ),
             }
           : {
               errors,

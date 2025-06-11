@@ -1,88 +1,11 @@
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+
 import { formatPyDict } from './pythonFormat'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { TransferArgs } from '../types'
 
-interface Offset {
-  x: number
-  y: number
-  z: number
-}
-
-interface Position {
-  offset: Offset
-  position_reference: string // ex. "well-bottom"
-}
-
-interface Delay {
-  enabled: boolean
-  duration?: number
-}
-
-interface TouchTip {
-  enabled: boolean
-  z_offset?: number
-  mm_from_edge?: number
-  speed?: number
-}
-
 type BlowoutLocation = 'source' | 'destination' | 'trash'
-interface BlowOut {
-  enabled: boolean
-  location?: BlowoutLocation
-  flow_rate?: number
-}
-
-interface Mix {
-  enabled: boolean
-  repetitions?: number
-  volume?: number
-}
-
-interface Retract {
-  air_gap_by_volume: number[][]
-  delay: Delay
-  end_position: Position
-  speed?: number
-  touch_tip?: TouchTip
-  blowout?: BlowOut
-}
-
-interface Submerge {
-  delay: Delay
-  start_position: Position
-  speed?: number
-}
-
-interface CommonLiquidSettings {
-  correction_by_volume: number[][]
-  delay: Delay
-  mix: Mix
-  retract: Retract
-  submerge: Submerge
-  flow_rate_by_volume: number[][]
-}
-
-interface AspirateSettings extends CommonLiquidSettings {
-  aspirate_position: Position
-  pre_wet?: boolean
-}
-
-interface DispenseSettings extends CommonLiquidSettings {
-  dispense_position: Position
-  push_out_by_volume: number[][]
-}
-
-interface AspirateAndDispenseSettings {
-  aspirate: AspirateSettings
-  dispense: DispenseSettings
-}
-
-export interface CustomLiquidClassProperties {
-  [pipetteName: string]: {
-    [tiprackUri: string]: AspirateAndDispenseSettings
-  }
-}
 
 interface CustomLiquidClassPropertiesProps {
   args: TransferArgs
@@ -103,7 +26,9 @@ export const getCustomLiquidClassProperties = (
     dispenseCorrectionVolume,
   } = props
 
-  const customLiquidClassProperties: CustomLiquidClassProperties = {
+  //    properties object is based off of liquid class schema
+  //    shared-data/liquid-class/schemas/1.json
+  const customLiquidClassProperties = {
     [pipetteName]: {
       [tiprackUri]: {
         aspirate: {
@@ -160,9 +85,17 @@ export const getCustomLiquidClassProperties = (
             speed: args.aspirateRetractSpeed ?? undefined,
             touch_tip: {
               enabled: args.touchTipAfterAspirate,
-              z_offset: args.touchTipAfterAspirateOffsetMmFromTop,
-              mm_from_edge: args.touchTipAfterAspirateMmFromEdge ?? undefined,
-              speed: args.touchTipAfterAspirateSpeed ?? undefined,
+              z_offset: args.touchTipAfterAspirate
+                ? args.touchTipAfterAspirateOffsetMmFromTop
+                : undefined,
+              mm_from_edge:
+                args.touchTipAfterAspirate &&
+                args.touchTipAfterAspirateMmFromEdge != null
+                  ? args.touchTipAfterAspirateMmFromEdge
+                  : undefined,
+              speed: args.touchTipAfterAspirate
+                ? args.touchTipAfterAspirateSpeed
+                : undefined,
             },
           },
         },
@@ -220,14 +153,25 @@ export const getCustomLiquidClassProperties = (
             speed: args.dispenseRetractSpeed ?? undefined,
             touch_tip: {
               enabled: args.touchTipAfterDispense,
-              z_offset: args.touchTipAfterDispenseOffsetMmFromTop,
-              mm_from_edge: args.touchTipAfterDispenseMmFromEdge ?? undefined,
-              speed: args.touchTipAfterDispenseSpeed ?? undefined,
+              z_offset: args.touchTipAfterDispense
+                ? args.touchTipAfterDispenseOffsetMmFromTop
+                : undefined,
+              mm_from_edge:
+                args.touchTipAfterDispense &&
+                args.touchTipAfterDispenseMmFromEdge != null
+                  ? args.touchTipAfterDispenseMmFromEdge
+                  : undefined,
+              speed: args.touchTipAfterDispense
+                ? args.touchTipAfterDispenseSpeed
+                : undefined,
             },
             blowout: {
               enabled: args.blowoutLocation != null,
               location: (args.blowoutLocation as BlowoutLocation) ?? undefined,
-              flow_rate: args.blowoutFlowRateUlSec,
+              flow_rate:
+                args.blowoutLocation != null
+                  ? args.blowoutFlowRateUlSec
+                  : undefined,
             },
           },
         },
@@ -239,9 +183,11 @@ export const getCustomLiquidClassProperties = (
     string,
     any
   > = JSON.parse(JSON.stringify(customLiquidClassProperties))
-  //    TODO: python name should be dynamic, will fix that later
-  return `custom_liquid_class_properties = ${formatPyDict(
-    stringifiedCustomLiquidClassProperties,
-    true
-  )}`
+  return formatPyDict(stringifiedCustomLiquidClassProperties, true)
+}
+
+export const getPythonLiquidClassName = (liquidClass: string): string => {
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassDef = allLiquidClassDefs[liquidClass]
+  return `${liquidClassDef.liquidClassName}_v${liquidClassDef.schemaVersion}`
 }

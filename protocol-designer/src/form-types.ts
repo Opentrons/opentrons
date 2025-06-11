@@ -184,6 +184,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
 export interface AnnotationFields {
   stepName: string
   stepDetails: string
+  stepNumber: number
 }
 export interface BlowoutFields {
   blowout_checkbox?: boolean

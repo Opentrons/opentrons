@@ -69,10 +69,10 @@ clean:
 	$(clean_cmd)
 	$(clean_cache_cmd)
 
-dist/opentrons_hardware-%-py2.py3-none-any.whl: export OPENTRONS_PROJECT=$(PROJECT)
-dist/opentrons_hardware-%-py2.py3-none-any.whl: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
-dist/opentrons_hardware-%-py2.py3-none-any.whl: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
-dist/opentrons_hardware-%-py2.py3-none-any.whl: $(ot_sources)
+dist/opentrons_hardware-%-py3-none-any.whl: export OPENTRONS_PROJECT=$(PROJECT)
+dist/opentrons_hardware-%-py3-none-any.whl: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+dist/opentrons_hardware-%-py3-none-any.whl: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+dist/opentrons_hardware-%-py3-none-any.whl: $(ot_sources)
 	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
