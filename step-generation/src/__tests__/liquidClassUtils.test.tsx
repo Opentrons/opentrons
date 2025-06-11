@@ -86,6 +86,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
+          stepId: 1,
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
@@ -94,7 +95,7 @@ describe('getCustomLiquidClassProperties', () => {
       })
     ).toEqual(
       `
-custom_liquid_class_properties = {
+{
     "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
         "aspirate": {
             "aspirate_position": {

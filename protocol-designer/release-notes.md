@@ -39,6 +39,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.
 - If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.
 - Successfully delete a defined liquid that has not been assigned to any location.
+- Display correct substep details for all transfer paths and pipettes.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.0 or newer.
 
