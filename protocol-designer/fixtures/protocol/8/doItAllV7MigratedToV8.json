@@ -7187,6 +7187,13 @@
       }
     },
     {
+      "commandType": "prepareToAspirate",
+      "key": "2f1122b5-db81-4751-9855-f0b22373d09d",
+      "params": {
+        "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193"
+      }
+    },
+    {
       "commandType": "moveToWell",
       "key": "f948ec0d-939d-4690-9785-e990428159ab",
       "params": {
