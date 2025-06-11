@@ -33,9 +33,9 @@ module.exports = function afterPack(context) {
         `${packager.appInfo.productFilename}.app`
       )
       console.log(
-        `After-pack: Packing python for darwin/universal as darwin/arm64+darwin/x64 to ${appBase}`
+        `After-pack: Packing python for darwin/universal as darwin/x64 to ${appBase}`
       )
-      return installPython(platformName, ['arm64', 'x64'], appBase)
+      return installPython(platformName, ['x64'], appBase)
     }
   } else {
     console.log(
