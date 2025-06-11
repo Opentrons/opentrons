@@ -163,6 +163,7 @@
   "tip_position_mix_touchTip_mmFromTop": "Edit touch tip position",
   "tip_position": "Edit {{prefix}} tip position",
   "trashBin": "Trash Bin",
+  "trash": "Trash",
   "updated_protocol_designer": "We've updated Protocol Designer!",
   "user_settings": "User Settings",
   "uses_standard_namespace": "Opentrons verified labware",

@@ -4,12 +4,23 @@ import { uuid } from '../../utils'
 import type { DispenseInPlaceParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
-export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
+interface DispenseInPlaceAtomicParams extends DispenseInPlaceParams {
+  isAirGap?: boolean // used to subtract volume from liquid state & substep details
+}
+
+export const dispenseInPlace: CommandCreator<DispenseInPlaceAtomicParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, volume, flowRate, pushOut, correctionVolume } = args
+  const {
+    pipetteId,
+    volume,
+    flowRate,
+    pushOut,
+    correctionVolume,
+    isAirGap,
+  } = args
 
   const errors: CommandCreatorError[] = []
   if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
@@ -32,6 +43,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceParams> = (
         ...(pushOut != null ? { pushOut } : {}),
         ...(correctionVolume != null ? { correctionVolume } : {}),
       },
+      ...(isAirGap ? { meta: { isAirGap } } : {}),
     },
   ]
   const pipettePythonName =

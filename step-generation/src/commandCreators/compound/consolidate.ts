@@ -794,6 +794,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const blowOutInPlaceCommand = [
