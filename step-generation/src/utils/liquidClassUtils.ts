@@ -130,16 +130,21 @@ export const getCustomLiquidClassProperties = (
             enabled: args.dispenseDelay != null,
             duration: args.dispenseDelay?.seconds ?? undefined,
           },
-          //  distribute does not allow mixInDestination
-          ...('mixInDestination' in args
-            ? {
-                mix: {
-                  enabled: args.mixInDestination != null,
-                  repetitions: args.mixInDestination?.times ?? undefined,
-                  volume: args.mixInDestination?.volume ?? undefined,
-                },
-              }
-            : {}),
+
+          mix: {
+            enabled:
+              'mixInDestination' in args
+                ? args.mixInDestination != null
+                : false,
+            repetitions:
+              'mixInDestination' in args
+                ? args.mixInDestination?.times ?? undefined
+                : undefined,
+            volume:
+              'mixInDestination' in args
+                ? args.mixInDestination?.volume ?? undefined
+                : undefined,
+          },
           submerge: {
             delay: {
               enabled: args.dispenseSubmergeDelay != null,

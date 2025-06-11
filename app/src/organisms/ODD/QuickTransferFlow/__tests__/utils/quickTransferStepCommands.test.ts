@@ -627,6 +627,7 @@ pipette.distribute_with_liquid_class(
                     "flow_rate_by_volume": [(0, 80)],
                     "correction_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
                         "delay": {"enabled": False},
                         "start_position": {

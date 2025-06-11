@@ -200,6 +200,7 @@ mock_pipette.distribute_with_liquid_class(
                     "flow_rate_by_volume": [(0, 2.2)],
                     "correction_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
+                    "mix": {"enabled": False},
                     "submerge": {
                         "delay": {"enabled": False},
                         "start_position": {"offset": {}},
@@ -1040,6 +1041,7 @@ mock_pipette.distribute_with_liquid_class(
                         "enabled": True,
                         "duration": 12,
                     },
+                    "mix": {"enabled": False},
                     "submerge": {
                         "delay": {"enabled": False},
                         "start_position": {"offset": {}},
