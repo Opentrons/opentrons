@@ -8,10 +8,10 @@ import {
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
-  LegacyStyledText,
   ListTable,
   Modal,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -621,9 +621,9 @@ export function AddFixtureModal({
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText as="p">
+            <StyledText oddStyle='bodyTextRegular'>
               {t('add_fixture_description')}
-            </LegacyStyledText>
+            </StyledText>
             <ListTable>
               {fixtureOptions}
               {nextStageOptions}
@@ -633,9 +633,9 @@ export function AddFixtureModal({
       ) : (
         <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <LegacyStyledText as="p">
+            <StyledText desktopStyle='bodyDefaultRegular'>
               {t('add_fixture_description')}
-            </LegacyStyledText>
+            </StyledText>
             <ListTable>
               {fixtureOptions}
               {nextStageOptions}
@@ -651,9 +651,9 @@ export function AddFixtureModal({
               marginTop="1.44rem"
               marginBottom="0.56rem"
             >
-              <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+              <StyledText css={GO_BACK_BUTTON_STYLE}>
                 {t('shared:go_back')}
-              </LegacyStyledText>
+              </StyledText>
             </Btn>
           ) : null}
         </Modal>
