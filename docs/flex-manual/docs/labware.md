@@ -44,10 +44,10 @@ The Opentrons Flex works by default with the single- and multi-well reservoirs l
 
 | Manufacturer | Specifications | API load name             |
 | :----------- | :------------- | :------------------------ |
-| Agilent      | <ul><li>290 mL</li><li>V bottom</li></ul> | agilient_1_reservoir_290ml |
-| Axygen       | <ul><li>90 mL</li><li>Flat bottom</li></ul> | axygen_1_reservoir_90ml   |
-| NEST         | <ul><li>195 mL</li><li>Flat bottom</li></ul> | nest_1_reservoir_195ml    |
-| NEST         | <ul><li>290 mL</li><li>V bottom</li></ul> | nest_1_reservoir_290ml    |
+| Agilent      | <ul><li>290 mL</li><li>V bottom</li></ul> | [`agilent_1_reservoir_290ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/agilent_1_reservoir_290ml/3.json) |
+| Axygen       | <ul><li>90 mL</li><li>Flat bottom</li></ul> | [`axygen_1_reservoir_90ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/axygen_1_reservoir_90ml/1.json) |
+| NEST         | <ul><li>195 mL</li><li>Flat bottom</li></ul> | [`nest_1_reservoir_195ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_1_reservoir_195ml/1.json) |
+| NEST         | <ul><li>290 mL</li><li>V bottom</li></ul> | [`nest_1_reservoir_290ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_1_reservoir_290ml/3.json) |
 
 ### Multi-well reservoirs 
 
@@ -55,8 +55,8 @@ The Opentrons Flex works by default with the single- and multi-well reservoirs l
 
 | Manufacturer | Specifications | API load name            |
 | :----------- | :------------- | :----------------------- |
-| NEST         | <ul><li>12 wells</li><li>15 mL/well</li><li>V bottom</li></ul> | nest_12_reservoir_15ml   |
-| USA Scientific | <ul><li>12 wells</li><li>22 mL/well</li><li>V bottom</li></ul> | usascientific_12_reservoir_22ml |
+| NEST         | <ul><li>12 wells</li><li>15 mL/well</li><li>V bottom</li></ul> | [`nest_12_reservoir_15ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_12_reservoir_15ml/2.json) |
+| USA Scientific | <ul><li>12 wells</li><li>22 mL/well</li><li>V bottom</li></ul> | [`usascientific_12_reservoir_22ml`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/usascientific_12_reservoir_22ml/1.json) |
 
 ### Reservoirs and API definitions 
 
@@ -79,47 +79,47 @@ The Opentrons Flex works by default with well plates listed below. Using these w
 
 | Manufacturer | Specifications | API load name |
 | :----------- | :------------- | :---------------------------- |
-| Corning | <ul><li>6 wells</li><li>16.8 mL/well</li><li>Circular wells, flat bottom</li></ul> | corning_6_wellplate_16.8ml_flat |
+| Corning | <ul><li>6 wells</li><li>16.8 mL/well</li><li>Circular wells, flat bottom</li></ul> | [`corning_6_wellplate_16.8ml_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_6_wellplate_16.8ml_flat/3.json) |
 
 ### 12-well plates 
 
 | Manufacturer | Specifications | API load name |
 | :----------- | :------------- | :---------------------------- |
-| Corning | <ul><li>12 wells</li><li>6.9 mL/well</li><li>Circular wells, flat bottom</li></ul> | corning_12_wellplate_6.9ml_flat |
+| Corning | <ul><li>12 wells</li><li>6.9 mL/well</li><li>Circular wells, flat bottom</li></ul> | [`corning_12_wellplate_6.9ml_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_12_wellplate_6.9ml_flat/3.json) |
 
 ### 24-well plates 
 
 | Manufacturer | Specifications | API load name |
 | :----------- | :------------- | :----------------------------- |
-| Corning | <ul><li>24 wells</li><li>3.4 mL/well</li><li>Circular wells, flat bottom</li></ul> | corning_24_wellplate_3.4ml_flat |
+| Corning | <ul><li>24 wells</li><li>3.4 mL/well</li><li>Circular wells, flat bottom</li></ul> | [`corning_24_wellplate_3.4ml_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_24_wellplate_3.4ml_flat/3.json) |
 
 ### 48-well plates 
 
 | Manufacturer | Specifications | API load name |
 | :----------- | :------------- | :----------------------------- |
-| Corning | <ul><li>48 wells</li><li>1.6 mL/well</li><li>Circular wells, flat bottom</li></ul> | corning_48_wellplate_1.6ml_flat |
+| Corning | <ul><li>48 wells</li><li>1.6 mL/well</li><li>Circular wells, flat bottom</li></ul> | [`corning_48_wellplate_1.6ml_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_48_wellplate_1.6ml_flat/4.json) |
 
 ### 96-well plates 
 
 | Manufacturer | Specifications | API load name |
 | :-------------- | :------------- | :---------------------------------- |
-| Bio-Rad | <ul><li>96 wells</li><li>200 µL/well</li><li>Circular wells, V bottom</li></ul> | biorad_96_wellplate_200ul_pcr |
-| Corning | <ul><li>96 wells</li><li>360 µL/well</li><li>Circular wells, flat bottom</li></ul> | corning_96_wellplate_360ul_flat |
-| NEST | <ul><li>96 wells</li><li>100 µL/well</li><li>Circular wells, V bottom</li><li>PCR full skirt</li></ul> | nest_96_wellplate_100ul_pcr_full_skirt |
-| NEST | <ul><li>96 wells</li><li>200 µL/well</li><li>Circular wells, flat bottom</li></ul> | nest_96_wellplate_200ul_flat |
-| NEST | <ul><li>96 deep wells</li><li>2000 µL/well</li><li>Square wells, V bottom</li></ul> | nest_96_wellplate_2ml_deep |
-| Opentrons | <ul><li>Tough 96 wells</li><li>200 µL/well</li><li>Circular wells, V bottom</li><li>PCR full skirt</li></ul> | opentrons_96_wellplate_200ul_pcr_full_skirt |
-| Thermo Scientific | <ul><li>Nunc 96 deep wells</li><li>1300 µL/well</li><li>Circular wells, U bottom</li></ul> | thermoscientificnunc_96_wellplate_1300ul |
-| Thermo Scientific | <ul><li>Nunc 96 deep wells</li><li>2000 µL/well</li><li>Circular wells, U bottom</li></ul> | thermoscientificnunc_96_wellplate_2000ul |
-| USA Scientific | <ul><li>96 deep wells</li><li>2.4 mL/well</li><li>Square wells, U bottom</li></ul> | usascientific_96_wellplate_2.4ml_deep |
+| Bio-Rad | <ul><li>96 wells</li><li>200 µL/well</li><li>Circular wells, V bottom</li></ul> | [`biorad_96_wellplate_200ul_pcr`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/biorad_96_wellplate_200ul_pcr/3.json) |
+| Corning | <ul><li>96 wells</li><li>360 µL/well</li><li>Circular wells, flat bottom</li></ul> | [`corning_96_wellplate_360ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_96_wellplate_360ul_flat/3.json) |
+| NEST | <ul><li>96 wells</li><li>100 µL/well</li><li>Circular wells, V bottom</li><li>PCR full skirt</li></ul> | [`nest_96_wellplate_100ul_pcr_full_skirt`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_96_wellplate_100ul_pcr_full_skirt/3.json) |
+| NEST | <ul><li>96 wells</li><li>200 µL/well</li><li>Circular wells, flat bottom</li></ul> | [`nest_96_wellplate_200ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_96_wellplate_200ul_flat/3.json) |
+| NEST | <ul><li>96 deep wells</li><li>2000 µL/well</li><li>Square wells, V bottom</li></ul> | [`nest_96_wellplate_2ml_deep`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/nest_96_wellplate_2ml_deep/3.json) |
+| Opentrons | <ul><li>Tough 96 wells</li><li>200 µL/well</li><li>Circular wells, V bottom</li><li>PCR full skirt</li></ul> | [`opentrons_96_wellplate_200ul_pcr_full_skirt`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/3.json) |
+| Thermo Scientific | <ul><li>Nunc 96 deep wells</li><li>1300 µL/well</li><li>Circular wells, U bottom</li></ul> | [`thermoscientificnunc_96_wellplate_1300ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/thermoscientificnunc_96_wellplate_1300ul/2.json) |
+| Thermo Scientific | <ul><li>Nunc 96 deep wells</li><li>2000 µL/well</li><li>Circular wells, U bottom</li></ul> | [`thermoscientificnunc_96_wellplate_2000ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/thermoscientificnunc_96_wellplate_2000ul/2.json) |
+| USA Scientific | <ul><li>96 deep wells</li><li>2.4 mL/well</li><li>Square wells, U bottom</li></ul> | [`usascientific_96_wellplate_2.4ml_deep`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/usascientific_96_wellplate_2.4ml_deep/2.json) |
 
 ### 384-well plates 
 
 | Manufacturer | Specifications | API load name |
 | :---------------- | :------------------------- | :--------------------------------- |
-| Applied Biosystems | <ul><li>384 wells</li><li>40 µL/well</li><li>Circular wells, V bottom</li></ul> | appliedbiosystemsmicroamp_384_wellplate_40ul |
-| Bio-Rad | <ul><li>384 wells</li><li>50 µL/well</li><li>Circular wells, V bottom</li></ul> | biorad_384_wellplate_50ul |
-| Corning | <ul><li>384 wells</li><li>112 µL/well</li><li>Square wells, flat bottom</li></ul> | corning_384_wellplate_112ul_flat |
+| Applied Biosystems | <ul><li>384 wells</li><li>40 µL/well</li><li>Circular wells, V bottom</li></ul> | [`appliedbiosystemsmicroamp_384_wellplate_40ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/appliedbiosystemsmicroamp_384_wellplate_40ul/2.json) |
+| Bio-Rad | <ul><li>384 wells</li><li>50 µL/well</li><li>Circular wells, V bottom</li></ul> | [`biorad_384_wellplate_50ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/biorad_384_wellplate_50ul/3.json) |
+| Corning | <ul><li>384 wells</li><li>112 µL/well</li><li>Square wells, flat bottom</li></ul> | [`corning_384_wellplate_112ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/corning_384_wellplate_112ul_flat/4.json) |
 
 ### Well plate adapters 
 
@@ -127,10 +127,10 @@ The aluminum plates listed below are [thermal adapters][thermal-adapters] for th
 
 | Adapter type | API load name |
 | :----------- | :------------ |
-| Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL | opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep   |
-| Opentrons 96 Flat Bottom Heater-Shaker Adapter with NEST 96 Well Plate 200 µL Flat | opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat |
-| Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 μL | opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt |
-| Opentrons Universal Flat Heater-Shaker Adapter with Corning 384 Well Plate 112 µL Flat | opentrons_96_flat_bottom_adapter                         |
+| Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL | [`opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json) |
+| Opentrons 96 Flat Bottom Heater-Shaker Adapter with NEST 96 Well Plate 200 µL Flat | [`opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json) |
+| Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 μL | [`opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json) |
+| Opentrons Universal Flat Heater-Shaker Adapter with Corning 384 Well Plate 112 µL Flat | [`opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json) |
 
 You can purchase adapters directly from Opentrons: 
 
@@ -144,10 +144,10 @@ You can purchase adapters directly from Opentrons:
 
 | Adapter/labware combination | API load name |
 | :-------------------------- | :------------ |
-| Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL | opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep    |
-| Opentrons 96 Flat Bottom Heater-Shaker Adapter with NEST 96 Well Plate 200 µL Flat | opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat |
-| Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 µL          | opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt |
-| Opentrons Universal Flat Heater-Shaker Adapter with Corning 384 Well Plate 112 µL Flat | opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat |
+| Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL | [`opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json)    |
+| Opentrons 96 Flat Bottom Heater-Shaker Adapter with NEST 96 Well Plate 200 µL Flat | [`opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json) |
+| Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 µL          | [`opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json) |
+| Opentrons Universal Flat Heater-Shaker Adapter with Corning 384 Well Plate 112 µL Flat | [`opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json) |
 
 Adapters can be purchased directly from Opentrons at [https://shop.opentrons.com](https://shop.opentrons.com). 
 
@@ -176,9 +176,9 @@ Unfiltered and filtered tips are bundled into a rack that consists of a reusable
 
 | Tip rack by volume | API load name                         |
 | :----------------- | :------------------------------------ |
-| 50 μL              | <ul><li>Unfiltered: opentrons_flex_96_tiprack_50ul</li><li>Filtered: opentrons_flex_96_filtertiprack_50ul</li></ul> |
-| 200 µL             | <ul><li>Unfiltered: opentrons_flex_96_tiprack_200ul</li><li>Filtered: opentrons_flex_96_filtertiprack_200ul</li></ul> |
-| 1000 µL            | <ul><li>Unfiltered: opentrons_flex_96_tiprack_1000ul</li><li>Filtered: opentrons_flex_96_filtertiprack_1000ul</li></ul> |
+| 50 μL              | <ul><li>Unfiltered: [`opentrons_flex_96_tiprack_50ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_tiprack_50ul/1.json)</li><li>Filtered: [`opentrons_flex_96_filtertiprack_50ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_filtertiprack_50ul/1.json)</li></ul> |
+| 200 µL             | <ul><li>Unfiltered: [`opentrons_flex_96_tiprack_200ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_tiprack_200ul/1.json)</li><li>Filtered: [`opentrons_flex_96_filtertiprack_200ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_filtertiprack_200ul/1.json)</li></ul> |
+| 1000 µL            | <ul><li>Unfiltered: [`opentrons_flex_96_tiprack_1000ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_tiprack_1000ul/1.json)</li><li>Filtered: [`opentrons_flex_96_filtertiprack_1000ul`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_filtertiprack_1000ul/1.json)</li></ul> |
 
 To help with identification, the tip rack mid-plates are color coded based on tip size: 
 
@@ -213,7 +213,7 @@ The 96-channel pipette requires an adapter to attach a full rack of tips properl
 
 | Adapter type | API load name |
 | :------------------------------ | :-------------------------------- |
-| Opentrons Flex 96 Tip Rack Adapter | opentrons_flex_96_tiprack_adapter |
+| Opentrons Flex 96 Tip Rack Adapter | [`opentrons_flex_96_tiprack_adapter`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_flex_96_tiprack_adapter/1.json) |
 
 The tip rack adapter is compatible with the Opentrons Flex Gripper. You can use the gripper to place fresh tip racks on the adapter or to pick up and move used tip racks into the waste chute. 
 
@@ -242,35 +242,35 @@ The Opentrons 4-in-1 tube rack supports a wide variety of tube sizes, singly or 
 
 | Tube type         | API load name                          |
 | :---------------- | :------------------------------------- |
-| 6 Falcon 50 mL    | opentrons_6_tuberack_falcon_50ml_conical |
-| 6 NEST 50 mL      | opentrons_6_tuberack_nest_50ml_conical   |
+| 6 Falcon 50 mL    | [`opentrons_6_tuberack_falcon_50ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_6_tuberack_falcon_50ml_conical/1.json) |
+| 6 NEST 50 mL      | [`opentrons_6_tuberack_nest_50ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_6_tuberack_nest_50ml_conical/1.json) |
 
 ### 10-tube racks 
 
 | Tube type | API load name |
 | :-------- | :------------ |
-| <ul><li>4 Falcon 50 mL</li><li>6 Falcon 15 mL</li></ul> | opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical |
-| <ul><li>4 NEST 50 mL</li><li>6 NEST 15 mL</li></ul> | opentrons_10_tuberack_nest_4x50ml_6x15ml_conical |
+| <ul><li>4 Falcon 50 mL</li><li>6 Falcon 15 mL</li></ul> | [`opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/1.json) |
+| <ul><li>4 NEST 50 mL</li><li>6 NEST 15 mL</li></ul> | [`opentrons_10_tuberack_nest_4x50ml_6x15ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/1.json) |
 
 ### 15-tube racks 
 
 | Tube type          | API load name                           |
 | :----------------- | :-------------------------------------- |
-| 15 Falcon 15 mL    | opentrons_15_tuberack_falcon_15ml_conical |
-| 15 NEST 15 mL      | opentrons_15_tuberack_nest_15ml_conical   |
+| 15 Falcon 15 mL    | [`opentrons_15_tuberack_falcon_15ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_15_tuberack_falcon_15ml_conical/1.json) |
+| 15 NEST 15 mL      | [`opentrons_15_tuberack_nest_15ml_conical`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_15_tuberack_nest_15ml_conical/1.json) |
 
 ### 24-tube racks 
 
-| Tube type                       | API load name                                       |
-| :------------------------------ | :-------------------------------------------------- |
-| 24 Eppendorf Safe-Lock 1.5 mL   | opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap |
-| 24 Eppendorf Safe-Lock 2 mL, U-shaped bottom | opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap |
-| 24 generic 2 mL screw cap       | opentrons_24_tuberack_generic_2ml_screwcap        |
-| 24 NEST 0.5 mL screw cap        | opentrons_24_tuberack_nest_0.5ml_screwcap         |
-| 24 NEST 1.5 mL screw cap        | opentrons_24_tuberack_nest_1.5ml_screwcap         |
-| 24 NEST 1.5 mL snap cap         | opentrons_24_tuberack_nest_1.5ml_snapcap          |
-| 24 NEST 2 mL screw cap          | opentrons_24_tuberack_nest_2ml_screwcap           |
-| 24 NEST 2 mL snap cap, U-shaped bottom | opentrons_24_tuberack_nest_2ml_snapcap          |
+| Tube type          | API load name                           |
+| :----------------- | :-------------------------------------- |
+| 24 Eppendorf Safe-Lock 1.5 mL   | [`opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap/1.json) |
+| 24 Eppendorf Safe-Lock 2 mL, U-shaped bottom | [`opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json) |
+| 24 generic 2 mL screw cap       | [`opentrons_24_tuberack_generic_2ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_generic_2ml_screwcap/1.json)        |
+| 24 NEST 0.5 mL screw cap        | [`opentrons_24_tuberack_nest_0.5ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_nest_0.5ml_screwcap/1.json)         |
+| 24 NEST 1.5 mL screw cap        | [`opentrons_24_tuberack_nest_1.5ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_nest_1.5ml_screwcap/1.json)         |
+| 24 NEST 1.5 mL snap cap         | [`opentrons_24_tuberack_nest_1.5ml_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_nest_1.5ml_snapcap/1.json)          |
+| 24 NEST 2 mL screw cap          | [`opentrons_24_tuberack_nest_2ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_nest_2ml_screwcap/1.json)           |
+| 24 NEST 2 mL snap cap, U-shaped bottom | [`opentrons_24_tuberack_nest_2ml_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_tuberack_nest_2ml_snapcap/1.json)          |
 
 ### Tube rack API definitions 
 
@@ -320,9 +320,9 @@ It is also compatible with generic PCR strips.
 
 | Thermal block           | API load name                         |
 | :---------------------- | :------------------------------------ |
-| Flex flat bottom plate  | opentrons_aluminum_flat_bottom_plate  |
+| Flex flat bottom plate  | [`opentrons_aluminum_flat_bottom_plate`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json)  |
 | 24-well aluminum block  | *See labware combinations below.*     |
-| 96-well aluminum block  | opentrons_96_well_aluminum_block      |
+| 96-well aluminum block  | [`opentrons_96_well_aluminum_block`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_well_aluminum_block/1.json)      |
 
 ### Aluminum block labware combinations 
 
@@ -335,20 +335,20 @@ The [Opentrons Labware Library](https://labware.opentrons.com/) supports the fol
 
 | 24-well block contents                | API load name                                   |
 | :------------------------------------ | :---------------------------------------------- |
-| Generic 2 mL screw cap                | opentrons_24_aluminumblock_generic_2ml_screwcap |
-| NEST 0.5 mL screw cap                 | opentrons_24_aluminumblock_nest_0.5ml_screwcap  |
-| NEST 1.5 mL screw cap                 | opentrons_24_aluminumblock_nest_1.5ml_screwcap  |
-| NEST 1.5 mL snap cap                  | opentrons_24_aluminumblock_nest_1.5ml_snapcap   |
-| NEST 2 mL screw cap                   | opentrons_24_aluminumblock_nest_2ml_screwcap    |
-| NEST 2 mL snap cap, U-shaped bottom   | opentrons_24_aluminumblock_nest_2ml_snapcap     |
+| Generic 2 mL screw cap                | [`opentrons_24_aluminumblock_generic_2ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_generic_2ml_screwcap/1.json) |
+| NEST 0.5 mL screw cap                 | [`opentrons_24_aluminumblock_nest_0.5ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_nest_0.5ml_screwcap/1.json)  |
+| NEST 1.5 mL screw cap                 | [`opentrons_24_aluminumblock_nest_1.5ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_nest_1.5ml_screwcap/1.json)  |
+| NEST 1.5 mL snap cap                  | [`opentrons_24_aluminumblock_nest_1.5ml_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1.json)   |
+| NEST 2 mL screw cap                   | [`opentrons_24_aluminumblock_nest_2ml_screwcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_nest_2ml_screwcap/1.json)    |
+| NEST 2 mL snap cap, U-shaped bottom   | [`opentrons_24_aluminumblock_nest_2ml_snapcap`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_24_aluminumblock_nest_2ml_snapcap/1.json)     |
 
 ### 96-well aluminum block labware combinations 
 
 | 96-well block contents      | API load name                                       |
 | :-------------------------- | :-------------------------------------------------- |
-| Bio-Rad well plate 200 µL   | opentrons_96_aluminumblock_biorad_wellplate_200uL   |
-| Generic PCR strip 200 µL    | opentrons_96_aluminumblock_generic_pcr_strip_200uL  |
-| NEST well plate 100 µL      | opentrons_96_aluminumblock_nest_wellplate_100uL     |
+| Bio-Rad well plate 200 µL   | [`opentrons_96_aluminumblock_biorad_wellplate_200uL`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_aluminumblock_biorad_wellplate_200ul/1.json)   |
+| Generic PCR strip 200 µL    | [`opentrons_96_aluminumblock_generic_pcr_strip_200uL`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json)  |
+| NEST well plate 100 µL      | [`opentrons_96_aluminumblock_nest_wellplate_100uL`](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_aluminumblock_nest_wellplate_100ul/1.json)     |
 
 ## Labware and the Opentrons Flex Gripper 
 
