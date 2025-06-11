@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
+  LegacyStyledText,
   ListTable,
   Modal,
   SPACING,
@@ -37,7 +38,6 @@ import {
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -367,7 +367,7 @@ export function AddFixtureModal({
     //   cutoutId,
     //   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     // )
-    const DEFAULT_AA_FOR_WASTE_CHUTE = '1ChannelWasteChute'
+    const DEFAULT_AA_FOR_WASTE_CHUTE = '96ChannelWasteChute'
     return [
       [
         {

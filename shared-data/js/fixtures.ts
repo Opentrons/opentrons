@@ -53,6 +53,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
 } from './constants'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -288,6 +289,28 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
       fixtureGroup: {},
       height: 0,
     },
+    {
+      id: 'fakeWasteChuteWithEmptySlot',
+      expectOpentronsModuleSerialNumber: false,
+      mayMountTo: ['cutoutD3'],
+      displayName: 'Standard Slot Right',
+      providesAddressableAreas: {
+        cutoutD1: [],
+        cutoutD2: [],
+        cutoutD3: ['96ChannelWasteChute', 'fakeD4'],
+        cutoutC1: [],
+        cutoutC2: [],
+        cutoutC3: [],
+        cutoutB1: [],
+        cutoutB2: [],
+        cutoutB3: [],
+        cutoutA1: [],
+        cutoutA2: [],
+        cutoutA3: [],
+      },
+      fixtureGroup: {},
+      height: 0,
+    },
   ],
 }
 
@@ -343,6 +366,10 @@ export const getCutoutFixtureReplacementIfNeeded = (
   ) {
     return FAKE_STAGING_AREA_RIGHT_SLOT
   }
+  else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE && deckDefinition.robot.model === FLEX_ROBOT_TYPE)
+  {
+    return FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT
+  }
   return cutoutFixtureId
 }
 
@@ -365,6 +392,10 @@ export const getReplacementFixtureForFakeFixture = (
 ): CutoutFixtureId => {
   if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
     return SINGLE_RIGHT_SLOT_FIXTURE
+  }
+  if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT)
+  {
+    return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
   }
   return cutoutFixtureId
 }
@@ -571,13 +602,7 @@ export function getFixtureDisplayName(
     case TRASH_BIN_ADAPTER_FIXTURE:
       return 'Trash bin'
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute only'
-    case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute only with cover'
-    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute with staging area slot'
-    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with staging area slot and cover'
+      return 'Waste chute'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
