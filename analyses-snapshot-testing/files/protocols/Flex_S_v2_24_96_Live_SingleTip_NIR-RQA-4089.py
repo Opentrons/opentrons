@@ -396,7 +396,7 @@ def add_parameters(parameters):
     parameters.add_str(
         display_name="Partial Tip Configuration",
         variable_name="partial_tip_config_key",
-        default="ninety_six_single_back_right",
+        default="ninety_six_single_front_left",
         description="Partial tip configurations described by pickup nozzle and tip count",
         choices=[  # value of each choice maps to the key of the partial tip config dataclass we defined
             {"display_name": "96 SINGLE nozzle H12", "value": "ninety_six_single_back_left"},
@@ -445,7 +445,7 @@ def run(ctx):
     ctx.comment(f"The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip.")
     ctx.comment(f"The tip strategy is {new_tip}.")
 
-    tiprack_B2 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "B2")
+    tiprack_B2 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "C1")
     tip_racks = [tiprack_B2]
     waste_chute_D3 = ctx.load_waste_chute()
     pipette_96 = ctx.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
@@ -455,7 +455,7 @@ def run(ctx):
     # Using a 15 mL reservoir as source
     # 1 row, 12 columns
     # https://labware.opentrons.com/#/?loadName=nest_12_reservoir_15ml
-    source_A2 = ctx.load_labware("nest_12_reservoir_15ml", "A2", "source")
+    source_A2 = ctx.load_labware("nest_12_reservoir_15ml", "A1", "source")
     # Load liquids into source wells
 
     WATER_SOURCE_WELL = "A1"
@@ -529,7 +529,7 @@ def run(ctx):
 
     # dest
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
-    dest_D2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
+    dest_C3 = ctx.load_labware("nest_96_wellplate_2ml_deep", "B3")
 
     WATER_DEST_WELL = "A1"
     WATER_DEST_COLUMN = 0
@@ -546,23 +546,23 @@ def run(ctx):
     GLYCEROL_DEST_COLUMNS = [GLYCEROL_DEST_COLUMN, 9, 10]
 
     # Single well and column variables
-    water_dest_well = dest_D2.wells_by_name()[WATER_DEST_WELL]
-    ethanol_dest_well = dest_D2.wells_by_name()[ETHANOL_DEST_WELL]
-    glycerol_dest_well = dest_D2.wells_by_name()[GLYCEROL_DEST_WELL]
-    water_dest_column = dest_D2.columns()[WATER_DEST_COLUMN]
-    ethanol_dest_column = dest_D2.columns()[ETHANOL_DEST_COLUMN]
-    glycerol_dest_column = dest_D2.columns()[GLYCEROL_DEST_COLUMN]
+    water_dest_well = dest_C3.wells_by_name()[WATER_DEST_WELL]
+    ethanol_dest_well = dest_C3.wells_by_name()[ETHANOL_DEST_WELL]
+    glycerol_dest_well = dest_C3.wells_by_name()[GLYCEROL_DEST_WELL]
+    water_dest_column = dest_C3.columns()[WATER_DEST_COLUMN]
+    ethanol_dest_column = dest_C3.columns()[ETHANOL_DEST_COLUMN]
+    glycerol_dest_column = dest_C3.columns()[GLYCEROL_DEST_COLUMN]
 
     # Multi well and column variables
-    water_dest_wells = [dest_D2.wells_by_name()[well] for well in WATER_DEST_WELLS]
-    ethanol_dest_wells = [dest_D2.wells_by_name()[well] for well in ETHANOL_DEST_WELLS]
-    glycerol_dest_wells = [dest_D2.wells_by_name()[well] for well in GLYCEROL_DEST_WELLS]
-    water_dest_columns = [dest_D2.columns()[col] for col in WATER_DEST_COLUMNS]
-    ethanol_dest_columns = [dest_D2.columns()[col] for col in ETHANOL_DEST_COLUMNS]
-    glycerol_dest_columns = [dest_D2.columns()[col] for col in GLYCEROL_DEST_COLUMNS]
+    water_dest_wells = [dest_C3.wells_by_name()[well] for well in WATER_DEST_WELLS]
+    ethanol_dest_wells = [dest_C3.wells_by_name()[well] for well in ETHANOL_DEST_WELLS]
+    glycerol_dest_wells = [dest_C3.wells_by_name()[well] for well in GLYCEROL_DEST_WELLS]
+    water_dest_columns = [dest_C3.columns()[col] for col in WATER_DEST_COLUMNS]
+    ethanol_dest_columns = [dest_C3.columns()[col] for col in ETHANOL_DEST_COLUMNS]
+    glycerol_dest_columns = [dest_C3.columns()[col] for col in GLYCEROL_DEST_COLUMNS]
 
     # displays black in deck map
-    dest_D2.load_empty(wells=dest_D2.wells())
+    dest_C3.load_empty(wells=dest_C3.wells())
 
     # Load liquids into source wells
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
@@ -613,7 +613,7 @@ def run(ctx):
     )
 
     comment_labware_well_volume_status(ctx, source_A2)
-    comment_labware_well_volume_status(ctx, dest_D2)
+    comment_labware_well_volume_status(ctx, dest_C3)
 
     pipette_96.consolidate_with_liquid_class(
         liquid_class=liquid_class,
@@ -625,7 +625,7 @@ def run(ctx):
     )
 
     comment_labware_well_volume_status(ctx, source_A2)
-    comment_labware_well_volume_status(ctx, dest_D2)
+    comment_labware_well_volume_status(ctx, dest_C3)
 
     pipette_96.distribute_with_liquid_class(
         liquid_class=liquid_class,
@@ -637,6 +637,6 @@ def run(ctx):
     )
 
     comment_labware_well_volume_status(ctx, source_A2)
-    comment_labware_well_volume_status(ctx, dest_D2)
+    comment_labware_well_volume_status(ctx, dest_C3)
 
-    color_wells_with_liquid(dest_D2, filled)
+    color_wells_with_liquid(dest_C3, filled)

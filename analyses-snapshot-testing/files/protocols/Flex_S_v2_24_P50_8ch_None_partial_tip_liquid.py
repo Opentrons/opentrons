@@ -311,7 +311,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[WATER_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     # visit_every_well=True,
+    #     group_wells=False,
     # )
     comment_labware_well_volume_status(ctx, dest)
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
@@ -323,7 +323,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[ETHANOL_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     # visit_every_well=True,
+    #     group_wells=False,
     # )
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])
@@ -335,7 +335,7 @@ def run(ctx):
     #     dest=dest.wells_by_name()[GLYCEROL_DEST_WELL],
     #     new_tip=new_tip,
     #     trash_location=trash,
-    #     # visit_every_well=True,
+    #     group_wells=False,
     # )
 
     # comment_tip_rack_status(ctx, pipette_8ch_50.tip_racks[0])

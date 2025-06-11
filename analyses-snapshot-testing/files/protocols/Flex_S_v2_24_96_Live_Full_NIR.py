@@ -88,7 +88,9 @@ def comment_labware_well_volume_status(ctx, labware):
         ctx: The protocol context, used to call `comment()`.
         labware: The labware object containing wells with volume info.
     """
-    ctx.comment(f"Labware: {labware.name} on {labware.parent}")  # More readable identifier
+    ctx.comment(
+        f"Labware: {labware.name} on {labware.parent}"
+    )  # More readable identifier
 
     # Iterate over each row by index
     for row_index, row in enumerate(labware.rows()):
@@ -155,22 +157,40 @@ def run(ctx):
     volume = 105
     new_tip = "never"
 
-    ctx.comment(f"It will transfer, consolidate, and distribute liquid using the 96 channel pipette.")
-    ctx.comment(f"The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip.")
+    ctx.comment(
+        f"It will transfer, consolidate, and distribute liquid using the 96 channel pipette."
+    )
+    ctx.comment(
+        f"The volume we are using is {volume} μl and is less than the max volume of the 200 μl tip."
+    )
     ctx.comment(f"The tip strategy is {new_tip}.")
 
-    tiprack_A1 = ctx.load_labware(opentrons_flex_96_filtertiprack_200ul, "A1", adapter="opentrons_flex_96_tiprack_adapter")
+    tiprack_A1 = ctx.load_labware(
+        opentrons_flex_96_filtertiprack_200ul,
+        "A1",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
     tip_racks = [
         tiprack_A1,
     ]
     waste_chute_D3 = ctx.load_waste_chute()
-    pipette_96 = ctx.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
+    pipette_96 = ctx.load_instrument(
+        "flex_96channel_1000", "right", tip_racks=tip_racks
+    )
 
     # Load liquids into source wells
-    water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
-    ethanol = ctx.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
-    glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    filled = ctx.define_liquid(name="Has Liquid", description="Not Empty", display_color="#FF69B4")
+    water = ctx.define_liquid(
+        name="Aqueous", description="H₂O", display_color="#738ee6"
+    )
+    ethanol = ctx.define_liquid(
+        name="Volatile", description="80%% ethanol solution", display_color="#59c0f0"
+    )
+    glycerol = ctx.define_liquid(
+        name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4"
+    )
+    filled = ctx.define_liquid(
+        name="Has Liquid", description="Not Empty", display_color="#FF69B4"
+    )
 
     liquid_class_names = [
         "water",
@@ -180,20 +200,35 @@ def run(ctx):
 
     pipette_96.pick_up_tip()
 
+    dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", "destination C1")
+    dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2", "destination C2")
+
     for liquid_class_name in liquid_class_names:
         ctx.comment(f"Liquid class: {liquid_class_name}")
         liquid_class = ctx.get_liquid_class(liquid_class_name)
+        source_loc_1 = "B1"
+        source_loc_2 = "B2"
         if liquid_class_name == "water":
             liquid_type = water
         elif liquid_class_name == "ethanol_80":
             liquid_type = ethanol
+            source_loc_1 = "D1"
+            source_loc_2 = (
+                "D2"  # Ethanol is loaded in D2 to avoid conflict with glycerol
+            )
         elif liquid_class_name == "glycerol_50":
             liquid_type = glycerol
+            source_loc_1 = "A3"
+            source_loc_2 = "B3"
         else:
             raise ValueError(f"Unknown liquid class: {liquid_class_name}")
 
-        source_B1 = ctx.load_labware(nest_1_reservoir_290ml, "B1", liquid_class_name)
-        source_B2 = ctx.load_labware(nest_1_reservoir_290ml, "B2", liquid_class_name)
+        source_B1 = ctx.load_labware(
+            nest_1_reservoir_290ml, source_loc_1, liquid_class_name
+        )
+        source_B2 = ctx.load_labware(
+            nest_1_reservoir_290ml, source_loc_2, liquid_class_name
+        )
         sources = [
             source_B1,
             source_B2,
@@ -202,9 +237,6 @@ def run(ctx):
 
         for source in sources:
             source.load_liquid(wells=source.wells(), liquid=liquid_type, volume=200000)
-
-        dest_C1 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", f"{liquid_class_name} destination C1")
-        dest_C2 = ctx.load_labware("nest_96_wellplate_2ml_deep", "C2", f"{liquid_class_name} destination C2")
 
         destinations = [dest_C1, dest_C2]
         for dest in destinations:

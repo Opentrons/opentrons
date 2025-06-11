@@ -31,6 +31,7 @@ tags = [
     "v8.4.1",
     "v8.3.2",
     "v8.2.0",
+    "v8.0.0",
 ]
 
 ROBOT_STACK_VERSION_MAP: Dict[str, Dict[str, str]] = {
@@ -39,6 +40,7 @@ ROBOT_STACK_VERSION_MAP: Dict[str, Dict[str, str]] = {
     "8.4.1": {"api": "2.23", "pd": "8.4.4"},
     "8.3.2": {"api": "2.22", "pd": "?"},
     "8.2.0": {"api": "2.21", "pd": "?"},
+    "8.0.0": {"api": "2.20", "pd": "?"},
 }
 
 
@@ -357,6 +359,7 @@ class AnalysisMatrix:
     v8_4_1: str = AnalysisOutcome.NA
     v8_3_2: str = AnalysisOutcome.NA
     v8_2_0: str = AnalysisOutcome.NA
+    v8_0_0: str = AnalysisOutcome.NA
     expect_no_errors: bool = False
 
     def set_result(self, tag: str, protocol: TargetProtocol) -> None:
@@ -379,6 +382,8 @@ class AnalysisMatrix:
             self.v8_3_2 = result
         elif tag_version == "v8.2.0":
             self.v8_2_0 = result
+        elif tag_version == "v8.0.0":
+            self.v8_0_0 = result
 
 
 def main() -> None:  # noqa: C901
@@ -453,6 +458,7 @@ def main() -> None:  # noqa: C901
             v8_4_1=AnalysisOutcome.NA,
             v8_3_2=AnalysisOutcome.NA,
             v8_2_0=AnalysisOutcome.NA,
+            v8_0_0=AnalysisOutcome.NA,
             expect_no_errors=p.expect_no_errors,
         )
         for p in selected_protocols
@@ -485,6 +491,7 @@ def main() -> None:  # noqa: C901
     table.add_column("v8.4.1", justify="center")
     table.add_column("v8.3.2", justify="center")
     table.add_column("v8.2.0", justify="center")
+    table.add_column("v8.0.0", justify="center")
     table.add_column("Expect No Errors", justify="center")
     for matrix in result_matrix:
         table.add_row(
@@ -493,6 +500,7 @@ def main() -> None:  # noqa: C901
             str(matrix.v8_4_1),
             str(matrix.v8_3_2),
             str(matrix.v8_2_0),
+            str(matrix.v8_0_0),
             str(matrix.expect_no_errors),
         )
     console.print(table)

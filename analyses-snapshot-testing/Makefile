@@ -204,7 +204,7 @@ collect-audit:
 .PHONY: prep
 prep: format ruff-check clean audit-registry collect-audit
 
-ANALYSIS_REFS := chore_release-8.5.0 v8.4.1 v8.3.2 v8.2.0
+ANALYSIS_REFS := chore_release-8.5.0 v8.4.1 v8.3.2 v8.2.0 v8.0.0
 
 .PHONY: build-matrix
 build-matrix: build-base-image

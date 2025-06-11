@@ -191,9 +191,9 @@ def run(ctx):
         volume=volume,
         source=water_source_well,
         dest=water_dest_well,
-        new_tip="always",
+        new_tip="once",
         trash_location=trash,
-        # visit_every_well=True,
+        group_wells=False,
     )
 
     dest_volume = water_dest_well.current_liquid_volume()
@@ -212,7 +212,7 @@ def run(ctx):
         volume=volume,
         source=ethanol_source_column,
         dest=ethanol_dest_column,
-        new_tip="always",
+        new_tip="once",
         trash_location=trash,
     )
 
@@ -233,7 +233,7 @@ def run(ctx):
         volume=volume,
         source=water_source_column,
         dest=water_dest_columns,
-        new_tip="always",
+        new_tip="once",
         trash_location=trash,
     )
 

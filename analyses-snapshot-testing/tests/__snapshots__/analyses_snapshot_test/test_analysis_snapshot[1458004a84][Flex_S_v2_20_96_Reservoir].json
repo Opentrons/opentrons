@@ -1199,7 +1199,7 @@
           "slotName": "D1"
         },
         "namespace": "opentrons",
-        "version": 1
+        "version": 2
       },
       "result": {
         "definition": {
@@ -1234,6 +1234,34 @@
               ]
             }
           ],
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "bottomHeight": 2.0,
+                  "bottomXDimension": 106.79,
+                  "bottomYDimension": 71.0,
+                  "shape": "cuboidal",
+                  "topHeight": 39.23,
+                  "topXDimension": 107.5,
+                  "topYDimension": 71.25,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "bottomHeight": 0,
+                  "bottomXDimension": 101.25,
+                  "bottomYDimension": 1.66,
+                  "shape": "cuboidal",
+                  "topHeight": 2,
+                  "topXDimension": 106.79,
+                  "topYDimension": 8,
+                  "xCount": 1,
+                  "yCount": 8
+                }
+              ]
+            }
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -1259,10 +1287,11 @@
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
           "stackingOffsetWithModule": {},
-          "version": 1,
+          "version": 2,
           "wells": {
             "A1": {
               "depth": 39.22,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 290000,
               "x": 63.88,
@@ -1305,7 +1334,7 @@
           "slotName": "D2"
         },
         "namespace": "opentrons",
-        "version": 1
+        "version": 2
       },
       "result": {
         "definition": {
@@ -1340,6 +1369,23 @@
               ]
             }
           ],
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "bottomHeight": 0.0,
+                  "bottomXDimension": 106.4,
+                  "bottomYDimension": 70,
+                  "shape": "cuboidal",
+                  "topHeight": 12.42,
+                  "topXDimension": 106.8,
+                  "topYDimension": 70.5,
+                  "xCount": 1,
+                  "yCount": 1
+                }
+              ]
+            }
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "Axygen 1 Well Reservoir 90 mL",
@@ -1365,10 +1411,11 @@
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
           "stackingOffsetWithModule": {},
-          "version": 1,
+          "version": 2,
           "wells": {
             "A1": {
               "depth": 12.42,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 90000,
               "x": 63.88,
@@ -1411,7 +1458,7 @@
           "slotName": "D3"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 3
       },
       "result": {
         "definition": {
@@ -1448,6 +1495,34 @@
               ]
             }
           ],
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "bottomHeight": 2.0,
+                  "bottomXDimension": 70.6,
+                  "bottomYDimension": 106.8,
+                  "shape": "cuboidal",
+                  "topHeight": 26.85,
+                  "topXDimension": 71.3,
+                  "topYDimension": 107.3,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "bottomHeight": 0,
+                  "bottomXDimension": 1.93,
+                  "bottomYDimension": 1.93,
+                  "shape": "cuboidal",
+                  "topHeight": 2,
+                  "topXDimension": 9,
+                  "topYDimension": 9,
+                  "xCount": 12,
+                  "yCount": 8
+                }
+              ]
+            }
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 1 Well Reservoir 195 mL",
@@ -1473,10 +1548,11 @@
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 3,
           "wells": {
             "A1": {
-              "depth": 25,
+              "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 195000,
               "x": 63.88,
@@ -1716,45 +1792,65 @@
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bf40ca95261843ab5aab24ea397a432e",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -38.22
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 63.88,
+          "y": 42.785,
+          "z": 5.82
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForResume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a635e53bb7e019c72043f1684612f025",
+      "notes": [],
+      "params": {
+        "message": "Where did I aspirate from?"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
     "apiVersion": [
       2,
-      20
+      24
     ],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "AttributeError [line 40]: 'ProtocolContext' object has no attribute 'aspirate'",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "AttributeError: 'ProtocolContext' object has no attribute 'aspirate'",
-          "errorCode": "4000",
-          "errorInfo": {
-            "args": "(\"'ProtocolContext' object has no attribute 'aspirate'\",)",
-            "class": "AttributeError",
-            "name": "aspirate",
-            "obj": "<opentrons.protocol_api.protocol_context.ProtocolContext object at 0xUUID>",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_20_96_Reservoir.py\", line N, in run\n\n  File \"Flex_S_v2_20_96_Reservoir.py\", line N, in aspirate_to_reservoir_test\n"
-          },
-          "errorType": "PythonException",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": []
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [],
   "labware": [
     {
@@ -1767,7 +1863,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/agilent_1_reservoir_290ml/1",
+      "definitionUri": "opentrons/agilent_1_reservoir_290ml/2",
       "displayName": "Agilent 290mL",
       "id": "UUID",
       "loadName": "agilent_1_reservoir_290ml",
@@ -1776,7 +1872,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/axygen_1_reservoir_90ml/1",
+      "definitionUri": "opentrons/axygen_1_reservoir_90ml/2",
       "displayName": "Axygen 90mL",
       "id": "UUID",
       "loadName": "axygen_1_reservoir_90ml",
@@ -1785,7 +1881,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/nest_1_reservoir_195ml/2",
+      "definitionUri": "opentrons/nest_1_reservoir_195ml/3",
       "displayName": "Nest 195mL",
       "id": "UUID",
       "loadName": "nest_1_reservoir_195ml",
@@ -1808,7 +1904,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

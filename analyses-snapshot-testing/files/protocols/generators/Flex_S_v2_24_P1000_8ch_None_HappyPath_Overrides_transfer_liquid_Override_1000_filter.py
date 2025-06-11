@@ -93,7 +93,7 @@ def run(ctx):
         dest=target.wells_by_name()[WATER_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        # visit_every_well=True,
+        group_wells=False,
     )
 
     pipette_8ch_1000.transfer_with_liquid_class(
@@ -103,7 +103,7 @@ def run(ctx):
         dest=target.wells_by_name()[ETHANOL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        # visit_every_well=True,
+        group_wells=False,
     )
 
     pipette_8ch_1000.transfer_with_liquid_class(
@@ -113,5 +113,5 @@ def run(ctx):
         dest=target.wells_by_name()[GLYCEROL_TARGET_WELL],
         new_tip=new_tip,
         trash_location=trash,
-        # visit_every_well=True,
+        group_wells=False,
     )
