@@ -12,10 +12,8 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import {
-  useAssignLiquidClass,
-  useSupportedLiquidClassOptions,
-} from '../MoveLiquidTools/hooks'
+import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'

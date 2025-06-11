@@ -21,7 +21,8 @@ vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')
-vi.mock('../hooks')
+vi.mock('../hooks/useAssignLiquidClass')
+vi.mock('../hooks/useSupportedLiquidClassOptions')
 
 const render = (props: ComponentProps<typeof MoveLiquidTools>) => {
   return renderWithProviders(<MoveLiquidTools {...props} />)
