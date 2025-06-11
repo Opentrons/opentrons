@@ -508,6 +508,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             (chunkIdx > 0 || pairIdx > 0)
               ? [
                   curryWithoutPython(dispenseInPlace, {
+                    isAirGap: true,
                     pipetteId: pipette,
                     volume: dispenseAirGapVol,
                     flowRate: dispenseFlowRateUlSec,
@@ -716,6 +717,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   ...(aspirateAirGapVol > 0
                     ? [
                         curryWithoutPython(dispenseInPlace, {
+                          isAirGap: true,
                           pipetteId: pipette,
                           volume: aspirateAirGapVol,
                           flowRate: dispenseFlowRateUlSec,

@@ -63,6 +63,7 @@ export const AnnouncementModal = (
           marginLeft="0"
           title={heading}
           type="info"
+          width="47rem"
           footer={
             <Flex
               justifyContent={JUSTIFY_END}
