@@ -360,6 +360,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
+    //  TODO: fix bug where new_tip api arg does not allow
+    //  changeTip: always but PD does
     `new_tip=${formatPyStr(changeTip)}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),

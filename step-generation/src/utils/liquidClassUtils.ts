@@ -31,8 +31,8 @@ export const getCustomLiquidClassProperties = (
   } = props
 
   let aspirateMixArgs: InnerMixArgs | null = null
-  if ('mixBeforeApirate' in args) {
-    aspirateMixArgs = args.mixBeforeApirate as InnerMixArgs | null
+  if ('mixBeforeAspirate' in args) {
+    aspirateMixArgs = args.mixBeforeAspirate as InnerMixArgs | null
   } else if ('mixFirstAspirate' in args) {
     aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
   }
