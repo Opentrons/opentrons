@@ -82,11 +82,7 @@ def get_parent_placement_origin_to_lw_origin(
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
         # We only consider it when the child labware is the topmost labware in a stackup.
         parent_entity_origin_to_child_labware_origin = (
-            Point(
-                child_labware.cornerOffsetFromSlot.x,
-                child_labware.cornerOffsetFromSlot.y,
-                child_labware.cornerOffsetFromSlot.z,
-            )
+            _to_point(child_labware.cornerOffsetFromSlot)
             if is_topmost_labware
             else Point(0, 0, 0)
         )
@@ -98,10 +94,8 @@ def get_parent_placement_origin_to_lw_origin(
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
         assert_type(child_labware, LabwareDefinition3)
-        parent_entity_origin_to_child_labware_origin = Point(
-            x=-1 * child_labware.extents.footprint.backLeft.x,
-            y=-1 * child_labware.extents.footprint.frontRight.y,
-            z=-1 * child_labware.extents.total.backLeftBottom.z,
+        parent_entity_origin_to_child_labware_origin = (
+            _get_back_left_bottom_position(child_labware) * -1
         )
 
         return (
@@ -151,14 +145,10 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
             )
         )
 
-        return Point(
-            module_parent_to_child_offset.x
-            - child_labware_overlap_with_parent_entity.x,
-            module_parent_to_child_offset.y
-            - child_labware_overlap_with_parent_entity.y,
-            module_parent_to_child_offset.z
-            - child_labware_overlap_with_parent_entity.z,
+        module_offset_point = _to_point_from_lw_offset_vector(
+            module_parent_to_child_offset
         )
+        return module_offset_point - child_labware_overlap_with_parent_entity
 
     elif _is_deck_location(parent_entity):
         return Point(x=0, y=0, z=0)
@@ -179,9 +169,7 @@ def _get_child_labware_overlap_with_parent_labware(
         child_labware_overlap = child_labware.stackingOffsetWithLabware.get(
             "default", Vector3D(x=0, y=0, z=0)
         )
-    return Point(
-        x=child_labware_overlap.x, y=child_labware_overlap.y, z=child_labware_overlap.z
-    )
+    return _to_point(child_labware_overlap)
 
 
 def _get_child_labware_overlap_with_parent_module(
@@ -199,9 +187,7 @@ def _get_child_labware_overlap_with_parent_module(
         else:
             return Point(x=0, y=0, z=0)
 
-    return Point(
-        x=child_labware_overlap.x, y=child_labware_overlap.y, z=child_labware_overlap.z
-    )
+    return _to_point(child_labware_overlap)
 
 
 def _is_thermocycler_on_ot2(
@@ -232,3 +218,22 @@ def _is_deck_location(parent_entity: LabwareParentDefinition) -> bool:
         return True
 
     return False
+
+
+def _to_point(vector: Vector3D) -> Point:
+    """Convert a Vector3D to a Point."""
+    return Point(x=vector.x, y=vector.y, z=vector.z)
+
+
+def _to_point_from_lw_offset_vector(offset_vector: LabwareOffsetVector) -> Point:
+    """Convert a LabwareOffsetVector to a Point."""
+    return Point(x=offset_vector.x, y=offset_vector.y, z=offset_vector.z)
+
+
+def _get_back_left_bottom_position(labware: LabwareDefinition3) -> Point:
+    """Get the back left bottom position from a v3 labware definition."""
+    return Point(
+        x=labware.extents.footprint.backLeft.x,
+        y=labware.extents.footprint.frontRight.y,
+        z=labware.extents.total.backLeftBottom.z,
+    )
