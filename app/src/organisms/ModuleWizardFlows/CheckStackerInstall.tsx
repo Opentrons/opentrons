@@ -15,6 +15,8 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
+import { useSendIdentifyModule } from './hooks'
+
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardStepProps } from './types'
@@ -66,8 +68,21 @@ export function CheckStackerInstall(
     ) {
       setStackerNotInstalled(true)
     } else {
+      if (attachedStacker != null) {
+        // Transition back to standard identify for stacker
+        sendIdentifyModule(attachedStacker, true, 'blue')
+      }
       proceed()
     }
+  }
+
+  const sendIdentifyModule = useSendIdentifyModule()
+  const handleTryAgain = (): void => {
+    if (attachedStacker != null) {
+      // Set the stacker to red
+      sendIdentifyModule(attachedStacker, true, 'red')
+    }
+    setStackerNotInstalled(false)
   }
 
   if (stackerNotInstalled) {
@@ -82,17 +97,11 @@ export function CheckStackerInstall(
           {isOnDevice ? (
             <SmallButton
               buttonType="primary"
-              onClick={() => {
-                setStackerNotInstalled(false)
-              }}
+              onClick={handleTryAgain}
               buttonText={i18n.format(t('try_again'), 'capitalize')}
             />
           ) : (
-            <PrimaryButton
-              onClick={() => {
-                setStackerNotInstalled(false)
-              }}
-            >
+            <PrimaryButton onClick={handleTryAgain}>
               {i18n.format(t('try_again'), 'capitalize')}
             </PrimaryButton>
           )}
@@ -111,17 +120,11 @@ export function CheckStackerInstall(
           {isOnDevice ? (
             <SmallButton
               buttonType="primary"
-              onClick={() => {
-                handleInterlockPinsValidation()
-              }}
+              onClick={handleInterlockPinsValidation}
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             />
           ) : (
-            <PrimaryButton
-              onClick={() => {
-                handleInterlockPinsValidation()
-              }}
-            >
+            <PrimaryButton onClick={handleInterlockPinsValidation}>
               {i18n.format(t('shared:continue'), 'capitalize')}
             </PrimaryButton>
           )}

@@ -24,7 +24,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { ModuleCard } from '..'
-import { DoorResult, useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
+import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
