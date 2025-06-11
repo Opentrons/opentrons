@@ -93,7 +93,7 @@ beforeEach(() => {
     dispenseRetractZOffset: -5,
     dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
     dispenseFlowRateUlSec: 12,
-    stepId: '1234',
+    stepId: 1,
   }
 
   invariantContext = makeContext()
@@ -169,7 +169,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="always",
     trash_location=waste_chute,
     liquid_class=protocol.define_liquid_class(
-        name="1234_transfer",
+        name="transfer_step_1",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -385,7 +385,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
-        name="1234_transfer",
+        name="transfer_step_1",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -663,7 +663,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
-        name="1234_transfer",
+        name="transfer_step_1",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {
@@ -5589,7 +5589,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
-        name="1234_transfer",
+        name="transfer_step_1",
         properties={
             "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
                 "aspirate": {

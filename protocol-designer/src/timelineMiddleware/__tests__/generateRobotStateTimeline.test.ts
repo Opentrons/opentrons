@@ -28,7 +28,7 @@ describe('generateRobotStateTimeline', () => {
       a: {
         errors: false,
         stepArgs: {
-          stepId: 'mockStepId',
+          stepId: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -102,7 +102,7 @@ describe('generateRobotStateTimeline', () => {
       b: {
         errors: false,
         stepArgs: {
-          stepId: 'mockStepId',
+          stepId: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
           volume: 5,

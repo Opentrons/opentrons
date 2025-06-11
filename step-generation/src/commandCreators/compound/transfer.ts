@@ -17,6 +17,7 @@ import {
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
+  formatPyValue,
   getSlotInLocationStack,
   getTrashOrLabware,
   indentPyLines,
@@ -324,14 +325,14 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   /** needed for python generation! > */
   const destTrashPipetteName =
-    trashBinEntities[args.destLabware]?.pythonName ??
-    wasteChuteEntities[args.destLabware]?.pythonName
+    trashBinEntities[destLabware]?.pythonName ??
+    wasteChuteEntities[destLabware]?.pythonName
   const trashPipetteName =
-    trashBinEntities[args.dropTipLocation]?.pythonName ??
-    wasteChuteEntities[args.dropTipLocation]?.pythonName
+    trashBinEntities[dropTipLocation]?.pythonName ??
+    wasteChuteEntities[dropTipLocation]?.pythonName
   const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
   const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
-  const pythonSourceWells = args.sourceWells
+  const pythonSourceWells = sourceWells
     .map(well => `${sourceLabwarePythonName}[${formatPyStr(well)}]`)
     .join(', ')
   const pythonDestWells =
@@ -342,14 +343,14 @@ export const transfer: CommandCreator<TransferArgs> = (
       : null
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${stepId}_${args.commandCreatorFnName}`)}`,
-    ...(args.liquidClass != null
-      ? [`base_liquid_class=${getPythonLiquidClassName(args.liquidClass)}`]
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    ...(liquidClass != null
+      ? [`base_liquid_class=${getPythonLiquidClassName(liquidClass)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
       pipetteName,
-      tiprackUri: args.tipRack,
+      tiprackUri: tipRack,
       aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
     })}`,
@@ -359,11 +360,12 @@ export const transfer: CommandCreator<TransferArgs> = (
   )},\n)`
 
   const pythonArgs = [
-    `volume=${args.volume}`,
+    `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
-    `new_tip=${formatPyStr(args.changeTip)}`,
+    `new_tip=${formatPyStr(changeTip)}`,
     `trash_location=${trashPipetteName}`,
+    ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({

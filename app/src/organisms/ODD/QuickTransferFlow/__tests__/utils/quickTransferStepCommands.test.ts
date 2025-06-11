@@ -120,7 +120,7 @@ const mockRobotState: TimelineFrame = {
 describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
-      stepId: 'mockStepId',
+      stepId: 1,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -207,7 +207,7 @@ pipette.transfer_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     liquid_class=protocol.define_liquid_class(
-        name="mockStepId_transfer",
+        name="transfer_step_1",
         properties={
             "p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
                 "aspirate": {
@@ -302,7 +302,7 @@ pipette.transfer_with_liquid_class(
   })
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
-      stepId: 'mockStepId',
+      stepId: 1,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -408,7 +408,7 @@ pipette.drop_tip()
   })
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
-      stepId: 'mockStepId',
+      stepId: 1,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],

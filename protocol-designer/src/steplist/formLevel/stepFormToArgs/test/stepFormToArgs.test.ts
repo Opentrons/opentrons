@@ -18,6 +18,7 @@ import type {
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {
     const input: HydratedMoveLiquidFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'moveLiquid',
       stepName: 'transfer',
@@ -93,6 +94,7 @@ describe('form casting', () => {
 
   it('should cast mix form fields', () => {
     const input: HydratedMixFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'mix',
       stepName: 'mix',
@@ -134,6 +136,7 @@ describe('form casting', () => {
 
   it('should cast pause form fields', () => {
     const input: HydratedPauseFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'pause',
       stepName: 'pause',
@@ -154,6 +157,7 @@ describe('form casting', () => {
 
   it('should cast magnet form fields', () => {
     const input: HydratedMagnetFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'magnet',
       stepName: 'magnet',
@@ -168,6 +172,7 @@ describe('form casting', () => {
 
   it('should cast temperature form fields', () => {
     const input: HydratedTemperatureFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'temperature',
       stepName: 'temperature',
@@ -184,6 +189,7 @@ describe('form casting', () => {
 
   it('should cast thermocycler form fields', () => {
     const input: HydratedThermocyclerFormData = {
+      stepNumber: 1,
       id: 'stepId',
       stepType: 'thermocycler',
       stepName: 'thermocycler',

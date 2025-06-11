@@ -86,7 +86,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
-          stepId: 'mockStepId',
+          stepId: 1,
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
