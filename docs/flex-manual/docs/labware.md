@@ -302,6 +302,8 @@ The 24-well block is used with individual sample vials. For example, it accepts 
 - Secure contents with snap cap or screw cap closures. 
 - Hold liquid in capacities of 0.5 mL, 1.5 mL, and 2 mL. 
 
+![24-well aluminum block adapter.](images/labware-24-well-block.jpg "24-well block")
+
 ### 96-well aluminum block 
 
 The 96-well block supports a wide variety of well plate types. For example, it accepts well plates that are: 
@@ -312,19 +314,22 @@ The 96-well block supports a wide variety of well plate types. For example, it a
 
 It is also compatible with generic PCR strips. 
 
+![96-well aluminum block adapter.](images/labware-96-well-block.jpg "96-well block")
+
 ### Standalone adapters 
 
 | Thermal block           | API load name                         |
 | :---------------------- | :------------------------------------ |
 | Flex flat bottom plate  | opentrons_aluminum_flat_bottom_plate  |
-| 24-well aluminum block  | See labware combinations below.      |
+| 24-well aluminum block  | *See labware combinations below.*     |
 | 96-well aluminum block  | opentrons_96_well_aluminum_block      |
 
 ### Aluminum block labware combinations 
 
-The Opentrons Labware Library supports the following block, vial, and well plate combinations, which are also defined in separate JSON labware definition files. The Flex robot and the Opentrons Python API rely on these JSON definitions to work with labware used by your protocols. For example, when working with the API, the `ProtocolContext.load_labware` function accepts these labware names as valid parameters in your code. The tables below list the default block/container combinations and related API load names. Links connect to corresponding JSON definitions in the Opentrons GitHub repository. 
+The [Opentrons Labware Library](https://labware.opentrons.com/) supports the following block, vial, and well plate combinations, which are also defined in separate JSON labware definition files. The Flex robot and the Opentrons Python API rely on these JSON definitions to work with labware used by your protocols. For example, when working with the API, the `ProtocolContext.load_labware` function accepts these labware names as valid parameters in your code. The tables below list the default block/container combinations and related API load names. Links connect to corresponding JSON definitions in the [Opentrons GitHub repository](https://github.com/Opentrons/opentrons). 
 
-**Note:** All tubes have V-shaped bottoms unless otherwise indicated. 
+!!! note
+    All tubes have V-shaped bottoms unless otherwise indicated. 
 
 ### 24-well aluminum block labware combinations 
 
@@ -351,14 +356,12 @@ Although the Opentrons Flex works with all the inventory in the Labware Library,
 
 | Labware category                | Brands                                     |
 | :------------------------------ | :----------------------------------------- |
-| Deep Well Plates                | NEST 96 Deep Well Plate 2 mL               |
-| Fully Skirted 96 Well Plates    | • Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt |
-|                                 | NEST 96 Well Plate 200 µL Flat             |
-| Tip Racks (unfiltered and filtered tips) | Opentrons Flex 96 Tip Rack 50 µL           |
-|                                 | Opentrons Flex 96 Tip Rack 200 µL          |
-|                                 | • Opentrons Flex 96 Tip Rack 1000 µL       |
+| Deep Well Plates                | <ul><li>NEST 96 Deep Well Plate 2 mL</li></ul> |
+| Fully Skirted 96 Well Plates    | <ul><li>Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt</li><li>NEST 96 Well Plate 200 µL Flat</li></ul> |
+| Tip Racks (unfiltered and filtered tips) | <ul><li>Opentrons Flex 96 Tip Rack 50 µL</li><li>Opentrons Flex 96 Tip Rack 200 µL</li><li>Opentrons Flex 96 Tip Rack 1000 µL</li></ul> |
 
-**Note:** For best results, use the Flex Gripper only with the labware listed above. The Flex Gripper may work with other ANSI/SLAS automation compliant labware, but this is not recommended. 
+!!! note
+    For best results, use the Flex Gripper only with the labware listed above. The Flex Gripper may work with other ANSI/SLAS automation compliant labware, but this is not recommended. 
 
 ## Custom labware definitions 
 
@@ -370,62 +373,60 @@ Opentrons tools and services help put custom labware within your reach. These fe
 
 #### Custom Labware Creator 
 
-The Custom Labware Creator is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons App. After that, your custom labware is available to the Flex robot and the Python API. 
+The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons App. After that, your custom labware is available to the Flex robot and the Python API. 
 
 #### Custom Labware Service 
 
 Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or because a custom item includes different shapes, sizes, or other irregularities described below. 
 
-| Labware you can define in Labware Creator | Labware Opentrons needs to define            |
-| :---------------------------------------- | :------------------------------------------- |
-| ☑ Wells and tubes are uniform and identical. | ☑ Wells and tube shapes vary.               |
-| ☑ All rows are evenly spaced (the space between rows is equal). | ☑ Rows are not evenly spaced.               |
-| ☑ All columns are evenly spaced (the space between columns is equal). | ☑ Columns are not evenly spaced.            |
-| ☑ Fits perfectly in one deck slot.       | ☑ Smaller than one deck slot (requires adapter) or spans multiple deck slots. |
+| Labware you can define in Labware Creator | Labware Opentrons needs to define |
+| :---------------------------------------- | :-------------------------------- |
+| :material-checkbox-outline: Wells and tubes are uniform and identical. | :material-checkbox-outline: Wells and tube shapes vary.               |
+| :material-checkbox-outline: All rows are evenly spaced (the space between rows is equal). | :material-checkbox-outline: Rows are not evenly spaced.               |
+| :material-checkbox-outline: All columns are evenly spaced (the space between columns is equal). | :material-checkbox-outline: Columns are not evenly spaced.            |
+| :material-checkbox-outline: Fits perfectly in one deck slot.       | :material-checkbox-outline: Smaller than one deck slot (requires adapter) or spans multiple deck slots. |
 
 Here are some diagrams that help you visualize the examples described above. 
 
-- **Regular** 
-    * All columns are evenly spaced and all rows are evenly spaced. 
-    * Columns do not need to have the same spacing as rows. 
-- **Regular** 
-    * The grid does not have to be in the center of labware. 
-- **Irregular** 
-    * Rows are evenly spaced but **columns are not evenly spaced.** 
-- **Irregular** 
-    * Columns/rows are evenly spaced but **wells are not identical.** 
-- **Irregular** 
-    * There is **more than one grid.** 
+| Layout {style="width: 200px;"} | Description |
+| ------ | ----------- |
+| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns.](images/labware-layout-regular-even-space.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />All columns are evenly spaced and all rows are evenly spaced.<br />Columns do not need to have the same spacing as rows. |
+| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](images/labware-layout-regular-off-center.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.  |
+| ![Labware with 4 columns of 3 rows, separated into two groups.](images/labware-layout-irregular-uneven-space.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Rows are evenly spaced but **columns are not evenly spaced.**  |
+| ![Labware with 3 square wells and 9 circular wells.](images/labware-layout-irregular-wells-not-identical.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
+| ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](images/labware-layout-irregular-multiple-grids.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
 
-Our labware team will work to understand your needs and design custom labware definitions for you. See the Custom Labware Request form for more information. This is a fee-based service. 
+Our labware team will work to understand your needs and design custom labware definitions for you. Contact Opentrons Support for more information. This is a fee-based service. 
 
 #### Python API 
 
 While you cannot create custom labware with our API, you can use custom labware with the available API methods. However, you need to define your custom labware first and import it into the Opentrons App. 
 
-Once you have added your labware to the Opentrons App, it's available to the Python API and the robot. See the Custom Labware Definitions section of the Python API documentation for more information. For information about writing protocol scripts with the API, see the Python Protocol API section in the Protocol Development chapter. 
+Once you have added your labware to the Opentrons App, it's available to the Python API and the robot. For information about writing protocol scripts with the API, see the [Python Protocol API section](protocol-development.md#python-protocol-api) in the Protocol Development chapter. 
 
 ### JSON labware schema 
 
 A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema. 
 
+A schema is a framework for organizing data. It sets the rules about what information is required or optional and how it’s organized in the JSON file. If you’re interested, take a moment to review [our labware schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/schemas). For an actual example, see the definition for the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json). The following table lists and defines the items in the Opentrons labware schema.
+
 | Property {style="width: 20%;"} | Data type | Definition                                   |
 | :------------------ | :-------- | :------------------------------------------- |
-| `schemaVersion`     | Number    | Schema version used by a labware. The current version is 2. |
-| `version`           | Integer   | An incrementing integer that identifies the labware version. Minimum version is 1. |
+| `schemaVersion`     | Number    | Schema version used by a labware. The current version is `3`. |
+| `version`           | Integer   | An incrementing integer that identifies the labware version. Minimum version is `1`. |
 | `namespace`         | String    | See `safeString` in the JSON definitions section below. |
-| `metadata`          | Object    | <ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either µL, mL, or L.</li></ul> |
+| `metadata`          | Object    | Properties used for search and display. Accepts only:<ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either µL, mL, or L.</li></ul> |
 | `brand`             | Object    | Information about the labware manufacturer or those products the labware is compatible with. |
-| `parameters`        | Object    | <ul><li>`format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`.</li><li>`quirks` (Array): Strings describing labware behavior. See the Opentrons 96 Deep Well Adapter definition.</li><li>`isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`).</li><li>`tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li><li>`tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li><li>`loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`).</li><li>`isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module.</li><li>`magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below.</li></ul> |
-| `ordering`          | Array     | An array that tracks how wells should be ordered on a piece of labware. See the Opentrons 96 PCR Adapter example. |
-| `cornerOffsetFromSlot` | Object    | <ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> For labware that does not span multiple slots, these values should be zero. See `positiveNumber` in the JSON definitions section below. |
-| `dimensions`        | Object    | <ul><li>`xDimension` (length)</li><li>`yDimension` (width)</li><li>`zDimension` (height)</li></ul> See the Opentrons 96 PCR Adapter example. |
-| `wells`             | Object    | An unordered object of well objects, including position and dimensions.<ul><li>Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12.</li><li>Each well object accepts the following properties:</li><ul><li>`depth` (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of `tipLength`, but the values should match.</li><li>`x` (Number): Location of the center-bottom of a well in reference to the left of the labware.</li><li>`y` (Number): Location of the center-bottom of a well in reference to the front of the labware.</li><li>`z` (Number): Location of the center-bottom of a well in reference to the bottom of the labware.</li><li>`totalLiquidVolume` (Number): Total well, tube, or tip volume in µL.</li><li>`xDimension` (Number): Length of a rectangular well.</li><li>`yDimension` (Number): Width of a rectangular well.</li><li>`diameter` (Number): Diameter of a circular well.</li><li>`shape` (String): Either `rectangular` or `circular`.<ul><li>If `rectangular`, specify `xDimension` and `yDimension`.</li><li>If `circular`, specify `diameter`.</li></ul></li></ul><li>For a circular well example, see the Opentrons 96 PCR Adapter. For a rectangular well example, see the NEST 96 Deep Well Plate 2mL.</li><li>For dimension, depth, and volume, see `positiveNumber` in the JSON definitions section below.</li></ul> |
-| `groups`            | Array     | Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution.<ul><li>Each item in the array accepts:</li><ul><li>`wells` (Array): An array of wells (e.g., `["A1", "B1", "C1"]`) that share the same metadata. Array elements are strings.</li><li>`metadata` (Object): Metadata specific to a grid of wells. Accepts only:</li><ul><li>`displayName` (String): Human-readable name for the well group.</li><li>`displayCategory`: Labels used to categorize well groups. See `displayCategory` in the JSON definitions section below.</li><li>`wellBottomShape` (String): Bottom shape of a well. Available shapes are `flat`, `u`, or `v` only.</li><li>`brand`: Brand information for the well group. See `brandData` in the JSON definitions section below.</li></ul></ul></ul> |
-| `allowedRoles`      | Array     | Defines an item's role or purpose. If the `allowedRoles` field is missing from a definition, an item is treated as labware.<ul><li>Possible array items are only the following strings:</li><ul><li>`labware` (standard labware items)</li><li>`adapter` (items designed to hold labware)</li><li>`fixture` (items that are affixed to the deck)</li><li>`maintenance` (items not used in normal protocol runs)</li></ul></ul> |
+| `parameters`        | Object    | Internal parameters that describe labware characteristics. Accepts only:<ul><li>`format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`.</li><li>`quirks` (Array): Strings describing labware behavior. See the [Opentrons 96 Deep Well Adapter](https://github.com/Opentrons/opentrons/blob/03cd0336c6051c05fa66088fabec426c7b751a85/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json#L1108) definition.</li><li>`isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`).</li><li>`tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li><li>`tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li><li>`loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`).</li><li>`isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module.</li><li>`magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below.</li></ul> |
+| `ordering`          | Array     | An array that tracks how wells should be ordered on a piece of labware. See the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L2) example. |
+| `cornerOffsetFromSlot` | Object    | Used for labware that spans multiple deck slots. Offset is the distance from the left-front-bottom corner of the slot to the left-front-bottom corner of the labware bounding box. Accepts only:<ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> For labware that does not span multiple slots, these values should be zero. See `positiveNumber` in the JSON definitions section below. |
+| `dimensions`        | Object    | Outer dimensions (in mm) of a piece of labware. Accepts only:<ul><li>`xDimension` (length)</li><li>`yDimension` (width)</li><li>`zDimension` (height)</li></ul> See the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L26) example. |
+| `wells`             | Object    | An unordered object of well objects, including position and dimensions.<br />Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12.<br />Each well object accepts the following properties:<ul><li>`depth` (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of `tipLength`, but the values should match.</li><li>`x` (Number): Location of the center-bottom of a well in reference to the left of the labware.</li><li>`y` (Number): Location of the center-bottom of a well in reference to the front of the labware.</li><li>`z` (Number): Location of the center-bottom of a well in reference to the bottom of the labware.</li><li>`totalLiquidVolume` (Number): Total well, tube, or tip volume in µL.</li><li>`xDimension` (Number): Length of a rectangular well.</li><li>`yDimension` (Number): Width of a rectangular well.</li><li>`diameter` (Number): Diameter of a circular well.</li><li>`shape` (String): Either `rectangular` or `circular`.<br />If `rectangular`, specify `xDimension` and `yDimension`.<br />If `circular`, specify `diameter`.</li></ul>For a circular well example, see the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L31). For a rectangular well example, see the [NEST 96 Deep Well Plate 2mL](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/nest_96_wellplate_2ml_deep/2.json#L35).<br />For dimension, depth, and volume, see `positiveNumber` in the JSON definitions section below. |
+| `groups`            | Array     | Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution. Each item in the array accepts: <ul><li>`wells` (Array): An array of wells (e.g., `["A1", "B1", "C1"]`) that share the same metadata. Array elements are strings.</li><li>`metadata` (Object): Metadata specific to a grid of wells. Accepts only:</li><ul><li>`displayName` (String): Human-readable name for the well group.</li><li>`displayCategory`: Labels used to categorize well groups. See `displayCategory` in the JSON definitions section below.</li><li>`wellBottomShape` (String): Bottom shape of a well. Available shapes are `flat`, `u`, or `v` only.</li></ul><li>`brand`: Brand information for the well group. See `brandData` in the JSON definitions section below.</li></ul> |
+| `allowedRoles`      | Array     | Defines an item's role or purpose. If the `allowedRoles` field is missing from a definition, an item is treated as `labware`. Possible array items are only the following strings: <ul><li>`labware` (standard labware items)</li><li>`adapter` (items designed to hold labware)</li><li>`fixture` (items that are affixed to the deck)</li><li>`maintenance` (items not used in normal protocol runs)</li></ul> |
 | `stackingOffsetWithLabware` | Object    | For labware that can stack on top of another piece of labware. Used to determine z-height (labware z height + adapter z height - overlap). See `coordinates` in the JSON definitions section below. |
 | `stackingOffsetWithModule` | Object    | For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See `coordinates` in the JSON definitions section below. |
-| `gripperOffsets`    | Object    | Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware.<ul><li>Includes a default object that includes two properties:</li><ul><li>`pickUpOffset`: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li><li>`dropOffset`: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li></ul></ul> See `coordinates` in the JSON definitions section below. |
+| `gripperOffsets`    | Object    | Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a `default` object that includes two properties: <ul><li>`pickUpOffset`: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li><li>`dropOffset`: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li></ul> See `coordinates` in the JSON definitions section below. |
 | `gripForce`         | Number    | Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16. |
 | `gripHeightFromLabwareBottom` | Number    | Recommended z-axis height, from the labware bottom to the center of the gripper pads. |
 

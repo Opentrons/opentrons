@@ -13,6 +13,14 @@ code, pre {
 
 /* Colors */
 
+.opentrons-blue, .blue-50 {
+    color: #006CFA;
+}
+
+.grey, .grey-60 {
+    color: #4A4C4E;
+}
+
 th {
     background-color: #D0E6FE;
 }
