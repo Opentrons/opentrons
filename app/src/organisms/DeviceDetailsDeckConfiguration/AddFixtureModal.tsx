@@ -449,17 +449,20 @@ export function AddFixtureModal({
   }
 
   const getWasteChuteOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
-    const wasteCuteId = getAddressableAreaIdForCutout(
-      cutoutId,
-      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-    )
-    console.log('wasteCuteId: ', wasteCuteId)
+    // this will not work for waste chute bc there are multiple addressable areas that can match this fixture.
+    // const wasteCuteId = getAddressableAreaIdForCutout(
+    //   cutoutId,
+    //   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    // )
+    const DEFAULT_AA_FOR_WASTE_CHUTE = '1ChannelWasteChute'
     return [
-      {
-        cutoutId,
-        cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        addressableAreaId: wasteCuteId ?? '1ChannelWasteChute', // or add a default fo waste chute
-      },
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE
+        },
+      ],
     ]
   }
 

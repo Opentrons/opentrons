@@ -68,8 +68,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
-    deckConfig,
-    deckDef
+    deckConfig
   )
 
   const stagingAreaItems = filterAAByAreaType(
