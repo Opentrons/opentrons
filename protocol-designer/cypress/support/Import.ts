@@ -11,7 +11,6 @@ export interface MigrateTestCase {
   title: string
   importTestFile: TestFilePath
   expectedTestFile: TestFilePath
-  unusedHardware: boolean
   migrationModal: 'newLabwareDefs' | 'v8.1' | 'noBehaviorChange' | null
 }
 
@@ -20,7 +19,6 @@ export const ContentStrings = {
   v8_1: 'The default dispense height is now 1 mm from the bottom of the well',
   noBehaviorChange:
     'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior',
-  unusedHardwareWarning: 'Protocol has unused hardware',
   exportButton: 'Export',
   continueButton: 'continue',
   continueWithExport: 'Continue with export',
@@ -59,14 +57,19 @@ export const verifyImportProtocolPage = (protocol: TestFile): void => {
     cy.contains(ContentStrings.protocolMetadata).should('be.visible')
     cy.contains(ContentStrings.instruments).should('be.visible')
     cy.contains(ContentStrings.protocolStartingDeck).should('be.visible')
-    cy.contains(String(protocolRead.metadata.protocolName)).should('be.visible')
+    if (!protocolRead.metadata.protocolName) {
+      cy.contains('Some name!').should('be.visible')
+    } else {
+      cy.contains(String(protocolRead.metadata.protocolName)).should(
+        'be.visible'
+      )
+    }
   })
 }
 
 export const migrateAndMatchSnapshot = ({
   importTestFile,
   expectedTestFile,
-  unusedHardware,
   migrationModal,
 }: MigrateTestCase): void => {
   const uploadProtocol: TestFile = getTestFile(importTestFile)
@@ -85,12 +88,16 @@ export const migrateAndMatchSnapshot = ({
       .click({ force: true })
   }
 
+  verifyImportProtocolPage(uploadProtocol)
+  cy.contains('Edit protocol').click()
+
+  cy.screenshot('protocol-designer/migration-snapshot', {
+    capture: 'viewport',
+    overwrite: true,
+  })
+
   cy.get(LocatorStrings.exportProtocol).click({ force: true })
 
-  if (unusedHardware) {
-    cy.get('div').contains(ContentStrings.unusedHardwareWarning).should('exist')
-    cy.contains(ContentStrings.continueWithExport).click({ force: true })
-  }
   const expectedProtocol: TestFile = getTestFile(expectedTestFile)
 
   cy.readFile(expectedProtocol.path).then(expectedProtocolRead => {

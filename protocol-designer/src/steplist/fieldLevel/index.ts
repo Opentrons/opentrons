@@ -213,7 +213,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(
-      maskToInteger,
+      maskToFloat,
       onlyPositiveNumbers,
       trimDecimals(1)
     ),
@@ -240,7 +240,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_delay_seconds: {
     maskValue: composeMaskers(
-      maskToInteger,
+      maskToFloat,
       onlyPositiveNumbers,
       trimDecimals(1)
     ),

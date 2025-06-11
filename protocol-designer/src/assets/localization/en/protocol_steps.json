@@ -22,7 +22,7 @@
     "targetHeaterShakerTemperature": "Must be between 37 and 95˚C",
     "blockTargetTempHold": "Must be between 4 and 99˚C",
     "lidTargetTempHold": "Must be between 37 and 110˚C",
-    "volume": "Must be between 0 and {{max}}"
+    "volume": "Must be between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
   "column": "Column",
@@ -51,8 +51,8 @@
   "edit_hardware": "Edit your deck hardware",
   "edit_modules": "Edit modules",
   "edit_hardware_on_deck": "Edit your deck hardware by placing modules and fixtures onto the deck",
-  "engage_height": "Engage height",
   "ending_deck": "Ending deck",
+  "engage_height": "Engage height",
   "flow_type_title": "{{type}} flow rate",
   "from": "from",
   "heater_shaker": {

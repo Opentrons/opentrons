@@ -89,18 +89,6 @@ export interface LiquidV1Mixin {
   }
 }
 
-export interface LiquidV2Mixin {
-  liquidSchemaId: 'opentronsLiquidSchemaV2'
-  liquids: {
-    [liquidId: string]: {
-      displayName: string
-      description: string
-      liquidClass: string | null
-      displayColor?: string
-    }
-  }
-}
-
 export interface RobotStructure {
   model: string
   deckId: string
@@ -147,7 +135,7 @@ export type ProtocolFile<
 > = ProtocolBase<DesignerApplicationData> &
   (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
-  (LiquidV1Mixin | LiquidV2Mixin) &
+  LiquidV1Mixin &
   (
     | CommandV8Mixin
     | CommandV9Mixin

@@ -9,10 +9,6 @@ OT_PYTHON ?= python
 # https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
 OT_VIRTUALENV_VERSION ?= 3.10
 
-# Use legacy editable installs to avoid breaking mypy type-checking
-# when using newer versions of setuptools
-export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
-
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 python := $(pipenv) run python
@@ -22,12 +18,39 @@ pytest := $(pipenv) run py.test
 pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
 pipenv_opts += $(and $(CI),--clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
+build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
 poetry := poetry
 poetry_run := $(poetry) run
 
 pypi_upload_url := https://upload.pypi.org/legacy/
 pypi_test_upload_url := https://test.pypi.org/legacy/
+
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
+
+PROJECT = $(project_rs_default)
+
+git_describe_base := git describe --dirty --tags --long --match
+
+# get the appropriate git describe command for a given project
+# parameter 1: project
+define git_describe_cmd_for_project
+$(if $(findstring robot-stack,$(1)),$(git_describe_base)=v*,$(if $(findstring ot3,$(1)),$(git_describe_base)=ot3@*,$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
+endef
+
+# get the appropriate tag regex for a given project
+# parameter 1: project
+define git_tag_regex_for_project
+$(if $(findstring robot-stack,$(1)),v(?P<version>.*),$(if $(findstring ot3,$(1)),ot3@(?P<version>.*),$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
+endef
+
+# get the full environment variable definition for hatch git describe
+# parameter 1: project
+define hatch_raw_options_for_project
+git_describe_command=$(call git_describe_cmd_for_project,$(1))
+endef
 
 # get the python package version
 # (evaluates to that string)
@@ -51,7 +74,7 @@ endef
 # parameter 4: any extra version tags
 # parameter 5: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_get_wheelname
-$(3)-$(call python_package_version,$(1),$(2),$(4),$(5))-py2.py3-none-any.whl
+$(3)-$(call python_package_version,$(1),$(2),$(4),$(5))-py3-none-any.whl
 endef
 
 # get the name of the sdist that setup.py will build

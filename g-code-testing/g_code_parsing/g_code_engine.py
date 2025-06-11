@@ -7,14 +7,19 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.protocol_engine import create_protocol_engine, Config, DeckType
+from opentrons.protocol_engine import (
+    create_protocol_engine,
+    Config,
+    DeckType,
+    error_recovery_policy,
+)
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner
+from opentrons.protocol_runner import RunOrchestrator
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from opentrons.protocols.api_support import deck_type
@@ -36,6 +41,28 @@ from g_code_parsing.utils import get_configuration_dir
 from opentrons_shared_data.robot.types import RobotType
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
+
+
+def _run_app(config: Settings):
+    async def _async_entry():
+        await asyncio.gather(
+            run_smoothie.run(config),
+            run_app.run(config, modules=[m.value for m in config.modules]),
+        )
+
+    asyncio.run(_async_entry())
+
+
+def _run_wait_ready(config: Settings):
+    # Entry point for process that waits for emulation to be ready.
+    async def _wait_ready() -> None:
+        c = await ModuleStatusClient.connect(
+            host="localhost", port=config.module_server.port
+        )
+        await wait_emulators(client=c, modules=config.modules, timeout=5)
+        c.close()
+
+    asyncio.run(_wait_ready())
 
 
 class GCodeEngine:
@@ -63,32 +90,11 @@ class GCodeEngine:
         hardware controller is returned."""
         modules = self._config.modules
 
-        # Entry point for the emulator app process
-        def _run_app():
-            async def _async_entry():
-                await asyncio.gather(
-                    run_smoothie.run(self._config),
-                    run_app.run(self._config, modules=[m.value for m in modules]),
-                )
-
-            asyncio.run(_async_entry())
-
-        proc = Process(target=_run_app)
+        proc = Process(target=_run_app, args=(self._config,))
         proc.daemon = True
         proc.start()
 
-        # Entry point for process that waits for emulation to be ready.
-        async def _wait_ready() -> None:
-            c = await ModuleStatusClient.connect(
-                host="localhost", port=self._config.module_server.port
-            )
-            await wait_emulators(client=c, modules=modules, timeout=5)
-            c.close()
-
-        def _run_wait_ready():
-            asyncio.run(_wait_ready())
-
-        ready_proc = Process(target=_run_wait_ready)
+        ready_proc = Process(target=_run_wait_ready, args=(self._config,))
         ready_proc.daemon = True
         ready_proc.start()
         ready_proc.join()
@@ -102,8 +108,15 @@ class GCodeEngine:
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
         # Wait for modules to be present
+        wait_begins = time.time()
         while len(emulator.attached_modules) != len(modules):
             time.sleep(0.1)
+            if (time.time() - wait_begins) > 30:
+                proc.kill()
+                proc.join()
+                raise RuntimeError(
+                    f"Failed to start {emulator.attached_modules} after 30 seconds"
+                )
 
         yield emulator
 
@@ -137,7 +150,6 @@ class GCodeEngine:
 
         # TODO(mm, 2023-05-16): robot_type should be automatically derived from the protocol file.
         robot_type: RobotType = "OT-2 Standard"
-
         with self._emulate() as hardware:
             if (isinstance(version, APIVersion) and version >= APIVersion(2, 14)) or (
                 isinstance(version, int)
@@ -163,10 +175,10 @@ class GCodeEngine:
                     content_hash=path,
                 )
 
-                protocol_runner = create_protocol_runner(
-                    protocol_config=config,
-                    protocol_engine=await create_protocol_engine(
-                        hardware_api=hardware,  # type: ignore
+                protocol_orchestrator = RunOrchestrator.build_orchestrator(
+                    hardware_api=hardware,
+                    protocol_engine=await create_protocol_engine.create_protocol_engine(
+                        hardware_api=hardware,
                         config=Config(
                             robot_type=robot_type,
                             deck_type=DeckType(
@@ -174,12 +186,13 @@ class GCodeEngine:
                             ),
                             use_simulated_deck_config=True,
                         ),
+                        error_recovery_policy=error_recovery_policy.never_recover,
                         load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),
-                    hardware_api=hardware,  # type: ignore
+                    protocol_config=config,
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
-                    await protocol_runner.run(
+                    await protocol_orchestrator.run(
                         deck_configuration=[], protocol_source=protocol_source
                     )
                     yield GCodeProgram.from_g_code_watcher(watcher)

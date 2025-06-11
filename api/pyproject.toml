@@ -1,0 +1,84 @@
+[project]
+name = 'opentrons'
+
+requires-python = '>=3.10'
+license = 'Apache-2.0'
+authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
+description = "The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy."
+
+dependencies = [
+   "opentrons-shared-data==0.0.0",
+    "aionotify==0.3.1",
+    "anyio>=3.6.1,<4.0.0",
+    "jsonschema>=3.0.1,<4.18.0",
+    "numpy>=1.20.0,<2",
+    "pydantic>=2.0.0,<3",
+    "pydantic-settings>=2,<3",
+    "pyserial>=3.5",
+    "typing-extensions>=4.0.0,<5",
+    "click>=8.0.0,<9",
+    "pyusb==1.2.1",
+    'importlib-metadata >= 1.0 ; python_version < "3.8"',
+    "packaging>=21.0",
+]
+
+dynamic = ['version', 'hatch-dependency-coversion']
+
+[project.optional-dependencies]
+"ot2-hardware" = ["opentrons-hardware==0.0.0"]
+"flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
+
+
+[project.scripts]
+"opentrons_simulate" = "opentrons.simulate:main"
+"opentrons_execute" = "opentrons.execute:main"
+
+[project.urls]
+"opentrons.com" = "https://www.opentrons.com"
+"Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/api"
+"Documentation" = "https://docs.opentrons.com"
+
+[build-system]
+requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
+build-backend = 'hatchling.build'
+
+[tool.hatch.metadata.hooks.dependency-coversion]
+override-versions-of=['opentrons-shared-data', 'opentrons-hardware', 'opentrons-hardware["FLEX"]']
+
+[tool.hatch.build.hooks.vcs-tunable]
+version-file="src/opentrons/_version.py"
+tag-pattern='v(?P<version>.*)'
+fallback_version='0.0.0-dev'
+
+[tool.hatch.version]
+source = 'vcs-tunable'
+
+[tool.hatch.version.raw-options]
+root = '..'
+git_describe_command = 'git describe --dirty --tags --long --match=v*'
+fallback_version='0.0.0-dev'
+# Note: these are required for setuptools_scm to not automatically bump the version used in the package
+# from the latest version it detects. This would actually be kind of useful, but we can only do it if
+# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+version_scheme='only-version'
+local_scheme='no-local-version'
+
+[tool.hatch.build.targets.sdist]
+include = ['src/opentrons', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/opentrons']
+
+[tool.hatch.build.targets.wheel.force_include]
+'LICENSE' = 'opentrons/LICENSE'

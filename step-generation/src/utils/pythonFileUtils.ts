@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
   getLabwareDefIsStandard,
@@ -8,6 +9,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { getPythonLiquidClassName } from './liquidClassUtils'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
@@ -307,6 +309,32 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
+export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const allLiquidClasses = Object.values(liquidEntities)
+    .map(liquid => liquid.liquidClass)
+    .filter(liquidClass => liquidClass != null)
+  const uniqueLiquidClasses = Array.from(new Set(allLiquidClasses))
+  const pythonLoadLiquidClasses = uniqueLiquidClasses
+    .map(liquidClass => {
+      // we check that liquidClass is not null earlier but i got a check error
+      // without specifying it here
+      if (liquidClass == null) {
+        return ''
+      }
+      return `${getPythonLiquidClassName(
+        liquidClass
+      )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
+        allLiquidClassDefs[liquidClass].liquidClassName
+      )})`
+    })
+    .join('\n')
+
+  return uniqueLiquidClasses.length > 0
+    ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
+    : ''
+}
+
 export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {
   const pythonLoadTrashBins = Object.values(trashBinEntities)
     ?.map(trashBin => {
@@ -380,6 +408,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
+    getLoadLiquidClasses(liquidEntities),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

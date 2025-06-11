@@ -220,7 +220,9 @@
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
           "aspirate_wells_grouped": false,
-          "aspirate_wells": ["A1"],
+          "aspirate_wells": [
+            "A1"
+          ],
           "aspirate_x_position": 0,
           "aspirate_y_position": 0,
           "blowout_checkbox": false,
@@ -260,7 +262,16 @@
           "dispense_touchTip_mmFromEdge": 0,
           "dispense_wellOrder_first": "t2b",
           "dispense_wellOrder_second": "l2r",
-          "dispense_wells": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+          "dispense_wells": [
+            "A1",
+            "B1",
+            "C1",
+            "D1",
+            "E1",
+            "F1",
+            "G1",
+            "H1"
+          ],
           "dispense_x_position": 0,
           "dispense_y_position": 0,
           "disposalVolume_checkbox": true,
@@ -313,7 +324,9 @@
           "times": "2",
           "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
           "volume": "10",
-          "wells": ["A1"],
+          "wells": [
+            "A1"
+          ],
           "stepType": "mix",
           "stepName": "mix",
           "stepDetails": "",
@@ -494,18 +507,126 @@
   "labwareDefinitions": {
     "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
       "ordering": [
-        ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-        ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-        ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-        ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-        ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-        ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-        ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-        ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-        ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"],
-        ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-        ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-        ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
+        [
+          "A1",
+          "B1",
+          "C1",
+          "D1",
+          "E1",
+          "F1",
+          "G1",
+          "H1"
+        ],
+        [
+          "A2",
+          "B2",
+          "C2",
+          "D2",
+          "E2",
+          "F2",
+          "G2",
+          "H2"
+        ],
+        [
+          "A3",
+          "B3",
+          "C3",
+          "D3",
+          "E3",
+          "F3",
+          "G3",
+          "H3"
+        ],
+        [
+          "A4",
+          "B4",
+          "C4",
+          "D4",
+          "E4",
+          "F4",
+          "G4",
+          "H4"
+        ],
+        [
+          "A5",
+          "B5",
+          "C5",
+          "D5",
+          "E5",
+          "F5",
+          "G5",
+          "H5"
+        ],
+        [
+          "A6",
+          "B6",
+          "C6",
+          "D6",
+          "E6",
+          "F6",
+          "G6",
+          "H6"
+        ],
+        [
+          "A7",
+          "B7",
+          "C7",
+          "D7",
+          "E7",
+          "F7",
+          "G7",
+          "H7"
+        ],
+        [
+          "A8",
+          "B8",
+          "C8",
+          "D8",
+          "E8",
+          "F8",
+          "G8",
+          "H8"
+        ],
+        [
+          "A9",
+          "B9",
+          "C9",
+          "D9",
+          "E9",
+          "F9",
+          "G9",
+          "H9"
+        ],
+        [
+          "A10",
+          "B10",
+          "C10",
+          "D10",
+          "E10",
+          "F10",
+          "G10",
+          "H10"
+        ],
+        [
+          "A11",
+          "B11",
+          "C11",
+          "D11",
+          "E11",
+          "F11",
+          "G11",
+          "H11"
+        ],
+        [
+          "A12",
+          "B12",
+          "C12",
+          "D12",
+          "E12",
+          "F12",
+          "G12",
+          "H12"
+        ]
       ],
       "brand": {
         "brand": "Opentrons",
@@ -1552,7 +1673,9 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "allowedRoles": ["adapter"],
+      "allowedRoles": [
+        "adapter"
+      ],
       "cornerOffsetFromSlot": {
         "x": 8.5,
         "y": 5.5,
@@ -1561,23 +1684,135 @@
     },
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2": {
       "ordering": [
-        ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-        ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-        ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-        ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-        ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-        ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-        ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-        ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-        ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"],
-        ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-        ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-        ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
+        [
+          "A1",
+          "B1",
+          "C1",
+          "D1",
+          "E1",
+          "F1",
+          "G1",
+          "H1"
+        ],
+        [
+          "A2",
+          "B2",
+          "C2",
+          "D2",
+          "E2",
+          "F2",
+          "G2",
+          "H2"
+        ],
+        [
+          "A3",
+          "B3",
+          "C3",
+          "D3",
+          "E3",
+          "F3",
+          "G3",
+          "H3"
+        ],
+        [
+          "A4",
+          "B4",
+          "C4",
+          "D4",
+          "E4",
+          "F4",
+          "G4",
+          "H4"
+        ],
+        [
+          "A5",
+          "B5",
+          "C5",
+          "D5",
+          "E5",
+          "F5",
+          "G5",
+          "H5"
+        ],
+        [
+          "A6",
+          "B6",
+          "C6",
+          "D6",
+          "E6",
+          "F6",
+          "G6",
+          "H6"
+        ],
+        [
+          "A7",
+          "B7",
+          "C7",
+          "D7",
+          "E7",
+          "F7",
+          "G7",
+          "H7"
+        ],
+        [
+          "A8",
+          "B8",
+          "C8",
+          "D8",
+          "E8",
+          "F8",
+          "G8",
+          "H8"
+        ],
+        [
+          "A9",
+          "B9",
+          "C9",
+          "D9",
+          "E9",
+          "F9",
+          "G9",
+          "H9"
+        ],
+        [
+          "A10",
+          "B10",
+          "C10",
+          "D10",
+          "E10",
+          "F10",
+          "G10",
+          "H10"
+        ],
+        [
+          "A11",
+          "B11",
+          "C11",
+          "D11",
+          "E11",
+          "F11",
+          "G11",
+          "H11"
+        ],
+        [
+          "A12",
+          "B12",
+          "C12",
+          "D12",
+          "E12",
+          "F12",
+          "G12",
+          "H12"
+        ]
       ],
       "brand": {
         "brand": "NEST",
-        "brandId": ["402501"],
-        "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
+        "brandId": [
+          "402501"
+        ],
+        "links": [
+          "https://www.nest-biotech.com/pcr-plates/58773587.html"
+        ]
       },
       "metadata": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -2600,17 +2835,49 @@
     },
     "opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1": {
       "ordering": [
-        ["A1", "B1", "C1", "D1"],
-        ["A2", "B2", "C2", "D2"],
-        ["A3", "B3", "C3", "D3"],
-        ["A4", "B4", "C4", "D4"],
-        ["A5", "B5", "C5", "D5"],
-        ["A6", "B6", "C6", "D6"]
+        [
+          "A1",
+          "B1",
+          "C1",
+          "D1"
+        ],
+        [
+          "A2",
+          "B2",
+          "C2",
+          "D2"
+        ],
+        [
+          "A3",
+          "B3",
+          "C3",
+          "D3"
+        ],
+        [
+          "A4",
+          "B4",
+          "C4",
+          "D4"
+        ],
+        [
+          "A5",
+          "B5",
+          "C5",
+          "D5"
+        ],
+        [
+          "A6",
+          "B6",
+          "C6",
+          "D6"
+        ]
       ],
       "brand": {
         "brand": "Opentrons",
         "brandId": [],
-        "links": ["https://shop.opentrons.com/aluminum-block-set/"]
+        "links": [
+          "https://shop.opentrons.com/aluminum-block-set/"
+        ]
       },
       "metadata": {
         "displayName": "Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap",
@@ -2850,7 +3117,10 @@
           },
           "brand": {
             "brand": "NEST",
-            "brandId": ["615601", "615001"],
+            "brandId": [
+              "615601",
+              "615001"
+            ],
             "links": [
               "https://www.nest-biotech.com/micro-centrifuge-tube/59201044.html"
             ]
@@ -2885,7 +3155,9 @@
       ],
       "parameters": {
         "format": "irregular",
-        "quirks": ["gripperIncompatible"],
+        "quirks": [
+          "gripperIncompatible"
+        ],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
         "loadName": "opentrons_24_aluminumblock_nest_1.5ml_snapcap"
@@ -2901,22 +3173,132 @@
     },
     "opentrons/nest_96_wellplate_200ul_flat/2": {
       "ordering": [
-        ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-        ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-        ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-        ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-        ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-        ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-        ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-        ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-        ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"],
-        ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-        ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-        ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
+        [
+          "A1",
+          "B1",
+          "C1",
+          "D1",
+          "E1",
+          "F1",
+          "G1",
+          "H1"
+        ],
+        [
+          "A2",
+          "B2",
+          "C2",
+          "D2",
+          "E2",
+          "F2",
+          "G2",
+          "H2"
+        ],
+        [
+          "A3",
+          "B3",
+          "C3",
+          "D3",
+          "E3",
+          "F3",
+          "G3",
+          "H3"
+        ],
+        [
+          "A4",
+          "B4",
+          "C4",
+          "D4",
+          "E4",
+          "F4",
+          "G4",
+          "H4"
+        ],
+        [
+          "A5",
+          "B5",
+          "C5",
+          "D5",
+          "E5",
+          "F5",
+          "G5",
+          "H5"
+        ],
+        [
+          "A6",
+          "B6",
+          "C6",
+          "D6",
+          "E6",
+          "F6",
+          "G6",
+          "H6"
+        ],
+        [
+          "A7",
+          "B7",
+          "C7",
+          "D7",
+          "E7",
+          "F7",
+          "G7",
+          "H7"
+        ],
+        [
+          "A8",
+          "B8",
+          "C8",
+          "D8",
+          "E8",
+          "F8",
+          "G8",
+          "H8"
+        ],
+        [
+          "A9",
+          "B9",
+          "C9",
+          "D9",
+          "E9",
+          "F9",
+          "G9",
+          "H9"
+        ],
+        [
+          "A10",
+          "B10",
+          "C10",
+          "D10",
+          "E10",
+          "F10",
+          "G10",
+          "H10"
+        ],
+        [
+          "A11",
+          "B11",
+          "C11",
+          "D11",
+          "E11",
+          "F11",
+          "G11",
+          "H11"
+        ],
+        [
+          "A12",
+          "B12",
+          "C12",
+          "D12",
+          "E12",
+          "F12",
+          "G12",
+          "H12"
+        ]
       ],
       "brand": {
         "brand": "NEST",
-        "brandId": ["701011"],
+        "brandId": [
+          "701011"
+        ],
         "links": [
           "https://www.nest-biotech.com/cell-culture-plates/59415537.html"
         ]
@@ -7061,8 +7443,15 @@
       }
     },
     {
-      "commandType": "aspirate",
-      "key": "3ba23422-930d-48c1-98b1-514a96629be7",
+      "commandType": "prepareToAspirate",
+      "key": "2f1122b5-db81-4751-9855-f0b22373d09d",
+      "params": {
+        "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193"
+      }
+    },
+    {
+      "commandType": "moveToWell",
+      "key": "f948ec0d-939d-4690-9785-e990428159ab",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10,

@@ -61,6 +61,33 @@ export const replaceTipCommands = (tip: number | string): CreateCommand[] => [
   ...dropTipHelper(),
   pickUpTipHelper(tip),
 ]
+export const prepareAndConfigureCommands = (
+  volumeToConfigure?: number
+): CreateCommand[] => {
+  const configureCommands: CreateCommand[] =
+    volumeToConfigure != null
+      ? [
+          {
+            commandType: 'configureForVolume',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              volume: volumeToConfigure,
+            },
+          },
+        ]
+      : []
+  return [
+    ...configureCommands,
+    {
+      commandType: 'prepareToAspirate',
+      key: expect.any(String),
+      params: {
+        pipetteId: 'p300SingleId',
+      },
+    },
+  ]
+}
 // NOTE: make sure none of these numbers match each other!
 const ASPIRATE_FLOW_RATE = 2.1
 const DISPENSE_FLOW_RATE = 2.2
@@ -302,6 +329,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
               volume: dispenseAirGap,
               flowRate: dispenseFlowRate,
             },
+            meta: AIR_GAP_META,
           },
         ]
       : []),
@@ -693,6 +721,7 @@ export const dispenseHelperLiquidClass = (params: {
               flowRate: dispenseFlowRate,
               pushOut: 0,
             },
+            meta: AIR_GAP_META,
           },
           ...(dispenseDelay > 0
             ? [

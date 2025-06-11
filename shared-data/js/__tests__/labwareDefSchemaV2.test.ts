@@ -132,6 +132,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
 
   // this labware has a lip
   'ev_resin_tips_flex_96_labware/1.json': standard96WellNames,
+  'ibidi_96_square_well_plate_300ul/1.json': standard96WellNames,
 
   // Presumably a bug. Fixed in v3 of this labware.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),

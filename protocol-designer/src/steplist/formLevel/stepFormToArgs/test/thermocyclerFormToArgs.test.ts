@@ -42,6 +42,7 @@ describe('thermocyclerFormToArgs', () => {
         profileVolume: '10',
         stepName: 'mock name',
         stepDetails: 'mock details',
+        stepNumber: 1,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
@@ -58,7 +59,7 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-
+        stepNumber: 1,
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: false,
@@ -104,6 +105,7 @@ describe('thermocyclerFormToArgs', () => {
         profileVolume: '4',
         profileTargetLidTemp: '40',
         orderedProfileItems: ['profileItem1', 'profileItem2'],
+        stepNumber: 1,
         profileItemsById: {
           profileItem1: {
             type: 'profileStep',
