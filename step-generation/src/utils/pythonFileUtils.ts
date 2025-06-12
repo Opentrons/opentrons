@@ -318,9 +318,7 @@ export function getLoadLiquidClasses(
   )
   const pythonLoadLiquidClasses = uniqueLiquidClassesFromForms
     .map(liquidClass => {
-      // we check that liquidClass is not null earlier but i got a check error
-      // without specifying it here
-      if (liquidClass == null) {
+      if (liquidClass == null || liquidClass === 'none') {
         return ''
       }
       return `${getPythonLiquidClassName(

@@ -407,7 +407,7 @@ pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
 
 const liquid1 = 'liquid1'
 const liquid2 = 'liquid2'
-let mockLiquidEntities: LiquidEntities = {
+const mockLiquidEntities: LiquidEntities = {
   [liquid1]: {
     liquidGroupId: liquid1,
     pythonName: 'liquid_1',
