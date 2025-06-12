@@ -222,7 +222,13 @@ class FixtureSettings:
             if len(tipracks) > 0:
                 wells = []
                 for rack in tipracks:
-                    wells += rack.wells()
+                    if pipette_channels == 1:
+                        wells += rack.wells()
+                    if pipette_channels == 8:
+                        # TODO remove the pattern
+                        wells += rack.wells()
+                    if pipette_channels == 96:
+                        wells += [rack.wells()[0]]
                 tips[size] = wells
 
         add_tips(20, tipracks_20ul_lw)
