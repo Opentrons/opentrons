@@ -109,11 +109,11 @@
         "yDimension": { "type": "number" },
         "footprintXDimension": {
           "type": "number",
-          "description": "The x dimension of the module's top-most plane."
+          "description": "The x dimension of the module's bottom-most plane."
         },
         "footprintYDimension": {
           "type": "number",
-          "description": "The y dimension of the module's top-most plane."
+          "description": "The y dimension of the module's bottom-most plane."
         },
         "labwareInterfaceXDimension": {
           "type": "number",
