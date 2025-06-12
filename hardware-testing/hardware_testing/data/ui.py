@@ -46,7 +46,10 @@ def get_user_answer(question: str) -> bool:
 
 def get_user_ready(message: str) -> None:
     """Get user ready."""
-    input(f"WAIT: {message}, press ENTER when ready: ")
+    global outfile
+    if not outfile:
+        input(f"WAIT: {message}, press ENTER when ready: ")
+
 
 
 def alert_user_ready(message: str, hw: SyncHardwareAPI) -> None:

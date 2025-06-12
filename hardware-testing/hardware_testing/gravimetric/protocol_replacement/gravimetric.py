@@ -240,14 +240,18 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
+        if simulating:
+            pipette_tag = "pipette"
+        else:
+            pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
         simulating = ctx.is_simulating()
         run_id = create_run_id()
         scale = Scale.build(simulating)
-        scale_serial = scale.read_serial_number()
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
                 test_name=name,
                 run_id=run_id,
+                tag=pipette_tag,
                 start_time=time(),
                 duration=0,
                 frequency=1000 if simulating else 5,
@@ -255,16 +259,14 @@ class FixtureSettings:
             ),
             scale,
             simulate=simulating,
+            start_graph=False
         )
+        scale_serial = scale.read_serial_number()
         if simulating:
             recorder.set_simulation_mass(10)
         recorder.record(in_thread=True)
         env_sensor = AsairDriver.BuildAsairSensor(simulating)
         env_serial = env_sensor.get_serial()
-        if simulating:
-            pipette_tag = "pipette"
-        else:
-            pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
         ot3api = ctx._core.get_hardware()
         robot_serial = str(ot3api.get_serial_number())
         fw_version = ot3api.fw_version
@@ -279,8 +281,8 @@ class FixtureSettings:
             name=name,
             run_id=run_id,
         )
-        os.makedirs(f"{test_report.parent}/{test_report._run_id}", exist_ok=True)
-        set_output_file(f"{test_report.parent}/{test_report._run_id}/run_output.txt")
+        os.makedirs(f"{test_report.parent}", exist_ok=True)
+        set_output_file(f"{test_report.parent}/run_output.txt")
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
@@ -637,6 +639,7 @@ def run(ctx: ProtocolContext) -> None:
     first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
     pick_up_tip_for_channel(fixture_settings, first_tip, 1)
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
     measurements: Dict[float, List[List[MeasurementData]]] = {}
     ctx.delay(
