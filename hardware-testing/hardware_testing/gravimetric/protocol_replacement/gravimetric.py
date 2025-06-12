@@ -704,7 +704,7 @@ def run(ctx: ProtocolContext) -> None:
 
     last_measurement = blank_measurments[-1][-1]
 
-    for tip in fixture_settings.tips:
+    for tip in fixture_settings.tip_sizes:
         for volume in fixture_settings.volumes[tip]:
             trial_asp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
