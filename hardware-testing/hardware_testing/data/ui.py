@@ -27,7 +27,7 @@ def _output(msg: str) -> None:
     global outfile
     if outfile:
         with open(outfile, "a") as f:
-            f.write(msg)
+            f.write(f"{msg}\n")
     else:
         print(msg)
 
@@ -49,7 +49,6 @@ def get_user_ready(message: str) -> None:
     global outfile
     if not outfile:
         input(f"WAIT: {message}, press ENTER when ready: ")
-
 
 
 def alert_user_ready(message: str, hw: SyncHardwareAPI) -> None:
