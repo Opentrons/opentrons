@@ -70,6 +70,7 @@
   "dispense_volume": "Dispense volume per well",
   "dispense": "Dispense",
   "disposal_volume_µL": "Disposal volume (µL)",
+  "disposal_volume": "Disposal volume",
   "distance_bottom_of_well_mm": "Distance from bottom of well (mm)",
   "distance_from_bottom": "Distance from bottom of well (mm)",
   "distribute_volume_error": "The selected source well is too small to distribute from. Try distributing to fewer wells.",
@@ -203,6 +204,7 @@
   "well": "well",
   "wellPlate": "Well plates",
   "wells": "wells",
+  "blowout_flow_rate_µL": "Blowout flow rate (µL/second)",
   "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted.",
   "withdraw_tip_from_liquid_aspirate": "Withdraw the tip from the liquid after aspirating",
   "withdraw_tip_from_liquid_dispense": "Withdraw the tip from the liquid after dispensing"

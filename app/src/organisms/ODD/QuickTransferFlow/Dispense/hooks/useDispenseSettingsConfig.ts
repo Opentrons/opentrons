@@ -18,11 +18,13 @@ import type {
 interface UseDispenseSettingsConfigProps {
   state: QuickTransferSummaryState
   setSelectedSetting: (setting: DispenseSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useDispenseSettingsConfig({
   state,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -162,6 +164,15 @@ export function useDispenseSettingsConfig({
         } else {
           setSelectedSetting('dispense_blow_out')
         }
+      },
+    },
+    {
+      option: 'dispense_disposal_volume',
+      copy: t('disposal_volume'),
+      value: 'ToDo: update', // ToDo add text item, volume, location, and flow rate
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting('dispense_disposal_volume')
       },
     },
     {

@@ -272,5 +272,11 @@ export function quickTransferSummaryReducer(
         conditionAspirate: action.conditionAspirate,
       }
     }
+    case 'SET_DISPOSAL_VOLUME_DISPENSE': {
+      return {
+        ...state,
+        disposalVolumeDispense: action.disposalVolumeDispense,
+      }
+    }
   }
 }

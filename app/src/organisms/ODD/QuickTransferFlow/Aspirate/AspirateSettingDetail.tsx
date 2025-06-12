@@ -25,12 +25,8 @@ interface CommonSettingProps {
   isMultiTransfer: boolean
 }
 
-interface SettingComponentProps {
-  kind: 'aspirate'
-  state: QuickTransferSummaryState
-  dispatch: Dispatch<QuickTransferSummaryAction>
-  onBack: () => void
-}
+interface SettingComponentProps
+  extends Omit<CommonSettingProps, 'isMultiTransfer'> {}
 
 interface AspirateSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
   selectedSetting: AspirateSettingOption | null
