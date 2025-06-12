@@ -474,16 +474,16 @@ def aspirate_with_liquid_class(
     trial: int,
     channel: int,
     transfer_properties: TransferProperties,
-    submerge_depth_override: Optional[float] = None,
-) -> None:
+    submerge_depth_override: float = -1.5,
+) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
-    fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
+    return fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         source=(
-            fixture_settings.liquid_source.meniscus(-1.5),
+            fixture_settings.liquid_source.meniscus(submerge_depth_override),
             fixture_settings.liquid_source._core,
         ),
         transfer_properties=transfer_properties,
@@ -505,7 +505,9 @@ def dispense_with_liquid_class(
     trial: int,
     channel: int,
     transfer_properties: TransferProperties,
+    contents: List[tx_comps_executor.LiquidAndAirGapPair],
     submerge_depth_override: Optional[float] = None,
+    final_air_gap: bool = True,
 ) -> None:
     """Dispense with Liquid Class."""
     fixture_settings.recorder.set_sample_tag(
@@ -514,19 +516,14 @@ def dispense_with_liquid_class(
     fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         dest=(
-            fixture_settings.liquid_source.meniscus(-1.5),
+            fixture_settings.liquid_source.meniscus(submerge_depth_override),
             fixture_settings.liquid_source._core,
         ),
         source=None,
         transfer_properties=transfer_properties,
         transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
-        tip_contents=[
-            tx_comps_executor.LiquidAndAirGapPair(  # TODO fix
-                liquid=volume,
-                air_gap=0,
-            )
-        ],
-        add_final_air_gap=True,
+        tip_contents=contents,
+        add_final_air_gap=final_air_gap,
         trash_location=fixture_settings.pipette.trash_container,
     )
 
@@ -548,7 +545,7 @@ def run_blank_test(
         transfer_properties=transfer_properties,
         tiprack_uri=tiprack_uri,
     )
-
+    print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings,
         MeasurementType.INIT,
@@ -558,7 +555,7 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
-    aspirate_with_liquid_class(
+    contents = aspirate_with_liquid_class(
         fixture_settings,
         tip,
         volume,
@@ -582,8 +579,10 @@ def run_blank_test(
         volume,
         trial,
         channel,
-        transfer_properties=transfer_properties,
+        transfer_properties,
+        contents,
         submerge_depth_override=15,
+        final_air_gap=False,
     )
     post_dispense = retract_and_wait(
         fixture_settings,
@@ -623,14 +622,14 @@ def run_one_test(
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
-    aspirate_with_liquid_class(
+    contents = aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
     )
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, channel=channel
     )
     dispense_with_liquid_class(
-        fixture_settings, tip, volume, trial, channel, transfer_properties
+        fixture_settings, tip, volume, trial, channel, transfer_properties, contents
     )
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel
