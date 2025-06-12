@@ -7,6 +7,8 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from opentrons.types import Point
+
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class LabwareOffsetVector(BaseModel):
@@ -31,3 +33,7 @@ class LabwareOffsetVector(BaseModel):
         return LabwareOffsetVector(
             x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
         )
+
+    def to_point(self) -> Point:
+        """Convert the vector to a Point."""
+        return Point(x=self.x, y=self.y, z=self.z)

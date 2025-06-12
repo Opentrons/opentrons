@@ -89,9 +89,10 @@ def get_parent_placement_origin_to_lw_origin(
 
     if isinstance(child_labware, LabwareDefinition2):
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
-        # We only consider it when the child labware is the topmost labware in a stackup.
+        # For compatibility with historical (buggy?) behavior,
+        # we only consider it when the child labware is the topmost labware in a stackup.
         parent_entity_origin_to_child_labware_origin = (
-            _to_point(child_labware.cornerOffsetFromSlot)
+            child_labware.cornerOffsetFromSlot.to_point()
             if is_topmost_labware
             else Point(0, 0, 0)
         )
@@ -136,10 +137,10 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
             )
         )
 
-        module_offset_point = _to_point_from_lw_offset_vector(
-            module_parent_to_child_offset
+        return (
+            module_parent_to_child_offset.to_point()
+            - child_labware_overlap_with_parent_entity
         )
-        return module_offset_point - child_labware_overlap_with_parent_entity
 
     elif isinstance(labware_location, OnLabwareLocation):
         assert isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3))
@@ -175,15 +176,18 @@ def _get_child_labware_overlap_with_parent_labware(
     child_labware: LabwareDefinition, parent_labware_name: str
 ) -> Point:
     """Get the child labware's overlap with the parent labware's load name."""
-    if parent_labware_name in child_labware.stackingOffsetWithLabware.keys():
+    if parent_labware_name in child_labware.stackingOffsetWithLabware:
         child_labware_overlap = child_labware.stackingOffsetWithLabware[
             parent_labware_name
         ]
     else:
-        child_labware_overlap = child_labware.stackingOffsetWithLabware.get(
-            "default", Vector3D(x=0, y=0, z=0)
-        )
-    return _to_point(child_labware_overlap)
+        child_labware_overlap = child_labware.stackingOffsetWithLabware.get("default")
+        if child_labware_overlap is None:
+            raise ValueError(
+                f"No default labware overlap specified for parent labware: {parent_labware_name}"
+            )
+
+    return child_labware_overlap.to_point()
 
 
 def _get_child_labware_overlap_with_parent_module(
@@ -201,7 +205,7 @@ def _get_child_labware_overlap_with_parent_module(
         else:
             return Point(x=0, y=0, z=0)
 
-    return _to_point(child_labware_overlap)
+    return child_labware_overlap.to_point()
 
 
 def _is_thermocycler_on_ot2(
@@ -215,16 +219,6 @@ def _is_thermocycler_on_ot2(
         in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
         and robot_model == "OT-2 Standard"
     )
-
-
-def _to_point(vector: Vector3D) -> Point:
-    """Convert a Vector3D to a Point."""
-    return Point(x=vector.x, y=vector.y, z=vector.z)
-
-
-def _to_point_from_lw_offset_vector(offset_vector: LabwareOffsetVector) -> Point:
-    """Convert a LabwareOffsetVector to a Point."""
-    return Point(x=offset_vector.x, y=offset_vector.y, z=offset_vector.z)
 
 
 def _get_back_left_bottom_position(labware: LabwareDefinition3) -> Point:

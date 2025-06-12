@@ -434,7 +434,7 @@ try:
     result = run_test_subprocess(spec_data)
     print(json.dumps({{"success": True, "result": result}}))
 except Exception as e:
-    print(json.dumps({{"success": False, "error": str(e)}}))
+    print(json.dumps({{"success": False, "error": "".join(traceback.format_exception(e))}}))
 """
 
     try:

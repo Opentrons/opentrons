@@ -528,6 +528,7 @@ class GeometryView:
                 f"Cannot get ancestor from location {location}"
             )
 
+    # TODO(jh, 06-12-25): This is suspiciously similar to get_ancestor_addressable_area_name. Can we unify these two?
     def _get_underlying_addressable_area_name(self, location: LabwareLocation) -> str:
         if isinstance(location, DeckSlotLocation):
             return location.slotName.id

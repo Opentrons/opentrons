@@ -22,6 +22,7 @@ from pydantic import (
 )
 from typing_extensions import Annotated, Literal
 
+from opentrons.types import Point
 from .constants import (
     Conical,
     Cuboidal,
@@ -66,9 +67,13 @@ class Vector2D(BaseModel):
 
 
 class Vector3D(BaseModel):
-    x: _Number
-    y: _Number
-    z: _Number
+    x: float
+    y: float
+    z: float
+
+    def to_point(self) -> Point:
+        """Convert the vector to a Point."""
+        return Point(x=self.x, y=self.y, z=self.z)
 
 
 class AxisAlignedBoundingBox2D(BaseModel):
