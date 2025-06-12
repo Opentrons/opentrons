@@ -11,9 +11,9 @@ This chapter describes the hardware systems of Opentrons Flex, which underlie it
 
 ### Frame and enclosure
 
-The *frame* of the Opentrons Flex robot provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed primarily of sheet metal and aluminum extrusions.
+The _frame_ of the Opentrons Flex robot provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed primarily of sheet metal and aluminum extrusions.
 
-The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
+The metal frame has openings for _side windows_ and a _front door_ made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
 White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can photograph the deck and working area for recording and tracking protocol execution.
 
@@ -26,20 +26,20 @@ The deck is the machined aluminum surface on which automated science protocols a
 <figcaption>Areas of the deck within Flex.</figcaption>
 </figure>
 
-The *working area* is the physical space above the deck that is accessible for pipetting. Labware placed in slots A1 through D3 are in the working area.
+The _working area_ is the physical space above the deck that is accessible for pipetting. Labware placed in slots A1 through D3 are in the working area.
 
-Opentrons Flex comes with *removable deck slots* for all 12 positions in the working area. Each deck slot has corner *labware clips* for securely placing labware on the deck.
+Opentrons Flex comes with _removable deck slots_ for all 12 positions in the working area. Each deck slot has corner _labware clips_ for securely placing labware on the deck.
 
-You can reconfigure the deck by replacing slots with other *deck fixtures*, including the *movable trash, waste chute,* and *module caddies*. The *expansion slot* behind A1 is only used to make additional room for the Thermocycler Module, which occupies slots A1 and B1.
+You can reconfigure the deck by replacing slots with other _deck fixtures_, including the _movable trash, waste chute,_ and _module caddies_. The _expansion slot_ behind A1 is only used to make additional room for the Thermocycler Module, which occupies slots A1 and B1.
 
 !!! note
-    Deck slots are interchangeable within a column (1, 2, or 3) but not across columns; column 1 and column 3 slots are distinct pieces despite their similar size. You can tell which column a slot goes in by orienting the blue labware clip to the back left.
+Deck slots are interchangeable within a column (1, 2, or 3) but not across columns; column 1 and column 3 slots are distinct pieces despite their similar size. You can tell which column a slot goes in by orienting the blue labware clip to the back left.
 
 You should leave deck slots installed in locations where you want to place standalone labware. The deck and items placed on it remain static, unless moved by the gripper or manual intervention.
 
 ### Staging area
 
-The *staging area* is additional space along the right side of the deck. You can store labware in this location after installing *staging area slots*. Labware placed in slots A4 through D4 are in the staging area. Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location. Adding extra slots helps keep the working area available for the equipment used in your automated protocols.
+The _staging area_ is additional space along the right side of the deck. You can store labware in this location after installing _staging area slots_. Labware placed in slots A4 through D4 are in the staging area. Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location. Adding extra slots helps keep the working area available for the equipment used in your automated protocols.
 
 Staging area slots are included in certain workstation configurations.
 You can also purchase a [set of four slots](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count) from Opentrons.
@@ -58,12 +58,12 @@ trash bin, and the external waste chute. You can only install fixtures
 in a few specific deck slots. The following table lists the deck
 locations for each fixture.
 
-| **Fixture**                        | **Slots**         |
-|------------------------------------|-------------------|
-| Staging area slots                 | A3–D3             |
-| Trash bin                          | A1–D1 and A3–D3   |
-| Waste chute                        | D3 only           |
-| Waste chute with staging area slot | D3 only           |
+| **Fixture**                        | **Slots**       |
+| ---------------------------------- | --------------- |
+| Staging area slots                 | A3–D3           |
+| Trash bin                          | A1–D1 and A3–D3 |
+| Waste chute                        | D3 only         |
+| Waste chute with staging area slot | D3 only         |
 
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
@@ -100,29 +100,29 @@ To install, remove the screws that attach a standard slot to the deck and replac
 
 Staging area slots are compatible with the Flex instruments, modules, and labware listed below.
 
-| Flex component | Staging area compatibility |
-|:-------------- |:------------|
-| **Gripper**        | The Flex Gripper can move labware to or from staging area slots.                                                     |
-| **Pipettes**       | Flex pipettes cannot reach the staging area. Use the gripper to move tip racks and labware from the staging area to the working area before pipetting. |
-| **Modules**        | The Magnetic Block GEN1 can be placed in column 3 on top of a staging area slot. Modules are not supported in column 4.<br><br>Powered modules such as the Heater-Shaker and Temperature Module fit into caddies that can be placed in column 3. You can't add a staging area slot to a position occupied by a module caddy. |
-| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use in the staging area, or manually add and remove labware from this location. |
+| Flex component | Staging area compatibility                                                                                                                                                                                                                                                                                                   |
+| :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Gripper**    | The Flex Gripper can move labware to or from staging area slots.                                                                                                                                                                                                                                                             |
+| **Pipettes**   | Flex pipettes cannot reach the staging area. Use the gripper to move tip racks and labware from the staging area to the working area before pipetting.                                                                                                                                                                       |
+| **Modules**    | The Magnetic Block GEN1 can be placed in column 3 on top of a staging area slot. Modules are not supported in column 4.<br><br>Powered modules such as the Heater-Shaker and Temperature Module fit into caddies that can be placed in column 3. You can't add a staging area slot to a position occupied by a module caddy. |
+| **Labware**    | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use in the staging area, or manually add and remove labware from this location.                                                                                                                                                                |
 
 ### Movement system
 
-Attached to the frame is the *gantry*, which is the robot's movement and positioning system.
+Attached to the frame is the _gantry_, which is the robot's movement and positioning system.
 
 The gantry moves separately along the x- and y-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm. The gantry is controlled by 36 VDC hybrid bipolar stepper motors.
 
-In turn, attached to the gantry are the *pipette mounts* and the *extension mount*. These move along the z-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along this axis is controlled by 36 VDC hybrid bipolar stepper motors.
+In turn, attached to the gantry are the _pipette mounts_ and the _extension mount_. These move along the z-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along this axis is controlled by 36 VDC hybrid bipolar stepper motors.
 
 The electronics contained in the gantry provide 36 VDC power and communications to the pipettes and gripper, when attached.
 
-![Diagram of the horizontal gantry and its attached pipette and extension mounts.](images/gantry-diagram.svg "Gantry components")
+![Diagram of the horizontal gantry and its attached pipette and extension mounts.](images/gantry-diagram.svg 'Gantry components')
 Location of instrument mounts on Flex.
 
 ### Touchscreen and LED displays
 
-The primary user interface is the 7-inch LCD *touchscreen*, located on the front right of the robot. The touchscreen is covered with Gorilla Glass 3 for scratch and damage resistance. Access many features of Flex right on the touchscreen, including:
+The primary user interface is the 7-inch LCD _touchscreen_, located on the front right of the robot. The touchscreen is covered with Gorilla Glass 3 for scratch and damage resistance. Access many features of Flex right on the touchscreen, including:
 
 - Protocol management
 
@@ -138,7 +138,7 @@ The primary user interface is the 7-inch LCD *touchscreen*, located on the front
 
 For more information on using Flex via the touchscreen, see the of the Software and Operation chapter.
 
-The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
+The _status light_ is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 
 <table>
   <thead>
@@ -193,7 +193,7 @@ The status light can also be disabled in the robot settings.
 
 ## Pipettes
 
-Opentrons *pipettes* are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
+Opentrons _pipettes_ are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
 
 - Opentrons Flex 1-Channel Pipette (1–50 µL)
 
@@ -205,12 +205,12 @@ Opentrons *pipettes* are configurable devices used to move liquids throughout th
 
 - Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
-Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
+Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one _pipette mount_ (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
 
-![Each capacity of pipette has captive attachment screws on its front. Pipette ejectors are at the bottom of each pipette, above the nozzles. The 1- and 8-channel pipettes have replaceable O-rings, and the 96-channel pipette has fixed O-rings.](images/pipette-components.png "Pipette components")
+![Each capacity of pipette has captive attachment screws on its front. Pipette ejectors are at the bottom of each pipette, above the nozzles. The 1- and 8-channel pipettes have replaceable O-rings, and the 96-channel pipette has fixed O-rings.](images/pipette-components.png 'Pipette components')
 Locations of components of the 1-, 8-, and 96-channel pipettes.
 
-The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
+The pipettes pick up disposable plastic _tips_ by pressing them onto the pipette _nozzles_, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a _tip rack adapter_, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette _ejector_ mechanism pushes the tips off of the nozzles.
 
 ### Pipette specifications
 
@@ -352,7 +352,7 @@ pipette. In general, for best results you should use the smallest tips
 that meet the needs of your protocol.
 
 !!! note
-    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the of the [Pipette Installation section][pipette-installation] Installation and Relocation chapter, for details.
+Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You _do not_ have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the of the [Pipette Installation section][pipette-installation] Installation and Relocation chapter, for details.
 
     The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section][servicing-flex] of the Maintenance and Service chapter for details.
 
@@ -362,7 +362,7 @@ The User Kit includes a metal pipette calibration probe, which you use during po
 
 ### Pipette tip rack adapter
 
-![The 96-channel tip rack adapter.](images/96-channel-tip-rack-adapter.png "96-channel tip rack adapter")
+![The 96-channel tip rack adapter.](images/96-channel-tip-rack-adapter.png '96-channel tip rack adapter')
 
 The Opentrons Flex 96-channel pipette ships with four tip rack adapters. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 μL, 200 μL, and 1000 µL tip racks.
 
@@ -416,13 +416,13 @@ You can view the currently installed firmware version of any attached pipette. O
 
 ## Gripper
 
-The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
+The _gripper_ moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the _extension mount_, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
 
 The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, deep well plates, and tip racks. For more details on what labware the gripper can move, see the [Labware and the Opentrons Flex Gripper section][labware-and-the-opentrons-flex-gripper] of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
 
 ### Gripper specifications
 
-The *jaws* perform the primary motion of the gripper, which is to open or close two parallel *paddles* to apply or release force on the sides of labware. Movement of the jaws is controlled by a 36 VDC brushed motor connected to a rack-and-pinion gear system.
+The _jaws_ perform the primary motion of the gripper, which is to open or close two parallel _paddles_ to apply or release force on the sides of labware. Movement of the jaws is controlled by a 36 VDC brushed motor connected to a rack-and-pinion gear system.
 
 To move a piece of labware that has been gripped by the jaws, the gantry lifts the gripper along the z-axis, moves it laterally, and then lowers it into the Calibration pin labware's new position.
 
@@ -433,7 +433,7 @@ To move a piece of labware that has been gripped by the jaws, the gantry lifts t
 
 ### Gripper calibration
 
-The gripper includes a metal *calibration pin*. The calibration pin is located in a recessed storage area on the lower part of the gripper. A magnet holds the pin in place. To remove the calibration pin, grasp it with your fingers and pull gently. To replace the pin, put it back in the storage slot. You'll know it's secure when it snaps into place.
+The gripper includes a metal _calibration pin_. The calibration pin is located in a recessed storage area on the lower part of the gripper. A magnet holds the pin in place. To remove the calibration pin, grasp it with your fingers and pull gently. To replace the pin, put it back in the storage slot. You'll know it's secure when it snaps into place.
 
 When calibrating the gripper, attach the pin to each jaw in turn. The robot moves the pin to calibration points on the deck to measure the gripper's exact position.
 
@@ -459,7 +459,7 @@ You can view the currently installed firmware version of the gripper. On the tou
 
 ## Emergency Stop Pendant
 
-The *Emergency Stop Pendant (E-stop)* is a dedicated hardware button for quickly stopping robot motion. Opentrons Flex requires a functional, disengaged E-stop to be attached at all times. When you press the stop button, Flex cancels any running protocol or setup workflow as quickly as possible and prevents most robot motion.
+The _Emergency Stop Pendant (E-stop)_ is a dedicated hardware button for quickly stopping robot motion. Opentrons Flex requires a functional, disengaged E-stop to be attached at all times. When you press the stop button, Flex cancels any running protocol or setup workflow as quickly as possible and prevents most robot motion.
 
 ### When to use the E-stop
 
@@ -491,27 +491,27 @@ The E-stop has a press-to-engage, twist-to-release mechanism.
 
 In the stopped state, Flex and connected hardware will behave as follows:
 
-| **Component**            | **Behavior When E-stop Engaged**                                                                                                                                                                                                                   |
-|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Gantry**              | <ul><li>Automated horizontal motion is halted.</li><li>Manual horizontal motion is allowed.</li></ul>                                                                                                                                              |
-| **Pipettes**            | <ul><li>Vertical motion is halted.</li><li>Motor brakes on vertical axes are engaged to prevent pipettes from falling.</li><li>Plunger motion and tip pickup is halted.</li></ul>                                                                  |
-| **Gripper**             | <ul><li>Vertical motion is halted.</li><li>Motor brake on vertical axis is engaged to prevent the gripper from falling.</li><li>Jaw motors that exert gripping force remain enabled, so the gripper will not drop labware it may be carrying.</li></ul> |
-| **Heater-Shaker Module**| <ul><li>The shaker stops and homes.</li><li>The labware latch opens.</li><li>Heating is disabled.</li></ul>                                                                                                                                        |
-| **Temperature Module**  | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                |
-| **Thermocycler Module** | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                  |
-| **Status light**        | <ul><li>The light turns red.</li></ul>                                                                                                                                                                                                                     |
-| **Touchscreen**         | <ul><li>A cancellation message takes over the screen.</li><li>An on-screen indicator shows when you have successfully disengaged the stop button.</li></ul>                                                  |
+| **Component**            | **Behavior When E-stop Engaged**                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Gantry**               | <ul><li>Automated horizontal motion is halted.</li><li>Manual horizontal motion is allowed.</li></ul>                                                                                                                                                   |
+| **Pipettes**             | <ul><li>Vertical motion is halted.</li><li>Motor brakes on vertical axes are engaged to prevent pipettes from falling.</li><li>Plunger motion and tip pickup is halted.</li></ul>                                                                       |
+| **Gripper**              | <ul><li>Vertical motion is halted.</li><li>Motor brake on vertical axis is engaged to prevent the gripper from falling.</li><li>Jaw motors that exert gripping force remain enabled, so the gripper will not drop labware it may be carrying.</li></ul> |
+| **Heater-Shaker Module** | <ul><li>The shaker stops and homes.</li><li>The labware latch opens.</li><li>Heating is disabled.</li></ul>                                                                                                                                             |
+| **Temperature Module**   | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                       |
+| **Thermocycler Module**  | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                       |
+| **Status light**         | <ul><li>The light turns red.</li></ul>                                                                                                                                                                                                                  |
+| **Touchscreen**          | <ul><li>A cancellation message takes over the screen.</li><li>An on-screen indicator shows when you have successfully disengaged the stop button.</li></ul>                                                                                             |
 
 ## Connections
 
-![Locations of connections on Flex. USB-A ports and covers for cable routing are on either side of the robot. Facing the rear of the robot, on the left are the AUX-1, AUX-2, USB-B and Ethernet ports. On the right are the IEC power inlet and on/off switch.](images/flex-connections.png "Flex connections")
+![Locations of connections on Flex. USB-A ports and covers for cable routing are on either side of the robot. Facing the rear of the robot, on the left are the AUX-1, AUX-2, USB-B and Ethernet ports. On the right are the IEC power inlet and on/off switch.](images/flex-connections.png 'Flex connections')
 
 ### Power connection
 
 Opentrons Flex connects to a power source via a standard IEC-C14 inlet. The robot contains an internal full-range AC/DC power supply, accepting 100–240 VAC, 50/60 Hz input and converting it to 36 VDC. All other internal electronics are powered by the 36 VDC supply.
 
 !!! warning
-    Only use the power cord provided with the robot. Do not use a power cord with inadequate current or voltage ratings.
+Only use the power cord provided with the robot. Do not use a power cord with inadequate current or voltage ratings.
 
     Keep the power cord free of obstructions so you can remove it if necessary.
 
@@ -526,7 +526,7 @@ The 8 rear USB-A ports (numbered USB-1 through USB-8) and 2 auxiliary ports (M12
 The rear USB-B port is for connecting the robot to a laptop or desktop computer, to establish communication with the Opentrons App running on the connected computer. The front USB-A port (USB-9), located below the touchscreen display, has the same functionality as the rear USB-A ports.
 
 !!! note
-    The USB ports are power-limited to protect the robot and connected devices. Power delivery is split internally into three port groups: the left rear USB-A ports (USB-1 through USB-4), the right rear USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of these groups will deliver a maximum of 500 mA to connected USB 2.0–compatible devices.
+The USB ports are power-limited to protect the robot and connected devices. Power delivery is split internally into three port groups: the left rear USB-A ports (USB-1 through USB-4), the right rear USB-A ports (USB-5 through USB-8), and the front USB-A port. Each of these groups will deliver a maximum of 500 mA to connected USB 2.0–compatible devices.
 
 ### Network connections
 
@@ -540,43 +540,43 @@ The internal Wi-Fi module supports 802.11 ac/a/b/g/n networks with a dual-band 2
 
 ### General specifications
 
-| **Specification**         | **Details**                                                                                                                                         |
-|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Dimensions**           | 87 × 69 × 84 cm / 34.25 × 27 × 33 in (W, D, H)                                                                                                      |
-| **Weight**               | 88.5 kg / 195 lb                                                                                                                                    |
-| **Deck slots**           | <ul><li>12 ANSI/SLAS-compatible slots in working area (accessible to pipettes)</li><li>4 additional slots for staging tips and labware (gripper only)</li></ul> |
-| **Touchscreen**          | 7-inch LCD touchscreen with scratch- and damage-resistant Gorilla Glass 3                                                                            |
-| **Wi-Fi**                | 802.11 ac/a/b/g/n dual-band (2.4/5 GHz)                                                                                                             |
-| **Ethernet**             | 100 Mbps                                                                                                                                            |
-| **USB**                  | <ul><li>9 USB-A ports</li><li>1 USB-B port</li><li>USB 2.0 speed</li></ul>                                                                          |
-| **Camera**               | 2MP, photo and video                                                                                                                                |
-| **Robot power input**    | <ul><li>100–240 VAC, 50–60 Hz, 1φ</li><li>4.0 A/115 VAC, 2.0 A/230 VAC</li></ul>                                                                    |
-| **Mains supply voltage fluctuation** | ±10%                                                                                                                                    |
-| **Mains supply frequency fluctuation** | ±5%                                                                                                                                   |
-| **Distribution system**  | TN-S                                                                                                                                                |
-| **Short-circuit supply current** | 6.3 A                                                                                                                                       |
-| **Frame composition**    | Rigid steel and CNC aluminum design                                                                                                                  |
-| **Window composition**   | Removable polycarbonate side windows and front door                                                                                                  |
-| **Ventilation requirements** | At least 20 cm / 8 in between the unit and a wall                                                                                                |
-| **Connected PC requirements** | The Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 10.10 or later</li><li>Ubuntu 12.04 or later</li></ul>                                               |
+| **Specification**                      | **Details**                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dimensions**                         | 87 × 69 × 84 cm / 34.25 × 27 × 33 in (W, D, H)                                                                                                                  |
+| **Weight**                             | 88.5 kg / 195 lb                                                                                                                                                |
+| **Deck slots**                         | <ul><li>12 ANSI/SLAS-compatible slots in working area (accessible to pipettes)</li><li>4 additional slots for staging tips and labware (gripper only)</li></ul> |
+| **Touchscreen**                        | 7-inch LCD touchscreen with scratch- and damage-resistant Gorilla Glass 3                                                                                       |
+| **Wi-Fi**                              | 802.11 ac/a/b/g/n dual-band (2.4/5 GHz)                                                                                                                         |
+| **Ethernet**                           | 100 Mbps                                                                                                                                                        |
+| **USB**                                | <ul><li>9 USB-A ports</li><li>1 USB-B port</li><li>USB 2.0 speed</li></ul>                                                                                      |
+| **Camera**                             | 2MP, photo and video                                                                                                                                            |
+| **Robot power input**                  | <ul><li>100–240 VAC, 50–60 Hz, 1φ</li><li>4.0 A/115 VAC, 2.0 A/230 VAC</li></ul>                                                                                |
+| **Mains supply voltage fluctuation**   | ±10%                                                                                                                                                            |
+| **Mains supply frequency fluctuation** | ±5%                                                                                                                                                             |
+| **Distribution system**                | TN-S                                                                                                                                                            |
+| **Short-circuit supply current**       | 6.3 A                                                                                                                                                           |
+| **Frame composition**                  | Rigid steel and CNC aluminum design                                                                                                                             |
+| **Window composition**                 | Removable polycarbonate side windows and front door                                                                                                             |
+| **Ventilation requirements**           | At least 20 cm / 8 in between the unit and a wall                                                                                                               |
+| **Connected PC requirements**          | The Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 10.10 or later</li><li>Ubuntu 12.04 or later</li></ul>                                     |
 
 ### Environmental specifications
 
-| **Specification**         | **Details**                          |
-|--------------------------|---------------------------------------|
-| **Environmental conditions** | Indoor use only                  |
-| **Ambient temperature**   | +20 to +25 °C (recommended)          |
-| **Relative humidity**     | 40–60%, non-condensing (recommended) |
-| **Pollution degree**      | 2 (non-conductive pollution only)    |
+| **Specification**            | **Details**                          |
+| ---------------------------- | ------------------------------------ |
+| **Environmental conditions** | Indoor use only                      |
+| **Ambient temperature**      | +20 to +25 °C (recommended)          |
+| **Relative humidity**        | 40–60%, non-condensing (recommended) |
+| **Pollution degree**         | 2 (non-conductive pollution only)    |
 
 For additional information on acceptable environmental conditions for use and transport, see the [Environmental Conditions section][environmental-conditions] of the Installation and Relocation chapter.
 
 ### Certifications
 
-| **Certification**         | **Status**         |
-|--------------------------|--------------------|
+| **Certification**           | **Status**             |
+| --------------------------- | ---------------------- |
 | **Certifications complete** | CE, ETL, FCC, ISO 9001 |
-| **Not certified/validated** | IVD, GMP         |
+| **Not certified/validated** | IVD, GMP               |
 
 A summary of certification information is printed on a sticker on the back of Flex, near the on/off switch. For detailed certification and compliance information, see the [Regulatory Compliance section][regulatory-compliance] in the Introduction.
 
@@ -587,14 +587,14 @@ provides additional information, including the robot's date of
 production. For example, the serial number `FLXA1020231007001` would
 indicate:
 
-| **Characters**  | **Category** | **Meaning**                                      |
-|-----------------|--------------|--------------------------------------------------|
-| `FLX`           | Model        | The robot is an Opentrons Flex.                  |
-| `A10`           | Version      | A code for the production version of the robot.  |
-| `2023`          | Year         | The robot was made in 2023.                      |
-| `10`            | Month        | The robot was made in October.                   |
-| `07`            | Day          | The robot was made on the 7th day of the month.  |
-| `001`           | Unit         | A unique number for robots made on a certain day.|
+| **Characters** | **Category** | **Meaning**                                       |
+| -------------- | ------------ | ------------------------------------------------- |
+| `FLX`          | Model        | The robot is an Opentrons Flex.                   |
+| `A10`          | Version      | A code for the production version of the robot.   |
+| `2023`         | Year         | The robot was made in 2023.                       |
+| `10`           | Month        | The robot was made in October.                    |
+| `07`           | Day          | The robot was made on the 7th day of the month.   |
+| `001`          | Unit         | A unique number for robots made on a certain day. |
 
 You can find the serial number for your Flex:
 

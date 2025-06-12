@@ -23,13 +23,13 @@ You can wipe off all the visible and easily accessible surfaces of your Flex. Th
 The following table lists the chemicals you can use to clean your Flex. Diluted alcohol and distilled water are our recommended cleaning solutions, but you can refer to this list for other cleaning options. You can also use these chemicals to clean modules, pipettes, and other attached hardware.
 
 !!! warning
-    *Do not use acetone.* The robot, pipettes, and modules are made from materials that acetone can damage or dissolve.
+_Do not use acetone._ The robot, pipettes, and modules are made from materials that acetone can damage or dissolve.
 
-| Solution   | Recommendations |
-|------------|-----------------|
-| **Alcohol**    | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
-| **Bleach**     | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.   |
-| **Distilled water** | You can use distilled water to clean or rinse your robot.                  |
+| Solution            | Recommendations                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Alcohol**         | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
+| **Bleach**          | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.                         |
+| **Distilled water** | You can use distilled water to clean or rinse your robot.                                             |
 
 ### Frame and window panel cleaning
 
@@ -75,17 +75,15 @@ To clean a 1-, 8-, or 96-channel pipette:
 1. Remove the pipette from the gantry.
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 3. Gently wipe down the following parts:
-    - Body
-    - Ejector
-    - Nozzles
+   - Body
+   - Ejector
+   - Nozzles
 4. Use a cloth dampened with distilled water for a rinse wipedown.
 5. Let the pipette air dry and reattach.
 
-![Cleanable pipette components, including the body, ejector, and nozzles.](images/pipette-components-cleaning.png "Pipette components")
+![Cleanable pipette components, including the body, ejector, and nozzles.](images/pipette-components-cleaning.png 'Pipette components')
 
-!!! warning
-    - *Do not* disassemble Flex pipettes for cleaning or attempt to clean their internal electronic components.
-    - *Do not* put Flex pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
+!!! warning - _Do not_ disassemble Flex pipettes for cleaning or attempt to clean their internal electronic components. - _Do not_ put Flex pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 ### Pipette decontamination
 
@@ -95,13 +93,13 @@ The routine cleaning steps described above may not clean your pipette if it beco
 
 Refer to the following table for recommended cleaning methods, by contamination type.
 
-| Contaminant  | Cleaning recommendation |
-|--------------|-------------------------|
-| **Aqueous solutions**   | Rinse the contaminated parts with distilled water or 70% ethanol and air dry at 15.5 °C (60 °F).         |
-| **Nucleic acids**       | Clean the contaminated parts in a glycine/HCl buffer (pH 2) for 10 minutes, rinse with distilled water, and air dry. |
-| **Organic solvents**    | Allow the solvent to evaporate on its own or immerse the pipette *nozzle only* in a detergent, rinse with distilled water, and air dry. |
-| **Proteins**            | Clean the contaminated parts with a detergent, rinse with distilled water, and air dry. *Do not* use alcohol. That will set the proteins. |
-| **Radioactive materials** | Place the pipette nozzle in a solution like Decon 90, rinse with distilled water, and air dry.         |
+| Contaminant               | Cleaning recommendation                                                                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aqueous solutions**     | Rinse the contaminated parts with distilled water or 70% ethanol and air dry at 15.5 °C (60 °F).                                          |
+| **Nucleic acids**         | Clean the contaminated parts in a glycine/HCl buffer (pH 2) for 10 minutes, rinse with distilled water, and air dry.                      |
+| **Organic solvents**      | Allow the solvent to evaporate on its own or immerse the pipette _nozzle only_ in a detergent, rinse with distilled water, and air dry.   |
+| **Proteins**              | Clean the contaminated parts with a detergent, rinse with distilled water, and air dry. _Do not_ use alcohol. That will set the proteins. |
+| **Radioactive materials** | Place the pipette nozzle in a solution like Decon 90, rinse with distilled water, and air dry.                                            |
 
 #### Inside the pipette
 
@@ -123,25 +121,22 @@ To clean the gripper:
 1. Remove the gripper from the gantry.
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 3. Gently wipe down the following parts:
-    - Gripper body
-    - Jaws
-    - Paddles
+   - Gripper body
+   - Jaws
+   - Paddles
 4. Use a cloth dampened with distilled water for a rinse wipedown.
 5. Let the gripper air dry and reattach.
 
-![Cleanable gripper components, including the body, jaws, and paddles.](images/gripper-components-cleaning.png "Gripper components"){width="50%"}
+![Cleanable gripper components, including the body, jaws, and paddles.](images/gripper-components-cleaning.png 'Gripper components'){width="50%"}
 
-!!! warning
-    - *Do not* disassemble the gripper for cleaning or attempt to clean its internal electronic components.
-    - *Do not* put the gripper in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
-
+!!! warning - _Do not_ disassemble the gripper for cleaning or attempt to clean its internal electronic components. - _Do not_ put the gripper in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 #### Gripper paddles
 
 The gripper paddles are wear items that require periodic replacement. When cleaning the gripper, inspect the rubber pads for tears, nicks, or other wear. Replace the paddles as needed with the two spares (included with the gripper). If you need additional gripper paddles, contact Opentrons Support at <support@opentrons.com>.
 
 !!! note
-    Aggressive cleaning chemicals may reduce the lifetime of the rubber pads on the gripper paddles.
+Aggressive cleaning chemicals may reduce the lifetime of the rubber pads on the gripper paddles.
 
 ## Cleaning modules
 
@@ -153,9 +148,7 @@ Be sure to turn the module's power off before cleaning it. You can clean the top
 - Remove the module from the caddy.
 - Disconnect any USB or power cables (if you're cleaning a powered module).
 
-!!! warning
-    - *Do not* disassemble modules for cleaning or attempt to clean their internal electronic components.
-    - *Do not* put Flex modules in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
+!!! warning - _Do not_ disassemble modules for cleaning or attempt to clean their internal electronic components. - _Do not_ put Flex modules in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 ### General module cleaning
 
@@ -175,18 +168,18 @@ To set up the Thermocycler with a clean seal:
 3. Rinse the seal with molecular biology grade water.
 4. Let the seal air dry.
 
-![Location of the automation seal on the inside lid of the Thermocycler](images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
+![Location of the automation seal on the inside lid of the Thermocycler](images/thermocycler-seal.svg 'Thermocycler seal'){width="50%"}
 
 ## Autoclave-safe labware
 
 The following table lists labware sold by Opentrons that we have verified as autoclave-safe. When you can't determine whether a piece of labware is autoclave-safe, just replace it with new, clean labware. You can [purchase replacement labware](https://opentrons.com/products/categories/tips-&-labware) from the Opentrons shop.
 
-| Labware type | Autoclave-safe items |
-|--------------|----------------------|
-| **Reservoirs**        | All NEST reservoirs                                                                                   |
-| **Sample vials**      | Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)                       |
-| **Tip racks and tips**| All Flex tip racks and tips                                                                          |
-| **Well plates**       | <ul><li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li><li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li><li>USA Scientific 96 Deep Well Plate, 2.4 mL</li></ul> |
+| Labware type           | Autoclave-safe items                                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reservoirs**         | All NEST reservoirs                                                                                                                                                     |
+| **Sample vials**       | Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)                                                                                          |
+| **Tip racks and tips** | All Flex tip racks and tips                                                                                                                                             |
+| **Well plates**        | <ul><li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li><li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li><li>USA Scientific 96 Deep Well Plate, 2.4 mL</li></ul> |
 
 If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
 

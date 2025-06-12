@@ -47,7 +47,7 @@ There are two sections of the All Protocols screen:
 Regardless of which section a protocol is in, its card or list entry includes information about when it was last run and when it was added to this robot.
 
 !!! note
-    Flex can store a maximum of 20 unique protocols. It automatically deletes older protocols to maintain this limit. Use the Opentrons App if you need to manage a larger number of protocols.
+Flex can store a maximum of 20 unique protocols. It automatically deletes older protocols to maintain this limit. Use the Opentrons App if you need to manage a larger number of protocols.
 
 #### Pin a protocol
 
@@ -74,7 +74,7 @@ Long press on a protocol and tap **Delete protocol** to delete it directly from 
 </figure>
 
 !!! warning
-    Run history is *not recoverable* after you delete a protocol on Flex. The protocol file itself is also not recoverable, although you may be able to resend the protocol to Flex if you've kept a copy of it on a computer.
+Run history is _not recoverable_ after you delete a protocol on Flex. The protocol file itself is also not recoverable, although you may be able to resend the protocol to Flex if you've kept a copy of it on a computer.
 
 ### Protocol details
 
@@ -105,7 +105,7 @@ The Summary tab shows:
 The Parameters tab lists all of the runtime parameters that you can configure from the touchscreen while setting up the protocol. The Default Value column shows the value that the protocol will use if you don't change it. The Range column shows the maximum and minimum, list of choices, or number of choices depending on the parameter type.
 
 !!! note
-    Runtime parameters are only available in Python protocols that define their names, descriptions, and possible values. See [Runtime Parameters](https://docs.opentrons.com/v2/runtime_parameters.html) in the Python API documentation for information on defining parameters and using their values. JSON protocols do not currently support this feature.
+Runtime parameters are only available in Python protocols that define their names, descriptions, and possible values. See [Runtime Parameters](https://docs.opentrons.com/v2/runtime_parameters.html) in the Python API documentation for information on defining parameters and using their values. JSON protocols do not currently support this feature.
 
 #### Hardware tab
 
@@ -168,13 +168,13 @@ If hardware is not connected or calibrated, you will see a warning icon (exclama
 
 Tap any row with a right arrow to show more information for that category. (The one exception is tapping Labware Position Check, which begins that process. See the Labware Position Check section below for more details.)
 
-| Category   | Description |
-|------------|------------|
-| Instruments    | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't. |
-| Parameters     | See the names, descriptions, and default values of runtime parameters for the protocol.<br />Tap a parameter to edit its value. See the Runtime Parameters section below for more details. |
-| Hardware       | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
-| Labware        | See the locations of labware. Each labware lists its initial deck location, and icons indicate labware that are on top of modules.<br />Tap <b>Map View</b> to switch to a visual layout of labware positions. |
-| Liquids        | See the types and total volumes of liquids.<br />Tap any liquid name to expand a list of well-by-well volumes. In turn, tap an individual volume row to show a visual layout of its location within labware. |
+| Category    | Description                                                                                                                                                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Instruments | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't.                                                                                                                     |
+| Parameters  | See the names, descriptions, and default values of runtime parameters for the protocol.<br />Tap a parameter to edit its value. See the Runtime Parameters section below for more details.                                                                          |
+| Hardware    | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
+| Labware     | See the locations of labware. Each labware lists its initial deck location, and icons indicate labware that are on top of modules.<br />Tap <b>Map View</b> to switch to a visual layout of labware positions.                                                      |
+| Liquids     | See the types and total volumes of liquids.<br />Tap any liquid name to expand a list of well-by-well volumes. In turn, tap an individual volume row to show a visual layout of its location within labware.                                                        |
 
 On any category screen, return to the "Prepare to run" screen by tapping the back arrow in the top left.
 
@@ -251,7 +251,7 @@ TK image of 8.4 LPC
 When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
 
 !!! note
-    The pipette will always start at the default position if you turn off Apply Labware Offsets in the robot settings.
+The pipette will always start at the default position if you turn off Apply Labware Offsets in the robot settings.
 
 ### Run progress
 
@@ -276,20 +276,20 @@ Starting in robot software version 8.0.0, if something unexpected happens during
 Flex error recovery allows you to continue a protocol run even when
 problems arise.
 
-![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](images/touchscreen-error-recovery.png "Error recovery")
+![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](images/touchscreen-error-recovery.png 'Error recovery')
 
 Tap **Launch recovery mode** to see options for the particular type of error that has occurred. Instead of just canceling the protocol and forcing a restart, this feature gives you a chance to correct problems like replacing a damaged tip or filling an empty well. Even if you have to cancel a protocol run, error recovery will let you preserve liquids in the pipette and control where tips are dropped. After all, an occasional mistake or problem shouldn't end a procedure with the loss of expensive reagents or valuable samples.
 
 Flex provides a protocol recovery path for the following error conditions.
 
-| Error type | Description {style="width: 30%;"} | Recovery options |
-| :--------- | :---------- | :--------------- |
-| No liquid detected | Occurs when a pipette encounters an empty well and expects a liquid to be present. | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul> |
+| Error type           | Description {style="width: 30%;"}                                                                                                                | Recovery options                                                                                                                                                                                                                                                |
+| :------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No liquid detected   | Occurs when a pipette encounters an empty well and expects a liquid to be present.                                                               | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul>                                                                                                              |
 | Pipette overpressure | Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips. | <ul><li>For aspiration:</li><ul><li>Retry with new tips.</li><li>Cancel protocol run.</li></ul><li>For dispense:</li><ul><li>Skip to the next step with the same tips.</li><li>Skip to the next step with new tips.</li><li>Cancel protocol run.</li></ul></ul> |
-| General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
+| General errors       | A catch-all category for other errors.                                                                                                           | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul>                                                                                                                                                                           |
 
 !!! note
-    The tip presence sensor is disabled for [partial tip pickup][partial-tip-pickup] of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
+The tip presence sensor is disabled for [partial tip pickup][partial-tip-pickup] of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
 
 You can view the status of a finished protocol and review any resolved errors on the run completion screen.
 
@@ -383,18 +383,18 @@ You'll set the amount of liquid to transfer (in μL) after specifying the source
 
 These are available after you name a quick transfer and before you save it. If some settings are familiar to you that's because they're the same as those offered in Protocol Designer. Advanced settings are optional; select any that you need or just save or run the transfer.
 
-| Setting {style="width: 25%;"} | Description |
-|----------|-------------|
-| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in μL/s.|
-| Pipette path           | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul> |
-| Tip position           | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well. |
-| Pre-wet tip            | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume. |
-| Mix                    | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together. |
-| Delay                  | Adds a timed delay (in seconds) before an aspirate or dispense action. |
-| Touch tip              | Move the pipette so the tip touches the wall of a well. Used to help knock off any droplets that might cling to the pipette's tip. Not supported on all labware. |
-| Air gap                | When used during aspiration, draw in extra air after the liquid. When used during dispense, draw in extra air before moving to the trash container to dispose of the tip. Used to prevent liquid from leaking out of the pipette tip. |
-| Blowout                | Blow an extra amount of air through the tip to clear it. The pipette can blow out into the trash bin, source well, or destination well. |
-| Change tip             | Replace the tip at the start of the transfer, before every aspirate, or per source well. |
+| Setting {style="width: 25%;"}    | Description                                                                                                                                                                                                                           |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in μL/s.                                                                                                                                                                       |
+| Pipette path                     | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul>                      |
+| Tip position                     | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well.                                                                                           |
+| Pre-wet tip                      | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume.                                                                                                                                                   |
+| Mix                              | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together.                                                                                                                                 |
+| Delay                            | Adds a timed delay (in seconds) before an aspirate or dispense action.                                                                                                                                                                |
+| Touch tip                        | Move the pipette so the tip touches the wall of a well. Used to help knock off any droplets that might cling to the pipette's tip. Not supported on all labware.                                                                      |
+| Air gap                          | When used during aspiration, draw in extra air after the liquid. When used during dispense, draw in extra air before moving to the trash container to dispose of the tip. Used to prevent liquid from leaking out of the pipette tip. |
+| Blowout                          | Blow an extra amount of air through the tip to clear it. The pipette can blow out into the trash bin, source well, or destination well.                                                                                               |
+| Change tip                       | Replace the tip at the start of the transfer, before every aspirate, or per source well.                                                                                                                                              |
 
 #### Managing transfers
 
@@ -447,7 +447,7 @@ Choose an attached instrument that you want to detach. Then loosen the instrumen
 Choose an attached instrument that you want to recalibrate. Then connect the instrument's calibration probe or pin and begin the automated calibration process. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section][instrument-installation-and-calibration] of the Installation and Relocation chapter.
 
 !!! note
-    The new calibration data will overwrite any previous calibration data for that instrument.
+The new calibration data will overwrite any previous calibration data for that instrument.
 
 ### Robot settings
 
@@ -493,7 +493,7 @@ Flex records what it's doing in several log files that are stored on the robot. 
 If you opt out of automatic data sharing, you can still [download your Flex log files](https://support.opentrons.com/s/article/How-to-download-the-logs-on-Opentrons-Flex) for your own use or to manually send them to Opentrons Support for troubleshooting.
 
 !!! note
-    There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
+There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
 
 #### Advanced
 
@@ -569,22 +569,22 @@ configuration indicates that the waste chute is in that location.</figcaption>
 The following table defines the statuses the robot generates when it
 compares its configured deck fixtures to your protocol.
 
-| Status              | Description |
-|---------------------|-------------|
-| **Configured**          | A fixture is specified in the correct location. Always verify that the fixture is physically attached before running the protocol. |
-| **Location conflict**   | A deck slot is configured with a fixture different from the fixture specified in your protocol (e.g., the protocol specifies a waste chute, but deck slot D3 is occupied by a staging area slot). |
-| **Not configured**      | A fixture required by your protocol is missing from the deck configuration (e.g., the protocol requires a staging area slot but that fixture is not configured in the specified location). |
+| Status                | Description                                                                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Configured**        | A fixture is specified in the correct location. Always verify that the fixture is physically attached before running the protocol.                                                                |
+| **Location conflict** | A deck slot is configured with a fixture different from the fixture specified in your protocol (e.g., the protocol specifies a waste chute, but deck slot D3 is occupied by a staging area slot). |
+| **Not configured**    | A fixture required by your protocol is missing from the deck configuration (e.g., the protocol requires a staging area slot but that fixture is not configured in the specified location).        |
 
 The following table defines the deck configuration statuses the robot generates when it compares its attached instruments and attached modules to its deck configuration and your protocol.
 
-| Status             | Description |
-|--------------------|-------------|
-| **Attach pipette**     | A required pipette is not attached.                                                                            |
-| **Calibrate**          | A module needs calibration. It is in the right location and connected to the robot.                            |
-| **Calibrate pipette**  | An attached pipette requires calibration.                                                                      |
-| **Connected**          | Modules are connected, calibrated, and in the right locations. Configuration status is good.                   |
-| **Location conflict**  | A module location conflicts with a deck fixture.                                                               |
-| **Not connected**      | The module is not connected to the robot or is powered off. Once connected, there will be no location conflict.|
+| Status                | Description                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Attach pipette**    | A required pipette is not attached.                                                                             |
+| **Calibrate**         | A module needs calibration. It is in the right location and connected to the robot.                             |
+| **Calibrate pipette** | An attached pipette requires calibration.                                                                       |
+| **Connected**         | Modules are connected, calibrated, and in the right locations. Configuration status is good.                    |
+| **Location conflict** | A module location conflicts with a deck fixture.                                                                |
+| **Not connected**     | The module is not connected to the robot or is powered off. Once connected, there will be no location conflict. |
 
 ## Opentrons App
 
@@ -629,7 +629,7 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 4.  Double-click the .AppImage file.
 
 !!! note
-    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
+Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 ### Transferring protocols to Flex
 
@@ -639,7 +639,7 @@ Every protocol will begin as a file on your computer, regardless of what method 
 
 When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
 
-The Opentrons App will analyze your protocol as soon as you import it. *Protocol analysis* is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
+The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
 
 <figure class="screenshot" markdown>
 ![Expanded three-dot menu for a protocol, showing these options: Start setup, Reanalyze, Send to Opentrons Flex, Show in folder, and Delete](images/app-protocol-menu.png "Screenshot")
@@ -647,7 +647,7 @@ The Opentrons App will analyze your protocol as soon as you import it. *Protocol
 </figure>
 
 !!! note
-    In-app protocol analysis is only a preliminary check of the validity of your protocol. Protocol analysis will run again on the robot once you transfer the protocol to it. It's possible for analysis to fail in the app and succeed on the robot, or vice versa. Analysis mismatches may occur when your app and robot software versions are out of sync, or if you have customized the Python environment on your Flex.
+In-app protocol analysis is only a preliminary check of the validity of your protocol. Protocol analysis will run again on the robot once you transfer the protocol to it. It's possible for analysis to fail in the app and succeed on the robot, or vice versa. Analysis mismatches may occur when your app and robot software versions are out of sync, or if you have customized the Python environment on your Flex.
 
 #### Run immediately
 
@@ -671,15 +671,15 @@ Use the Opentrons App to view the status of modules connected to your Flex and c
 </figure>
 
 !!! note
-    The Magnetic Block does not have a card in Instruments and Modules, since it is unpowered and does not connect to Flex via USB.
+The Magnetic Block does not have a card in Instruments and Modules, since it is unpowered and does not connect to Flex via USB.
 
 Click the three-dot menu (⋮) on the module card to choose from available commands. You can always choose **About module** to see the firmware version and serial number of the module. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of the module and its current status:
 
-| Module type    | Commands |
-| -------------- | -------- |
+| Module type       | Commands                                                                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Heater-Shaker** | <ul><li>Set module temperature / Deactivate heater</li><li>Open labware latch / Close labware latch</li><li>Test shake / Deactivate shaker</li></ul> |
-| **Temperature**   | <ul><li>Set module temperature / Deactivate module</li></ul>                            |
-| **Thermocycler**  | <ul><li>Set lid temperature / Deactivate lid</li><li>Open lid / Close lid</li><li>Set block temperature / Deactivate block</li></ul> |
+| **Temperature**   | <ul><li>Set module temperature / Deactivate module</li></ul>                                                                                         |
+| **Thermocycler**  | <ul><li>Set lid temperature / Deactivate lid</li><li>Open lid / Close lid</li><li>Set block temperature / Deactivate block</li></ul>                 |
 
 ### Recent protocol runs
 
@@ -696,15 +696,15 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
-    If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
-Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
+Flex _will not_ retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
 ## Advanced operation
 
 ### Jupyter Notebook
 
-Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called *cells*. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
+Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called _cells_. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
 
 Access your robot's Jupyter Notebook either:
 
@@ -730,23 +730,23 @@ Follow these steps to authenticate to your Flex via SSH:
 3.  Find the `robot_key.pub` file and copy it to the root of a USB-A flash drive.
 
     !!! note
-        The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. (macOS can read and write to FAT-formatted drives.)
+    The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. (macOS can read and write to FAT-formatted drives.)
 
 4.  Eject the drive and connect it to an open USB-A port on your Flex. Make sure that it is the only drive attached to your Flex, or the key file may not be accessible.
 
 5.  On your computer, type the following command in your terminal. Replace `ROBOT_IP` with the local IP address of your Flex.
 
-    ``` bash
+    ```bash
     curl \
     --location --request POST \
     'http://ROBOT_IP:31950/server/ssh_keys/from_local'
     ```
-    
+
     The command is successful if you get a 201 response with a message indicating how many keys were added. The command failed if you get a 404 response.
 
 6.  After successfully adding the key, type the following command. Again, replace `ROBOT_IP` with the local IP address of your Flex.
 
-    ``` bash
+    ```bash
     ssh -i robot_key root@ROBOT_IP
     ```
 

@@ -1,6 +1,6 @@
 site_name: Opentrons Flex Instruction Manual
 
-nav: 
+nav:
   - Preface: preface.md
   - Introduction: introduction.md
   - Installation and Relocation: installation-relocation.md
@@ -11,10 +11,10 @@ nav:
   - Software and Operation: software-operation.md
   - Maintenance and Service: maintenance-service.md
   - Appendices:
-    - Glossary: glossary.md
-    - Additional Documentation: additional-documentation.md
-    - Open-Source Software: open-source-software.md
-    - Support and Contact Information: support-contact-information.md
+      - Glossary: glossary.md
+      - Additional Documentation: additional-documentation.md
+      - Open-Source Software: open-source-software.md
+      - Support and Contact Information: support-contact-information.md
 
 theme:
   name: material
@@ -37,7 +37,7 @@ markdown_extensions:
   - md_in_html
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg      
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.inlinehilite
   - pymdownx.highlight:
       anchor_linenums: true
@@ -52,4 +52,4 @@ extra_css:
   - manual.css
   - opentrons-theme.css
 
-copyright: "© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law."
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
