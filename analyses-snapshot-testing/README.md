@@ -10,9 +10,9 @@
 
 ## Concepts
 
-- Analysis is done against the local code in `api/` !!!
-- Protocols are stored in the [files/protocols](./files/protocols) directory
-- Protocols that are generators with overrides are stored in the [files/protocols_with_overrides](./files/protocols/generators) directory
+- Analysis is done against the local code!!!
+- Protocols to be analyzed are stored in the [files/protocols](./files/protocols) directory
+- Protocols generators, that generate many protocols at test time (not under source control), where a key (override) is injected at the top of the file, are stored in the [files/protocols_with_overrides](./files/protocols/generators) directory
 - Protocols are named according to the [files/README.md](./files/README.md) instructions
 - Protocols are loaded into the analyses battery in [automation/data/protocols.py](./automation/data/protocols.py)
   - This is AUTOMATICALLY generated

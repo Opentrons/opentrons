@@ -20327,7 +20327,7 @@
       "key": "60f13ef62feb6fc0e9b405adc66b0d6c",
       "notes": [],
       "params": {
-        "displayName": "Wash 2 ",
+        "displayName": "Washes 2 + 3",
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
           "slotName": "B2"
@@ -23352,7 +23352,7 @@
       "key": "3587ddb5f4ffa77af25caabe51b89b10",
       "notes": [],
       "params": {
-        "displayName": "Wash 3 ",
+        "displayName": "Wash 4",
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
           "slotName": "B3"
@@ -38587,12 +38587,7 @@
       "id": "UUID",
       "key": "4c49a1ebe909a938c3769eeffbc009e8",
       "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
+      "params": {},
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -39236,12 +39231,7 @@
       "id": "UUID",
       "key": "d63d6f480fb59a1bb0857ec198e23473",
       "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
+      "params": {},
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -39885,12 +39875,7 @@
       "id": "UUID",
       "key": "5572de715d04e4a4104e68371d79226d",
       "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
+      "params": {},
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -40534,12 +40519,7 @@
       "id": "UUID",
       "key": "71a93bd3d8c15e1c4f3bac8333b7fd6d",
       "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
+      "params": {},
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -41430,12 +41410,7 @@
       "id": "UUID",
       "key": "e9e5c59b2b9fecfb6ca7765fb8919122",
       "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
+      "params": {},
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -41751,23 +41726,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "home",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "567f3d9e3081932e88c0c2adad4eb464",
-      "notes": [],
-      "params": {
-        "axes": [
-          "leftPlunger",
-          "leftZ"
-        ]
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -41853,7 +41811,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
-      "displayName": "Wash 2 ",
+      "displayName": "Washes 2 + 3",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
       "location": {
@@ -41862,7 +41820,7 @@
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
-      "displayName": "Wash 3 ",
+      "displayName": "Wash 4",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
       "location": {
@@ -42511,15 +42469,9 @@
       "id": "UUID"
     },
     {
-      "description": "Wash 2 Buffer",
+      "description": "Buffer for Washes 2, 3 and 4",
       "displayColor": "#800080",
-      "displayName": "Wash 2",
-      "id": "UUID"
-    },
-    {
-      "description": "Wash 4 Buffer",
-      "displayColor": "#ADD8E6",
-      "displayName": "Wash 4",
+      "displayName": "Wash 2 Buffer",
       "id": "UUID"
     },
     {

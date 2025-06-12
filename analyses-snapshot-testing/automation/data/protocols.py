@@ -850,9 +850,6 @@ class Protocols:
         robot="Flex",
         folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
     )
-    OT2_M_P300GEN2_Smoke_8_4_4: Protocol = Protocol(
-        file_stem="OT2_M_P300GEN2_Smoke_8_4_4", file_extension="json", robot="OT2", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
-    )
     OT2_S_PD_8_4_2_smoketest: Protocol = Protocol(
         file_stem="OT2_S_PD_8_4_2_smoketest", file_extension="json", robot="OT2", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
     )
@@ -1227,6 +1224,9 @@ class Protocols:
         file_extension="json",
         robot="OT2",
         folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
+    )
+    OT2_S_v8_4_4P300GEN2_Smoke: Protocol = Protocol(
+        file_stem="OT2_S_v8_4_4P300GEN2_Smoke", file_extension="json", robot="OT2", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
     )
     OT2_X_v2_11_P300S_TC1_TC2_ThermocyclerMoamError: Protocol = Protocol(
         file_stem="OT2_X_v2_11_P300S_TC1_TC2_ThermocyclerMoamError", file_extension="py", robot="OT2", folder=PROTOCOLS_FOLDER

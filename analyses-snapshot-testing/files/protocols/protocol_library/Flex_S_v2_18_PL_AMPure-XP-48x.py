@@ -76,16 +76,16 @@ def run(protocol: protocol_api.ProtocolContext):
     #-------PROTOCOL STEP-------
     STEP_CLEANUP        = True      # This is a example Step in the protocol, example would be a Cleanup Step after library prep that can be optionally excluded. 
     #---------------------------
-    TIP_SETTING         = "Single Tip Use"  # "Single Tip Use" or "Double Sided"
+    TIP_SETTING         = "Single Tip Use"  # "Single Tip Use" or "Reusing Tips"
     BEADRATIO_2         = 0.3
     RESUSPENSION        = 20
-    SHAKE_TIME          = 30
+    SHAKE_TIME          = 5                 # minutes
     SHAKE_RPM           = 1200
-    ETOH_TIME           = 2
+    ETOH_TIME           = 2                 # minutes
     NEW_PLATE           = False
-    DOUBLEDSIDED        = "Single Sided"    # "Single Sided" or "Double Sided"
+    DOUBLEDSIDED        = False
 
-    TIP_MIX             = False     # Default False   | Use Tip Mixing instead of Heatershaker
+    TIP_MIX             = True      # Default False   | Use Tip Mixing instead of Heatershaker
     ONDECK_THERMO       = False     # Default False   | On Deck Thermocycler
     ONDECK_HEATERSHAKER = False     # Default False   | True = On Deck Heater Shaker, False = No heatershaker and increased tip mixing reps.
     ONDECK_TEMP         = False     # Default False   | True = On Deck Temperature module, False = No Temperature Module
@@ -94,7 +94,7 @@ def run(protocol: protocol_api.ProtocolContext):
     DEACTIVATE_TEMP     = True      # Whether or not to deactivate the heating and cooling modules after a run
     USE_GRIPPER         = True      # Using the Gripper
     CUSTOM_OFFSETS      = False     # Manually enter offset position settings
-    RES_TYPE_96x        = False  # Type of Reservoir, if reusing tips or omitting rows, set True to use a 96x2ml deepwell
+    RES_TYPE_96x        = False     # Type of Reservoir, if reusing tips or omitting rows, set True to use a 96x2ml deepwell
     ETOH_1_AirMultiDis  = False     # When adding EtOH to multiple columns, dispense above the wells and reuse tips (Tip Saving)
     RSB_1_AirMultiDis   = False     # When adding RSB to multiple columns, dispense above the wells and reuse tips (Tip Saving)
     COLUMN_SET_BATCH    = False     # Whether or not remove supernatant and add RSB in batches, to prevent uneven drying in high sample count runs
@@ -593,9 +593,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # ============================ RESERVOIR ================================
     AMPure              = reservoir['A1']
-    #EtOH              = reservoir['A4']
-    #EtOH              = reservoir['A5']
-    #EtOH              = reservoir['A6']
+    #EtOH               = reservoir['A4']
+    #EtOH               = reservoir['A5']
+    #EtOH               = reservoir['A6']
     RSB                 = reservoir['A7']
     Liquid_trash_well_3 = reservoir['A10']
     Liquid_trash_well_2 = reservoir['A11']
@@ -612,13 +612,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1'] # Plate 1 / Cleanup 1
         ETOH_list = ['A4']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1'] # Cleanup 2
             else:
                 column_2_list = ['A2'] # Cleanup 2
             column_3_list = ['A1'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1'] # Cleanup 2
             else:
                 column_2_list = ['A2'] # Cleanup 2
@@ -627,13 +627,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1','A2'] # Plate 1 / Cleanup 1
         ETOH_list = ['A4','A4']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2'] # Cleanup 2
             else:
                 column_2_list = ['A3','A4'] # Cleanup 2
             column_3_list = ['A1','A2'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2'] # Cleanup 2
             else:
                 column_2_list = ['A3','A4'] # Cleanup 2
@@ -642,13 +642,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1','A2','A3',] # Plate 1 / Cleanup 1
         ETOH_list = ['A4','A4','A4']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3'] # Cleanup 2
             else:
                 column_2_list = ['A4','A5','A6'] # Cleanup 2
             column_3_list = ['A1','A2','A3'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3'] # Cleanup 2
             else:
                 column_2_list = ['A4','A5','A6'] # Cleanup 2
@@ -657,13 +657,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1','A2','A3','A4'] # Plate 1 / Cleanup 1
         ETOH_list = ['A4','A4','A5','A5']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4'] # Cleanup 2
             else:
                 column_2_list = ['A5','A6','A7','A8'] # Cleanup 2
             column_3_list = ['A1','A2','A3','A4'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4'] # Cleanup 2
             else:
                 column_2_list = ['A5','A6','A7','A8'] # Cleanup 2
@@ -672,13 +672,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1','A2','A3','A4','A5'] # Plate 1 / Cleanup 1
         ETOH_list = ['A4','A4','A4','A5','A5']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4','A5'] # Cleanup 2
             else:
                 column_2_list = ['A6','A7','A8','A9','A10'] # Cleanup 2
             column_3_list = ['A1','A2','A3','A4','A5'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4','A5',] # Cleanup 2
             else:
                 column_2_list = ['A6','A7','A8','A9','A10'] # Cleanup 2
@@ -687,13 +687,13 @@ def run(protocol: protocol_api.ProtocolContext):
         column_1_list = ['A1','A2','A3','A4','A5','A6'] # Plate 1 / Cleanup 1
         ETOH_list = ['A4','A4','A4','A5','A5','A5']
         if NEW_PLATE == True:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4','A5','A6'] # Cleanup 2
             else:
                 column_2_list = ['A7','A8','A9','A10','A11','A12'] # Cleanup 2
             column_3_list = ['A1','A2','A3','A4','A5','A6'] # Plate 2
         else:
-            if DOUBLEDSIDED == 'Single Sided':
+            if DOUBLEDSIDED == False:
                 column_2_list = ['A1','A2','A3','A4','A5','A6'] # Cleanup 2
             else:
                 column_2_list = ['A7','A8','A9','A10','A11','A12'] # Cleanup 2
@@ -703,13 +703,13 @@ def run(protocol: protocol_api.ProtocolContext):
     # These are Custom Offsets which are a PER INSTRUMENT Setting, to account for slight adjustments of the gripper calibration or labware.
     if CUSTOM_OFFSETS == True:
         PCRPlate_Z_offset = 0
-        Deepwell_Z_offset = 1
+        Deepwell_Z_offset = 0
         # HEATERSHAKER OFFSETS
-        hs_drop_offset={'x':0,'y':-2,'z':0}
-        hs_pick_up_offset={'x':0,'y':-2,'z':0}
+        hs_drop_offset={'x':0,'y':0,'z':0}
+        hs_pick_up_offset={'x':0,'y':0,'z':0}
         # MAG BLOCK OFFSETS
-        mb_drop_offset={'x':0,'y':0.,'z':0.5}
-        mb_pick_up_offset={'x':0,'y':-2,'z':0}
+        mb_drop_offset={'x':0,'y':0.,'z':0}
+        mb_pick_up_offset={'x':0,'y':0,'z':0}
         # THERMOCYCLER OFFSETS
         tc_drop_offset={'x':0,'y':0,'z':0}
         tc_pick_up_offset={'x':0,'y':0,'z':0}
@@ -758,12 +758,12 @@ def run(protocol: protocol_api.ProtocolContext):
         for loop, X in enumerate(column_1_list):
             TipCheck(50,None,loop,None)
             for Y in range(math.ceil(INPUTVOLUME/50)):
-                p50.aspirate(TransferSup, sample_plate_1[X].bottom(z=PCRPlate_Z_offset+0.25))
+                p50.aspirate(TransferSup, sample_plate_1[X].bottom(z=PCRPlate_Z_offset+1))
                 p50.dispense(TransferSup, CleanupPlate[column_1_list[loop]].bottom(z=Deepwell_Z_offset+1))
             TipDone(50,None,loop,None)
         #=============================
 
-        protocol.comment('--> ADDING AMPure (0.8x)')
+        protocol.comment('--> ADDING AMPure')
         SampleVol = INPUTVOLUME
         AMPureMixRPM = SHAKE_RPM
         AMPureMixTime = SHAKE_TIME*60 if DRYRUN == False else 0.1*60 # Seconds
@@ -775,8 +775,8 @@ def run(protocol: protocol_api.ProtocolContext):
         for loop, X in enumerate(column_1_list):
             AMPureVol = (BEADRATIO*INPUTVOLUME)
             TipCheck(200,None,loop,None)
-            p1000.aspirate(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1), rate=0.25)
-            p1000.dispense(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1), rate=0.25)
+            p1000.aspirate(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
+            p1000.dispense(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
             p1000.aspirate(AMPureVol+3 if INPUTVOLUME < 100 else AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1), rate=0.25)
             if INPUTVOLUME < 100:
                 p1000.dispense(3, AMPure.bottom(z=Deepwell_Z_offset+1), rate=0.25)
@@ -791,18 +791,15 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.dispense(AMPureVol, CleanupPlate[X].bottom(z=Deepwell_Z_offset+3), rate=0.5)
             p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+7))
             p1000.default_speed = 100
-            p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+3))
+            p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
             if TIP_MIX == True:
                 AmpureMixRep = 10
             if TIP_MIX == False:
                 AmpureMixRep = 2
             for Mix in range(AmpureMixRep):
-                p1000.aspirate(70, rate=0.5)
-                p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0.25))
-                p1000.aspirate(20, rate=0.5)
-                p1000.dispense(20, rate=0.5)
-                p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+3))
-                p1000.dispense(70, rate=0.5)
+                p1000.aspirate((SampleVol+AMPureVol)-10, rate=0.5)
+                protocol.delay(seconds=1)
+                p1000.dispense((SampleVol+AMPureVol)-10, rate=0.5)
                 Mix += 1
             p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+7))
             p1000.default_speed = 400
@@ -833,8 +830,7 @@ def run(protocol: protocol_api.ProtocolContext):
         if DRYRUN == False:
             protocol.delay(minutes=4)
 
-        if DOUBLEDSIDED == 'Single Sided':
-
+        if DOUBLEDSIDED == True:
             protocol.comment('--> Transferring Sample to CleanupPlate')
             #TransferReps = math.ceil((INPUTVOLUME+(BEADRATIO*INPUTVOLUME))/50)
             #TransferSup = 50 if int((INPUTVOLUME+(BEADRATIO*INPUTVOLUME))/TransferReps)+3 >=50 else int((INPUTVOLUME+(BEADRATIO*INPUTVOLUME))/TransferReps)+3
@@ -847,8 +843,8 @@ def run(protocol: protocol_api.ProtocolContext):
                 TransferSup = 50 if int((INPUTVOLUME+(BEADRATIO*INPUTVOLUME))/TransferReps)+3 >=50 else int((INPUTVOLUME+(BEADRATIO*INPUTVOLUME))/TransferReps)+3
                 TipCheck(50,None,loop,None)
                 for Y in range(TransferReps):
-                    p50.aspirate(TransferSup, CleanupPlate[X].bottom(z=Deepwell_Z_offset+0.2))
-                    p50.dispense(TransferSup, CleanupPlate[column_2_list[loop]].bottom(z=Deepwell_Z_offset+1))
+                    p50.aspirate(TransferSup, CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
+                    p50.dispense(TransferSup, CleanupPlate[column_2_list[loop]].bottom(z=Deepwell_Z_offset+1.5))
                 TipDone(50,None,loop,None)
             #=============================
 
@@ -874,10 +870,10 @@ def run(protocol: protocol_api.ProtocolContext):
             #=============================
             for loop, X in enumerate(column_2_list):
                 TipCheck(200,None,loop,None)
-                p1000.aspirate(AMPureVol, AMPure.bottom(z=1), rate=0.25)
-                p1000.dispense(AMPureVol, AMPure.bottom(z=1), rate=0.25)
-                p1000.aspirate(AMPureVol+3, AMPure.bottom(z=1), rate=0.25)
-                p1000.dispense(3, AMPure.bottom(z=1), rate=0.25)
+                p1000.aspirate(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
+                p1000.dispense(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
+                p1000.aspirate(AMPureVol+3, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
+                p1000.dispense(3, AMPure.bottom(z=Deepwell_Z_offset+1.5), rate=0.25)
                 p1000.default_speed = 5
                 p1000.move_to(AMPure.top(z=-3))
                 #=====Reservoir Tip Touch========
@@ -896,7 +892,7 @@ def run(protocol: protocol_api.ProtocolContext):
                     AmpureMixRep = 2
                 for Mix in range(AmpureMixRep):
                     p1000.aspirate(70, rate=0.5)
-                    p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0.25))
+                    p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
                     p1000.aspirate(20, rate=0.5)
                     p1000.dispense(20, rate=0.5)
                     p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+3))
@@ -940,7 +936,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+2))
             p1000.aspirate(RemoveSup-100)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0))
+            p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
             p1000.aspirate(100)
             p1000.default_speed = 200
             p1000.move_to(CleanupPlate[X].top(z=2))
@@ -973,7 +969,7 @@ def run(protocol: protocol_api.ProtocolContext):
             if ETOH_1_AirMultiDis == True:
                 TipCheck(200,None,loop,None)
                 for loop, X in enumerate(column_2_list):
-                    p1000.aspirate(ETOHMaxVol, reservoir.wells_by_name()[ETOH_list[loop]].bottom(z=1))
+                    p1000.aspirate(ETOHMaxVol, reservoir.wells_by_name()[ETOH_list[loop]].bottom(z=Deepwell_Z_offset+1.5))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=0))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=-5))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=0))
@@ -994,7 +990,7 @@ def run(protocol: protocol_api.ProtocolContext):
             else:
                 for loop, X in enumerate(column_2_list):
                     TipCheck(200,None,loop,None)
-                    p1000.aspirate(ETOHMaxVol, reservoir.wells_by_name()[ETOH_list[loop]].bottom(z=1))
+                    p1000.aspirate(ETOHMaxVol, reservoir.wells_by_name()[ETOH_list[loop]].bottom(z=Deepwell_Z_offset+1.5))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=0))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=-5))
                     p1000.move_to(reservoir.wells_by_name()[ETOH_list[loop]].top(z=0))
@@ -1028,7 +1024,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+2))
                 p1000.aspirate(RemoveSup-100)
                 protocol.delay(minutes=0.1)
-                p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0))
+                p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
                 p1000.aspirate(100)
                 p1000.default_speed = 5
                 p1000.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+7))
@@ -1063,7 +1059,7 @@ def run(protocol: protocol_api.ProtocolContext):
             #=============================
             for loop, X in enumerate(column_2_list[batch*(int(len(column_2_list)/BATCHREP)):(1+batch)*int(len(column_2_list)/BATCHREP)]):
                 TipCheck(50,None,loop,None)
-                p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0))
+                p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
                 p50.aspirate(50, rate=0.25)
                 TipDone(50,None,loop,None)
             #=============================
@@ -1091,17 +1087,17 @@ def run(protocol: protocol_api.ProtocolContext):
             #=============================
             for loop, X in enumerate(column_2_list[batch*(int(len(column_2_list)/BATCHREP)):(1+batch)*int(len(column_2_list)/BATCHREP)]):
                 TipCheck(50,'REUSE',loop,None)
-                p50.aspirate(RSBVol, RSB.bottom(z=1))
-                p50.move_to(CleanupPlate.wells_by_name()[X].top(z=3))
+                p50.aspirate(RSBVol, RSB.bottom(z=Deepwell_Z_offset+1.5))
+                p50.move_to(CleanupPlate.wells_by_name()[X].bottom(z=Deepwell_Z_offset+2))
                 p50.dispense(RSBVol)
                 if TIP_MIX == True:
                     RSBMixRep = 10
                 if TIP_MIX == False:
                     RSBMixRep = 2
-                p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0.25))
+                p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
                 for Mix in range(RSBMixRep):
-                    p50.aspirate(RSBVol, rate=0.5)
-                    p50.dispense(RSBVol, rate=0.5)
+                    p50.aspirate(RSBVol-5, rate=0.5)
+                    p50.dispense(RSBVol-5, rate=0.5)
                     Mix += 1
                 p50.blow_out(CleanupPlate.wells_by_name()[X].top(z=3))
                 TipDone(50,'REUSE',loop,None)
@@ -1132,16 +1128,17 @@ def run(protocol: protocol_api.ProtocolContext):
         #=============================
         for loop, X in enumerate(column_2_list):
             TipCheck(50,'REUSE',loop,None)
-            p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+0))
+            p50.move_to(CleanupPlate[X].bottom(z=Deepwell_Z_offset+1))
             p50.aspirate(TransferSup)
             if NEW_PLATE == True:
-                p50.dispense(TransferSup, sample_plate_2[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+0.5))
-                p50.blow_out(sample_plate_2[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+2))
+                p50.dispense(TransferSup, sample_plate_2[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+1))
+                p50.blow_out(sample_plate_2[column_3_list[loop]].top(z=PCRPlate_Z_offset-3))
             else:
-                p50.dispense(TransferSup, sample_plate_1[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+0.5))
-                p50.blow_out(sample_plate_1[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+2))
+                p50.dispense(TransferSup, sample_plate_1[column_3_list[loop]].bottom(z=PCRPlate_Z_offset+1))
+                p50.blow_out(sample_plate_1[column_3_list[loop]].top(z=PCRPlate_Z_offset-3))
             TipDone(50,'REUSE',loop,None)
         #=============================
+
 
     # =================================================================================================
     # ========================================== PROTOCOL END =========================================
@@ -1207,14 +1204,14 @@ def run(protocol: protocol_api.ProtocolContext):
         if RES_TYPE_96x == False:
             reservoir.wells_by_name()['A1'].load_liquid(liquid=AMPure, volume=AMPure_Volume*8+1000)
             if ETOH_Volume <= 15000:
-                reservoir.wells_by_name()['A3'].load_liquid(liquid=EtOH, volume=15000)
-            if ETOH_Volume >= 15000 and ETOH_Volume <30000:
-                reservoir.wells_by_name()['A3'].load_liquid(liquid=EtOH, volume=15000)
                 reservoir.wells_by_name()['A4'].load_liquid(liquid=EtOH, volume=15000)
-            if ETOH_Volume >= 30000:
-                reservoir.wells_by_name()['A3'].load_liquid(liquid=EtOH, volume=15000)
+            if ETOH_Volume >= 15000 and ETOH_Volume <30000:
                 reservoir.wells_by_name()['A4'].load_liquid(liquid=EtOH, volume=15000)
                 reservoir.wells_by_name()['A5'].load_liquid(liquid=EtOH, volume=15000)
+            if ETOH_Volume >= 30000:
+                reservoir.wells_by_name()['A4'].load_liquid(liquid=EtOH, volume=15000)
+                reservoir.wells_by_name()['A5'].load_liquid(liquid=EtOH, volume=15000)
+                reservoir.wells_by_name()['A6'].load_liquid(liquid=EtOH, volume=15000)
             reservoir.wells_by_name()['A7'].load_liquid(liquid=RSB, volume=RSB_Volume*8)
             reservoir.wells_by_name()['A10'].load_liquid(liquid=Liquid_trash_well, volume=0)
             reservoir.wells_by_name()['A11'].load_liquid(liquid=Liquid_trash_well, volume=0)
@@ -1223,14 +1220,14 @@ def run(protocol: protocol_api.ProtocolContext):
             for loop, X in enumerate(UsedColumn):
                 reservoir.wells_by_name()[X+'1'].load_liquid(liquid=AMPure, volume=AMPure_Volume)
                 if ETOH_Volume >= 15000:
-                    reservoir.wells_by_name()[X+'3'].load_liquid(liquid=EtOH, volume=15000)
-                if ETOH_Volume >= 15000 and ETOH_Volume <30000:
-                    reservoir.wells_by_name()[X+'3'].load_liquid(liquid=EtOH, volume=15000)
                     reservoir.wells_by_name()[X+'4'].load_liquid(liquid=EtOH, volume=15000)
-                if ETOH_Volume >= 30000:
-                    reservoir.wells_by_name()[X+'3'].load_liquid(liquid=EtOH, volume=15000)
+                if ETOH_Volume >= 15000 and ETOH_Volume <30000:
                     reservoir.wells_by_name()[X+'4'].load_liquid(liquid=EtOH, volume=15000)
                     reservoir.wells_by_name()[X+'5'].load_liquid(liquid=EtOH, volume=15000)
+                if ETOH_Volume >= 30000:
+                    reservoir.wells_by_name()[X+'4'].load_liquid(liquid=EtOH, volume=15000)
+                    reservoir.wells_by_name()[X+'5'].load_liquid(liquid=EtOH, volume=15000)
+                    reservoir.wells_by_name()[X+'6'].load_liquid(liquid=EtOH, volume=15000)
                 reservoir.wells_by_name()[X+'7'].load_liquid(liquid=RSB, volume=RSB_Volume)
                 reservoir.wells_by_name()[X+'10'].load_liquid(liquid=Liquid_trash_well, volume=0)
                 reservoir.wells_by_name()[X+'11'].load_liquid(liquid=Liquid_trash_well, volume=0)

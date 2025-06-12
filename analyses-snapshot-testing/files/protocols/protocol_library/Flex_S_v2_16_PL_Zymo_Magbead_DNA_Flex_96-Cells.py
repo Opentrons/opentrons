@@ -124,17 +124,16 @@ def run(ctx):
     for well in wash1_reservoir.wells():
         well.load_liquid(liquid=wash1_buffer,volume=wash1_vol + 100)
 
-    wash2_reservoir = ctx.load_labware(deepwell_type, 'B2','Wash 2 ')
+    wash2_reservoir = ctx.load_labware(deepwell_type, 'B2','Washes 2 + 3')
     wash2_res       = wash2_reservoir.wells()[0]
-    wash2_buffer    = ctx.define_liquid(name='Wash 2',description='Wash 2 Buffer',display_color='#800080')
+    wash2_buffer    = ctx.define_liquid(name='Wash 2 Buffer',description='Buffer for Washes 2, 3 and 4',display_color='#800080')
     for well in wash2_reservoir.wells():
         well.load_liquid(liquid=wash2_buffer,volume=(2*wash2_vol) + 100)
 
-    wash4_reservoir = ctx.load_labware(deepwell_type, 'B3','Wash 3 ')
+    wash4_reservoir = ctx.load_labware(deepwell_type, 'B3','Wash 4')
     wash4_res       = wash4_reservoir.wells()[0]
-    wash4_buffer    = ctx.define_liquid(name='Wash 4',description='Wash 4 Buffer',display_color='#ADD8E6')
     for well in wash4_reservoir.wells():
-        well.load_liquid(liquid=wash4_buffer,volume=wash4_vol + 100)
+        well.load_liquid(liquid=wash2_buffer,volume=wash4_vol + 100)
 
     elution_res     = elutionplate.wells()[0]
     elution_buffer  = ctx.define_liquid(name='Elution Buffer',description='Elution Buffer',display_color='#FF0000')
@@ -415,7 +414,7 @@ def run(ctx):
         pip.air_gap(20)
         if not tip_mixing:
             pip.return_tip()
-            pip.home()
+            ctx.home()
 
         if heater_shaker:
             h_s.set_and_wait_for_shake_speed(rpm=1800)
@@ -476,7 +475,7 @@ def run(ctx):
     pip.dispense(elution_vol, samples_m)
     if not tip_mixing:
         pip.return_tip()
-        pip.home()
+        ctx.home()
 
     if heater_shaker:
         h_s.set_and_wait_for_shake_speed(rpm=2000)
@@ -507,5 +506,3 @@ def run(ctx):
     pip.aspirate(elution_vol,samples_m.bottom(0.15))
     pip.dispense(elution_vol,elutionplate.wells()[0])
     pip.return_tip()
-
-    pip.home()
