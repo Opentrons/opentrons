@@ -555,6 +555,7 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
+    print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings,
         tip,
@@ -564,6 +565,7 @@ def run_blank_test(
         transfer_properties=transfer_properties,
         submerge_depth_override=15,
     )
+    print_info("Post aspirate read.")
     post_aspirate = retract_and_wait(
         fixture_settings,
         MeasurementType.ASPIRATE,
@@ -573,6 +575,7 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
+    print_info("dispensing.")
     dispense_with_liquid_class(
         fixture_settings,
         tip,
@@ -584,6 +587,7 @@ def run_blank_test(
         submerge_depth_override=15,
         final_air_gap=False,
     )
+    print_info("Post dispense read.")
     post_dispense = retract_and_wait(
         fixture_settings,
         MeasurementType.DISPENSE,
@@ -619,18 +623,23 @@ def run_one_test(
         tiprack_uri=tiprack_uri,
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
+    print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
+    print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
     )
+    print_info("Post aspirate read.")
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, channel=channel
     )
+    print_info("dispensing.")
     dispense_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties, contents
     )
+    print_info("Post dispense read.")
     post_dispense = retract_and_wait(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel
     )
@@ -642,8 +651,13 @@ def run(ctx: ProtocolContext) -> None:
     """Run."""
     fixture_settings = FixtureSettings.build(ctx)
     first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
+    print_info("Picking up first tip.")
     pick_up_tip_for_channel(fixture_settings, first_tip, 1)
+    print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    print_info(
+        f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
+    )
     fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
     measurements: Dict[float, List[List[MeasurementData]]] = {}
@@ -652,7 +666,7 @@ def run(ctx: ProtocolContext) -> None:
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
     )
     for i in range(fixture_settings.blank_trials):
-        print_info(f"Running blank trial {i}")
+        print_header(f"Running blank trial {i}")
         blank_measurments.append(
             run_blank_test(
                 fixture_settings,
@@ -704,6 +718,9 @@ def run(ctx: ProtocolContext) -> None:
             for channel in fixture_settings.channels:
                 channel_aspriate_dict: Dict[int, List[float]]
                 for trial in range(fixture_settings.trials):
+                    print_header(
+                        f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
+                    )
                     measurements[volume].append(
                         run_one_test(
                             fixture_settings,
