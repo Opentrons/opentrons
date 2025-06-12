@@ -9,6 +9,19 @@ div.parts-list figure {
   width: 200px;
 }
 
+/* Bolder darker text for parts list captions */
+div.parts-list figcaption {
+  font-weight: 600;
+  color: #4A4C4E;
+}
+
+/* But regular styling for sub-captions, e.g. screw size */
+div.parts-list figcaption .part-info {
+  font-weight: 400;
+  color: #737578;
+  margin-top: 0;
+}
+
 figure.screenshot img {
   border: 1px solid #888;
 }

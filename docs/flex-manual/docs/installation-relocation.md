@@ -110,39 +110,99 @@ The Flex ships with the components listed below. Pipettes, the gripper, and modu
 
 <div class="parts-list" markdown>
 
-<figure markdown> ![Opentrons Flex robot](images/parts-list/flex-robot.svg "Opentrons Flex robot") <figcaption>(1) Opentrons Flex robot</figcaption> </figure>
+<figure markdown>
+![Opentrons Flex robot](images/parts-list/flex-robot.svg "Opentrons Flex robot")
+<figcaption>(1) Opentrons Flex robot</figcaption>
+</figure>
 
-<figure markdown> ![USB cable](images/parts-list/usb-cable.svg "USB cable") <figcaption>(1) USB cable</figcaption> </figure>
+<figure markdown>
+![USB cable](images/parts-list/usb-cable.svg "USB cable")
+<figcaption>(1) USB cable</figcaption>
+</figure>
 
-<figure markdown> ![Ethernet cable](images/parts-list/ethernet-cable.svg "Ethernet cable") <figcaption>(1) Ethernet cable</figcaption> </figure>
+<figure markdown>
+![Ethernet cable](images/parts-list/ethernet-cable.svg "Ethernet cable")
+<figcaption>(1) Ethernet cable</figcaption>
+</figure>
 
-<figure markdown> ![Power cable](images/parts-list/power-cable.svg "Power cable") <figcaption>(1) Power cable</figcaption> </figure>
+<figure markdown>
+![Power cable](images/parts-list/power-cable.svg "Power cable")
+<figcaption>(1) Power cable</figcaption>
+</figure>
 
-<figure markdown> ![L-keys](images/parts-list/l-keys.svg "L-keys") <figcaption>(5) L-keys<br />(12 mm hex, 1.5 mm hex,<br />2.5 mm hex, 3 mm hex,<br />T10 Torx)</figcaption> </figure>
+<figure markdown>
+![L-keys](images/parts-list/l-keys.svg "L-keys")
+<figcaption>(5) L-keys
+<p class="part-info">(12 mm hex, 1.5 mm hex,<br />
+2.5 mm hex, 3 mm hex,<br />
+T10 Torx)</p></figcaption>
+</figure>
 
-<figure markdown> ![Emergency Stop Pendant](images/parts-list/emergency-stop.svg "Emergency Stop Pendant") <figcaption>(1) Emergency Stop Pendant</figcaption> </figure>
+<figure markdown>
+![Emergency Stop Pendant](images/parts-list/emergency-stop.svg "Emergency Stop Pendant")
+<figcaption>(1) Emergency Stop Pendant</figcaption>
+</figure>
 
-<figure markdown> ![Deck slot with labware clips](images/parts-list/deck-plate.svg "Deck slot with labware clips") <figcaption>(1) Deck slot with labware clips</figcaption> </figure>
+<figure markdown>
+![Deck slot with labware clips](images/parts-list/deck-plate.svg "Deck slot with labware clips")
+<figcaption>(1) Deck slot with labware clips</figcaption>
+</figure>
 
-<figure markdown> ![Spare labware clips](images/parts-list/labware-clips.svg "Spare labware clips") <figcaption>(4) Spare labware clips</figcaption> </figure>
+<figure markdown>
+![Spare labware clips](images/parts-list/labware-clips.svg "Spare labware clips")
+<figcaption>(4) Spare labware clips</figcaption>
+</figure>
 
-<figure markdown> ![Pipette calibration probe](images/parts-list/calibration-probe.svg "Pipette calibration probe") <figcaption>(1) Pipette calibration probe</figcaption> </figure>
+<figure markdown>
+![Pipette calibration probe](images/parts-list/calibration-probe.svg "Pipette calibration probe")
+<figcaption>(1) Pipette calibration probe</figcaption>
+</figure>
 
-<figure markdown> ![Carrying handles and caps](images/parts-list/carrying-handles.svg "Carrying handles and caps") <figcaption>(4) Carrying handles and caps</figcaption> </figure>
+<figure markdown>
+![Carrying handles and caps](images/parts-list/carrying-handles.svg "Carrying handles and caps")
+<figcaption>(4) Carrying handles and caps</figcaption>
+</figure>
 
-<figure markdown> ![Top window panel](images/parts-list/top-window-panel.svg "Top window panel") <figcaption>(1) Top window panel</figcaption> </figure>
+<figure markdown>
+![Top window panel](images/parts-list/top-window-panel.svg "Top window panel")
+<figcaption>(1) Top window panel</figcaption>
+</figure>
 
-<figure markdown> ![Side window panels](images/parts-list/side-window-panels.svg "Side window panels") <figcaption>(4) Side window panels</figcaption> </figure>
+<figure markdown>
+![Side window panels](images/parts-list/side-window-panels.svg "Side window panels")
+<figcaption>(4) Side window panels</figcaption>
+</figure>
 
-<figure markdown> ![2.5 mm hex screwdriver](images/parts-list/2-5-mm-hex-screwdriver.svg "2.5 mm hex screwdriver") <figcaption>(1) 2.5 mm hex screwdriver</figcaption> </figure>
+<figure markdown>
+![2.5 mm hex screwdriver](images/parts-list/2-5-mm-hex-screwdriver.svg "2.5 mm hex screwdriver")
+<figcaption>(1) 2.5 mm hex screwdriver</figcaption>
+</figure>
 
-<figure markdown> ![19 mm wrench](images/parts-list/19-mm-wrench.svg "19 mm wrench") <figcaption>(1) 19 mm wrench</figcaption> </figure>
+<figure markdown>
+![19 mm wrench](images/parts-list/19-mm-wrench.svg "19 mm wrench")
+<figcaption>(1) 19 mm wrench</figcaption>
+</figure>
 
-<figure markdown> ![Window screws](images/parts-list/window-screw.svg "Window screws") <figcaption>(16 + spares) Window screws<br />(M4x8 mm flat head)</figcaption> </figure>
+<figure markdown>
+![Window screws](images/parts-list/window-screw.svg "Window screws")
+<figcaption>(16 + spares) Window screws
+<p class="part-info">(M4x8 mm flat head)</p>
+</figcaption>
+</figure>
 
-<figure markdown> ![Spare deck slot screws](images/parts-list/deck-plate-screw.svg "Spare deck slot screws") <figcaption>(10) Spare deck slot screws<br />(M4x10 mm socket head)</figcaption> </figure>
+<figure markdown>
+![Spare deck slot screws](images/parts-list/deck-plate-screw.svg "Spare deck slot screws")
+<figcaption>(10) Spare deck slot screws
+<p class="part-info">(M4x10 mm socket head)</p>
+</figcaption>
+</figure>
 
-<figure markdown> ![Spare deck clip screws](images/parts-list/deck-clip-screw.svg "Spare deck clip screws") <figcaption>(12) Spare deck clip screws<br />(M3x6 mm socket head)</figcaption> </figure>
+<figure markdown>
+![Spare deck clip screws](images/parts-list/deck-clip-screw.svg "Spare deck clip screws")
+<figcaption>(12) Spare deck clip screws
+<p class="part-info">(M3x6 mm socket head)</p>
+</figcaption>
+</figure>
 
 </div>
 

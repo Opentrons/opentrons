@@ -21,7 +21,8 @@ theme:
   palette:
     primary: custom
     accent: custom
-  logo: images/opentrons-logo-white.png
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
   icon:
     admonition:
       tip: material/lightbulb-on-outline
@@ -51,5 +52,4 @@ extra_css:
   - manual.css
   - opentrons-theme.css
 
-extra:
-  generator: false
+copyright: "© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law."

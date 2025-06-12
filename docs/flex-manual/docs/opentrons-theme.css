@@ -14,15 +14,16 @@ code, pre {
 /* Colors */
 
 :root {
-  --md-primary-fg-color: #006CFA; /* Opentrons Blue */
+  --md-primary-fg-color: #006CFA; /* Helix blue 50 (Opentrons Blue) */
+  --md-accent-fg-color: #0056C8; /* Helix blue 55 */
 }
 
 .opentrons-blue, .blue-50 {
-    color: #006CFA;
+  color: #006CFA;
 }
 
 .grey, .grey-60 {
-    color: #4A4C4E;
+  color: #4A4C4E;
 }
 
 /* Applying colors to elements */
@@ -77,4 +78,11 @@ article ul li::marker {
   top: 0; 
   font-weight: bold; 
   font-size: 0.9em; 
+}
+
+/* Caption styling */
+
+.md-typeset figcaption { /* .md-typeset parent required or will not override font-style */
+  font-style: normal;
+  color: #737578;
 }
