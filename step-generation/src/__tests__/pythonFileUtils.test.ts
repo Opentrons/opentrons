@@ -518,22 +518,19 @@ waste_chute = protocol.load_waste_chute()`.trimStart()
 })
 
 describe('getLoadLiquidClasses', () => {
-  it('should load a liquid class for each liquid class types with duplicate liquid classes and other steps', () => {
+  it('should load a liquid class for each liquid class types', () => {
     expect(
       getLoadLiquidClasses([
         WATER_LIQUID_CLASS_NAME,
         ETHANOL_LIQUID_CLASS_NAME,
         GLYCEROL_LIQUID_CLASS_NAME,
-        GLYCEROL_LIQUID_CLASS_NAME,
-        'none',
       ])
     ).toBe(
       `
 # Load Liquid Classes:
 water_v1 = protocol.get_liquid_class("water")
 ethanol_80_v1 = protocol.get_liquid_class("ethanol_80")
-glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")
-`.trimStart()
+glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })

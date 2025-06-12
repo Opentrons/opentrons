@@ -313,12 +313,9 @@ export function getLoadLiquidClasses(
   allLiquidClassesFromForms: string[]
 ): string {
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const uniqueLiquidClassesFromForms = Array.from(
-    new Set(allLiquidClassesFromForms)
-  )
-  const pythonLoadLiquidClasses = uniqueLiquidClassesFromForms
+  const pythonLoadLiquidClasses = allLiquidClassesFromForms
     .map(liquidClass => {
-      if (liquidClass == null || liquidClass === 'none') {
+      if (liquidClass == null) {
         return ''
       }
       return `${getPythonLiquidClassName(
@@ -329,7 +326,7 @@ export function getLoadLiquidClasses(
     })
     .join('\n')
 
-  return uniqueLiquidClassesFromForms.length > 0
+  return allLiquidClassesFromForms.length > 0
     ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
     : ''
 }
