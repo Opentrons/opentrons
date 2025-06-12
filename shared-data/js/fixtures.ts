@@ -34,6 +34,7 @@ import {
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
+  LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
@@ -694,6 +695,49 @@ export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   D3_ADDRESSABLE_AREA,
 ]
 
+export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
+  D4: 'fakeD4',
+  C4: 'fakeC4',
+  B4: 'fakeB4',
+  A4: 'fakeA4',
+  flexStackerModuleV1D4: 'fakeD4',
+  flexStackerModuleV1C4: 'fakeC4',
+  flexStackerModuleV1B4: 'fakeB4',
+  flexStackerModuleV1A4: 'fakeA4',
+  magneticBlockV1A3: 'A3',
+  magneticBlockV1B3: 'B3',
+  magneticBlockV1C3: 'C3',
+  magneticBlockV1D3: 'D3',
+  '1ChannelWasteChute': 'D3',
+  '8ChannelWasteChute': 'D3',
+  '96ChannelWasteChute': 'D3',
+  gripperWasteChute: 'D3',
+  temperatureModuleV2D3: 'D3',
+  temperatureModuleV2C3: 'C3',
+  temperatureModuleV2B3: 'B3',
+  temperatureModuleV2A3: 'A3',
+  heaterShakerV1D3: 'D3',
+  heaterShakerV1C3: 'C3',
+  heaterShakerV1B3: 'B3',
+  heaterShakerV1A3: 'A3',
+  movableTrashD3: 'D3',
+  movableTrashC3: 'C3',
+  movableTrashB3: 'B3',
+  movableTrashA3: 'A3',
+}
+
+export const MODULE_CUTOUT_FIXTURE_ID = [
+  'heaterShakerModuleV1',
+  'temperatureModuleV2',
+  'magneticBlockV1',
+  'stagingAreaSlotWithMagneticBlockV1',
+  'thermocyclerModuleV2Rear',
+  'thermocyclerModuleV2Front',
+  'absorbanceReaderV1',
+  'flexStackerModuleV1',
+  'flexStackerModuleV1WithMagneticBlockV1',
+]
+
 export const isAddressableAreaStandardSlot = (
   addressableAreaName: AddressableAreaName,
   deckDef: DeckDefinition
@@ -703,8 +747,116 @@ export const isAddressableAreaStandardSlot = (
     : STANDARD_OT2_SLOTS
   ).includes(addressableAreaName)
 
-// export const getModuleOptionsForCutoutId = (cutoutId: CutoutId): CutoutConfigMap[][] => {
-//   const deck_def = getDeckDefFromRobotType('OT-3 Standard')
-//   const cutoutFixturesAllowed = deck_def.cutoutFixtures.filter(item => item.mayMountTo.includes(cutoutId))
-//   console.log("cutoutFixturesAllowed: ", cutoutFixturesAllowed)
-// }
+export const getFlexDeckDefAAByFixtureIdForCutoutId = (
+  cutoutId: CutoutId
+): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const deckDefWithFakes = getDeckDefAAWithFakeAA(deckDef)
+  // replace staging area aaId to fake ones
+  const availableCutoutFixtuers = deckDefWithFakes.cutoutFixtures.filter(cf =>
+    cf.mayMountTo.includes(cutoutId)
+  )
+  const aaForCutoutFixrure = availableCutoutFixtuers.reduce<
+    Partial<Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]>>
+  >((acc, { id, providesAddressableAreas }) => {
+    acc[id] = providesAddressableAreas[cutoutId]
+    return acc
+  }, {})
+  return aaForCutoutFixrure as Record<
+    CutoutFixtureIdsWithFakes,
+    AddressableAreaNamesWithFakes[]
+  >
+}
+
+/**
+ * get relevent aa name that match with cutoutId and fixtureId.
+ *
+ * @param cutoutId - The cutoutId we are looking for.
+ * @param fixtureId - The fixtureId we are looking for.
+ * @returns The aa name or null if not match found.
+ */
+export const getAddressableMatchForAreaId = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureId,
+  addressableAreaId: AddressableAreaNamesWithFakes
+): AddressableAreaNamesWithFakes | null => {
+  const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
+    cutoutId
+  )
+  const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
+  if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
+    return aaListForFixtureId[0]
+  } else {
+    const aa =
+      aaListForFixtureId.filter(
+        (aa: AddressableAreaNamesWithFakes) =>
+          aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
+      ) ?? null
+    console.log('aa: ', aa)
+    return aa[0]
+  }
+}
+
+export const replaceCutoutFixtureWithComboFixture = (
+  addedCutoutConfigs: CutoutConfigMap[],
+  deckConfigWithAA: CutoutConfigMap[],
+  cutoutId: CutoutId
+): CutoutConfigMap[] => {
+  const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
+
+  return addedCutoutConfigs.map(aaCutoutItem => {
+    console.log('Processing cutout item:', aaCutoutItem)
+
+    // Only handle SINGLE_RIGHT_CUTOUTS
+    if (!SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId)) {
+      return { ...aaCutoutItem }
+    }
+
+    // Filter potential combo fixture options
+    const comboFixturesOptions = Object.entries(
+      addressableAreasById
+    ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
+
+    console.log('comboFixturesOptions:', comboFixturesOptions)
+
+    // Try to match with deck config
+    for (const dc of deckConfigWithAA) {
+      const match = comboFixturesOptions.find(([, areaIds]) =>
+        areaIds.includes(dc.addressableAreaId)
+      )
+
+      if (match) {
+        if (match[0] === aaCutoutItem.cutoutFixtureId) {
+          return { ...aaCutoutItem }
+        } else {
+          const [fixtureId, areaList] = match
+          console.log('match: ', match)
+          console.log('areaList: ', areaList)
+
+          const otherModules = areaList.filter(
+            id => id !== aaCutoutItem.addressableAreaId
+          )
+          console.log('otherModules: ', otherModules)
+          const matchedModule = deckConfigWithAA.find(dc =>
+            otherModules.includes(dc.addressableAreaId)
+          )
+          const sn = matchedModule?.opentronsModuleSerialNumber
+          console.log('matchedModule: ', matchedModule)
+          console.log('Matched fixture:', fixtureId, 'Module SN:', sn)
+
+          return {
+            ...aaCutoutItem,
+            cutoutFixtureId: fixtureId as CutoutFixtureId,
+            opentronsModuleSerialNumber:
+              sn ?? aaCutoutItem.opentronsModuleSerialNumber,
+          }
+        }
+      } else {
+        console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
+        continue
+      }
+    }
+    // Fallback if no match found
+    return { ...aaCutoutItem }
+  })
+}

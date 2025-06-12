@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { Btn } from '@opentrons/components'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
@@ -15,9 +16,6 @@ import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { AddFixtureModal } from '../AddFixtureModal'
-import {
-  Btn
-} from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -40,8 +38,8 @@ describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
-    console.log("in before each")
-    console.log("Btn: ", Btn)
+    console.log('in before each')
+    console.log('Btn: ', Btn)
     props = {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
@@ -131,7 +129,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, cutoutId: 'cutoutA1', addressableAreaId:'A1' }
+    props = { ...props, cutoutId: 'cutoutA1', addressableAreaId: 'A1' }
     render(props)
     screen.getByText('Add to Slot A1')
     screen.getByText(
@@ -145,7 +143,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, cutoutId: 'cutoutB3', addressableAreaId: 'B3'  }
+    props = { ...props, cutoutId: 'cutoutB3', addressableAreaId: 'B3' }
     render(props)
     screen.getByText('Add to Slot B3')
     screen.getByText(
@@ -159,7 +157,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should only render module options in column 2', () => {
-    props = { ...props, cutoutId: 'cutoutB2', addressableAreaId: 'B2'}
+    props = { ...props, cutoutId: 'cutoutB2', addressableAreaId: 'B2' }
     render(props)
     screen.getByText('Add to Slot B2')
     screen.getByText(
@@ -179,20 +177,20 @@ describe('Desktop AddFixtureModal', () => {
 
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0])// click fixtures
+    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0]) // click fixtures
     fireEvent.click(screen.getByRole('button', { name: 'Select options' })) // click waste chute options
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(
-      1
-    )
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
 
-    const displayText = getFixtureDisplayName(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+    const displayText = getFixtureDisplayName(
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
     screen.getByText(displayText)
   })
 
   it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
     render(props)
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
-    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0])// click fixtures
+    fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0]) // click fixtures
     fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
 
     fireEvent.click(screen.getByText('Go back'))
