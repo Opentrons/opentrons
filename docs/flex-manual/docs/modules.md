@@ -18,17 +18,17 @@ Opentrons Flex is compatible with four types of on-deck Opentrons modules:
 
 Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark indicates compatibility, and an X indicates incompatibility.
 
-| Device type and generation | OT-2 | Flex |
-| -------------------------- | :--: | :--: |
-| Heater-Shaker Module GEN1  |  ✓   |  ✓   |
-| Magnetic Module GEN1       |  ✓   |  ×   |
-| Magnetic Module GEN2       |  ✓   |  ×   |
-| Magnetic Block GEN1        |  ×   |  ✓   |
-| Temperature Module GEN1    |  ✓   |  ×   |
-| Temperature Module GEN2    |  ✓   |  ✓   |
-| Thermocycler Module GEN1   |  ✓   |  ×   |
-| Thermocycler Module GEN2   |  ✓   |  ✓   |
-| HEPA Module                |  ✓   |  ×   |
+| Device type and generation      | OT-2 | Flex |
+|---------------------------------|:----:|:----:|
+| Heater-Shaker Module GEN1       |  ✓   |  ✓   |
+| Magnetic Module GEN1            |  ✓   |  ×   |
+| Magnetic Module GEN2            |  ✓   |  ×   |
+| Magnetic Block GEN1             |  ×   |  ✓   |
+| Temperature Module GEN1         |  ✓   |  ×   |
+| Temperature Module GEN2         |  ✓   |  ✓   |
+| Thermocycler Module GEN1        |  ✓   |  ×   |
+| Thermocycler Module GEN2        |  ✓   |  ✓   |
+| HEPA Module                     |  ✓   |  ×   |
 
 ## Module caddy system
 
@@ -97,7 +97,7 @@ At any time, you can view and manage your module calibration data in the Opentro
 
 ## Heater-Shaker Module GEN1
 
-![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](images/heater-shaker-module.png 'Heater-Shaker Module')
+![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](images/heater-shaker-module.png "Heater-Shaker Module")
 
 ### Heater-Shaker features
 
@@ -169,24 +169,23 @@ Outside of protocols, the Opentrons App can display the current status of the He
 
 ### Heater-Shaker specifications
 
-| **Specification**                    | **Details**                                                                                                                               |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dimensions**                       | 152 × 90 × 82 mm (L/W/H)                                                                                                                  |
-| **Weight**                           | 1.34 kg                                                                                                                                   |
-| **Module power input**               | 36 VDC, 6.1 A                                                                                                                             |
-| **Power adapter input**              | 100–240 VAC, 50/60 Hz                                                                                                                     |
-| **Mains supply voltage fluctuation** | ±10%                                                                                                                                      |
-| **Overvoltage**                      | Category II                                                                                                                               |
-| **Power consumption**                | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
-| **Environmental conditions**         | Indoor use only                                                                                                                           |
-| **Ambient temperature**              | 20–25 °C                                                                                                                                  |
-| **Relative humidity**                | Up to 80%, non-condensing                                                                                                                 |
-| **Altitude**                         | Up to 2,000 m above sea level                                                                                                             |
-| **Pollution degree**                 | 2                                                                                                                                         |
+| **Specification**               | **Details**  |
+|---------------------------------|--------------|
+| **Dimensions**                  | 152 × 90 × 82 mm (L/W/H)                                                   |
+| **Weight**                      | 1.34 kg                                                                    |
+| **Module power input**          | 36 VDC, 6.1 A                                                              |
+| **Power adapter input**         | 100–240 VAC, 50/60 Hz                                                      |
+| **Mains supply voltage fluctuation** | ±10%                                                                  |
+| **Overvoltage**                 | Category II                                                                |
+| **Power consumption**           | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
+| **Environmental conditions**    | Indoor use only                                                            |
+| **Ambient temperature**         | 20–25 °C                                                                   |
+| **Relative humidity**           | Up to 80%, non-condensing                                                  |
+| **Altitude**                    | Up to 2,000 m above sea level                                              |
+| **Pollution degree**            | 2                                                                          |
 
 ## Magnetic Block GEN1
-
-![The Magnetic Block has an array of 96 high-strength magnets.](images/magnetic-block.png 'Magnetic Block')
+![The Magnetic Block has an array of 96 high-strength magnets.](images/magnetic-block.png "Magnetic Block")
 
 ### Magnetic Block features
 
@@ -200,25 +199,25 @@ The Magnetic Block is unpowered, does not contain any electronic components, and
 
 The Magnetic Block GEN1 is fully programmable in Protocol Designer and the Python Protocol API.
 
-Outside of protocols, however, the touchscreen and the Opentrons App _are not_ aware of and _cannot_ display the current status of the Magnetic Block GEN1. This is an unpowered module. It does not contain electronic or mechanical components that can communicate with the Flex robot. You "control" the Magnetic Block via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
+Outside of protocols, however, the touchscreen and the Opentrons App *are not* aware of and *cannot* display the current status of the Magnetic Block GEN1. This is an unpowered module. It does not contain electronic or mechanical components that can communicate with the Flex robot. You "control" the Magnetic Block via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
 
 ### Magnetic Block specifications
 
-| **Specification**            | **Details**                  |
-| ---------------------------- | ---------------------------- |
-| **Dimensions**               | 136 × 94 × 45 mm (L/W/H)     |
-| **Weight**                   | 1.13 kg                      |
-| **Module power**             | None, module is unpowered    |
-| **Magnet grade**             | N52 neodymium                |
-| **Environmental conditions** | Indoor use only              |
-| **Ambient temperature**      | 20–25 °C                     |
-| **Relative humidity**        | 30–80%, non-condensing       |
-| **Altitude**                 | Up to 2000 m above sea level |
-| **Pollution degree**         | 2                            |
+| **Specification**       | **Details**                     |
+|--------------------------|---------------------------------|
+| **Dimensions**           | 136 × 94 × 45 mm (L/W/H)       |
+| **Weight**               | 1.13 kg                        |
+| **Module power**         | None, module is unpowered      |
+| **Magnet grade**         | N52 neodymium                  |
+| **Environmental conditions** | Indoor use only           |
+| **Ambient temperature**  | 20–25 °C                       |
+| **Relative humidity**    | 30–80%, non-condensing         |
+| **Altitude**             | Up to 2000 m above sea level   |
+| **Pollution degree**     | 2                              |
 
 ## Temperature Module GEN2
 
-![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](images/temperature-module.png 'Temperature Module')
+![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](images/temperature-module.png "Temperature Module")
 
 ### Temperature Module features
 
@@ -231,7 +230,8 @@ The Opentrons Temperature Module GEN2 is a hot and cold plate module. It is ofte
 To hold labware at temperature, the module uses aluminum thermal blocks. The module comes with 24- well and 96-well thermal blocks. The Temperature Module caddy comes with a deep well block and a flat bottom block designed for use with the Flex Gripper. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 
 !!! note
-Note: The module also ships with a flat bottom block for the OT-2. Do not use the OT-2 block with Flex. The flat bottom block for Flex has the words “Opentrons Flex” on its top surface. The one for OT-2 does not.
+    Note: The module also ships with a flat bottom block for the OT-2. Do not use the OT-2 block with Flex. The flat bottom block for Flex has the words “Opentrons Flex” on its top surface. The one for OT-2 does not.
+
 
 <div class="parts-list" markdown>
 
@@ -265,20 +265,20 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Temperature Module specifications
 
-| **Specification**            | **Details**                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------------------ |
-| **Dimensions**               | 194 × 90 × 84 mm (L/W/H)                                                                         |
-| **Weight**                   | 1.5 kg                                                                                           |
-| **Module power**             | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
-| **Environmental conditions** | Indoor use only                                                                                  |
-| **Ambient temperature**      | <22 °C (recommended for optimal cooling)                                                         |
-| **Relative humidity**        | Up to 60%, non-condensing                                                                        |
-| **Altitude**                 | Up to 2000 m above sea level                                                                     |
-| **Pollution degree**         | 2                                                                                                |
+| **Specification**               | **Details**                                                                 |
+|----------------------------------|-----------------------------------------------------------------------------|
+| **Dimensions**                  | 194 × 90 × 84 mm (L/W/H)                                                   |
+| **Weight**                      | 1.5 kg                                                                    |
+| **Module power**                | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
+| **Environmental conditions**    | Indoor use only                                                            |
+| **Ambient temperature**         | <22 °C (recommended for optimal cooling)                                  |
+| **Relative humidity**           | Up to 60%, non-condensing                                                  |
+| **Altitude**                    | Up to 2000 m above sea level                                               |
+| **Pollution degree**            | 2                                                                          |
 
 ## Thermocycler Module GEN2
 
-![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](images/thermocycler.png 'Thermocycler')
+![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](images/thermocycler.png "Thermocycler")
 
 ### Thermocycler features
 
@@ -302,7 +302,7 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 #### Thermocycler profiles
 
-The Thermocycler can execute _profiles_: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
+The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
 #### Rubber automation seals
 
@@ -319,16 +319,16 @@ temperature, and lid position.
 
 ### Thermocycler specifications
 
-| Specification                    | Details                                           |
-| -------------------------------- | ------------------------------------------------- |
-| **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                   |
-| **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                  |
-| **Weight (including rear duct)** | 8.4 kg                                            |
-| **Power adapter voltage**        | 100–240 V at 50/60 Hz                             |
-| **Power adapter current**        | 8.5–5 A                                           |
-| **Overvoltage**                  | Category II                                       |
-| **Environmental conditions**     | Indoor use only                                   |
-| **Ambient temperature**          | 20–25 °C (ideal); 2–40 °C (acceptable)            |
-| **Relative humidity**            | 30–80%, non-condensing                            |
-| **Altitude**                     | Up to 2000 m above sea level                      |
-| **Ventilation requirements**     | At least 20 cm / 8 in between the unit and a wall |
+| Specification                    | Details                                          |
+|----------------------------------|--------------------------------------------------|
+| **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                  |
+| **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                 |
+| **Weight (including rear duct)** | 8.4 kg                                           |
+| **Power adapter voltage**        | 100–240 V at 50/60 Hz                            |
+| **Power adapter current**        | 8.5–5 A                                          |
+| **Overvoltage**                  | Category II                                      |
+| **Environmental conditions**     | Indoor use only                                  |
+| **Ambient temperature**          | 20–25 °C (ideal); 2–40 °C (acceptable)           |
+| **Relative humidity**            | 30–80%, non-condensing                           |
+| **Altitude**                     | Up to 2000 m above sea level                     |
+| **Ventilation requirements**     | At least 20 cm / 8 in between the unit and a wall|

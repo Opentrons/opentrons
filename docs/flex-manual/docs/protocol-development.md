@@ -18,15 +18,15 @@ The Protocol Library search returns results as you type. You can select a result
 
 Each protocol card will show:
 
-| **Category**             | **Description**                                                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Protocol name**        | The name of the protocol.                                                                                                                                   |
-| **Verification**         | Badges indicate if the protocol is verified by Opentrons, a third-party manufacturer, or members of the community.                                          |
-| **Time estimate**        | Approximately how long the protocol takes to run.                                                                                                           |
-| **Description**          | A short summary of what the protocol does.                                                                                                                  |
-| **Robot model**          | Which Opentrons robots the protocol is compatible with.                                                                                                     |
+| **Category**                | **Description**                                                                                                                                         |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Protocol name**        | The name of the protocol.                                                                                                                               |
+| **Verification**         | Badges indicate if the protocol is verified by Opentrons, a third-party manufacturer, or members of the community.                                      |
+| **Time estimate**        | Approximately how long the protocol takes to run.                                                                                                       |
+| **Description**          | A short summary of what the protocol does.                                                                                                              |
+| **Robot model**          | Which Opentrons robots the protocol is compatible with.                                                                                                 |
 | **Protocol editability** | JSON protocols are editable in Protocol Designer, with no coding required. Python protocols are editable in any text editor, using the Python Protocol API. |
-| **Modules**              | Any hardware modules that are required.                                                                                                                     |
+| **Modules**              | Any hardware modules that are required.                                                                                                                 |
 
 In addition to these categories, in the sidebar you can filter results
 by:
@@ -66,7 +66,7 @@ Opentrons provides a [Remote Custom Protocol Development service](https://opentr
 By default, Opentrons adds all custom protocols to the Protocol Library so the community can benefit from them. However, if your application requires privacy, you can opt out of inclusion in the Protocol Library.
 
 !!! note
-The Custom Protocol Development service only writes Python protocols that control Opentrons hardware. It does not cover controlling the robot with code in other languages, nor does it cover controlling third-party hardware.
+    The Custom Protocol Development service only writes Python protocols that control Opentrons hardware. It does not cover controlling the robot with code in other languages, nor does it cover controlling third-party hardware.
 
 #### Protocol request guidelines
 
@@ -172,7 +172,7 @@ your protocol:
     gripper, or the waste chute. Only are shown.
 
 !!! note
-You can't currently use multiple Heater-Shaker Modules or Magnetic Blocks in a JSON protocol. If your application requires them, you'll need to use a Python protocol. See the below.
+    You can't currently use multiple Heater-Shaker Modules or Magnetic Blocks in a JSON protocol. If your application requires them, you'll need to use a Python protocol. See the below.
 
 At any time, you can return to the File tab to rename your protocol, add
 an author name or description, or change your hardware configuration.
@@ -180,11 +180,11 @@ an author name or description, or change your hardware configuration.
 #### Part 2: Define liquids
 
 Move on to the **Liquids** tab to set up samples and reagents. This tab
-is only for _defining_ types of liquids. You'll indicate the starting
+is only for *defining* types of liquids. You'll indicate the starting
 positions and amounts of liquids in Part 3, on the Design tab.
 
 Click **New Liquid** and then enter the name of your liquid and an
-optional description. You can also choose whether to _serialize_ the
+optional description. You can also choose whether to *serialize* the
 liquid, so each well containing that liquid will be numbered on the deck
 map and in action steps. For example, if your protocol has blood
 samples, serialization can help you keep them separate in your workflow,
@@ -209,7 +209,7 @@ labware, or adapters. Drag and drop labware to an open slot to move it
 there, or to an occupied slot to swap the two pieces of labware.
 
 !!! note
-You can'tmove modules or adapters around the deck map by drag and drop. This is to make it easier to move _labware_ onto or off of a module.
+    You can'tmove modules or adapters around the deck map by drag and drop. This is to make it easier to move *labware* onto or off of a module.
 
 - To change a module's position, return to the **File** tab and click
   **Edit** next to the module name.
@@ -221,7 +221,7 @@ You can'tmove modules or adapters around the deck map by drag and drop. This is 
 Hover over any labware and click **Add Liquids** to specify which wells
 contain which liquid. Clicking on a single well or dragging across a
 range of wells will reveal a form at the top of the screen. Choose one
-of the liquids you defined and the volume _each_ well should start with,
+of the liquids you defined and the volume *each* well should start with,
 in μL. For example, if you select the first column on a 96-well plate
 and specify 100 μL, that will be 800 μL of liquid total (100 μL × 8
 wells).
@@ -264,7 +264,7 @@ deck. Click **Add Step** and choose the type of step.
 
   - **Heater-Shaker:** Control the temperature, shake speed, and labware
     latch of the Heater-Shaker Module. You can set an optional timer
-    that will pause the protocol for a set period of time _after_ the
+    that will pause the protocol for a set period of time *after* the
     other actions are completed (heating to high temperatures or waiting
     for the module to passively cool to a temperature can take a long
     time).
@@ -278,7 +278,7 @@ deck. Click **Add Step** and choose the type of step.
     - Change Thermocycler state: Set a block temperature, set a lid
       temperature, or move the lid.
 
-    - Program a Thermocycler profile: Define a _profile_, a timed
+    - Program a Thermocycler profile: Define a *profile*, a timed
       heating and cooling routine that can be automatically repeated.
       Each step of the profile holds the block at a certain temperature
       for a certain time. Profiles do not change the temperature of the
@@ -338,7 +338,7 @@ loaded, you can edit any aspect of the protocol, including its name,
 description, hardware configuration, and steps.
 
 !!! warning
-Importing a protocol will replace any other protocol that you've been working on in Protocol Designer. Be sure to export your work before importing another file, or open Protocol Designer in a second browser tab to work on multiple files at once.
+    Importing a protocol will replace any other protocol that you've been working on in Protocol Designer. Be sure to export your work before importing another file, or open Protocol Designer in a second browser tab to work on multiple files at once.
 
 ## Python Protocol API
 
@@ -399,7 +399,7 @@ def run(protocol):
 
 If you're running a protocol via the Opentrons App or the touchscreen, you don't need to call the `run()` function, because the robot software does it for you.
 
-However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called _cells_), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation section][advanced-operation] of the Software and Operation chapter.
+However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called *cells*), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation section][advanced-operation] of the Software and Operation chapter.
 
 ### Python-exclusive features
 
@@ -425,7 +425,7 @@ Runtime parameters can customize Boolean, numerical, and string values in your p
 
 #### Non-blocking commands
 
-Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a _non-blocking_ manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
+Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
 
 #### Multiple modules of the same type
 
@@ -433,7 +433,7 @@ The Python API only restricts module placement based on physical limitations. Pr
 
 #### Python packages
 
-Not only does the Python API support some features not included in Protocol Designer, but every Python protocol _is a Python script_, which means that it can perform any computation that relies on the Python standard libraries or the suite of libraries included in the Flex system software.
+Not only does the Python API support some features not included in Protocol Designer, but every Python protocol *is a Python script*, which means that it can perform any computation that relies on the Python standard libraries or the suite of libraries included in the Flex system software.
 
 You can even install additional Python packages on Flex. [Connect to your Flex via SSH][command-line-operation-over-ssh] and install the package with `pip`. To avoid analysis errors in the Opentrons App, install the packages on your computer as well. In the Opentrons App settings, go to **Advanced** and click **Add override path** in the Override Path to Python section. Choose the copy of `python` on your system that has access to the packages.
 
@@ -478,6 +478,7 @@ def run(protocol: protocol_api.ProtocolContext):
         "flex_1channel_1000", "left", tip_racks[tips]
     )
 ```
+
 
 The only necessary changes are the new arguments of `load_labware()` and `load_instrument()`. Keep in mind that if you use smaller capacity tips than the original protocol, you may need to make further adjustments to avoid running out of tips, and the protocol may take longer to execute.
 
@@ -531,7 +532,8 @@ Update module load names for the Temperature Module and Thermocycler Module to o
 The Heater-Shaker Module only has one generation, which is compatible
 with Flex and OT-2.
 
-For protocols that load `magnetic module`, `magdeck`, or `magnetic module gen2`, see [Magnetic Module Protocols][magnetic-module-protocols] below.
+For protocols that load `magnetic module`, `magdeck`, or `magnetic module
+gen2`, see [Magnetic Module Protocols][magnetic-module-protocols] below.
 
 ### OT-2 JSON protocols
 

@@ -10,13 +10,7 @@ module.exports = {
 
   extends: ['stylelint-config-standard', 'stylelint-config-styled-components'],
 
-  ignoreFiles: [
-    'api/**',
-    '**/dist/**',
-    '**/coverage/**',
-    '**/venv/**',
-    'docs/**',
-  ],
+  ignoreFiles: ['api/**', '**/dist/**', '**/coverage/**', '**/venv/**', 'docs/**'],
 
   rules: {
     'selector-class-pattern': /^[a-z0-9_]+$/,
