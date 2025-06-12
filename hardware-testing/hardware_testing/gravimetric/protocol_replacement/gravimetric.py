@@ -506,7 +506,7 @@ def dispense_with_liquid_class(
     channel: int,
     transfer_properties: TransferProperties,
     contents: List[tx_comps_executor.LiquidAndAirGapPair],
-    submerge_depth_override: Optional[float] = None,
+    submerge_depth_override: float = -1.5,
     final_air_gap: bool = True,
 ) -> None:
     """Dispense with Liquid Class."""
