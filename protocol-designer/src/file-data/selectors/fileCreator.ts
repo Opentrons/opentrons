@@ -354,7 +354,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
-    const allLiquidClassesFromForms = Array.from(
+    const allUniqueLiquidClassesFromForms = Array.from(
       Object.values(savedStepForms).reduce<Set<string>>((acc, stepForm) => {
         if (
           'liquidClass' in stepForm &&
@@ -407,7 +407,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
           ingredLocations,
           labwareNicknamesById,
           robotType,
-          allLiquidClassesFromForms
+          allUniqueLiquidClassesFromForms
         ),
         pythonCustomLabwareDict(invariantContext.labwareEntities),
       ]

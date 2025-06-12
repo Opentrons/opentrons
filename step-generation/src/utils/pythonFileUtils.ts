@@ -310,10 +310,10 @@ export function getLoadLiquids(
 }
 
 export function getLoadLiquidClasses(
-  allLiquidClassesFromForms: string[]
+  allUniqueLiquidClassesFromForms: string[]
 ): string {
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const pythonLoadLiquidClasses = allLiquidClassesFromForms
+  const pythonLoadLiquidClasses = allUniqueLiquidClassesFromForms
     .map(liquidClass => {
       if (liquidClass == null) {
         return ''
@@ -326,7 +326,7 @@ export function getLoadLiquidClasses(
     })
     .join('\n')
 
-  return allLiquidClassesFromForms.length > 0
+  return allUniqueLiquidClassesFromForms.length > 0
     ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
     : ''
 }
@@ -376,7 +376,7 @@ export function pythonDefRun(
   liquidsByLabwareId: LabwareLiquidState,
   labwareNicknamesById: Record<string, string>,
   robotType: RobotType,
-  allLiquidClassesFromForms: string[]
+  allUniqueLiquidClassesFromForms: string[]
 ): string {
   const {
     moduleEntities,
@@ -405,7 +405,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
-    getLoadLiquidClasses(allLiquidClassesFromForms),
+    getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
