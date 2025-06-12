@@ -26,6 +26,10 @@ export const getLoadLiquidClassCommands = (
       }
       const { spec: pipetteSpecs } = pipetteEntity
       const pipetteModel = getFlexNameConversion(pipetteSpecs)
+
+      // creating a unique string to avoid duplicate loadLiquidClass commands
+      // for the same liquid class, pipette model, and tip rack
+      const uniqueString = `${liquidClass}-${pipetteModel}-${tipRack}`
       const byTipTypeSettings =
         liquidClass != null
           ? getAllLiquidClassDefs()
@@ -35,8 +39,8 @@ export const getLoadLiquidClassCommands = (
               ?.byTipType.find(({ tiprack }) => tiprack === tipRack)
           : null
 
-      if (byTipTypeSettings != null && !loadedLiquidClasses.has(liquidClass)) {
-        loadedLiquidClasses.add(liquidClass)
+      if (byTipTypeSettings != null && !loadedLiquidClasses.has(uniqueString)) {
+        loadedLiquidClasses.add(uniqueString)
         return [
           ...acc,
           {
