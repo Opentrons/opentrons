@@ -487,8 +487,18 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  ev_resin_tips_flex_96_labware: [
+    new URL('../../images/ev_resin_tips_flex_96_labware.png', import.meta.url)
+      .href,
+  ],
+  ev_resin_tips_flex_96_tiprack_adapter: [
+    new URL(
+      '../../images/ev_resin_tips_flex_96_tiprack_adapter.png',
+      import.meta.url
+    ).href,
+  ],
   axygen_96_well_plate_500_µL: [
-    new URL('../../images/Axygen_96_Well_Plate_500uL.jpg', import.meta.url)
+    new URL('../../images/axygen_96_Well_Plate_500uL.jpg', import.meta.url)
       .href,
   ],
   smc_384_read_plate: [
