@@ -546,7 +546,7 @@ const PROFILE_TARGET_LID_TEMP_RANGE: FormError = {
   location: 'field',
 }
 const PROFILE_VOLUME_RANGE: FormError = {
-  title: RANGE_TITLE,
+  title: `Enter a value between ${MIN_TC_PROFILE_VOLUME} and ${MAX_TC_PROFILE_VOLUME}`,
   dependentFields: ['profileVolume'],
   location: 'field',
 }

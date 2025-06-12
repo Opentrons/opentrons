@@ -19,7 +19,7 @@ export const ContentStrings = {
   v8_1: 'The default dispense height is now 1 mm from the bottom of the well',
   noBehaviorChange:
     'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior',
-  exportButton: 'Export',
+  exportButton: 'Export JSON',
   continueButton: 'continue',
   continueWithExport: 'Continue with export',
   migrationModal:
@@ -89,7 +89,7 @@ export const migrateAndMatchSnapshot = ({
   }
 
   verifyImportProtocolPage(uploadProtocol)
-  cy.contains('Edit protocol').click()
+  // cy.contains('Edit protocol').click()
 
   cy.screenshot('protocol-designer/migration-snapshot', {
     capture: 'viewport',

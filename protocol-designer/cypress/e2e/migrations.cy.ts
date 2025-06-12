@@ -2,10 +2,20 @@
 import { migrateAndMatchSnapshot, MigrateTestCase } from '../support/Import'
 import { TestFilePath } from '../support/TestFiles'
 
+//  TODO: revisit the usage of this cypress test since it tests exporting
+//  JSON but we will no longer support that soon
 describe('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {
     cy.visit('/')
+    cy.window().then(win => {
+      ;(win as any).enablePrereleaseMode()
+    })
     cy.closeAnalyticsModal()
+    cy.openSettingsPage()
+    cy.get(
+      '[data-testid="ToggleButton_Settings_OT_PD_ENABLE_JSON_EXPORT"]'
+    ).click()
+    cy.visit('/')
   })
 
   const testCases: MigrateTestCase[] = [

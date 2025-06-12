@@ -30,7 +30,7 @@ import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   createFile,
-  createPythonFile,
+  createJSONFile,
   getLabwareDefinitionsInUse,
 } from '../selectors'
 
@@ -99,7 +99,7 @@ describe('createFile selector', () => {
   }
   it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createFile.resultFunc(
+    const result = createJSONFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
@@ -123,7 +123,7 @@ describe('createFile selector', () => {
 
   it('should return a valid Python protocol file', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createPythonFile.resultFunc(
+    const result = createFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
@@ -286,7 +286,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: '8.5.0',
+        version: 'fake_PD_version',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },

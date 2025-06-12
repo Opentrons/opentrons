@@ -6,37 +6,40 @@ import {
 
 import type { PipetteV2Specs } from '..'
 
-export const getCorrectionVolume = (args: {
+export const getByVolumeValue = (args: {
   liquidClass: string | null
   pipetteSpecs: PipetteV2Specs
   tiprackDefUri: string
   targetVolume: number
   liquidHandlingAction: 'aspirate' | 'singleDispense' | 'multiDispense'
-}): number => {
+  byVolumeProperty: 'correctionByVolume' | 'flowRateByVolume'
+  defaultValue?: number | null
+}): number | null => {
   const {
     liquidClass,
     pipetteSpecs,
     tiprackDefUri,
     targetVolume,
     liquidHandlingAction,
+    byVolumeProperty,
+    defaultValue = null,
   } = args
+
   const allLiquidClassDefs = getAllLiquidClassDefs()
 
   if (liquidClass == null) {
-    return 0
+    return defaultValue
   }
   const convertedPipetteName = getFlexNameConversion(pipetteSpecs)
   const liquidClassDef =
     allLiquidClassDefs[liquidClass] ?? allLiquidClassDefs.waterV1
-  const liquidClassValuesForPipette = liquidClassDef.byPipette.find(
-    ({ pipetteModel }) => convertedPipetteName === pipetteModel
-  )
-  const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
-    ({ tiprack }) => tiprack === tiprackDefUri
-  )
+  const liquidClassValuesForTip = liquidClassDef.byPipette
+    .find(({ pipetteModel }) => convertedPipetteName === pipetteModel)
+    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
   if (liquidClassValuesForTip == null) {
-    return 0
+    return defaultValue
   }
+
   const liquidHandlingObject =
     liquidHandlingAction === 'multiDispense' &&
     !('multiDispense' in liquidClassValuesForTip)
@@ -44,13 +47,11 @@ export const getCorrectionVolume = (args: {
       : liquidClassValuesForTip[liquidHandlingAction]
 
   if (liquidHandlingObject == null) {
-    return 0
+    return defaultValue
   }
-  const { correctionByVolume } = liquidHandlingObject
+  const byVolume = liquidHandlingObject[byVolumeProperty]
   return (
-    linearInterpolate(
-      targetVolume,
-      correctionByVolume as Array<[number, number]>
-    ) ?? 0
+    linearInterpolate(targetVolume, byVolume as Array<[number, number]>) ??
+    defaultValue
   )
 }
