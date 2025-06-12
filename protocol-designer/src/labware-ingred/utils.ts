@@ -1,6 +1,7 @@
 import {
   FIXED_TRASH_ID,
   FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   getAreSlotsAdjacent,
   getDeckDefFromRobotType,
   getIsLabwareAboveHeight,
@@ -66,7 +67,8 @@ export function getNextAvailableDeckSlot(
       isSlotEmpty = false
     } else if (
       moduleSlots.includes(slot.id) ||
-      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id)
+      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id) ||
+      FLEX_STACKER_ADDRESSABLE_AREAS.includes(slot.id)
     ) {
       isSlotEmpty = false
       //  return slot as full if slot is adjacent to heater-shaker for ot-2 and taller than 53mm
