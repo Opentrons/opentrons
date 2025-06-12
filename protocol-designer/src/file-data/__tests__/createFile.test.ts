@@ -286,7 +286,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: 'fake_PD_version',
+        version: '8.5.0',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },
