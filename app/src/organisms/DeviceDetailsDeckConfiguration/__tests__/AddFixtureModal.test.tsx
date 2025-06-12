@@ -7,7 +7,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
-  WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -62,18 +61,18 @@ describe('Touchscreen AddFixtureModal', () => {
 
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('Add to slot D3')
+    screen.getByText('Add to Slot D3')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
-    expect(screen.getAllByText('Select options').length).toBe(2)
+    expect(screen.getAllByText('Add').length).toBe(2)
   })
 
   it('should set deck config when tapping add button', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[1])
+    fireEvent.click(screen.getAllByText('Add')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
   })
 
@@ -83,7 +82,7 @@ describe('Touchscreen AddFixtureModal', () => {
       providedFixtureOptions: ['trashBinAdapter'],
     }
     render(props)
-    screen.getByText('Add to slot D3')
+    screen.getByText('Add to Slot D3')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
@@ -115,56 +114,54 @@ describe('Desktop AddFixtureModal', () => {
 
   it('should render text and buttons slot D3', () => {
     render(props)
-    screen.getByText('Add to slot D3')
+    screen.getByText('Add to Slot D3')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
 
     screen.getByText('Fixtures')
     screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[0])
-    screen.getByText('Staging area slot')
+    fireEvent.click(screen.getAllByText('Add')[0])
     screen.getByText('Trash bin')
     screen.getByText('Waste chute')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
     expect(
       screen.getAllByRole('button', { name: 'Select options' }).length
     ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, cutoutId: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1', addressableAreaId:'A1' }
     render(props)
-    screen.getByText('Add to slot A1')
+    screen.getByText('Add to Slot A1')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[0])
+    fireEvent.click(screen.getAllByText('Add')[0])
     screen.getByText('Trash bin')
     screen.getByRole('button', { name: 'Add' })
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, cutoutId: 'cutoutB3' }
+    props = { ...props, cutoutId: 'cutoutB3', addressableAreaId: 'B3'  }
     render(props)
-    screen.getByText('Add to slot B3')
+    screen.getByText('Add to Slot B3')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[0])
-    screen.getByText('Staging area slot')
+    fireEvent.click(screen.getAllByText('Add')[0])
     screen.getByText('Trash bin')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
   })
 
   it('should only render module options in column 2', () => {
-    props = { ...props, cutoutId: 'cutoutB2' }
+    props = { ...props, cutoutId: 'cutoutB2', addressableAreaId: 'B2'}
     render(props)
-    screen.getByText('Add to slot B2')
+    screen.getByText('Add to Slot B2')
     screen.getByText(
       'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
     )
