@@ -41,7 +41,8 @@ export function getNextAvailableDeckSlot(
     .filter(module => module.slot)
     .map(mod => mod.slot)
   if (hasTC) {
-    moduleSlots = [...moduleSlots, '8', '10', '11']
+    //  encompass all TC slots for both robots since they're different
+    moduleSlots = [...moduleSlots, '8', '10', '11', 'A1']
   }
 
   return deckDef.locations.addressableAreas.find(slot => {
