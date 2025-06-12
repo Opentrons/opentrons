@@ -246,11 +246,11 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
+        simulating = ctx.is_simulating()
         if simulating:
             pipette_tag = "pipette"
         else:
             pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
-        simulating = ctx.is_simulating()
         run_id = create_run_id()
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
