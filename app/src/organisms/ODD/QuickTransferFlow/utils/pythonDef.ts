@@ -111,7 +111,9 @@ export function pythonDef(
       getLoadWasteChute(wasteChuteEntities),
     ],
     getLoadLiquidClasses(
-      stepArgs?.liquidClass != null ? [stepArgs.liquidClass] : []
+      stepArgs?.liquidClass != null && stepArgs?.liquidClass !== 'none'
+        ? [stepArgs.liquidClass]
+        : []
     ),
     quickTransferStepCommands({
       stepArgs,

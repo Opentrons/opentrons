@@ -8,6 +8,7 @@ import { createSelector } from 'reselect'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
+  NONE_LIQUID_CLASS_NAME,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
@@ -353,9 +354,18 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
-    const allLiquidClassesFromForms: string[] = Object.values(savedStepForms)
-      .filter(stepForm => 'liquidClass' in stepForm)
-      ?.map(stepForm => stepForm.liquidClass)
+    const allLiquidClassesFromForms = Array.from(
+      Object.values(savedStepForms).reduce<Set<string>>((acc, stepForm) => {
+        if (
+          'liquidClass' in stepForm &&
+          stepForm.liquidClass != null &&
+          stepForm.liquidClass !== NONE_LIQUID_CLASS_NAME
+        ) {
+          acc.add(stepForm.liquidClass as string)
+        }
+        return acc
+      }, new Set())
+    )
 
     const designerApplication: PythonDesignerApplication = {
       robot: {
