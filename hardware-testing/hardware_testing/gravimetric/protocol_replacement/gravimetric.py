@@ -441,7 +441,7 @@ def retract_and_wait(
     """Retract away from the scale and record the weight."""
     m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
     fixture_settings.pipette._retract()
-    if fixture_settings.recorder and not blank:
+    if fixture_settings.recorder and not blank and fixture_settings.ctx.is_simulating():
         if mode == MeasurementType.ASPIRATE:
             fixture_settings.recorder.add_simulation_mass(volume * -0.001)
         elif mode == MeasurementType.DISPENSE:
