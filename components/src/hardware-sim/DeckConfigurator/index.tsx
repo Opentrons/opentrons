@@ -2,7 +2,7 @@ import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  replaceStagingFixtureAndTransformCutoutFixturesToAA,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
 } from '@opentrons/shared-data'
@@ -67,7 +67,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
   )
 

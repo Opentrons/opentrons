@@ -387,6 +387,11 @@ export const getReplacementFixtureForFixtureRemoval = (
   return SINGLE_CENTER_SLOT_FIXTURE
 }
 
+/**
+ * Given a fake cutout fixutre find a replacment to store on the server
+ * @param cutoutFixtureId: a cutoutId we wish to replace with a non fake fixture
+ * @returns the relevant cutoutFixtureId to store on the server
+ */
 export const getReplacementFixtureForFakeFixture = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes
 ): CutoutFixtureId => {
@@ -398,8 +403,12 @@ export const getReplacementFixtureForFakeFixture = (
   }
   return cutoutFixtureId
 }
-
-export const replaceStagingFixtureAndTransformCutoutFixturesToAA = (
+/**
+ * Given a list of cutout configs replace fixtures with their fake fixtures
+ * @param: a list of cutout config from the server
+ * @returns: a list of cutout config with relevant AA
+ */
+export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
   cutoutFixtures: CutoutConfig[]
 ): CutoutConfigMap[] => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
@@ -438,6 +447,11 @@ export const filterAAByAreaType = (
   })
 }
 
+/**
+ * Given a deck def add all fake cutout fixtures and fake AA
+ * @param deckDefinition: deck def we wish to extend
+ * @returns a new deck def with fake fixtures
+ */
 export const getDeckDefAAWithFakeAA = (
   deckDefinition: DeckDefinition
 ): DeckDefinitionWithFakes => {
@@ -748,6 +762,12 @@ export const isAddressableAreaStandardSlot = (
     : STANDARD_OT2_SLOTS
   ).includes(addressableAreaName)
 
+/**
+ * Given a cutout id get a key value pair of all possibilities for fixture id and related AA
+ * @param addedCutoutConfigs: fixtures list selected to add to deck
+ * @param cutoutId: cutout if we are adding a fixture to.
+ * @returns key value pair of of all possibilities for fixture id and related AA
+ */
 export const getFlexDeckDefAAByFixtureIdForCutoutId = (
   cutoutId: CutoutId
 ): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
@@ -798,6 +818,13 @@ export const getAddressableAreaMatchForAreaId = (
   }
 }
 
+/**
+ * Given a cutout fixture find if should be changed to a combo fixture
+ * @param addedCutoutConfigs: fixtures list selected to add to deck
+ * @param deckConfigWithAA: current deck state
+ * @param cutoutId:
+ * @returns update list of the current deck with the combo fixtures replacements
+ */
 export const replaceCutoutFixtureWithComboFixture = (
   addedCutoutConfigs: CutoutConfigMap[],
   deckConfigWithAA: CutoutConfigMap[],

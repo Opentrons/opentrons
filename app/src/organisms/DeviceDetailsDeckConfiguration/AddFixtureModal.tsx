@@ -32,7 +32,7 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_CUTOUT_FIXTURE_ID,
   replaceCutoutFixtureWithComboFixture,
-  replaceStagingFixtureAndTransformCutoutFixturesToAA,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_RIGHT_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -86,7 +86,7 @@ export function AddFixtureModal({
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
-  const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
   )
   const unconfiguredMods =
