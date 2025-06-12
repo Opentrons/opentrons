@@ -353,10 +353,13 @@ def set_gantry_per_axis_setting_ot3(
 ) -> None:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        settings.high_throughput[axis_kind] = value
-    else:
-        settings.low_throughput[axis_kind] = value
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_1000[axis_kind] = value
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_200[axis_kind] = value
+        case GantryLoad.LOW_THROUGHPUT:
+            settings.low_throughput[axis_kind] = value
 
 
 def get_gantry_per_axis_setting_ot3(
@@ -364,9 +367,13 @@ def get_gantry_per_axis_setting_ot3(
 ) -> float:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        return settings.high_throughput[axis_kind]
-    return settings.low_throughput[axis_kind]
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            return settings.high_throughput_1000[axis_kind]
+        case GantryLoad.HIGH_THROUGHPUT_200:
+            return settings.high_throughput_200[axis_kind]
+        case GantryLoad.LOW_THROUGHPUT:
+            return settings.low_throughput[axis_kind]
 
 
 async def set_gantry_load_per_axis_current_settings_ot3(

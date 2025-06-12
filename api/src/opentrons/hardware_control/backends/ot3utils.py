@@ -215,7 +215,7 @@ def get_current_settings(
                 hold_current=conf_by_pip["hold_current"][axis_kind],
                 run_current=conf_by_pip["run_current"][axis_kind],
             )
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         # In high-throughput configuration, the right mount doesn't do anything: the
         # lead screw nut is disconnected from the carriage, and it just hangs out
         # up at the top of the axis. We should therefore not give it a lot of current.
@@ -242,7 +242,7 @@ def get_system_constraints(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         axis_kind_list.append(OT3AxisKind.Q)
     for axis_kind in axis_kind_list:
         for axis in Axis.of_kind(axis_kind):
