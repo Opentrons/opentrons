@@ -5,10 +5,9 @@ import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
-import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   useCreateTargetedMaintenanceRunMutation,
@@ -25,6 +24,7 @@ import {
   useUpdateDeckConfig,
   useUpdateLabware,
 } from './hooks'
+import { useLPCAnalytics } from './useLPCAnalytics'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -61,6 +61,11 @@ export function useLPCFlows({
   robotType,
   protocolName,
 }: UseLPCFlowsProps): UseLPCFlowsResult {
+  const analytics = useLPCAnalytics({
+    robotType,
+    runId: runId ?? 'UNKNOWN',
+  })
+
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
@@ -150,15 +155,14 @@ export function useLPCFlows({
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.
     if (!isLaunching) {
+      analytics.reportLaunchLpcWizard()
       setIsLaunching(true)
-      const labwareOffsets = getRelevantOffsets(
-        robotType,
-        ot2Offsets,
-        flexOffsets ?? []
-      )
-      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
+      // Inject OT-2 offsets into the maintenance run upon creation.
+      // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
+      const injectedOffsets =
+        robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
 
-      return createTargetedMaintenanceRun(createRunData).then(
+      return createTargetedMaintenanceRun(injectedOffsets).then(
         maintenanceRun => {
           setMaintenanceRunId(maintenanceRun.data.id)
         }
@@ -208,6 +212,7 @@ export function useLPCFlows({
           protocolName,
           maintenanceRunId,
           ot2Offsets,
+          analytics,
         },
       }
     : {

@@ -13,6 +13,7 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
+  InlineNotification,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -20,7 +21,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {

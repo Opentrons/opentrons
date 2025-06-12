@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '../../../ui-style-constants'
 import { RobotCoordsText } from '../../Deck'
 
 import type { MemoExoticComponent } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './types'
 
 // magic layout numbers to make the letters close to the edges of the labware
@@ -14,13 +14,13 @@ const LETTER_COLUMN_X_ADJUSTMENT = -4
 const NUMBER_COLUMN_Y_ADJUSTMENT = 2
 
 interface LabwareWellLabelsProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   highlightedWellLabels?: HighlightedWellLabels
   wellLabelColor?: string
 }
 
 const Labels = (props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wells: string[]
   isLetterColumn?: boolean
   highlightedWellLabels?: HighlightedWellLabels

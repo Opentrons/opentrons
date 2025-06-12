@@ -1,19 +1,10 @@
 import { useModulesQuery } from '@opentrons/react-api-client'
-import {
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-} from '@opentrons/shared-data'
 
 import {
   ANALYTICS_MODULE_COMMAND_COMPLETED,
   ANALYTICS_MODULE_COMMAND_ERROR,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  getAttachedProtocolModuleMatches,
-  getProtocolModulesInfo,
-} from '/app/transformations/analysis'
 
 import type { CommandData } from '@opentrons/api-client'
 import type {
@@ -22,7 +13,9 @@ import type {
   ModuleOnlyParams,
   ModuleType,
   RunTimeCommand,
+  TemperatureModuleAwaitTemperatureParams,
   TemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data'
 
 const ANALYTIC_COMMAND_TYPES: Array<RunTimeCommand['commandType']> = [
@@ -81,7 +74,6 @@ export interface UseModuleCommandAnalyticsResult {
 
 export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
   const doTrackEvent = useTrackEvent()
-  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
   const moduleQuery = useModulesQuery()
 
   const reportModuleCommand = ({
@@ -96,22 +88,11 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
 
     const attachedModules = moduleQuery?.data?.data ?? []
 
-    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
-    const protocolModulesInfo =
-      analysis != null ? getProtocolModulesInfo(analysis, deckDef) : []
-
-    const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-      attachedModules,
-      protocolModulesInfo,
-      deckConfig
-    )
-
-    const matchedModules = attachedProtocolModuleMatches.map(module => ({
-      moduleType: module.attachedModuleMatch?.moduleType,
-      moduleId: module.attachedModuleMatch?.id,
-      serialNumber: module.attachedModuleMatch?.serialNumber,
-      firmwareVersion: module.attachedModuleMatch?.firmwareVersion,
+    const matchedModules = attachedModules.map(module => ({
+      moduleType: module.moduleType,
+      moduleId: module.id,
+      serialNumber: module.serialNumber,
+      firmwareVersion: module.firmwareVersion,
     }))
 
     const { moduleId, celsius } = isParamType(
@@ -165,20 +146,25 @@ function isModuleOnlyParams(params: unknown): params is ModuleOnlyParams {
   return typeof params === 'object' && params !== null && 'moduleId' in params
 }
 
-function isTemperatureParams(params: unknown): params is TemperatureParams {
+type AllTemperatureParams =
+  | TemperatureModuleAwaitTemperatureParams
+  | TemperatureParams
+  | ThermocyclerSetTargetBlockTemperatureParams
+
+function isTemperatureParams(params: unknown): params is AllTemperatureParams {
   return typeof params === 'object' && params !== null && 'celsius' in params
 }
 
 /* Checks param type and returns variables found */
 function isParamType(params: unknown): { moduleId: string; celsius: string } {
-  if (isModuleOnlyParams(params)) {
-    return { moduleId: String(params.moduleId), celsius: '' }
-  }
   if (isTemperatureParams(params)) {
     return {
       moduleId: String(params.moduleId),
       celsius: String(params.celsius),
     }
+  }
+  if (isModuleOnlyParams(params)) {
+    return { moduleId: String(params.moduleId), celsius: '' }
   }
   return { moduleId: '', celsius: '' }
 }

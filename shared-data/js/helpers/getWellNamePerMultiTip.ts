@@ -3,7 +3,7 @@ import range from 'lodash/range'
 import { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
 import { getLabwareHasQuirk, orderWells, sortWells } from './index'
 
-import type { LabwareDefinition2 } from '../types'
+import type { LabwareDefinition } from '../types'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips
@@ -11,7 +11,7 @@ const OFFSET_8_CHANNEL = 9 // offset in mm between tips
 const MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) // length in mm from first to last tip of multichannel
 
 export function findWellAt(
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition,
   x: number,
   y: number
 ): string | null | undefined {
@@ -38,7 +38,7 @@ export function findWellAt(
 
 // "topWellName" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
 export function getWellNamePerMultiTip(
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition,
   topWellName: string,
   channels: 8 | 96
 ): string[] | null {

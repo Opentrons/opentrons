@@ -4,7 +4,7 @@ import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 
 import type { CSSProperties, MemoExoticComponent } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
 
 type WellContents =
@@ -16,7 +16,7 @@ type WellContents =
   | 'selectedWell'
 export interface StyledWellProps {
   wellContents: WellContents
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wells: WellGroup
 }
 

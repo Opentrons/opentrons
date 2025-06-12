@@ -3,7 +3,8 @@ import sortBy from 'lodash/sortBy'
 
 import {
   getLabwareDefIsStandard,
-  labwareSchemaV2 as labwareSchema,
+  labwareSchemaV2,
+  labwareSchemaV3,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
 
@@ -19,17 +20,46 @@ import type {
   CheckedLabwareFile,
   UncheckedLabwareFile,
 } from '@opentrons/app/src/redux/custom-labware/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition,
+  LabwareDefinition3,
+} from '@opentrons/shared-data'
 
 const ajv = new Ajv()
-const validateDefinition = ajv.compile(labwareSchema)
+
+// todo(mm, 2025-05-13): When we have ajv>=7, add a type parameter like
+// `ajv.compile<LabwareDefinition>(...)` so we don't have to make our own type guards.
+const ajvValidateSchema2 = ajv.compile(labwareSchemaV2 as object)
+const ajvValidateSchema3 = ajv.compile(labwareSchemaV3 as object)
+
+function isValidSchema2(data: unknown): data is LabwareDefinition {
+  const result = ajvValidateSchema2(data)
+  return typeof result === 'boolean' && result
+}
+
+function isValidSchema3(data: unknown): data is LabwareDefinition3 {
+  const result = ajvValidateSchema3(data)
+  return typeof result === 'boolean' && result
+}
 
 // TODO(mc, 2019-10-21): this code is somewhat duplicated with stuff in
 // shared-data, but the shared-data validation function isn't geared towards
 // this use case because it either throws or passes invalid files; align them
-const validateLabwareDefinition = (data: any): LabwareDefinition2 | null =>
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  validateDefinition(data) ? data : null
+function validateLabwareDefinition(data: unknown): LabwareDefinition | null {
+  const schemaVersion = safeGetSchemaVersion(data)
+  if (schemaVersion === 3) {
+    return isValidSchema3(data) ? data : null
+  } else if (schemaVersion === 2) {
+    return isValidSchema2(data) ? data : null
+  } else return null
+}
+
+function safeGetSchemaVersion(maybeLabwareDefinition: unknown): number | null {
+  const maybeSchemaVersion: unknown = (maybeLabwareDefinition as any)
+    ?.schemaVersion
+  if (typeof maybeSchemaVersion === 'number') return maybeSchemaVersion
+  return null
+}
 
 // validate a collection of unchecked labware files
 export function validateLabwareFiles(

@@ -11,6 +11,7 @@ import {
   fillLabwareLiquidsSectionAndClickConfirm,
   fillModulesSectionAndClickConfirm,
   fillProtocolFormatSectionAndClickConfirm,
+  fillRuntimeParametersSectionAndClickConfirm,
 } from '../../../resources/utils/createProtocolTestUtils'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -143,10 +144,9 @@ describe('CreateProtocol', () => {
     await fillInstrumentsSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Modules' })).toHaveAttribute(
-        'aria-expanded',
-        'true'
-      )
+      expect(
+        screen.getByRole('button', { name: 'Modules & Fixtures' })
+      ).toHaveAttribute('aria-expanded', 'true')
     })
   })
 
@@ -199,13 +199,29 @@ describe('CreateProtocol', () => {
     expect(previewItems[9]).toHaveTextContent('Test liquid')
   })
 
-  it('should open the Steps section when the Labware & Liquids section is completed', async () => {
+  it('should open the Runtime Parameters section when the Labware & Liquids section is completed', async () => {
     render()
     await fillProtocolFormatSectionAndClickConfirm()
     await fillApplicationSectionAndClickConfirm()
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
     await fillLabwareLiquidsSectionAndClickConfirm()
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Runtime Parameters' })
+      ).toHaveAttribute('aria-expanded', 'true')
+    })
+  })
+
+  it('should open the Steps section when the Runtime Parameters section is completed', async () => {
+    render()
+    await fillProtocolFormatSectionAndClickConfirm()
+    await fillApplicationSectionAndClickConfirm()
+    await fillInstrumentsSectionAndClickConfirm()
+    await fillModulesSectionAndClickConfirm()
+    await fillLabwareLiquidsSectionAndClickConfirm()
+    await fillRuntimeParametersSectionAndClickConfirm()
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Steps' })).toHaveAttribute(
@@ -223,6 +239,7 @@ describe('CreateProtocol', () => {
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
     await fillLabwareLiquidsSectionAndClickConfirm()
+    await fillRuntimeParametersSectionAndClickConfirm()
 
     const textArea = screen.getByRole('textbox')
     fireEvent.change(textArea, { target: { value: 'Test step' } })
@@ -234,8 +251,8 @@ describe('CreateProtocol', () => {
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    // After filling the Steps section, there should be 9 items
-    expect(previewItems).toHaveLength(10)
+    // With a value filled in for runtime parameters, it will show in the preview
+    expect(previewItems).toHaveLength(11)
 
     // The test step content is not added to the preview items
     // The submit button should be enabled even though the step doesn't appear in preview
@@ -250,6 +267,7 @@ describe('CreateProtocol', () => {
     await fillInstrumentsSectionAndClickConfirm()
     await fillModulesSectionAndClickConfirm()
     await fillLabwareLiquidsSectionAndClickConfirm()
+    await fillRuntimeParametersSectionAndClickConfirm()
 
     const textArea = screen.getByRole('textbox')
     fireEvent.change(textArea, { target: { value: 'Test step' } })
@@ -261,8 +279,8 @@ describe('CreateProtocol', () => {
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    // After filling the Steps section, there should be 9 items
-    expect(previewItems).toHaveLength(10)
+    // With a value filled in for runtime parameters, it will show in the preview
+    expect(previewItems).toHaveLength(11)
 
     // The test step content is not added to the preview items
     // But the submit button should be enabled after confirming the step

@@ -20,7 +20,7 @@ import { SecureLabwareModal } from '../SecureLabwareModal'
 
 import type { ComponentProps } from 'react'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -30,7 +30,7 @@ import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')
 
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {
@@ -100,6 +100,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: '7',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -135,6 +136,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'thermocyclerModuleId',
           moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+          moduleSlotName: 'B1',
         },
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
@@ -166,6 +168,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'magneticModuleId',
           moduleModel: 'magneticModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -206,6 +209,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,
@@ -247,6 +251,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: 'temperatureModuleId',
           moduleModel: 'temperatureModuleV2' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: '7',
@@ -311,6 +316,7 @@ describe('LabwareListItem', () => {
         {
           moduleId: mockModuleId,
           moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+          moduleSlotName: 'A1',
         },
       ],
       slotName: mockModuleSlot.slotName,

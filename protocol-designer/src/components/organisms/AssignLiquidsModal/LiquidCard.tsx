@@ -25,6 +25,7 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import { getLabwareEntities } from '../../../step-forms/selectors'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { WellContents } from './WellContents'
 
 import type { SelectedContainerId } from '../../../labware-ingred/reducers'
 import type { LiquidInfo } from './LiquidToolbox'
@@ -33,8 +34,7 @@ interface LiquidCardProps {
   info: LiquidInfo
 }
 
-export function LiquidCard(props: LiquidCardProps): JSX.Element {
-  const { info } = props
+export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
   const { name, color, liquidClassDisplayName, liquidIndex } = info
   const { t } = useTranslation('liquids')
   const dispatch = useDispatch()
@@ -207,30 +207,5 @@ export function LiquidCard(props: LiquidCardProps): JSX.Element {
         </>
       ) : null}
     </ListButton>
-  )
-}
-
-interface WellContentsProps {
-  wellName: string
-  volume: number
-}
-
-function WellContents(props: WellContentsProps): JSX.Element {
-  const { wellName, volume } = props
-  const { t } = useTranslation('liquids')
-
-  return (
-    <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-      <StyledText width="50%" desktopStyle="bodyDefaultRegular">
-        {wellName}
-      </StyledText>
-      <Flex width="50%">
-        <Tag
-          text={`${volume} ${t('microliters')}`}
-          type="default"
-          shrinkToContent
-        />
-      </Flex>
-    </Flex>
   )
 }

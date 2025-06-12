@@ -1,3 +1,5 @@
+import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
+
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import { formatPyStr, uuid } from '../../utils'
 
@@ -34,7 +36,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       noTipOnPipette({
         actionName,
@@ -74,7 +76,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
         labwareId,
         wellName,
         wellLocation: {
-          origin: 'top',
+          origin: WELL_ORIGIN_TOP,
           offset: {
             z: zOffsetFromTop,
           },

@@ -22,7 +22,7 @@ import type { Run } from '@opentrons/api-client'
 import type {
   CutoutConfigProtocolSpec,
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareDefinitionsByUri,
   LabwareLocation,
   LoadedLabware,
@@ -54,7 +54,7 @@ export interface UseDeckMapUtilsResult {
   labwareOnDeck: RunCurrentLabwareOnDeck[]
   loadedLabware: LoadedLabware[]
   loadedModules: LoadedModule[]
-  movedLabwareDef: LabwareDefinition2 | null
+  movedLabwareDef: LabwareDefinition | null
   moduleRenderInfo: RunModuleInfo[]
   labwareRenderInfo: RunLabwareInfo[]
   highlightLabwareEventuallyIn: string[]
@@ -177,7 +177,7 @@ interface RunCurrentModulesOnDeck {
     | {
         lidMotorState?: undefined
       }
-  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDef: LabwareDefinition | null
 }
 
 // Builds the necessary module object expected by BaseDeck.
@@ -215,7 +215,7 @@ export function getRunCurrentModulesOnDeck({
 
 interface RunCurrentLabwareOnDeck {
   labwareLocation: LabwareLocation
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }
 // Builds the necessary labware object expected by BaseDeck.
 // Note that while this highlights all labware in the failed labware slot, the result is later filtered to render
@@ -259,7 +259,7 @@ export function getRunCurrentLabwareOnDeck({
 interface RunCurrentModuleInfo {
   moduleId: string
   moduleDef: ModuleDefinition
-  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDef: LabwareDefinition | null
   nestedLabwareSlotName: string
   slotName: string
 }
@@ -327,7 +327,7 @@ export const getRunCurrentModulesInfo = ({
 }
 
 interface RunCurrentLabwareInfo {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   labwareLocation: LabwareLocation
   slotName: string
 }
@@ -403,7 +403,7 @@ export function getRunCurrentLabwareInfo({
 const getLabwareDefinition = (
   labware: LoadedLabware,
   protocolLabwareDefinitionsByUri: LabwareDefinitionsByUri
-): LabwareDefinition2 => {
+): LabwareDefinition => {
   if (labware.id === 'fixedTrash') {
     return getFixedTrashLabwareDefinition()
   } else {

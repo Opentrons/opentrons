@@ -443,6 +443,11 @@
       "type": "number",
       "enum": [1]
     },
+    "version": {
+      "description": "Version of the liquid class definition itself (eg water v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
+    },
     "namespace": {
       "$ref": "#/definitions/safeString"
     },
@@ -492,6 +497,7 @@
     "displayName",
     "description",
     "schemaVersion",
+    "version",
     "namespace",
     "byPipette"
   ],

@@ -15,7 +15,7 @@ import { useRequiredProtocolLabware } from '/app/resources/protocols'
 import { Labware } from '../Labware'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/protocols')
 
@@ -37,20 +37,20 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {
-          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition,
           lidDisplayName: 'tiprack lid',
           quantity: 1,
         },
         {
-          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition,
           quantity: 2,
         },
         {
-          labwareDef: fixture96Plate as LabwareDefinition2,
+          labwareDef: fixture96Plate as LabwareDefinition,
           quantity: 1,
         },
         {
-          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition,
           quantity: 1,
         },
       ])

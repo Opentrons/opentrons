@@ -35,6 +35,7 @@ from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
@@ -527,6 +528,15 @@ class RunDataManager:
         """Get current tip attached states, keyed by pipette id."""
         if run_id == self._run_orchestrator_store.current_run_id:
             return self._run_orchestrator_store.get_tip_attached()
+
+        raise RunNotCurrentError()
+
+    def get_flex_stacker_substate(
+        self, run_id: str
+    ) -> Mapping[str, FlexStackerSubState]:
+        """Get current Flex Stacker Substates by module id."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_flex_stacker_substate()
 
         raise RunNotCurrentError()
 

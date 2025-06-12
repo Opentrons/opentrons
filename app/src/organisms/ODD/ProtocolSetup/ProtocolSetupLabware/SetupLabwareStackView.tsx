@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  getWellFillFromLabwareId,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
@@ -19,16 +18,24 @@ import {
   Tag,
   truncateString,
 } from '@opentrons/components'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
-import type { LabwareByLiquidId } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
@@ -85,6 +92,10 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
+  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
+    labwareDefinition
+  )
+  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   return (
     <>
@@ -171,7 +182,7 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
           >
             <g
               onClick={() => {

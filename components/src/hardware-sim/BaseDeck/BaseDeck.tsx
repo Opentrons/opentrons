@@ -1,8 +1,11 @@
 import { Fragment } from 'react'
+import partition from 'lodash/partition'
 
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDef2,
+  getModuleType,
   getPositionFromSlotId,
   HEATERSHAKER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
@@ -37,7 +40,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   ModuleLocation,
   ModuleModel,
@@ -50,7 +53,7 @@ import type { StagingAreaLocation } from './StagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wellFill?: WellFill
   missingTips?: WellGroup
   /** generic prop to render self-positioned children for each labware */
@@ -64,7 +67,7 @@ export interface LabwareOnDeck {
 export interface ModuleOnDeck {
   moduleModel: ModuleModel
   moduleLocation: ModuleLocation
-  nestedLabwareDef?: LabwareDefinition2 | null
+  nestedLabwareDef?: LabwareDefinition | null
   nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
   /** generic prop to render self-positioned children for each module */
@@ -73,7 +76,22 @@ export interface ModuleOnDeck {
   highlightLabware?: boolean
   highlightShadowLabware?: boolean
   stacked?: boolean
+  hopperLabware?: HopperLabwareProps
 }
+export interface HopperLabwareProps {
+  hopperLabwareDef: LabwareDefinition | null
+  hopperLabwareWellFill: WellFill
+  hopperOnLabwareClick: () => void
+  hopperHighlightLabware: boolean
+  hopperStacked: boolean
+}
+
+// these ugly consts are unfortunately necessary as the hopper location exists
+// outside of our deck definition so the render doesn't follow our normal conventions
+export const STACKER_MODULE_Y_OFFSET = -6
+export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
+export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
+export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
@@ -149,9 +167,20 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       fixture.cutoutId === WASTE_CHUTE_CUTOUT
   )
 
+  const [singleLocationModules, stackerModules] = partition(
+    modulesOnDeck,
+    module => getModuleType(module.moduleModel) !== FLEX_STACKER_MODULE_TYPE
+  )
+
   return (
     <RobotCoordinateSpace
-      viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+      viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
+        deckDef.cornerOffsetFromOrigin[1]
+      } ${
+        stackerModules.length > 0
+          ? deckDef.dimensions[0] + STACKER_DECK_VIEW_BOX_EXPANSION
+          : deckDef.dimensions[0]
+      } ${deckDef.dimensions[1]}`}
       animated={animatedSVG}
       {...svgProps}
     >
@@ -170,7 +199,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0 ||
                 modulesOnDeck.findIndex(
-                  module => module.moduleModel === 'absorbanceReaderV1'
+                  module =>
+                    module.moduleModel === 'absorbanceReaderV1' ||
+                    module.moduleModel === 'flexStackerModuleV1'
                 ) >= 0
               }
             />
@@ -245,7 +276,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       )}
       <>
         {/* render modules, nested labware, and overlays */}
-        {modulesOnDeck.map(
+        {singleLocationModules.map(
           ({
             moduleModel,
             moduleLocation,
@@ -291,6 +322,68 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 ) : null}
                 {moduleChildren}
               </Module>
+            ) : null
+          }
+        )}
+        {stackerModules.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDef,
+            nestedLabwareWellFill,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+            highlightLabware,
+            highlightShadowLabware,
+          }) => {
+            const stackerSlotName = getStackerLocationFromSlot(
+              moduleLocation.slotName
+            )
+            const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
+            const moduleDef = getModuleDef2(moduleModel)
+            return slotPosition != null ? (
+              <>
+                <StagingAreaFixture
+                  cutoutId={
+                    `cutout${moduleLocation.slotName}` as StagingAreaLocation
+                  }
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                />
+                <Module
+                  key={`${moduleModel} ${moduleLocation.slotName}`}
+                  def={moduleDef}
+                  x={slotPosition[0]}
+                  y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slotPosition[0]
+                  )}
+                  innerProps={innerProps}
+                >
+                  {nestedLabwareDef != null ? (
+                    <g
+                      cursor={onLabwareClick != null ? 'pointer' : ''}
+                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
+                    >
+                      <LabwareRender
+                        definition={nestedLabwareDef}
+                        onLabwareClick={onLabwareClick}
+                        wellFill={nestedLabwareWellFill}
+                        shouldRotateAdapterOrientation={
+                          inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                        }
+                        highlight={highlightLabware}
+                        highlightShadow={highlightShadowLabware}
+                      />
+                    </g>
+                  ) : null}
+                  {moduleChildren}
+                </Module>
+              </>
             ) : null
           }
         )}
@@ -344,17 +437,20 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {/* render stacked badge on module labware */}
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
+            const moduleDef = getModuleDef2(moduleModel)
             const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
+              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
+                ? getStackerLocationFromSlot(moduleLocation.slotName)
+                : moduleLocation.slotName,
               deckDef
             )
-            const moduleDef = getModuleDef2(moduleModel)
-
-            const {
+            let {
               x: nestedLabwareOffsetX,
               y: nestedLabwareOffsetY,
             } = moduleDef.labwareOffset
-
+            if (moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE) {
+              nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
+            }
             // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
             const clampedLabwareOffsetX =
               Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
@@ -425,4 +521,8 @@ function StackedBadge(): JSX.Element {
       />
     </RobotCoordsForeignObject>
   )
+}
+
+function getStackerLocationFromSlot(slotName: string): string {
+  return `${slotName.charAt(0)}4`
 }

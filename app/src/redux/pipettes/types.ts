@@ -1,6 +1,6 @@
 import type { PipetteData } from '@opentrons/api-client'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   PipetteChannels,
   PipetteModel,
   PipetteModelSpecs,
@@ -252,7 +252,7 @@ export type ProtocolPipettesMatchByMount = {
 export interface TipRackCalibrationData {
   displayName: string
   lastModifiedDate: string | null
-  tipRackDef: LabwareDefinition2
+  tipRackDef: LabwareDefinition
 }
 
 export interface ProtocolPipetteTipRackCalData {

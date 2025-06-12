@@ -13,7 +13,6 @@ import { DeviceReset } from '../DeviceReset'
 import type { ComponentProps } from 'react'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
-vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-api')
 
 const render = (props: ComponentProps<typeof DeviceReset>) => {
@@ -67,6 +66,7 @@ describe('DeviceReset', () => {
     const clearMockResetOptions = {
       resetLabwareOffsets: false,
       settingsResets: {
+        gripperOffsetCalibrations: false,
         pipetteOffsetCalibrations: true,
         moduleCalibration: true,
         runsHistory: true,
@@ -147,9 +147,6 @@ describe('DeviceReset', () => {
         moduleCalibration: true,
         runsHistory: true,
         gripperOffsetCalibrations: true,
-        authorizedKeys: false,
-        onDeviceDisplay: false,
-        deckConfiguration: false,
       },
     }
 

@@ -1,7 +1,5 @@
 import type {
-  LabwareDefinition1,
-  LabwareDefinition2,
-  LabwareDefinition3,
+  LabwareDefinition,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -96,7 +94,7 @@ export interface LabwareOffset {
 }
 
 export interface RunLoadedLabwareDefinitions {
-  data: Array<LabwareDefinition1 | LabwareDefinition2 | LabwareDefinition3>
+  data: LabwareDefinition[]
 }
 
 export interface Run {
@@ -135,6 +133,7 @@ export interface RunCurrentStateData {
   activeNozzleLayouts: Record<string, NozzleLayoutValues> // keyed by pipetteId
   tipStates: Record<string, TipStates> // keyed by pipetteId
   placeLabwareState?: PlaceLabwareState
+  flexStackerStates?: Record<string, FlexStackerState> // keyed by moduleId
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
@@ -242,4 +241,12 @@ export interface PlaceLabwareState {
 
 export interface TipStates {
   hasTip: boolean
+}
+
+export interface FlexStackerState {
+  primaryLabwareURI: string
+  adapterLabwareURI?: string
+  lidLabwareURI?: string
+  count: number
+  maxCount: number
 }

@@ -23,14 +23,14 @@ import {
 
 import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
-  isTimeFormatMinutesSeconds,
-  temperatureRangeFieldValue,
-} from '../../../../../../steplist/fieldLevel/errors'
-import {
   maskToFloat,
   maskToInteger,
   maskToTime,
 } from '../../../../../../steplist/fieldLevel/processing'
+import {
+  enterValueWithinRange,
+  isTimeFormatMinutesSeconds,
+} from '../../../../../../steplist/fieldLevel/thermocyclerFieldErrors'
 import { uuid } from '../../../../../../utils'
 import { getStepIndex, getTimeFromString } from './utils'
 
@@ -77,7 +77,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
     setIsInEdit,
     readOnly = true,
   } = props
-  const { i18n, t } = useTranslation(['application', 'form'])
+  const { i18n, t } = useTranslation(['application', 'form', 'protocol_steps'])
   const [hover, setHover] = useState<boolean>(false)
   const [showEdit, setShowEditCurrentCycle] = useState<boolean>(!readOnly)
 
@@ -425,7 +425,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
                       cycleStepId,
                       'temp',
                       maskToFloat(e.target.value),
-                      temperatureRangeFieldValue(4, 99)
+                      enterValueWithinRange(4, 99)
                     )
                   }}
                   onBlur={() => {
@@ -440,6 +440,9 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
                       },
                     })
                   }}
+                  caption={t(
+                    'protocol_steps:captions_for_fields.blockTargetTemp'
+                  )}
                   error={
                     stepState.temp.wasAccessed ? stepState.temp.error : null
                   }

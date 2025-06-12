@@ -9,6 +9,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
   getLabwareSlot,
   getSlotInLocationStack,
   modulePipetteCollision,
@@ -21,6 +22,7 @@ import {
 
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<MoveToWellParams> = (
@@ -172,6 +174,26 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       )
     }
   }
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+
+  if (
+    isMultiChannelPipette &&
+    !getIsSafePipetteMovement({
+      robotState: prevRobotState,
+      invariantContext,
+      pipetteId,
+      labwareId,
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
+  }
   if (errors.length > 0) {
     return {
       errors,
@@ -196,11 +218,16 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
       },
     },
   ]
-  //  NOTE: forceDirect and minimumZHeight were never wired up in the form or stepArgs
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}]${formatPyWellLocation(
+      wellLocation
+    )}`,
+    ...(forceDirect ? [`force_direct=True`] : []),
+    ...(minimumZHeight ? [`minimum_z_height=${minimumZHeight}`] : []),
+    ...(speed ? [`speed=${speed}`] : []),
+  ]
   return {
     commands,
-    python: `${pipettePythonName}.move_to(${labwarePythonName}[${formatPyStr(
-      wellName
-    )}]${formatPyWellLocation(wellLocation)})`,
+    python: `${pipettePythonName}.move_to(${pythonArgs.join(', ')})`,
   }
 }

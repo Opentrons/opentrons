@@ -16,7 +16,7 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:
@@ -24,7 +24,7 @@ clean:
 
 .PHONY: wheel
 wheel:
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	rm -rf build
 
 .PHONY: debug-test

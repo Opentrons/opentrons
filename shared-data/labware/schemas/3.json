@@ -86,11 +86,11 @@
       "additionalProperties": false,
       "properties": {
         "backLeft": {
-          "description": "The back-left (-x, +y) corner.",
+          "description": "(-x, +y) relative to the labware origin.",
           "$ref": "#/definitions/vector2D"
         },
         "frontRight": {
-          "description": "The front-right (+x, -y) corner.",
+          "description": "(+x, -y) relative to the labware origin.",
           "$ref": "#/definitions/vector2D"
         }
       }
@@ -101,11 +101,11 @@
       "additionalProperties": false,
       "properties": {
         "backLeftBottom": {
-          "description": "The back-left-bottom (-x, +y, -z) corner.",
+          "description": "(-x, +y, -z) relative to the labware origin.",
           "$ref": "#/definitions/vector3D"
         },
         "frontRightTop": {
-          "description": "The front-right-top (+x, -y, +z) corner.",
+          "description": "(+x, -y, +z) relative to the labware origin.",
           "$ref": "#/definitions/vector3D"
         }
       }
@@ -207,15 +207,16 @@
           "$ref": "#/definitions/positiveNumber"
         },
         "x": {
-          "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
+          "description": "x location of center-bottom of well in reference to the labware origin",
           "$ref": "#/definitions/positiveNumber"
         },
         "y": {
-          "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
-          "$ref": "#/definitions/positiveNumber"
+          "description": "y location of center-bottom of well in reference to the labware origin",
+          "type": "number",
+          "maximum": 0
         },
         "z": {
-          "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
+          "description": "z location of center-bottom of well in reference to the labware origin",
           "$ref": "#/definitions/positiveNumber"
         },
         "geometryDefinitionId": {

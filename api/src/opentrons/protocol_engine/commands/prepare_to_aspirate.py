@@ -95,12 +95,7 @@ class PrepareToAspirateImplementation(
         if isinstance(prepare_result, DefinedErrorData):
             return prepare_result
         else:
-            return SuccessData(
-                public=PrepareToAspirateResult(),
-                state_update=prepare_result.state_update.set_pipette_ready_to_aspirate(
-                    pipette_id=params.pipetteId, ready_to_aspirate=True
-                ),
-            )
+            return self._transform_result(prepare_result)
 
 
 class PrepareToAspirate(

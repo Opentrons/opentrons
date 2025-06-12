@@ -5,12 +5,15 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareInfoByLiquidId,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+import {
+  getLabwareInfoByLiquidId,
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
+} from '/app/transformations/commands'
 
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
@@ -55,10 +58,11 @@ export function SetupLabwareList(
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 

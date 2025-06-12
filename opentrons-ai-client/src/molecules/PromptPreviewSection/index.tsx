@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   SPACING,
   StyledText,
@@ -17,6 +18,7 @@ export interface PromptPreviewSectionProps {
   items: string[]
   itemMaxWidth?: string
   oneItemPerRow?: boolean
+  isStepsSection?: boolean
 }
 
 const PromptPreviewSectionContainer = styled(Flex)`
@@ -33,10 +35,12 @@ const TagsContainer = styled.div<{
 }>`
   display: flex;
   grid-gap: ${SPACING.spacing4};
-  flex-wrap: ${WRAP};
+  /* When oneItemPerRow is true, disable wrapping to keep a single column layout */
+  flex-wrap: ${props => (props.oneItemPerRow ? 'NO_WRAP' : WRAP)};
   justify-content: flex-start;
   width: 100%;
-  flex-direction: ${props => (Boolean(props.oneItemPerRow) ? 'column' : 'row')};
+  flex-direction: ${props =>
+    props.oneItemPerRow ? DIRECTION_COLUMN : DIRECTION_ROW};
 `
 
 const TagItemWrapper = styled.div<{
@@ -75,6 +79,7 @@ const StepTag = styled.div`
   border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing2} ${SPACING.spacing8};
   width: 100%;
+  font-size: 0.875rem;
 `
 
 // Component to handle multiline steps
@@ -97,32 +102,53 @@ export function PromptPreviewSection({
   items,
   itemMaxWidth = '35%',
   oneItemPerRow = false,
+  isStepsSection = false,
 }: PromptPreviewSectionProps): JSX.Element {
+  // If this is the Steps section, render each step in its own row
+  if (isStepsSection) {
+    return (
+      <PromptPreviewSectionContainer>
+        <SectionHeading desktopStyle="bodyLargeSemiBold">
+          {title}
+        </SectionHeading>
+        <Flex flexDirection="column" gridGap={SPACING.spacing4} width="100%">
+          {items.map((item: string, index: number) => (
+            <StepTagContent key={`step-${index}`} text={item} />
+          ))}
+        </Flex>
+      </PromptPreviewSectionContainer>
+    )
+  }
+
+  const stackItems = oneItemPerRow || isStepsSection
   return (
     <PromptPreviewSectionContainer>
       <SectionHeading desktopStyle="bodyLargeSemiBold">{title}</SectionHeading>
-      <TagsContainer oneItemPerRow={oneItemPerRow}>
+      <TagsContainer oneItemPerRow={stackItems}>
         {items.map((item: string, index: number) => {
           // Handle the special line break item that separates labware from liquids
           if (item === '__LINE_BREAK__') {
             return <LineBreakWrapper key={`line-break-${index}`} />
           }
 
-          // Render regular items
+          // Skip empty strings
+          if (item.trim() === '') return null
+
+          // Render each tag, forcing a break for stacked layouts
           return (
-            item.trim() !== '' && (
+            <Fragment key={`item-row-${index}`}>
               <TagItemWrapper
                 data-testid={`item-tag-wrapper-${index}`}
-                key={`item-tag-${index}`}
                 itemMaxWidth={itemMaxWidth}
               >
-                {title === 'Steps' ? (
+                {isStepsSection ? (
                   <StepTagContent text={item} />
                 ) : (
                   <Tag text={item} type="default" />
                 )}
               </TagItemWrapper>
-            )
+              {stackItems ? <LineBreakWrapper /> : null}
+            </Fragment>
           )
         })}
       </TagsContainer>

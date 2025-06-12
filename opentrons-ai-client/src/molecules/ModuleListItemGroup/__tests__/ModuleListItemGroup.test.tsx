@@ -1,20 +1,28 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ModuleListItemGroup } from '../index'
 
-import type { DisplayModules } from '../../../organisms/ModulesSection'
+// Define a local type matching the usage in the mock
+interface TestDisplayModule {
+  id: string
+  type: string // Using string for simplicity in test mock
+  model: string
+  name: string
+}
 
-const modulesMock: DisplayModules[] = [
+const modulesMock: TestDisplayModule[] = [
   {
+    id: 'module-1',
     type: 'heaterShakerModuleType',
     model: 'heaterShakerModuleV1',
     name: 'Heater-Shaker Module GEN1',
   },
   {
+    id: 'module-2',
     type: 'temperatureModuleType',
     model: 'temperatureModuleV2',
     name: 'Temperature Module GEN2',
@@ -73,23 +81,41 @@ describe('ModuleListItemGroup', () => {
     expect(screen.getAllByText('Choose an adapter').length).toBe(2)
   })
 
-  it('should be able to select an adapter', () => {
+  it('should be able to select an adapter', async () => {
     render()
 
-    const dropdownButton = screen.getAllByText('Choose an adapter')[1]
+    const dropdownButtons = screen.getAllByText('Choose an adapter')
+    const secondModuleDropdownButton = dropdownButtons[1]
 
-    fireEvent.click(dropdownButton)
+    fireEvent.click(secondModuleDropdownButton)
 
-    const adapterOption = screen.getByText(
+    const listBox = await screen.findByRole('listbox')
+
+    const adapterOptionButton = within(listBox).getByText(
       'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
     )
 
-    fireEvent.click(adapterOption)
+    fireEvent.click(adapterOptionButton)
+
+    const listItems = screen.getAllByTestId('ListItem_default')
+    const secondModuleListItem = listItems.find(item =>
+      within(item).queryByText('Temperature Module GEN2')
+    )
+
+    if (secondModuleListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the second module list item.'
+      )
+    }
 
     expect(
-      screen.getByText(
+      within(secondModuleListItem).getByText(
         'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
       )
     ).toBeInTheDocument()
+
+    expect(
+      within(secondModuleListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
   })
 })

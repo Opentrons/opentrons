@@ -25,7 +25,7 @@ HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR) $(SYSTEM_SERVER_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -59,6 +59,8 @@ setup: setup-js setup-py
 setup-py-toolchain:
 	$(OT_PYTHON) -m pip install --upgrade pip
 	$(OT_PYTHON) -m pip install pipenv==2023.12.1
+# this needs to be installed AFTER pipenv or pipenv will update this to the bad version
+	$(OT_PYTHON) -m pip install virtualenv==20.30.0
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -97,6 +99,10 @@ teardown-py: $(PYTHON_TEARDOWN_TARGETS)
 %-py-teardown: %-py-clean
 	$(MAKE) -C $* teardown
 
+# Specialize the %-py-teardown pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-teardown: $(SHARED_DATA_DIR)-py-clean
+	$(MAKE) -C $(SHARED_DATA_DIR) teardown-py
+
 # clean all project output
 .PHONY: clean
 clean: clean-js clean-py
@@ -114,6 +120,10 @@ clean-py: $(PYTHON_CLEAN_TARGETS)
 
 %-py-clean:
 	$(MAKE) -C $* clean
+
+# Specialize the %-py-clean pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-clean:
+	$(MAKE) -C $(SHARED_DATA_DIR) clean-py
 
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)

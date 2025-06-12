@@ -4739,7 +4739,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": 2.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -4750,7 +4750,7 @@
         "position": {
           "x": 391.88,
           "y": 42.74,
-          "z": 44.4
+          "z": 46.4
         },
         "z_position": "SimulatedProbeResult"
       },
@@ -5031,7 +5031,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": 2.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -5042,7 +5042,7 @@
         "position": {
           "x": 391.88,
           "y": 42.74,
-          "z": 44.4
+          "z": 46.4
         },
         "z_position": "SimulatedProbeResult"
       },
@@ -5063,7 +5063,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": 2.0
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -5074,7 +5074,7 @@
         "position": {
           "x": 391.88,
           "y": 42.74,
-          "z": 44.4
+          "z": 46.4
         },
         "z_position": "SimulatedProbeResult"
       },

@@ -8,10 +8,15 @@ const log = createLogger('protocol-analysis/getPythonPath')
 let pythonPath: string | null = null
 
 export function selectPythonPath(pythonOverride: string | null): void {
-  // default candidates for posix and windows
+  // default candidates for posix and windows. this includes arm64 arch overrides;
+  // we don't ship these today, but if we ship them tomorrow we won't have to change this again
   let candidates = [
     path.join(process.resourcesPath ?? './', 'python/bin/python3'),
+    path.join(process.resourcesPath ?? './', 'python/x64/bin/python3'),
+    path.join(process.resourcesPath ?? './', 'python/arm64/bin/python3'),
     path.join(process.resourcesPath ?? './', 'python/python.exe'),
+    path.join(process.resourcesPath ?? './', 'python/x64/python.exe'),
+    path.join(process.resourcesPath ?? './', 'python/arm64/python.exe'),
   ]
 
   // add override path, posix path, and windows path at front of candidates

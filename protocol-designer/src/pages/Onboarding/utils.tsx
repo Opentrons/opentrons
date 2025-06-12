@@ -5,13 +5,13 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
-  LabwareDefByDefURI,
+  LabwareDef2ByDefURI,
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
 
 interface TiprackOptionsProps {
-  allLabware: LabwareDefByDefURI
+  allLabware: LabwareDef2ByDefURI
   allowAllTipracks: boolean
   selectedPipetteName?: string | null
 }

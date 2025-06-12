@@ -108,4 +108,25 @@ describe(`test labware definitions with schema v3`, () => {
     checkExtents(labwareDef)
     checkGeometryDefinitions(labwareDef)
   })
+
+  describe.each(allPaths)('%s', labwarePath => {
+    const labwareDef = require(labwarePath) as LabwareDefinition3
+
+    test('extents properly use back-left bottom origin with quadrant IV coordinates', () => {
+      expect(labwareDef.extents.footprint.backLeft.x).toBe(0)
+      expect(labwareDef.extents.footprint.backLeft.y).toBe(0)
+      expect(labwareDef.extents.footprint.frontRight.x).toBeGreaterThan(0)
+      expect(labwareDef.extents.footprint.frontRight.y).toBeLessThan(0)
+    })
+
+    test('all wells have quadrant IV coordinates', () => {
+      for (const wellName in labwareDef.wells) {
+        const well = labwareDef.wells[wellName]
+
+        expect(well.x).toBeGreaterThan(0)
+        expect(well.y).toBeLessThan(0)
+        expect(well.z).toBeGreaterThan(0)
+      }
+    })
+  })
 })

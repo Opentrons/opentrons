@@ -12,7 +12,9 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   padding-right: ${SPACING.spacing16};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight20};
 
   ${styleProps}
 

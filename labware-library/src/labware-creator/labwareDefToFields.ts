@@ -32,7 +32,7 @@ export function labwareDefToFields(
     metadata,
     totalLiquidVolume,
     xOffsetFromLeft,
-    yOffsetFromTop,
+    yOffsetFromBack,
   } = allUniqueWellGroupProps[0]
 
   const homogeneousWells =
@@ -130,7 +130,7 @@ export function labwareDefToFields(
     gridSpacingY: ySpacing == null || ySpacing === 0 ? null : String(ySpacing),
 
     gridOffsetX: String(xOffsetFromLeft),
-    gridOffsetY: String(yOffsetFromTop),
+    gridOffsetY: String(yOffsetFromBack),
 
     homogeneousWells: boolToBoolString(homogeneousWells),
     regularRowSpacing: boolToBoolString(regularRowSpacing),

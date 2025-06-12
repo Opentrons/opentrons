@@ -18,10 +18,11 @@ export function forDropTip(
     invariantContext,
     prevLiquidState: robotState.liquidState,
     pipetteId,
-    labwareId,
+    entityId: labwareId,
     useFullVolume: true,
     wellName,
     robotStateAndWarnings,
   })
-  robotState.tipState.pipettes[pipetteId] = false
+  robotState.tipState.pipettes[pipetteId].hasTip = false
+  robotState.tipState.pipettes[pipetteId].tiprackURI = null
 }

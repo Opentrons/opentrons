@@ -87,8 +87,7 @@ export interface FlexStackerData {
   latchState: 'opened' | 'closed' | 'unknown'
   platformState: 'extended' | 'retracted' | 'unknown' | 'missing'
   hopperDoorState: 'opened' | 'closed' | 'unknown'
-  axisStateX: 'extended' | 'retracted' | 'unknown'
-  axisStateZ: 'extended' | 'retracted' | 'unknown'
+  installDetected: boolean
   status: FlexStackerStatus
 }
 

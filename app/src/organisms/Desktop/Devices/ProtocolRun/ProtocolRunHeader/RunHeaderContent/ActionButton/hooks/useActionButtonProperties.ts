@@ -84,7 +84,7 @@ export function useActionButtonProperties({
     buttonText = t('analyzing_on_robot')
   } else if (isClosingCurrentRun) {
     buttonIconName = 'ot-spinner'
-    buttonText = t('canceling_run')
+    buttonText = t('shared:robot_is_busy')
   } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')

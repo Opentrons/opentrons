@@ -16,7 +16,7 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { useRunStatus } from '/app/resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import { CancelingRunModal } from '../CancelingRunModal'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
@@ -96,7 +96,14 @@ describe('ConfirmCancelRunModal', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_IDLE,
+        },
+      },
+    } as any)
   })
 
   afterEach(() => {
@@ -143,20 +150,36 @@ describe('ConfirmCancelRunModal', () => {
       ...props,
       isActiveRun: false,
     }
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 
-  it('when quick transfer run is stopped, the run is dismissed and the modal closes if the run is not yet active', () => {
+  it('when quick transfer run is stopped, the run is dismissed and navigates to quick transfer', () => {
     props = {
       ...props,
       isActiveRun: false,
       isQuickTransfer: true,
     }
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
@@ -164,11 +187,78 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/quick-transfer')
   })
 
+  it('when quick transfer run with protocolId is stopped, it navigates to protocol-specific quick transfer', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      isQuickTransfer: true,
+      protocolId: 'test-protocol-id',
+    }
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/quick-transfer/test-protocol-id'
+    )
+  })
+
+  it('when run with protocolId is stopped, it navigates to protocol page', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      protocolId: 'test-protocol-id',
+    }
+
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
+    render(props)
+
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
+  })
+
   it('when run is stopped, the run is not dismissed if the run is active', () => {
-    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          status: RUN_STATUS_STOPPED,
+        },
+      },
+    } as any)
+
     render(props)
 
     expect(mockDismissCurrentRun).not.toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+  })
+
+  it('when tapping cancel run with error, should reset isCanceling', () => {
+    mockStopRun.mockImplementation((id, options) => {
+      options.onError()
+    })
+
+    render(props)
+    const button = screen.getByText('Cancel run')
+    fireEvent.click(button)
+
+    const cancelButton = screen.getByText('Cancel run')
+    expect(cancelButton).toBeInTheDocument()
   })
 })

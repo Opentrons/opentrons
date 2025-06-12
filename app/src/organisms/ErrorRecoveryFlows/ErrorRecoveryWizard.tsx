@@ -32,7 +32,7 @@ import {
 } from './shared'
 import { getErrorKind } from './utils'
 
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
@@ -71,7 +71,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
     isOnDevice: boolean
     analytics: UseRecoveryAnalyticsResult<RecoveryRoute, RouteStep>
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
-    allRunDefs: LabwareDefinition2[]
+    allRunDefs: LabwareDefinition[]
   }
 
 export function ErrorRecoveryWizard(
@@ -263,13 +263,13 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-    case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-    case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       return buildManualReplaceLwAndRetry()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()

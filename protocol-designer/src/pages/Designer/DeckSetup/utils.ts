@@ -160,21 +160,48 @@ export const getLabwareIsRecommended = (
 //  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
+  enableStackingFF: boolean,
   adapterLoadName?: string
 ): string[] => {
   if (adapterLoadName == null) {
     return []
   }
-  return Object.entries(defs)
-    .filter(
-      ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null &&
-        //  stacking labware gets added via the LabwareCard
-        !compatibleParentLabware?.includes(adapterLoadName)
-    )
-    .map(([labwareDefUri]) => labwareDefUri)
+
+  if (enableStackingFF) {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  } else {
+    return Object.entries(defs)
+      .filter(
+        ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
+          stackingOffsetWithLabware?.[adapterLoadName] != null &&
+          !compatibleParentLabware?.includes(adapterLoadName)
+      )
+      .map(([labwareDefUri]) => labwareDefUri)
+  }
 }
 
+export const getStackerDefinition = (
+  defs: LabwareDefByDefURI,
+  loadName?: string
+): string | null => {
+  if (loadName == null || loadName === 'opentrons_flex_deck_riser') {
+    return null
+  }
+
+  const labwareDefURI = Object.entries(defs)
+    .filter(([, { compatibleParentLabware }]) =>
+      compatibleParentLabware?.includes(loadName)
+    )
+    .reverse()
+    .map(([labwareDefUri]) => labwareDefUri)[0]
+
+  return labwareDefURI
+}
 interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']
   selectedSlot: string
@@ -639,12 +666,12 @@ export const getIsLabwareInUse = (
 
 export function getIsLabwareOnSlotInUse(
   savedSteps: SavedStepFormState,
-  createdLabwareForSlot?: LabwareOnDeck,
-  createdNestedLabwareForSlot?: LabwareOnDeck
+  createdAdapterForSlot?: LabwareOnDeck,
+  createdTopLabwareForSlot?: LabwareOnDeck
 ): boolean {
   const isCurrentLabwareInUse = [
-    createdLabwareForSlot,
-    createdNestedLabwareForSlot,
+    createdAdapterForSlot,
+    createdTopLabwareForSlot,
   ]
     .map(lw => getIsLabwareInUse(savedSteps, lw))
     .includes(true)

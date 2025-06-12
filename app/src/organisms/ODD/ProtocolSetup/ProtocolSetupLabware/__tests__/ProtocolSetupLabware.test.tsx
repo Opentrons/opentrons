@@ -145,6 +145,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId:
             'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
           moduleModel: 'heaterShakerModuleV1',
+          moduleSlotName: 'B2',
         },
       ],
     })

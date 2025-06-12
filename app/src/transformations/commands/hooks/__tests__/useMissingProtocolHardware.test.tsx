@@ -15,7 +15,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'
 
@@ -25,7 +25,7 @@ import type { Protocol } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
@@ -110,7 +110,7 @@ const mockRTPData = [
     default: 'none',
   },
 ]
-const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',

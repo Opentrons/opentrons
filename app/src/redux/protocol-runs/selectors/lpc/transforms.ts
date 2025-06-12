@@ -15,7 +15,7 @@ import {
 import type { TFunction } from 'i18next'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
@@ -58,14 +58,14 @@ export const getFlexSlotNameOnly = (
 export interface GetLabwareDefsForLPCParams {
   labwareId: string
   loadedLabware: CompletedProtocolAnalysis['labware']
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
 }
 
 export const getItemLabwareDef = ({
   labwareId,
   loadedLabware,
   labwareDefs,
-}: GetLabwareDefsForLPCParams): LabwareDefinition2 | null => {
+}: GetLabwareDefsForLPCParams): LabwareDefinition | null => {
   const labwareDefUri =
     loadedLabware.find(l => l.id === labwareId)?.definitionUri ?? null
 
@@ -105,7 +105,7 @@ export const getSelectedLabwareWithOffsetDetails = (
 export const getSelectedLabwareDefFrom = (
   runId: string,
   state: State
-): LabwareDefinition2 | null => {
+): LabwareDefinition | null => {
   const selectedLabware =
     state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware
   const labwareDefs = state?.protocolRuns[runId]?.lpc?.labwareDefs

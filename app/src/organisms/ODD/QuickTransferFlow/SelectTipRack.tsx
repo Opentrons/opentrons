@@ -31,7 +31,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
-  const allLabwareDefinitionsByUri = getAllDefinitions()
+  const allLabwareDefinition2sByUri = getAllDefinitions()
   const selectedPipetteDefaultTipracks =
     state.pipette?.liquids.default.defaultTipracks ?? []
 
@@ -68,7 +68,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
         width="100%"
       >
         {selectedPipetteDefaultTipracks.map(tipRack => {
-          const tipRackDef = allLabwareDefinitionsByUri[tipRack]
+          const tipRackDef = allLabwareDefinition2sByUri[tipRack]
 
           return tipRackDef != null ? (
             <RadioButton

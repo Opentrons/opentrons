@@ -59,6 +59,9 @@ export default defineConfig(
           '@opentrons/usb-bridge/node-client': path.resolve(
             '../usb-bridge/node-client/src/index.ts'
           ),
+          '@opentrons/shared-data/labware/fixtures/3': path.resolve(
+            '../shared-data/labware/fixtures/3/index.ts'
+          ),
         },
       },
     }

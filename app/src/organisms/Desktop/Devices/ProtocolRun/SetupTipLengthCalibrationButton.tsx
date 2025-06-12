@@ -28,14 +28,14 @@ import { useRunHasStarted } from '/app/resources/runs'
 import { useDeckCalibrationData } from '../hooks'
 
 import type { Mount } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface SetupTipLengthCalibrationButtonProps {
   robotName: string
   runId: string
   hasCalibrated: boolean
   mount: Mount
-  tipRackDefinition: LabwareDefinition2
+  tipRackDefinition: LabwareDefinition
   isExtendedPipOffset: boolean
   disabled: boolean
 }

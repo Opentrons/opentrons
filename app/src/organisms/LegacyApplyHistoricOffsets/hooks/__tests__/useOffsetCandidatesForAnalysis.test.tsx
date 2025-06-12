@@ -15,7 +15,7 @@ import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 
 import type { FunctionComponent, ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
@@ -24,7 +24,7 @@ vi.mock('@opentrons/shared-data')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/useNotifyDataReady')
 
-const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',

@@ -11,6 +11,7 @@ import {
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -163,7 +164,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
         header={
           kind === 'aspirate'
             ? t('air_gap_after_aspirating')
-            : t('air_gap_before_dispensing')
+            : t('air_gap_after_dispensing')
         }
         buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
@@ -176,19 +177,26 @@ export function AirGap(props: AirGapProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableAirGapDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={airGapEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {kind === 'aspirate'
+              ? t('air_gap_description_aspirate')
+              : t('air_gap_description_dispense')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableAirGapDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={airGapEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (

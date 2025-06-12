@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
 
@@ -20,7 +20,6 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  getDeckDefFromRobotType,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
@@ -32,11 +31,15 @@ import {
 import { FixedTrashText } from '../../../components/molecules'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import {
+  editSlotInfo,
+  selectZoomedIntoSlot,
+} from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { getSlotInformation } from '../utils'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
@@ -51,12 +54,11 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
+  DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
-const WASTE_CHUTE_SPACE = 30
-const DETAILS_HOVER_SPACE = 60
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
@@ -76,17 +78,29 @@ interface DeckSetupContainerProps {
   setHoverSlot: Dispatch<SetStateAction<string | null>>
   hoverSlot: string | null
   robotType: RobotType
+  deckDef: DeckDefinition
+  setViewBox: Dispatch<SetStateAction<string>>
+  viewBox: string
+  initialViewBox: string
 }
 export function DeckSetupContainer(
   props: DeckSetupContainerProps
 ): JSX.Element {
-  const { robotType, hoverSlot, setHoverSlot } = props
+  const {
+    robotType,
+    hoverSlot,
+    setHoverSlot,
+    deckDef,
+    initialViewBox,
+    viewBox,
+    setViewBox,
+  } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
-  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -107,26 +121,11 @@ export function DeckSetupContainer(
       wasteChuteFixtures.length > 0
   )
 
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
   const windowInnerWidthRem = window.innerWidth / 16
   const deckMapRatio = round(
     (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
     2
   )
-
-  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
-  const viewBoxY = hasWasteChute
-    ? deckDef.cornerOffsetFromOrigin[1] -
-      WASTE_CHUTE_SPACE -
-      DETAILS_HOVER_SPACE
-    : deckDef.cornerOffsetFromOrigin[1]
-  const viewBoxWidth = deckDef.dimensions[0] / deckMapRatio
-  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
-  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-
-  const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
   const isZoomed = Object.values(zoomIn).some(val => val != null)
   const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
@@ -140,9 +139,13 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-
   const addEquipment = (slotId: string): void => {
+    const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
+      deckSetup: activeDeckSetup,
+      slot: slotId,
+      deckDef,
+    })
+
     const cutoutId =
       getCutoutIdForAddressableArea(
         slotId as AddressableAreaName,
@@ -170,6 +173,12 @@ export function DeckSetupContainer(
         setViewBox,
       })
     }
+    dispatch(
+      editSlotInfo({
+        moduleModel: createdModuleForSlot?.model,
+        fixture: preSelectedFixture,
+      })
+    )
   }
 
   const _hasGen1MultichannelPipette = useMemo(
@@ -342,7 +351,6 @@ export function DeckSetupContainer(
                   )}
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
-                    hoveredLabware={hoveredLabware}
                     hover={hoverSlot}
                     terminalItemId={terminalItemId}
                     setHover={setHoverSlot}
@@ -375,7 +383,6 @@ export function DeckSetupContainer(
                 setViewBox,
               })
             }}
-            setHoveredLabware={setHoveredLabware}
           />
         ) : null}
       </Flex>

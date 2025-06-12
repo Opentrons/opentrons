@@ -66,5 +66,11 @@ describe('airGapInWasteChute', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_pipette.move_to(mock_waste_chute_1)
+mock_pipette.air_gap(volume=10, in_place=True, flow_rate=10)
+`.trim()
+    )
   })
 })

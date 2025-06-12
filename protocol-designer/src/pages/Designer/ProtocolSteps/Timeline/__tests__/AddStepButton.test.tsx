@@ -146,7 +146,9 @@ describe('AddStepButton', () => {
         },
       },
       labware: {},
-      additionalEquipmentOnDeck: {},
+      additionalEquipmentOnDeck: {
+        trash: { id: 'trash', location: 'cutoutA3', name: 'trashBin' },
+      },
       pipettes: {},
     })
     vi.mocked(getRobotStateTimeline).mockReturnValue({ timeline: [] })

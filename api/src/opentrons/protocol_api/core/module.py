@@ -435,6 +435,7 @@ class AbstractFlexStackerCore(
     def set_stored_labware_items(
         self,
         labware: Sequence[LabwareCoreType],
+        stacking_offset_z: float | None,
     ) -> None:
         """Configure the stacker to contain a set of labware."""
 
@@ -450,6 +451,7 @@ class AbstractFlexStackerCore(
     def get_max_storable_labware_from_list(
         self,
         labware: Sequence[LabwareCoreType],
+        overlap_offset: float | None = None,
     ) -> Sequence[LabwareCoreType]:
         """Limit the passed list to how many labware can fit in a stacker."""
 
@@ -477,5 +479,6 @@ class AbstractFlexStackerCore(
         adapter_namespace: str | None,
         adapter_version: int | None,
         count: int | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""

@@ -168,12 +168,14 @@ def evaluate_explicit_load_statements_for_slot(
     allow_overlapping_calls: bool,
 ) -> typing.List[ast_h.AssignStatement]:
     """Evaluates an explicit call for a slot and returns the corresponding assign statement."""
-    what_to_load: typing.List[ast_h.AssignStatement] = create_deck_configuration_satisfying_load_statement(slot)
+    what_to_load: typing.List[
+        ast_h.AssignStatement
+    ] = create_deck_configuration_satisfying_load_statement(slot)
 
-    # If there is no explicit call for the slot, then we don't need to do anything 
+    # If there is no explicit call for the slot, then we don't need to do anything
     if slot.label not in explicit_calls:
         return what_to_load
-    
+
     # If there is an explicit call for the slot, we need to decide whether to override or append to what to load
     else:
         # Regardless of allow_overlapping_calls value, we want to remove the explicit call from the dictionary
@@ -185,8 +187,8 @@ def evaluate_explicit_load_statements_for_slot(
 
         else:
             # If we don't allow overlapping calls, we want to override the list of what to load
-            what_to_load = [explicit_call]     
-            
+            what_to_load = [explicit_call]
+
     return what_to_load
 
 

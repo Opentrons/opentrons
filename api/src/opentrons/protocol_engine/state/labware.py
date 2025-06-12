@@ -1162,6 +1162,40 @@ class LabwareView:
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
 
+    def stacker_labware_pool_to_ordered_list(
+        self,
+        primary_labware_definition: LabwareDefinition,
+        lid_labware_definition: LabwareDefinition | None,
+        adapter_labware_definition: LabwareDefinition | None,
+    ) -> List[LabwareDefinition]:
+        """Get the pool definitions in the top-first order suitable for geometry calculations."""
+        self.raise_if_stacker_labware_pool_is_not_valid(
+            primary_labware_definition,
+            lid_labware_definition,
+            adapter_labware_definition,
+        )
+        return [
+            x
+            for x in [
+                lid_labware_definition,
+                primary_labware_definition,
+                adapter_labware_definition,
+            ]
+            if x is not None
+        ]
+
+    def get_stacker_labware_overlap_offset(
+        self, definitions: list[LabwareDefinition]
+    ) -> OverlapOffset:
+        """Get the overlap amount between each labware pool.
+
+        The definitions must be in top-first order, ideally created by
+        `stacker_labware_pool_to_ordered_list`.
+        """
+        return self.get_labware_overlap_offsets(
+            definitions[-1], definitions[0].parameters.loadName
+        )
+
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
@@ -1178,6 +1212,18 @@ class LabwareView:
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
+            )
+        elif (
+            labware_validation.validate_definition_is_lid(top_labware_definition)
+            and top_labware_definition.compatibleParentLabware is not None
+            and self.get_load_name(bottom_labware_id)
+            not in top_labware_definition.compatibleParentLabware
+        ):
+            # This parent is assumed to be compatible, unless the lid enumerates
+            # all its compatible parents and this parent is missing from the list.
+            raise ValueError(
+                f"Labware Lid {top_labware_definition.parameters.loadName} may not be loaded on parent labware"
+                f" {self.get_display_name(bottom_labware_id)}."
             )
         elif isinstance(below_labware.location, ModuleLocation):
             below_definition = self.get_definition(labware_id=below_labware.id)

@@ -8,10 +8,10 @@ import {
 
 import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
-import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
 
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
-const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition
 const mockLoadLabwareCommands: RunTimeCommand[] = [
   {
     key: 'CommandKey0',

@@ -78,61 +78,61 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_source_plate',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     [DEST_LABWARE]: {
       id: DEST_LABWARE,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_dest_plate',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     [TROUGH_LABWARE]: {
       id: TROUGH_LABWARE,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_trough',
       labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_tip_rack_1',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_tip_rack_2',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_tip_rack_3',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack4AdapterId: {
       id: 'tiprack4AdapterId',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_adapter_4',
       labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
       def: fixtureTiprackAdapter,
     },
     tiprack5AdapterId: {
       id: 'tiprack5AdapterId',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_adapter_5',
       labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
       def: fixtureTiprackAdapter,
     },
     tiprack4Id: {
       id: 'tiprack4Id',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_tip_rack_4',
       labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
       def: fixtureTiprack1000ul,
     },
     tiprack5Id: {
       id: 'tiprack5Id',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_tip_rack_5',
       labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
       def: fixtureTiprack1000ul,
     },
@@ -149,7 +149,7 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_pipette_p10',
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10SingleV2Specs,
@@ -160,7 +160,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10MultiV2Specs,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_pipette_p10_multi',
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
@@ -168,7 +168,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
       tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300SingleV2Specs,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_pipette',
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
@@ -176,7 +176,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
       tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300MultiV2Specs,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_pipette_p300_multi',
     },
     [PIPETTE_96]: {
       name: 'p1000_96',
@@ -184,7 +184,7 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack1000ul)],
       tiprackLabwareDef: [fixtureTiprack1000ul],
       spec: fixtureP100096V2Specs,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_pipette_p1000_96',
     },
   }
 
@@ -340,7 +340,10 @@ export const getRobotStateWithTipStandard = (
       tiprack2Id: true,
     },
   })
-  robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = true
+  robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = {
+    hasTip: true,
+    tiprackURI: 'tiprackId',
+  }
   return robotStateWithTip
 }
 export const getRobotStatePickedUpTipStandard = (
@@ -353,7 +356,10 @@ export const getRobotStatePickedUpTipStandard = (
       tiprack1Id: true,
     },
   })
-  robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = true
+  robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = {
+    hasTip: true,
+    tiprackURI: 'tiprackId',
+  }
   robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
   return robotStatePickedUpOneTip
 }

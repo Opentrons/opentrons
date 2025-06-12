@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -19,6 +19,7 @@ import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -49,11 +50,13 @@ import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
+  useModuleAttachedToast,
   useProtocolReceiptToast,
   useScrollRef,
   useSoftwareUpdatePoll,
@@ -161,6 +164,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
   )
+  const localRobot = useSelector(getLocalRobot)
 
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
   const options = {
@@ -169,6 +173,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useScreenIdle(sleepTime, options)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useEffect(() => {
     if (isIdle) {
@@ -199,9 +204,25 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
+                    {showModuleSetupModal && localRobot?.name != null ? (
+                      <ModuleWizardFlows
+                        showSetupLauncher={true}
+                        closeFlow={() => {
+                          setShowModuleSetupModal(false)
+                        }}
+                        robotName={localRobot.name}
+                      />
+                    ) : null}
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
+                        {!showModuleSetupModal ? (
+                          <ModuleAttachedToasts
+                            openFlow={() => {
+                              setShowModuleSetupModal(true)
+                            }}
+                          />
+                        ) : null}
                         <SharedScrollRefProvider>
                           <OnDeviceDisplayAppRoutes />
                         </SharedScrollRefProvider>
@@ -288,5 +309,10 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
 
 function ProtocolReceiptToasts(): null {
   useProtocolReceiptToast()
+  return null
+}
+
+function ModuleAttachedToasts({ openFlow }: { openFlow: () => void }): null {
+  useModuleAttachedToast(openFlow)
   return null
 }

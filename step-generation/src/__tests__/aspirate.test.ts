@@ -103,10 +103,10 @@ describe('aspirate', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.aspirate(
+mock_pipette.aspirate(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.aspirate,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
 )`.trimStart()
     )
   })

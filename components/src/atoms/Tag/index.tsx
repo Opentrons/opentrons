@@ -2,6 +2,7 @@ import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
+import { LiquidIcon } from '../../molecules/LiquidIcon'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
@@ -9,6 +10,7 @@ import { StyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
+import type { LiquidIconProps } from '../../molecules/LiquidIcon'
 
 export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 
@@ -22,6 +24,8 @@ export interface TagProps {
   /** Tag icon */
   iconName?: IconName
   shrinkToContent?: boolean
+  /** liquid icon */
+  liquidIcon?: LiquidIconProps
 }
 
 const defaultColors = {
@@ -49,7 +53,14 @@ const TAG_PROPS_BY_TYPE: Record<
 }
 
 export function Tag(props: TagProps): JSX.Element {
-  const { iconName, type, text, iconPosition, shrinkToContent = false } = props
+  const {
+    iconName,
+    type,
+    text,
+    iconPosition,
+    shrinkToContent = false,
+    liquidIcon,
+  } = props
 
   return (
     <Flex
@@ -72,6 +83,7 @@ export function Tag(props: TagProps): JSX.Element {
           css={ICON_STYLE}
         />
       ) : null}
+      {liquidIcon != null ? <LiquidIcon {...liquidIcon} /> : null}
       <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextRegular">
         {text}
       </StyledText>

@@ -17,20 +17,13 @@ sphinx_build := $(pipenv) run sphinx-build -W --keep-going
 # github.com/Opentrons/opentrons/issues/6135
 sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,$(project_rs_default),opentrons,$(BUILD_NUMBER))
-
-# Find the version of the sdist file from git using a helper script.
-sdist_file = dist/$(call python_get_sdistname,api,$(project_rs_default),opentrons)
+wheel_file = dist/$(call python_get_wheelname,api,$(PROJECT),opentrons,$(BUILD_NUMBER))
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,api,$(project_rs_default),opentrons)
+version_file = $(call python_get_git_version,api,$(PROJECT),opentrons)
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -64,13 +57,12 @@ twine_repository_url ?= $(pypi_test_upload_url)
 clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
-clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -90,22 +82,26 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist:
 	$(clean_sdist_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -124,12 +120,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
-	$(python) -m black --check src tests docs/v2/example_protocols setup.py
-	$(python) -m flake8 src tests setup.py
+	$(python) -m black --check src tests docs/v2/example_protocols
+	$(python) -m flake8 src tests
 
 .PHONY: format
 format:
-	$(python) -m black src tests docs/v2/example_protocols setup.py
+	$(python) -m black src tests docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -172,16 +168,15 @@ local-shell:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist
-	echo $(sdist_file)
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
+push-no-restart-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server)
 	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
 	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
 	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/

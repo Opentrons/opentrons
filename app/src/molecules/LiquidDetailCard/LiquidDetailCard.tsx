@@ -18,7 +18,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+import {
+  getWellRangeForLiquidLabwarePair,
+  MICRO_LITERS,
+} from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 import {
@@ -26,7 +29,6 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getIsOnDevice } from '/app/redux/config'
-import { getWellRangeForLiquidLabwarePair } from '/app/transformations/analysis'
 
 import type { Dispatch, SetStateAction } from 'react'
 

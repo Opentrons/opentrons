@@ -10,7 +10,11 @@ import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__f
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { DetachProbe } from '/app/organisms/LabwarePositionCheck/steps'
 import {
+  selectActivePipette,
   selectActivePipetteChannelCount,
+  selectCurrentSubstep,
+  selectSelectedLwOverview,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectStepInfo,
 } from '/app/redux/protocol-runs'
 
@@ -25,7 +29,8 @@ vi.mock('/app/redux/protocol-runs')
 
 const render = (
   props: ComponentProps<typeof DetachProbe>,
-  channelCount = 1
+  channelCount = 1,
+  currentSubstep = 'default-substep'
 ) => {
   const mockState = {
     [props.runId]: {
@@ -35,7 +40,20 @@ const render = (
         protocolName: 'MOCK_PROTOCOL',
       },
       activePipette: {
+        id: 'mock-pipette-id',
         channelCount: channelCount,
+      },
+      currentSubstep: currentSubstep,
+      selectedLwOverview: {
+        offsetLocationDetails: {
+          labwareId: 'mock-labware-id',
+          well: 'A1',
+        },
+      },
+      selectedLwWithOffsetDetailsMostRecentVectorOffset: {
+        x: 1,
+        y: 2,
+        z: 3,
       },
     },
   }
@@ -49,9 +67,17 @@ const render = (
 describe('DetachProbe', () => {
   let props: ComponentProps<typeof DetachProbe>
   let mockHandleProceed: Mock
+  let mockToggleRobotMoving: Mock
+  let mockHome: Mock
+  let mockHandleMoveToInitialOffsetPosition: Mock
+  let mockGoBackLastStep: Mock
 
   beforeEach(() => {
     mockHandleProceed = vi.fn()
+    mockToggleRobotMoving = vi.fn().mockResolvedValue(undefined)
+    mockHome = vi.fn().mockResolvedValue(undefined)
+    mockHandleMoveToInitialOffsetPosition = vi.fn().mockResolvedValue(undefined)
+    mockGoBackLastStep = vi.fn()
 
     vi.mocked(
       selectStepInfo
@@ -60,6 +86,26 @@ describe('DetachProbe', () => {
       selectActivePipetteChannelCount
     ).mockImplementation((runId: string) => (state: any) =>
       state[runId]?.activePipette?.channelCount || 1
+    )
+    vi.mocked(
+      selectActivePipette
+    ).mockImplementation((runId: string) => (state: any) =>
+      state[runId]?.activePipette
+    )
+    vi.mocked(
+      selectCurrentSubstep
+    ).mockImplementation((runId: string) => (state: any) =>
+      state[runId]?.currentSubstep
+    )
+    vi.mocked(
+      selectSelectedLwOverview
+    ).mockImplementation((runId: string) => (state: any) =>
+      state[runId]?.selectedLwOverview
+    )
+    vi.mocked(
+      selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
+    ).mockImplementation((runId: string) => (state: any) =>
+      state[runId]?.selectedLwWithOffsetDetailsMostRecentVectorOffset
     )
 
     props = {
@@ -70,7 +116,11 @@ describe('DetachProbe', () => {
           ...mockLPCContentProps.commandUtils.headerCommands,
           handleProceed: mockHandleProceed,
         },
+        toggleRobotMoving: mockToggleRobotMoving,
+        home: mockHome,
+        handleMoveToInitialOffsetPosition: mockHandleMoveToInitialOffsetPosition,
       },
+      goBackLastStep: mockGoBackLastStep,
     }
   })
 

@@ -58,6 +58,7 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
       size={size ?? '2rem'}
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
+      data-testid={`ToggleButton_${label ?? 'label'}`}
     >
       <Flex>
         <Icon name={iconName} size="2rem" />

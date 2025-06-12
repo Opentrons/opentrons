@@ -7,6 +7,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
 ---
+
+## Opentrons Robot Software Changes in 8.5.0
+
+### TODO
+
+---
+
+## Opentrons Robot Software Changes in 8.4.1
+
+There are no changes to the robot software in v8.4.1, but it is required for running protocols in v8.4.1 of the Opentrons App.
+
+---
+
 ## Opentrons Robot Software Changes in 8.4.0
 
 Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for pipetting relative to a liquid meniscus, and other new features, improvements, and bug fixes.
@@ -20,15 +33,23 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 ### Improvements
 
-- Improved tip drop motions for Flex 1- and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
+- Improved tip drop motions for Flex 1-channel and 8-channel pipettes correctly drop and return attached tips to the tip rack.
 
 ### Bug Fixes
 
-- The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
+- The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module.
+
+---
+
+## Opentrons Robot Software Changes in 8.3.2
+
+The 8.3.2 hotfix release fixes a bug where protocol commands could time out, especially when running many long protocols.
+
+---
 
 ## Opentrons Robot Software Changes in 8.3.1
 
-The 8.3.1 hotfix release contains two bug fixes:    
+The 8.3.1 hotfix release contains two bug fixes:
 
 - Exported data from the Absorbance Plate Reader no longer contains invalid values. 
 - A small fix allows all robots to properly reboot after an upgrade to v8.3.0. 

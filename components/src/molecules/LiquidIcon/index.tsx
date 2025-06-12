@@ -6,9 +6,9 @@ import { Btn, Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-type LiquidIconSize = 'small' | 'medium'
+type LiquidIconSize = 'xSmall' | 'small' | 'medium'
 
-interface LiquidIconProps {
+export interface LiquidIconProps {
   color: string
   size?: LiquidIconSize
   onClick?: () => void
@@ -17,6 +17,15 @@ interface LiquidIconProps {
 
 export function LiquidIcon(props: LiquidIconProps): JSX.Element {
   const { color, size = 'small', onClick, hasError = false } = props
+
+  const sizeStylesMap: Record<
+    LiquidIconSize,
+    { iconSize: string; padding: string }
+  > = {
+    xSmall: { iconSize: SPACING.spacing6, padding: SPACING.spacing6 },
+    small: { iconSize: '0.5rem', padding: SPACING.spacing8 },
+    medium: { iconSize: '1rem', padding: SPACING.spacing12 },
+  }
 
   const LIQUID_ICON_CONTAINER_STYLE = css`
     height: max-content;
@@ -38,14 +47,10 @@ export function LiquidIcon(props: LiquidIconProps): JSX.Element {
   const liquid = (
     <Flex
       css={LIQUID_ICON_CONTAINER_STYLE}
-      padding={size === 'medium' ? SPACING.spacing12 : SPACING.spacing8}
+      padding={sizeStylesMap[size].padding}
       data-testid={`LiquidIcon_${color}`}
     >
-      <Icon
-        name="circle"
-        color={color}
-        size={size === 'medium' ? '1rem' : '0.5rem'}
-      />
+      <Icon name="circle" color={color} size={sizeStylesMap[size].iconSize} />
     </Flex>
   )
 

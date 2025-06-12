@@ -17,7 +17,6 @@ import {
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_ABSOLUTE,
-  ProtocolDeck,
   SIZE_2,
   SIZE_3,
   SPACING,
@@ -34,6 +33,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolUsesGripper } from '/app/transformations/commands'

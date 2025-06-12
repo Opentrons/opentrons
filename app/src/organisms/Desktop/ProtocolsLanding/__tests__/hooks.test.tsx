@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -285,7 +285,7 @@ const mockStoredProtocolData = [
 ] as StoredProtocolData[]
 
 describe('useSortedProtocols', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     store.dispatch = vi.fn()
   })

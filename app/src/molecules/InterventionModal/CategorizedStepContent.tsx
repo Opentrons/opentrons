@@ -13,7 +13,7 @@ import { Command, CommandIndex } from '../Command'
 
 import type { CommandTextData } from '@opentrons/components'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -27,7 +27,7 @@ export interface CommandWithIndex {
 export interface CategorizedStepContentProps {
   robotType: RobotType
   commandTextData: CommandTextData | null
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   topCategoryHeadline: string
   topCategory: NonSkeletonCommandState
   topCategoryCommand: CommandWithIndex | null
@@ -52,7 +52,7 @@ type MappedState =
       command: RunTimeCommand
       state: NonSkeletonCommandState
       commandTextData: CommandTextData
-      allRunDefs: LabwareDefinition2[]
+      allRunDefs: LabwareDefinition[]
     }
   | typeof EMPTY_COMMAND
 
@@ -60,7 +60,7 @@ const commandAndState = (
   command: CommandWithIndex | null,
   state: NonSkeletonCommandState,
   commandTextData: CommandTextData | null,
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 ): MappedState =>
   command == null || commandTextData == null
     ? EMPTY_COMMAND

@@ -5,7 +5,11 @@ import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 
 import { FlexTrash } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  deckExample,
+  FLEX_ROBOT_TYPE,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
@@ -21,8 +25,10 @@ import {
 import { DeckSetupContainer } from '../DeckSetupContainer'
 import { DeckSetupDetails } from '../DeckSetupDetails'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
+import { getCutoutIdForAddressableArea } from '../utils'
 
 import type * as OpentronsComponents from '@opentrons/components'
+import type * as OpentronsShared from '@opentrons/shared-data'
 
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
@@ -32,11 +38,20 @@ vi.mock('../DeckSetupDetails')
 vi.mock('../../../../ui/steps')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../file-data/selectors')
+vi.mock('../utils')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actual,
     FlexTrash: vi.fn(),
+    SingleSlotFixture: <div>mock singleSlotFixture</div>,
+  }
+})
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsShared>()
+  return {
+    ...actual,
+    getPositionFromSlotId: vi.fn(),
   }
 })
 
@@ -46,6 +61,15 @@ const render = () => {
       setHoverSlot={vi.fn()}
       hoverSlot={null}
       robotType={FLEX_ROBOT_TYPE}
+      deckDef={
+        ({
+          ...deckExample,
+          locations: { addressableAreas: [{ id: 'cutoutD3' }] },
+        } as any) as OpentronsShared.DeckDefinition
+      }
+      setViewBox={vi.fn()}
+      viewBox="mockViewBox"
+      initialViewBox="mockInitialViewBox"
     />
   )[0]
 }
@@ -76,6 +100,8 @@ describe('DeckSetupContainer', () => {
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
+    vi.mocked(getCutoutIdForAddressableArea).mockReturnValue('cutoutD3')
+    vi.mocked(getPositionFromSlotId).mockReturnValue([0, 0, 0])
   })
   it('renders the DeckSetupToolbox when slot and cutout are not null', () => {
     render()
@@ -89,18 +115,6 @@ describe('DeckSetupContainer', () => {
     })
     render()
     screen.getByText('mock DeckSetupDetails')
-  })
-  it('renders a flex trash when a trash bin is attached', () => {
-    vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
-      labware: {},
-      modules: {},
-      additionalEquipmentOnDeck: {
-        trash: { name: 'trashBin', location: 'cutoutA3', id: 'mockId' },
-      },
-      pipettes: {},
-    })
-    render()
-    screen.getByText('mock FlexTrash')
   })
   it('does not render a flex trash if the zoomed in slot cutout is the same location', () => {
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({

@@ -1,30 +1,73 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import { css } from 'styled-components'
 
-import { LegacyStyledText, StyledText } from '@opentrons/components'
+import {
+  AnimationVideo,
+  LegacyStyledText,
+  StyledText,
+} from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
+import {
+  selectActivePipette,
+  selectActivePipetteChannelCount,
+  selectCurrentSubstep,
+  selectSelectedLwOverview,
+  selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
+} from '/app/redux/protocol-runs'
 
+import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
-  const { proceedStep, goBackLastStep, commandUtils } = props
+  const { proceedStep, goBackLastStep, commandUtils, runId } = props
   const { t } = useTranslation('labware_position_check')
+  const {
+    toggleRobotMoving,
+    handleMoveToInitialOffsetPosition,
+    home,
+  } = commandUtils
+
+  const currentSubstep = useSelector(selectCurrentSubstep(runId))
+  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const pipetteId = pipette.id
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
+  const mostRecentVectorOffset = useSelector(
+    selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
+  )
+  const offsetLocationDetails = selectedLwInfo?.offsetLocationDetails
 
   const handleGoBack = (): void => {
-    void commandUtils
-      .toggleRobotMoving(true)
-      .then(() => commandUtils.home())
+    void toggleRobotMoving(true)
+      .then(() => {
+        // On the desktop app, ensure the robot returns to the initial offset position instead of the home position
+        // when actively calibrating an offset.
+        if (
+          currentSubstep === 'handle-lw/edit-offset/check-labware' &&
+          offsetLocationDetails != null
+        ) {
+          return home()
+            .then(() =>
+              handleMoveToInitialOffsetPosition(
+                offsetLocationDetails,
+                pipetteId,
+                mostRecentVectorOffset
+              )
+            )
+            .then(() => Promise.resolve())
+        } else {
+          return home()
+        }
+      })
       .then(() => {
         goBackLastStep()
       })
-      .then(() => commandUtils.toggleRobotMoving(false))
+      .then(() => toggleRobotMoving(false))
   }
 
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
@@ -71,10 +114,8 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
             </StyledText>
           }
         />
-        <StyledVideo
-          autoPlay
-          loop
-          controls={false}
+        <AnimationVideo
+          css={VIDEO_STYLE}
           src={probeVideo()}
           data-testid="probe-video"
         />
@@ -83,7 +124,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   )
 }
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   height: 100%;
   width: 100%;
 `

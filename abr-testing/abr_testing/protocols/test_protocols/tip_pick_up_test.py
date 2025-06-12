@@ -34,23 +34,31 @@ def run(protocol: ProtocolContext) -> None:
         "D2": protocol.params.D2,  # type: ignore[attr-defined]
         "D3": protocol.params.D3,  # type: ignore[attr-defined]
     }
-    tip_rack_slots = [slot for slot, value in slot_mapping.items() if value]
-    tip_racks = []
-    for slot in tip_rack_slots:
-        tip_racks.append(protocol.load_labware(tip_rack_type, slot))
-    if pipette_mount == "left":
-        pipette = protocol.load_instrument(
-            pipette_type_left, mount=pipette_mount, tip_racks=tip_racks
-        )
-    else:
-        pipette = protocol.load_instrument(
-            pipette_type_right, mount=pipette_mount, tip_racks=tip_racks
-        )
-    tip_count = 0
-    total_tip_pick_ups = len(tip_rack_slots) * 12
-    for i in range(10000):
-        pipette.pick_up_tip()
-        pipette.return_tip()
-        tip_count += 1
-        if tip_count >= total_tip_pick_ups:
-            pipette.reset_tipracks()
+    if not protocol.is_simulating():
+        slack_bot = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
+    try:
+        tip_rack_slots = [slot for slot, value in slot_mapping.items() if value]
+        tip_racks = []
+        for slot in tip_rack_slots:
+            tip_racks.append(protocol.load_labware(tip_rack_type, slot))
+        if pipette_mount == "left":
+            pipette = protocol.load_instrument(
+                pipette_type_left, mount=pipette_mount, tip_racks=tip_racks
+            )
+        else:
+            pipette = protocol.load_instrument(
+                pipette_type_right, mount=pipette_mount, tip_racks=tip_racks
+            )
+        tip_count = 0
+        total_tip_pick_ups = len(tip_rack_slots) * 12
+        for i in range(10000):
+            pipette.pick_up_tip()
+            pipette.return_tip()
+            tip_count += 1
+            if tip_count >= total_tip_pick_ups:
+                pipette.reset_tipracks()
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        raise (e)

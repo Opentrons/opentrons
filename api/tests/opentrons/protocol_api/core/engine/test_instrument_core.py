@@ -409,6 +409,43 @@ def test_move_to_coordinates(
     )
 
 
+def test_move_to_trash(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move the pipette to a trash and update the location cache."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("waste management")
+
+    subject.move_to(
+        location=mock_trash,
+        well_core=None,
+        force_direct=True,
+        minimum_z_height=42.0,
+        speed=4.56,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="waste management",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=True,
+                speed=4.56,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
+    )
+
+
 def test_pick_up_tip(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -974,6 +1011,48 @@ def test_blow_out_in_place(
     )
 
 
+def test_blow_out_to_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move to a trash and blow out there."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("rubbish")
+
+    subject.blow_out(
+        location=mock_trash,
+        well_core=None,
+        in_place=False,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="rubbish",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_engine_client.execute_command(
+            cmd.BlowOutInPlaceParams(
+                pipetteId="abc123",
+                flowRate=6.7,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
+    )
+
+
 def test_dispense_to_well(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1118,6 +1197,56 @@ def test_dispense_to_coordinates(
                 pushOut=None,
             )
         ),
+    )
+
+
+def test_dispense_to_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+) -> None:
+    """It should move to a trash and dispense there."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_trash.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(mock_trash.area_name).then_return("garbage day")
+
+    subject.dispense(
+        volume=12.34,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=mock_trash,
+        in_place=False,
+        push_out=None,
+        meniscus_tracking=None,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.MoveToAddressableAreaForDropTipParams(
+                pipetteId="abc123",
+                addressableAreaName="garbage day",
+                offset=AddressableOffsetVector(x=1, y=2, z=3),
+                forceDirect=False,
+                speed=None,
+                minimumZHeight=None,
+                alternateDropLocation=False,
+                ignoreTipConfiguration=True,
+            )
+        ),
+        mock_engine_client.execute_command(
+            cmd.DispenseInPlaceParams(
+                pipetteId="abc123",
+                volume=12.34,
+                correctionVolume=None,
+                flowRate=7.8,
+                pushOut=None,
+            )
+        ),
+        mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),
     )
 
 
@@ -1757,7 +1886,7 @@ def test_detect_liquid_presence(
             cmd.TryLiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
                 ),
                 wellName=well_core.get_name(),
                 labwareId=well_core.labware_id,
@@ -1803,6 +1932,53 @@ def test_liquid_probe_without_recovery(
         subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
 
 
+def test_liquid_probe_without_recovery_unsafe(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_engine_client.state,
+            pipette_id=subject.pipette_id,
+            labware_id=well_core.labware_id,
+            well_name=well_core.get_name(),
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            ),
+        )
+    ).then_raise(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError(
+            "Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette."
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.LiquidProbeResult(position=DeckPoint(x=0, y=0, z=0), z_position=0)
+    )
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError,
+        match="Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette.",
+    ):
+        subject.liquid_probe_without_recovery(well_core=well_core, loc=loc)
+
+
 def test_liquid_probe_with_recovery(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1826,6 +2002,53 @@ def test_liquid_probe_with_recovery(
             )
         )
     )
+
+
+def test_liquid_probe_with_recovery_unsafe(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+) -> None:
+    """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
+    well_core = WellCore(
+        name="my cool well", labware_id="123abc", engine_client=mock_engine_client
+    )
+    decoy.when(
+        pipette_movement_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_engine_client.state,
+            pipette_id=subject.pipette_id,
+            labware_id=well_core.labware_id,
+            well_name=well_core.get_name(),
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            ),
+        )
+    ).then_raise(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError(
+            "Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette."
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.execute_command(
+            cmd.LiquidProbeParams(
+                pipetteId=subject.pipette_id,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
+                ),
+                wellName=well_core.get_name(),
+                labwareId=well_core.labware_id,
+            )
+        )
+    ).then_return(
+        cmd.LiquidProbeResult(position=DeckPoint(x=0, y=0, z=0), z_position=0)
+    )
+    loc = Location(Point(0, 0, 0), None)
+    with pytest.raises(
+        pipette_movement_conflict.PartialTipMovementNotAllowedError,
+        match="Requested motion with the A1 nozzle partial configuration is outside of robot bounds for the pipette.",
+    ):
+        subject.liquid_probe_with_recovery(well_core=well_core, loc=loc)
 
 
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
@@ -2335,11 +2558,11 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
     decoy.when(
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=123,
-            disposal_volume=0,
             air_gap=test_transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                 123
             ),
             max_volume=100,
+            current_volume=4.56,
         )
     ).then_raise(ValueError("Oh oh!"))
     with pytest.raises(ValueError, match="Oh oh!"):
@@ -2350,6 +2573,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
             transfer_type=TransferType.ONE_TO_ONE,
             tip_contents=[],
             volume_for_pipette_mode_configuration=None,
+            current_volume=4.56,
         )
 
 

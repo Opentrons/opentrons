@@ -235,6 +235,6 @@ class AbstractModule(abc.ABC):
         """Listen for events and update the module state."""
         pass
 
-    async def identify(self) -> None:
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
         pass

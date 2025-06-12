@@ -49,7 +49,6 @@ describe('MagnetTools', () => {
         dirtyFields: [],
         focusedField: null,
       },
-      visibleFormErrors: [],
       toolboxStep: 1,
       propsForFields: {
         magnetAction: {
@@ -116,7 +115,7 @@ describe('MagnetTools', () => {
   it('renders the text and a switch button for v2', () => {
     render(props)
     screen.getByText('Module')
-    screen.getByText('Magnet state')
+    screen.getByText('Magnets')
     screen.getByLabelText('Engage')
     const toggleButton = screen.getByRole('switch')
     screen.getByText('Engage height')

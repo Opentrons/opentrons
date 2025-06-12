@@ -25,23 +25,23 @@
     "total": {
       "backLeftBottom": {
         "x": 0,
-        "y": 85.48,
+        "y": 0,
         "z": 0
       },
       "frontRightTop": {
         "x": 127.76,
-        "y": 0,
+        "y": -85.48,
         "z": 16.0
       }
     },
     "footprint": {
       "backLeft": {
         "x": 0,
-        "y": 85.48
+        "y": 0
       },
       "frontRight": {
         "x": 127.76,
-        "y": 0
+        "y": -85.48
       }
     }
   },
@@ -99,7 +99,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -109,7 +109,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -119,7 +119,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -129,7 +129,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -139,7 +139,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -149,7 +149,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -159,7 +159,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -169,7 +169,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 14.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -179,7 +179,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -189,7 +189,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -199,7 +199,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -209,7 +209,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -219,7 +219,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -229,7 +229,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -239,7 +239,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -249,7 +249,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 23.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -259,7 +259,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -269,7 +269,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -279,7 +279,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -289,7 +289,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -299,7 +299,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -309,7 +309,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -319,7 +319,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -329,7 +329,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 32.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -339,7 +339,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -349,7 +349,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -359,7 +359,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -369,7 +369,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -379,7 +379,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -389,7 +389,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -399,7 +399,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -409,7 +409,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 41.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -419,7 +419,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -429,7 +429,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -439,7 +439,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -449,7 +449,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -459,7 +459,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -469,7 +469,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -479,7 +479,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -489,7 +489,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 50.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -499,7 +499,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -509,7 +509,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -519,7 +519,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -529,7 +529,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -539,7 +539,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -549,7 +549,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -559,7 +559,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -569,7 +569,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 59.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -579,7 +579,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -589,7 +589,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -599,7 +599,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -609,7 +609,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -619,7 +619,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -629,7 +629,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -639,7 +639,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -649,7 +649,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 68.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -659,7 +659,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -669,7 +669,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -679,7 +679,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -689,7 +689,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -699,7 +699,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -709,7 +709,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -719,7 +719,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -729,7 +729,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 77.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -739,7 +739,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -749,7 +749,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -759,7 +759,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -769,7 +769,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -779,7 +779,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -789,7 +789,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -799,7 +799,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -809,7 +809,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 86.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -819,7 +819,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -829,7 +829,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -839,7 +839,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -849,7 +849,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -859,7 +859,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -869,7 +869,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -879,7 +879,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -889,7 +889,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 95.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -899,7 +899,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -909,7 +909,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -919,7 +919,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -929,7 +929,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -939,7 +939,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -949,7 +949,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -959,7 +959,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -969,7 +969,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 104.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -979,7 +979,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 74.24,
+      "y": -11.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -989,7 +989,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 65.24,
+      "y": -20.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -999,7 +999,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 56.24,
+      "y": -29.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -1009,7 +1009,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 47.24,
+      "y": -38.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -1019,7 +1019,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 38.24,
+      "y": -47.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -1029,7 +1029,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 29.24,
+      "y": -56.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -1039,7 +1039,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 20.24,
+      "y": -65.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     },
@@ -1049,7 +1049,7 @@
       "shape": "circular",
       "diameter": 5.5,
       "x": 113.38,
-      "y": 11.24,
+      "y": -74.24,
       "z": 1.05,
       "geometryDefinitionId": "conicalWell"
     }

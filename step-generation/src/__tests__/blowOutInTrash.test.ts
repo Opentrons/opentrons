@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { blowOutInTrash } from '../commandCreators/compound'
 import {
   DEFAULT_PIPETTE,
-  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
@@ -26,7 +26,7 @@ let invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
+const prevRobotState: RobotState = getRobotStateWithTipStandard(
   invariantContext
 )
 
@@ -62,8 +62,9 @@ describe('blowOutInTrash', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(mock_trash_bin_1)`.trim()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out(mock_trash_bin_1)
+`.trim()
     )
   })
   it('returns correct commands for blowout in a trash bin for an ot-2', () => {
@@ -108,8 +109,9 @@ mockPythonName.blow_out(mock_trash_bin_1)`.trim()
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(protocol.fixed_trash)`.trim()
+mock_pipette.flow_rate.blow_out = 10
+mock_pipette.blow_out(protocol.fixed_trash)
+`.trim()
     )
   })
 })

@@ -6,6 +6,7 @@ import {
   fixtureTiprack1000ul,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 
@@ -89,7 +90,10 @@ const mockRobotState: TimelineFrame = {
       },
     },
     pipettes: {
-      mockPipette: false,
+      mockPipette: {
+        hasTip: false,
+        tiprackURI: null,
+      },
     },
   },
   liquidState: {
@@ -116,6 +120,7 @@ const mockRobotState: TimelineFrame = {
 describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
+      stepId: 1,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -135,6 +140,7 @@ describe('quickTransferStepCommands', () => {
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,
@@ -145,8 +151,7 @@ describe('quickTransferStepCommands', () => {
       dispenseRetractYOffset: 0,
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
-      blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -171,11 +176,16 @@ describe('quickTransferStepCommands', () => {
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -190,27 +200,109 @@ describe('quickTransferStepCommands', () => {
       `
 # TRANSFER STEP
 
-pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.move_to(mock_labware_1["A1"].top(z=2))
-pipette.prepare_to_aspirate()
-pipette.move_to(mock_labware_1["A1"].bottom())
-pipette.move_to(mock_labware_1["A1"].bottom())
-pipette.aspirate(
+pipette.transfer_with_liquid_class(
     volume=10,
-    rate=56 / pipette.flow_rate.aspirate,
+    source=[mock_labware_1["A1"]],
+    dest=[mock_labware_2["B1"]],
+    new_tip="always",
+    trash_location=mock_trash_bin_1,
+    liquid_class=protocol.define_liquid_class(
+        name="transfer_step_1",
+        properties={
+            "p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                        },
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 56)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "start_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                        },
+                        "position_reference": "well-bottom",
+                    },
+                    "push_out_by_volume": [(0, 0)],
+                    "flow_rate_by_volume": [(0, 80)],
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "start_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 0,
+                            },
+                            "position_reference": "well-bottom",
+                        },
+                        "touch_tip": {"enabled": False},
+                        "blowout": {
+                            "enabled": True,
+                            "location": "source_well",
+                            "flow_rate": 50,
+                        },
+                    },
+                },
+            }},
+        },
+    ),
 )
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
-pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
-pipette.drop_tip()`.trimStart()
+`.trimStart()
     )
   })
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
+      stepId: 1,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -229,6 +321,7 @@ pipette.drop_tip()`.trimStart()
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,
@@ -240,8 +333,7 @@ pipette.drop_tip()`.trimStart()
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       touchTipAfterAspirateMmFromEdge: null,
-      blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: 'mockTrashBin',
       mixFirstAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -266,11 +358,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
@@ -286,32 +383,37 @@ pipette.drop_tip()`.trimStart()
 # CONSOLIDATE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.aspirate(
-    volume=10,
-    location=mock_labware_1["B1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.dispense(
-    volume=20,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["B1"].top(z=2))
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.aspirate(volume=10, flow_rate=56)
+pipette.move_to(mock_labware_1["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].top(z=2))
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=20, flow_rate=80)
+pipette.move_to(mock_trash_bin_1)
 pipette.flow_rate.blow_out = 50
-pipette.blow_out(mock_trash_bin_1)
-pipette.drop_tip()`.trimStart()
+pipette.blow_out()
+pipette.drop_tip()
+`.trim()
     )
   })
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
+      stepId: 1,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
       blowoutFlowRateUlSec: 50,
+      conditioningVolume: null,
       touchTipAfterAspirateMmFromEdge: null,
       liquidClass: null,
       aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
@@ -327,6 +429,7 @@ pipette.drop_tip()`.trimStart()
       aspirateRetractYOffset: 0,
       aspirateRetractZOffset: 0,
       aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
+      aspirateRetractDelay: null,
       dispenseSubmergeSpeed: null,
       dispenseSubmergeXOffset: 0,
       dispenseSubmergeYOffset: 0,
@@ -337,8 +440,7 @@ pipette.drop_tip()`.trimStart()
       dispenseRetractYOffset: 0,
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
-      blowoutOffsetFromTopMm: -1,
-      blowoutLocation: 'source',
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       mixBeforeAspirate: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
@@ -362,11 +464,16 @@ pipette.drop_tip()`.trimStart()
       dispenseDelay: null,
       touchTipAfterDispense: false,
       touchTipAfterDispenseOffsetMmFromTop: 0,
+      touchTipAfterDispenseMmFromEdge: 0,
       touchTipAfterDispenseSpeed: null,
       dispenseFlowRateUlSec: 80,
       dispenseOffsetFromBottomMm: -1,
       dispenseXOffset: 0,
       dispenseYOffset: 0,
+      dispenseZOffset: 0,
+      dispensePositionReference: POSITION_REFERENCE_BOTTOM,
+      dispenseSubmergeDelay: null,
+      dispenseRetractDelay: null,
       name: 'transfer',
       description: 'transferring from 1 well to another',
       disposalVolume: null,
@@ -383,22 +490,25 @@ pipette.drop_tip()`.trimStart()
 # DISTRIBUTE STEP
 
 pipette.pick_up_tip(location=mock_tiprack_1)
-pipette.aspirate(
-    volume=20,
-    location=mock_labware_1["A1"].bottom(z=-1),
-    rate=56 / pipette.flow_rate.aspirate,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["A1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
-pipette.dispense(
-    volume=10,
-    location=mock_labware_2["B1"].bottom(z=-1),
-    rate=80 / pipette.flow_rate.dispense,
-)
-pipette.drop_tip()`.trimStart()
+pipette.move_to(mock_labware_1["A1"].top(z=2))
+pipette.prepare_to_aspirate()
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.aspirate(volume=20, flow_rate=56)
+pipette.move_to(mock_labware_1["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.dispense(volume=10, flow_rate=80, push_out=0)
+pipette.move_to(mock_labware_2["A1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.dispense(volume=10, flow_rate=80)
+pipette.move_to(mock_labware_2["B1"].bottom())
+pipette.move_to(mock_labware_1["A1"].top())
+pipette.flow_rate.blow_out = 50
+pipette.blow_out()
+pipette.drop_tip()
+`.trim()
     )
   })
 })

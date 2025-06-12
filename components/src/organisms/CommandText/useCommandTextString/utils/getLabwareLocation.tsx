@@ -15,7 +15,7 @@ import { getModuleModel } from './getModuleModel'
 import type {
   AddressableAreaName,
   CutoutId,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   LabwareLocationSequence,
   ModuleModel,
@@ -49,11 +49,11 @@ export interface SequenceSlotOnlyParams extends SequenceBaseParams {
   detailLevel: 'slot-only'
 }
 export interface LocationFullParams extends BaseParams {
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   detailLevel?: 'full'
 }
 export interface SequenceFullParams extends SequenceBaseParams {
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   detailLevel?: 'full'
 }
 

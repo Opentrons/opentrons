@@ -8,32 +8,24 @@ import {
 } from '@opentrons/step-generation'
 
 import {
-  getMaxUiFlowRate,
-  MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S,
-  MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S,
-  MAX_PLUNGER_SPEED_OT2,
-} from '../PipetteFields/utils'
+  FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
+  FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
+  OT2_PLUNGER_MAX_SPEED,
+} from '../../../../../constants'
+import { getMaxUiFlowRate } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
-  getFormLevelError,
 } from '../utils'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
+import type { FormErrorLocationType } from '../../../../../steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
   dependentFields: ['field1', 'field2'],
-}
-
-const MAPPED_ERRORS = {
-  field1: {
-    title: 'form level error title',
-    dependentFields: ['field1', 'field2'],
-    showAtField: true,
-    showAtForm: true,
-  },
+  location: 'form' as FormErrorLocationType,
 }
 
 describe('getBlowoutLocationOptionsForForm', () => {
@@ -104,52 +96,28 @@ describe('capitalizeFirstLetter', () => {
 })
 
 describe('getFormErrorsMappedToField', () => {
-  it('should flatten form-level errors to an object keyed by each implicated field with form-level error as the value', () => {
+  it('should return no errors since they are form level', () => {
     const result = getFormErrorsMappedToField([BASE_VISIBLE_FORM_ERROR])
-    expect(result).toEqual({
-      field1: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: true,
-      },
-      field2: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: true,
-      },
-    })
+    expect(result).toEqual({ field1: [], field2: [] })
   })
-  it('should maintain booleans for showAtForm and showAtField', () => {
+  it('should render errors for field level', () => {
     const result = getFormErrorsMappedToField([
-      { ...BASE_VISIBLE_FORM_ERROR, showAtForm: false },
+      { ...BASE_VISIBLE_FORM_ERROR, location: 'field' },
     ])
     expect(result).toEqual({
-      field1: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: false,
-      },
-      field2: {
-        ...BASE_VISIBLE_FORM_ERROR,
-        showAtField: true,
-        showAtForm: false,
-      },
+      field1: [
+        {
+          ...BASE_VISIBLE_FORM_ERROR,
+          location: 'field',
+        },
+      ],
+      field2: [
+        {
+          ...BASE_VISIBLE_FORM_ERROR,
+          location: 'field',
+        },
+      ],
     })
-  })
-})
-
-describe('getFormLevelError', () => {
-  it('shows form-level error at field when showAtField is true', () => {
-    const result = getFormLevelError('field1', MAPPED_ERRORS)
-    expect(result).toEqual('form level error title')
-  })
-
-  it('shows no form-level error at field when showAtField is false', () => {
-    const result = getFormLevelError('field1', {
-      ...MAPPED_ERRORS,
-      field1: { ...MAPPED_ERRORS.field1, showAtField: false },
-    })
-    expect(result).toBeNull()
   })
 })
 
@@ -185,12 +153,12 @@ describe('getMaxUiFlowRate', () => {
     const expectedAccuracy = 0.05 * 50 + 1
     const expectedTravelMm = 50 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      50 / (expectedTravelMm / MAX_PLUNGER_SPEED_OT2)
+      50 / (expectedTravelMm / OT2_PLUNGER_MAX_SPEED)
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
-  it('should calculate max flow rate for OT-3 single channel', () => {
+  it('should calculate max flow rate for Flex single channel', () => {
     const args = {
       targetVolume: 20,
       channels: 1,
@@ -202,12 +170,12 @@ describe('getMaxUiFlowRate', () => {
     const expectedAccuracy = 0.06 * 20 + 1.2
     const expectedTravelMm = 20 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      20 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
+      20 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
-  it('should calculate max flow rate for OT-3 8-channel', () => {
+  it('should calculate max flow rate for Flex 8-channel', () => {
     const args = {
       targetVolume: 80,
       channels: 8,
@@ -219,12 +187,12 @@ describe('getMaxUiFlowRate', () => {
     const expectedAccuracy = 0.06 * 80 + 1.2
     const expectedTravelMm = 80 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      80 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
+      80 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
 
-  it('should calculate max flow rate for OT-3 96-channel', () => {
+  it('should calculate max flow rate for Flex 96-channel', () => {
     const args = {
       targetVolume: 5,
       channels: 96,
@@ -236,7 +204,7 @@ describe('getMaxUiFlowRate', () => {
     const expectedAccuracy = 0.1 * 5 + 0.5
     const expectedTravelMm = 5 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      5 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_HIGH_THROUGHPUT_MM_PER_S)
+      5 / (expectedTravelMm / FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED)
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
@@ -255,7 +223,7 @@ describe('getMaxUiFlowRate', () => {
     const correctionMultiplier = 1 + 10 / 50
     const expectedTravelMmCorrected = expectedTravelMm * correctionMultiplier
     const expectedMaxFlowRate = round(
-      50 / (expectedTravelMmCorrected / MAX_PLUNGER_SPEED_OT2)
+      50 / (expectedTravelMmCorrected / OT2_PLUNGER_MAX_SPEED)
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
@@ -272,7 +240,7 @@ describe('getMaxUiFlowRate', () => {
     const expectedAccuracy = 0.05 * 150 + 1 // Using the last entry [100, 0.05, 1]
     const expectedTravelMm = 150 / expectedAccuracy
     const expectedMaxFlowRate =
-      150 / (expectedTravelMm / MAX_PLUNGER_SPEED_FLEX_LOW_THROUGHPUT_MM_PER_S)
+      150 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
     expect(getMaxUiFlowRate(largeVolumeArgs)).toEqual(expectedMaxFlowRate)
   })
 })

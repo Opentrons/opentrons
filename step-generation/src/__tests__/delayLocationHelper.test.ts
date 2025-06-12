@@ -59,8 +59,9 @@ describe('delayLocationHelper', () => {
     ])
     expect(res.python).toBe(
       `
-mockPythonName.move_to(mock_waste_chute_1)
-protocol.delay(seconds=30)`.trimStart()
+mock_pipette_p10.move_to(mock_waste_chute_1)
+protocol.delay(seconds=30)
+`.trim()
     )
   })
   it('moves to well and delays', () => {
@@ -102,8 +103,9 @@ protocol.delay(seconds=30)`.trimStart()
     ])
     expect(res.python).toBe(
       `
-mockPythonName.move_to(mockPythonName["B1"].bottom(z=10))
-protocol.delay(seconds=30)`.trimStart()
+mock_pipette_p10.move_to(mock_source_plate["B1"].bottom(z=10))
+protocol.delay(seconds=30)
+`.trim()
     )
   })
   it('moves to trash bin and delays', () => {
@@ -148,8 +150,9 @@ protocol.delay(seconds=30)`.trimStart()
     ])
     expect(res.python).toBe(
       `
-mockPythonName.move_to(mock_trash_bin_1)
-protocol.delay(seconds=30)`.trimStart()
+mock_pipette_p10.move_to(mock_trash_bin_1)
+protocol.delay(seconds=30)
+`.trim()
     )
   })
 })

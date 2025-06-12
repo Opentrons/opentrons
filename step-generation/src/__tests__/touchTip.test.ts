@@ -60,7 +60,7 @@ describe('touchTip', () => {
       },
     ])
     expect(res.python).toBe(
-      `mockPythonName.touch_tip(mockPythonName["A1"], v_offset=10, speed=10, mm_from_edge=0.2)`
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10, speed=10, mm_from_edge=0.2)`
     )
   })
 
@@ -78,7 +78,7 @@ describe('touchTip', () => {
     const res = getSuccessResult(result)
 
     expect(res.python).toBe(
-      `mockPythonName.touch_tip(mockPythonName["A1"], v_offset=10)`
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10)`
     )
   })
 

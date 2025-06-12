@@ -11,6 +11,8 @@ import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { InterventionModal, useInterventionModal } from '..'
 import {
+  mockEmptyStackerCommand,
+  mockFillStackerCommand,
   mockMoveLabwareCommandFromModule,
   mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithoutStartTime,
@@ -245,5 +247,45 @@ describe('InterventionModal', () => {
     screen.getByText('mockLabware')
     screen.queryAllByText('A1')
     screen.queryAllByText('C1')
+  })
+
+  it('renders an empty stacker modal', () => {
+    props = {
+      ...props,
+      command: mockEmptyStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockEmptyStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Empty Stacker')
+    screen.queryAllByText('STACKER C3')
+  })
+
+  it('renders a fill stacker modal', () => {
+    props = {
+      ...props,
+      command: mockFillStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockFillStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Refill Stacker')
+    screen.queryAllByText('STACKER C3')
   })
 })

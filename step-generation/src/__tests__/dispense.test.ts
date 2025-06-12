@@ -62,7 +62,6 @@ describe('dispense', () => {
         },
         flowRate: 6,
         tipRack: 'tiprack1Id',
-        nozzles: null,
       }
     })
     it('dispense normally (with tip)', () => {
@@ -90,10 +89,10 @@ describe('dispense', () => {
       ])
       expect(getSuccessResult(result).python).toBe(
         `
-mockPythonName.dispense(
+mock_pipette.dispense(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.dispense,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
 )`.trimStart()
       )
     })
@@ -121,7 +120,6 @@ mockPythonName.dispense(
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
           tipRack: 'tiprack1Id',
-          nozzles: null,
         },
         invariantContext,
         initialRobotState

@@ -19,8 +19,10 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{ label: 'first button', value: 'first' }}
-        secondButton={{ label: 'second button', value: 'second' }}
+        buttons={[
+          { label: 'first button', value: 'first' },
+          { label: 'second button', value: 'second' },
+        ]}
       />
     )
     expect(screen.getByText('headline')).not.toBeNull()
@@ -29,9 +31,9 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{ label: 'first button', value: 'first' }}
-        secondButton={{ label: 'second button', value: 'second' }}
-        furtherButtons={[
+        buttons={[
+          { label: 'first button', value: 'first' },
+          { label: 'second button', value: 'second' },
           { label: 'third button', value: 'third' },
           { label: 'fourth button', value: 'fourth' },
         ]}
@@ -46,9 +48,11 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{ label: 'first button', value: 'first' }}
-        secondButton={{ label: 'second button', value: 'second' }}
-        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        buttons={[
+          { label: 'first button', value: 'first' },
+          { label: 'second button', value: 'second' },
+          { label: 'third button', value: 'third' },
+        ]}
       />
     )
     expect(inputElForButtonFromButtonText('first button').checked).toBeFalsy()
@@ -70,9 +74,11 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{ label: 'first button', value: 'first' }}
-        secondButton={{ label: 'second button', value: 'second' }}
-        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        buttons={[
+          { label: 'first button', value: 'first' },
+          { label: 'second button', value: 'second' },
+          { label: 'third button', value: 'third' },
+        ]}
         initialSelected="second"
       />
     )
@@ -86,13 +92,15 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{
-          label: 'first button',
-          value: 'first',
-          onChange: onChange as ChangeEventHandler<HTMLInputElement>,
-        }}
-        secondButton={{ label: 'second button', value: 'second' }}
-        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        buttons={[
+          {
+            label: 'first button',
+            value: 'first',
+            onChange: onChange as ChangeEventHandler<HTMLInputElement>,
+          },
+          { label: 'second button', value: 'second' },
+          { label: 'third button', value: 'third' },
+        ]}
       />
     )
     fireEvent.click(inputElForButtonFromButtonText('first button'))
@@ -112,9 +120,11 @@ describe('InterventionModal', () => {
     render(
       <ModalContentOneColSimpleButtons
         headline="headline"
-        firstButton={{ label: 'first button', value: 'first' }}
-        secondButton={{ label: 'second button', value: 'second' }}
-        furtherButtons={[{ label: 'third button', value: 'third' }]}
+        buttons={[
+          { label: 'first button', value: 'first' },
+          { label: 'second button', value: 'second' },
+          { label: 'third button', value: 'third' },
+        ]}
         onSelect={onSelect}
       />
     )

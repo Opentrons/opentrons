@@ -14,7 +14,7 @@ function createMockOptions(): DropdownOption[] {
 const mockOptions: DropdownOption[] = createMockOptions()
 
 const meta: Meta<typeof DropdownMenuComponent> = {
-  title: 'App/Atoms/DropdownMenu',
+  title: 'Helix/Molecules/DropdownMenu',
   component: DropdownMenuComponent,
 }
 export default meta

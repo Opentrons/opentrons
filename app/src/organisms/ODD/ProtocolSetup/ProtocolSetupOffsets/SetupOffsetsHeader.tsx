@@ -10,9 +10,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   appliedOffsetsToRun,
@@ -31,6 +33,10 @@ export function SetupOffsetsHeader({
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const { makeSnackbar } = useToaster()
+  const { reportApplyOffsets } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
@@ -53,6 +59,7 @@ export function SetupOffsetsHeader({
         )
           .then(() => {
             dispatch(appliedOffsetsToRun(runId))
+            reportApplyOffsets()
             updateWithRunId(runId)
             setSetupScreen('prepare to run')
           })

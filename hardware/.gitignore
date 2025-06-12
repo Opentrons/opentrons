@@ -1,0 +1,7 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+dist
+
+opentrons_hardware/_version.py

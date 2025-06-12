@@ -11,14 +11,22 @@ from opentrons.drivers.flex_stacker.types import (
     LimitSwitchStatus,
     PlatformStatus,
     StackerAxis,
+    LEDColor,
+    LEDPattern,
 )
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import (
+    MAX_TRAVEL,
+    OFFSET_MD,
     SIMULATING_POLL_PERIOD,
+    STACKING_OFFSET_LG,
+    STACKING_OFFSET_SM,
     FlexStackerReader,
 )
+from opentrons.hardware_control.modules.types import PlatformState
 from opentrons.hardware_control.poller import Poller
+from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 
 @pytest.fixture
@@ -141,3 +149,245 @@ async def test_set_run_hold_current(
     assert motion_params.hold_current == default.hold_current
     mock_driver.set_run_current.reset_mock()
     mock_driver.set_ihold_current.reset_mock()
+
+
+PLATFORM_STATUS_UNKNOWN = PlatformStatus(False, False)
+PLATFORM_STATUS_EXTENDED = PlatformStatus(True, False)
+PLATFORM_STATUS_RETRACTED = PlatformStatus(False, True)
+
+X_UNKNOWN = LimitSwitchStatus(False, False, False, False, False)
+X_EXTENDED = LimitSwitchStatus(True, False, False, False, False)
+X_RETRACTED = LimitSwitchStatus(False, True, False, False, False)
+
+
+@pytest.mark.parametrize("x_status", [X_EXTENDED, X_RETRACTED, X_UNKNOWN])
+@pytest.mark.parametrize(
+    "platform_status,expected",
+    [
+        (PLATFORM_STATUS_RETRACTED, PlatformState.RETRACTED),
+        (PLATFORM_STATUS_EXTENDED, PlatformState.EXTENDED),
+    ],
+)
+async def test_platform_state(
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    x_status: LimitSwitchStatus,
+    platform_status: PlatformStatus,
+    expected: PlatformState,
+) -> None:
+    """Test that the platform state is correctly determined."""
+    mock_driver.get_platform_status.return_value = platform_status
+    mock_driver.get_limit_switches_status.return_value = x_status
+
+    # update the cached value
+    await subject._reader.get_limit_switch_status()
+    await subject._reader.get_platform_sensor_state()
+    assert subject._get_platform_live_data() == expected
+
+
+@pytest.mark.parametrize(
+    "x_status,expected",
+    [
+        (X_EXTENDED, PlatformState.MISSING),
+        (X_RETRACTED, PlatformState.MISSING),
+        (X_UNKNOWN, PlatformState.UNKNOWN),
+    ],
+)
+async def test_platform_state_unknown(
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    x_status: LimitSwitchStatus,
+    expected: PlatformState,
+) -> None:
+    """Test that the platform state is correctly determined."""
+    mock_driver.get_platform_status.return_value = PLATFORM_STATUS_UNKNOWN
+    mock_driver.get_limit_switches_status.return_value = x_status
+
+    # update the value
+    await subject._reader.get_limit_switch_status()
+    await subject._reader.get_platform_sensor_state()
+    assert subject._get_platform_live_data() == expected
+
+
+@pytest.mark.parametrize(
+    ("should_identify", "hopper_door", "event", "result_params"),
+    [
+        (  # running
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.RUNNING, enabled=True),
+            (0.5, LEDColor.GREEN, LEDPattern.STATIC, None),
+        ),
+        (  # paused - door open
+            False,
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
+        ),
+        (  # paused - should identify
+            True,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
+        ),
+        (  # paused - door closed not identified
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.PAUSED, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # idle - door open
+            False,
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.IDLE, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
+        ),
+        (  # idle - door closed
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.IDLE, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # hardware error - identified
+            True,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.HARDWARE_ERROR, enabled=True),
+            (0.5, LEDColor.RED, LEDPattern.FLASH, 300),
+        ),
+        (  # hardware error - not identified
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.HARDWARE_ERROR, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # software error
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.SOFTWARE_ERROR, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.STATIC, None),
+        ),
+        (  # error recovery - door open
+            False,
+            False,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.BLUE, LEDPattern.PULSE, 2000),
+        ),
+        (  # error recovery - should identify
+            True,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.YELLOW, LEDPattern.PULSE, 2000),
+        ),
+        (  # error recovery - door closed
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.ERROR_RECOVERY, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.STATIC, None),
+        ),
+        (  # run complete
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.RUN_COMPLETED, enabled=True),
+            (0.5, LEDColor.GREEN, LEDPattern.PULSE, None),
+        ),
+        (  # updating
+            False,
+            True,
+            StatusBarUpdateEvent(state=StatusBarState.UPDATING, enabled=True),
+            (0.5, LEDColor.WHITE, LEDPattern.PULSE, None),
+        ),
+    ],
+)
+async def test_stacker_status_bar_event_handler(
+    subject: modules.FlexStacker,
+    mock_driver: mock.AsyncMock,
+    should_identify: bool,
+    hopper_door: bool,
+    event: StatusBarUpdateEvent,
+    result_params: tuple[float, LEDColor, LEDPattern, int | None],
+) -> None:
+    mock_driver.get_hopper_door_closed.return_value = hopper_door
+    subject.set_stacker_identify(should_identify)
+    await subject._reader.get_door_closed()
+    await subject._handle_status_bar_event(event)
+    mock_driver.set_led.assert_called_with(
+        result_params[0],
+        color=result_params[1],
+        pattern=result_params[2],
+        duration=result_params[3],
+        reps=None,
+    )
+
+
+@pytest.mark.parametrize(
+    ("labware_height", "stacking_offset", "expect_error"),
+    [
+        (16, STACKING_OFFSET_SM, False),
+        (100, STACKING_OFFSET_LG, False),
+        (0, STACKING_OFFSET_SM, True),
+        (-10, STACKING_OFFSET_SM, True),
+        (200, STACKING_OFFSET_LG, True),
+    ],
+)
+async def test_store_labware_enforce_sensing(
+    subject: modules.FlexStacker,
+    labware_height: float,
+    stacking_offset: float,
+    expect_error: bool,
+) -> None:
+    """
+    Test successful storage labware with labware sensing enforced.
+    """
+    with (
+        mock.patch.object(
+            subject, "_prepare_for_action", mock.AsyncMock()
+        ) as _prepare_for_action,
+        mock.patch.object(
+            subject, "_move_and_home_axis", mock.AsyncMock()
+        ) as _move_and_home_axis,
+        mock.patch.object(
+            subject, "verify_shuttle_labware_presence", mock.AsyncMock()
+        ) as verify_shuttle_labware_presence,
+        mock.patch.object(subject, "move_axis", mock.AsyncMock()) as move_axis,
+        mock.patch.object(subject, "open_latch", mock.AsyncMock()) as open_latch,
+        mock.patch.object(subject, "close_latch", mock.AsyncMock()) as close_latch,
+    ):
+        # Test invalid labware height
+        if expect_error:
+            with pytest.raises(ValueError):
+                await subject.store_labware(
+                    labware_height=labware_height,
+                    enforce_shuttle_lw_sensing=True,
+                )
+            return
+
+        # Test valid labware height
+        await subject.store_labware(
+            labware_height=labware_height,
+            enforce_shuttle_lw_sensing=True,
+        )
+
+        # We need to verify the move sequence
+        _prepare_for_action.assert_called()
+        _move_and_home_axis.assert_any_call(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
+
+        # Assertions for offset calculation and move_axis
+        distance_z = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - stacking_offset
+        move_axis.assert_called_once_with(StackerAxis.Z, Direction.EXTEND, distance_z)
+
+        # Verify labware transfer
+        open_latch.assert_called_once()
+        z_distance = labware_height / 2
+        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
+        _move_and_home_axis.assert_any_call(
+            StackerAxis.Z, Direction.EXTEND, z_distance, z_speed
+        )
+        close_latch.assert_called_once()
+
+        # Now the z can be moved down and verify no labware is detected
+        _move_and_home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, OFFSET_MD)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, False)
+
+        # Then finally the x is moved to the gripper position
+        _move_and_home_axis.assert_any_call(StackerAxis.X, Direction.EXTEND, OFFSET_MD)

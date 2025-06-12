@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  getWellFillFromLabwareId,
   JUSTIFY_CENTER,
   LabwareRender,
   Modal,
@@ -19,10 +18,15 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
@@ -30,12 +34,15 @@ import {
 } from '/app/transformations/analysis'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
-import type { LabwareByLiquidId } from '@opentrons/components/'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LabwareInStack, StackItem } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 interface SlotDetailModalProps {
   closeModal: () => void
@@ -83,6 +90,10 @@ export const SlotDetailModal = (
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
+  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
+    labwareDefinition
+  )
+  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -218,7 +229,7 @@ export const SlotDetailModal = (
               ) : null}
             </Flex>
             <LabwareThumbnail
-              viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+              viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
               width={
                 selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'
               }

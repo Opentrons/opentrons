@@ -6,7 +6,7 @@ import {
 } from '/app/transformations/commands'
 
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -14,7 +14,7 @@ import type {
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
   labware: LoadedLabware[],
-  labwareDefinitions: Record<string, LabwareDefinition2>,
+  labwareDefinitions: Record<string, LabwareDefinition>,
   commands: RunTimeCommand[]
 ): boolean => {
   const numberOfTipracks = labware.reduce(

@@ -10,7 +10,6 @@ import { i18n } from '../../../../../assets/localization'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
-  getPipetteEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../../step-forms/selectors'
@@ -83,16 +82,6 @@ describe('StepOverflowMenu', () => {
         pipette: mockId,
       },
     })
-    vi.mocked(getPipetteEntities).mockReturnValue({
-      [mockId]: {
-        name: 'p50_single_flex',
-        spec: {} as any,
-        id: mockId,
-        tiprackLabwareDef: [],
-        tiprackDefURI: ['mockDefURI1', 'mockDefURI2'],
-        pythonName: 'mockPythonName',
-      },
-    })
   })
 
   it('renders each button and clicking them calls the action', () => {
@@ -114,7 +103,7 @@ describe('StepOverflowMenu', () => {
     screen.getByText('Delete steps')
   })
 
-  it('should not render view details button if pipette is 96-channel', () => {
+  it('should render view details button if pipette is 96-channel', () => {
     vi.mocked(getSavedStepForms).mockReturnValue({
       [moveLiquidStepId]: {
         stepType: 'moveLiquid',
@@ -122,17 +111,7 @@ describe('StepOverflowMenu', () => {
         pipette: mockId96,
       },
     })
-    vi.mocked(getPipetteEntities).mockReturnValue({
-      [mockId96]: {
-        name: 'p1000_96',
-        spec: {} as any,
-        id: mockId96,
-        tiprackLabwareDef: [],
-        tiprackDefURI: ['mockDefURI1_96'],
-        pythonName: 'mockPythonName',
-      },
-    })
     render(props)
-    expect(screen.queryByText('View details')).not.toBeInTheDocument()
+    expect(screen.getByText('View details')).toBeInTheDocument()
   })
 })

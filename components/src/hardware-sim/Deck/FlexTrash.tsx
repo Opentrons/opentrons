@@ -1,6 +1,8 @@
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
   opentrons1Trash3200MlFixedV1 as trashLabwareDef,
 } from '@opentrons/shared-data'
 
@@ -70,11 +72,10 @@ export const FlexTrash = ({
   } = deckDefinition.locations.addressableAreas[0].boundingBox
 
   // adjust for dimensions from trash definition
-  const {
-    x: xAdjustment,
-    y: yAdjustment,
-  } = trashLabwareDef.cornerOffsetFromSlot
-  const { xDimension, yDimension } = trashLabwareDef.dimensions
+  const { x: xAdjustment, y: yAdjustment } = getSchema2CornerOffsetFromSlot(
+    trashLabwareDef
+  )
+  const { xDimension, yDimension } = getSchema2Dimensions(trashLabwareDef)
 
   // rotate trash 180 degrees in column 1
   const rotateDegrees =

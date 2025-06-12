@@ -133,6 +133,7 @@ describe('createPresavedStepForm', () => {
         pauseTemperature: null,
         stepDetails: '',
         stepName: 'pause',
+        stepNumber: 0,
       })
     })
   })
@@ -235,6 +236,7 @@ describe('createPresavedStepForm', () => {
       blowout_flowRate: null,
       liquidClassesSupported: true,
       liquidClass: 'none',
+      stepNumber: 0,
     })
   })
   describe('mix step', () => {
@@ -244,6 +246,7 @@ describe('createPresavedStepForm', () => {
         id: stepId,
         pipette: 'leftPipetteId',
         stepType: 'mix',
+        stepNumber: 0,
         // default fields
         labware: null,
         nozzles: null,
@@ -292,8 +295,9 @@ describe('createPresavedStepForm', () => {
       engageHeight: null,
       magnetAction: 'engage',
       // Default values
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=disengage, when the previous magnet step is an engage', () => {
@@ -306,8 +310,9 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'engage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
+          stepNumber: 0,
         },
       },
       orderedStepIds: ['prevStepId'],
@@ -319,8 +324,9 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'disengage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
@@ -333,7 +339,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'disengage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -346,8 +352,9 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'engage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default temperature module when a Temperature step is added', () => {
@@ -359,8 +366,9 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature',
+      stepName: 'temperature module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   ;[true, false].forEach(timelineHasErrors => {
@@ -398,6 +406,7 @@ describe('createPresavedStepForm', () => {
               // TC Default fields (should all be ignored, robotState is used to populate the form)
               stepName: 'thermocycler',
               stepDetails: '',
+              stepNumber: 0,
               thermocyclerFormType: 'thermocyclerState',
               blockIsActive: false,
               blockTargetTemp: null,
@@ -436,6 +445,7 @@ describe('createPresavedStepForm', () => {
           profileTargetLidTemp: null,
           profileVolume: null,
           stepDetails: '',
+          stepNumber: 0,
           stepName: 'thermocycler',
           stepType: 'thermocycler',
           thermocyclerFormType: 'thermocyclerState',

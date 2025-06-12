@@ -3,14 +3,8 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 package_name = abr_testing
 package_version = $(call python_package_version,abr-testing,$(project_rs_default))
-wheel_file = dist/$(call python_get_wheelname,abr-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
-sdist_file = dist/$(call python_get_sdistname,abr-testing,$(project_rs_default),$(package_name))
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,abr-testing,$(project_rs_default),abr-testing)
@@ -34,10 +28,10 @@ ot_sources := $(ot_py_sources)
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
-
+wheel_file = $(call python_get_wheelname,abr-testing,$(project_rs_default),abr_testing)
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -46,45 +40,39 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:
 	$(clean_cmd)
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	rm -rf dist/*.whl
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist:
-	$(clean_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: lint
 lint:
 	$(python) -m mypy abr_testing tests
-	$(python) -m black --check abr_testing tests setup.py
-	$(python) -m flake8 abr_testing tests setup.py
+	$(python) -m black --check abr_testing tests
+	$(python) -m flake8 abr_testing tests
 
 .PHONY: format
 format:
-	$(python) -m black abr_testing tests setup.py
+	$(python) -m black abr_testing tests
 
 .PHONY: test
 test:
 	@echo "No tests yet"
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"abr_testing",,,$(version_file))
+push-no-restart-ot3: wheel Pipfile.lock
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

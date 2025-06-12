@@ -98,7 +98,11 @@ setup:
 
 .PHONY: clean
 clean:
-	pnpm exec shx rm -rf lib dist python
+	pnpm shx rm -rf lib dist python/install
+
+.PHONY: cleanall
+cleanall: clean
+	pnpm shx rm -rf python
 
 # artifacts
 #####################################################################
@@ -134,7 +138,7 @@ dist-posix: clean lib
 
 .PHONY: dist-osx
 dist-osx: clean lib
-	$(builder) --mac --x64
+	$(builder) --mac --universal
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux

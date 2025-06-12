@@ -1,9 +1,9 @@
-import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
 
 export function getSlotLabwareDefinition(
   labwareId: string,
   commands?: RunTimeCommand[]
-): LabwareDefinition2 {
+): LabwareDefinition {
   const loadLabwareCommands = commands?.filter(
     command => command.commandType === 'loadLabware'
   )

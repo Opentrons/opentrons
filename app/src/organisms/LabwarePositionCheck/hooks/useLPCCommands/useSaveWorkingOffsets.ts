@@ -20,6 +20,7 @@ export interface UseBuildOffsetsToApplyResult {
 
 export function useSaveWorkingOffsets({
   runId,
+  analytics,
 }: UseLPCCommandChildProps): UseBuildOffsetsToApplyResult {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -58,6 +59,7 @@ export function useSaveWorkingOffsets({
     ])
       .then(res => {
         setIsLoading(false)
+        analytics.reportSaveOffset(res)
 
         return res
       })

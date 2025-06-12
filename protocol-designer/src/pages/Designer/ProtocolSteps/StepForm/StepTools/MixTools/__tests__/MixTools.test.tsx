@@ -1,7 +1,11 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { MixTools } from '..'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
@@ -10,6 +14,7 @@ import {
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../../../../file-data/selectors'
 import {
   getLabwareEntities,
   getPipetteEntities,
@@ -22,15 +27,15 @@ import { SecondStepMixTools } from '../SecondStepMixTools'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')
+vi.mock('../../../../../../../file-data/selectors')
 vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
-vi.mock('../../MoveLiquidTools/hooks')
+vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -49,7 +54,6 @@ describe('MixToolFirstStep', () => {
       } as any,
       formData: {} as FormData,
       toolboxStep: 0,
-      visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
       setShowFormErrors: vi.fn(),
@@ -85,6 +89,7 @@ describe('MixToolFirstStep', () => {
     vi.mocked(LiquidClassesStepTools).mockReturnValue(
       <div>mock LiquidClassesStepTools</div>
     )
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
   })
 
   it('renders FirstStepMixTools when toolboxStep is 0', () => {
@@ -104,10 +109,18 @@ describe('MixToolFirstStep', () => {
     screen.getByText('mock SecondStepMixTools')
   })
 
-  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true', () => {
+  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true and robot is Flex', () => {
     props.toolboxStep = 1
     vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
     render(props)
     screen.getByText('mock LiquidClassesStepTools')
+  })
+
+  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true and robot is OT-2', () => {
+    props.toolboxStep = 1
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+    vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+    render(props)
+    screen.getByText('mock SecondStepMixTools')
   })
 })

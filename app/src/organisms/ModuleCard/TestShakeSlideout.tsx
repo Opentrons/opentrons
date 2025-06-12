@@ -301,6 +301,7 @@ export const TestShakeSlideout = (
             setShowModuleSetupModal(false)
           }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+          moduleModel={module.moduleModel}
         />
       )}
       <Link

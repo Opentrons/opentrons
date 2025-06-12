@@ -80,6 +80,25 @@
       "body8": "Removing quantity dropdown from all modules during the Flex setup flow to reduce deck setup conflicts",
       "body9": "All protocols now require Opentrons App version 8.3.0+ to run.",
       "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+    },
+    "liquidClassAndPythonExport": {
+      "heading": "{{version}} Release Notes",
+      "body1": "Welcome to Protocol Designer {{version}}!",
+      "body2": "We're excited to introduce support for liquid classes and exporting Python!",
+      "body3": "Additionally, improvements for the following:",
+      "body4": "Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).",
+      "body5": "During a mix, push out is set to 0 by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.",
+      "body6": "Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a tip drop location.",
+      "body7": "Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.",
+      "body8": "When adding a disposal volume, a blowout location is now required.",
+      "body9": "No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.",
+      "body10": "If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.",
+      "body11": "If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.",
+      "body12": "If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.",
+      "body13": "Successfully delete a defined liquid that has not been assigned to any location.",
+      "body14": "Display correct substep details for all transfer paths and pipettes.",
+      "body15": "All protocols now require Opentrons App version 8.5.0+ to run.",
+      "body16": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
     }
   },
   "labware_selection": {
@@ -99,7 +118,7 @@
   },
   "tip_position": {
     "title": "Tip Positioning",
-    "caption": "between {{min}} and {{max}}",
+    "caption": "Must be between {{min}} and {{max}}",
     "warning": "Tip position is close to the edge of the well and may cause collisions.",
     "radio_button": {
       "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
@@ -136,7 +155,8 @@
     },
     "errors": {
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
-      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
+      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}",
+      "GENERIC": "Enter a value within the specified range"
     },
     "field_label": "Distance from bottom of well",
     "view": {
@@ -296,9 +316,9 @@
     "now_button": "Pause protocol now",
     "later_button": "I will build a pause later",
     "redesign": {
-      "title": "Pause protocol until {{module}} is at {{temp}}˚C",
-      "body1": "Build a pause step to wait until {{module}} reaches {{temp}}˚C before continuing to the next step.",
-      "body2": "Build a pause step later if you want your protocol to proceed to the next step while the {{module}} goes to {{temp}}˚C",
+      "title": "Pause protocol until {{module}} is at {{temp}}°C",
+      "body1": "Build a pause step to wait until {{module}} reaches {{temp}}°C before continuing to the next step.",
+      "body2": "Build a pause step later if you want your protocol to proceed to the next step while the {{module}} goes to {{temp}}°C",
       "build_pause_later": "Build pause later",
       "pause_protocol": "Pause protocol"
     }

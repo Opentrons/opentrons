@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   RobotApiRequestMeta,
   RobotApiV2ErrorResponseBody,
@@ -75,7 +75,7 @@ export type VectorTuple = [number, number, number]
 export type SessionCommandData =
   | { vector: VectorTuple }
   | { hasBlock: boolean }
-  | { tiprackDefinition: LabwareDefinition2 }
+  | { tiprackDefinition: LabwareDefinition }
   | {}
 
 export interface SessionCommandParams {
@@ -326,5 +326,5 @@ export interface CalibrationLabware {
   namespace: string
   version: number
   isTiprack: boolean
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }

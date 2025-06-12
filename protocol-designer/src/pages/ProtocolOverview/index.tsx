@@ -26,7 +26,6 @@ import {
   EditInstrumentsModal,
   EditProtocolMetadataModal,
 } from '../../components/organisms'
-import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
 import {
   getEnablePythonExport,
@@ -35,6 +34,7 @@ import {
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
+import { useProtocolExportHandler } from '../../resources/hooks'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
@@ -48,12 +48,6 @@ import { ProtocolMetadata } from './ProtocolMetadata'
 import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
-import { getWarningContent } from './UnusedModalContent'
-import {
-  getUnusedEntities,
-  getUnusedStagingAreas,
-  getUnusedTrash,
-} from './utils'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
@@ -61,7 +55,7 @@ import type { ThunkDispatch } from '../../types'
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
-const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
+export const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLabware',
   'loadModule',
   'loadPipette',
@@ -92,20 +86,19 @@ export function ProtocolOverview(): JSX.Element {
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
     false
   )
-  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
-    false
-  )
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
+  const { timeline } = useSelector(fileSelectors.getRobotStateTimeline)
+  const hasCommands = timeline.length > 0
+
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
     false
   )
-  const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -126,48 +119,15 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const nonLoadCommands =
-    fileData?.commands.filter(
-      command => !LOAD_COMMANDS.includes(command.commandType)
-    ) ?? []
-  const gripperInUse =
-    fileData?.commands.find(
-      command =>
-        (command.commandType === 'moveLabware' &&
-          command.params.strategy === 'usingGripper') ||
-        command.commandType === 'absorbanceReader/closeLid' ||
-        command.commandType === 'absorbanceReader/openLid'
-    ) != null
-  const noCommands = fileData != null ? nonLoadCommands.length === 0 : true
-  const modulesWithoutStep = getUnusedEntities(
-    modulesOnDeck,
-    savedStepForms,
-    'moduleId',
-    robotType
-  )
-  const pipettesWithoutStep = getUnusedEntities(
-    initialDeckSetup.pipettes,
-    savedStepForms,
-    'pipette',
-    robotType
-  )
-  const isGripperAttached = Object.values(additionalEquipment).some(
-    equipment => equipment?.name === 'gripper'
-  )
-  const gripperWithoutStep = isGripperAttached && !gripperInUse
-
-  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    additionalEquipmentOnDeck,
-    fileData?.commands
-  )
-  const fixtureWithoutStep: Fixture = {
-    trashBin: trashBinUnused,
-    wasteChute: wasteChuteUnused,
-    stagingAreaSlots: getUnusedStagingAreas(
-      additionalEquipmentOnDeck,
-      fileData?.commands
-    ),
-  }
+  const {
+    handleExportClick,
+    exportWarningModalElement,
+  } = useProtocolExportHandler({
+    hasCommands,
+    onConfirmExport: () => {
+      dispatch(loadFileActions.saveProtocolFile())
+    },
+  })
 
   const pipettesOnDeck = Object.values(pipettes)
   const {
@@ -187,39 +147,6 @@ export function ProtocolOverview(): JSX.Element {
     },
   ]
 
-  const hasWarning =
-    noCommands ||
-    modulesWithoutStep.length > 0 ||
-    pipettesWithoutStep.length > 0 ||
-    gripperWithoutStep ||
-    fixtureWithoutStep.trashBin ||
-    fixtureWithoutStep.wasteChute ||
-    fixtureWithoutStep.stagingAreaSlots.length > 0
-
-  const warning = hasWarning
-    ? getWarningContent({
-        noCommands,
-        pipettesWithoutStep,
-        modulesWithoutStep,
-        gripperWithoutStep,
-        fixtureWithoutStep,
-        t,
-      })
-    : null
-
-  const exportWarningModal = useBlockingHint({
-    hintKey: warning?.hintKey ?? null,
-    enabled: showExportWarningModal,
-    content: warning?.content,
-    handleCancel: () => {
-      setShowExportWarningModal(false)
-    },
-    handleContinue: () => {
-      setShowExportWarningModal(false)
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
-
   return (
     <Fragment>
       {showEditMetadataModal ? (
@@ -236,7 +163,7 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {exportWarningModal}
+      {exportWarningModalElement}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
@@ -293,9 +220,7 @@ export function ProtocolOverview(): JSX.Element {
             />
             <LargeButton
               buttonText={t('export_protocol')}
-              onClick={() => {
-                setShowExportWarningModal(true)
-              }}
+              onClick={handleExportClick}
               iconName="arrow-right"
               whiteSpace={NO_WRAP}
               height="3.5rem"

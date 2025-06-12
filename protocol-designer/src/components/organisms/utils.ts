@@ -1,9 +1,10 @@
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
+  MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import { AIR, MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
 import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
 import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
@@ -14,13 +15,18 @@ import type {
   AddressableAreaName,
   CutoutId,
   DeckDefinition,
+  LabwareDefinition2,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
 } from '../../step-forms'
+import type * as wellContentsSelectors from '../../top-selectors/well-contents'
+import type { CutoutConfigExtended } from './HardwareConfigurator/AddFixtureModal'
+import type { WellContentsByNumber } from './SlotDetailModal'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -50,8 +56,7 @@ export const getSlotsWithCollisions = (
 export const getLabwareNotCompatibleWithModule = (
   moduleType: ModuleType,
   labware: AllTemporalPropertiesForTimelineFrame['labware'],
-  cutoutId: CutoutId,
-  tcSlot: string
+  cutoutId: CutoutId
 ): string | null => {
   const slot = cutoutId.split('cutout')[1]
   const isThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
@@ -59,18 +64,13 @@ export const getLabwareNotCompatibleWithModule = (
     lw.stack.includes(slot)
   )
   const isLabwareOnOtherTCSlot = isThermocycler
-    ? Object.values(labware).some(({ stack }) => stack.includes(tcSlot))
+    ? Object.values(labware).some(({ stack }) => stack.includes('A1'))
     : false
-
-  if (isLabwareOnOtherTCSlot) {
-    return tcSlot
-  } else {
-    const isCompatible =
-      labwareOnSlot != null
-        ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
-        : true
-    return isCompatible ? null : slot
-  }
+  const isCompatible =
+    labwareOnSlot != null
+      ? getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+      : true
+  return isCompatible && !isLabwareOnOtherTCSlot ? null : slot
 }
 
 export const getSlotHasLabware = (
@@ -79,6 +79,50 @@ export const getSlotHasLabware = (
 ): boolean => {
   const slot = cutoutId.split('cutout')[1]
   return Object.values(labware).some(lw => lw.stack.includes(slot))
+}
+
+export const getLabwareOnSlot = (
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId
+): LabwareDefinition2 | null => {
+  const slot = cutoutId.split('cutout')[1]
+  return Object.values(labware).find(lw => lw.stack.includes(slot))?.def ?? null
+}
+
+export const getLabwareCompatibleForEditHardware = (
+  labware: AllTemporalPropertiesForTimelineFrame['labware'],
+  cutoutId: CutoutId,
+  newModule?: CutoutConfigExtended,
+  newFixture?: CutoutConfigExtended
+): boolean => {
+  const labwareDef = getLabwareOnSlot(labware, cutoutId)
+  const labwareDefB1 = getLabwareOnSlot(labware, 'cutoutB1')
+  const moduleType =
+    newModule != null
+      ? newModule.type === 'stagingAreaAndMagneticBlock'
+        ? MAGNETIC_BLOCK_TYPE
+        : getModuleType(newModule.type as ModuleModel)
+      : null
+
+  let labwareCompatible = true
+  if (moduleType != null && moduleType === THERMOCYCLER_MODULE_TYPE) {
+    if (Object.values(labware).some(lw => lw.stack.includes('A1'))) {
+      labwareCompatible = false
+    } else if (labwareDefB1 != null) {
+      labwareCompatible = getLabwareIsCompatible(labwareDefB1, moduleType)
+    } else {
+      labwareCompatible = true
+    }
+  } else if (labwareDef != null && moduleType != null) {
+    labwareCompatible = getLabwareIsCompatible(labwareDef, moduleType)
+  } else if (
+    newFixture != null &&
+    (newFixture.type === 'wasteChute' || newFixture.type === 'trashBin') &&
+    labwareDef != null
+  ) {
+    labwareCompatible = false
+  }
+  return labwareCompatible
 }
 
 //  NOTE: used to get the next available module slot for OT-2
@@ -105,4 +149,59 @@ export const getNextAvailableModuleSlot = (
   } else {
     return null
   }
+}
+
+export const getLiquidIdsOnLabware = (
+  wellContents: ContentsByWell
+): string[] => {
+  const allLiquidIdsOnLabware =
+    wellContents != null
+      ? Object.values(wellContents)
+          .flatMap(contents => contents.groupIds)
+          ?.filter(group => group !== AIR)
+      : []
+  return Array.from(new Set(allLiquidIdsOnLabware))
+}
+
+export const getIsWellContentsEmpty = (
+  allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null,
+  labwareId: string
+): boolean => {
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[labwareId]
+      : {}
+  return wellContents != null
+    ? Object.values(wellContents).every(
+        well => Object.keys(well.ingreds).length === 0
+      )
+    : true
+}
+
+export const getVolumesPerLiquid = (
+  wellContents: ContentsByWell,
+  individualIds: string[]
+): Record<string, WellContentsByNumber> => {
+  const volumesPerLiquid: Record<string, WellContentsByNumber> = {}
+  individualIds.forEach(id => {
+    const volumeByWell: WellContentsByNumber =
+      wellContents != null
+        ? Object.values(wellContents).reduce(
+            (acc: WellContentsByNumber, contents) => {
+              const groupIndex = contents.groupIds.indexOf(id)
+              if (groupIndex !== -1) {
+                const ingred = contents.ingreds[id]
+                if (ingred?.volume != null) {
+                  acc[contents.wellName ?? 'A1'] = ingred.volume
+                }
+              }
+              return acc
+            },
+            {}
+          )
+        : {}
+
+    volumesPerLiquid[id] = volumeByWell
+  })
+  return volumesPerLiquid
 }

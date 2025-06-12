@@ -82,7 +82,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A4")`
+      `protocol.move_labware(mock_source_plate, "A4")`
     )
   })
   it('should return a moveLabware command moving to a trash bin for an ot-2', () => {
@@ -116,7 +116,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_trash_bin_1)`
+      `protocol.move_labware(mock_source_plate, mock_trash_bin_1)`
     )
   })
   it('should return a moveLabware command moving to a trash bin for flex', () => {
@@ -139,7 +139,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_trash_bin_1)`
+      `protocol.move_labware(mock_source_plate, mock_trash_bin_1)`
     )
   })
   it('should return a moveLabware command moving to a module', () => {
@@ -189,7 +189,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mock_heater_shaker_1, use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, mock_heater_shaker_1, use_gripper=True)`
     )
   })
   it('should return a moveLabware command moving to an adapter', () => {
@@ -205,7 +205,7 @@ describe('moveLabware', () => {
         ...invariantContext.labwareEntities,
         [DEST_LABWARE]: {
           def: fixtureTiprackAdapter as LabwareDefinition2,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_dest_adapter',
         } as any,
       },
     }
@@ -222,7 +222,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, mockPythonName)`
+      `protocol.move_labware(mock_source_plate, mock_dest_adapter)`
     )
   })
   it('should return a moveLabware command moving manually off-deck', () => {
@@ -245,7 +245,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, protocol_api.OFF_DECK)`
+      `protocol.move_labware(mock_source_plate, protocol_api.OFF_DECK)`
     )
   })
   it('should return a moveLabware command for manualMoveWithPause given only the required params', () => {
@@ -268,7 +268,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A1")`
+      `protocol.move_labware(mock_source_plate, "A1")`
     )
   })
   it('should return a moveLabware command for moving with a gripper given only the required params', () => {
@@ -291,7 +291,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "A1", use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, "A1", use_gripper=True)`
     )
   })
   it('should return an error for labware does not exist with bad labwareid', () => {
@@ -379,7 +379,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, "1", use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, "1", use_gripper=True)`
     )
   })
   it('should return an error for trying to move the labware to an occupied module', () => {
@@ -404,7 +404,7 @@ describe('moveLabware', () => {
           model: 'heaterShakerModuleV1',
           id: HEATER_SHAKER_ID,
           type: 'heaterShakerModuleType',
-          pythonName: 'mockpythonName',
+          pythonName: 'mock_heater_shaker',
         },
       },
       labwareEntities: {
@@ -484,7 +484,7 @@ describe('moveLabware', () => {
           id: 'labwareid',
           labwareDefURI: 'mockDefUri',
           def: aluminumBlockDef,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_alumnium_block',
         },
       },
     }
@@ -665,7 +665,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, waste_chute, use_gripper=True)`
+      `protocol.move_labware(mock_tip_rack_1, waste_chute, use_gripper=True)`
     )
   })
   it('should return a warning for if you try to move a labware with liquids into the waste chute', () => {
@@ -705,7 +705,7 @@ describe('moveLabware', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      `protocol.move_labware(mockPythonName, waste_chute, use_gripper=True)`
+      `protocol.move_labware(mock_source_plate, waste_chute, use_gripper=True)`
     )
   })
   it('should return an error when trying to move with gripper when there is no gripper', () => {
@@ -758,7 +758,10 @@ describe('moveLabware', () => {
           tiprack1Id: { A1: true },
         },
         pipettes: {
-          p10SingleId: true,
+          p10SingleId: {
+            hasTip: true,
+            tiprackURI: 'tiprackId',
+          },
         },
       },
     } as any) as RobotState

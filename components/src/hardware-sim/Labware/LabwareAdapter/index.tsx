@@ -8,7 +8,7 @@ import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
 import { OpentronsToughPCRAutoSealingLid } from './OpentronsToughPCRAutoSealingLid'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const LABWARE_ADAPTER_LOADNAME_PATHS = {
   opentrons_96_deep_well_adapter: Opentrons96DeepWellAdapter,
@@ -27,7 +27,7 @@ export const labwareAdapterLoadNames = Object.keys(
 
 export interface LabwareAdapterProps {
   labwareLoadName: LabwareAdapterLoadName
-  definition?: LabwareDefinition2
+  definition?: LabwareDefinition
   highlight?: boolean
   highlightShadow?: boolean
 }

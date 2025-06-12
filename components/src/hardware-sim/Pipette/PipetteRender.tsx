@@ -13,10 +13,10 @@ import {
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
 import { EmanatingNozzle } from './EmanatingNozzle'
 
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   pipetteName: PipetteName
   usingMetalProbe?: boolean
 }

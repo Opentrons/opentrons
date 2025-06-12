@@ -23,7 +23,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useRunStatus } from '/app/resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import { CancelingRunModal } from './CancelingRunModal'
 
@@ -62,8 +62,9 @@ export function ConfirmCancelRunModal({
       }
     },
   })
-  const runStatus = useRunStatus(runId)
   const localRobot = useSelector(getLocalRobot)
+  const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
+  const runStatus = data?.data.status
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
@@ -86,7 +87,7 @@ export function ConfirmCancelRunModal({
   }
 
   useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED) {
+    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       if (!isActiveRun) {
         dismissCurrentRun(runId)

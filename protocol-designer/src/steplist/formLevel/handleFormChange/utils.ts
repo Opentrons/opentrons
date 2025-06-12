@@ -6,7 +6,10 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   POSITION_REFERENCE_TOP,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
@@ -32,6 +35,7 @@ import type {
   AdditionalEquipmentEntities,
   LabwareEntities,
   PipetteEntities,
+  ReferenceVolumes,
 } from '@opentrons/step-generation'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type {
@@ -400,7 +404,7 @@ const getByVolumeField = (args: {
 
 const getSubmergeRetractFields = (args: {
   submergeRetractLookup: Submerge | RetractAspirate | RetractDispense
-  volume: number
+  volumes: ReferenceVolumes
   liquidHandlingAction: LiquidHandlingTab
   tipMovement: 'submerge' | 'retract'
   additionalEquipmentEntities?: AdditionalEquipmentEntities
@@ -409,7 +413,7 @@ const getSubmergeRetractFields = (args: {
 }): Record<string, any> => {
   const {
     submergeRetractLookup,
-    volume,
+    volumes,
     liquidHandlingAction,
     tipMovement,
     additionalEquipmentEntities,
@@ -436,7 +440,7 @@ const getSubmergeRetractFields = (args: {
   const airGapFields =
     'airGapByVolume' in submergeRetractLookup && !isConditioningVolumeEnabled
       ? getByVolumeField({
-          volume,
+          volume: volumes.airGap,
           byVolume: submergeRetractLookup.airGapByVolume,
           field: 'airGap',
           prefix: liquidHandlingAction,
@@ -479,7 +483,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -532,13 +536,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...aspirateFlowRateFields,
     ...aspirateOffsetFields,
     ...aspiratePositionReferenceFields,
-    aspirate_submerge_mmFromBottom: 0,
+    aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
     aspirate_submerge_x_position: 0,
     aspirate_submerge_y_position: 0,
     aspirate_submerge_speed: aspirate.submerge.speed,
     aspirate_retract_speed: aspirate.retract.speed,
-    aspirate_retract_mmFromBottom: 0,
+    aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
     aspirate_retract_x_position: 0,
     aspirate_retract_y_position: 0,
@@ -550,13 +554,13 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
-    dispense_submerge_mmFromBottom: 0,
+    dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
     dispense_submerge_x_position: 0,
     dispense_submerge_y_position: 0,
     dispense_submerge_speed: dispense.submerge.speed,
     dispense_retract_speed: dispense.retract.speed,
-    dispense_retract_mmFromBottom: 0,
+    dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_retract_position_reference: POSITION_REFERENCE_TOP,
     dispense_retract_x_position: 0,
     dispense_retract_y_position: 0,
@@ -597,7 +601,7 @@ const getNoLiquidClassValuesMix = (
     return {}
   }
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs().waterV1
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -720,13 +724,18 @@ const getLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tipRack
     )?.def ?? null
-  const byVolumeLookup = getReferenceVolumesForByVolumeInterpolation({
-    rawForm,
+  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     conditioningByVolume,
     disposalByVolume,
-  })
+    volume,
+    path: rawForm.path as PathOption,
+    numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+      [number, number]
+    >,
+  }).referenceVolumes
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
     aspiratePositionReference,
@@ -764,7 +773,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
   const conditioningFields =
-    multiDispense != null
+    multiDispense != null && byVolumeLookup.conditioning != null
       ? getByVolumeField({
           volume: byVolumeLookup.conditioning,
           byVolume: conditioningByVolume,
@@ -772,7 +781,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
   const disposalFields =
-    multiDispense != null
+    multiDispense != null && byVolumeLookup.disposal != null
       ? getByVolumeField({
           volume: byVolumeLookup.disposal,
           byVolume: disposalByVolume,
@@ -786,7 +795,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   // aspirate/dispense submerge fields
   const aspirateSubmergeFields = getSubmergeRetractFields({
     submergeRetractLookup: aspirate.submerge,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'aspirate',
     tipMovement: 'submerge',
     additionalEquipmentEntities,
@@ -796,7 +805,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
       path === 'multiDispense' && multiDispense != null
         ? multiDispense.submerge
         : singleDispense.submerge,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'dispense',
     tipMovement: 'submerge',
   })
@@ -804,7 +813,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   // aspirate/dispense retract fields
   const aspirateRetractFields = getSubmergeRetractFields({
     submergeRetractLookup: aspirate.retract,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'aspirate',
     tipMovement: 'retract',
     isConditioningVolumeEnabled,
@@ -814,7 +823,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
       path === 'multiDispense' && multiDispense != null
         ? multiDispense.retract
         : singleDispense.retract,
-    volume: Number(volume),
+    volumes: byVolumeLookup,
     liquidHandlingAction: 'dispense',
     tipMovement: 'retract',
     additionalEquipmentEntities,
@@ -953,134 +962,6 @@ const getLiquidClassValuesMix = (args: {
       : {}),
   }
   return values
-}
-
-export const getReferenceVolumesForByVolumeInterpolation = (args: {
-  rawForm: FormData
-  pipetteSpecs: PipetteV2Specs
-  tiprackDefinition: LabwareDefinition2 | null
-  conditioningByVolume: Array<[number, number]>
-  disposalByVolume: Array<[number, number]>
-}): {
-  airGap: number
-  correctionAspirate: number
-  correctionDispense: number
-  pushOut: number
-  flowRateAspirate: number
-  flowRateDispense: number
-  conditioning: number
-  disposal: number
-} => {
-  const {
-    rawForm,
-    pipetteSpecs,
-    tiprackDefinition,
-    conditioningByVolume,
-    disposalByVolume,
-  } = args
-  const { volume: rawVolume, path: rawPath, aspirate_wells } = rawForm
-  const volume = Number(rawVolume)
-  const path = rawPath as PathOption
-  const { liquids } = pipetteSpecs
-  const isInLowVolumeMode =
-    volume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const maxWorkingVolumePipette = isInLowVolumeMode
-    ? liquids.lowVolumeDefault.maxVolume
-    : liquids.default.maxVolume
-  const maxWorkingVolumeTip = tiprackDefinition?.wells.A1.totalLiquidVolume
-  const maxWorkingVolume =
-    maxWorkingVolumeTip == null
-      ? maxWorkingVolumePipette
-      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)
-  const numAspirations = Math.ceil(volume / maxWorkingVolume)
-  const minVolumeForMultiAspirateDispense = volume * 2
-  const isMultiDispenseAvailable =
-    minVolumeForMultiAspirateDispense >=
-    minVolumeForMultiAspirateDispense +
-      (linearInterpolate(
-        minVolumeForMultiAspirateDispense,
-        conditioningByVolume
-      ) ?? 0) +
-      (linearInterpolate(minVolumeForMultiAspirateDispense, disposalByVolume) ??
-        0)
-  const isMultiAspirateAvailable =
-    maxWorkingVolume > minVolumeForMultiAspirateDispense
-
-  const getTotalVolumeForMultiDispense = (
-    targetVol: number,
-    includeConditioning: boolean = true
-  ): number => {
-    const interpolatedConditioningVolume =
-      linearInterpolate(targetVol, conditioningByVolume) ?? 0
-    const interpolatedDisposalVolume =
-      linearInterpolate(targetVol, disposalByVolume) ?? 0
-    return (
-      targetVol +
-      (includeConditioning ? interpolatedConditioningVolume : 0) +
-      interpolatedDisposalVolume
-    )
-  }
-
-  // early return if multiAspirate/multiDispense cannot be accommodated
-  if (
-    path === 'single' ||
-    (path === 'multiDispense' && !isMultiDispenseAvailable) ||
-    (path === 'multiAspirate' && !isMultiAspirateAvailable)
-  ) {
-    const volumePerAspiration = volume / numAspirations
-    return {
-      airGap: volumePerAspiration,
-      correctionAspirate: volumePerAspiration,
-      correctionDispense: volumePerAspiration,
-      pushOut: volumePerAspiration,
-      flowRateAspirate: volumePerAspiration,
-      flowRateDispense: volumePerAspiration,
-      conditioning: 0,
-      disposal: 0,
-    }
-  }
-
-  if (path === 'multiDispense') {
-    let totalVolumeForMultiDispense: number = 0
-    for (let i = 0; i < aspirate_wells.length; i++) {
-      const next = getTotalVolumeForMultiDispense((i + 1) * volume)
-      if (next > maxWorkingVolume) {
-        break
-      } else {
-        totalVolumeForMultiDispense = (i + 1) * volume
-      }
-    }
-    return {
-      airGap: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense,
-        false
-      ),
-      correctionAspirate: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense
-      ),
-      correctionDispense: volume,
-      pushOut: volume,
-      conditioning: totalVolumeForMultiDispense,
-      disposal: totalVolumeForMultiDispense,
-      flowRateAspirate: getTotalVolumeForMultiDispense(
-        totalVolumeForMultiDispense
-      ),
-      flowRateDispense: volume,
-    }
-  }
-  // path is valid multiAspirate
-  const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
-  const volumeTotalAspiration = maxSourcesPerAspiration * volume
-  return {
-    airGap: volumeTotalAspiration,
-    correctionAspirate: volumeTotalAspiration,
-    correctionDispense: volumeTotalAspiration,
-    pushOut: volumeTotalAspiration,
-    flowRateAspirate: volume,
-    flowRateDispense: volumeTotalAspiration,
-    conditioning: volumeTotalAspiration,
-    disposal: volumeTotalAspiration,
-  }
 }
 
 export const getLiquidClassesValues = (args: {

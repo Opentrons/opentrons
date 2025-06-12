@@ -13,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  getLabwareInfoByLiquidId,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -44,8 +43,11 @@ import {
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
 import {
+  getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
   getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
 } from '/app/transformations/commands'
 
 import { LabwareMapView } from './LabwareMapView'
@@ -54,15 +56,14 @@ import { SetupLabwareStackView } from './SetupLabwareStackView'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
+  LabwareByLiquidId,
   LabwareInStack,
-  ModuleInStack,
   StackItem,
 } from '/app/transformations/commands'
 import type { SetupScreens } from '../types'
@@ -106,10 +107,11 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
+  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    .filter(([key, value]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
     ? startingDeck.offDeck
     : null
 
@@ -178,7 +180,6 @@ export function ProtocolSetupLabware({
             {showMapView ? (
               <LabwareMapView
                 mostRecentAnalysis={mostRecentAnalysis}
-                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
                 startingDeck={startingDeck}
                 labwareByLiquidId={labwareByLiquidId}
                 handleLabwareClick={setSelectedLabwareStack}
@@ -417,9 +418,7 @@ function RowLabware({
   onClick,
   labwareByLiquidId,
 }: RowLabwareProps): JSX.Element | null {
-  const moduleInStack = stackedItems.find(
-    (item): item is ModuleInStack => 'moduleModel' in item
-  )
+  const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
@@ -463,12 +462,12 @@ function RowLabware({
       type="noActive"
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      gridGap={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
       onClick={() => {
         onClick([slotName, labwareInStack])
       }}
     >
-      <Flex gridGap={SPACING.spacing4} width="7.6875rem">
+      <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
         {matchedModule != null ? (
           <DeckInfoLabel
@@ -482,7 +481,7 @@ function RowLabware({
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
-        width="75%"
+        width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           {labwareLiquidRenderInfo.map((labware, index) => (

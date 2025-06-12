@@ -132,6 +132,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
 
   // this labware has a lip
   'ev_resin_tips_flex_96_labware/1.json': standard96WellNames,
+  'ibidi_96_square_well_plate_300ul/1.json': standard96WellNames,
 
   // Presumably a bug. Fixed in v3 of this labware.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),
@@ -149,7 +150,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames,
   'opentrons_24_tuberack_nest_1.5ml_screwcap/2.json': standard24WellNames,
   'opentrons_24_tuberack_nest_2ml_screwcap/2.json': standard24WellNames,
-  'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12),
+  'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12), // Fixed in v3 of this labware.
   'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4),
   'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames,
 }
@@ -310,7 +311,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
-        'agilent_1_reservoir_290ml/2',
+        'agilent_1_reservoir_290ml/2', // Fixed in v3 of this labware.
         'corning_24_wellplate_3.4ml_flat/3',
         'corning_6_wellplate_16.8ml_flat/3',
         'corning_96_wellplate_360ul_flat/3',

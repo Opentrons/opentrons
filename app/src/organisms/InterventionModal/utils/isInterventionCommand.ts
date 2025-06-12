@@ -8,6 +8,8 @@ export function isInterventionCommand(
     command.commandType === 'pause' ||
     command.commandType === 'waitForResume' ||
     (command.commandType === 'moveLabware' &&
-      command.params.strategy === 'manualMoveWithPause')
+      command.params.strategy === 'manualMoveWithPause') ||
+    command.commandType === 'flexStacker/empty' ||
+    command.commandType === 'flexStacker/fill'
   )
 }

@@ -28,19 +28,29 @@ export function constructInvariantContextFromRunCommands(
     (acc: InvariantContext, command: RunTimeCommand) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
         const result = command.result
-        const labwareEntities: LabwareEntities = {
-          ...acc.labwareEntities,
-          [result.labwareId]: {
-            id: result.labwareId,
-            labwareDefURI: getLabwareDefURI(result.definition),
-            def: result.definition,
-            //  ProtocolTimelineScrubber won't need access to pythonNames
-            pythonName: 'n/a',
-          },
-        }
-        return {
-          ...acc,
-          labwareEntities,
+
+        if (result.definition.schemaVersion === 2) {
+          const labwareEntities: LabwareEntities = {
+            ...acc.labwareEntities,
+            [result.labwareId]: {
+              id: result.labwareId,
+              labwareDefURI: getLabwareDefURI(result.definition),
+              def: result.definition,
+              //  ProtocolTimelineScrubber won't need access to pythonNames
+              pythonName: 'n/a',
+            },
+          }
+          return {
+            ...acc,
+            labwareEntities,
+          }
+        } else {
+          // todo(mm, 2025-05-16):
+          // loadLabware commands from the backend can have schema 3 labware definitions.
+          // step-generation, and this function by extension, are not prepared to handle
+          // schema 3 yet. Just ignore those definitions for now.
+          // See also the loadPipette handling, below.
+          return acc
         }
       } else if (
         command.commandType === 'loadModule' &&
@@ -79,10 +89,11 @@ export function constructInvariantContextFromRunCommands(
               c.result.labwareId === labwareId
           ) ?? null
 
-        const tiprackLabwareDef =
-          matchingCommand != null && matchingCommand.result != null
-            ? matchingCommand.result.definition ?? null
-            : null
+        let tiprackLabwareDef = matchingCommand?.result?.definition ?? null
+        // We're not prepared to handle labware schema 3 yet. See the todo comment
+        // in the loadLabware handling, above.
+        if (tiprackLabwareDef?.schemaVersion === 3) tiprackLabwareDef = null
+
         const specs: any = getPipetteSpecsV2(command.params.pipetteName)
 
         const pipetteEntities: PipetteEntities = {

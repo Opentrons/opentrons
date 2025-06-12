@@ -12,19 +12,10 @@ SHX := npx shx
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,system-server,$(project_rs_default),system_server,$(BUILD_NUMBER))
-
-# Find the version of the sdist from git using a helper script. We
-# use python here so we can use the same version normalization that will be
-# used to create the sdist.
-sdist_file = $(call python_get_sdistname,system-server,$(project_rs_default),system_server)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,system-server,$(project_rs_default),system_server)
@@ -58,7 +49,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
@@ -75,29 +66,23 @@ format:
 	$(python) -m black system_server tests
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
-wheel: setup.py $(ot_sources)
-	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist: clean
-	$(python) setup.py sdist
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+wheel: clean
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-system-server.service)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-system-server)
 
 .PHONY: push-ot3
-push-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server,,,$(version_file))
+push-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-system-server,system_server/)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-system-server)
 
 .PHONY: dev

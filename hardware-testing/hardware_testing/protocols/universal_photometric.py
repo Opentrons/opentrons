@@ -1,13 +1,11 @@
 """Universal photometric test."""
-import os
 from typing import Tuple
 
 from opentrons import protocol_api
-from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
-from opentrons_shared_data.load import get_shared_data_root
+from opentrons.types import Mount
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
-requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
@@ -207,7 +205,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "NEST 290mL", "value": "nest_1_reservoir_290ml"},
             {"display_name": "None", "value": "none"},
         ],
-        default="nest_1_reservoir_195ml",
+        default="nest_1_reservoir_290ml",
     )
     parameters.add_str(
         variable_name="destination_labware_loadname",
@@ -232,75 +230,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         description=("Use LLD to detect liquid height."),
         default=True,
     )
-
-
-def _find_latest_labware_version(loadname: str) -> int:
-    latest = sorted(
-        os.listdir(f"{get_shared_data_root()}/labware/definitions/3/{loadname}/")
-    )[-1]
-    return int(latest[0])
-
-
-def _get_height_after_liquid_handling(
-    labware: protocol_api.Labware,
-    height_before: float,
-    volume: float,
-) -> float:
-    """Get height after liquid handling fr 96 channel pipetting."""
-    well_core = labware._core.get_well_core("A1")
-    geometry = well_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    labware_id = well_core.labware_id  # type: ignore [attr-defined]
-    well_name = well_core._name  # type: ignore [attr-defined]
-
-    try:
-        return geometry.get_well_height_after_volume(
-            labware_id=labware_id,
-            well_name=well_name,
-            initial_height=height_before,
-            volume=volume,
-        )
-    except InvalidLiquidHeightFound:
-        raise ValueError(f"called with height before = {height_before} vol = {volume}")
-
-
-def _get_well_volume_at_height(
-    labware: protocol_api.Labware,
-    height: float,
-) -> float:
-    well_core = labware._core.get_well_core("A1")
-    geometry = well_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    labware_id = well_core.labware_id  # type: ignore [attr-defined]
-    well_name = well_core._name  # type: ignore [attr-defined]
-
-    return geometry.get_well_volume_at_height(
-        labware_id=labware_id,
-        well_name=well_name,
-        height=height,
-    )
-
-
-def _get_well_height_at_volume(
-    labware: protocol_api.Labware,
-    volume: float,
-) -> float:
-    well_core = labware._core.get_well_core("A1")
-    geometry = well_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    labware_id = well_core.labware_id  # type: ignore [attr-defined]
-    well_name = well_core._name  # type: ignore [attr-defined]
-
-    return geometry.get_well_height_at_volume(
-        labware_id=labware_id,
-        well_name=well_name,
-        volume=volume,
-    )
-
-
-def _get_current_liquid_height(labware: protocol_api.Labware) -> float:
-    source_core = labware._core.get_well_core("A1")
-    source_core_geometry = source_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    source_labware_id = source_core._labware_id  # type: ignore [attr-defined]
-    source_well_name = source_core._name  # type: ignore [attr-defined]
-    return source_core_geometry.get_meniscus_height(source_labware_id, source_well_name)
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
@@ -328,14 +257,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         tip_racks=tipracks,
     )
 
-    # dye source
-    src_labware_version = _find_latest_labware_version(
-        loadname=ctx.params.reservoir_labware_loadname  # type: ignore [attr-defined]
-    )
     dye_source = ctx.load_labware(
         ctx.params.reservoir_labware_loadname,  # type: ignore [attr-defined]
         "D2",
-        version=src_labware_version,  # type: ignore [attr-defined]
     )
     dye = ctx.define_liquid(
         name="Dye",
@@ -345,24 +269,17 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
     if not ctx.params.lld:  # type: ignore [attr-defined]
         dye_source["A1"].load_liquid(dye, ctx.params.dye_volume)  # type: ignore [attr-defined]
 
-    # destination plate
-    plate_labware_version = _find_latest_labware_version(
-        loadname=ctx.params.destination_labware_loadname  # type: ignore [attr-defined]
-    )
     plate = ctx.load_labware(
         ctx.params.destination_labware_loadname,  # type: ignore [attr-defined]
         location="D3",
-        version=plate_labware_version,
     )
     diluent = ctx.define_liquid(
         name="Diluent",
         description="Food Coloring",
         display_color="#FE0000",
     )
-    diluent_volume = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
-    dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
-    def _validate_dye_liquid_height() -> float:
+    def _validate_dye_liquid_height() -> None:
 
         liquid_height_valid = False
         retrying = False
@@ -375,11 +292,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 # try again.
                 pip.detect_liquid_presence(dye_source["A1"])
 
-            src_liquid_height = _get_current_liquid_height(dye_source)
+            actual_starting_dye_volume = dye_source["A1"].current_liquid_volume()
 
-            actual_starting_dye_volume = _get_well_volume_at_height(
-                labware=dye_source, height=src_liquid_height
-            )
             needed_starting_dye_volume = (
                 96
                 * ctx.params.cycles  # type: ignore [attr-defined]
@@ -390,9 +304,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 liquid_height_valid = True
             else:
                 pip._retract()
+                rounded = round(actual_starting_dye_volume, 2)  # type: ignore[arg-type]
                 ctx.pause(
                     f"Need {round(needed_starting_dye_volume, 2)} uL dye to start. \
-                     Only {round(actual_starting_dye_volume, 2)} uL detected. Refill and try again."
+                     Only {rounded} uL detected. Refill and try again."
                 )
                 retrying = True
         pip._retract()
@@ -401,7 +316,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             pip._retract()
             ctx.pause("Replace tip rack.")
             pip.pick_up_tip(tips["A1"])
-        return src_liquid_height
 
     def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
         if ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
@@ -409,7 +323,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             dispense_submerge_speed = 50
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
-            if not ctx.is_simulating:  # type: ignore [truthy-function]
+            if not ctx.is_simulating():
                 from hardware_testing.gravimetric.liquid_class.defaults import (
                     get_liquid_class,
                 )
@@ -449,38 +363,28 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         dispense_exit_speed,
         set_push_out,
     ) = _set_pipettte_motion_settings()
-    current_src_volume = ctx.params.dye_volume  # type: ignore [attr-defined]
-    current_plate_volume = 0
     for i in range(ctx.params.cycles):  # type: ignore [attr-defined]
         tips = _get_tiprack(i)
         pip.pick_up_tip(tips["A1"])
 
         if i == 0:
-            source_liquid_height = _validate_dye_liquid_height()
-        else:
-            source_liquid_height = _get_well_height_at_volume(
-                labware=dye_source, volume=current_src_volume
-            )
-        current_src_volume = _get_well_volume_at_height(
-            labware=dye_source, height=source_liquid_height
-        )
-        src_volume_after_aspirate = (
-            current_src_volume
-            - 96 * ctx.params.target_volume  # type: ignore [attr-defined]
-        )
+            _validate_dye_liquid_height()
+
         aspirate_volume = (
             ctx.params.target_volume  # type: ignore [attr-defined]
             + ctx.params.conditioning_volume  # type: ignore [attr-defined]
         )
         aspirate_pos = (
-            _get_well_height_at_volume(
-                labware=dye_source, volume=src_volume_after_aspirate
+            dye_source["A1"].estimate_liquid_height_after_pipetting(
+                Mount.LEFT, -1 * ctx.params.target_volume  # type: ignore [attr-defined]
             )
             - ctx.params.asp_sub_depth  # type: ignore [attr-defined]
         )
         # Move above reservoir
         pip.move_to(location=dye_source["A1"].top())
         # Move to aspirate position at aspirate submerge speed
+        if ctx.is_simulating():
+            aspirate_pos = 0.1
         pip.move_to(
             location=dye_source["A1"].bottom(aspirate_pos),
             speed=aspirate_submerge_speed,
@@ -492,7 +396,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             volume=aspirate_volume,
             location=None,
         )
-        current_src_volume = src_volume_after_aspirate
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]
             pip.dispense(
@@ -510,7 +413,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         if ctx.params.pause_after_asp:  # type: ignore [attr-defined]
             ctx.pause("Inspect for dropouts.")
         # we'll always end up with 200 uL after dispensing
-        dispense_pos = _get_well_height_at_volume(labware=plate, volume=200)
+        prep_vol = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
+        plate.load_liquid(plate.wells(), prep_vol, diluent)
+        dispense_pos = plate["A1"].estimate_liquid_height_after_pipetting(
+            Mount.LEFT, ctx.params.target_volume  # type: ignore [attr-defined]
+        )
 
         # note: would probably be good to add a needed dead volume in this comparison
         dispense_submerge_depth = ctx.params.disp_sub_depth  # type: ignore [attr-defined]
@@ -524,7 +431,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         pip.move_to(location=plate["A1"].top())
         # Move to dispense position at dispense submerge speed
         pip.move_to(
-            location=plate["A1"].bottom(dispense_pos),
+            location=plate["A1"].bottom(dispense_pos),  # type: ignore [arg-type]
             speed=dispense_submerge_speed,
         )
         # Dispense
@@ -533,7 +440,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             location=None,
             push_out=set_push_out,  # type: ignore [attr-defined]
         )
-        current_plate_volume += ctx.params.target_volume  # type: ignore [attr-defined]
         # Exit liquid from dispense position at dispense exit speed
         blow_out_pos = plate["A1"].bottom(
             dispense_pos + ctx.params.disp_sub_depth + 5  # type: ignore [attr-defined]

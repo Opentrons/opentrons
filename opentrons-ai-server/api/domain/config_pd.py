@@ -84,7 +84,7 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
 8. To use correct load names, pipettes, modules, please look at <PD-LOAD-NAMES> tags in <DOCUMENTS>
 
 9. Common errors to avoid
-    - If the prompt does not contain liquid definition, please keep `ingredients`, `ingredLocations` and `liquids` empty.
+    - If the prompt does not contain liquid definition, please keep `ingredients` and `ingredLocations` empty.
     - If user specifies the number of steps explicitly, please generate such number of steps - not more.
     - Use V2 not V1 for the following thermocyclerModuleV2, temperatureModuleV2.
     - For PCR protocols, follow the profile steps strictly as mentioned in the description
@@ -100,27 +100,38 @@ Please refer to <TIP_HANDLING> in <DOCUMENTS>
     - Unless otherwise specified, when a moveLiquid step is used, the trash bin should be specified as
       `"trashBinLocationUpdate": "trashbin-1": "cutout12" ` in the `__INITIAL_DECK_SETUP_STEP__`.
       Correspondingly, in the moveLiquid step, the `"dropTip_location"` field must be specified as
-      `"dropTip_location": "trashbin-1"`, not `"dropTip_location": "trashId"`.
+      `"dropTip_location": "trashbin-1"` where `trashbin-1` is the ID of the trash bin,
+      not random name like`"dropTip_location": "trashId"`.
 
 10. Steptype rules
     - if thermocycler is used, then it must be opened before transfer liquid.
       - Wrong: moveLiquid, moveLiquid, thermocycler
       - Correct: thermocycler (open), moveLiquid, moveLiquid, thermocycler
+      The following parameters behave differently depending on single channel pipette or multi-chunnel pipette.
 
-<LIMITATIONS>
-There are cases where OpentronsAI cannot generate JSON protocol.
+11. 1) Single channel pipette: they can accept individual wells like 'A1','B3', 'F4'
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "B1", "A1", "H1"]
+    "dispense_wells" = [ "C1", "D1", "A1"]
+    ```
+    2) Multi-channel pipette: they only accept Row A's wells eg., A1, A2, and so on.
+    For example, to refer to all wells in the first
+    column we only say "A1". Robot automatically figures out the remainig wells since multi-channel
+    pipette have access to all wells in the column at the same time.
+    Eg.,
+    ```json
+    "aspirate_wells" = [ "A1"]  # in this case, robot will aspirate from all wells in the first column
+    "dispense_wells" = [ "A1"]  # in this case, robot will dispense to all wells in the first column
+    ```
+12. <Dealing  with unknown labware>
+ - If user specifies a labware that is not in the <DOCUMENTS>, please ask for clarification. Do not generate a protocol.
+ - If users states that the labware is custom, and use it anyway you may go ahead and use it.
 
-- No support for Runtime Parameters
-- No Conditional statements
-- No loop
-- No Partial tip pickup
-
-If users asks for any of the above, please reply with the following tag:
-<LIMITATION_REPLY>
-"[REASON as above] is not supported. Please try again. Thanks."
-</LIMITATION_REPLY>
-
-</LIMITATIONS>
+13. Please pay extra attention to the additional notes in <DOCUMENTS> for example thermocycler temperature
+ranges: Block: 4-99°C, Lid: 37-110°C, otherwise PD throws an error. Another example, after opening thermocycler,
+we may perform a step. But we need to close it before executing a thermocycler profile. For example,
+Open, Close and Incubate constitute three thermocycler steps.
 
 Remember to use only the information provided in the <DOCUMENTS>.
 Do not introduce any external information or assumptions.
@@ -131,14 +142,37 @@ Here are the inputs you will work with:
 {USER_PROMPT}
 </USER_PROMPT>
 
-Please put your thinking in <thinking> tags:
-<thinking>
-thinking steps and reasons
-</thinking>
+
+The output format instructions are as follows.
+Make sure to put all outputs into respective tags which are requred:
+- <THINKING>
+- <PD_JSON>
+- <COMMENTS>
+
+Please put your thinking in <THINKING> tags:
+<THINKING>
+[thinking steps and reasons]
+</THINKING>
 
 Please put the generated protocol inside:
-<pd_json>
-# protocol goes here
-</pd_json>
+<PD_JSON>
+[protocol goes here]
+</PD_JSON>
+
+Please put all other comments in <comments> tags:
+<COMMENTS>
+[comments]
+[labware related comments]
+[There are cases where OpentronsAI cannot generate JSON protocol.
+    - No support for Runtime Parameters
+    - No Conditional statements
+    - No loop
+    - No Partial tip pickup
+If users asks for any of the above, please reply with the following tag:
+"[REASON as above] is not supported or something similar. Please try again. Thanks."
+]
+</COMMENTS>
+
+Do not put any other text outside of the tags.
 
 """

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { getWellRangeForLiquidLabwarePair } from '@opentrons/shared-data'
+
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
@@ -7,7 +9,6 @@ import {
   getTotalVolumePerLiquidLabwarePair,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,
-  getWellRangeForLiquidLabwarePair,
 } from '../liquids'
 
 import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'

@@ -198,7 +198,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
 
   return (
     <>
-      {/* TODO: update this modal */}
       {showConfirmationDoubleClick && (
         <ConfirmDeleteModal
           modalType={getModalType()}
@@ -206,7 +205,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
           onCancelClick={cancelDoubleClick}
         />
       )}
-      {/* TODO: update this modal */}
       {showConfirmation && (
         <ConfirmDeleteModal
           modalType={getModalType()}

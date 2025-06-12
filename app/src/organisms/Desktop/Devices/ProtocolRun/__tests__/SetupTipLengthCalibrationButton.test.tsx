@@ -16,7 +16,7 @@ import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtu
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components/src/hooks')
 vi.mock('/app/organisms/RunTimeControl/hooks')
@@ -38,7 +38,7 @@ describe('SetupTipLengthCalibrationButton', () => {
     robotName = ROBOT_NAME,
     runId = RUN_ID,
     hasCalibrated = false,
-    tipRackDefinition = fixtureTiprack300ul as LabwareDefinition2,
+    tipRackDefinition = fixtureTiprack300ul as LabwareDefinition,
     isExtendedPipOffset = false,
   }: Partial<ComponentProps<typeof SetupTipLengthCalibrationButton>> = {}) => {
     return renderWithProviders(

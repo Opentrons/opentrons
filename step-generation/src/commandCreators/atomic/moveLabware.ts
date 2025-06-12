@@ -60,9 +60,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     prevRobotState.liquidState != null
       ? getLabwareHasLiquid(prevRobotState.liquidState, labwareId)
       : false
-  const hasTipOnPipettes = Object.values(
-    prevRobotState.tipState.pipettes
-  ).includes(true)
+  const hasTipOnPipettes = Object.values(prevRobotState.tipState.pipettes).some(
+    ({ hasTip }) => hasTip
+  )
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
   const warnings: CommandCreatorWarning[] = []
@@ -109,7 +109,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     })
   )
   const hasMultipleObjectsInSameSlot =
-    largestStackLoadnames?.length > 0 && !isStackingAllowed
+    largestStackLoadnames?.length > 0 &&
+    !isStackingAllowed &&
+    !newLocationInWasteChute
 
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(

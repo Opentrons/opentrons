@@ -186,11 +186,12 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._core.get_minimum_liquid_sense_height()
 
     @requires_version(2, 0)
-    def aspirate(
+    def aspirate(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -227,6 +228,9 @@ class InstrumentContext(publisher.CommandPublisher):
                      <flow_rate>`. If not specified, defaults to 1.0. See
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
+        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
+                          ``rate`` must not be set.
+        :type flow_rate: float
         :returns: This instance.
 
         .. note::
@@ -236,10 +240,25 @@ class InstrumentContext(publisher.CommandPublisher):
             ``location``, specify it as a keyword argument:
             ``pipette.aspirate(location=plate['A1'])``
 
+        .. versionchanged:: 2.24
+            Added the ``flow_rate`` parameter.
         """
+        if flow_rate is not None:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError("rate must not be set if flow_rate is specified")
+            rate = flow_rate / self._core.get_aspirate_flow_rate()
+        else:
+            flow_rate = self._core.get_aspirate_flow_rate(rate)
+
         _log.debug(
-            "aspirate {} from {} at {}".format(
-                volume, location if location else "current position", rate
+            "aspirate {} from {} at {} µL/s".format(
+                volume, location if location else "current position", flow_rate
             )
         )
 
@@ -258,7 +277,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             raise ValueError(
                 "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
             )
@@ -276,7 +295,6 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_available_volume() if volume is None else volume
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
-        flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         if (
             self.api_version >= APIVersion(2, 20)
@@ -312,7 +330,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def dispense(
+    def dispense(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[
@@ -320,6 +338,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense liquid from a pipette tip.
@@ -376,14 +395,18 @@ class InstrumentContext(publisher.CommandPublisher):
                      <flow_rate>`. If not specified, defaults to 1.0. See
                      :ref:`new-plunger-flow-rates`.
         :type rate: float
+
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
 
                          When not specified or set to ``None``, the plunger moves by a non-zero default amount.
 
-
                          For a table of default values, see :ref:`push-out-dispense`.
         :type push_out: float
+
+        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
+                          ``rate`` must not be set.
+        :type flow_rate: float
 
         :returns: This instance.
 
@@ -399,6 +422,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.17
             Behavior of the ``volume`` parameter.
+
+        .. versionchanged:: 2.24
+            Added the ``flow_rate`` parameter.
+
+        .. versionchanged:: 2.24
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -406,13 +436,27 @@ class InstrumentContext(publisher.CommandPublisher):
                 until_version="2.15",
                 current_version=f"{self.api_version}",
             )
+
+        if flow_rate is not None:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError("rate must not be set if flow_rate is specified")
+            rate = flow_rate / self._core.get_dispense_flow_rate()
+        else:
+            flow_rate = self._core.get_dispense_flow_rate(rate)
+
         _log.debug(
-            "dispense {} from {} at {}".format(
-                volume, location if location else "current position", rate
+            "dispense {} from {} at {} µL/s".format(
+                volume, location if location else "current position", flow_rate
             )
         )
-        last_location = self._get_last_location_by_api_version()
 
+        last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
                 location=location, last_location=last_location
@@ -430,15 +474,13 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_current_volume() if not volume else volume
 
-        flow_rate = self._core.get_dispense_flow_rate(rate)
-
-        if isinstance(target, (TrashBin, WasteChute)):
+        if isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.dispense_in_disposal_location(
                     instrument=self,
                     volume=c_vol,
-                    location=target,
+                    location=target.location,
                     rate=rate,
                     flow_rate=flow_rate,
                 ),
@@ -446,10 +488,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 self._core.dispense(
                     volume=c_vol,
                     rate=rate,
-                    location=target,
+                    location=target.location,
                     well_core=None,
                     flow_rate=flow_rate,
-                    in_place=False,
+                    in_place=target.in_place,
                     push_out=push_out,
                     meniscus_tracking=None,
                 )
@@ -496,6 +538,8 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
         final_push_out: Optional[float] = None,
@@ -523,6 +567,10 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
+        :param aspirate_flow_rate: The flow rate for each aspirate in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
+        :param dispense_flow_rate: The flow rate for each dispense in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
         :param final_push_out: How much to push out after the final mix repetition. The
@@ -542,7 +590,8 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         .. versionchanged:: 2.24
-            Adds the ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
+            Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``,
+            ``dispense_delay``, and ``final_push_out`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -557,6 +606,28 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
 
+        if aspirate_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="aspirate_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if aspirate_flow_rate is specified"
+                )
+        if dispense_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="dispense_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if dispense_flow_rate is specified"
+                )
         if aspirate_delay and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="aspirate_delay",
@@ -588,16 +659,14 @@ class InstrumentContext(publisher.CommandPublisher):
         def aspirate_with_delay(
             location: Optional[types.Location | labware.Well],
         ) -> None:
-            self.aspirate(volume, location, rate)
+            self.aspirate(volume, location, rate, flow_rate=aspirate_flow_rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
-            # protocol_api_old/test_context.py does not allow push_out at all, even if
-            # it's set to None, so we have to hide the argument to make the test pass.
-            # I don't know if the test is even valid, but I'm afraid to change the test.
-            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
-            self.dispense(volume, None, rate, **dispense_kwargs)
+            self.dispense(
+                volume, None, rate, flow_rate=dispense_flow_rate, push_out=push_out
+            )
             if dispense_delay:
                 delay_with_publish(dispense_delay)
 
@@ -656,6 +725,10 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
+
+        .. versionchanged:: 2.24
+            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
+            into a trash bin or waste chute.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -696,17 +769,17 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
-        elif isinstance(target, (TrashBin, WasteChute)):
+        elif isinstance(target, validation.DisposalTarget):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.blow_out_in_disposal_location(
-                    instrument=self, location=target
+                    instrument=self, location=target.location
                 ),
             ):
                 self._core.blow_out(
-                    location=target,
+                    location=target.location,
                     well_core=None,
-                    in_place=False,
+                    in_place=target.in_place,
                 )
             return self
 
@@ -793,8 +866,12 @@ class InstrumentContext(publisher.CommandPublisher):
         # If location is a valid well, move to the well first
         if location is None:
             last_location = self._protocol_core.get_last_location()
-            if not last_location:
-                raise RuntimeError("No valid current location cache present")
+            if last_location is None or isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for touch tip."
+                )
             parent_labware, well = last_location.labware.get_parent_labware_and_well()
             if not well or not parent_labware:
                 raise RuntimeError(
@@ -843,8 +920,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
-    def air_gap(
-        self, volume: Optional[float] = None, height: Optional[float] = None
+    def air_gap(  # noqa: C901
+        self,
+        volume: Optional[float] = None,
+        height: Optional[float] = None,
+        in_place: Optional[bool] = None,
+        rate: Optional[float] = None,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw air into the pipette's tip at the current well.
@@ -859,12 +941,27 @@ class InstrumentContext(publisher.CommandPublisher):
                        the air gap. The default is 5 mm above the current well.
         :type height: float
 
+        :param in_place: Air gap at the pipette's current position, without moving to
+                         some height above the well. If ``in_place`` is specified,
+                         ``height`` must be unset.
+        :type in_place: bool
+
+        :param rate: A multiplier for the default flow rate of the pipette. Calculated
+                     as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
+                     <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
+                     will aspirate at a rate of 1.0 * InstrumentContext.flow_rate.aspirate. See
+                     :ref:`new-plunger-flow-rates`.
+        :type rate: float
+
+        :param flow_rate: The rate, in µL/s, at which the pipette will draw in air.
+        :type flow_rate: float
+
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
-        :raises RuntimeError: If location cache is ``None``. This should happen if
-                              ``air_gap()`` is called without first calling a method
-                              that takes a location (e.g., :py:meth:`.aspirate`,
-                              :py:meth:`dispense`)
+        :raises RuntimeError: If location cache is ``None`` and the air gap is not
+                              ``in_place``. This would happen if ``air_gap()`` is called
+                              without first calling a method that takes a location (e.g.,
+                              :py:meth:`.aspirate`, :py:meth:`dispense`)
 
         :returns: This instance.
 
@@ -882,22 +979,75 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.22
             No longer implemented as an aspirate.
+        .. versionchanged:: 2.24
+            Added the ``in_place`` option.
+        .. versionchanged:: 2.24
+            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
+            both are unspecified then ``rate`` is by default set to 1.0.
+            Can air gap over a trash bin or waste chute.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
 
-        if height is None:
-            height = 5
-        loc = self._protocol_core.get_last_location()
-        if not loc or not loc.labware.is_well:
-            raise RuntimeError("No previous Well cached to perform air gap")
-        target = loc.labware.as_well().top(height)
-        self.move_to(target, publish=False)
+        if rate is not None and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="rate",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        if flow_rate is not None and self.api_version < APIVersion(2, 24):
+            raise APIVersionError(
+                api_element="flow_rate",
+                until_version="2.24",
+                current_version=f"{self._api_version}",
+            )
+
+        if flow_rate is not None and rate is not None:
+            raise ValueError("Cannot define both flow_rate and rate.")
+
+        if in_place:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="in_place",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if height is not None:
+                raise ValueError("height must be unset if air gapping in_place")
+        else:
+            if height is None:
+                height = 5
+            last_location = self._protocol_core.get_last_location()
+            if self.api_version < APIVersion(2, 24) and isinstance(
+                last_location, (TrashBin, WasteChute)
+            ):
+                last_location = None
+            if last_location is None or (
+                isinstance(last_location, types.Location)
+                and not last_location.labware.is_well
+            ):
+                raise RuntimeError(
+                    f"Cached location of {last_location} is not valid for air gap."
+                )
+            target: Union[types.Location, TrashBin, WasteChute]
+            if isinstance(last_location, types.Location):
+                target = last_location.labware.as_well().top(height)
+            else:
+                target = last_location.top(height)
+            self.move_to(target, publish=False)
+
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
             self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
-            flow_rate = self._core.get_aspirate_flow_rate()
-            self._core.air_gap_in_place(c_vol, flow_rate)
+            if flow_rate is not None:
+                calculated_rate = flow_rate
+            elif rate is not None:
+                calculated_rate = rate * self._core.get_aspirate_flow_rate()
+            else:
+                calculated_rate = self._core.get_aspirate_flow_rate()
+
+            self._core.air_gap_in_place(c_vol, calculated_rate)
         else:
             self.aspirate(volume)
         return self
@@ -1644,7 +1794,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1667,6 +1817,8 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
               - ``"per source"``: Use one tip for each source well, even if
                 :ref:`tip refilling <complex-tip-refilling>` is required.
+              - ``"per destination"``: Use one tip for each destination well, even if
+                :ref:`tip refilling <complex-tip-refilling>` is required.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
@@ -1675,6 +1827,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1692,7 +1847,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1761,7 +1916,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1791,6 +1946,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1808,7 +1966,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1883,7 +2041,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -1914,6 +2072,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
 
         :meta private:
         """
@@ -1931,7 +2092,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -2212,12 +2373,10 @@ class InstrumentContext(publisher.CommandPublisher):
                        to the volume of liquid that will be dispensed.
         :type volume: float
 
-        :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
-                     in µL/s is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
+        :param rate: How quickly the plunger moves to displace the commanded volume, in µL/s. This rate does not directly relate to
                      the flow rate of liquid out of the resin tip.
 
-                     The default value of ``10.0`` is recommended.
+                     Defaults to ``10.0`` µL/s.
         :type rate: float
         """
         well: Optional[labware.Well] = None
@@ -2542,14 +2701,22 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._well_bottom_clearances
 
-    def _get_last_location_by_api_version(self) -> Optional[types.Location]:
+    def _get_last_location_by_api_version(
+        self,
+    ) -> Optional[Union[types.Location, TrashBin, WasteChute]]:
         """Get the last location accessed by this pipette, if any.
 
         In pre-engine Protocol API versions, this call omits the pipette mount.
+        Between 2.14 (first engine PAPI version) and 2.23 this only returns None or a Location object.
         This is to preserve pre-existing, potentially buggy behavior.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
+        if self._api_version >= APIVersion(2, 24):
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
+        elif self._api_version >= ENGINE_CORE_API_VERSION:
+            last_location = self._protocol_core.get_last_location(
+                mount=self._core.get_mount()
+            )
+            return last_location if isinstance(last_location, types.Location) else None
         else:
             return self._protocol_core.get_last_location()
 
@@ -2605,7 +2772,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 actual_value=str(volume),
             )
         last_location = self._get_last_location_by_api_version()
-        if last_location and isinstance(last_location.labware, labware.Well):
+        if (
+            last_location
+            and isinstance(last_location, types.Location)
+            and isinstance(last_location.labware, labware.Well)
+        ):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
 

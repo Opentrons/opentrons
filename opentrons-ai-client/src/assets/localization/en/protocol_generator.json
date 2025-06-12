@@ -41,6 +41,7 @@
   "ot2_pipettes": "OT-2 pipettes: Include volume, number of channels, and generation.",
   "pcr_flex": "PCR (Flex)",
   "pcr": "PCR",
+  "pd_protocol_reply": "Here’s the protocol I generated for you. You can download it and import it to <a>Protocol Designer</a>",
   "pipettes": "Pipettes: Specify your pipettes, including the volume, number of channels, and whether they’re mounted on the left or right.",
   "privacy_policy": "By continuing, you agree to the Opentrons <privacyPolicyLink>Privacy policy</privacyPolicyLink> and <EULALink>End user license agreement</EULALink>",
   "progressFinalizing": "Finalizing...",

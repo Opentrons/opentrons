@@ -7,8 +7,6 @@ import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenL
 import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
-import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
 import { getSuccessResult } from '../fixtures'
 
 import type {
@@ -65,20 +63,6 @@ describe('thermocycler atomic commands', () => {
       params: {
         moduleId: module,
         celsius: temperature,
-      },
-    },
-    {
-      commandCreator: thermocyclerWaitForBlockTemperature,
-      expectedType: 'thermocycler/waitForBlockTemperature',
-      params: {
-        moduleId: module,
-      },
-    },
-    {
-      commandCreator: thermocyclerWaitForLidTemperature,
-      expectedType: 'thermocycler/waitForLidTemperature',
-      params: {
-        moduleId: module,
       },
     },
   ]
