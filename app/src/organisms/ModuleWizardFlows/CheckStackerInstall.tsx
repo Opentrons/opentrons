@@ -88,47 +88,45 @@ export function CheckStackerInstall(
   if (stackerNotInstalled) {
     return (
       <SimpleWizardBody
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
         isSuccess={false}
         iconColor={COLORS.red50}
         header={t('door_circuit_error')}
         subHeader={t('branded:door_circuit_error_description')}
       >
-        <Flex css={BUTTON_STYLE}>
-          {isOnDevice ? (
-            <SmallButton
-              buttonType="primary"
-              onClick={handleTryAgain}
-              buttonText={i18n.format(t('try_again'), 'capitalize')}
-            />
-          ) : (
-            <PrimaryButton onClick={handleTryAgain}>
-              {i18n.format(t('try_again'), 'capitalize')}
-            </PrimaryButton>
-          )}
-        </Flex>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={handleTryAgain}
+            buttonText={i18n.format(t('try_again'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton onClick={handleTryAgain}>
+            {i18n.format(t('try_again'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
   } else {
     return (
       <SimpleWizardBody
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
         isSuccess={false}
         iconColor={COLORS.yellow50}
         header={t('close_stacker_doors')}
         subHeader={t('branded:close_stacker_doors_description')}
       >
-        <Flex css={BUTTON_STYLE}>
-          {isOnDevice ? (
-            <SmallButton
-              buttonType="primary"
-              onClick={handleInterlockPinsValidation}
-              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-            />
-          ) : (
-            <PrimaryButton onClick={handleInterlockPinsValidation}>
-              {i18n.format(t('shared:continue'), 'capitalize')}
-            </PrimaryButton>
-          )}
-        </Flex>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={handleInterlockPinsValidation}
+            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton onClick={handleInterlockPinsValidation}>
+            {i18n.format(t('shared:continue'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
   }

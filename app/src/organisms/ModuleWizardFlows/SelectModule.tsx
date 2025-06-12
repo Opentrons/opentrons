@@ -82,14 +82,9 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
-    // stop blinking previous module
-    if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
-    }
-    // blink new module
+    // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
-        sendIdentifyModule(mod, true)
         setSelectedModule(mod)
         break
       }
@@ -99,30 +94,10 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const handleStartSetup = (module: AttachedModule | null): void => {
     if (module != null) {
       // If this is a Flex Stacker makes sure its installed properly
-      if (
-        module.moduleType === 'flexStackerModuleType' &&
-        !module.data.installDetected
-      ) {
-        sendIdentifyModule(module, true, 'red')
-        setStackerNotInstalled(true)
-        return
-      }
       // Proceed to module setup
       buildFlowForSelectedModule(module)
       setShowLaunchSetup(false)
     }
-  }
-
-  const handleTryAgain = (): void => {
-    if (selectedModule != null) {
-      // Start blinking module, otherwise stop if multiple are available.
-      sendIdentifyModule(selectedModule, isSingleModule)
-      // Clear the selected module
-      if (!isSingleModule) {
-        setSelectedModule(null)
-      }
-    }
-    setStackerNotInstalled(false)
   }
 
   const BUTTON_STYLE = css`
@@ -138,31 +113,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
     }
   `
 
-  if (stackerNotInstalled) {
-    return (
-      <SimpleWizardBody
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('error_stacker_not_installed')}
-        subHeader={
-          <Trans t={t} i18nKey={t('error_stacker_not_installed_message')} />
-        }
-      >
-        {isOnDevice ? (
-          <SmallButton
-            buttonType="primary"
-            onClick={handleTryAgain}
-            buttonText={i18n.format(t('try_again'), 'capitalize')}
-          />
-        ) : (
-          <PrimaryButton onClick={handleTryAgain}>
-            {i18n.format(t('try_again'), 'capitalize')}
-          </PrimaryButton>
-        )}
-      </SimpleWizardBody>
-    )
-  } else if (isSingleModule && selectedModule != null) {
+  if (isSingleModule && selectedModule != null) {
     const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
