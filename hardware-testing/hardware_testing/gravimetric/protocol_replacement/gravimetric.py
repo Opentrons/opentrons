@@ -265,7 +265,7 @@ class FixtureSettings:
             ),
             scale,
             simulate=simulating,
-            start_graph=False
+            start_graph=False,
         )
         scale_serial = scale.read_serial_number()
         if simulating:
