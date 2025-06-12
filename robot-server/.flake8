@@ -1,6 +1,9 @@
 [flake8]
 
-extend-exclude = venv .venv
+extend-exclude =
+    venv .venv
+    # Ignore Python Protocol API files that are used as opaque test input.
+    tests/integration/persistence_snapshots/
 
 # max cyclomatic complexity
 max-complexity = 9
@@ -35,6 +38,4 @@ per-file-ignores =
     tests/service/*:ANN,D
     tests/conftest.py:ANN,D
 
-# Ignore Python Protocol API files that are used as opaque test input.
-extend-exclude =
-    tests/integration/persistence_snapshots/
+
