@@ -1,15 +1,15 @@
-# Opentrons Flex
+<style>
+article {
+  text-align: center;
+}
+</style>
 
-**Instruction Manual**
+![Opentrons Flex](images/opentrons-flex-logo.svg "Opentrons Flex logo"){ width="75%" }
+
+# Instruction Manual
+
+![<# alt text #>](images/flex-hero.png "flex-hero.png")
 
 **Opentrons Labworks Inc.**
 
-October 2024
-
-#### © OPENTRONS 2024
-
-Opentrons Flex^TM\ ^(Opentrons Labworks, Inc.)
-
-Registered names, trademarks, etc. used in this document, even when not
-specifically marked as such, are not to be considered unprotected by
-law.
+May 2025

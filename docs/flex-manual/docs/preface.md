@@ -20,7 +20,7 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
 - **Learn even more.** Still need something else? Consult the appendices.
 
-    - [Appendix A:Glossary](glossary.md) defines Flex-related terms.
+    - [Appendix A: Glossary](glossary.md) defines Flex-related terms.
 
     - [Appendix B: Additional Documentation](additional-documentation.md) points you to even more resources for Opentrons products and writing code to control Flex.
     
