@@ -15,9 +15,13 @@ from ..types import (
     LabwareParentDefinition,
     ModuleDefinition,
     ModuleModel,
-    AddressableArea,
     LabwareOffsetVector,
     DeckLocationDefinition,
+    LabwareLocation,
+    ModuleLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+    OnLabwareLocation,
 )
 
 
@@ -28,6 +32,7 @@ def get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: LabwareOffsetVector,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    labware_location: ModuleLocation,
 ) -> Point:
     ...
 
@@ -39,6 +44,7 @@ def get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
 ) -> Point:
     ...
 
@@ -50,6 +56,7 @@ def get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    labware_location: OnLabwareLocation,
 ) -> Point:
     ...
 
@@ -60,6 +67,7 @@ def get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    labware_location: LabwareLocation,
 ) -> Point:
     """Returns the offset from parent entity's placement origin to child labware origin.
 
@@ -75,6 +83,7 @@ def get_parent_placement_origin_to_lw_origin(
             parent_entity=parent_entity,
             module_parent_to_child_offset=module_parent_to_child_offset,
             deck_definition=deck_definition,
+            labware_location=labware_location,
         )
     )
 
@@ -109,9 +118,32 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
     parent_entity: LabwareParentDefinition,
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
+    labware_location: LabwareLocation,
 ) -> Point:
     """Get the offset vector from parent entity origin to child labware placement origin."""
-    if isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3)):
+    if isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        return Point(x=0, y=0, z=0)
+
+    elif isinstance(labware_location, ModuleLocation):
+        assert isinstance(parent_entity, ModuleDefinition)
+        assert module_parent_to_child_offset is not None
+
+        child_labware_overlap_with_parent_entity = (
+            _get_child_labware_overlap_with_parent_module(
+                child_labware=child_labware,
+                parent_module_model=parent_entity.model,
+                deck_definition=deck_definition,
+            )
+        )
+
+        module_offset_point = _to_point_from_lw_offset_vector(
+            module_parent_to_child_offset
+        )
+        return module_offset_point - child_labware_overlap_with_parent_entity
+
+    elif isinstance(labware_location, OnLabwareLocation):
+        assert isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3))
+
         # TODO(jh, 06-05-25): This logic is slightly duplicative of LabwareView get_dimensions. Can we unify?
         if isinstance(parent_entity, LabwareDefinition2):
             parent_entity_height = parent_entity.dimensions.zDimension
@@ -135,26 +167,8 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
             z=parent_entity_height - child_labware_overlap_with_parent_entity.z,
         )
 
-    elif isinstance(parent_entity, ModuleDefinition):
-        assert module_parent_to_child_offset is not None
-        child_labware_overlap_with_parent_entity = (
-            _get_child_labware_overlap_with_parent_module(
-                child_labware=child_labware,
-                parent_module_model=parent_entity.model,
-                deck_definition=deck_definition,
-            )
-        )
-
-        module_offset_point = _to_point_from_lw_offset_vector(
-            module_parent_to_child_offset
-        )
-        return module_offset_point - child_labware_overlap_with_parent_entity
-
-    elif _is_deck_location(parent_entity):
-        return Point(x=0, y=0, z=0)
-
     else:
-        raise TypeError(f"Unsupported parent entity type: {parent_entity}")
+        raise TypeError(f"Unsupported labware location type: {labware_location}")
 
 
 def _get_child_labware_overlap_with_parent_labware(
@@ -201,23 +215,6 @@ def _is_thermocycler_on_ot2(
         in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
         and robot_model == "OT-2 Standard"
     )
-
-
-def _is_deck_location(parent_entity: LabwareParentDefinition) -> bool:
-    """Check if parent entity is a deck location (AddressableArea or SlotDefV3)."""
-    if isinstance(parent_entity, AddressableArea):
-        return True
-
-    elif (
-        isinstance(parent_entity, dict)
-        and "id" in parent_entity
-        and "position" in parent_entity
-        and "boundingBox" in parent_entity
-        and "compatibleModuleTypes" in parent_entity
-    ):
-        return True
-
-    return False
 
 
 def _to_point(vector: Vector3D) -> Point:

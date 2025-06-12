@@ -5,7 +5,6 @@ import io
 import json
 import textwrap
 import mock
-import dataclasses
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast
 
@@ -22,7 +21,6 @@ from opentrons_shared_data.pipette import (
 from opentrons import execute, types
 from opentrons.hardware_control import Controller, api
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
-from opentrons.protocol_engine import Config
 from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.util import entrypoint_util
@@ -87,22 +85,6 @@ def mock_deck_configuration(
 
     monkeypatch.setattr(
         entrypoint_util, "get_deck_configuration", mock_get_deck_configuration
-    )
-
-
-@pytest.fixture(autouse=True)
-def mock_protocol_engine_config(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock the protocol engine config creation to use simulated deck config."""
-    original_get_config = execute._get_protocol_engine_config
-
-    def mock_get_protocol_engine_config(*args: Any, **kwargs: Any) -> Config:
-        """Create a new config with use_simulated_deck_config=True."""
-        config = original_get_config(*args, **kwargs)
-
-        return dataclasses.replace(config, use_simulated_deck_config=True)
-
-    monkeypatch.setattr(
-        execute, "_get_protocol_engine_config", mock_get_protocol_engine_config
     )
 
 

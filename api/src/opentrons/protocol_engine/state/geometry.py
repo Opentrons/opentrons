@@ -23,8 +23,6 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -93,7 +91,6 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
-    ModuleDefinition,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -460,35 +457,39 @@ class GeometryView:
     ) -> Point:
         parent_entity = self._get_parent_definition(labware_location)
 
-        if isinstance(parent_entity, ModuleDefinition):
-            assert isinstance(labware_location, ModuleLocation)
+        if isinstance(labware_location, ModuleLocation):
             module_parent_to_child_offset = self._modules.get_nominal_offset_to_child(
                 module_id=labware_location.moduleId,
                 addressable_areas=self._addressable_areas,
             )
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
-                parent_entity=parent_entity,
+                parent_entity=parent_entity,  # type: ignore[arg-type]
                 module_parent_to_child_offset=module_parent_to_child_offset,
                 deck_definition=self._addressable_areas.deck_definition,
                 is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
             )
-        elif isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3)):
+        elif isinstance(labware_location, OnLabwareLocation):
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
-                parent_entity=parent_entity,
+                parent_entity=parent_entity,  # type: ignore[arg-type]
                 module_parent_to_child_offset=None,
                 deck_definition=self._addressable_areas.deck_definition,
                 is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
+            )
+        elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+            return get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_entity=parent_entity,  # type: ignore[arg-type]
+                module_parent_to_child_offset=None,
+                deck_definition=self._addressable_areas.deck_definition,
+                is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
             )
         else:
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_entity=parent_entity,
-                module_parent_to_child_offset=None,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-            )
+            raise ValueError(f"Invalid labware location: {labware_location}")
 
     def _get_parent_definition(
         self, location: LabwareLocation

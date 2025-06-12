@@ -32,6 +32,9 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     Dimensions as AddressableAreaDimensions,
     LabwareOffsetVector,
+    ModuleLocation,
+    AddressableAreaLocation,
+    OnLabwareLocation,
 )
 from opentrons.types import DeckSlotName
 
@@ -145,6 +148,7 @@ class ModuleOverlapSpec(NamedTuple):
     child_definition: LabwareDefinition2
     module_parent_to_child_offset: LabwareOffsetVector
     is_topmost_labware: bool
+    labware_location: ModuleLocation
     expected_total_offset: Point
 
 
@@ -154,6 +158,7 @@ class LabwareOverlapSpec(NamedTuple):
     child_definition: LabwareDefinition2
     parent_definition: LabwareDefinition2
     is_topmost_labware: bool
+    labware_location: OnLabwareLocation
     expected_total_offset: Point
 
 
@@ -163,6 +168,7 @@ class AddressableAreaSpec(NamedTuple):
     child_definition: LabwareDefinition2
     addressable_area: AddressableArea
     is_topmost_labware: bool
+    labware_location: AddressableAreaLocation
     expected_total_offset: Point
 
 
@@ -173,6 +179,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=550, y=700, z=850),
     ),
     ModuleOverlapSpec(
@@ -181,6 +188,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=False,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=400, y=450, z=500),
     ),
     ModuleOverlapSpec(
@@ -189,6 +197,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=400, y=500, z=600),
     ),
     ModuleOverlapSpec(
@@ -197,6 +206,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=False,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=250, y=250, z=250),
     ),
     ModuleOverlapSpec(
@@ -205,6 +215,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=600, y=800, z=989.3),
     ),
     ModuleOverlapSpec(
@@ -213,6 +224,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=False,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=450, y=550, z=639.3),
     ),
     ModuleOverlapSpec(
@@ -221,6 +233,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=600, y=800, z=1000),
     ),
     ModuleOverlapSpec(
@@ -229,6 +242,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=False,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=450, y=550, z=650),
     ),
     ModuleOverlapSpec(
@@ -237,6 +251,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=100, y=200, z=300),
     ),
     ModuleOverlapSpec(
@@ -245,6 +260,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=LabwareOffsetVector(x=450, y=550, z=650),
         is_topmost_labware=False,
+        labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=-50, y=-50, z=-50),
     ),
 ]
@@ -254,24 +270,28 @@ LABWARE_OVERLAP_SPECS: List[LabwareOverlapSpec] = [
         child_definition=_LABWARE_DEF_V2_WITH_LABWARE_STACKING,
         parent_definition=_LABWARE_DEF_V2_2,
         is_topmost_labware=True,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-1"),
         expected_total_offset=Point(x=250, y=400, z=1000),
     ),
     LabwareOverlapSpec(
         child_definition=_LABWARE_DEF_V2_WITH_LABWARE_STACKING,
         parent_definition=_LABWARE_DEF_V2_2,
         is_topmost_labware=False,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-1"),
         expected_total_offset=Point(x=50, y=100, z=600),
     ),
     LabwareOverlapSpec(
         child_definition=_LABWARE_DEF_V2_WITH_LABWARE_STACKING,
         parent_definition=_LABWARE_DEF_V2_UNKNOWN,
         is_topmost_labware=True,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=450, y=650, z=950),
     ),
     LabwareOverlapSpec(
         child_definition=_LABWARE_DEF_V2_WITH_LABWARE_STACKING,
         parent_definition=_LABWARE_DEF_V2_UNKNOWN,
         is_topmost_labware=False,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=250, y=350, z=550),
     ),
 ]
@@ -281,12 +301,14 @@ ADDRESSABLE_AREA_SPECS: List[AddressableAreaSpec] = [
         child_definition=_LABWARE_DEF_V2,
         addressable_area=_ADDRESSABLE_AREA,
         is_topmost_labware=True,
+        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
         expected_total_offset=Point(x=150, y=250, z=350),
     ),
     AddressableAreaSpec(
         child_definition=_LABWARE_DEF_V2,
         addressable_area=_ADDRESSABLE_AREA,
         is_topmost_labware=False,
+        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
         expected_total_offset=Point(x=0, y=0, z=0),
     ),
 ]
@@ -302,6 +324,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
     child_definition: LabwareDefinition2,
     module_parent_to_child_offset: LabwareOffsetVector,
     is_topmost_labware: bool,
+    labware_location: ModuleLocation,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from module parent to labware origin."""
@@ -311,6 +334,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
         is_topmost_labware=is_topmost_labware,
+        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -324,6 +348,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
     child_definition: LabwareDefinition2,
     parent_definition: LabwareDefinition2,
     is_topmost_labware: bool,
+    labware_location: OnLabwareLocation,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from labware parent to labware origin."""
@@ -333,6 +358,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
+        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -346,6 +372,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     child_definition: LabwareDefinition2,
     addressable_area: AddressableArea,
     is_topmost_labware: bool,
+    labware_location: AddressableAreaLocation,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from addressable area to labware origin."""
@@ -355,6 +382,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
+        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -368,6 +396,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=True,
+        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
     )
 
     expected_offset = Point(x=-100, y=800, z=-300)
