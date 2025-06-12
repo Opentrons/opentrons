@@ -19,11 +19,11 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  AA_TO_AA_SLOT,
   ABSORBANCE_READER_V1,
+  DEFAULT_AA_FOR_WASTE_CHUTE,
   FLEX_STACKER_MODULE_V1,
   getAADisplayName,
-  getAddressableMatchForAreaId,
+  getAddressableAreaMatchForAreaId,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getFlexDeckDefAAByFixtureIdForCutoutId,
@@ -141,7 +141,7 @@ export function AddFixtureModal({
       const cutoutFixtureId = keys.find(
         key => key === moduleModel
       ) as CutoutFixtureId
-      const aaforModule = getAddressableMatchForAreaId(
+      const aaforModule = getAddressableAreaMatchForAreaId(
         cutoutId,
         cutoutFixtureId,
         addressableAreaId
@@ -245,7 +245,7 @@ export function AddFixtureModal({
     unconfiguredMods: AttachedModule[]
   ): CutoutConfigMap[][] => {
     let availableOptions: CutoutConfigMap[][] = []
-    const aaMagBlockId = getAddressableMatchForAreaId(
+    const aaMagBlockId = getAddressableAreaMatchForAreaId(
       cutoutId,
       MAGNETIC_BLOCK_V1_FIXTURE,
       addressableAreaId
@@ -269,9 +269,6 @@ export function AddFixtureModal({
   }
 
   const getWasteChuteOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
-    // Waste chute fixtures have multiple aa options foreach fixture.
-    // It does not matter what aa we use so we just use a default one.
-    const DEFAULT_AA_FOR_WASTE_CHUTE = '96ChannelWasteChute'
     return [
       [
         {
@@ -285,7 +282,7 @@ export function AddFixtureModal({
 
   const getFixtureOptions = (cutoutId: CutoutId): CutoutConfigMap[][] => {
     let availableOptions: CutoutConfigMap[][] = []
-    const TrashBinAA = getAddressableMatchForAreaId(
+    const TrashBinAA = getAddressableAreaMatchForAreaId(
       cutoutId,
       TRASH_BIN_ADAPTER_FIXTURE,
       addressableAreaId
@@ -303,7 +300,7 @@ export function AddFixtureModal({
       ]
     }
 
-    const stagingAreaAA = getAddressableMatchForAreaId(
+    const stagingAreaAA = getAddressableAreaMatchForAreaId(
       cutoutId,
       STAGING_AREA_RIGHT_SLOT_FIXTURE,
       addressableAreaId
@@ -336,7 +333,7 @@ export function AddFixtureModal({
         )
         const aaProvidedFixtureOptions = addressableAreasById[o]
         if (aaProvidedFixtureOptions != null) {
-          const aaForFixture = getAddressableMatchForAreaId(
+          const aaForFixture = getAddressableAreaMatchForAreaId(
             cutoutId,
             o,
             addressableAreaId

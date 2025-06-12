@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
-import { ListItem } from '../../atoms/ListItem/index'
 import { TertiaryButton } from '../../atoms/buttons'
+import { ListItem } from '../../atoms/ListItem/index'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
@@ -59,7 +59,7 @@ interface FixtureOptionProps {
   buttonText: string
   isOnDevice: boolean
 }
-console.log("Btn: ", Btn)
+console.log('Btn: ', Btn)
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
   return isOnDevice ? (

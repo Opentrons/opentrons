@@ -24,6 +24,7 @@ import {
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
+  DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   FLEX_ROBOT_TYPE,
@@ -775,7 +776,7 @@ export const getFlexDeckDefAAByFixtureIdForCutoutId = (
  * @param fixtureId - The fixtureId we are looking for.
  * @returns The aa name or null if not match found.
  */
-export const getAddressableMatchForAreaId = (
+export const getAddressableAreaMatchForAreaId = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
   addressableAreaId: AddressableAreaNamesWithFakes
@@ -786,14 +787,14 @@ export const getAddressableMatchForAreaId = (
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
     return aaListForFixtureId[0]
+  } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
+    return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
-    const aa =
-      aaListForFixtureId.filter(
-        (aa: AddressableAreaNamesWithFakes) =>
-          aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
-      ) ?? null
-    console.log('aa: ', aa)
-    return aa[0]
+    const aa = aaListForFixtureId.find(
+      (aa: AddressableAreaNamesWithFakes) =>
+        aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
+    )
+    return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
 
