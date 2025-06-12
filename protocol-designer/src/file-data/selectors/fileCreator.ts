@@ -99,7 +99,8 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<ProtocolFile> = createSelector(
+//  eventually will be deprecated
+export const createJSONFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -312,7 +313,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   }
 )
 
-export const createPythonFile: Selector<PDPythonFile> = createSelector(
+export const createFile: Selector<PDPythonFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -358,9 +359,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       },
       designerApplication: {
         name: 'opentrons/protocol-designer',
-        //  hardcoding this version in to avoid unnecessary migrating
-        //  TODO: remember to update to the applicationVersion const
-        version: '8.5.0',
+        version: applicationVersion,
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,

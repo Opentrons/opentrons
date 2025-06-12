@@ -55,10 +55,6 @@ export const getEnableTimelineScrubber: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_TIMELINE_SCRUBBER ?? false
 )
-export const getEnablePythonExport: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_PYTHON_EXPORT ?? false
-)
 export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
@@ -66,4 +62,8 @@ export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
 export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
+)
+export const getEnableJsonExport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false
 )
