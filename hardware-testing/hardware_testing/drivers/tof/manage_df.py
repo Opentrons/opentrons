@@ -7,6 +7,7 @@ import sys
 import pandas as pd
 import google_sheets_helper
 import re
+from datetime import datetime
 
 def get_configs():
     configurations = None
@@ -221,6 +222,10 @@ def append_df(df, drive_folder_path, data_folder):
 
                 # new_row = {col: None for col in columns}
                 file_df['Hash_id'] = generate_hash(stacker_file)
+
+                pattern = r"_run-(\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})"
+                match = re.search(pattern, stacker_file)
+                file_df['Date'] = match.group(1)
                 
                 file_df['Test'] = data_folder
 
@@ -260,6 +265,7 @@ def append_df(df, drive_folder_path, data_folder):
 def create_df_csv(df_name, drive_folder_path):
     columns = [
         "Hash_id",
+        "Date",
         "Test",
         "Labware_Name",
         "Stacker_SN",
