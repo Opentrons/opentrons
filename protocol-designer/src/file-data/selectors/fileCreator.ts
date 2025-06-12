@@ -142,7 +142,8 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
       labwareEntities,
       labwareNicknamesById,
       liquidEntities,
-      ingredLocations
+      ingredLocations,
+      savedStepForms
     )
 
     const name = fileMetadata.protocolName || 'untitled'
