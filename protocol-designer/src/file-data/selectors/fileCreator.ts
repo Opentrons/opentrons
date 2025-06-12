@@ -353,6 +353,10 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
+    const allLiquidClassesFromForms: string[] = Object.values(savedStepForms)
+      .filter(stepForm => 'liquidClass' in stepForm)
+      ?.map(stepForm => stepForm.liquidClass)
+
     const designerApplication: PythonDesignerApplication = {
       robot: {
         model: robotType,
@@ -392,7 +396,8 @@ export const createFile: Selector<PDPythonFile> = createSelector(
           robotStateTimeline,
           ingredLocations,
           labwareNicknamesById,
-          robotType
+          robotType,
+          allLiquidClassesFromForms
         ),
         pythonCustomLabwareDict(invariantContext.labwareEntities),
       ]

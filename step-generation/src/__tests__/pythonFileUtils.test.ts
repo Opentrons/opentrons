@@ -518,20 +518,32 @@ waste_chute = protocol.load_waste_chute()`.trimStart()
 })
 
 describe('getLoadLiquidClasses', () => {
-  it('should load a liquid class for each liquid class types', () => {
-    const liquid3 = 'liquid3'
-    mockLiquidEntities = {
-      ...mockLiquidEntities,
-      [liquid3]: {
-        liquidGroupId: liquid3,
-        pythonName: 'liquid_3',
-        description: '',
-        displayName: 'honey',
-        displayColor: 'mock display color 3',
+  it('should load a liquid class for each liquid class types with duplicate liquid classes and other steps', () => {
+    const mockStepForms = {
+      id: {
+        stepType: 'moveLiquid',
+        liquidClass: WATER_LIQUID_CLASS_NAME,
+      },
+      id2: {
+        stepType: 'moveLabware',
+      },
+      id3: {
+        stepType: 'moveLiquid',
+        liquidClass: ETHANOL_LIQUID_CLASS_NAME,
+      },
+      id4: {
+        stepType: 'mix',
+        liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
+      },
+      id5: {
+        stepType: 'mix',
         liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
       },
     }
-    expect(getLoadLiquidClasses(mockLiquidEntities)).toBe(
+    const liquidClassses = Object.values(mockStepForms)
+      .filter(step => 'liquidClass' in step)
+      ?.map(step => step.liquidClass)
+    expect(getLoadLiquidClasses(liquidClassses)).toBe(
       `
 # Load Liquid Classes:
 water_v1 = protocol.get_liquid_class("water")

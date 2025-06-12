@@ -309,13 +309,14 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
-export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
+export function getLoadLiquidClasses(
+  allLiquidClassesFromForms: string[]
+): string {
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const allLiquidClasses = Object.values(liquidEntities)
-    .map(liquid => liquid.liquidClass)
-    .filter(liquidClass => liquidClass != null)
-  const uniqueLiquidClasses = Array.from(new Set(allLiquidClasses))
-  const pythonLoadLiquidClasses = uniqueLiquidClasses
+  const uniqueLiquidClassesFromForms = Array.from(
+    new Set(allLiquidClassesFromForms)
+  )
+  const pythonLoadLiquidClasses = uniqueLiquidClassesFromForms
     .map(liquidClass => {
       // we check that liquidClass is not null earlier but i got a check error
       // without specifying it here
@@ -330,7 +331,7 @@ export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
     })
     .join('\n')
 
-  return uniqueLiquidClasses.length > 0
+  return uniqueLiquidClassesFromForms.length > 0
     ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
     : ''
 }
@@ -379,7 +380,8 @@ export function pythonDefRun(
   robotStateTimeline: Timeline,
   liquidsByLabwareId: LabwareLiquidState,
   labwareNicknamesById: Record<string, string>,
-  robotType: RobotType
+  robotType: RobotType,
+  allLiquidClassesFromForms: string[]
 ): string {
   const {
     moduleEntities,
@@ -408,7 +410,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
-    getLoadLiquidClasses(liquidEntities),
+    getLoadLiquidClasses(allLiquidClassesFromForms),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
