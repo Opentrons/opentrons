@@ -384,8 +384,8 @@ async def _cycle_plunger(
 
 
 async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
-    if not api.is_simulator:
-        ui.get_user_ready("attach a pipette")
+    # if not api.is_simulator:
+    #     ui.get_user_ready("attach a pipette")
     await helpers_ot3.update_firmware(api)
     await api.cache_instruments()
     found = [
@@ -429,8 +429,8 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
     while True:
         mount_list = await _get_next_pipette_mount(api)
         for mount in mount_list:
-            if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-                continue
+            # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+            #     continue
 
             report = _build_csv_report(cycles=cycles, trials=trials)
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)

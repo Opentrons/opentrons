@@ -306,9 +306,7 @@ def set_csv_report_meta_data_ot3(
 ) -> None:
     """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
-    report.set_operator(
-        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
-    )
+    report.set_operator("operator")
 
     # default DUT to be the robot serial
     # and only scan barcode if we're not simulating
@@ -317,7 +315,7 @@ def set_csv_report_meta_data_ot3(
     print(f"device under test: {dut_str}")
     if not api.is_simulator and dut != DeviceUnderTest.OTHER:
         # always confirm barcode for robot/pipette/gripper
-        barcode = input("SCAN device barcode: ").strip()
+        barcode = dut_str
     else:
         barcode = dut_str
     print(f"barcode: {barcode}")
