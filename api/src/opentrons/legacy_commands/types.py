@@ -50,6 +50,8 @@ CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
+CONFIGURE_FOR_VOLUME: Final = "command.CONFIGURE_FOR_VOLUME"
+CONFIGURE_NOZZLE_LAYOUT: Final = "command.CONFIGURE_NOZZLE_LAYOUT"
 
 
 # Modules #
@@ -589,6 +591,14 @@ class PressurizeCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
 
 
+class ConfigureForVolumePayload(TextOnlyPayload):
+    instrument: InstrumentContext
+
+
+class ConfigureNozzleLayoutPayload(TextOnlyPayload):
+    instrument: InstrumentContext
+
+
 class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
@@ -607,6 +617,16 @@ class UnsealCommand(TypedDict):
 class PressurizeCommand(TypedDict):
     name: Literal["command.PRESSURIZE"]
     payload: PressurizeCommandPayload
+
+
+class ConfigureForVolume(TypedDict):
+    name: Literal["command.CONFIGURE_FOR_VOLUME"]
+    payload: ConfigureForVolumePayload
+
+
+class ConfigureNozzleLayoutCommand(TypedDict):
+    name: Literal["command.CONFIGURE_NOZZLE_LAYOUT"]
+    payload: ConfigureNozzleLayoutPayload
 
 
 # Robot Commands and Payloads
