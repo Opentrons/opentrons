@@ -236,7 +236,6 @@ export function AddFixtureModal({
     )
     availableOptions = [...availableOptions, ...unconfiguredFlexStacker]
 
-    console.log('availableOptions: ', availableOptions)
     return availableOptions
   }
 
@@ -370,7 +369,6 @@ export function AddFixtureModal({
     optionStage
   )
 
-  console.log('availableOptions:: ', availableOptions)
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
     nextStageOptions = (
@@ -397,7 +395,6 @@ export function AddFixtureModal({
         />
       </>
     )
-    console.log('nextStageOptions: ', nextStageOptions)
   } else if (
     optionStage === 'fixtureOptions' &&
     cutoutId === WASTE_CHUTE_CUTOUT &&
@@ -431,7 +428,6 @@ export function AddFixtureModal({
         ) ?? fixture
       )
     }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
-    console.log('newDeckConfig: ', newDeckConfig)
 
     updateDeckConfiguration(newDeckConfig)
     closeModal()

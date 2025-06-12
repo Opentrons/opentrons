@@ -845,8 +845,6 @@ export const replaceCutoutFixtureWithComboFixture = (
       addressableAreasById
     ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
 
-    console.log('comboFixturesOptions:', comboFixturesOptions)
-
     // Try to match with deck config
     for (const dc of deckConfigWithAA) {
       const match = comboFixturesOptions.find(([, areaIds]) =>
@@ -858,20 +856,13 @@ export const replaceCutoutFixtureWithComboFixture = (
           return { ...aaCutoutItem }
         } else {
           const [fixtureId, areaList] = match
-          console.log('match: ', match)
-          console.log('areaList: ', areaList)
-
           const otherModules = areaList.filter(
             id => id !== aaCutoutItem.addressableAreaId
           )
-          console.log('otherModules: ', otherModules)
           const matchedModule = deckConfigWithAA.find(dc =>
             otherModules.includes(dc.addressableAreaId)
           )
           const sn = matchedModule?.opentronsModuleSerialNumber
-          console.log('matchedModule: ', matchedModule)
-          console.log('Matched fixture:', fixtureId, 'Module SN:', sn)
-
           return {
             ...aaCutoutItem,
             cutoutFixtureId: fixtureId as CutoutFixtureId,
