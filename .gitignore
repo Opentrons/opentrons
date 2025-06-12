@@ -33,7 +33,6 @@ eggs/
 lib64/
 parts/
 sdist/
-site/
 var/
 *.egg-info/
 .installed.cfg
@@ -78,6 +77,9 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 docs/build/
+
+# mkdocs documentation
+docs/*/site/
 
 # PyBuilder
 target/
