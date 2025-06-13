@@ -24,7 +24,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
     toolboxStep,
     showFormErrors = true,
     focusedField,
-    setShowFormErrors,
+    setShowFormErrorsInNewField,
   } = props
   const { t } = useTranslation(['form', 'application'])
   const [contentType, setContentType] = useState<ThermocyclerContentType>(
@@ -47,7 +47,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
           onChange={() => {
             setContentType('thermocyclerState')
             propsForFields.thermocyclerFormType.updateValue('thermocyclerState')
-            setShowFormErrors?.(false)
+            setShowFormErrorsInNewField?.(false)
           }}
           isSelected={contentType === 'thermocyclerState'}
         />
@@ -62,7 +62,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
             propsForFields.thermocyclerFormType.updateValue(
               'thermocyclerProfile'
             )
-            setShowFormErrors?.(false)
+            setShowFormErrorsInNewField?.(false)
           }}
           isSelected={contentType === 'thermocyclerProfile'}
         />

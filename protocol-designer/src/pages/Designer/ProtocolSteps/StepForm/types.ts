@@ -31,7 +31,7 @@ export interface StepFormProps {
   toolboxStep: number
   showFormErrors: boolean
   focusedField?: string | null
-  setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  setShowFormErrorsInNewField?: Dispatch<SetStateAction<boolean>>
   tab: LiquidHandlingTab
   setTab: Dispatch<SetStateAction<LiquidHandlingTab>>
 }

@@ -34,7 +34,7 @@ export function MixTools(
     toolboxStep,
     tab,
     setTab,
-    setShowFormErrors,
+    setShowFormErrorsInNewField,
   } = props
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
@@ -82,7 +82,7 @@ export function MixTools(
         {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
           <LiquidClassesStepTools
             propsForFields={propsForFields}
-            setShowFormErrors={setShowFormErrors}
+            setShowFormErrorsInNewField={setShowFormErrorsInNewField}
             formData={formData}
             orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
             type="mix"

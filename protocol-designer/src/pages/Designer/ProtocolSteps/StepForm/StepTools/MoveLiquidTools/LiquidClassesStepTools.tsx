@@ -17,14 +17,14 @@ interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
   orderedLiquidClassOptions: LiquidClassOption[]
-  setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  setShowFormErrorsInNewField?: Dispatch<SetStateAction<boolean>>
   type: 'mix' | 'transfer'
 }
 
 export const LiquidClassesStepTools = ({
   propsForFields,
   formData,
-  setShowFormErrors,
+  setShowFormErrorsInNewField,
   type,
   orderedLiquidClassOptions,
 }: LiquidClassesStepToolsProps): JSX.Element => {
@@ -55,7 +55,7 @@ export const LiquidClassesStepTools = ({
               key={name}
               onChange={(e: ChangeEvent<any>) => {
                 propsForFields.liquidClass.updateValue(e.target.value)
-                setShowFormErrors?.(false)
+                setShowFormErrorsInNewField?.(false)
               }}
               buttonLabel={name}
               buttonValue={value}

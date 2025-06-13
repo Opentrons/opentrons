@@ -105,12 +105,12 @@ const PAUSE_TYPE_REQUIRED: FormError = {
 const TIME_PARAM_REQUIRED: FormError = {
   title: 'Must include hours, minutes, or seconds',
   dependentFields: ['pauseAction', 'pauseTime'],
-  location: 'form',
+  location: 'field',
 }
 const PAUSE_TEMP_PARAM_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['pauseAction', 'pauseTemperature'],
-  location: 'form',
+  location: 'field',
 }
 
 const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({

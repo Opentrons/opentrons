@@ -16,7 +16,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     toolboxStep,
     propsForFields,
     formData,
-    setShowFormErrors,
+    setShowFormErrorsInNewField,
     tab,
     setTab,
   } = props
@@ -50,7 +50,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
               <LiquidClassesStepTools
                 propsForFields={propsForFields}
                 formData={formData}
-                setShowFormErrors={setShowFormErrors}
+                setShowFormErrorsInNewField={setShowFormErrorsInNewField}
                 type="transfer"
                 orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
               />
@@ -60,7 +60,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                 formData={formData}
                 tab={tab}
                 setTab={setTab}
-                setShowFormErrors={setShowFormErrors}
+                setShowFormErrorsInNewField={setShowFormErrorsInNewField}
               />
             )}
           </>
@@ -72,7 +72,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             formData={formData}
             tab={tab}
             setTab={setTab}
-            setShowFormErrors={setShowFormErrors}
+            setShowFormErrorsInNewField={setShowFormErrorsInNewField}
           />
         )
       default:

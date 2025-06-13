@@ -59,7 +59,7 @@ interface SecondStepsMoveLiquidToolsProps {
   formData: FormData
   tab: LiquidHandlingTab
   setTab: Dispatch<SetStateAction<LiquidHandlingTab>>
-  setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  setShowFormErrorsInNewField?: Dispatch<SetStateAction<boolean>>
 }
 
 export const SecondStepsMoveLiquidTools = ({
@@ -67,7 +67,7 @@ export const SecondStepsMoveLiquidTools = ({
   formData,
   tab,
   setTab,
-  setShowFormErrors,
+  setShowFormErrorsInNewField,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
@@ -117,7 +117,7 @@ export const SecondStepsMoveLiquidTools = ({
     isActive: tab === 'aspirate',
     onClick: () => {
       setTab('aspirate')
-      setShowFormErrors?.(false)
+      setShowFormErrorsInNewField?.(false)
     },
   }
   const dispenseTab = {
@@ -125,7 +125,7 @@ export const SecondStepsMoveLiquidTools = ({
     isActive: tab === 'dispense',
     onClick: () => {
       setTab('dispense')
-      setShowFormErrors?.(false)
+      setShowFormErrorsInNewField?.(false)
     },
   }
 

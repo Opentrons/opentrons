@@ -205,9 +205,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     moduleId as string | null
   )
   const [toolboxStep, setToolboxStep] = useState<number>(0)
-  const [showFormErrors, setShowFormErrors] = useState<boolean>(false)
+  //  TODO: refactor this state. We could add it to redux's unsavedForm state
+  //  but its a bit tricky since some forms need to reset it upon field changes
+  //  and not upon pressing "save"
+  const [showFormErrors, setShowFormErrorsInNewField] = useState<boolean>(false)
   const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
-
   // state used to determine if user has seen advanced settings page (relevant for presaved forms)
   const [
     hasSeenAdvancedSettings,
@@ -366,7 +368,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       dispatch(selectDropdownItem({ selection: null, mode: 'clear' }))
       dispatch(hoverSelection({ id: null, text: null }))
     } else {
-      setShowFormErrors(true)
+      setShowFormErrorsInNewField(true)
       if (tab === 'aspirate' && isDispenseError && !isAspirateError) {
         setTab('dispense')
       }
@@ -392,9 +394,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
       if (!isErrorOnCurrentPage) {
         setToolboxStep(prevStep => prevStep + 1)
-        setShowFormErrors(false)
+        setShowFormErrorsInNewField(false)
       } else {
-        setShowFormErrors(true)
+        setShowFormErrorsInNewField(true)
       }
       handleScrollToTop()
     } else {
@@ -474,7 +476,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
                 width="100%"
                 onClick={() => {
                   setToolboxStep(currStep => currStep - 1)
-                  setShowFormErrors(false)
+                  setShowFormErrorsInNewField(false)
                   handleScrollToTop()
                 }}
               >
@@ -521,7 +523,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               toolboxStep,
               showFormErrors,
               focusedField,
-              setShowFormErrors,
+              setShowFormErrorsInNewField,
               tab,
               setTab,
             }}
