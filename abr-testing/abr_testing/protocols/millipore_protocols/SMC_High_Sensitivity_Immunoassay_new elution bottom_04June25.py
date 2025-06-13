@@ -491,15 +491,15 @@ def run(ctx: ProtocolContext) -> None:
     sample_vol = 3.5 * volume_s
 
     h_s: HeaterShakerContext = ctx.load_module(
-        "heaterShakerModuleV1", "D3"
+        "heaterShakerModuleV1", "D1"
     )  # type: ignore[assignment]
     hs_adapter = h_s.load_adapter("opentrons_universal_flat_adapter")
     h_s.close_labware_latch()
     assay_plate = hs_adapter.load_labware("axygen_96_wellplate_500ul", "Assay plate")
 
-    waste = ctx.load_trash_bin("A3")
+    waste = ctx.load_trash_bin("D3")
     elution_plate = ctx.load_labware(
-        "smc_384_read_plate", "D1", "Read plate without skirted lid"
+        "smc_384_read_plate", "C1", "Read plate without skirted lid"
     )
     standard_plate = ctx.load_labware(
         "nest_96_wellplate_2ml_deep", "D2", "Starting standards + sample plate"
