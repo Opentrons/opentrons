@@ -36,6 +36,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 82.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Heater-Shaker Module GEN1",
@@ -58,6 +60,7 @@
             "y": 1.125,
             "z": 68.275
           },
+          "locatingFeaturesAsParent": {},
           "model": "heaterShakerModuleV1",
           "moduleType": "heaterShakerModuleType",
           "otSharedSchema": "module/schemas/2",

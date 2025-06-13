@@ -73,6 +73,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 108.96,
+            "labwareInterfaceXDimension": 127.76,
+            "labwareInterfaceYDimension": 85.48,
             "lidHeight": 61.7,
             "overLabwareHeight": 0.0
           },
@@ -96,6 +98,7 @@
             "y": 68.8,
             "z": 108.96
           },
+          "locatingFeaturesAsParent": {},
           "model": "thermocyclerModuleV2",
           "moduleType": "thermocyclerModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -190,6 +193,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 110.152,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 4.052
           },
           "displayName": "Magnetic Module GEN2",
@@ -199,6 +204,7 @@
             "y": -0.125,
             "z": 82.25
           },
+          "locatingFeaturesAsParent": {},
           "model": "magneticModuleV2",
           "moduleType": "magneticModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -411,6 +417,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 84.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Temperature Module GEN2",
@@ -433,6 +441,7 @@
             "y": -0.15,
             "z": 80.09
           },
+          "locatingFeaturesAsParent": {},
           "model": "temperatureModuleV2",
           "moduleType": "temperatureModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -869,6 +878,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 82.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Heater-Shaker Module GEN1",
@@ -891,6 +902,7 @@
             "y": 1.125,
             "z": 68.275
           },
+          "locatingFeaturesAsParent": {},
           "model": "heaterShakerModuleV1",
           "moduleType": "heaterShakerModuleType",
           "otSharedSchema": "module/schemas/2",

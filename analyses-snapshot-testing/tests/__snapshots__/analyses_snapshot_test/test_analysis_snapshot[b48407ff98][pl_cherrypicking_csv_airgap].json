@@ -4806,6 +4806,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 84.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Temperature Module GEN2",
@@ -4828,6 +4830,7 @@
             "y": -0.15,
             "z": 80.09
           },
+          "locatingFeaturesAsParent": {},
           "model": "temperatureModuleV2",
           "moduleType": "temperatureModuleType",
           "otSharedSchema": "module/schemas/2",

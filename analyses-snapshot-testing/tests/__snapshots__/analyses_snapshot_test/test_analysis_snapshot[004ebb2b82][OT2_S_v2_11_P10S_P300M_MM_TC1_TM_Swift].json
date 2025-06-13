@@ -3797,6 +3797,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 110.152,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 4.052
           },
           "displayName": "Magnetic Module GEN2",
@@ -3806,6 +3808,7 @@
             "y": -0.125,
             "z": 82.25
           },
+          "locatingFeaturesAsParent": {},
           "model": "magneticModuleV2",
           "moduleType": "magneticModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -5287,6 +5290,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 84.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Temperature Module GEN1",
@@ -5296,6 +5301,7 @@
             "y": -0.15,
             "z": 80.09
           },
+          "locatingFeaturesAsParent": {},
           "model": "temperatureModuleV1",
           "moduleType": "temperatureModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -5700,6 +5706,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 98.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "lidHeight": 37.7,
             "overLabwareHeight": 0.0
           },
@@ -5710,6 +5718,7 @@
             "y": 82.56,
             "z": 97.8
           },
+          "locatingFeaturesAsParent": {},
           "model": "thermocyclerModuleV1",
           "moduleType": "thermocyclerModuleType",
           "otSharedSchema": "module/schemas/2",
