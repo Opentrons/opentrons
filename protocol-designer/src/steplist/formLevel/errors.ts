@@ -86,16 +86,19 @@ const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
   dependentFields: ['aspirate_labware', 'pipette'],
   location: 'form',
+  showOnReopen: true,
 }
 const INCOMPATIBLE_DISPENSE_LABWARE: FormError = {
   title: 'Selected dispense labware is incompatible with pipette',
   dependentFields: ['dispense_labware', 'pipette'],
   location: 'form',
+  showOnReopen: true,
 }
 const INCOMPATIBLE_LABWARE: FormError = {
   title: 'Selected labware is incompatible with pipette',
   dependentFields: ['labware', 'pipette'],
   location: 'form',
+  showOnReopen: true,
 }
 const PAUSE_TYPE_REQUIRED: FormError = {
   title:
@@ -118,17 +121,20 @@ const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
   title: `Volume is greater than maximum pipette/tip volume (${pipetteCapacity} ul)`,
   dependentFields: ['pipette', 'volume'],
   location: 'form',
+  showOnReopen: true,
 })
 
 const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
   dependentFields: ['aspirate_wells', 'dispense_wells'],
   location: 'form',
+  showOnReopen: true,
 }
 const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
   title: 'Well selection must be many to 1, or 1 to 1',
   dependentFields: ['aspirate_wells'],
   location: 'form',
+  showOnReopen: true,
 }
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
   title: 'Action type must be either engage or disengage',
@@ -223,6 +229,7 @@ const PAUSE_MODULE_REQUIRED: FormError = {
   title: 'Select a module',
   dependentFields: ['moduleId', 'pauseAction'],
   location: 'field',
+  showOnReopen: true,
 }
 const PAUSE_TEMP_REQUIRED: FormError = {
   title: 'Pause temperature required',
@@ -241,59 +248,69 @@ const LABWARE_TO_MOVE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['labware'],
   location: 'field',
+  showOnReopen: true,
 }
 const NEW_LABWARE_LOCATION_REQUIRED: FormError = {
   title: 'New location required',
   dependentFields: ['newLocation'],
   location: 'field',
+  showOnReopen: true,
 }
 const ASPIRATE_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['aspirate_wells'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const DISPENSE_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['dispense_wells'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const MIX_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['wells'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['volume'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const TIMES_REQUIRED: FormError = {
   title: 'Enter an integer value greater than 0',
   dependentFields: ['times'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const ASPIRATE_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['aspirate_labware'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const DISPENSE_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['dispense_labware'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const MIX_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['labware'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
   title: 'Enter an integer value greater than 0',
@@ -400,12 +417,14 @@ const ABSORBANCE_READER_MODULE_ID_REQUIRED: FormError = {
   dependentFields: ['moduleId'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const MAGNETIC_MODULE_ID_REQUIRED: FormError = {
   title: 'Module required',
   dependentFields: ['moduleId'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
@@ -482,29 +501,34 @@ const VOLUME_OUT_OF_RANGE: FormError = {
   dependentFields: ['volume'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const VOLUME_UNDER_MINIMUM: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['volume'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const MESSAGE_REQUIRED: FormError = {
   title: 'Message required',
   dependentFields: ['message'],
   location: 'field',
+  showOnReopen: true,
 }
 const PIPETTE_REQUIRED: FormError = {
   title: 'Pipette required',
   dependentFields: ['pipette'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const TIPRACK_REQUIRED: FormError = {
   title: 'Tiprack required',
   dependentFields: ['tiprack'],
   location: 'field',
   page: 0,
+  showOnReopen: true,
 }
 const TARGET_TEMPERATURE_RANGE: FormError = {
   title: RANGE_TITLE,
