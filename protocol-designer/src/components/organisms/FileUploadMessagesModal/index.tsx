@@ -10,7 +10,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getEnablePythonExport } from '../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
@@ -22,10 +21,8 @@ export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
-  const enableExportPython = useSelector(getEnablePythonExport)
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
-    enableExportPython,
   })
   const dismissModal = (): void => {
     dispatch(dismissFileUploadMessage())

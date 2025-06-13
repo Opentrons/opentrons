@@ -83,7 +83,6 @@ export function pythonDef(
     pipetteEntities,
     wasteChuteEntities,
     trashBinEntities,
-    liquidEntities,
   } = invariantContext
   const { labware, pipettes } = initialRobotState
   const sections: string[] = [
@@ -94,7 +93,11 @@ export function pythonDef(
       getLoadTrashBins(trashBinEntities),
       getLoadWasteChute(wasteChuteEntities),
     ],
-    getLoadLiquidClasses(liquidEntities),
+    getLoadLiquidClasses(
+      stepArgs?.liquidClass != null && stepArgs?.liquidClass !== 'none'
+        ? [stepArgs.liquidClass]
+        : []
+    ),
     quickTransferStepCommands({
       stepArgs,
       invariantContext,

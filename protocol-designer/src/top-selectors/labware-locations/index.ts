@@ -18,6 +18,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
+  getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -185,11 +186,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
     const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
       (acc, [labwareId, labwareOnDeck]) => {
-        const labwareOnAdapter = Object.values(labware).find(
-          temporalProperties =>
-            getTopLocationInStack(temporalProperties.stack) === labwareId
+        const hasLabwareAboveAdapter = Object.values(labware).some(
+          ({ stack }) =>
+            stack.includes(labwareId) &&
+            getTopLocationInStack(stack) !== labwareId
         )
-        const adapterSlot = getTopLocationInStack(labwareOnDeck.stack)
+        const adapterSlot = getSlotInLocationStack(labwareOnDeck.stack)
         const modIdWithAdapter = Object.keys(modules).find(modId =>
           labwareOnDeck.stack.includes(modId)
         )
@@ -204,7 +206,8 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             : 'unknown module'
         const moduleSlotInfo = modSlot ?? 'unknown slot'
         const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
-        return labwareOnAdapter == null && isAdapter
+
+        return isAdapter && !hasLabwareAboveAdapter
           ? [
               ...acc,
               {
@@ -223,7 +226,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(
-          ([_, lwOnDeck]) => lwOnDeck.stack[0] === modId
+          ([_, lwOnDeck]) => lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
         )
         const type = moduleEntities[modId].type
         const slot = modOnDeck.slot

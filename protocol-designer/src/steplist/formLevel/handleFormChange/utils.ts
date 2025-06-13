@@ -417,8 +417,8 @@ const getSubmergeRetractFields = (args: {
     liquidHandlingAction,
     tipMovement,
     additionalEquipmentEntities,
-    isDisposalVolumeEnabled = true,
-    isConditioningVolumeEnabled = true,
+    isDisposalVolumeEnabled = false,
+    isConditioningVolumeEnabled = false,
   } = args
 
   // all common submerge and retract fields
@@ -438,7 +438,8 @@ const getSubmergeRetractFields = (args: {
 
   // retract fields
   const airGapFields =
-    'airGapByVolume' in submergeRetractLookup && !isConditioningVolumeEnabled
+    'airGapByVolume' in submergeRetractLookup &&
+    !(liquidHandlingAction === 'aspirate' && isConditioningVolumeEnabled)
       ? getByVolumeField({
           volume: volumes.airGap,
           byVolume: submergeRetractLookup.airGapByVolume,
@@ -789,8 +790,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
 
-  const isConditioningVolumeEnabled = conditioningFields.conditioning_volume > 0
-  const isDisposalVolumeEnabled = disposalFields.disposalVolume_volume > 0
+  const isConditioningVolumeEnabled =
+    conditioningFields.conditioning_volume > 0 && path === 'multiDispense'
+  const isDisposalVolumeEnabled =
+    disposalFields.disposalVolume_volume > 0 && path === 'multiDispense'
 
   // aspirate/dispense submerge fields
   const aspirateSubmergeFields = getSubmergeRetractFields({
