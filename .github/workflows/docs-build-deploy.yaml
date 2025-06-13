@@ -50,7 +50,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Sandbox
         working-directory: ./docs
-        run: make deploy-flex-manual S3_BUCKET=sandbox.docs BRANCH=${{ github.ref_name }}
+        run: make deploy-flex-manual SANDBOX_S3_BUCKET=sandbox.docs BRANCH=${{ github.ref_name }}
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to sandbox" >> $GITHUB_OUTPUT
