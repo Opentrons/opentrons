@@ -55,8 +55,7 @@ class AddressableArea:
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
-    # Camel cased to mirror module/labware definitions.
-    locatingFeaturesAsParent: LocatingFeatures
+    locating_features_as_parent: LocatingFeatures
 
 
 # TODO make the below some sort of better type

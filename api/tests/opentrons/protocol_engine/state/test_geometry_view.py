@@ -208,7 +208,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     bounding_box=Dimensions(x=128, y=86, z=0),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    locatingFeaturesAsParent=LocatingFeatures(),
+    locating_features_as_parent=LocatingFeatures(),
 )
 
 
@@ -2992,7 +2992,7 @@ def test_get_slot_item(
         bounding_box=Dimensions(x=0, y=0, z=0),
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
-        locatingFeaturesAsParent=LocatingFeatures(),
+        locating_features_as_parent=LocatingFeatures(),
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(

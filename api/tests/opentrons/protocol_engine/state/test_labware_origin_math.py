@@ -144,7 +144,7 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    locatingFeaturesAsParent=LocatingFeatures(),
+    locating_features_as_parent=LocatingFeatures(),
 )
 
 

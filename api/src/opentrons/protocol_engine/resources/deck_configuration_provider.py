@@ -135,7 +135,7 @@ def get_addressable_area_from_name(
                 compatible_module_types=addressable_area.get(
                     "compatibleModuleTypes", []
                 ),
-                locatingFeaturesAsParent=locating_features_as_parent,
+                locating_features_as_parent=locating_features_as_parent,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"
