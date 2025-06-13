@@ -11,6 +11,7 @@ export type ModuleSetupWizardStep =
   | DetachProbeStep
   | SuccessStep
   | CloseDoorStep
+  | CheckInstallationPinsStep
   | InstallShuttleStep
   | UpdateFirmwareStep
 
@@ -72,6 +73,9 @@ export interface BeforeBeginningStep {
 }
 export interface CloseDoorStep {
   section: typeof SECTIONS.CLOSE_DOOR
+}
+export interface CheckInstallationPinsStep {
+  section: typeof SECTIONS.CHECK_INSTALLATION_PINS
 }
 export interface InstallShuttleStep {
   section: typeof SECTIONS.INSTALL_SHUTTLE
