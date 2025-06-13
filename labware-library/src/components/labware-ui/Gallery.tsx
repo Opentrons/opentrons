@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import { labwareImages } from './labware-images'
 import styles from './styles.module.css'
@@ -14,21 +15,19 @@ export interface GalleryProps {
 
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition, className } = props
-  const {
-    parameters: params,
-    dimensions: dims,
-    cornerOffsetFromSlot,
-  } = definition
+  const { parameters: params } = definition
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
   const [currentImage, setCurrentImage] = React.useState(0)
   const render = (
     <RobotWorkSpace
       key="center"
-      // TODO BEFORE MERGE
-      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dims.xDimension} ${dims.yDimension}`}
+      viewBox={`${minX} ${minY} ${xDimension} ${yDimension}`}
       width="100%"
       height="100%"
     >
-      {() => <LabwareRender definition={definition} />}
+      {() => (
+        <LabwareRender definition={definition} positioningMode="passThrough" />
+      )}
     </RobotWorkSpace>
   )
 
