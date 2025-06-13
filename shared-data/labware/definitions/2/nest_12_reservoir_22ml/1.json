@@ -181,6 +181,13 @@
   "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "opentrons_universal_flat_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 10.22
+    }
+  },
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
