@@ -1,4 +1,4 @@
-:og:description: How to select and apply a liquid class definition in Opentrons protocols. 
+:og:description: How to select and apply transfer behavior optimized for liquid classes in Opentrons protocols. 
 
 .. _liquid-classes: 
 
@@ -45,6 +45,8 @@ Use an Opentrons-verified liquid class in your transfers to automatically apply 
 
 Liquid Class Properties
 ========================
+
+## TODO: insert a little intro text up here 
 
 .. image:: /opentrons/api/docs/img/lc_icons/submerge_position.png
     ## TODO: get images working in table 
@@ -190,8 +192,11 @@ To customize an Opentrons-verified liquid class, use :py:meth:`InstrumentContext
  requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
  def run(protocol_context):
-
- ## todo: add tips, trash, pipette combination
+    tiprack = protocol_context.load_labware("opentrons_96_tiprack_20ul", "A2")
+    pipette_20 = protocol_context.load_instrument("p20_single_gen2", mount="left", tip_racks=[tiprack])
+    trash = protocol_context.load_trash_bin("A3")
+    nest_plate = protocol_context.load_labware("nest_96_wellplate_200ul_flat", "B1")
+    arma_plate = protocol_context.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "B2")
 
     # customize based on the aqueous liquid class  
     custom_water = protocol_context.define_liquid_class(
@@ -208,10 +213,38 @@ Next, edit indivual liquid class properties based on your Flex pipette and tip c
     # access aqueous liquid class properties for the Flex 1-ch. pipette and tips
     custom_water_props = custom_water.get_for(pipette_20, tiprack)
     
-    # edit aspirate submerge speed, flow rate, and delay
+    # edit aspirate submerge speed
+    custom_water_props.aspirate.submerge.speed = 80
+
+    # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
+    custom_water_props.aspirate.flow_rate_by_volume = [(10.0, 40.0), (20.0, 30.0)]
+
+    # edit to delay before an aspirate
+    custom_water_props.aspirate.delay = {"enabled": True} 
 
 
+You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified ``base_liquid_class``, you'll start from scratch, providing a value for every required property in your liquid class. 
 
-To create a new liquid class, use ``define_liquid_class()`` to...
+.. code-block:: python
 
-## TODO: when creating a new, custom liquid class, users need to define every single property? 
+    # create a new liquid class
+    custom_viscous = protocol_context.define_liquid_class(
+        name="custom_viscous",
+        properties=custom_liquid_class_properties,
+        display_name="Custom Viscous",
+    )
+
+    # add aspirate properties for the pipette, tip rack, and liquid class
+    custom_liquid_class_properties = {
+       "p20_single_gen2": {
+          "opentrons/opentrons_96_tiprack_20ul/1": {
+              "aspirate": {
+                 "aspirate_position": {
+                    "offset": {"x": 1, "y": 2, "z": 3},
+                    "position_reference": "well-bottom",
+                }
+
+The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for required properties like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See :ref:`liquid-class-definitions` for a complete list of liquid class properties to include.
+## TODO: or link users to github here 
+
+
