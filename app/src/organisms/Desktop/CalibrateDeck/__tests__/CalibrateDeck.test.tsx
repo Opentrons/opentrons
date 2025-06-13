@@ -1,8 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getDeckDefinitions } from '@opentrons/shared-data'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
@@ -22,13 +20,6 @@ vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/organisms/Desktop/CalibrationError')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getDeckDefinitions>()
-  return {
-    ...actual,
-    getDeckDefinitions: vi.fn(),
-  }
-})
 
 interface CalibrateDeckSpec {
   heading: string
@@ -91,7 +82,6 @@ describe('CalibrateDeck', () => {
 
   beforeEach(() => {
     dispatchRequests = vi.fn()
-    vi.mocked(getDeckDefinitions).mockReturnValue({})
     vi.mocked(useCalibrationError).mockReturnValue(null)
     vi.mocked(CalibrationError).mockReturnValue(
       <div>MOCK_CALIBRATION_ERROR</div>
