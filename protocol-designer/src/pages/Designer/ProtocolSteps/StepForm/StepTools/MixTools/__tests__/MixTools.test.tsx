@@ -56,7 +56,7 @@ describe('MixToolFirstStep', () => {
       toolboxStep: 0,
       tab: 'aspirate',
       setTab: vi.fn(),
-      setShowFormErrors: vi.fn(),
+      setShowFormErrorsInNewField: vi.fn(),
     }
     vi.mocked(getLabwareEntities).mockReturnValue({
       labwareId: {
