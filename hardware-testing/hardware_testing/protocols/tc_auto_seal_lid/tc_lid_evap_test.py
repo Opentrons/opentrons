@@ -15,11 +15,13 @@ metadata = {"protocolName": "Tough Auto Seal Lid Evaporation Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 
-def _long_hold_test(thermocycler: ThermocyclerContext, tc_lid_temp: float) -> None:
+def _long_hold_test(
+    thermocycler: ThermocyclerContext, tc_lid_temp: float, tc_block_temp: float
+) -> None:
     """Holds TC lid in Thermocycler for 5 min at high temp before evap test."""
     thermocycler.set_block_temperature(4, hold_time_minutes=5)
     thermocycler.set_lid_temperature(tc_lid_temp)
-    thermocycler.set_block_temperature(98, hold_time_minutes=5)
+    thermocycler.set_block_temperature(tc_block_temp, hold_time_minutes=5)
     thermocycler.set_block_temperature(4, hold_time_minutes=5)
     thermocycler.open_lid()
 
@@ -121,7 +123,16 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "107", "value": 107},
             {"display_name": "110", "value": 110},
             {"display_name": "120", "value": 120},
-            
+        ],
+    )
+    parameters.add_float(
+        variable_name="tc_block_temp",
+        display_name="TC Lid Temp",
+        description="Max temp of TC Lid",
+        default=98,
+        choices=[
+            {"display_name": "95", "value": 95},
+            {"display_name": "98", "value": 98},
         ],
     )
     parameters.add_str(
@@ -142,6 +153,7 @@ def run(protocol: ProtocolContext) -> None:
     pipette_type = protocol.params.pipette_type  # type: ignore[attr-defined]
     mount_position = protocol.params.mount_pos  # type: ignore[attr-defined]
     tc_lid_temp = protocol.params.tc_lid_temp  # type: ignore[attr-defined]
+    tc_block_temp = protocol.params.tc_block_temp  # type: ignore[attr-defined]
     test_type = protocol.params.test_type  # type: ignore[attr-defined]
     # SETUP
     # Thermocycler
@@ -182,9 +194,9 @@ def run(protocol: ProtocolContext) -> None:
 
     if test_type == "long_hold_test":
         protocol.move_labware(top_lid, plate_in_cycler, use_gripper=True)
-        _long_hold_test(thermocycler, tc_lid_temp)
+        _long_hold_test(thermocycler, tc_lid_temp, tc_block_temp)
         protocol.move_labware(top_lid, "B2", use_gripper=True)
-        _long_hold_test(thermocycler, tc_lid_temp)
+        _long_hold_test(thermocycler, tc_lid_temp, tc_block_temp)
         _fill_with_liquid_and_measure(protocol, pipette, reservoir, plate_in_cycler)
         thermocycler.close_lid()
         _pcr_cycle(thermocycler)
