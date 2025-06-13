@@ -14,9 +14,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  coordinateTupleToVector3D,
   getDeckDefinitions,
+  getDeckSlotOriginToLabwareOrigin,
   getLabwareDisplayName,
   getPositionFromSlotId,
+  getVectorSum,
 } from '@opentrons/shared-data'
 
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
@@ -24,7 +27,6 @@ import * as Sessions from '/app/redux/sessions'
 
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
-import type { AddressableArea } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
@@ -116,7 +118,11 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
               map(
                 addressableAreasById,
                 (addressableArea, addressableAreaName) => {
-                  if (!addressableArea.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
+                  if (!addressableArea.matingSurfaceUnitVector) {
+                    // if slot has no mating surface, don't render anything in it
+                    return null
+                  }
+
                   let labwareDef = null
                   if (String(tipRack?.slot) === addressableAreaName) {
                     labwareDef = tipRack?.definition
@@ -126,16 +132,31 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                   ) {
                     labwareDef = calBlock?.definition
                   }
+                  if (labwareDef === null) {
+                    return null
+                  }
 
-                  const slotDefPosition = getPositionFromSlotId(
+                  const slotOrigin = getPositionFromSlotId(
                     addressableArea.id,
                     deckDef
+                  )
+                  if (slotOrigin === null) {
+                    return null // Shouldn't happen.
+                  }
+
+                  const slotOriginToLabwareOrigin = getDeckSlotOriginToLabwareOrigin(
+                    addressableArea,
+                    labwareDef
+                  )
+                  const labwarePosition = getVectorSum(
+                    coordinateTupleToVector3D(slotOrigin),
+                    slotOriginToLabwareOrigin
                   )
 
                   return labwareDef != null ? (
                     <CalibrationLabwareRender
                       key={addressableAreaName}
-                      slotDefPosition={slotDefPosition}
+                      labwarePosition={labwarePosition}
                       labwareDef={labwareDef}
                     />
                   ) : null

@@ -7,45 +7,43 @@ import {
 import {
   getIsTiprack,
   getLabwareDisplayName,
-  getSchema2Dimensions,
+  getLabwareViewBox,
 } from '@opentrons/shared-data'
 
 import styles from './styles.module.css'
 
-import type { CoordinateTuple, LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, Vector2D } from '@opentrons/shared-data'
 
 interface CalibrationLabwareRenderProps {
   labwareDef: LabwareDefinition
-  slotDefPosition: CoordinateTuple | null
+  labwarePosition: Vector2D /** The labware will be translated so its origin is here. */
 }
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps
 ): JSX.Element {
-  const { labwareDef, slotDefPosition } = props
+  const { labwareDef, labwarePosition } = props
 
   const title = getLabwareDisplayName(labwareDef)
-  const dimensions = getSchema2Dimensions(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(labwareDef)
+
   return (
-    <g
-      // TODO BEFORE MERGE
-      transform={`translate(${String(slotDefPosition?.[0])}, ${String(
-        slotDefPosition?.[1]
-      )})`}
-    >
+    <g transform={`translate(${labwarePosition.x}, ${labwarePosition.y})`}>
       {
         // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
         isTiprack ? (
           <>
-            <LabwareRender definition={labwareDef} />
+            <LabwareRender
+              definition={labwareDef}
+              positioningMode="passThrough"
+            />
             <RobotCoordsForeignDiv
-              // TODO BEFORE MERGE
-              width={dimensions.xDimension}
-              height={dimensions.yDimension}
-              x={0}
-              y={0 - dimensions.yDimension}
+              width={xDimension}
+              height={yDimension}
+              x={minX}
+              y={minY - yDimension}
               transformWithSVG
               innerDivProps={{ className: styles.labware_ui_wrapper }}
             >
