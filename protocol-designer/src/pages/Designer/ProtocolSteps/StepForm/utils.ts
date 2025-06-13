@@ -1,6 +1,4 @@
-import { hydrate } from 'react-dom'
 import difference from 'lodash/difference'
-import isEqual from 'lodash/isEqual'
 import startCase from 'lodash/startCase'
 import without from 'lodash/without'
 
@@ -11,11 +9,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { i18n } from '../../../../assets/localization'
-import {
-  ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
-  PAUSE_UNTIL_TEMP,
-  PAUSE_UNTIL_TIME,
-} from '../../../../constants'
+import { PAUSE_UNTIL_TEMP, PAUSE_UNTIL_TIME } from '../../../../constants'
 import { PROFILE_CYCLE } from '../../../../form-types'
 import {
   getDefaultsForStepType,
@@ -34,7 +28,6 @@ import type {
   PathOption,
   ProfileItem,
   StepFieldName,
-  StepIdType,
   StepType,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
@@ -116,7 +109,7 @@ export const getDirtyFields = (
           setHeaterShakerTemperature,
           targetHeaterShakerTemperature,
         } = formData
-        let heaterShakerDirtyFields = ['moduleId']
+        const heaterShakerDirtyFields = ['moduleId']
         if (heaterShakerSetTimer && heaterShakerTimer == null) {
           heaterShakerDirtyFields.push('heaterShakerTimer')
         }
@@ -134,7 +127,7 @@ export const getDirtyFields = (
       }
       case 'magnet': {
         const { engageHeight, magnetAction } = formData
-        let magnetDirtyFields = ['moduleId']
+        const magnetDirtyFields = ['moduleId']
         if (magnetAction === 'engage' && engageHeight == null) {
           magnetDirtyFields.push('engageHeight')
         }
@@ -143,7 +136,7 @@ export const getDirtyFields = (
       }
       case 'temperature': {
         const { setTemperature, targetTemperature } = formData
-        let temperatureDirtyFields = ['moduleId']
+        const temperatureDirtyFields = ['moduleId']
         if (setTemperature === 'true' && targetTemperature == null) {
           temperatureDirtyFields.push('targetTemperature')
         }
@@ -152,7 +145,7 @@ export const getDirtyFields = (
       }
       case 'pause': {
         const { pauseAction } = formData
-        let pauseDirtyFields = []
+        const pauseDirtyFields = []
         if (pauseAction === PAUSE_UNTIL_TEMP) {
           pauseDirtyFields.push('pauseTime')
           pauseDirtyFields.push('pauseTemperature')
@@ -165,7 +158,7 @@ export const getDirtyFields = (
       }
       case 'absorbanceReader': {
         const { absorbanceReaderFormType } = formData
-        let absorbanceReaderDirtyFields = ['moduleId']
+        const absorbanceReaderDirtyFields = ['moduleId']
         if (absorbanceReaderFormType == null) {
           absorbanceReaderDirtyFields.push('absorbanceReaderFormType')
         } else if (absorbanceReaderFormType === 'absorbanceReaderLid') {
@@ -188,7 +181,7 @@ export const getDirtyFields = (
           lidTargetTemp,
           thermocyclerFormType,
         } = formData
-        let themocyclerDirtyFields = ['moduleId']
+        const themocyclerDirtyFields = ['moduleId']
         if (blockIsActive && blockTargetTemp == null) {
           themocyclerDirtyFields.push('blockTargetTemp')
         }
@@ -222,7 +215,7 @@ export const getDirtyFields = (
           pushOut_volume,
           pushOut_checkbox,
         } = formData
-        let mixDirtyFields = [
+        const mixDirtyFields = [
           'pipette',
           'tipRack',
           'volume',
@@ -287,7 +280,7 @@ export const getDirtyFields = (
           conditioning_checkbox,
           conditioning_volume,
         } = formData
-        let moveLiquidDirtyFields = [
+        const moveLiquidDirtyFields = [
           'pipette',
           'tipRack',
           'volume',

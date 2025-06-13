@@ -45,7 +45,6 @@ import {
   getCurrentFormIsPresaved,
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
-  getFormLevelWarningsPerStep,
   getInvariantContext,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
