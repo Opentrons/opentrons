@@ -153,10 +153,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}
+requirements = {"robotType": "OT-2", "apiLevel": "2.24"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
@@ -286,7 +283,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: 'fake_PD_version',
+        version: '8.5.0',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },

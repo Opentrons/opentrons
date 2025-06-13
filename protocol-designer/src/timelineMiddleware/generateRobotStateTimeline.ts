@@ -60,7 +60,8 @@ export const generateRobotStateTimeline = (
 
       // TODO: update to only mix requiring curryCommandCreator
       const commandCreator =
-        args.commandCreatorFnName !== 'transfer'
+        args.commandCreatorFnName !== 'transfer' &&
+        args.commandCreatorFnName !== 'consolidate'
           ? curryCommandCreator
           : curryWithoutPython
 

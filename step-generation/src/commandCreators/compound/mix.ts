@@ -1,7 +1,7 @@
 import flatMap from 'lodash/flatMap'
 
 import {
-  getCorrectionVolume,
+  getByVolumeValue,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
   WELL_ORIGIN_BOTTOM,
@@ -172,20 +172,26 @@ export const mixInPlaceUtil = (args: {
 
   const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
 
-  const correctionVolumeAspirate = getCorrectionVolume({
-    liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: tiprack,
-    targetVolume: volume,
-    liquidHandlingAction: 'aspirate',
-  })
-  const correctionVolumeDispense = getCorrectionVolume({
-    liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: tiprack,
-    targetVolume: volume,
-    liquidHandlingAction: 'singleDispense',
-  })
+  const correctionVolumeAspirate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tiprack,
+      targetVolume: volume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
+  const correctionVolumeDispense =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tiprack,
+      targetVolume: volume,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
 
   const moveToWellCommands: CurriedCommandCreator[] =
     moveToWellParams != null
