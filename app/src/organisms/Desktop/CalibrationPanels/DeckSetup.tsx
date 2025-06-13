@@ -134,7 +134,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     }
                   })()
 
-                  if (labwareDef === null) {
+                  if (labwareDef == null) {
                     return null
                   }
 
@@ -142,7 +142,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     addressableArea.id,
                     deckDef
                   )
-                  if (slotOrigin === null) {
+                  if (slotOrigin == null) {
                     return null // Shouldn't happen.
                   }
 
