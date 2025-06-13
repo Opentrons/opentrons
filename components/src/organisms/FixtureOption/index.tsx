@@ -16,6 +16,43 @@ import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { MouseEventHandler } from 'react'
 
+interface FixtureOptionProps {
+  onClickHandler: MouseEventHandler
+  optionName: string
+  buttonText: string
+  isOnDevice: boolean
+}
+export function FixtureOption(props: FixtureOptionProps): JSX.Element {
+  const { onClickHandler, optionName, buttonText, isOnDevice } = props
+  return isOnDevice ? (
+    <FixtureButtonODD onClick={onClickHandler}>
+      <StyledText
+        oddStyle="bodyTextRegular"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
+        {optionName}
+      </StyledText>
+      <StyledText oddStyle="bodyTextRegular">{buttonText}</StyledText>
+    </FixtureButtonODD>
+  ) : (
+    <ListItem
+      type="default"
+      padding="16px"
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <StyledText desktopStyle="bodyDefaultSemiBold">{optionName}</StyledText>
+      <TertiaryButton
+        buttonType="primary"
+        onClick={onClickHandler}
+        data-testid={optionName}
+      >
+        {buttonText}
+      </TertiaryButton>
+    </ListItem>
+  )
+}
+
 export const FixtureButtonODD = styled(Btn)`
   display: ${DISPLAY_FLEX};
   background-color: ${COLORS.grey35};
@@ -52,39 +89,3 @@ export const FixtureButtonODD = styled(Btn)`
     color: ${COLORS.grey50};
   }
 `
-
-interface FixtureOptionProps {
-  onClickHandler: MouseEventHandler
-  optionName: string
-  buttonText: string
-  isOnDevice: boolean
-}
-export function FixtureOption(props: FixtureOptionProps): JSX.Element {
-  const { onClickHandler, optionName, buttonText, isOnDevice } = props
-  return isOnDevice ? (
-    <FixtureButtonODD onClick={onClickHandler}>
-      <StyledText
-        oddStyle="bodyTextRegular"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
-        {optionName}
-      </StyledText>
-      <StyledText oddStyle="bodyTextRegular">{buttonText}</StyledText>
-    </FixtureButtonODD>
-  ) : (
-    <ListItem
-      type="default"
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-    >
-      <StyledText desktopStyle="bodyDefaultSemiBold">{optionName}</StyledText>
-      <TertiaryButton
-        buttonType="primary"
-        onClick={onClickHandler}
-        data-testid={optionName}
-      >
-        {buttonText}
-      </TertiaryButton>
-    </ListItem>
-  )
-}

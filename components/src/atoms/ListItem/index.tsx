@@ -84,10 +84,10 @@ export function ListItem(props: ListItemProps): JSX.Element {
     color: ${listItemProps.color ?? COLORS.black90};
     width: 100%;
     height: ${FLEX_MAX_CONTENT};
-    border-radius: ${BORDERS.borderRadius8};
-    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    border-radius: ${BORDERS.borderRadius4};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
       border-radius: ${BORDERS.borderRadius12};
     }
   `

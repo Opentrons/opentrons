@@ -1,7 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Btn } from '@opentrons/components'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,

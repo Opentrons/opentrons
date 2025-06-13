@@ -28,13 +28,11 @@ import {
   getFixtureDisplayName,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   HEATERSHAKER_MODULE_V1,
-  LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_CUTOUT_FIXTURE_ID,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  SINGLE_RIGHT_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_CUTOUTS,
@@ -54,12 +52,10 @@ import type {
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixtureId,
-  CutoutFixtureIdsWithFakes,
   CutoutId,
   CutoutIdToCutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { push } from 'connected-react-router'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -235,7 +231,7 @@ export function AddFixtureModal({
       cutoutId,
       FLEX_STACKER_MODULE_V1
     )
-    availableOptions.push( ...unconfiguredFlexStacker)
+    availableOptions.push(...unconfiguredFlexStacker)
 
     return availableOptions
   }

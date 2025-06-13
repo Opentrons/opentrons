@@ -202,7 +202,6 @@ export function ProtocolSetupModulesAndDeck({
                   mostRecentAnalysis={mostRecentAnalysis}
                   setSetupScreen={setSetupScreen}
                   setCutoutId={setCutoutId}
-                  setAddressableAreaId={setAddressableAreaId}
                   setProvidedFixtureOptions={setProvidedFixtureOptions}
                 />
               </Flex>

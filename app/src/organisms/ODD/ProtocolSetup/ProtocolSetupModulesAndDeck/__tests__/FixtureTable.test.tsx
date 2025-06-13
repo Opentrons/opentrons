@@ -26,7 +26,6 @@ vi.mock('/app/organisms/LocationConflictModal')
 
 const mockSetSetupScreen = vi.fn()
 const mockSetCutoutId = vi.fn()
-const mockSetAddressableAreaId = vi.fn()
 const mockSetProvidedFixtureOptions = vi.fn()
 
 const render = (props: ComponentProps<typeof FixtureTable>) => {
@@ -43,7 +42,6 @@ describe('FixtureTable', () => {
       robotType: FLEX_ROBOT_TYPE,
       setSetupScreen: mockSetSetupScreen,
       setCutoutId: mockSetCutoutId,
-      setAddressableAreaId: mockSetAddressableAreaId,
       setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
