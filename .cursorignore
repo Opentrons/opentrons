@@ -74,3 +74,21 @@ target/
 !api/docs/dist/
 api/docs/dist/hardware/
 api/docs/dist/v2/
+
+
+# local IDE configs
+.vscode
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# build artifacts
+app/dist/
+app-shell/dist/
+app-shell-odd/dist/
+components/lib
+discovery-client/lib
+labware-designer/dist/
+labware-library/dist/
+protocol-designer/dist/
+opentrons-ai-client/dist/
