@@ -208,8 +208,9 @@ class ModuleDefinition(BaseModel):
         description="Offsets to use for labware movement using gripper",
     )
 
-    locatingFeaturesAsParent: LocatingFeatures = Field(
-        ...,
+    # TODO(jh, 06-13-25): This should absolutely be required after EXEC-212 closes.
+    locatingFeaturesAsParent: Optional[LocatingFeatures] = Field(
+        default=None,
         description="List of explict locating features when this module acts as the parent in a labware stackup",
     )
 
