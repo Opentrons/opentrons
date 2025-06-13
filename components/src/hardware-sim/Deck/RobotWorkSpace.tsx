@@ -16,23 +16,30 @@ export interface RobotWorkSpaceRenderProps {
   addressableAreasById: { [addressableAreaId: string]: AddressableArea }
 }
 
-export interface RobotWorkSpaceProps extends StyleProps {
-  deckDef?: DeckDefinition
-
-  /**
-   * The x/y area to show, in standard SVG `x y xDimension yDimension` syntax.
-   *
-   * Specify coordinates in the Opentrons orientation, not the standard SVG orientation.
-   * So (x, y) is the area's front-left, xDimension extends the viewed area to the
-   * right, and yDimension extends the viewed area to the back.
-   */
-  viewBox?: string | null
+type BaseProps = {
   children?: (props: RobotWorkSpaceRenderProps) => ReactNode
   deckLayerBlocklist?: string[]
-  // optional boolean to show the OT-2 deck from deck defintion layers
+  /** optional boolean to show the OT-2 deck from deck defintion layers */
   showDeckLayers?: boolean
   id?: string
-}
+} & (
+  | // Require at least one of deckDef or viewBox,
+  {
+      deckDef: DeckDefinition
+    }
+  | {
+      /**
+       * The x/y area to show, in standard SVG `x y xDimension yDimension` syntax.
+       *
+       * Specify coordinates in the Opentrons orientation, not the standard SVG orientation.
+       * So (x, y) is the area's front-left, xDimension extends the viewed area to the
+       * right, and yDimension extends the viewed area to the back.
+       */
+      viewBox: string
+    }
+)
+
+export type RobotWorkSpaceProps = BaseProps & StyleProps
 
 /**
  * A wrapper for rendering the robot deck, labware, etc. from a top-down perspective.
@@ -42,34 +49,17 @@ export interface RobotWorkSpaceProps extends StyleProps {
  * SVG-transform them so they're displayed the correct way. This is needed because
  * SVG inverts y compared to Opentrons coordinates.
  */
-export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
+export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
   const {
     children,
-    deckDef,
     deckLayerBlocklist = [],
     showDeckLayers = false,
-    viewBox,
     id,
     ...styleProps
   } = props
+  const activeViewBox = getViewBoxFromProps(props)
+  const addressableAreasById = getAddressableAreasByIdFromProps(props)
   const wrapperRef = useRef<SVGSVGElement>(null)
-
-  if (!deckDef && !viewBox) return null
-
-  let wholeDeckViewBox
-  let addressableAreasById = {}
-  if (deckDef != null) {
-    const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-    const [deckXDimension, deckYDimension] = deckDef.dimensions
-
-    addressableAreasById = deckDef.locations.addressableAreas.reduce(
-      (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
-      {}
-    )
-    wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-  }
-
-  const activeViewBox = viewBox ?? wholeDeckViewBox
 
   return (
     <Svg viewBox={activeViewBox} ref={wrapperRef} id={id} {...styleProps}>
@@ -94,4 +84,34 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       </g>
     </Svg>
   )
+}
+
+function getAddressableAreasByIdFromProps(
+  props: RobotWorkSpaceProps
+): RobotWorkSpaceRenderProps['addressableAreasById'] {
+  if ('deckDef' in props) {
+    return Object.fromEntries(
+      props.deckDef.locations.addressableAreas.map(addressableArea => [
+        addressableArea.id,
+        addressableArea,
+      ])
+    )
+  } else {
+    return {}
+  }
+}
+
+function getViewBoxFromProps(props: RobotWorkSpaceProps): string {
+  if ('viewBox' in props) {
+    // An explicitly provided viewBox takes precedence.
+    return props.viewBox
+  } else {
+    return getWholeDeckViewBox(props.deckDef)
+  }
+}
+
+function getWholeDeckViewBox(deckDef: DeckDefinition): string {
+  const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
+  const [deckXDimension, deckYDimension] = deckDef.dimensions
+  return `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
 }
