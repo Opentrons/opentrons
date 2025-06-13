@@ -547,6 +547,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const isLastChunk = chunkIndex === sourceWellChunks.length - 1
       const numSourcesPerAsp = sourceWellChunk.length // can differ on final chunk
       const totalSampleDispenseVolume = volume * numSourcesPerAsp
+
       const changeTipNow =
         // path is in ['always', 'once', 'never']
         changeTip === 'always' || (changeTip === 'once' && isFirstChunk)

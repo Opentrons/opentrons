@@ -62,9 +62,7 @@ export function quickTransferStepCommands(
       : []
 
   return (
-    `# ${upperCase(stepArgs?.commandCreatorFnName)} STEP\n\n` +
-    nonLoadCommands +
-    `\n`
+    `# ${upperCase(stepArgs?.commandCreatorFnName)} STEP\n\n` + nonLoadCommands
   )
 }
 

@@ -296,8 +296,7 @@ pipette.transfer_with_liquid_class(
             }},
         },
     ),
-)
-`.trimStart()
+)`.trimStart()
     )
   })
   it('should generate a consolidate step in py', () => {
@@ -478,8 +477,7 @@ pipette.consolidate_with_liquid_class(
             }},
         },
     ),
-)
-`.trimStart()
+)`.trimStart()
     )
   })
   it('should generate a distribute step in py', () => {
@@ -663,8 +661,7 @@ pipette.distribute_with_liquid_class(
             }},
         },
     ),
-)
-`.trimStart()
+)`.trimStart()
     )
   })
 })
