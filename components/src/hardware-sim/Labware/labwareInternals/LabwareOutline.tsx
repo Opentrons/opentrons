@@ -52,7 +52,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   } = props
 
   const { minX, minY, xDimension, yDimension } =
-    definition !== undefined
+    definition != null
       ? getLabwareViewBox(definition)
       : {
           minX: props.minX,
