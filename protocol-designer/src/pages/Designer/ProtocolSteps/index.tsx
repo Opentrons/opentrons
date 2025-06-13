@@ -31,11 +31,10 @@ import {
   StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
-  createFile,
   getRobotStateTimeline,
   getRobotType,
 } from '../../../file-data/selectors'
@@ -43,7 +42,6 @@ import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { saveProtocolFile } from '../../../load-file/actions'
 import { useProtocolExportHandler } from '../../../resources/hooks'
 import {
-  getAdditionalEquipmentEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../step-forms/selectors'
@@ -58,12 +56,6 @@ import {
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
 import { getHasTrash } from '../../../utils'
-import { LOAD_COMMANDS } from '../../ProtocolOverview'
-import {
-  getUnusedEntities,
-  getUnusedStagingAreas,
-  getUnusedTrash,
-} from '../../ProtocolOverview/utils'
 import { DeckSetupContainer } from '../DeckSetup'
 import { zoomInOnCoordinate } from '../DeckSetup/utils'
 import { OffDeck } from '../OffDeck'
@@ -75,7 +67,6 @@ import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
-import type { Fixture } from '../../ProtocolOverview'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 const STEP_SUMMARY_HEIGHT = '18.2rem'
@@ -107,7 +98,7 @@ export function ProtocolSteps({
   const robotType = useSelector(getRobotType)
   const activeItem = useSelector(getActiveItem)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const { pipettes, modules, labware, additionalEquipmentOnDeck } = deckSetup
+  const { labware, additionalEquipmentOnDeck } = deckSetup
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -130,7 +121,11 @@ export function ProtocolSteps({
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
   const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
-  const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
+  const { errors: timelineErrors, timeline } = useSelector(
+    getRobotStateTimeline
+  )
+  const hasCommands = timeline.length > 0
+
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -139,61 +134,11 @@ export function ProtocolSteps({
   const isOffDeck = deckView === rightString
   const isZoomedIn = zoomedInSlot != null
 
-  const fileData = useSelector(createFile)
-  const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
-
-  const nonLoadCommands =
-    fileData?.commands.filter(
-      command => !LOAD_COMMANDS.includes(command.commandType)
-    ) ?? []
-  const gripperInUse =
-    fileData?.commands.find(
-      command =>
-        (command.commandType === 'moveLabware' &&
-          command.params.strategy === 'usingGripper') ||
-        command.commandType === 'absorbanceReader/closeLid' ||
-        command.commandType === 'absorbanceReader/openLid'
-    ) != null
-  const noCommands = fileData != null ? nonLoadCommands.length === 0 : true
-  const modulesWithoutStep = getUnusedEntities(
-    modules,
-    savedStepForms,
-    'moduleId',
-    robotType
-  )
-  const pipettesWithoutStep = getUnusedEntities(
-    pipettes,
-    savedStepForms,
-    'pipette',
-    robotType
-  )
-  const isGripperAttached = Object.values(additionalEquipment).some(
-    equipment => equipment?.name === 'gripper'
-  )
-  const gripperWithoutStep = isGripperAttached && !gripperInUse
-
-  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    additionalEquipmentOnDeck,
-    fileData?.commands
-  )
-  const fixtureWithoutStep: Fixture = {
-    trashBin: trashBinUnused,
-    wasteChute: wasteChuteUnused,
-    stagingAreaSlots: getUnusedStagingAreas(
-      additionalEquipmentOnDeck,
-      fileData?.commands
-    ),
-  }
-
   const {
     handleExportClick,
     exportWarningModalElement,
   } = useProtocolExportHandler({
-    noCommands,
-    modulesWithoutStep,
-    pipettesWithoutStep,
-    gripperWithoutStep,
-    fixtureWithoutStep,
+    hasCommands,
     onConfirmExport: () => {
       dispatch(saveProtocolFile())
     },
@@ -303,7 +248,9 @@ export function ProtocolSteps({
             overflow={OVERFLOW_AUTO}
             flexDirection={DIRECTION_COLUMN}
           >
-            {isZoomedIn || formData != null ? null : (
+            {isZoomedIn ||
+            formData != null ||
+            selectedSubstep != null ? null : (
               <Flex justifyContent={JUSTIFY_END}>
                 <ExportButton onClick={handleExporting} />
               </Flex>
@@ -404,7 +351,9 @@ export function ProtocolSteps({
           ) : null}
         </Flex>
         {formData == null && selectedSubstep ? (
-          <SubStepsToolbox stepId={selectedSubstep} />
+          <Flex paddingY={SPACING.spacing12}>
+            <SubStepsToolbox stepId={selectedSubstep} />
+          </Flex>
         ) : null}
         <Flex
           padding={

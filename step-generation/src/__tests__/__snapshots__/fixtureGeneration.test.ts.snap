@@ -19283,7 +19283,10 @@ exports[`snapshot tests > makeState 1`] = `
   },
   "tipState": {
     "pipettes": {
-      "p300SingleId": false,
+      "p300SingleId": {
+        "hasTip": false,
+        "tiprackURI": null,
+      },
     },
     "tipracks": {
       "tiprack1Id": {

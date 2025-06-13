@@ -32,16 +32,13 @@ import {
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
 } from '../../../../../../constants'
 import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
-import { getFormErrorsMappedToField } from '../../utils'
 
 import type { TFunction } from 'i18next'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { FormData } from '../../../../../../form-types'
 import type { InitializationMode } from '../../../../../../step-forms/types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldProps, FieldPropsByName } from '../../types'
-import type { ErrorMappedToField } from '../../utils'
 
 const MAX_WAVELENGTHS = 6
 const CUSTOM_OPTION: DropdownOption = { name: 'Other', value: '' }
@@ -62,7 +59,6 @@ const WAVELENGTH_OPTIONS = [...DEFINED_OPTIONS, CUSTOM_OPTION]
 interface InitializationProps {
   formData: FormData
   propsForFields: FieldPropsByName
-  visibleFormErrors: StepFormErrors
   showFormErrors: boolean
 }
 
@@ -90,12 +86,10 @@ const getBadWavelengthError = (
 }
 
 export function Initialization(props: InitializationProps): JSX.Element {
-  const { formData, propsForFields, visibleFormErrors, showFormErrors } = props
+  const { formData, propsForFields, showFormErrors } = props
   const [numWavelengths, setNumWavelengths] = useState<number>(
     (formData.wavelengths?.length as number) ?? 1
   )
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
-
   return (
     <Flex
       gridGap={SPACING.spacing4}
@@ -112,7 +106,6 @@ export function Initialization(props: InitializationProps): JSX.Element {
         mode={formData.mode}
         numWavelengths={numWavelengths}
         setNumWavelengths={setNumWavelengths}
-        mappedErrorsToField={mappedErrorsToField}
         showFormErrors={showFormErrors}
       />
     </Flex>
@@ -160,7 +153,6 @@ interface InitializationEditorProps {
   wavelengthsProps: FieldProps
   numWavelengths: number
   setNumWavelengths: Dispatch<SetStateAction<number>>
-  mappedErrorsToField: ErrorMappedToField
   showFormErrors: boolean
 }
 
@@ -173,7 +165,6 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
     wavelengthsProps,
     numWavelengths,
     setNumWavelengths,
-    mappedErrorsToField,
     showFormErrors,
   } = props
   const { t } = useTranslation('form')
@@ -259,7 +250,6 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
             <ReferenceWavelength
               formData={formData}
               propsForFields={propsForFields}
-              error={mappedErrorsToField.referenceWavelength?.title ?? null}
             />
           </Flex>
         </>
@@ -359,11 +349,10 @@ function WavelengthItem(props: WavelengthItemProps): JSX.Element {
 interface ReferenceWavelengthProps {
   formData: FormData
   propsForFields: FieldPropsByName
-  error: string | null
 }
 
 function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
-  const { formData, propsForFields, error } = props
+  const { formData, propsForFields } = props
   const { t } = useTranslation('form')
   const isExpanded = formData.referenceWavelengthActive === true
   const referenceWavelength = formData.referenceWavelength
@@ -371,7 +360,6 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
     ({ value }) => value === referenceWavelength
   )
 
-  const [isFocused, setIsFocused] = useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
@@ -458,13 +446,7 @@ function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
                 onClick={e => {
                   e.stopPropagation()
                 }}
-                onBlur={() => {
-                  setIsFocused(false)
-                }}
-                onFocus={() => {
-                  setIsFocused(true)
-                }}
-                error={!isFocused ? error : null}
+                error={propsForFields.referenceWavelength.errorToShow}
               />
             ) : null}
           </>

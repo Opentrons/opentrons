@@ -25,7 +25,7 @@ import { setFeatureFlags } from '../../../feature-flags/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { removeOpentronsPhrases } from '../../../utils'
-import { useKitchen } from '../Kitchen/hooks'
+import { useKitchen } from '../Kitchen/useKitchen'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'

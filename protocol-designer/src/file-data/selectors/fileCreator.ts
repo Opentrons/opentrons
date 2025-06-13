@@ -99,7 +99,8 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<ProtocolFile> = createSelector(
+//  eventually will be deprecated
+export const createJSONFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -196,7 +197,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const liquids: ProtocolFile['liquids'] = reduce(
+    const liquids: LiquidV1Mixin['liquids'] = reduce(
       liquidEntities,
       (acc, liquidData, liquidId) => {
         return {
@@ -244,7 +245,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    const liquidV1Mixin: LiquidV1Mixin = {
+    const liquidV2Mixin: LiquidV1Mixin = {
       liquidSchemaId: 'opentronsLiquidSchemaV1',
       liquids,
     }
@@ -305,14 +306,14 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...protocolBase,
       ...deckStructure,
       ...labwareV2Mixin,
-      ...liquidV1Mixin,
+      ...liquidV2Mixin,
       ...commandv10Mixin,
       ...commandAnnotionaV1Mixin,
     }
   }
 )
 
-export const createPythonFile: Selector<PDPythonFile> = createSelector(
+export const createFile: Selector<PDPythonFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -358,9 +359,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       },
       designerApplication: {
         name: 'opentrons/protocol-designer',
-        //  hardcoding this version in to avoid unnecessary migrating
-        //  TODO: remember to update to the applicationVersion const
-        version: '8.5.0',
+        version: applicationVersion,
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,

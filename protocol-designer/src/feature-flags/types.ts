@@ -26,6 +26,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_MOAM',
   'OT_PD_ENABLE_REDESIGN',
   'OT_PD_ENABLE_ABSORBANCE_READER',
+  'OT_PD_ENABLE_PYTHON_EXPORT',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
@@ -39,9 +40,10 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_LIQUID_CLASSES'
   | 'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2'
   | 'OT_PD_ENABLE_TIMELINE_SCRUBBER'
-  | 'OT_PD_ENABLE_PYTHON_EXPORT'
   | 'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT'
   | 'OT_PD_ENABLE_STACKING'
+  //  this feature is for internal purposes, users should never export JSON
+  | 'OT_PD_ENABLE_JSON_EXPORT'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -57,8 +59,8 @@ export const allFlags: FlagTypes[] = [
   'OT_PD_ENABLE_REACT_SCAN',
   'OT_PD_ENABLE_LIQUID_CLASSES',
   'OT_PD_ENABLE_TIMELINE_SCRUBBER',
-  'OT_PD_ENABLE_PYTHON_EXPORT',
   'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
   'OT_PD_ENABLE_STACKING',
+  'OT_PD_ENABLE_JSON_EXPORT',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

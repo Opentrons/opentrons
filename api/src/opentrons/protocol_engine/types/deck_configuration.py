@@ -1,12 +1,13 @@
 """Protocol engine types to do with deck configuration."""
 
 from dataclasses import dataclass
-from typing import FrozenSet, List, Tuple, Optional
+from typing import FrozenSet, List, Tuple, Optional, Union
 from enum import Enum
 
 from opentrons.types import DeckSlotName
 
 from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
+from opentrons_shared_data.deck.types import SlotDefV3
 
 from .util import Vec3f, Dimensions
 
@@ -70,3 +71,7 @@ class DeckType(str, Enum):
     OT2_STANDARD = "ot2_standard"
     OT2_SHORT_TRASH = "ot2_short_trash"
     OT3_STANDARD = "ot3_standard"
+
+
+DeckLocationDefinition = Union[AddressableArea, SlotDefV3]
+"""Union of locations that contain deck definition information."""

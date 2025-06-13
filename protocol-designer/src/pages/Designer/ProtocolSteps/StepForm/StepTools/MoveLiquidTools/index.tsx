@@ -5,7 +5,8 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../../../file-data/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { useAssignLiquidClass } from './hooks'
+import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 
@@ -16,18 +17,21 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     toolboxStep,
     propsForFields,
     formData,
-    visibleFormErrors,
     setShowFormErrors,
     tab,
     setTab,
   } = props
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
     'aspirate_wells',
     propsForFields.liquidClass.updateValue
+  )
+
+  const orderedSupportedLiquidClassOptions = useSupportedLiquidClassOptions(
+    orderedLiquidClassOptions,
+    formData
   )
   const robotType = useSelector(getRobotType)
 
@@ -38,7 +42,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       case 1:
@@ -50,7 +53,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                 formData={formData}
                 setShowFormErrors={setShowFormErrors}
                 type="transfer"
-                orderedLiquidClassOptions={orderedLiquidClassOptions}
+                orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
               />
             ) : (
               <SecondStepsMoveLiquidTools
@@ -59,7 +62,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
                 tab={tab}
                 setTab={setTab}
                 setShowFormErrors={setShowFormErrors}
-                visibleFormErrors={visibleFormErrors}
               />
             )}
           </>
@@ -72,7 +74,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             tab={tab}
             setTab={setTab}
             setShowFormErrors={setShowFormErrors}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       default:
@@ -83,7 +84,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
     }

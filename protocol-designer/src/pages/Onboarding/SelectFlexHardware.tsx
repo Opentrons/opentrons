@@ -4,7 +4,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { HandleEnter } from '../../components/atoms'
 import { HardwareConfigurator } from '../../components/organisms/HardwareConfigurator'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { WizardBody } from './WizardBody'
 
 import type { WizardTileProps } from './types'

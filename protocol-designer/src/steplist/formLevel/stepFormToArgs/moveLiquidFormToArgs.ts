@@ -10,7 +10,6 @@ import {
 } from '@opentrons/step-generation'
 
 import {
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
@@ -119,6 +118,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
           disposalByVolume: null,
         })
@@ -128,6 +129,8 @@ const getCheckedPath = (
           volume,
           path,
           numDispenseWells: hydratedFormData.dispense_wells.length,
+          aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
+            .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
             (liquidClassValuesForTip.multiDispense
               ?.conditioningByVolume as Array<[number, number]>) ?? null,
@@ -169,9 +172,9 @@ export const moveLiquidFormToArgs = (
     dispense_x_position,
     aspirate_y_position,
     dispense_y_position,
-    blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
+    stepNumber,
   } = hydratedFormData
   let sourceWells = getOrderedWells(
     hydratedFormData.aspirate_wells,
@@ -289,10 +292,6 @@ export const moveLiquidFormToArgs = (
       hydratedFormData.blowout_location) ||
     null
 
-  const blowoutOffsetFromTopMm =
-    blowoutLocation != null
-      ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-      : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
     hydratedFormData,
     'aspirate_airGap_checkbox',
@@ -314,7 +313,9 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.conditioning_volume > 0
       ? hydratedFormData.conditioning_volume
       : 0
+
   const commonFields = {
+    stepId: stepNumber,
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,
@@ -333,7 +334,6 @@ export const moveLiquidFormToArgs = (
     blowoutFlowRateUlSec:
       hydratedFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
-    blowoutOffsetFromTopMm,
     changeTip: hydratedFormData.changeTip,
     preWetTip: Boolean(hydratedFormData.preWetTip),
     aspirateDelay,
@@ -454,7 +454,7 @@ export const moveLiquidFormToArgs = (
         disposalVolume,
         conditioningVolume,
         // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
-        blowoutLocation: hydratedFormData.blowout_location,
+        blowoutLocation,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         // cannot distribute into a waste chute so if destWells is null

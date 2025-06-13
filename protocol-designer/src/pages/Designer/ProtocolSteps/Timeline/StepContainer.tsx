@@ -30,7 +30,7 @@ import {
   DELETE_STEP_FORM,
   getMainPagePortalEl,
 } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { actions as steplistActions } from '../../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {

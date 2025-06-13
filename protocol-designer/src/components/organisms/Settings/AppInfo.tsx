@@ -2,19 +2,16 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  Btn,
+  BasicButton,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  Link as LinkComponent,
   ListItem,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { DOC_URL } from '..'
-import { LINK_BUTTON_STYLE } from '../../atoms'
 
 import type { Dispatch, SetStateAction } from 'react'
 
@@ -27,6 +24,10 @@ export function AppInfo({
 }: AppInfoProps): JSX.Element {
   const { t } = useTranslation('shared')
   const pdVersion = process.env.OT_PD_VERSION
+
+  const handleSoftwareManualClick = (): void => {
+    window.open(DOC_URL, '_blank')
+  }
 
   return (
     <Flex
@@ -51,31 +52,17 @@ export function AppInfo({
           <StyledText desktopStyle="bodyDefaultRegular">{pdVersion}</StyledText>
         </Flex>
         <Flex gridGap={SPACING.spacing16} alignItems={ALIGN_CENTER}>
-          <LinkComponent
-            css={LINK_BUTTON_STYLE}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            href={DOC_URL}
-            external
-            padding={SPACING.spacing4}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('software_manual')}
-            </StyledText>
-          </LinkComponent>
-
-          <Btn
-            css={LINK_BUTTON_STYLE}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          <BasicButton onClick={handleSoftwareManualClick} underLine>
+            {t('software_manual')}
+          </BasicButton>
+          <BasicButton
             onClick={() => {
               setShowAnnouncementModal(true)
             }}
-            data-testid="AnnouncementModal_viewReleaseNotesButton"
-            padding={SPACING.spacing4}
+            underLine
           >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('release_notes')}
-            </StyledText>
-          </Btn>
+            {t('release_notes')}
+          </BasicButton>
         </Flex>
       </ListItem>
     </Flex>

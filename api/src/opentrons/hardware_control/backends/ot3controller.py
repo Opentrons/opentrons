@@ -899,12 +899,15 @@ class OT3Controller(FlexBackend):
         async with self._monitor_overpressure(checked_moving_pipettes):
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
-        if Axis.Q in checked_axes:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-                    Axis.to_kind(Axis.Q)
-                ],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity[
+                    gantry_load
+                ][Axis.to_kind(Axis.Q)],
             )
 
         for position in positions:

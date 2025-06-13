@@ -27,7 +27,10 @@ describe('liquidProbe', () => {
   })
   it('creates liquidProbe command if pipette has tips', () => {
     initialRobotState.tipState.pipettes = {
-      [p300SingleId]: true,
+      [p300SingleId]: {
+        hasTip: true,
+        tiprackURI: 'tiprackId',
+      },
     }
     const params: LiquidProbeParams = {
       pipetteId: DEFAULT_PIPETTE,
@@ -61,7 +64,10 @@ describe('liquidProbe', () => {
   })
   it('does not create liquidProbe command if pipette does not have tips', () => {
     robotStateWithTip.tipState.pipettes = {
-      [p300SingleId]: false,
+      [p300SingleId]: {
+        hasTip: false,
+        tiprackURI: null,
+      },
     }
     const params: LiquidProbeParams = {
       pipetteId: DEFAULT_PIPETTE,

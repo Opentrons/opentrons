@@ -93,7 +93,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     destLabware,
     destWell,
@@ -200,7 +199,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     spec: pipetteSpecs,
     name: pipetteName,
   } = invariantContext.pipetteEntities[pipette]
-  const multiDispenseValuesForTip = getAllLiquidClassDefs()
+  const liquidClassValuesForTip = getAllLiquidClassDefs()
     [
       liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
         ? WATER_LIQUID_CLASS_NAME
@@ -208,17 +207,18 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     ].byPipette?.find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)?.multiDispense
+    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const { aspirate } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     volume,
     path: 'multiAspirate',
     numDispenseWells: sourceWells.length,
-    conditioningByVolume: (multiDispenseValuesForTip?.conditioningByVolume ??
-      []) as Array<[number, number]>,
-    disposalByVolume: (multiDispenseValuesForTip?.disposalByVolume ??
-      []) as Array<[number, number]>,
+    aspirateAirGapByVolume:
+      (aspirate?.retract.airGapByVolume as Array<[number, number]>) ?? [],
+    conditioningByVolume: null,
+    disposalByVolume: null,
   })
 
   const { numWellsToFitInTip } = multiWellHandling
@@ -233,24 +233,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
-      pipette,
-      sourceLabware,
-      tipRack,
-      { x: aspirateXOffset, y: aspirateYOffset }
-    )
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+      pipetteId: pipette,
+      labwareId: sourceLabware,
+      wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
+    })
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
-      pipette,
-      destLabware,
-      tipRack,
-      { x: dispenseXOffset, y: dispenseYOffset }
-    )
+      pipetteId: pipette,
+      labwareId: destLabware,
+      wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
+    })
     if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
       errors.push(errorCreators.possiblePipetteCollision())
     }
@@ -798,6 +794,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const blowOutInPlaceCommand = [
@@ -828,11 +825,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             wellName: destWell,
             wellLocation: {
               origin: WELL_ORIGIN_TOP,
-              offset: {
-                x: 0,
-                y: 0,
-                z: blowoutOffsetFromTopMm,
-              },
             },
           }),
 

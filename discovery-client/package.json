@@ -28,7 +28,7 @@
     "lodash": "4.17.21",
     "mdns-js": "1.0.1",
     "node-fetch": "2.6.7",
-    "redux": "4.0.5",
+    "redux": "5.0.1",
     "reselect": "4.0.0",
     "stable": "0.1.8",
     "to-regex": "3.0.2",

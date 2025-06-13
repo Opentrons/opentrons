@@ -33,7 +33,7 @@ def verify_and_normalize_transfer_args(
     last_tip_picked_up_from: Optional[Well],
     tip_racks: List[Labware],
     nozzle_map: NozzleMapInterface,
-    target_all_wells: bool,
+    group_wells_for_multi_channel: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
 ) -> TransferInfo:
@@ -43,7 +43,7 @@ def verify_and_normalize_transfer_args(
     else:
         # If trash bin or waste chute, set this to empty to have less isinstance checks after this
         flat_dests_list = []
-    if not target_all_wells and nozzle_map.tip_count > 1:
+    if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
         flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
             flat_sources_list, nozzle_map
         )

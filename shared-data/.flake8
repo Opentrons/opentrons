@@ -1,0 +1,31 @@
+[flake8]
+
+extend-exclude = venv .venv
+
+# max cyclomatic complexity
+max-complexity = 9
+
+extend-ignore =
+    # defer formatting concerns to black
+    # E203: space around `:` operator
+    # E501: maximum line length
+    E203,
+    E501,
+    # do not require type annotations for self nor cls
+    ANN101,
+    ANN102
+
+# configure flake8-docstrings
+# https://pypi.org/project/flake8-docstrings/
+docstring-convention = google
+
+noqa-require-code = true
+
+per-file-ignores =
+    python/opentrons_shared_data/load.py:D
+    python/opentrons_shared_data/deck/*:D
+    python/opentrons_shared_data/labware/*:D
+    python/opentrons_shared_data/module/*:D
+    python/opentrons_shared_data/pipette/*:D
+    python/opentrons_shared_data/protocol/*:D
+    python_tests/*:ANN,D

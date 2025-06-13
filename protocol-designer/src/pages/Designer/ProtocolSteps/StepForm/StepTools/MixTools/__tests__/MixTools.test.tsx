@@ -27,7 +27,6 @@ import { SecondStepMixTools } from '../SecondStepMixTools'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
 
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')
@@ -36,7 +35,7 @@ vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
-vi.mock('../../MoveLiquidTools/hooks')
+vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -55,7 +54,6 @@ describe('MixToolFirstStep', () => {
       } as any,
       formData: {} as FormData,
       toolboxStep: 0,
-      visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
       setShowFormErrors: vi.fn(),

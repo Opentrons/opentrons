@@ -862,7 +862,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
         touchTipAfterDispense: true,
         blowoutFlowRateUlSec: 2.3,
-        blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 3,
         touchTipAfterAspirateOffsetMmFromTop: -3.4,
       }

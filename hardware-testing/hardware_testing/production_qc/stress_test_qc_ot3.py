@@ -55,7 +55,7 @@ DEFAULT_Y_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.Y]
 DEFAULT_Z_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.Z]
 
 # NOTE: using high-throughput hold current, to purposefully heat it up
-DEFAULT_Z_HOLD_CURRENT = DEFAULT_HOLD_CURRENT.high_throughput[OT3AxisKind.Z]
+DEFAULT_Z_HOLD_CURRENT = DEFAULT_HOLD_CURRENT.high_throughput_1000[OT3AxisKind.Z]
 
 DEFAULT_X_SPEEDS: List[float] = [
     DEFAULT_X_SPEED - 100,

@@ -864,7 +864,10 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  # this uses the Q motor
+        [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            [NodeId.pipette_left],
+        ],  # this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
@@ -888,7 +891,7 @@ async def test_set_default_currents(
         assert these_current_settings
         for k, v in these_current_settings.items():
             if k == Axis.P_L and (
-                gantry_load == GantryLoad.HIGH_THROUGHPUT
+                gantry_load == GantryLoad.HIGH_THROUGHPUT_1000
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
@@ -914,7 +917,7 @@ async def test_set_default_currents(
         ],
         [
             {Axis.Q: 1.5},
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
             [{NodeId.pipette_left: 1.5}, [NodeId.pipette_left]],
         ],
     ],
@@ -953,7 +956,7 @@ async def test_set_run_current(
         ],
         [
             {Axis.Q: 0.8},
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
             [{NodeId.pipette_left: 0.8}, [NodeId.pipette_left]],
         ],
     ],
@@ -1421,7 +1424,7 @@ async def test_controller_move(
 ) -> None:
     from copy import deepcopy
 
-    controller.update_constraints_for_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+    controller.update_constraints_for_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
 
     run_target_pos = deepcopy(target_pos)
     config = {"run.side_effect": move_group_run_side_effect(controller, run_target_pos)}
