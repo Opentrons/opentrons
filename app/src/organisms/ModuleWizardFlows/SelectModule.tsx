@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -60,7 +60,6 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
 
   const isSingleModule = newModules.length === 1
   const sendIdentifyModule = useSendIdentifyModule()
-  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort

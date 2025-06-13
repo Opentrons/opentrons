@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 
 import {
   COLORS,
-  Flex,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,
@@ -26,19 +25,6 @@ interface CheckStackerInstallProps extends ModuleSetupWizardStepProps {
   attachedModules: AttachedModule[]
   doorOpenStatus: boolean
 }
-
-const BUTTON_STYLE = css`
-    width: 100%;
-    justify-content: ${JUSTIFY_FLEX_END};
-    padding-right: ${SPACING.spacing32};
-    padding-bottom: ${SPACING.spacing32};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      justify-content: ${JUSTIFY_FLEX_END}};
-      padding-bottom: ${SPACING.spacing32};
-      padding-left: ${SPACING.spacing32};
-    }
-  `
 
 export function CheckStackerInstall(
   props: CheckStackerInstallProps
