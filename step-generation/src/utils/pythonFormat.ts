@@ -72,7 +72,7 @@ export function formatPyList(list: any[]): string {
         element.every(number => typeof number === 'number')
     )
   ) {
-    return `[${list.map(value => formatPyTuple(value)).join(', ')}]`
+    return `[${list.map((value: any[]) => formatPyTuple(value)).join(', ')}]`
   }
 
   return `[${list.map(value => formatPyValue(value)).join(', ')}]`
