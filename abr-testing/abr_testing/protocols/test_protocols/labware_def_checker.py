@@ -20,17 +20,16 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Type of Labware",
         choices=[
             {
-                "display_name": "Axygen 500 ul Well Plate",
-                "value": "axygen_96_wellplate_500ul",
+                "display_name": "Nest 8 Reservoir 22 mL",
+                "value": "nest_8_reservoir_22ml",
             },
             {
-                "display_name": "Corn96Wellplate 360 ul Lid",
-                "value": "corning_96_wellplate_360ul_lid",
+                "display_name": "Nest 12 Reservoir 22 mL",
+                "value": "nest_12_reservoir_22ml",
             },
-            {"display_name": "SMC384well Read Plate", "value": "smc_384_read_plate"},
             {
-                "display_name": "ibidi96 SqrWellFltBtmPlt300µL",
-                "value": "ibidi_96_square_well_plate_300ul",
+                "display_name": "Nest 24 Reservoir 10.4 mL", 
+                "value": "nest_24_reservoir_10.4ml"
             },
         ],
         default="axygen_96_wellplate_500ul",
