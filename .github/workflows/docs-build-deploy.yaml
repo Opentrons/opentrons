@@ -1,0 +1,57 @@
+# Run tests, build PD, and deploy it to sandbox
+
+name: 'Docs build and deploy'
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-build-deploy.yaml'
+  push:
+    branches:
+      - 'edge'
+      - 'mkdocs-bucket-20250613' # Remove after a successful run on the PR
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  sandbox-build-and-deploy-flex-manual:
+    timeout-minutes: 5
+    runs-on: 'ubuntu-24.04'
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          aws-region: us-east-2
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Sync the project
+        working-directory: ./docs
+        run: make setup
+      - name: Build Flex Manual
+        working-directory: ./docs
+        run: make build-flex-manual
+      - name: Deploy Flex Manual to Sandbox
+        working-directory: ./docs
+        run: make deploy-flex-manual S3_BUCKET=sandbox.docs BRANCH=${{ github.ref_name }}
+      - name: Output URL to Summary
+        run: |
+          echo "## Flex Manual deployed to sandbox" >> $GITHUB_OUTPUT
+          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.ref_name }}/flex-manual/>" >> $GITHUB_OUTPUT
