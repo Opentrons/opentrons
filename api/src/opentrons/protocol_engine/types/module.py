@@ -16,6 +16,7 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons.types import Point
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LocatingFeatures
 
@@ -295,6 +296,10 @@ class ModuleOffsetVector(BaseModel):
         return ModuleOffsetVector(
             x=other.x - self.x, y=other.y - self.y, z=other.z - self.z
         )
+
+    def to_point(self) -> Point:
+        """Convert the vector to a Point."""
+        return Point(x=self.x, y=self.y, z=self.z)
 
 
 @dataclass
