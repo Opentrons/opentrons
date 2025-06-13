@@ -60,7 +60,6 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
 
   const isSingleModule = newModules.length === 1
   const sendIdentifyStacker = useSendIdentifyStacker()
-  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort
