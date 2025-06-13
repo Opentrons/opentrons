@@ -65,13 +65,13 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "on the left", "value": 1},
             {"display_name": "on the right", "value": 2},
         ],
-    ),
+    )
     parameters.add_float(
         variable_name="bottom",
         display_name="Lowest Bottom Offset",
-        default = 0.4,
-        maximum = 1.0,
-        minimum = 0.1
+        default=0.4,
+        maximum=1.0,
+        minimum=0.1,
     )
 
 
