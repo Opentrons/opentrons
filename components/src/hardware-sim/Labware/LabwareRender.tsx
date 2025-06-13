@@ -38,7 +38,9 @@ export interface LabwareRenderProps {
    * How the rendered labware should be positioned. Use `passThrough` for new code.
    *
    * `passThrough` -
-   *   The origin of the labware will be at the SVG origin.
+   *   The origin of the labware will be at the SVG origin. Beware that what
+   *   "the origin of the labware" corresponds to, physically, is not consistent across
+   *   labware. e.g. do not assume that it's always the labware's front-left corner.
    *
    *   To render a labware on its own, use the `getLabwareViewBox()` util from
    *   shared-data to compute the SVG's viewBox around that origin.
