@@ -13,6 +13,7 @@ import {
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import {
+  PD_APPLICATION_VERSION,
   pythonCustomLabwareDict,
   pythonDefRun,
   pythonImports,
@@ -374,7 +375,11 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       },
       designerApplication: {
         name: 'opentrons/protocol-designer',
-        version: applicationVersion,
+        // NOTE: hardcoding in the version like this could be tricky since we
+        // will have to remember to update the version with every release. But this solves
+        // the issues where you have to manually update when importing back to PD, before the release
+        // since using `applicationVersion` means that the version is tied to the release tag.
+        version: PD_APPLICATION_VERSION,
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
