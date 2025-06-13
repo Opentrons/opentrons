@@ -305,7 +305,8 @@ export const makeSingleEditFieldProps = (
   hydratedForm: HydratedFormData,
   t: any,
   visibleFormErrors: StepFormErrors,
-  showFormErrors: boolean
+  showFormErrors: boolean,
+  currentFormIsPresaved: boolean
 ): FieldPropsByName => {
   const { blur, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(
@@ -317,7 +318,8 @@ export const makeSingleEditFieldProps = (
       : false
     const value = formData ? formData[name] : null
     const mappedErrorsToField =
-      visibleFormErrors?.length > 0 && showFormErrors
+      visibleFormErrors?.length > 0 &&
+      (showFormErrors || !currentFormIsPresaved)
         ? getFormErrorsMappedToField(visibleFormErrors)
         : {}
 
