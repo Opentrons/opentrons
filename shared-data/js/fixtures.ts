@@ -46,6 +46,8 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_MODULE_V2,
@@ -53,6 +55,7 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
 } from './constants'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -616,6 +619,12 @@ export function getFixtureDisplayName(
       return 'Trash bin'
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       return 'Waste chute'
+    case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+      return 'Waste chute only with cover'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      return 'Waste chute with staging area slot'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+        return 'Waste chute with staging area slot and cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
@@ -677,6 +686,7 @@ export function getFixtureDisplayName(
           )} in USB-${usbPortNumber} and magnetic block`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
     default:
+      console.error('was not able to find display name for: ', cutoutFixtureId)
       return 'Slot'
   }
 }
