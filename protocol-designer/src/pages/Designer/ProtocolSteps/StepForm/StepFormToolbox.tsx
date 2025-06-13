@@ -241,7 +241,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     handleChangeFormInput,
     hydratedForm,
     t,
-    visibleFormErrors
+    visibleFormErrors,
+    showFormErrors
   )
 
   const [isRename, setIsRename] = useState<boolean>(false)
