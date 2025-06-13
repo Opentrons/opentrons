@@ -27,6 +27,7 @@ import * as Sessions from '/app/redux/sessions'
 
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
@@ -123,15 +124,16 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     return null
                   }
 
-                  let labwareDef = null
-                  if (String(tipRack?.slot) === addressableAreaName) {
-                    labwareDef = tipRack?.definition
-                  } else if (
-                    calBlock != null &&
-                    String(calBlock?.slot) === addressableAreaName
-                  ) {
-                    labwareDef = calBlock?.definition
-                  }
+                  const labwareDef = ((): LabwareDefinition | null => {
+                    if (tipRack?.slot === addressableAreaName) {
+                      return tipRack.definition
+                    } else if (calBlock?.slot === addressableAreaName) {
+                      return calBlock.definition
+                    } else {
+                      return null
+                    }
+                  })()
+
                   if (labwareDef === null) {
                     return null
                   }
