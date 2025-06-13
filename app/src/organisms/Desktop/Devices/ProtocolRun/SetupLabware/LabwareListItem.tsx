@@ -27,9 +27,8 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
+  getLabwareViewBox,
   getModuleType,
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -395,16 +394,13 @@ function StandaloneLabware(props: {
   definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
-  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
-  const dimensions = getSchema2Dimensions(definition)
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
 
   return (
-    // TODO BEFORE MERGE
-    <LabwareThumbnail
-      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-    >
+    <LabwareThumbnail viewBox={`${minX} ${minY} ${xDimension} ${yDimension}`}>
       <LabwareRender
         definition={definition}
+        positioningMode="passThrough"
         wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
       />
     </LabwareThumbnail>
