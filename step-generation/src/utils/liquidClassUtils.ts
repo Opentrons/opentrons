@@ -193,7 +193,7 @@ export const getCustomLiquidClassProperties = (
     string,
     any
   > = JSON.parse(JSON.stringify(customLiquidClassProperties))
-  return formatPyDict(stringifiedCustomLiquidClassProperties, true)
+  return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 
 export const getPythonLiquidClassName = (liquidClass: string): string => {
