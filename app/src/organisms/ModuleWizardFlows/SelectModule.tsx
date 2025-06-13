@@ -81,9 +81,14 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
+    // stop blinking previous module
+    if (selectedModule != null) {
+      sendIdentifyModule(selectedModule, false)
+    }
     // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
+        sendIdentifyModule(mod, true)
         setSelectedModule(mod)
         break
       }
