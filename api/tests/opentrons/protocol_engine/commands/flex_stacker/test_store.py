@@ -93,6 +93,7 @@ async def test_store_raises_if_full(
         contained_labware_bottom_first=_contained_labware(3),
         max_pool_count=3,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -123,6 +124,7 @@ async def test_store_raises_if_carriage_logically_empty(
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -164,6 +166,7 @@ async def test_store_raises_if_not_configured(
         contained_labware_bottom_first=_contained_labware(contained_labware_count),
         max_pool_count=max_pool_count,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -218,7 +221,8 @@ async def test_store_raises_if_stall(
         pool_lid_definition=None,
         contained_labware_bottom_first=[],
         max_pool_count=999,
-        pool_overlap=0,
+        pool_overlap=6,
+        pool_height=10,
     )
 
     decoy.when(
@@ -234,9 +238,6 @@ async def test_store_raises_if_stall(
     decoy.when(state_view.labware.get_definition("labware-id")).then_return(
         flex_50uL_tiprack
     )
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
-    ).then_return(4)
 
     decoy.when(state_view.geometry.get_location_sequence("labware-id")).then_return(
         [
@@ -394,6 +395,7 @@ async def test_store_raises_if_labware_does_not_match(
         contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
 
     decoy.when(
@@ -461,7 +463,8 @@ async def test_store(
         pool_lid_definition=None,
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
-        pool_overlap=0,
+        pool_overlap=6,
+        pool_height=10,
     )
 
     decoy.when(
@@ -477,10 +480,6 @@ async def test_store(
     decoy.when(state_view.labware.get_definition("labware-id")).then_return(
         flex_50uL_tiprack
     )
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
-    ).then_return(4)
-
     decoy.when(state_view.geometry.get_location_sequence("labware-id")).then_return(
         [
             OnModuleLocationSequenceComponent(moduleId=stacker_id),

@@ -43,6 +43,7 @@ from .deck_configuration import (
     AddressableArea,
     DeckConfigurationType,
     DeckType,
+    DeckLocationDefinition,
 )
 from .liquid_class import LiquidClassRecord, LiquidClassRecordWithId
 from .module import (
@@ -98,6 +99,7 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
+    LabwareParentDefinition,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -182,6 +184,7 @@ __all__ = [
     "AddressableArea",
     "DeckConfigurationType",
     "DeckType",
+    "DeckLocationDefinition",
     # Liquid classes
     "LiquidClassRecord",
     "LiquidClassRecordWithId",
@@ -249,6 +252,7 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
+    "LabwareParentDefinition",
     # Liquids
     "HexColor",
     "EmptyLiquidId",

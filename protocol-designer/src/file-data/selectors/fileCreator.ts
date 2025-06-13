@@ -40,7 +40,7 @@ import type {
   CommandV10Mixin,
   CreateCommand,
   LabwareV2Mixin,
-  LiquidV2Mixin,
+  LiquidV1Mixin,
   OT2RobotMixin,
   OT3RobotMixin,
   ProtocolBase,
@@ -99,7 +99,8 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<ProtocolFile> = createSelector(
+//  eventually will be deprecated
+export const createJSONFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -196,7 +197,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const liquids: LiquidV2Mixin['liquids'] = reduce(
+    const liquids: LiquidV1Mixin['liquids'] = reduce(
       liquidEntities,
       (acc, liquidData, liquidId) => {
         return {
@@ -205,7 +206,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             displayName: liquidData.displayName,
             description: liquidData.description ?? '',
             displayColor: liquidData.displayColor ?? swatchColors(liquidId),
-            liquidClass: liquidData.liquidClass ?? null,
           },
         }
       },
@@ -245,8 +245,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    const liquidV2Mixin: LiquidV2Mixin = {
-      liquidSchemaId: 'opentronsLiquidSchemaV2',
+    const liquidV2Mixin: LiquidV1Mixin = {
+      liquidSchemaId: 'opentronsLiquidSchemaV1',
       liquids,
     }
 
@@ -313,7 +313,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   }
 )
 
-export const createPythonFile: Selector<PDPythonFile> = createSelector(
+export const createFile: Selector<PDPythonFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -359,9 +359,7 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       },
       designerApplication: {
         name: 'opentrons/protocol-designer',
-        //  hardcoding this version in to avoid unnecessary migrating
-        //  TODO: remember to update to the applicationVersion const
-        version: '8.5.0',
+        version: applicationVersion,
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,

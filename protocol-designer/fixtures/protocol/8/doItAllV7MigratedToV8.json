@@ -4059,19 +4059,17 @@
       }
     }
   },
-  "liquidSchemaId": "opentronsLiquidSchemaV2",
+  "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {
     "0": {
       "displayName": "Water",
       "description": "",
-      "displayColor": "#b925ff",
-      "liquidClass": null
+      "displayColor": "#b925ff"
     },
     "1": {
       "displayName": "Samples",
       "description": "",
-      "displayColor": "#ffd600",
-      "liquidClass": null
+      "displayColor": "#ffd600"
     }
   },
   "commandSchemaId": "opentronsCommandSchemaV10",
@@ -7186,6 +7184,13 @@
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10
+      }
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "key": "2f1122b5-db81-4751-9855-f0b22373d09d",
+      "params": {
+        "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193"
       }
     },
     {

@@ -471,7 +471,7 @@ LoadConfigs = List[
                     },
                 )
             ],
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
         ),
         (
             [
@@ -516,7 +516,7 @@ LoadConfigs = List[
                 ),
                 (OT3Mount.GRIPPER, {"model": GripperModel.v1, "id": "g12345"}),
             ],
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
         ),
     ),
 )
@@ -696,7 +696,10 @@ async def test_pickup_moves(
     _, pipette_handler = mock_instrument_handlers
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
-            gantry_load = GantryLoad.HIGH_THROUGHPUT
+            if configs["model"] == "flex_96channel_1000":
+                gantry_load = GantryLoad.HIGH_THROUGHPUT_1000
+            else:
+                gantry_load = GantryLoad.HIGH_THROUGHPUT_200
         else:
             gantry_load = GantryLoad.LOW_THROUGHPUT
 
@@ -733,7 +736,10 @@ async def test_pickup_moves(
     ) as mock_move_rel:
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
         move_call_list = [call.args for call in mock_move_rel.call_args_list]
-        if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             assert move_call_list == [
                 (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
                 (OT3Mount.LEFT, Point(z=end_z_retract_dist)),
@@ -750,7 +756,10 @@ async def test_pickup_moves(
         #  except no calls to move_to_plunger_bottom
         await ot3_hardware.tip_pickup_moves(Mount.LEFT, 40.0)
         move_call_list = [call.args for call in mock_move_rel.call_args_list]
-        if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             assert move_call_list == [
                 (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
                 (OT3Mount.LEFT, Point(z=end_z_retract_dist)),
@@ -782,7 +791,7 @@ async def test_blow_out_position(
     liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
-            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mock_backend_get_tip_status, mount, configs
         )
@@ -837,7 +846,7 @@ async def test_blow_out_error(
     liquid_class = LiquidClasses.default
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
-            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mock_backend_get_tip_status, mount, configs
         )
@@ -2211,7 +2220,7 @@ async def test_pick_up_tip_full_tiprack(
                 hardware_backend._gear_motor_position[Axis.P_L] += distance
 
         tip_action.side_effect = _update_gear_motor_pos
-        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
         pipette_handler.plan_ht_pick_up_tip.assert_called_once_with()
         # first call should be "clamp", moving down
@@ -2258,7 +2267,7 @@ async def test_drop_tip_full_tiprack(
 
         set_mock_plunger_configs()
 
-        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
         mock_backend_get_tip_status.return_value = TipStateType.ABSENT
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_ht_drop_tip.assert_called_once_with()

@@ -23,7 +23,7 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 
@@ -59,7 +59,8 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
       : availableModules
 
   const isSingleModule = newModules.length === 1
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort
@@ -75,7 +76,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   useEffect(() => {
     if (isSingleModule) {
       setSelectedModule(newModules[0])
-      sendIdentifyModule(newModules[0], true)
+      sendIdentifyStacker(newModules[0], true)
     }
   }, [isSingleModule])
 
@@ -83,12 +84,12 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
     if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
+      sendIdentifyStacker(selectedModule, false)
     }
     // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
-        sendIdentifyModule(mod, true)
+        sendIdentifyStacker(mod, true)
         setSelectedModule(mod)
         break
       }

@@ -21,7 +21,7 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {

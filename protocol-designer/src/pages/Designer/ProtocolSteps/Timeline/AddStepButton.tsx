@@ -40,7 +40,7 @@ import {
   ConfirmDeleteModal,
   getMainPagePortalEl,
 } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { OFFDECK } from '../../../../constants'
 import { getEnableComment } from '../../../../feature-flags/selectors'
 import {

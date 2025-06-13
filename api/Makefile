@@ -115,7 +115,7 @@ test-cov:
 
 .PHONY: test-ot2
 test-ot2:
-	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(pytest) -m 'not ot3_only and not stackup_testing' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:

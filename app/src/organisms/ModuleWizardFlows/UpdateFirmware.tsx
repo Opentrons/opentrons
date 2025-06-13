@@ -20,7 +20,7 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
@@ -47,7 +47,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   const { t } = useTranslation('module_wizard_flows')
 
   const dispatch = useDispatch<Dispatch>()
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyStacker = useSendIdentifyStacker()
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
   const moduleSerialNumber = props.attachedModule.serialNumber
   const [
@@ -78,7 +78,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
         clearTimeout(moduleRequestTimeoutId)
       }
       setIsModuleUpdating(false)
-      sendIdentifyModule(matchingModule, true, 'blue')
+      sendIdentifyStacker(matchingModule, true, 'blue')
       patchModuleAfterUpdate(matchingModule)
       proceed()
     }

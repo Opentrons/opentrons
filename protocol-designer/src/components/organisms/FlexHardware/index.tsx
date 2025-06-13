@@ -28,7 +28,7 @@ import { uuid } from '../../../utils'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
 import { HardwareConfigurator } from '../HardwareConfigurator'
-import { useKitchen } from '../Kitchen/hooks'
+import { useKitchen } from '../Kitchen/useKitchen'
 import { updateInitialDeckState } from './util'
 
 import type {

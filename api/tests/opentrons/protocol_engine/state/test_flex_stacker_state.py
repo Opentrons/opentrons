@@ -125,6 +125,7 @@ def test_add_module_action(
         contained_labware_bottom_first=[],
         max_pool_count=0,
         pool_overlap=0,
+        pool_height=0,
     )
 
 
@@ -173,6 +174,7 @@ def test_get_labware_definition_list(
         contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     assert subject.get_pool_definition_ordered_list() == result
 
@@ -203,6 +205,7 @@ def test_get_contained_labware() -> None:
         ],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     assert subject.get_contained_labware() == [
         StackerStoredLabwareGroup(

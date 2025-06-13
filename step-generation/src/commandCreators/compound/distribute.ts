@@ -93,7 +93,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateZOffset,
     blowoutFlowRateUlSec,
     blowoutLocation,
-    blowoutOffsetFromTopMm,
     changeTip,
     conditioningVolume,
     destLabware,
@@ -441,6 +440,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         blowoutLocation == null
           ? [
               curryCommandCreator(dispenseInPlace, {
+                isAirGap: true,
                 pipetteId: pipette,
                 volume: dispenseAirGapVolume,
                 flowRate: dispenseFlowRateUlSec,
@@ -509,6 +509,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             invariantContext,
             liquidClass,
             tiprack: tipRack,
+            generatePython: true,
           })
         : []
       const mixBeforeAspirateCommands =
@@ -525,6 +526,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const delayAfterAspirateCommands =
@@ -695,6 +697,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   ...(airGapInTip > 0
                     ? [
                         curryCommandCreator(dispenseInPlace, {
+                          isAirGap: true,
                           pipetteId: pipette,
                           volume: airGapInTip,
                           flowRate: dispenseFlowRateUlSec,
@@ -887,11 +890,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: destinationWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,
@@ -911,11 +909,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 wellName: sourceWell,
                 wellLocation: {
                   origin: WELL_ORIGIN_TOP,
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: blowoutOffsetFromTopMm,
-                  },
                 },
               }),
               ...blowoutInPlaceCommand,
