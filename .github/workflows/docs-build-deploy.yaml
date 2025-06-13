@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - 'edge'
-      - 'mkdocs-bucket-20250613' # Remove after a successful run on the PR
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
