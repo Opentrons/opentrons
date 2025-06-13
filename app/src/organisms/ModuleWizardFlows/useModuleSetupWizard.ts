@@ -17,7 +17,7 @@ import {
 } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
@@ -71,7 +71,7 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyStacker = useSendIdentifyStacker()
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -150,7 +150,7 @@ export function useModuleSetupWizard(
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
+    if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
     if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
