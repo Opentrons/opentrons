@@ -332,7 +332,11 @@ export const zoomedInSlotInfo = (
         ...state,
         selectedTopLabware: {
           labwareDefURI,
-          amount: state.selectedTopLabware.amount,
+          // defaults amount to 1 if labware is selected
+          amount:
+            labwareDefURI != null && state.selectedTopLabware.amount === 0
+              ? 1
+              : state.selectedTopLabware.amount,
         },
       }
     }
