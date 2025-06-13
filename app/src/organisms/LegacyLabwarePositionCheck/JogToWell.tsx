@@ -147,7 +147,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           <LiveOffsetValue {...liveOffset} />
         </Flex>
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
-          {/* TODO BEFORE MERGE: Same questions about DECK_MAP_VIEWBOX */}
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
               <>

@@ -125,9 +125,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 >
                   <RobotWorkSpace
                     key={lw.id}
-                    // TODO BEFORE MERGE
                     viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-                    // Also TODO BEFORE MERGE, what happens if you set width+height in addition to viewBox? It doesn't get stretched?
                     width="9.5625rem"
                     height="6.375rem"
                   >

@@ -52,8 +52,6 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
   }
 
   return (
-    // TODO BEFORE MERGE: Understand what how these foreign div things work and figure out if they
-    // need to be updated for schema 3.
     <RobotCoordsForeignDiv
       width={boxWidth}
       height={

@@ -182,7 +182,6 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            // TODO BEFORE MERGE
             viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
           >
             <g

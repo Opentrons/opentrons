@@ -17,12 +17,10 @@ export function SelectedModuleLabwareRender(
   return (
     <>
       {adapterDef != null && moduleModel != null ? (
-        // TODO BEFORE MERGE: No idea what's going on here but it is probably wrong?
         <LabwareRenderOnDeck labwareDef={adapterDef} x={0} y={0} />
       ) : null}
 
       {topLabwareOnDeck != null && moduleModel != null ? (
-        // TODO BEFORE MERGE: No idea what's going on here but it is probably wrong?
         <LabwareOnDeckComponent labwareOnDeck={topLabwareOnDeck} x={0} y={0} />
       ) : null}
     </>

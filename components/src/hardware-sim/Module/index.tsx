@@ -84,7 +84,6 @@ export const Module = (props: Props): JSX.Element => {
   } = props
   const moduleType = getModuleType(def.model)
 
-  // TODO BEFORE MERGE
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
   const {
     x: translateX,

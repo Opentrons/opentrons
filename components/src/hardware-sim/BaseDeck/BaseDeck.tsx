@@ -306,12 +306,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
-                    {/* TODO BEFORE MERGE: Deal with labware-on-module positioning somehow */}
                     <LabwareRender
                       definition={nestedLabwareDef}
                       onLabwareClick={onLabwareClick}
                       wellFill={nestedLabwareWellFill}
-                      // TODO BEFORE MERGE: Deal with rotation here somehow
                       shouldRotateAdapterOrientation={
                         inferModuleOrientationFromXCoordinate(
                           slotPosition[0]
@@ -369,12 +367,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                       cursor={onLabwareClick != null ? 'pointer' : ''}
                       transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
                     >
-                      {/* TODO BEFORE MERGE: Deal with labware-on-stacker (???) positioning here somehow */}
                       <LabwareRender
                         definition={nestedLabwareDef}
                         onLabwareClick={onLabwareClick}
                         wellFill={nestedLabwareWellFill}
-                        // TODO BEFORE MERGE: Deal with rotation here somehow
                         shouldRotateAdapterOrientation={
                           inferModuleOrientationFromXCoordinate(
                             slotPosition[0]
@@ -421,8 +417,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 
             return slotPosition != null ? (
               <g
-                // TODO BEFORE MERGE: Flesh out labware-in-deck-slot positioning.
-                // But also, where in this file are we handling labware-on-adapter-on-*?
                 key={labwareLocation.slotName}
                 transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
                 cursor={onLabwareClick != null ? 'pointer' : ''}

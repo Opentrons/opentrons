@@ -26,7 +26,6 @@ export interface WellLabelsProps {
   wellLabelColor?: string
 }
 
-// TODO BEFORE MERGE: Go through all this and make sure it's still OK with schema 3
 const Labels = (props: {
   definition: LabwareDefinition
   wells: string[]

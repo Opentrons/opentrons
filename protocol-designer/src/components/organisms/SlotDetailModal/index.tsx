@@ -139,7 +139,6 @@ export const SlotDetailModal = (
             </Flex>
             <RobotWorkSpace
               key={labwareOnDeck.def.parameters.loadName}
-              // TODO BEFORE MERGE
               viewBox={`0 0 ${labwareOnDeck.def.dimensions.xDimension} ${labwareOnDeck.def.dimensions.yDimension}`}
             >
               {() => (

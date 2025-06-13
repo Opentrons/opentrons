@@ -8,8 +8,6 @@ import type { ComponentProps } from 'react'
 interface RobotCoordinateSpaceProps extends ComponentProps<typeof Svg> {
   animated?: boolean
 }
-// TODO BEFORE MERGE: What is the difference between RobotWorkSpace and RobotCoordinateSpace these days?
-// Do we still need them both? Also why does it seem like RobotWorkSpace is doing more math?
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps
 ): JSX.Element {

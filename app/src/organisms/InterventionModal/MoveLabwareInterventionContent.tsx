@@ -216,12 +216,10 @@ export function MoveLabwareInterventionContent({
                         def={moduleDef}
                         x={x}
                         y={y}
-                        // TODO BEFORE MERGE: Same thing, should this have been passed to LabwareRender
                         orientation={inferModuleOrientationFromXCoordinate(x)}
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
-                          // TODO BEFORE MERGE: Needs-to-labware coords, I think
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
@@ -230,7 +228,6 @@ export function MoveLabwareInterventionContent({
                   {labwareRenderInfo
                     .filter(l => l.labwareId !== command.params.labwareId)
                     .map(({ x, y, labwareDef, labwareId }) => (
-                      // TODO BEFORE MERGE
                       <g key={labwareId} transform={`translate(${x},${y})`}>
                         {labwareDef != null &&
                         labwareId !== command.params.labwareId ? (

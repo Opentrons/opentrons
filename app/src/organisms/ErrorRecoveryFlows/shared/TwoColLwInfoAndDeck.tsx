@@ -232,7 +232,6 @@ export function TwoColLwInfoAndDeck(
                       def={moduleDef}
                       x={x}
                       y={y}
-                      // TODO BEFORE MERGE: Unrelated bug, but should this have been passed to LabwareRender too?
                       orientation={inferModuleOrientationFromXCoordinate(x)}
                     >
                       {nestedLabwareDef != null &&
@@ -245,7 +244,6 @@ export function TwoColLwInfoAndDeck(
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
                   .map(({ x, y, labwareDef, labwareId }) => (
-                    // TODO BEFORE MERGE
                     <g key={labwareId} transform={`translate(${x},${y})`}>
                       {labwareDef != null && labwareId !== failedLwId ? (
                         <LabwareRender definition={labwareDef} />

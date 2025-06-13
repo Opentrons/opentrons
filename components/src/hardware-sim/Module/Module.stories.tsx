@@ -40,7 +40,6 @@ const Template: Story<{
   innerProps: {}
 }> = args => {
   return (
-    // TODO BEFORE MERGE, maybe
     <RobotCoordinateSpace height="100vh" width="100vw" viewBox="0 -50 200 320">
       <ModuleComponent
         def={getModuleDef2(args.model)}

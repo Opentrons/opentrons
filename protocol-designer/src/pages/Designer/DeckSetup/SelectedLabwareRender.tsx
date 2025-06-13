@@ -38,7 +38,6 @@ export function SelectedLabwareRender(
     <>
       {labwareDef != null ? (
         <LabwareRenderOnDeck
-          // TODO BEFORE MERGE: passing in these slot positions on their own is probably wrong if x/y are the labware render origin.
           labwareDef={labwareDef}
           x={slotPosition[0]}
           y={slotPosition[1]}
@@ -46,8 +45,6 @@ export function SelectedLabwareRender(
       ) : null}
       {labwareOnDeck != null ? (
         <LabwareOnDeckComponent
-          // TODO BEFORE MERGE: Oh God. What is the difference between LabwareOnDeckComponent and LabwareRenderOnDeck.
-          // Also passing in these slot positions on their own is probably wrong if x/y are the labware render origin.
           x={slotPosition[0]}
           y={slotPosition[1]}
           labwareOnDeck={labwareOnDeck}
