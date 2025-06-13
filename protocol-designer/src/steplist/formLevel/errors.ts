@@ -77,6 +77,7 @@ export interface FormError {
   page?: number
   //  for mix and moveLiquid tools
   tab?: LiquidHandlingTab
+  showOnReopen?: boolean
 }
 
 const RANGE_TITLE = 'Enter a value within the specified range'
@@ -154,6 +155,7 @@ const MODULE_ID_REQUIRED: FormError = {
     'Module is required. Ensure the appropriate module is present on the deck and selected for this step',
   dependentFields: ['moduleId'],
   location: 'field',
+  showOnReopen: true,
 }
 const TARGET_TEMPERATURE_REQUIRED: FormError = {
   title: 'Temperature required',
