@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
     from opentrons.protocol_api._liquid import LiquidClass
+    from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from opentrons.types import Location, Mount, AxisMapType
 
@@ -591,12 +592,16 @@ class PressurizeCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
 
 
-class ConfigureForVolumePayload(TextOnlyPayload):
+class ConfigureForVolumePayload(TypedDict, TextOnlyPayload):
     instrument: InstrumentContext
+    volume: float
 
 
-class ConfigureNozzleLayoutPayload(TextOnlyPayload):
+class ConfigureNozzleLayoutPayload(TypedDict, TextOnlyPayload):
     instrument: InstrumentContext
+    style: NozzleLayout
+    start: Union[str, None]
+    end: Union[str, None]
 
 
 class MoveLabwareCommand(TypedDict):
@@ -619,7 +624,7 @@ class PressurizeCommand(TypedDict):
     payload: PressurizeCommandPayload
 
 
-class ConfigureForVolume(TypedDict):
+class ConfigureForVolumeCommand(TypedDict):
     name: Literal["command.CONFIGURE_FOR_VOLUME"]
     payload: ConfigureForVolumePayload
 
@@ -726,6 +731,8 @@ Command = Union[
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
+    ConfigureForVolumeCommand,
+    ConfigureNozzleLayoutCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
@@ -785,6 +792,8 @@ CommandPayload = Union[
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,
+    ConfigureForVolumePayload,
+    ConfigureNozzleLayoutPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,

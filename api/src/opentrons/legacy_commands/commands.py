@@ -451,11 +451,11 @@ def resin_tip_dispense(
 def configure_for_volume(
     instrument: InstrumentContext,
     volume: float,
-) -> command_types.ConfigureForVolumePayload:
+) -> command_types.ConfigureForVolumeCommand:
     text = f"Configure pipette on {instrument.mount} mount to handle {volume} µL."
     return {
         "name": command_types.CONFIGURE_FOR_VOLUME,
-        "payload": {"instrument": instrument, "text": text},
+        "payload": {"instrument": instrument, "volume": volume, "text": text},
     }
 
 
@@ -473,5 +473,11 @@ def configure_nozzle_layout(
     text += "."
     return {
         "name": command_types.CONFIGURE_NOZZLE_LAYOUT,
-        "payload": {"instrument": instrument, "text": text},
+        "payload": {
+            "instrument": instrument,
+            "style": style,
+            "start": start,
+            "end": end,
+            "text": text,
+        },
     }
