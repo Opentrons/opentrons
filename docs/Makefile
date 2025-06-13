@@ -1,6 +1,5 @@
-
 FLEX_MANUAL_PREFIX ?= flex-manual
-AWS_PROFILE ?= your-profile
+# AWS_PROFILE is intentionally left undefined by default
 BRANCH ?= edge
 SANDBOX_S3_BUCKET ?= your-bucket-name
 
@@ -18,4 +17,7 @@ build-flex-manual:
 
 .PHONY: deploy-flex-manual
 deploy-flex-manual:
-	aws s3 sync $(FLEX_MANUAL_PREFIX)/site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/$(FLEX_MANUAL_PREFIX)/ --delete --acl public-read --profile $(AWS_PROFILE)
+	@if [ -n "$$CI" ]; then \
+		echo "If you need to run this locally, set the variable AWS_PROFILE."; \
+	fi
+	aws s3 sync $(FLEX_MANUAL_PREFIX)/site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/$(FLEX_MANUAL_PREFIX)/ --delete --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
