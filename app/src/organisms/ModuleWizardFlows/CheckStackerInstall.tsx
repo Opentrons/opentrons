@@ -1,14 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  COLORS,
-  JUSTIFY_FLEX_END,
-  PrimaryButton,
-  RESPONSIVENESS,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
