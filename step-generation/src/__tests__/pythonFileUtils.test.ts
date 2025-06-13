@@ -1,24 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   fixture96Plate,
   fixtureP300MultiV2Specs,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
+  GLYCEROL_LIQUID_CLASS_NAME,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import {
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLiquidClasses,
   getLoadLiquids,
   getLoadModules,
   getLoadPipettes,
@@ -402,6 +406,7 @@ const mockLiquidEntities: LiquidEntities = {
     displayName: 'water',
     description: 'mock description',
     displayColor: 'mock display color',
+    liquidClass: WATER_LIQUID_CLASS_NAME,
   },
   [liquid2]: {
     liquidGroupId: liquid2,
@@ -409,6 +414,7 @@ const mockLiquidEntities: LiquidEntities = {
     description: '',
     displayName: 'sulfur',
     displayColor: 'mock display color 2',
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
   },
 }
 
@@ -499,6 +505,24 @@ describe('getLoadWasteChute', () => {
       `
 # Load Waste Chute:
 waste_chute = protocol.load_waste_chute()`.trimStart()
+    )
+  })
+})
+
+describe('getLoadLiquidClasses', () => {
+  it('should load a liquid class for each liquid class types', () => {
+    expect(
+      getLoadLiquidClasses([
+        WATER_LIQUID_CLASS_NAME,
+        ETHANOL_LIQUID_CLASS_NAME,
+        GLYCEROL_LIQUID_CLASS_NAME,
+      ])
+    ).toBe(
+      `
+# Load Liquid Classes:
+water_v1 = protocol.get_liquid_class("water")
+ethanol_80_v1 = protocol.get_liquid_class("ethanol_80")
+glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })

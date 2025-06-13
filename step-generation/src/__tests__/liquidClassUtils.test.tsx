@@ -15,6 +15,7 @@ import {
   getFlowRateAndOffsetParamsTransferLike,
   SOURCE_LABWARE,
 } from '../fixtures'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
 import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -55,7 +56,7 @@ describe('getCustomLiquidClassProperties', () => {
           aspirateAirGapVolume: 2,
           touchTipAfterDispense: true,
           mixInDestination: { volume: 10, times: 3 },
-          blowoutLocation: 'source',
+          blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
           dropTipLocation: FIXED_TRASH_ID,
           aspirateXOffset: 0,
           dispenseXOffset: 0,
@@ -86,6 +87,7 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
+          stepId: 1,
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
@@ -94,7 +96,7 @@ describe('getCustomLiquidClassProperties', () => {
       })
     ).toEqual(
       `
-custom_liquid_class_properties = {"p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
+{"p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
     "aspirate": {
         "aspirate_position": {
             "offset": {"x": 0, "y": 0, "z": 2},

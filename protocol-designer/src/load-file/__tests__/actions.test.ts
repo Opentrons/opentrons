@@ -30,7 +30,7 @@ describe('saveProtocolFile thunk', () => {
       }
     })
     vi.mocked(saveFileUtil).mockImplementation((fileData, fileName) => {
-      expect(fileName).toEqual('fooFileName.json')
+      expect(fileName).toEqual('fooFileName.py')
       expect(fileData).toBe(mockFileData)
     })
     const dispatch: () => any = vi.fn().mockImplementation(action => {

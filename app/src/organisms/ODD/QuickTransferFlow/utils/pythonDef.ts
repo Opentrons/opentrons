@@ -5,6 +5,7 @@ import {
   distribute,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLiquidClasses,
   getLoadPipettes,
   getLoadTrashBins,
   getLoadWasteChute,
@@ -68,13 +69,17 @@ export function quickTransferStepCommands(
 
   let finalDropTipCommand = ''
 
-  if (Object.values(trashBinEntities).length > 0) {
-    finalDropTipCommand = `${pipettePythonName}.drop_tip()`
-  } else if (Object.values(wasteChuteEntities).length > 0) {
-    const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
-    finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+  if (
+    stepArgs?.commandCreatorFnName !== 'transfer' &&
+    stepArgs?.commandCreatorFnName !== 'consolidate'
+  ) {
+    if (Object.values(trashBinEntities).length > 0) {
+      finalDropTipCommand = `${pipettePythonName}.drop_tip()`
+    } else if (Object.values(wasteChuteEntities).length > 0) {
+      const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
+      finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+    }
   }
-
   return (
     `# ${upperCase(stepArgs?.commandCreatorFnName)} STEP\n\n` +
     nonLoadCommands +
@@ -108,6 +113,11 @@ export function pythonDef(
       getLoadTrashBins(trashBinEntities),
       getLoadWasteChute(wasteChuteEntities),
     ],
+    getLoadLiquidClasses(
+      stepArgs?.liquidClass != null && stepArgs?.liquidClass !== 'none'
+        ? [stepArgs.liquidClass]
+        : []
+    ),
     quickTransferStepCommands({
       stepArgs,
       invariantContext,

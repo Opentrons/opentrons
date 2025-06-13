@@ -7,6 +7,7 @@ import type { HydratedHeaterShakerFormData } from '../../../../form-types'
 describe('heaterShakerFormToArgs', () => {
   it('returns heater shaker command creator when temp, shaking, and timer is specified', () => {
     const formData: HydratedHeaterShakerFormData = {
+      stepNumber: 1,
       stepType: 'heaterShaker',
       id: 'id',
       stepDetails: 'step details',
@@ -36,6 +37,7 @@ describe('heaterShakerFormToArgs', () => {
   })
   it('return heater shaker command creator when only temp is specified', () => {
     const formData: HydratedHeaterShakerFormData = {
+      stepNumber: 1,
       stepType: 'heaterShaker',
       id: 'id',
       stepDetails: 'step details',

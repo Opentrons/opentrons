@@ -1,6 +1,7 @@
 import {
   FIXED_TRASH_ID,
   FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   getAreSlotsAdjacent,
   getDeckDefFromRobotType,
   getIsLabwareAboveHeight,
@@ -41,7 +42,8 @@ export function getNextAvailableDeckSlot(
     .filter(module => module.slot)
     .map(mod => mod.slot)
   if (hasTC) {
-    moduleSlots = [...moduleSlots, '8', '10', '11']
+    //  encompass all TC slots for both robots since they're different
+    moduleSlots = [...moduleSlots, '8', '10', '11', 'A1']
   }
 
   return deckDef.locations.addressableAreas.find(slot => {
@@ -65,7 +67,8 @@ export function getNextAvailableDeckSlot(
       isSlotEmpty = false
     } else if (
       moduleSlots.includes(slot.id) ||
-      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id)
+      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id) ||
+      FLEX_STACKER_ADDRESSABLE_AREAS.includes(slot.id)
     ) {
       isSlotEmpty = false
       //  return slot as full if slot is adjacent to heater-shaker for ot-2 and taller than 53mm

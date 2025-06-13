@@ -4,7 +4,7 @@ import flatMap from 'lodash/flatMap'
 import {
   ALL,
   getAllLiquidClassDefs,
-  getCorrectionVolume,
+  getByVolumeValue,
   getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -374,6 +374,48 @@ export const distribute: CommandCreator<DistributeArgs> = (
       z: dispenseRetractZOffset,
     },
   }
+
+  const aspirateAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVolume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const aspirateAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVolume,
+      liquidHandlingAction: 'multiDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
+  const dispenseAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVolume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const dispenseAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVolume,
+      liquidHandlingAction: 'multiDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
+
   const destWellChunks = chunk(destWells, numWellsToFitInTip)
   const commandCreators = flatMap(
     destWellChunks,
@@ -425,13 +467,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
           pipetteId: pipette,
         }),
       ]
-      const dispenseCorrectionVolumeForDispenseAirGap = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume: dispenseAirGapVolume,
-        liquidHandlingAction: 'multiDispense',
-      })
+      const dispenseCorrectionVolumeForDispenseAirGap =
+        getByVolumeValue({
+          liquidClass,
+          pipetteSpecs,
+          tiprackDefUri: tipRack,
+          targetVolume: dispenseAirGapVolume,
+          liquidHandlingAction: 'multiDispense',
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
       const voidDispenseAirGapCommand =
         dispenseAirGapVolume > 0 &&
         !changeTipNow &&
@@ -440,9 +485,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
         blowoutLocation == null
           ? [
               curryCommandCreator(dispenseInPlace, {
+                isAirGap: true,
                 pipetteId: pipette,
                 volume: dispenseAirGapVolume,
-                flowRate: dispenseFlowRateUlSec,
+                flowRate: dispenseAirGapDispenseFlowRate,
                 ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                   ? {
                       correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
@@ -508,6 +554,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             invariantContext,
             liquidClass,
             tiprack: tipRack,
+            generatePython: true,
           })
         : []
       const mixBeforeAspirateCommands =
@@ -524,6 +571,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               invariantContext,
               liquidClass,
               tiprack: tipRack,
+              generatePython: true,
             })
           : []
       const delayAfterAspirateCommands =
@@ -570,20 +618,23 @@ export const distribute: CommandCreator<DistributeArgs> = (
               : []),
           ]
         : []
-      const aspirateCorrectionVolumeForAspirateAirGap = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume: aspirateAirGapVolume,
-        liquidHandlingAction: 'aspirate',
-      })
+      const aspirateCorrectionVolumeForAspirateAirGap =
+        getByVolumeValue({
+          liquidClass,
+          pipetteSpecs,
+          tiprackDefUri: tipRack,
+          targetVolume: aspirateAirGapVolume,
+          liquidHandlingAction: 'aspirate',
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
       const airGapAfterAspirateRetractCommands =
         aspirateAirGapVolume > 0
           ? [
               curryCommandCreator(airGapInPlace, {
                 pipetteId: pipette,
                 volume: aspirateAirGapVolume,
-                flowRate: aspirateFlowRateUlSec,
+                flowRate: aspirateAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                   ? {
                       correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
@@ -593,25 +644,29 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...delayAfterAspirateCommands,
             ]
           : []
-      const aspirateCorrectionVolumeForTotalAspiration = getCorrectionVolume({
-        liquidClass,
-        pipetteSpecs,
-        tiprackDefUri: tipRack,
-        targetVolume:
-          totalSampleAspirateVolume +
-          (disposalVolume ?? 0) +
-          (conditioningVolume ?? 0),
-        liquidHandlingAction: 'aspirate',
-      })
-      const dispenseCorrectionVolumeForConditioningVolume = getCorrectionVolume(
-        {
+      const aspirateCorrectionVolumeForTotalAspiration =
+        getByVolumeValue({
+          liquidClass,
+          pipetteSpecs,
+          tiprackDefUri: tipRack,
+          targetVolume:
+            totalSampleAspirateVolume +
+            (disposalVolume ?? 0) +
+            (conditioningVolume ?? 0),
+          liquidHandlingAction: 'aspirate',
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
+      const dispenseCorrectionVolumeForConditioningVolume =
+        getByVolumeValue({
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
           targetVolume: conditioningVolume ?? 0,
           liquidHandlingAction: 'multiDispense',
-        }
-      )
+          byVolumeProperty: 'correctionByVolume',
+          defaultValue: 0,
+        }) ?? 0
       const dispenseConditioningVolumeCommands =
         conditioningVolume != null && conditioningVolume > 0
           ? [
@@ -666,22 +721,28 @@ export const distribute: CommandCreator<DistributeArgs> = (
           const isOverallUltimateDispense = isLastChunk && isLastWellInChunk
 
           let airGapInTip = 0
+          let airGapDispenseFlowRate = dispenseFlowRateUlSec
           if (isFirstWellInChunk && aspirateAirGapVolume > 0) {
             airGapInTip = aspirateAirGapVolume
+            airGapDispenseFlowRate = aspirateAirGapDispenseFlowRate
           } else if (
             !isFirstWellInChunk &&
             dispenseAirGapVolume > 0 &&
             (conditioningVolume == null || conditioningVolume === 0)
           ) {
             airGapInTip = dispenseAirGapVolume
+            airGapDispenseFlowRate = dispenseAirGapDispenseFlowRate
           }
-          const dispenseCorrectionVolumeForAirGap = getCorrectionVolume({
-            liquidClass,
-            pipetteSpecs,
-            tiprackDefUri: tipRack,
-            targetVolume: airGapInTip,
-            liquidHandlingAction: 'multiDispense',
-          })
+          const dispenseCorrectionVolumeForAirGap =
+            getByVolumeValue({
+              liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: tipRack,
+              targetVolume: airGapInTip,
+              liquidHandlingAction: 'multiDispense',
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const dispenseSubmergeCommands =
             destinationWell != null
               ? [
@@ -694,9 +755,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   ...(airGapInTip > 0
                     ? [
                         curryCommandCreator(dispenseInPlace, {
+                          isAirGap: true,
                           pipetteId: pipette,
                           volume: airGapInTip,
-                          flowRate: dispenseFlowRateUlSec,
+                          flowRate: airGapDispenseFlowRate,
                           pushOut: 0,
                           correctionVolume: dispenseCorrectionVolumeForAirGap,
                         }),
@@ -745,13 +807,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
           // don't push out if mixing in destination
           const effectivePushOut =
             disposalVolume === 0 && isLastWellInChunk ? pushOut : 0
-          const dispenseCorrectionVolumeForDestination = getCorrectionVolume({
-            liquidClass,
-            pipetteSpecs,
-            tiprackDefUri: tipRack,
-            targetVolume: volume,
-            liquidHandlingAction: 'multiDispense',
-          })
+          const dispenseCorrectionVolumeForDestination =
+            getByVolumeValue({
+              liquidClass,
+              pipetteSpecs,
+              tiprackDefUri: tipRack,
+              targetVolume: volume,
+              liquidHandlingAction: 'multiDispense',
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const dispenseCommands = [
             curryCommandCreator(dispenseInPlace, {
               pipetteId: pipette,
@@ -794,15 +859,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 }),
               ]
             : []
-          const aspirateCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
-            {
+          const aspirateCorrectionVolumeForDispenseAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: dispenseAirGapVolume,
               liquidHandlingAction: 'aspirate',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const getAirGapAfterDispenseCommands = (
             considerUltimateSubtransfer: boolean
           ): CurriedCommandCreator[] =>
@@ -826,7 +892,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   curryCommandCreator(airGapInPlace, {
                     pipetteId: pipette,
                     volume: dispenseAirGapVolume,
-                    flowRate: aspirateFlowRateUlSec,
+                    flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
