@@ -12,15 +12,15 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Nest 24 Reservoir 10.4 mL",
-    "displayCategory": "reservoir",
+    "displayName": "Nest 24 Wellplate 10.4 mL",
+    "displayCategory": "wellPlate",
     "displayVolumeUnits": "mL",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127.2,
     "yDimension": 84.9,
-    "zDimension": 43.5
+    "zDimension": 44.5
   },
   "wells": {
     "A1": {
@@ -298,11 +298,11 @@
     }
   ],
   "parameters": {
-    "format": "irregular",
+    "format": "regular",
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "nest_24_reservoir_10.4ml"
+    "loadName": "nest_24_wellplate_10.4ml"
   },
   "namespace": "custom_beta",
   "version": 1,
