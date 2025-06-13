@@ -5694,7 +5694,7 @@ mock_pipette.transfer_with_liquid_class(
                         },
                         "blowout": {
                             "enabled": True,
-                            "location": "fixedTrash",
+                            "location": "trash",
                             "flow_rate": 2.3,
                         },
                     },
