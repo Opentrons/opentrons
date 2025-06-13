@@ -45,6 +45,7 @@ class SlotDefV3(TypedDict, total=False):
     displayName: str
     compatibleModuleTypes: List[ModuleType]
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
+    locatingFeaturesAsParent: LocatingFeatures
 
 
 class CalibrationPoint(TypedDict):
