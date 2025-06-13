@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -15,7 +15,11 @@ import {
   getHydratedForm,
   selectors as stepFormSelectors,
 } from '../../../../step-forms'
-import { getInvariantContext } from '../../../../step-forms/selectors'
+import {
+  getInvariantContext,
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../step-forms/selectors'
 import { actions } from '../../../../steplist'
 import { actions as stepsActions } from '../../../../ui/steps'
 import { StepFormToolbox } from './StepFormToolbox'
@@ -63,10 +67,19 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
   } = props
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
-    getDirtyFields(isNewStep, formData)
+    getDirtyFields(
+      isNewStep,
+      formData?.stepType ?? 'unknown step type',
+      pipetteEntities,
+      labwareEntities,
+      formData
+    )
   )
+
   const handleBlur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
@@ -117,6 +130,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     return null
   }
   const hydratedForm = getHydratedForm(formData, invariantContext)
+
   const focusHandlers = {
     focusedField,
     dirtyFields,

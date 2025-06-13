@@ -31,6 +31,7 @@ import type { ProfileFormError } from '../../../steplist/formLevel/profileErrors
 import type { MakeAlert } from './types'
 
 interface FormAlertsProps {
+  currentFormIsPresaved: boolean
   showFormErrors: boolean
   focusedField?: StepFieldName | null
   dirtyFields?: StepFieldName[]
@@ -43,7 +44,13 @@ interface WarningType {
 }
 
 function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
-  const { showFormErrors, focusedField, dirtyFields, page } = props
+  const {
+    currentFormIsPresaved,
+    showFormErrors,
+    focusedField,
+    dirtyFields,
+    page,
+  } = props
 
   const { t } = useTranslation('alert')
   const dispatch = useDispatch()
@@ -80,6 +87,7 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
     dirtyFields: dirtyFields ?? [],
     errors: formLevelErrorsForUnsavedForm,
     page,
+    currentFormIsPresaved,
     showErrors: showFormErrors,
   })
 

@@ -307,7 +307,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_touchTip_mmFromEdge?: number | null
   aspirate_touchTip_mmFromTop?: number | null
   aspirate_touchTip_speed?: number | null
-  aspirate_wells_grouped?: boolean | null
+  aspirate_wells_grouped?: boolean | null //  TODO: deprecate this?
   aspirate_x_position?: number | null
   aspirate_y_position?: number | null
   aspirate_position_reference: PositionReference
@@ -407,7 +407,6 @@ export type HydratedMagnetFormData = AnnotationFields & {
   id: string
   magnetAction: MagnetAction
   moduleId: string
-  stepDetails: string | null
   stepType: 'magnet'
 }
 export interface HydratedTemperatureFormData extends AnnotationFields {

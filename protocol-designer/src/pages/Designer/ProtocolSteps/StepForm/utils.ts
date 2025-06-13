@@ -1,3 +1,4 @@
+import { hydrate } from 'react-dom'
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import startCase from 'lodash/startCase'
@@ -10,6 +11,11 @@ import {
 } from '@opentrons/step-generation'
 
 import { i18n } from '../../../../assets/localization'
+import {
+  ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
+} from '../../../../constants'
 import { PROFILE_CYCLE } from '../../../../form-types'
 import {
   getDefaultsForStepType,
@@ -17,13 +23,18 @@ import {
 } from '../../../../steplist/formLevel'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+  PipetteEntity,
+} from '@opentrons/step-generation'
 import type {
   FormData,
   HydratedFormData,
   PathOption,
   ProfileItem,
   StepFieldName,
+  StepIdType,
   StepType,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
@@ -80,33 +91,311 @@ export function getBlowoutLocationOptionsForForm(args: {
 // TODO: type fieldNames, don't use `string`
 export const getDirtyFields = (
   isNewStep: boolean,
+  stepType: string,
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities,
   formData?: FormData | null
 ): string[] => {
-  let dirtyFields = []
+  let dirtyFields: string[] = []
 
-  if (formData == null) {
+  if (formData == null || isNewStep) {
     return []
-  }
-
-  if (!isNewStep) {
-    dirtyFields = Object.keys(formData)
   } else {
-    const data = formData
-    // new step, but may have auto-populated fields.
-    // "Dirty" any fields that differ from default new form values
-    const defaultFormData = getDefaultsForStepType(formData.stepType)
-    dirtyFields = Object.keys(defaultFormData).reduce(
-      (acc: string[], fieldName: StepFieldName) => {
-        const currentValue = data[fieldName]
-        const initialValue = defaultFormData[fieldName]
-        return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]
-      },
-      []
-    )
+    switch (formData.stepType) {
+      case 'moveLabware':
+      case 'comment': {
+        dirtyFields = Object.keys(formData)
+        break
+      }
+      case 'heaterShaker': {
+        const {
+          heaterShakerSetTimer,
+          heaterShakerTimer,
+          setShake,
+          targetSpeed,
+          setHeaterShakerTemperature,
+          targetHeaterShakerTemperature,
+        } = formData
+        let heaterShakerDirtyFields = ['moduleId']
+        if (heaterShakerSetTimer && heaterShakerTimer == null) {
+          heaterShakerDirtyFields.push('heaterShakerTimer')
+        }
+        if (setShake && targetSpeed == null) {
+          heaterShakerDirtyFields.push('targetSpeed')
+        }
+        if (
+          setHeaterShakerTemperature &&
+          targetHeaterShakerTemperature == null
+        ) {
+          heaterShakerDirtyFields.push('targetHeaterShakerTemperature')
+        }
+        dirtyFields = heaterShakerDirtyFields
+        break
+      }
+      case 'magnet': {
+        const { engageHeight, magnetAction } = formData
+        let magnetDirtyFields = ['moduleId']
+        if (magnetAction === 'engage' && engageHeight == null) {
+          magnetDirtyFields.push('engageHeight')
+        }
+        dirtyFields = magnetDirtyFields
+        break
+      }
+      case 'temperature': {
+        const { setTemperature, targetTemperature } = formData
+        let temperatureDirtyFields = ['moduleId']
+        if (setTemperature === 'true' && targetTemperature == null) {
+          temperatureDirtyFields.push('targetTemperature')
+        }
+        dirtyFields = temperatureDirtyFields
+        break
+      }
+      case 'pause': {
+        const { pauseAction } = formData
+        let pauseDirtyFields = []
+        if (pauseAction === PAUSE_UNTIL_TEMP) {
+          pauseDirtyFields.push('pauseTime')
+          pauseDirtyFields.push('pauseTemperature')
+          pauseDirtyFields.push('moduleId')
+        } else if (pauseAction === PAUSE_UNTIL_TIME) {
+          pauseDirtyFields.push('pauseTime')
+        }
+        dirtyFields = pauseDirtyFields
+        break
+      }
+      case 'absorbanceReader': {
+        const { absorbanceReaderFormType } = formData
+        let absorbanceReaderDirtyFields = ['moduleId']
+        if (absorbanceReaderFormType == null) {
+          absorbanceReaderDirtyFields.push('absorbanceReaderFormType')
+        } else if (absorbanceReaderFormType === 'absorbanceReaderLid') {
+          absorbanceReaderDirtyFields.push('lidOpen')
+        } else if (absorbanceReaderFormType === 'absorbanceReaderRead') {
+          absorbanceReaderDirtyFields.push('fileName')
+        }
+        dirtyFields = absorbanceReaderDirtyFields
+        break
+      }
+      case 'thermocycler': {
+        const {
+          blockTargetTemp,
+          lidIsActiveHold,
+          lidTargetTempHold,
+          lidIsActive,
+          blockTargetTempHold,
+          blockIsActive,
+          blockIsActiveHold,
+          lidTargetTemp,
+          thermocyclerFormType,
+        } = formData
+        let themocyclerDirtyFields = ['moduleId']
+        if (blockIsActive && blockTargetTemp == null) {
+          themocyclerDirtyFields.push('blockTargetTemp')
+        }
+        if (lidIsActive && lidTargetTemp == null) {
+          themocyclerDirtyFields.push('lidTargetTemp')
+        }
+        if (thermocyclerFormType === 'thermocyclerProfile') {
+          themocyclerDirtyFields.push('profileVolume')
+          themocyclerDirtyFields.push('profileTargetLidTemp')
+          if (blockIsActiveHold && blockTargetTempHold == null) {
+            themocyclerDirtyFields.push('blockTargetTempHold')
+          }
+          if (lidIsActiveHold && lidTargetTempHold == null) {
+            themocyclerDirtyFields.push('lidTargetTempHold')
+          }
+        }
+        dirtyFields = themocyclerDirtyFields
+        break
+      }
+      case 'mix': {
+        const {
+          pipette,
+          aspirate_delay_checkbox,
+          dispense_delay_checkbox,
+          blowout_location,
+          blowout_checkbox,
+          aspirate_delay_seconds,
+          dispense_delay_seconds,
+          mix_touchTip_checkbox,
+          mix_touchTip_mmFromTop,
+          pushOut_volume,
+          pushOut_checkbox,
+        } = formData
+        let mixDirtyFields = [
+          'pipette',
+          'tipRack',
+          'volume',
+          'wells',
+          'dropTip_location',
+          'times',
+          'labware',
+          'changeTip',
+        ]
+        if (pipetteEntities[pipette].spec.channels > 1) {
+          mixDirtyFields.push('nozzles')
+        }
+        if (aspirate_delay_checkbox && aspirate_delay_seconds == null) {
+          mixDirtyFields.push('aspirate_delay_seconds')
+        }
+        if (blowout_checkbox && blowout_location == null) {
+          mixDirtyFields.push('blowout_location')
+        }
+        if (dispense_delay_checkbox && dispense_delay_seconds == null) {
+          mixDirtyFields.push('dispense_delay_seconds')
+        }
+        if (mix_touchTip_checkbox && mix_touchTip_mmFromTop == null) {
+          mixDirtyFields.push('mix_touchTip_mmFromTop')
+        }
+        if (pushOut_checkbox && pushOut_volume == null) {
+          mixDirtyFields.push('pushOut_volume')
+        }
+        dirtyFields = mixDirtyFields
+        break
+      }
+      case 'moveLiquid': {
+        const {
+          dispense_labware,
+          pipette,
+          pushOut_checkbox,
+          pushOut_volume,
+          aspirate_mix_checkbox,
+          aspirate_mix_times,
+          aspirate_mix_volume,
+          aspirate_delay_checkbox,
+          aspirate_delay_seconds,
+          aspirate_touchTip_checkbox,
+          aspirate_touchTip_speed,
+          aspirate_touchTip_mmFromEdge,
+          aspirate_airGap_checkbox,
+          aspirate_airGap_volume,
+          dispense_delay_checkbox,
+          dispense_delay_seconds,
+          dispense_mix_checkbox,
+          dispense_mix_times,
+          dispense_mix_volume,
+          blowout_checkbox,
+          blowout_location,
+          blowout_flowRate,
+          dispense_touchTip_checkbox,
+          dispense_touchTip_speed,
+          dispense_touchTip_mmFromEdge,
+          dispense_airGap_checkbox,
+          dispense_airGap_volume,
+          disposalVolume_checkbox,
+          disposalVolume_volume,
+          conditioning_checkbox,
+          conditioning_volume,
+        } = formData
+        let moveLiquidDirtyFields = [
+          'pipette',
+          'tipRack',
+          'volume',
+          'aspirate_wells',
+          'dropTip_location',
+          'dispense_labware',
+          'aspirate_labware',
+          'changeTip',
+          'aspirate_submerge_delay_seconds',
+          'aspirate_submerge_speed',
+          'aspirate_retract_delay_seconds',
+          'aspirate_retract_speed',
+          'dispense_submerge_delay_seconds',
+          'dispense_submerge_speed',
+          'dispense_retract_delay_seconds',
+          'dispense_retract_speed',
+        ]
+        if (
+          dispense_labware != null &&
+          labwareEntities[dispense_labware] != null
+        ) {
+          moveLiquidDirtyFields.push('dispense_wells')
+        }
+        if (pipetteEntities[pipette].spec.channels > 1) {
+          moveLiquidDirtyFields.push('nozzles')
+        }
+        if (pushOut_checkbox && pushOut_volume == null) {
+          moveLiquidDirtyFields.push('pushOut_volume')
+        }
+        if (
+          aspirate_mix_checkbox &&
+          (aspirate_mix_times == null || aspirate_mix_volume == null)
+        ) {
+          moveLiquidDirtyFields.push('aspirate_mix_times')
+          moveLiquidDirtyFields.push('aspirate_mix_volume')
+        }
+        if (aspirate_delay_checkbox && aspirate_delay_seconds == null) {
+          moveLiquidDirtyFields.push('aspirate_delay_seconds')
+        }
+        if (
+          aspirate_touchTip_checkbox &&
+          (aspirate_touchTip_speed == null ||
+            aspirate_touchTip_mmFromEdge == null)
+        ) {
+          moveLiquidDirtyFields.push('aspirate_touchTip_mmFromEdge')
+          moveLiquidDirtyFields.push('aspirate_touchTip_speed')
+        }
+        if (aspirate_airGap_checkbox && aspirate_airGap_volume == null) {
+          moveLiquidDirtyFields.push('aspirate_airGap_volume')
+        }
+        if (dispense_delay_checkbox && dispense_delay_seconds == null) {
+          moveLiquidDirtyFields.push('dispense_delay_seconds')
+        }
+        if (
+          dispense_mix_checkbox &&
+          (dispense_mix_volume == null || dispense_mix_times == null)
+        ) {
+          moveLiquidDirtyFields.push('dispense_mix_volume')
+          moveLiquidDirtyFields.push('dispense_mix_times')
+        }
+        if (
+          blowout_checkbox &&
+          (blowout_location == null || blowout_flowRate == null)
+        ) {
+          moveLiquidDirtyFields.push('blowout_location')
+          moveLiquidDirtyFields.push('blowout_flowRate')
+        }
+        if (
+          dispense_touchTip_checkbox &&
+          (dispense_touchTip_speed == null ||
+            dispense_touchTip_mmFromEdge == null)
+        ) {
+          moveLiquidDirtyFields.push('dispense_touchTip_speed')
+          moveLiquidDirtyFields.push('dispense_touchTip_mmFromEdge')
+        }
+        if (dispense_airGap_checkbox && dispense_airGap_volume == null) {
+          moveLiquidDirtyFields.push('dispense_airGap_volume')
+        }
+        if (disposalVolume_checkbox && disposalVolume_volume == null) {
+          moveLiquidDirtyFields.push('disposalVolume_volume')
+        }
+        if (conditioning_checkbox && conditioning_volume == null) {
+          moveLiquidDirtyFields.push('conditioning_volume')
+        }
+        dirtyFields = moveLiquidDirtyFields
+        break
+      }
+
+      //  NOTE: this is only hit if a new form type is created and we
+      //  haven't wired up the dirty fields yet
+      default: {
+        dirtyFields = []
+        console.error(
+          `the dirty fields have not been added yet for ${stepType}`
+        )
+      }
+    }
   }
 
   // exclude form "metadata" (not really fields)
-  return without(dirtyFields, 'stepType', 'id')
+  return without(
+    dirtyFields,
+    'stepType',
+    'id',
+    'stepDetails',
+    'stepNumber',
+    'stepName'
+  )
 }
 
 export const getIsErrorOnCurrentPage = (args: {
@@ -121,18 +410,33 @@ export const getVisibleFormErrors = (args: {
   focusedField?: string | null
   dirtyFields: string[]
   errors: StepFormErrors
-  showErrors?: boolean
   page: number
+  currentFormIsPresaved: boolean
+  showErrors?: boolean
 }): StepFormErrors => {
-  const { focusedField, errors, page = 0, showErrors } = args
+  const {
+    focusedField,
+    errors,
+    page = 0,
+    showErrors,
+    dirtyFields,
+    currentFormIsPresaved,
+  } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
       // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
       focusedField
     )
-
+    const dependentFieldsAreDirty =
+      difference(error.dependentFields, dirtyFields).length === 0
     const isPageImplicated = error.page != null ? page === error.page : true
-    return isPageImplicated && dependentFieldsAreNotFocused && showErrors
+    return (
+      isPageImplicated &&
+      dependentFieldsAreNotFocused &&
+      (!currentFormIsPresaved
+        ? dependentFieldsAreDirty || showErrors
+        : showErrors)
+    )
   })
 }
 export const getVisibleFormWarnings = (args: {
