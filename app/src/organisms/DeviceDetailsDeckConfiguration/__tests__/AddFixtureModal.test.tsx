@@ -38,8 +38,6 @@ describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
-    console.log('in before each')
-    console.log('Btn: ', Btn)
     props = {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',

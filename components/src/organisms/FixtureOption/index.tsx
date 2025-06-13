@@ -59,7 +59,6 @@ interface FixtureOptionProps {
   buttonText: string
   isOnDevice: boolean
 }
-console.log('Btn: ', Btn)
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
   return isOnDevice ? (
@@ -75,8 +74,6 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   ) : (
     <ListItem
       type="default"
-      gridGap={SPACING.spacing24} // why is this not working
-      css="padding: 16px"
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >

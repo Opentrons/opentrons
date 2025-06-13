@@ -59,6 +59,7 @@ import type {
   CutoutIdToCutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { push } from 'connected-react-router'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -200,41 +201,41 @@ export function AddFixtureModal({
     cutoutId: CutoutId,
     unconfiguredMods: AttachedModule[]
   ): CutoutConfigMap[][] => {
-    let availableOptions: CutoutConfigMap[][] = []
+    const availableOptions: CutoutConfigMap[][] = []
     if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
       const unconfiguredTCs = getThermoUnconfiguredFixtures(
         unconfiguredMods,
         cutoutId
       )
-      availableOptions = [...availableOptions, ...unconfiguredTCs]
+      availableOptions.push(...unconfiguredTCs)
     }
     const unconfiguredHeaterShakers = getModuleUnconfiguredFixtures(
       unconfiguredMods,
       cutoutId,
       HEATERSHAKER_MODULE_V1
     )
-    availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
+    availableOptions.push(...unconfiguredHeaterShakers)
 
     const unconfiguredTemperatureModules = getModuleUnconfiguredFixtures(
       unconfiguredMods,
       cutoutId,
       TEMPERATURE_MODULE_V2
     )
-    availableOptions = [...availableOptions, ...unconfiguredTemperatureModules]
+    availableOptions.push(...unconfiguredTemperatureModules)
 
     const unconfiguredAbsorbanceReaders = getModuleUnconfiguredFixtures(
       unconfiguredMods,
       cutoutId,
       ABSORBANCE_READER_V1
     )
-    availableOptions = [...availableOptions, ...unconfiguredAbsorbanceReaders]
+    availableOptions.push(...unconfiguredAbsorbanceReaders)
 
     const unconfiguredFlexStacker = getModuleUnconfiguredFixtures(
       unconfiguredMods,
       cutoutId,
       FLEX_STACKER_MODULE_V1
     )
-    availableOptions = [...availableOptions, ...unconfiguredFlexStacker]
+    availableOptions.push( ...unconfiguredFlexStacker)
 
     return availableOptions
   }
