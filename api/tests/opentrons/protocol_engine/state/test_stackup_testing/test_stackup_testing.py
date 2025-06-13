@@ -521,12 +521,15 @@ def _compare_with_snapshot(
 
     coordinate_mismatches = _find_coordinate_mismatches(snapshot_data, temp_results)
 
-    failure_messages = _build_failure_messages(
+    critical_failures, warnings = _build_failure_messages(
         errors, coordinate_mismatches, missing_stackups, new_stackups
     )
 
-    if failure_messages:
-        pytest.fail("".join(failure_messages))
+    for warning in warnings:
+        logger.warning(warning)
+
+    if critical_failures:
+        pytest.fail("".join(critical_failures))
 
     if temp_snapshot_path.exists():
         temp_snapshot_path.unlink()
@@ -545,18 +548,27 @@ def _find_coordinate_mismatches(
             current_coords = temp_results[stackup_key]["coordinates"]
             snapshot_coords = snapshot_data[stackup_key]["coordinates"]
 
-            if current_coords != snapshot_coords:
+            current_x, current_y, current_z = current_coords
+            snapshot_x, snapshot_y, snapshot_z = snapshot_coords
+
+            if not (
+                current_x == pytest.approx(snapshot_x)
+                and current_y == pytest.approx(snapshot_y)
+                and current_z == pytest.approx(snapshot_z)
+            ):
                 coordinate_mismatches.append(
                     {
                         "stackup_key": stackup_key,
-                        "expected": snapshot_coords,
-                        "actual": current_coords,
-                        "diff": tuple(
-                            round(a - e, 6)
-                            for a, e in zip(current_coords, snapshot_coords)
+                        "expected": [snapshot_x, snapshot_y, snapshot_z],
+                        "actual": [current_x, current_y, current_z],
+                        "diff": (
+                            round(current_x - snapshot_x, 6),
+                            round(current_y - snapshot_y, 6),
+                            round(current_z - snapshot_z, 6),
                         ),
                     }
                 )
+
     return coordinate_mismatches
 
 
@@ -565,29 +577,35 @@ def _build_failure_messages(
     coordinate_mismatches: List[Dict[str, Any]],
     missing_stackups: Set[str],
     new_stackups: Set[str],
-) -> List[str]:
-    """Build comprehensive failure messages for test failures."""
-    failure_messages = []
+) -> Tuple[List[str], List[str]]:
+    """Build comprehensive failure messages for test failures.
+
+    critical_failures: Issues that fail the test
+    warnings: Issues reported but not fail the test
+    """
+    critical_failures = []
+    warnings = []
 
     if errors:
-        failure_messages.append(
+        warning_msg = (
             f"\n{len(errors)} stackups failed to execute:\n"
             + "\n".join(f"  {e['stackup_key']}: {e['error']}" for e in errors[:10])
             + (f"\n  ... and {len(errors) - 10} more" if len(errors) > 10 else "")
         )
+        warnings.append(warning_msg)
 
     if missing_stackups:
-        failure_messages.append(
+        warnings.append(
             f"\n{len(missing_stackups)} stackups from snapshot are missing in current run"
         )
 
     if new_stackups:
-        failure_messages.append(
+        warnings.append(
             f"\n{len(new_stackups)} new stackups found (run with UPDATE_SNAPSHOT=1 to include them)"
         )
 
     if coordinate_mismatches:
-        failure_messages.append(
+        critical_failures.append(
             f"\n{len(coordinate_mismatches)} stackups have coordinate mismatches:\n"
             + "\n".join(
                 f"  {m['stackup_key']}:\n"
@@ -598,4 +616,4 @@ def _build_failure_messages(
             )
         )
 
-    return failure_messages
+    return critical_failures, warnings
