@@ -164,7 +164,7 @@ def load_gripper_jaw_width(
         gripper_jaw_width_data = gripper_offset.get_gripper_jaw_width_data(gripper_id)
         if gripper_jaw_width_data:
             return GripperJawWidthData(
-                encoder_position_at_jaw_closed=gripper_jaw_width_data.encoder_position_at_jaw_closed,
+                encoder_position_at_jaw_closed=gripper_jaw_width_data.encoderPositionAtJawClosed,
                 source=gripper_jaw_width_data.source,
                 status=cal_top_types.CalibrationStatus(
                     markedAt=gripper_jaw_width_data.status.markedAt,

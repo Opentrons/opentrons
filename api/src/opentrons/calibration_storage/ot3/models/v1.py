@@ -82,7 +82,7 @@ class InstrumentOffsetModel(BaseModel):
 
 
 class GripperJawWidthModel(BaseModel):
-    encoder_position_at_jaw_closed: float = Field(
+    encoderPositionAtJawClosed: float = Field(
         ..., description="The encoder position when the gripper jaw is closed."
     )
     lastModified: DatetimeType = Field(

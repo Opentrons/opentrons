@@ -106,7 +106,7 @@ def save_gripper_jaw_width_data(
         cal_status_model = v1.CalibrationStatus()
 
     gripper_jaw_width = v1.GripperJawWidthModel(
-        encoder_position_at_jaw_closed=encoder_position_at_jaw_closed,
+        encoderPositionAtJawClosed=encoder_position_at_jaw_closed,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
         status=cal_status_model,
