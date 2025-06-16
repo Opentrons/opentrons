@@ -141,7 +141,6 @@ describe('createFile selector', () => {
     expect(result.pythonProtocol).toBe(
       `
 import json
-from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
 
 metadata = {
