@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-from typing_extensions import Self
+from typing_extensions import Self, Optional
 from datetime import datetime
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -20,8 +20,10 @@ from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     LiquidTrackingType,
     StackerStoredLabwareGroup,
+    ModuleModel,
+    ModuleDefinition,
 )
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -410,12 +412,25 @@ class AddressableAreaUsedUpdate:
 
 
 @dataclasses.dataclass
+class LoadModuleUpdate:
+    """An update that loads a module."""
+
+    module_id: str
+    definition: ModuleDefinition
+    serial_number: Optional[str]
+    slot_name: Optional[DeckSlotName]
+    requested_model: Optional[ModuleModel]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
+
+    loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
@@ -662,6 +677,24 @@ class StateUpdate:
             pipette_name=pipette_name,
             mount=mount,
             liquid_presence_detection=liquid_presence_detection,
+        )
+        return self
+
+    def set_load_module(
+        self: Self,
+        module_id: str,
+        definition: ModuleDefinition,
+        serial_number: Optional[str],
+        slot_name: Optional[DeckSlotName],
+        requested_model: Optional[ModuleModel],
+    ) -> Self:
+        """Add a new module to state. See `LoadModuleUpdate`."""
+        self.loaded_module = LoadModuleUpdate(
+            module_id=module_id,
+            definition=definition,
+            serial_number=serial_number,
+            slot_name=slot_name,
+            requested_model=requested_model,
         )
         return self
 

@@ -6,6 +6,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine.errors import LocationIsOccupiedError
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons_shared_data.robot.types import RobotType
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (
@@ -172,13 +173,22 @@ async def test_load_module_implementation(
         )
     )
 
+    expected_state_update = StateUpdate()
+    expected_state_update.set_load_module(
+        module_id="module-id",
+        definition=module_definition,
+        requested_model=module_model,
+        serial_number="mod-serial",
+        slot_name=load_slot_name,
+    )
+
     assert result == SuccessData(
         public=LoadModuleResult(
             moduleId="module-id",
             serialNumber="mod-serial",
             model=module_model,
-            definition=module_definition,
         ),
+        state_update=expected_state_update,
     )
 
 
@@ -187,7 +197,7 @@ async def test_load_module_raises_if_location_occupied(
     equipment: EquipmentHandler,
     state_view: StateView,
 ) -> None:
-    """A loadModule command should have an execution implementation."""
+    """A loadModule command should raise an error if the location is occupied."""
     subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadModuleParams(
@@ -284,7 +294,7 @@ async def test_load_module_raises_wrong_location(
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
-    """It should issue a load module engine command."""
+    """It should raise an error when trying to load a module in an incompatible location."""
     subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadModuleParams(
@@ -340,7 +350,7 @@ async def test_load_module_raises_module_fixture_id_does_not_exist(
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
-    """It should issue a load module engine command and raise an error for unmatched fixtures."""
+    """It should raise an error when the module fixture ID does not exist."""
     subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadModuleParams(

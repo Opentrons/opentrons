@@ -457,6 +457,15 @@ def load_module_action(
         state_update.addressable_area_used = AddressableAreaUsedUpdate(
             addressable_area_name=used_addressable_area
         )
+
+    state_update.set_load_module(
+        module_id=module_id,
+        definition=module_def,
+        requested_model=module_def.model,
+        serial_number="fake-serial",
+        slot_name=location.slotName,
+    )
+
     return SucceedCommandAction(
         command=LoadModule(
             params=LoadModuleParams(
@@ -469,7 +478,6 @@ def load_module_action(
             status=CommandStatus.SUCCEEDED,
             result=LoadModuleResult(
                 moduleId=module_id,
-                definition=module_def,
                 model=module_def.model,
             ),
         ),
@@ -4156,27 +4164,11 @@ def test_get_location_sequence_module_with_adapter(
     subject: GeometryView,
 ) -> None:
     """Test if you can get the location sequence of a labware directly on a module."""
-    load_module = SucceedCommandAction(
-        command=LoadModule(
-            params=LoadModuleParams(
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
-                model=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="load-module-1",
-            createdAt=datetime.now(),
-            key="load-module-1",
-            status=CommandStatus.SUCCEEDED,
-            result=LoadModuleResult(
-                moduleId="module-id-1",
-                definition=tempdeck_v2_def,
-                model=tempdeck_v2_def.model,
-            ),
-        ),
-        state_update=StateUpdate(
-            addressable_area_used=AddressableAreaUsedUpdate(
-                addressable_area_name="temperatureModuleV2A3"
-            )
-        ),
+    load_module = load_module_action(
+        module_id="module-id-1",
+        module_def=tempdeck_v2_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="temperatureModuleV2A3",
     )
     load_adapter = SucceedCommandAction(
         command=_dummy_command(),
@@ -4305,27 +4297,11 @@ def test_get_predicted_location_sequence_with_pending_labware(
     subject: GeometryView,
 ) -> None:
     """Test if you can get the location sequence of a labware directly on a module."""
-    load_module = SucceedCommandAction(
-        command=LoadModule(
-            params=LoadModuleParams(
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
-                model=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="load-module-1",
-            createdAt=datetime.now(),
-            key="load-module-1",
-            status=CommandStatus.SUCCEEDED,
-            result=LoadModuleResult(
-                moduleId="module-id-1",
-                definition=tempdeck_v2_def,
-                model=tempdeck_v2_def.model,
-            ),
-        ),
-        state_update=StateUpdate(
-            addressable_area_used=AddressableAreaUsedUpdate(
-                addressable_area_name="temperatureModuleV2A3"
-            )
-        ),
+    load_module = load_module_action(
+        module_id="module-id-1",
+        module_def=tempdeck_v2_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="temperatureModuleV2A3",
     )
     module_store.handle_action(load_module)
     addressable_area_store.handle_action(load_module)
