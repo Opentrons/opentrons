@@ -24,7 +24,7 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
     - [Appendix B: Additional Documentation](additional-documentation.md) points you to even more resources for Opentrons products and writing code to control Flex.
     
-    - [Appendix C: Open-Source Software](open-sourcs-software.md) explains how Opentrons software is hosted on GitHub as a resource for both developers and non-developers.
+    - [Appendix C: Open-Source Software](open-source-software.md) explains how Opentrons software is hosted on GitHub as a resource for both developers and non-developers.
     
     - [Appendix D: Support and Contact Information](support-contact-information.md) lists how to get in touch with Opentrons if you need assistance beyond what our documentation provides.
 

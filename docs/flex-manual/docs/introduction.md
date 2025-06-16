@@ -132,11 +132,11 @@ potential injury or harm.
 
 | Symbol   | Description  |
 | :------- | :----------- |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | **Warning:** Alerts users to <ul><li>Potentially hazardous conditions.</li><li>Actions that may result in personal injury or death.</li></ul>                             |
-| ![Symbol for caution](../images/regulatory-marks/warning-label-caution.svg "Caution")  | **Caution:** Cautions users against <ul><li>Damage to the equipment.</li><li>Lost or corrupted data.</li><li>Unrecoverable interruption of the operation being performed.</li></ul> |
-| ![Symbol for electrical shock](../images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock")  | **Electrical shock:** Identifies instrument components that might pose a risk of electrical shock if the instrument is handled improperly.                                |
-| ![Symbol for hot surface](../images/regulatory-marks/warning-label-hot-surface.svg "Hot surface")  | **Hot surface:** Identifies instrument components that pose a risk of personal injury due to high heat/temperatures if the instrument is handled improperly.              |
-| ![Symbol for pinch point](../images/regulatory-marks/warning-label-pinch-point.svg "Pinch point")  | **Pinch point:** Identifies instrument components that can pose a risk of personal injury when in motion.                                                                  |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | **Warning:** Alerts users to <ul><li>Potentially hazardous conditions.</li><li>Actions that may result in personal injury or death.</li></ul>                             |
+| ![Symbol for caution](images/regulatory-marks/warning-label-caution.svg "Caution")  | **Caution:** Cautions users against <ul><li>Damage to the equipment.</li><li>Lost or corrupted data.</li><li>Unrecoverable interruption of the operation being performed.</li></ul> |
+| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock")  | **Electrical shock:** Identifies instrument components that might pose a risk of electrical shock if the instrument is handled improperly.                                |
+| ![Symbol for hot surface](images/regulatory-marks/warning-label-hot-surface.svg "Hot surface")  | **Hot surface:** Identifies instrument components that pose a risk of personal injury due to high heat/temperatures if the instrument is handled improperly.              |
+| ![Symbol for pinch point](images/regulatory-marks/warning-label-pinch-point.svg "Pinch point")  | **Pinch point:** Identifies instrument components that can pose a risk of personal injury when in motion.                                                                  |
 
 
 You will find the following labels on the Flex:
@@ -163,9 +163,9 @@ Always observe the following electrical safety warnings:
 
 | Symbol   | Description  |
 | :------- | :----------- |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Plug the robot into a grounded, Class 1 circuit. See the [Power Connection section][power-connection] in the System Description chapter.                                                                                |
-| ![Symbol for electrical shock](../images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock") | Do not connect (plug in), disconnect (unplug), or use AC power cables if: <ul><li>The cable is frayed or damaged.</li><li>Other attached cables, cords, or receptacles are frayed or damaged.</li></ul> Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.                                                           |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Do not replace the AC power cable unless at the direction of Opentrons Support.                                                                                            |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Plug the robot into a grounded, Class 1 circuit. See the [Power Connection section][power-connection] in the System Description chapter.                                                                                |
+| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock") | Do not connect (plug in), disconnect (unplug), or use AC power cables if: <ul><li>The cable is frayed or damaged.</li><li>Other attached cables, cords, or receptacles are frayed or damaged.</li></ul> Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.                                                           |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Do not replace the AC power cable unless at the direction of Opentrons Support.                                                                                            |
 
 For more information on electrical requirements, see the [Power Consumption section][power-consumption] of the Installation and Relocation chapter.
 
@@ -175,11 +175,11 @@ Always observe the following additional safety warnings:
 
 | Symbol   | Description  |
 | :------- | :----------- |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure. |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.           |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, it requires two people to lift and move it safely. See the [Relocation section][relocation] in the Installation and Relocation chapter.                                                                        |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the in the Installation and Relocation chapter. |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the in the Installation and Relocation chapter.                |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.           |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, it requires two people to lift and move it safely. See the [Relocation section][relocation] in the Installation and Relocation chapter.                                                                        |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the in the Installation and Relocation chapter. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the in the Installation and Relocation chapter.                |
 
 ### Safety cautions
 
@@ -187,8 +187,8 @@ To help protect the Flex from damage, follow these precautions:
 
 | Symbol   | Description  |
 | :------- | :----------- |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware.md). |
-| ![Symbol for warning](../images/regulatory-marks/warning-label-caution.svg "Warning") | Keep corrosive materials, agents, or otherwise damaging materials away from the robot.|
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware.md). |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Keep corrosive materials, agents, or otherwise damaging materials away from the robot.|
 
 ### Biological safety
 
@@ -260,9 +260,7 @@ Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and E
 
 Opentrons products that fall under the WEEE directive are labeled with the <img src="../images/regulatory-marks/WEEE.svg" style="height: 1.25em;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
 
-If you or your business have Opentrons products that are at end of life
-or need to be discarded for a separate purpose, contact Opentrons for
-proper disposal and recycling.
+If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.
 
 ### Wi-Fi precertification
 
