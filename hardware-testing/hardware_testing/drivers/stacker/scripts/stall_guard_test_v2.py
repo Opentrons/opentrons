@@ -217,7 +217,7 @@ async def main(args) -> None:
 async def repeatablity_test(args) -> None:
     # dictConfig(LOG_CONFIG)
     t = Timer()
-    timeout = 10
+    timeout = 6
     axis_mapping = {
                     'x': {'total_travel': 202, 'axis': StackerAxis.X},
                     'z': {'total_travel': 202, 'axis': StackerAxis.Z},
