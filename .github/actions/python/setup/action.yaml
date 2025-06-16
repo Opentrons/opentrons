@@ -21,13 +21,15 @@ runs:
         fi
     - name: Set the OT_PYTHON env variable
       shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
+      # This GITHUB_ENV write is okay as long as an attacker can't control the $(which python) output.
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV # zizmor: ignore[github-env]
     - name: If provided set the OT_VIRTUALENV_VERSION env variable
       if: ${{ inputs.python-version != 'false' }}
       shell: bash
       env:
         INPUTS_PYTHON_VERSION: ${{ inputs.python-version }}
-      run: echo "OT_VIRTUALENV_VERSION=$INPUTS_PYTHON_VERSION" >> $GITHUB_ENV
+      # This GITHUB_ENV write is okay as long as an attacker can't control the python-version output.
+      run: echo "OT_VIRTUALENV_VERSION=$INPUTS_PYTHON_VERSION" >> $GITHUB_ENV # zizmor: ignore[github-env]
     - shell: bash
       run: npm install --global shx@0.3.3
     - shell: bash
