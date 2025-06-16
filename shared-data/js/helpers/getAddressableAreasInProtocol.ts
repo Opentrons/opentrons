@@ -8,11 +8,6 @@ import type { AddressableAreaName } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type { CompletedProtocolAnalysis, DeckDefinition } from '../types'
 
-
-// this utility is sorting through load labware  and move labware commands (not onto modules)
-// and load module commands to accumulate all addressable areas used in the protocol
-// it should not need to be updated for new stacker labware commands but we should verify
-// that we get the proper addressable areas for stacker load module commands
 export function getAddressableAreasInProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
@@ -22,7 +17,6 @@ export function getAddressableAreasInProtocol(
   const addressableAreasFromCommands = commands.reduce<AddressableAreaName[]>(
     (acc, command) => {
       const { commandType, params } = command
-      // If moveLabware command and new location is a slot
       if (
         commandType === 'moveLabware' &&
         params.newLocation !== 'offDeck' &&
@@ -40,10 +34,7 @@ export function getAddressableAreasInProtocol(
         } else {
           return [...acc, addressableAreaName]
         }
-      } 
-      // if moveLabware command and new location is type addressable area
-      // this will happen if it is a staging slot
-      else if (
+      } else if (
         commandType === 'moveLabware' &&
         params.newLocation !== 'offDeck' &&
         params.newLocation !== 'systemLocation' &&
@@ -51,9 +42,7 @@ export function getAddressableAreasInProtocol(
         !acc.includes(params.newLocation.addressableAreaName)
       ) {
         return [...acc, params.newLocation.addressableAreaName]
-      } 
-      // slotname scenario for load commands
-      else if (
+      } else if (
         (commandType === 'loadLabware' ||
           commandType === 'loadLid' ||
           commandType === 'loadLidStack') &&
@@ -77,10 +66,7 @@ export function getAddressableAreasInProtocol(
         } else {
           return [...acc, addressableAreaName]
         }
-      } 
-      // getting the addressable areas for all slots that are occupied by modules
-      // 
-      else if (
+      } else if (
         commandType === 'loadModule' &&
         !acc.includes(params.location.slotName as AddressableAreaName)
       ) {
@@ -89,7 +75,6 @@ export function getAddressableAreasInProtocol(
           params.location.slotName,
           deckDef
         )
-        // this is conveniently working but not future proof
         return [...acc, addressableAreaNames[0]]
       } else if (
         (commandType === 'loadLabware' ||
@@ -101,9 +86,7 @@ export function getAddressableAreasInProtocol(
         !acc.includes(params.location.addressableAreaName)
       ) {
         return [...acc, params.location.addressableAreaName]
-      } 
-      // these are for disposal locations
-      else if (
+      } else if (
         commandType === 'moveToAddressableArea' &&
         !acc.includes(params.addressableAreaName)
       ) {
