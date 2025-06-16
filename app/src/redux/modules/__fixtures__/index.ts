@@ -403,6 +403,29 @@ export const mockFlexStacker: Types.FlexStackerModule = {
   },
 }
 
+export const mockFlexStackerMissingShuttle: Types.FlexStackerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'fsm123',
+  hardwareRevision: 'flexstacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    latchState: 'closed',
+    platformState: 'unknown',
+    hopperDoorState: 'closed',
+    installDetected: true,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
 export const mockMagneticBlock = {
   id: 'magneticBlock_id',
   moduleModel: 'magneticBlockV1',

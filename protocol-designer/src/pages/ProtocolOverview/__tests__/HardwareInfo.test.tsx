@@ -62,10 +62,10 @@ describe('HardwareInfo', () => {
 
   it('should render trash bin and tc for flex robot and header copy and button', () => {
     render(props)
-    screen.getByText('Deck hardware')
+    screen.getByText('Deck Hardware')
     screen.getByText('A3')
     screen.getAllByText('Trash Bin')
-    screen.getByText('A1, B1')
+    screen.getByText('A1+B1')
     screen.getAllByText('Thermocycler Module GEN2')
     fireEvent.click(screen.getByText('Edit'))
     expect(mockNavigate).toHaveBeenCalled()

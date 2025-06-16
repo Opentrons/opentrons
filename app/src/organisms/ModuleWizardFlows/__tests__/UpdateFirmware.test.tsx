@@ -18,15 +18,19 @@ import {
   useDispatchApiRequest,
 } from '/app/redux/robot-api'
 
+import { useSendIdentifyStacker } from '../hooks'
 import { UpdateFirmware } from '../UpdateFirmware'
 
 import type { ComponentProps } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { IdentifyColor } from '@opentrons/shared-data'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 vi.mock('@opentrons/react-api-client')
 
 const LAST_ID = 'lastRequestId'
@@ -41,16 +45,25 @@ const render = (props: ComponentProps<typeof UpdateFirmware>) => {
 describe('UpdateFirmware', () => {
   let dispatchApiRequest: DispatchApiRequestType
   let handleModuleApiRequests: (robotName: string, serial: string) => void
+  let sendIdentifyStacker: (
+    module: AttachedModule,
+    start: boolean,
+    color?: IdentifyColor
+  ) => void
   let props: React.ComponentProps<typeof UpdateFirmware>
   beforeEach(() => {
     vi.useFakeTimers()
     dispatchApiRequest = vi.fn()
     handleModuleApiRequests = vi.fn()
+    sendIdentifyStacker = vi.fn()
     props = {
       proceed: vi.fn(),
       goBack: vi.fn(),
+      restartSetup: vi.fn(),
       chainRunCommands: vi.fn(),
       isRobotMoving: false,
+      isModuleUpdating: false,
+      setIsModuleUpdating: vi.fn(),
       attachedModule: mockHeaterShaker,
       attachedPipette: mockAttachedPipetteInformation,
       errorMessage: null,
@@ -71,6 +84,7 @@ describe('UpdateFirmware', () => {
       dispatchApiRequest,
       [LAST_ID],
     ])
+    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
 
   afterEach(() => {

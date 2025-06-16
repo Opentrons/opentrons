@@ -3,6 +3,7 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 
+import { COLUMN } from '@opentrons/shared-data'
 import {
   consolidate,
   curryCommandCreator,
@@ -12,7 +13,10 @@ import {
 } from '@opentrons/step-generation'
 
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import { substepTimeline } from './substepTimeline'
+import {
+  substepTimelineMultiChannel,
+  substepTimelineSingleChannel,
+} from './substepTimeline'
 import * as steplistUtils from './utils'
 
 import type {
@@ -33,6 +37,7 @@ import type {
   StepItemSourceDestRow,
   SubstepItemData,
   SubstepTimelineFrame,
+  SubstepWellData,
 } from './types'
 
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
@@ -54,7 +59,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       sourceWells: stepArgs.sourceWells,
@@ -71,7 +75,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       disposalVolume: stepArgs.disposalVolume,
@@ -89,7 +92,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWell: stepArgs.destWell,
       sourceWells: stepArgs.sourceWells,
@@ -116,12 +118,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
-  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
-  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
-  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
   return steplistUtils.mergeWhen(
-    filteredSubstepRows,
+    substepRows,
     (
       currentRow,
       nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
@@ -139,6 +137,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
         preIngreds: nextRow.dest && nextRow.dest.preIngreds,
         postIngreds: nextRow.dest && nextRow.dest.postIngreds,
       },
+      aspirateVolume: currentRow.volume ?? null,
+      dispenseVolume: nextRow.volume ?? null,
       volume: showDispenseVol ? nextRow.volume : currentRow.volume,
     }),
     currentRow => {
@@ -168,88 +168,59 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
-  //  TODO(jr, 5/2/24): filtering out air gap steps for now since a refactor would be required
-  //  to figure out if the air gap is for the aspirate or dispense labware. Otherwise, a white screen
-  //  was happening with an air gap step trying to happen in an aspirate labware well that did not exist
-  const filteredSubstepRows = substepRows.filter(row => !row.isAirGap)
-  return steplistUtils.mergeWhen(
-    filteredSubstepRows,
-    (
-      currentMultiRow: SubstepTimelineFrame,
-      nextMultiRow: SubstepTimelineFrame
-    ) => {
-      // aspirate then dispense multirows adjacent
-      // (inferring from first channel row in each multirow)
-      return (
-        currentMultiRow &&
-        currentMultiRow.source &&
-        nextMultiRow &&
-        nextMultiRow.dest
-      )
-    }, // Merge each channel row together when predicate true
-    (currentMultiRow, nextMultiRow) => {
-      return range(channels).map(channelIndex => {
-        const sourceChannelWell =
-          currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
-        const destChannelWell =
-          nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
-        const source = currentMultiRow.source &&
-          sourceChannelWell && {
-            well: sourceChannelWell,
-            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
-          }
-        const dest = nextMultiRow.dest &&
-          destChannelWell && {
-            well: destChannelWell,
-            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-          }
-        const activeTips = currentMultiRow.activeTips
+  const mergedRows = substepRows.reduce<StepItemSourceDestRow[][]>(
+    (acc, _, index) => {
+      if (index % channels !== 0) {
+        return acc
+      }
+
+      const chunk = substepRows.slice(index, index + channels)
+
+      const row = range(chunk.length).map(channelIndex => {
+        const step = chunk[channelIndex]
+        const wellNameSource = step?.source?.wells?.[0]
+        const wellNameDest = step?.dest?.wells?.[0]
+
+        const source: SubstepWellData | undefined =
+          wellNameSource != null
+            ? {
+                well: wellNameSource,
+                preIngreds: step.source?.preIngreds ?? {},
+                postIngreds: step.source?.postIngreds ?? {},
+              }
+            : undefined
+
+        const dest: SubstepWellData | undefined =
+          wellNameDest != null
+            ? {
+                well: wellNameDest,
+                preIngreds: step.dest?.preIngreds ?? {},
+                postIngreds: step.dest?.postIngreds ?? {},
+              }
+            : undefined
+
         return {
-          activeTips,
+          activeTips: step.activeTips,
           source,
           dest: isMixStep ? source : dest,
-          // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
-          volume: showDispenseVol
-            ? nextMultiRow.volume
-            : currentMultiRow.volume,
+          volume: showDispenseVol ? step.volume : step.volume,
         }
       })
+      //  this is for a mixing step
+      const hasNoSourceOrDest = row.every(
+        ({ source, dest }) => source === undefined && dest === undefined
+      )
+
+      if (!hasNoSourceOrDest) {
+        acc.push(row)
+      }
+
+      return acc
     },
-    currentMultiRow =>
-      range(channels).map(channelIndex => {
-        const source = currentMultiRow.source && {
-          well: currentMultiRow.source.wells[channelIndex],
-          preIngreds:
-            currentMultiRow.source.preIngreds[
-              currentMultiRow.source.wells[channelIndex]
-            ],
-          postIngreds:
-            currentMultiRow.source.postIngreds[
-              currentMultiRow.source.wells[channelIndex]
-            ],
-        }
-        const dest = currentMultiRow.dest && {
-          well: currentMultiRow.dest.wells[channelIndex],
-          preIngreds:
-            currentMultiRow.dest.preIngreds[
-              currentMultiRow.dest.wells[channelIndex]
-            ],
-          postIngreds:
-            currentMultiRow.dest.postIngreds[
-              currentMultiRow.dest.wells[channelIndex]
-            ],
-        }
-        const activeTips = currentMultiRow.activeTips
-        return {
-          activeTips,
-          source,
-          dest,
-          volume: currentMultiRow.volume,
-        }
-      })
+    []
   )
+
+  return mergedRows
 }
 
 function transferLikeSubsteps(args: {
@@ -262,7 +233,9 @@ function transferLikeSubsteps(args: {
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const tipState = cloneDeep(args.robotState.tipState)
-  tipState.pipettes = mapValues(tipState.pipettes, () => true)
+  tipState.pipettes = mapValues(tipState.pipettes, () => {
+    return { hasTip: true, tiprackURI: '' } // arbitrary tip URI
+  })
   const initialRobotState = { ...args.robotState, tipState }
   const { pipette: pipetteId } = stepArgs
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
@@ -292,20 +265,22 @@ function transferLikeSubsteps(args: {
     return null
   }
 
+  let channels = pipetteSpec.channels
+  if (stepArgs.nozzles === COLUMN && channels === 96) {
+    channels = 8
+  }
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
-    const substepRows: SubstepTimelineFrame[] = substepTimeline(
+    const substepRows = substepTimelineMultiChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      pipetteSpec.channels,
-      stepArgs.nozzles
+      initialRobotState
     )
     const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
       {
         substepRows,
         isMixStep: stepArgs.commandCreatorFnName === 'mix',
-        channels: pipetteSpec.channels,
+        channels,
         showDispenseVol,
       }
     )
@@ -318,17 +293,16 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(
+    const substepRows = substepTimelineSingleChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      1,
-      null
+      initialRobotState
     )
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
       showDispenseVol,
     })
+
     return {
       substepType: 'sourceDest',
       multichannel: false,

@@ -1,18 +1,12 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '@opentrons/components'
+
 import { useBlockingHint } from '../../components/organisms'
-import { getWarningContent } from '../../pages/ProtocolOverview/UnusedModalContent'
 
-import type { Fixture } from '../../pages/ProtocolOverview'
-import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
-
-export interface USeProtocolExportHandlerProps {
-  noCommands: boolean
-  modulesWithoutStep: ModuleOnDeck[]
-  pipettesWithoutStep: PipetteOnDeck[]
-  gripperWithoutStep: boolean
-  fixtureWithoutStep: Fixture
+export interface UseProtocolExportHandlerProps {
+  hasCommands: boolean
   onConfirmExport: () => void
 }
 
@@ -22,37 +16,21 @@ interface UseProtocolExportHandlerResult {
 }
 
 export const useProtocolExportHandler = ({
-  noCommands,
-  modulesWithoutStep,
-  pipettesWithoutStep,
-  gripperWithoutStep,
-  fixtureWithoutStep,
+  hasCommands,
   onConfirmExport,
-}: USeProtocolExportHandlerProps): UseProtocolExportHandlerResult => {
+}: UseProtocolExportHandlerProps): UseProtocolExportHandlerResult => {
   const { t } = useTranslation(['protocol_overview', 'alert'])
   const [showModalWithWarning, setShowModalWithWarning] = useState<boolean>(
     false
   )
 
-  const hasWarning =
-    noCommands ||
-    modulesWithoutStep.length > 0 ||
-    pipettesWithoutStep.length > 0 ||
-    gripperWithoutStep ||
-    fixtureWithoutStep.trashBin ||
-    fixtureWithoutStep.wasteChute ||
-    fixtureWithoutStep.stagingAreaSlots.length > 0
+  const hasWarning = !hasCommands
 
-  const warningDetails = hasWarning
-    ? getWarningContent({
-        noCommands,
-        pipettesWithoutStep,
-        modulesWithoutStep,
-        gripperWithoutStep,
-        fixtureWithoutStep,
-        t,
-      })
-    : null
+  const content = (
+    <StyledText desktopStyle="bodyDefaultRegular">
+      {t('alert:export_warnings.redesign.no_commands.body1')}
+    </StyledText>
+  )
 
   const proceedExport = useCallback(() => {
     setShowModalWithWarning(false)
@@ -64,9 +42,9 @@ export const useProtocolExportHandler = ({
   }, [])
 
   const exportWarningModalElement = useBlockingHint({
-    hintKey: warningDetails?.hintKey ?? null,
+    hintKey: 'no_commands',
     enabled: showModalWithWarning,
-    content: warningDetails?.content,
+    content: content,
     handleCancel: cancelExportWarning,
     handleContinue: proceedExport,
   })

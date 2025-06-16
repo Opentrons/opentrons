@@ -5,10 +5,6 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
 package_name = hardware_testing
 package_version = $(call python_package_version,hardware-testing,$(project_rs_default))
 wheel_file = dist/$(call python_get_wheelname,hardware-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
@@ -62,18 +58,22 @@ clean:
 	$(clean_cmd)
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	rm -rf dist/*.whl
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
+sdist: export OPENTRONS_PROJECT=$(PROJECT)
+sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist:
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -84,23 +84,6 @@ test:
 .PHONY: test-cov
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
-
-.PHONY: test-photometric-single
-test-photometric-single:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --photoplate-col-offset 3
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
-
-.PHONY: test-photometric-multi
-test-photometric-multi:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
-
-.PHONY: test-photometric
-test-photometric:
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 200 --channels 96 --tip 50 --trials 1
-	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 200 --channels 96 --tip 20 --trials 1
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
@@ -133,7 +116,6 @@ test-gravimetric:
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
-	$(MAKE) test-photometric
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -175,12 +157,12 @@ test-stacker:
 .PHONY: lint
 lint:
 	$(python) -m mypy hardware_testing tests
-	$(python) -m black --check hardware_testing tests setup.py
-	$(python) -m flake8 hardware_testing tests setup.py
+	$(python) -m black --check hardware_testing tests
+	$(python) -m flake8 hardware_testing tests
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests setup.py
+	$(python) -m black hardware_testing tests
 
 define move-plot-webpage-ot3
 ssh $(ssh_helper_ot3) root@$(1) \
@@ -215,7 +197,7 @@ restart:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push
 push: push-no-restart restart
@@ -225,8 +207,8 @@ restart-ot3:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
+push-no-restart-ot3: wheel Pipfile.lock
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3:
@@ -234,7 +216,7 @@ push-ot3:
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3
-	cd ../ && $(MAKE) -C shared-data push-ot3
+	#cd ../ && $(MAKE) -C shared-data push-ot3
 
 .PHONE: open-dev-app
 open-dev-app:

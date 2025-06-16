@@ -38,6 +38,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 84.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Temperature Module GEN2",
@@ -60,6 +62,7 @@
             "y": -0.15,
             "z": 80.09
           },
+          "locatingFeaturesAsParent": {},
           "model": "temperatureModuleV2",
           "moduleType": "temperatureModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -2032,6 +2035,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2199,6 +2210,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2370,6 +2389,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2545,6 +2572,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2724,6 +2759,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,

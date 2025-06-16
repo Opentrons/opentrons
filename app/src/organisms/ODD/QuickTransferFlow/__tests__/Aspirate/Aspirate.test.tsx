@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -8,12 +8,14 @@ import { Aspirate } from '../../Aspirate'
 import { AspirateSettingDetail } from '../../Aspirate/AspirateSettingDetail'
 import { AspirateSettingItem } from '../../Aspirate/AspirateSettingItem'
 import { useAspirateSettingsConfig } from '../../Aspirate/hooks/useAspirateSettingsConfig'
+import { ResetAdvancedSettingsModal } from '../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../../Aspirate/AspirateSettingItem')
 vi.mock('../../Aspirate/AspirateSettingDetail')
 vi.mock('../../Aspirate/hooks/useAspirateSettingsConfig')
+vi.mock('../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal')
 
 const render = (props: ComponentProps<typeof Aspirate>) => {
   return renderWithProviders(<Aspirate {...props} />, {
@@ -161,6 +163,9 @@ describe('Aspirate', () => {
     vi.mocked(useAspirateSettingsConfig).mockReturnValue(
       mockAspirateSettingsItems
     )
+    vi.mocked(ResetAdvancedSettingsModal).mockReturnValue(
+      <div>mock ResetAdvancedSettingsModal</div>
+    )
   })
 
   it('renders mock components and reset button', () => {
@@ -170,5 +175,12 @@ describe('Aspirate', () => {
     screen.getByRole('button', { name: 'Reset aspirate settings' })
   })
 
-  // ToDo(kk:04/03) add test for reset button
+  it('when clicking reset button, shows ResetAdvancedSettingsModal', () => {
+    render(props)
+    const resetButton = screen.getByRole('button', {
+      name: 'Reset aspirate settings',
+    })
+    fireEvent.click(resetButton)
+    screen.getByText('mock ResetAdvancedSettingsModal')
+  })
 })

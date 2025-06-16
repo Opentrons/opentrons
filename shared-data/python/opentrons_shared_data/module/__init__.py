@@ -1,4 +1,5 @@
 """ opentrons_shared_data.module: functions and types for module defs """
+
 import json
 from ast import literal_eval
 from pathlib import Path
@@ -42,7 +43,7 @@ of a thermocycler on a Flex.
 
 
 class ModuleNotFoundError(KeyError):
-    def __init__(self, version: str, model_or_loadname: str):
+    def __init__(self, version: str, model_or_loadname: str) -> None:
         super().__init__(model_or_loadname)
         self.requested_version = version
         self.requested_module = model_or_loadname

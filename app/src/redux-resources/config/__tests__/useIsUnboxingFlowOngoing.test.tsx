@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
@@ -13,7 +13,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 
-const store: Store<State> = createStore(vi.fn(), {})
+const store: Store<State> = legacy_createStore(vi.fn(), {})
 
 const mockDisplaySettings = {
   sleepMs: 604800000,

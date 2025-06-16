@@ -7,14 +7,15 @@
     "y": 68.8,
     "z": 108.96
   },
+  "locatingFeaturesAsParent": {},
   "dimensions": {
     "bareOverallHeight": 108.96,
     "overLabwareHeight": 0.0,
     "lidHeight": 61.7,
     "xDimension": 172,
     "yDimension": 245.2,
-    "labwareInterfaceXDimension": 128,
-    "labwareInterfaceYDimension": 86
+    "labwareInterfaceXDimension": 127.76,
+    "labwareInterfaceYDimension": 85.48
   },
   "cornerOffsetFromSlot": {
     "x": -22.125,

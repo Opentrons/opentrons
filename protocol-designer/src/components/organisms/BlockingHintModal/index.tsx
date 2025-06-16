@@ -51,9 +51,7 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
   }
 
   const confirmButtonText =
-    hintKey === 'no_commands' || hintKey === 'unused_hardware'
-      ? 'continue_with_export'
-      : 'confirm'
+    hintKey === 'no_commands' ? 'continue_with_export' : 'confirm'
 
   return createPortal(
     <Modal

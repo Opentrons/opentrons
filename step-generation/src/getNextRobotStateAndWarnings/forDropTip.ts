@@ -23,5 +23,6 @@ export function forDropTip(
     wellName,
     robotStateAndWarnings,
   })
-  robotState.tipState.pipettes[pipetteId] = false
+  robotState.tipState.pipettes[pipetteId].hasTip = false
+  robotState.tipState.pipettes[pipetteId].tiprackURI = null
 }

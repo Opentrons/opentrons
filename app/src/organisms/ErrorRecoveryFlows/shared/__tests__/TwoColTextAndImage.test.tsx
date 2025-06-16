@@ -46,8 +46,8 @@ describe('TwoColTextAndImage', () => {
         handleMotionRouting: mockHandleMotionRouting,
       },
       recoveryMap: {
-        route: RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
-        step: RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.STEPS.MANUAL_REPLACE,
+        route: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE,
       },
       recoveryCommands: {
         closeLabwareLatch: mockCloseLabwareLatch,
@@ -61,11 +61,10 @@ describe('TwoColTextAndImage', () => {
     expect(mockProceedNextStep).toHaveBeenCalled()
   })
 
-  it(`calls proceedNextStep and closeLabwareLatch when primary button is clicked for ${RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE}`, async () => {
+  it(`calls proceedNextStep and closeLabwareLatch when primary button is clicked for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE}`, async () => {
     props.recoveryMap = {
-      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+      step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
     }
     render(props)
     clickButtonLabeled('Re-engage latch')
@@ -82,7 +81,7 @@ describe('TwoColTextAndImage', () => {
     })
   })
 
-  it(`passes correct title for ${RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE}`, () => {
+  it(`passes correct title for ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE}`, () => {
     render(props)
     screen.getByText('Load labware shuttle onto track')
     screen.getByText(

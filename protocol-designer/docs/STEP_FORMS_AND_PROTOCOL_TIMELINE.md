@@ -32,7 +32,7 @@ The lightweight mapping function `compoundCommandCreatorFromStepArgs` determines
 
 ### Timeline warnings & errors
 
-Before we talked about form/field-level errors & warnings. These can be purely generated from the form values, without taking Timeline/RobotState concerns into account.
+Before we talked about form-level errors & warnings. These can be purely generated from the form values, without taking Timeline/RobotState concerns into account.
 
 Timeline warnings and errors are for situations when information from the timeline is relevant. For example: the error when running out of tips mid-protocol, or the warning when aspirating from a well that doesn't have enough liquid.
 
@@ -68,13 +68,11 @@ The rest of this doc will describe the PD-specific side of things: how Step Form
 
 **Masking values**: Masking is a behavior where a field rejects updates when they fail to meet a certain condition -- for example, a field only intended for integers will reject changes to add a decimal point. Maskers are used in the presentational layer (specifically, in the `FieldConnector` component) where they should be applied to all updates.
 
-**Field-level errors**: `steplist/fieldLevel` allows you to specify a `getErrors` function for each field. A field can have multiple "error checker" functions that can be composed together; the final result is an array of strings where each represents an error in the field. ~~(NOTE: if there are multiple field-level errors, `FieldConnector` will just join them with `', '`.)~~
-
 **Form-level errors & warnings**: When an error is related to the value of more than one field, it should be specified in `steplist/formLevel` under `getErrors` for that form's `stepType`. Also, there's no such thing as field-level warnings in PD; if need a warning in a form, go to `formLevel` and specify a `getWarnings` function. Form-level errors have a `dependentFields` array associated with them, which is used to ensure that all fields have been touched (are not pristine) before showing the error.
 
 ## Effects of field/form errors
 
-- **Blocking Form Save:** Forms with field-level or form-level errors cannot be saved. The "Save" button will be disabled.
+- **Blocking Form Save:** Forms with form-level errors cannot be saved. The "Save" button will be disabled.
 
 - **Timeline truncation:** If a saved step form has field/form errors, it will not be passed to `{formName}ToArgs` and when the timeline is built it will stop before the error-containing step form.
 

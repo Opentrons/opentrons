@@ -41,3 +41,7 @@ analyses-snapshot-testing/analysis_results
 
 opentrons-ai-server/package
 opentrons-ai-server/api/storage/index/
+
+# Leave Markdown formatting alone because some of it is load-bearing for MkDocs.
+# Note that this is a Prettier thing, not an ESLint thing. Prettier shares this config file.
+/docs/**/*.md

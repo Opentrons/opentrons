@@ -16,7 +16,9 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons.types import Point
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
@@ -127,6 +129,8 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
+    labwareInterfaceXDimension: Optional[float] = None
+    labwareInterfaceYDimension: Optional[float] = None
     lidHeight: Optional[float] = None
     maxStackerFillHeight: Optional[float] = None
     maxStackerRetrievableHeight: Optional[float] = None
@@ -202,6 +206,12 @@ class ModuleDefinition(BaseModel):
     gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
         default_factory=dict,
         description="Offsets to use for labware movement using gripper",
+    )
+
+    # TODO(jh, 06-13-25): This should absolutely be required after EXEC-212 closes.
+    locatingFeaturesAsParent: Optional[LocatingFeatures] = Field(
+        default=None,
+        description="List of explict locating features when this module acts as the parent in a labware stackup",
     )
 
 
@@ -287,6 +297,10 @@ class ModuleOffsetVector(BaseModel):
         return ModuleOffsetVector(
             x=other.x - self.x, y=other.y - self.y, z=other.z - self.z
         )
+
+    def to_point(self) -> Point:
+        """Convert the vector to a Point."""
+        return Point(x=self.x, y=self.y, z=self.z)
 
 
 @dataclass

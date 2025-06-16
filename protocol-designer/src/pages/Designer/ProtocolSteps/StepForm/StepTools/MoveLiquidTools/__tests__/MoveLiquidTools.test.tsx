@@ -14,7 +14,6 @@ import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
 import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
 
 vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../../../../../file-data/selectors')
@@ -22,7 +21,8 @@ vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')
-vi.mock('../hooks')
+vi.mock('../hooks/useAssignLiquidClass')
+vi.mock('../hooks/useSupportedLiquidClassOptions')
 
 const render = (props: ComponentProps<typeof MoveLiquidTools>) => {
   return renderWithProviders(<MoveLiquidTools {...props} />)
@@ -38,7 +38,6 @@ describe('MoveLiquidTools', () => {
         liquidClass: { updateValue: vi.fn() },
       } as any,
       formData: {} as FormData,
-      visibleFormErrors: {} as StepFormErrors,
       tab: 'aspirate',
       setTab: vi.fn(),
       focusHandlers: {} as any,

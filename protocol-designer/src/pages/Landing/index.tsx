@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  BasicButton,
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
@@ -19,11 +20,10 @@ import {
 } from '@opentrons/components'
 
 import { getHasOptedIn } from '../../analytics/selectors'
-import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
@@ -46,6 +46,7 @@ export function Landing(): JSX.Element {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
@@ -94,6 +95,12 @@ export function Landing(): JSX.Element {
 
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+  }
+
+  const handleImportClick = (): void => {
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click()
+    }
   }
 
   return (
@@ -150,12 +157,15 @@ export function Landing(): JSX.Element {
           />
         </StyledNavLink>
         <StyledLabel>
-          <Flex css={LINK_BUTTON_STYLE}>
-            <StyledText desktopStyle="bodyLargeRegular">
-              {t('import_existing_protocol')}
-            </StyledText>
-          </Flex>
-          <input type="file" onChange={loadFile} />
+          <BasicButton onClick={handleImportClick} underLine>
+            {t('import_existing_protocol')}
+          </BasicButton>
+          <StyledInput
+            type="file"
+            onChange={loadFile}
+            ref={fileInputRef}
+            aria-label={t('import')}
+          />
         </StyledLabel>
       </Flex>
       <EndUserAgreementFooter />
@@ -181,4 +191,8 @@ const ButtonText = styled.span`
 const StyledNavLink = styled(NavLink)<ComponentProps<typeof NavLink>>`
   color: ${COLORS.white};
   text-decoration: none;
+`
+
+const StyledInput = styled.input`
+  display: none;
 `

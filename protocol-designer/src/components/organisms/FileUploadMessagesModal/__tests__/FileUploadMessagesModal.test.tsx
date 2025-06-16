@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FileUploadMessagesModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { getEnablePythonExport } from '../../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
@@ -23,7 +22,6 @@ const render = () => {
 
 describe('FileUploadMessagesModal', () => {
   beforeEach(() => {
-    vi.mocked(getEnablePythonExport).mockReturnValue(true)
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: true,
       errorType: 'INVALID_FILE_TYPE',
@@ -34,14 +32,6 @@ describe('FileUploadMessagesModal', () => {
     screen.getByText('Invalid file type')
     screen.getByText(
       'Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.'
-    )
-  })
-  it('renders modal for a non-JSON and non-python file with ff turned off', () => {
-    vi.mocked(getEnablePythonExport).mockReturnValue(false)
-    render()
-    screen.getByText('Invalid file type')
-    screen.getByText(
-      'Protocol Designer only accepts JSON protocol files created with Protocol Designer. Upload a valid file to continue.'
     )
   })
   it('renders modal for a migration', () => {

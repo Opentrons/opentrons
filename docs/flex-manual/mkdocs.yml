@@ -1,0 +1,55 @@
+site_name: Opentrons Flex Instruction Manual
+
+nav:
+  - Preface: preface.md
+  - Introduction: introduction.md
+  - Installation and Relocation: installation-relocation.md
+  - System Description: system-description.md
+  - Modules: modules.md
+  - Labware: labware.md
+  - Protocol Development: protocol-development.md
+  - Software and Operation: software-operation.md
+  - Maintenance and Service: maintenance-service.md
+  - Appendices:
+      - Glossary: glossary.md
+      - Additional Documentation: additional-documentation.md
+      - Open-Source Software: open-source-software.md
+      - Support and Contact Information: support-contact-information.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - manual.css
+  - opentrons-theme.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

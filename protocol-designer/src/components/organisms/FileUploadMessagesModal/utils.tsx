@@ -25,11 +25,10 @@ interface InvalidModalProps {
   t: any
   type: 'general' | 'python'
   errorMessage?: string | null
-  enableExportPython?: boolean
 }
 
 const getInvalidFileType = (props: InvalidModalProps): ModalContents => {
-  const { t, type, enableExportPython } = props
+  const { t, type } = props
   return {
     title:
       type === 'general'
@@ -38,11 +37,7 @@ const getInvalidFileType = (props: InvalidModalProps): ModalContents => {
     body: (
       <StyledText desktopStyle="bodyDefaultRegular">
         {type === 'general'
-          ? t(
-              enableExportPython
-                ? 'incorrect_file_type_body_ff'
-                : 'incorrect_file_type_body'
-            )
+          ? t('incorrect_file_type_body')
           : t('incorrect_python_file_type_body')}
       </StyledText>
     ),
@@ -241,13 +236,12 @@ export const getMigrationMessage = (
 }
 
 interface FileUploadModalContentsProps {
-  enableExportPython: boolean
   uploadResponse?: FileUploadMessage | null
 }
 export function useFileUploadModalContents(
   props: FileUploadModalContentsProps
 ): ModalContents | null {
-  const { uploadResponse, enableExportPython } = props
+  const { uploadResponse } = props
   const { t } = useTranslation('shared')
 
   if (uploadResponse == null) return null
@@ -255,7 +249,7 @@ export function useFileUploadModalContents(
   if (uploadResponse.isError) {
     switch (uploadResponse.errorType) {
       case 'INVALID_FILE_TYPE':
-        return getInvalidFileType({ t, type: 'general', enableExportPython })
+        return getInvalidFileType({ t, type: 'general' })
       case 'INVALID_JSON_FILE':
         return invalidJsonModal({
           errorMessage: uploadResponse.errorMessage,

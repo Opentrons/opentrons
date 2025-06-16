@@ -22,12 +22,12 @@ export function TwoColTextAndImage(
 ): JSX.Element | null {
   const { routeUpdateActions, recoveryMap, recoveryCommands } = props
   const {
-    LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    MANUAL_REPLACE_STACKER_AND_RETRY,
+    STACKER_SHUTTLE_MISSING_RETRY,
+    STACKER_STALLED_RETRY,
     ROBOT_IN_MOTION,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
+    STACKER_STALLED_SKIP,
+    STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_RETRY,
   } = RECOVERY_MAP
   const { route, step } = recoveryMap
   const {
@@ -40,8 +40,8 @@ export function TwoColTextAndImage(
 
   const primaryOnClick = (): void => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
           void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
             void closeLabwareLatch().then(() => {
@@ -60,17 +60,17 @@ export function TwoColTextAndImage(
 
   const buildTitle = (): string => {
     switch (route) {
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return t('load_labware_shuttle_onto_track')
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('prepare_for_stacker_latch_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch')
         }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case STACKER_STALLED_RETRY.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
         return t('clear_track_of_obstructions')
       default:
         console.error(
@@ -82,13 +82,13 @@ export function TwoColTextAndImage(
 
   const buildBody = (): string | null => {
     switch (route) {
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return t('take_any_necessary_precautions_before_loading_shuttle')
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case STACKER_STALLED_RETRY.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
         return t('clear_track_of_obstructions_and_close_door')
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('stacker_latch_will_reengage')
         } else {
@@ -104,8 +104,8 @@ export function TwoColTextAndImage(
 
   const buildButtonText = (): string => {
     switch (route) {
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('re_engage_latch')
         } else {

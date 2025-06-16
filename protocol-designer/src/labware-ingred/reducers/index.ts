@@ -125,7 +125,7 @@ const selectedLiquidGroup = handleActions(
     EDIT_LIQUID_GROUP: () => unselectedLiquidGroupState, // clear on form save
   },
   unselectedLiquidGroupState
-)
+) as Reducer<SelectedLiquidGroupState, Action>
 const initialLabwareState: ContainersState = {}
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -313,7 +313,7 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
   selectedSlot: { slot: null, cutout: null },
 }
 
-export const zoomedInSlotInfo = (
+export const zoomedInSlotInfo = ((
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
     | SelectTopLabwareAction
@@ -332,7 +332,11 @@ export const zoomedInSlotInfo = (
         ...state,
         selectedTopLabware: {
           labwareDefURI,
-          amount: state.selectedTopLabware.amount,
+          // defaults amount to 1 if labware is selected
+          amount:
+            labwareDefURI != null && state.selectedTopLabware.amount === 0
+              ? 1
+              : state.selectedTopLabware.amount,
         },
       }
     }
@@ -399,13 +403,13 @@ export const zoomedInSlotInfo = (
     default:
       return state
   }
-}
+}) as Reducer<ZoomedIntoSlotInfoState, Action>
 
 const initialGenerateNewProtocolState: GenerateNewProtocolState = {
   isNewProtocol: false,
 }
 
-export const generateNewProtocol = (
+export const generateNewProtocol = ((
   state: GenerateNewProtocolState = initialGenerateNewProtocolState,
   action: GenerateNewProtocolAction
 ): GenerateNewProtocolState => {
@@ -417,7 +421,7 @@ export const generateNewProtocol = (
     default:
       return state
   }
-}
+}) as Reducer<GenerateNewProtocolState, Action>
 export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
@@ -429,8 +433,9 @@ export interface RootState {
   ingredLocations: LocationsState
   generateNewProtocol: GenerateNewProtocolState
 }
+
 // TODO Ian 2018-01-15 factor into separate files
-export const rootReducer: Reducer<RootState, Action> = combineReducers({
+export const rootReducer = combineReducers({
   zoomedInSlotInfo,
   modeLabwareSelection,
   selectedContainerId,
@@ -440,4 +445,4 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   ingredients,
   ingredLocations,
   generateNewProtocol,
-})
+}) as Reducer<RootState, Action>

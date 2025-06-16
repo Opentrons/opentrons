@@ -349,6 +349,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   isSelected={selectedZoomInSlot != null}
                   deckDef={deckDef}
                   stagingAreaAddressableAreas={[]}
+                  addEquipment={addEquipment}
                 />
               ) : null}
             </Module>
@@ -418,6 +419,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               isSelected={selectedZoomInSlot != null}
               deckDef={deckDef}
               stagingAreaAddressableAreas={stagingAreaAddressableAreas}
+              addEquipment={addEquipment}
             />
           )
         })}

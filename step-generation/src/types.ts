@@ -133,7 +133,7 @@ export interface LiquidEntity {
   description: string | null
   pythonName: string
   liquidGroupId: string
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export interface LiquidEntities {
@@ -229,7 +229,7 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number
+  mmFromBottom: number // TODO: deprecate this
 }
 
 interface CommonArgs {
@@ -242,6 +242,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -271,7 +272,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm: number
+  aspirateOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   aspirateXOffset: number
   /** y offset mm */
@@ -293,7 +294,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  dispenseOffsetFromBottomMm: number
+  dispenseOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   dispenseXOffset: number
   /** y offset mm */
@@ -304,7 +305,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
@@ -637,7 +637,10 @@ export interface TimelineFrame {
       }
     }
     pipettes: {
-      [pipetteId: string]: boolean // true if pipette has tip(s)
+      [pipetteId: string]: {
+        hasTip: boolean
+        tiprackURI: string | null
+      } // true if pipette has tip(s)
     }
   }
   liquidState: {
@@ -700,7 +703,9 @@ export type ErrorType =
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
+  | 'RETRACT_BELOW_DISPENSE'
   | 'SUBMERGE_BELOW_ASPIRATE'
+  | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

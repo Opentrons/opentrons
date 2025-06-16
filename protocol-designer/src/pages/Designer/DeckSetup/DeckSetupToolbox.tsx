@@ -19,6 +19,7 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
 
 import {
   LINK_BUTTON_STYLE,
@@ -76,6 +77,7 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
     false
   )
+  const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
 
   const {
     createdAdapterForSlot,
@@ -247,7 +249,7 @@ export function DeckSetupToolbox(
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('customize_slot')}
+              {t('edit_labware')}
             </StyledText>
           </Flex>
         }
@@ -268,20 +270,28 @@ export function DeckSetupToolbox(
         confirmButtonText={t('done')}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <Flex width={FLEX_MAX_CONTENT}>
-            <EmptySelectorButton
-              textAlignment="left"
-              text={t('add_labware')}
-              iconName="plus"
-              onClick={() => {
-                setShowSelectLabwareModal(true)
-              }}
-            />
-          </Flex>
+          {isOnPlateReader ? null : (
+            <Flex width={FLEX_MAX_CONTENT}>
+              <EmptySelectorButton
+                textAlignment="left"
+                text={t('add_labware')}
+                iconName="plus"
+                onClick={() => {
+                  setShowSelectLabwareModal(true)
+                }}
+              />
+            </Flex>
+          )}
           {hasNoLabware ? (
             <InfoScreen
-              content={t('no_labware_added')}
-              subContent={t('select_labware_to_add')}
+              content={t(
+                isOnPlateReader ? 'cant_add_labware' : 'no_labware_added'
+              )}
+              subContent={t(
+                isOnPlateReader
+                  ? 'plate_reader_labware'
+                  : 'select_labware_to_add'
+              )}
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>

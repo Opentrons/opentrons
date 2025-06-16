@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import {
+  ABSORBANCE_READER_V1,
   fixture96Plate,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
@@ -13,7 +14,7 @@ import {
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { SelectLabwareModal } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   deleteContainer,
@@ -46,7 +47,7 @@ vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
 vi.mock('../../../../ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
@@ -106,12 +107,27 @@ describe('DeckSetupToolbox', () => {
   })
   it('should render empty labware and add labware CTA opens modal ', () => {
     render(props)
-    screen.getByText('Customize slot')
+    screen.getByText('Edit labware')
     screen.getByText('Add labware')
     screen.getByText('No labware added')
     screen.getByText('Select labware to add to slot')
     fireEvent.click(screen.getByText('Add labware'))
     screen.getByText('mock SelectLabwareModal')
+  })
+  it('renders correct copy for adding a labware onto a plate reader', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedFixture: null,
+      selectedModuleModel: ABSORBANCE_READER_V1,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
+    render(props)
+    screen.getByText('Can’t add labware')
+    screen.getByText(
+      'The plate reader must start empty so it can be initialized.'
+    )
   })
   it('should clear the slot from all items when the clear cta is called', () => {
     vi.mocked(getLabwareNicknamesById).mockReturnValue({

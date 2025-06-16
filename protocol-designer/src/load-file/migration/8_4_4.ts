@@ -29,7 +29,6 @@ export const migrateFile = (
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
     acc[id] = {
       displayName: ingredient.name ?? '',
-      liquidClass: ingredient.liquidClass,
       description: ingredient.description ?? null,
       liquidGroupId: id,
       displayColor: liquids[id].displayColor ?? swatchColors(id),

@@ -36,6 +36,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 82.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Heater-Shaker Module GEN1",
@@ -58,6 +60,7 @@
             "y": 1.125,
             "z": 68.275
           },
+          "locatingFeaturesAsParent": {},
           "model": "heaterShakerModuleV1",
           "moduleType": "heaterShakerModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -3105,6 +3108,8 @@
           ],
           "dimensions": {
             "bareOverallHeight": 84.0,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 0.0
           },
           "displayName": "Temperature Module GEN2",
@@ -3127,6 +3132,7 @@
             "y": -0.15,
             "z": 80.09
           },
+          "locatingFeaturesAsParent": {},
           "model": "temperatureModuleV2",
           "moduleType": "temperatureModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -3562,6 +3568,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 45.0,
+            "labwareInterfaceXDimension": 127.75,
+            "labwareInterfaceYDimension": 85.75,
             "overLabwareHeight": 0.0
           },
           "displayName": "Magnetic Block GEN1",
@@ -3584,6 +3592,7 @@
             "y": 0.0,
             "z": 38.0
           },
+          "locatingFeaturesAsParent": {},
           "model": "magneticBlockV1",
           "moduleType": "magneticBlockType",
           "otSharedSchema": "module/schemas/2",

@@ -26,46 +26,16 @@ PLATFORM := $(shell uname -s)
 is-windows=$(findstring $(PLATFORM), Windows)
 $(if $(is-windows), echo "when using windows with an openSSH version larger then 9 add -O flag to scp command. see comments for more details")
 
-# push-python-package: execute a push to the robot of a particular python
-# package.
-#
-# argument 1 is the host to push to
-# argument 2 is the identity file to use, if any
-# argument 3 is any further ssh options, quoted
-# argument 4 is the path to the wheel file
-define push-python-package
-$(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
-scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
-ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
-"function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
-mount -o remount,rw / &&\
-cd /usr/lib/python3.10/site-packages &&\
-unzip -o /data/$(notdir $(4)) && cleanup || cleanup"
-endef
-
-# push-python-sdist: push an sdist to an ot3
+# push-python: universal installer for python dists to robots
 # argument 1 is the host to push to
 # argument 2 is the identity file to use, if any
 # argument 3 is any further ssh options, quoted
 # argument 4 is the path to the sdist locally
 # argument 5 is the path to go to on the remote side
-# argument 6 is the python package name
-# argument 7 is an additional subdir if necessary in the sdist
-# argument 8 is either egg or dist (default egg)
-# argument 9 is the version dict entry to update the VERSION.json file
-define push-python-sdist
-$(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
+define push-python
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
-ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
-"function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; mount -o remount,ro / ; } ;\
- mkdir -p /var/$(notdir $(4))-unzip ; \
- cd /var/$(notdir $(4))-unzip && tar xf ../$(notdir $(4)) ; \
- mount -o remount,rw / ; \
- rm -rf $(5)/$(6) $(5)/$(6)*.egg-info ; \
- mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6) $(5)/ ; \
- mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.$(if $(8),$(8),egg)-info $(5)/$(basename $(basename $(notdir $(4)))).$(if $(8),$(8),egg)-info ; \
- cleanup \
- "
+scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(dir $(realpath $(lastword $(MAKEFILE_LIST))))/install-dist-remote.sh root@$(1):/var/
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) /var/install-dist-remote.sh /var/$(notdir $(4)) $(5)
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units

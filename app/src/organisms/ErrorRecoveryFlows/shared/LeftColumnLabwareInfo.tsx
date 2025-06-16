@@ -33,10 +33,10 @@ export function LeftColumnLabwareInfo({
   } = failedLabwareUtils
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
   const {
-    MANUAL_REPLACE_STACKER_AND_RETRY,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_STALLED_RETRY,
+    STACKER_STALLED_SKIP,
+    STACKER_HOPPER_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
@@ -67,8 +67,8 @@ export function LeftColumnLabwareInfo({
       }
     } else {
       switch (step) {
-        case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
-        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -76,9 +76,9 @@ export function LeftColumnLabwareInfo({
               deckLabel: displayNameCurrentLoc.toUpperCase(),
             },
           }
-        case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-        case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-        case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
+        case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -100,12 +100,12 @@ export function LeftColumnLabwareInfo({
 
   const buildQuantity = (): number | null => {
     switch (step) {
-      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY:
+      case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
+      case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
         return labwareQuantity
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
         return null
       default:
         return labwareQuantity

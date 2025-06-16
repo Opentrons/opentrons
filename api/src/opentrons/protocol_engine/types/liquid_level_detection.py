@@ -27,42 +27,102 @@ class SimulatedProbeResult(BaseModel):
         return data
 
     def __add__(
-        self, other: float | SimulatedProbeResult
+        self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
         """Bypass addition and just return self."""
         return self
 
     def __sub__(
-        self, other: float | SimulatedProbeResult
+        self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
         """Bypass subtraction and just return self."""
         return self
 
     def __radd__(
-        self, other: float | SimulatedProbeResult
+        self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
         """Bypass addition and just return self."""
         return self
 
     def __rsub__(
-        self, other: float | SimulatedProbeResult
+        self, other: float | int | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
         """Bypass subtraction and just return self."""
         return self
 
-    def __gt__(self, other: float | SimulatedProbeResult) -> bool:
+    def __mul__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass multiplication and just return self."""
+        return self
+
+    def __rmul__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass multiplication and just return self."""
+        return self
+
+    def __truediv__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass division and just return self."""
+        return self
+
+    def __rtruediv__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass division and just return self."""
+        return self
+
+    def __pow__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass exponent math and just return self."""
+        return self
+
+    def __rpow__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass exponent math and just return self."""
+        return self
+
+    def __mod__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass modulus and just return self."""
+        return self
+
+    def __rmod__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass modulus and just return self."""
+        return self
+
+    def __floordiv__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass floor division and just return self."""
+        return self
+
+    def __rfloordiv__(
+        self, other: float | int | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass floor division and just return self."""
+        return self
+
+    def __gt__(self, other: float | int | SimulatedProbeResult) -> bool:
         """Bypass 'greater than' and just return self."""
         return True
 
-    def __lt__(self, other: float | SimulatedProbeResult) -> bool:
+    def __lt__(self, other: float | int | SimulatedProbeResult) -> bool:
         """Bypass 'less than' and just return self."""
         return False
 
-    def __ge__(self, other: float | SimulatedProbeResult) -> bool:
+    def __ge__(self, other: float | int | SimulatedProbeResult) -> bool:
         """Bypass 'greater than or eaqual to' and just return self."""
         return True
 
-    def __le__(self, other: float | SimulatedProbeResult) -> bool:
+    def __le__(self, other: float | int | SimulatedProbeResult) -> bool:
         """Bypass 'less than or equal to' and just return self."""
         return False
 

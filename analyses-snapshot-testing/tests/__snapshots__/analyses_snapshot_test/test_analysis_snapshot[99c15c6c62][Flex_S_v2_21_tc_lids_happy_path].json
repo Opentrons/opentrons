@@ -118,6 +118,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -285,6 +293,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -456,6 +472,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -629,6 +653,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 108.96,
+            "labwareInterfaceXDimension": 127.76,
+            "labwareInterfaceYDimension": 85.48,
             "lidHeight": 61.7,
             "overLabwareHeight": 0.0
           },
@@ -652,6 +678,7 @@
             "y": 68.8,
             "z": 108.96
           },
+          "locatingFeaturesAsParent": {},
           "model": "thermocyclerModuleV2",
           "moduleType": "thermocyclerModuleType",
           "otSharedSchema": "module/schemas/2",

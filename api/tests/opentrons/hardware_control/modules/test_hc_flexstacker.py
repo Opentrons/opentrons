@@ -1,7 +1,6 @@
 import asyncio
 import pytest
 import mock
-from decoy import Decoy
 from typing import AsyncGenerator
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
@@ -18,7 +17,11 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import (
+    MAX_TRAVEL,
+    OFFSET_MD,
     SIMULATING_POLL_PERIOD,
+    STACKING_OFFSET_LG,
+    STACKING_OFFSET_SM,
     FlexStackerReader,
 )
 from opentrons.hardware_control.modules.types import PlatformState
@@ -296,7 +299,6 @@ async def test_platform_state_unknown(
     ],
 )
 async def test_stacker_status_bar_event_handler(
-    decoy: Decoy,
     subject: modules.FlexStacker,
     mock_driver: mock.AsyncMock,
     should_identify: bool,
@@ -315,3 +317,77 @@ async def test_stacker_status_bar_event_handler(
         duration=result_params[3],
         reps=None,
     )
+
+
+@pytest.mark.parametrize(
+    ("labware_height", "stacking_offset", "expect_error"),
+    [
+        (16, STACKING_OFFSET_SM, False),
+        (100, STACKING_OFFSET_LG, False),
+        (0, STACKING_OFFSET_SM, True),
+        (-10, STACKING_OFFSET_SM, True),
+        (200, STACKING_OFFSET_LG, True),
+    ],
+)
+async def test_store_labware_enforce_sensing(
+    subject: modules.FlexStacker,
+    labware_height: float,
+    stacking_offset: float,
+    expect_error: bool,
+) -> None:
+    """
+    Test successful storage labware with labware sensing enforced.
+    """
+    with (
+        mock.patch.object(
+            subject, "_prepare_for_action", mock.AsyncMock()
+        ) as _prepare_for_action,
+        mock.patch.object(
+            subject, "_move_and_home_axis", mock.AsyncMock()
+        ) as _move_and_home_axis,
+        mock.patch.object(
+            subject, "verify_shuttle_labware_presence", mock.AsyncMock()
+        ) as verify_shuttle_labware_presence,
+        mock.patch.object(subject, "move_axis", mock.AsyncMock()) as move_axis,
+        mock.patch.object(subject, "open_latch", mock.AsyncMock()) as open_latch,
+        mock.patch.object(subject, "close_latch", mock.AsyncMock()) as close_latch,
+    ):
+        # Test invalid labware height
+        if expect_error:
+            with pytest.raises(ValueError):
+                await subject.store_labware(
+                    labware_height=labware_height,
+                    enforce_shuttle_lw_sensing=True,
+                )
+            return
+
+        # Test valid labware height
+        await subject.store_labware(
+            labware_height=labware_height,
+            enforce_shuttle_lw_sensing=True,
+        )
+
+        # We need to verify the move sequence
+        _prepare_for_action.assert_called()
+        _move_and_home_axis.assert_any_call(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
+
+        # Assertions for offset calculation and move_axis
+        distance_z = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - stacking_offset
+        move_axis.assert_called_once_with(StackerAxis.Z, Direction.EXTEND, distance_z)
+
+        # Verify labware transfer
+        open_latch.assert_called_once()
+        z_distance = labware_height / 2
+        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
+        _move_and_home_axis.assert_any_call(
+            StackerAxis.Z, Direction.EXTEND, z_distance, z_speed
+        )
+        close_latch.assert_called_once()
+
+        # Now the z can be moved down and verify no labware is detected
+        _move_and_home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, OFFSET_MD)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, False)
+
+        # Then finally the x is moved to the gripper position
+        _move_and_home_axis.assert_any_call(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
