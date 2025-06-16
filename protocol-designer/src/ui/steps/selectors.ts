@@ -267,7 +267,19 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
           form => form[fieldName] !== firstFieldValue
         )
 
-        if (isFieldValueIndeterminant) {
+        const uniqueFieldValues: string[] = Array.from(
+          new Set(forms.map(form => form[fieldName]))
+        )
+        //  special-casing the tipRack field has not indeterminate
+        //  if steps use multiple tiprack types because the FlowRate
+        //  depends on the tiprack type
+        if (fieldName === 'tipRack' && uniqueFieldValues.length > 1) {
+          acc[fieldName] = {
+            value: firstFieldValue,
+            isIndeterminate: false,
+          }
+          return acc
+        } else if (isFieldValueIndeterminant) {
           acc[fieldName] = {
             isIndeterminate: true,
           }
