@@ -335,7 +335,7 @@ jobs:
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
 
       - name: 'upload windows artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -346,7 +346,7 @@ jobs:
           artifacts: ./artifacts/*/*.exe
           artifactContentType: application/vnd.microsoft.portable-executable
       - name: 'upload macos artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -357,7 +357,7 @@ jobs:
           artifacts: ./artifacts/*/*.dmg
           artifactContentType: application/octet-stream
       - name: 'upload linux artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true

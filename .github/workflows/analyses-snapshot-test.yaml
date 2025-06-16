@@ -128,7 +128,7 @@ jobs:
       - name: Create Snapshot update Request
         id: create_pull_request
         if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE == 'true' && github.event_name == 'pull_request'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
@@ -152,7 +152,7 @@ jobs:
 
       - name: Create Snapshot update Request on edge overnight failure
         if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with: # scheduled run uses the default values for ANALYSIS_REF and SNAPSHOT_REF which are edge
           commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
