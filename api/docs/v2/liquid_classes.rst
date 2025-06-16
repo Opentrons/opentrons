@@ -46,10 +46,12 @@ Use an Opentrons-verified liquid class in your transfers to automatically apply 
 Liquid Class Properties
 ========================
 
-## TODO: insert a little intro text up here 
+When you select a liquid class to use in transfers on the the Flex, properties like submerge speed, flow rate, touch tip, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
+
+Each Opentrons-verified liquid class is defined by a set of properties: 
 
 .. image:: /opentrons/api/docs/img/lc_icons/submerge_position.png
-    ## TODO: get images working in table 
+    ## TODO: get images working in table. probably don't want the icon and text in different columns.
 
 .. list-table:: 
     :header-rows: 1
@@ -57,41 +59,41 @@ Liquid Class Properties
     * -  
       - Property
       - Description
-    * - .. image:: /opentrons/api/docs/img/lc_icons/submerge_position.png
+    * - *submerge position, speed icons*
       - Submerge position, speed 
       - 
         * The pipette begins at this position above the liquid, before submerging. 
         * The pipette submerges into the liquid at this speed. 
-    * - 
+    * - *delay icon*
       - Delay
       - The pipette delays a specified amount of time: 
         * before submerging into or retracting from liquid  
         * before or after an aspirate or dispense
         * after a push out. 
-    * - 
+    * - *mix icon*
       - Mix
       - The pipette mixes liquid inside the well before an aspirate or after a dispense.
-    * - 
+    * - *pre-wet tip icon*
       - Pre-wet tip
       - The pipette pre-wets the attached tip before aspirating liquid.
-    * - 
+    * - *flow rate icon*
       - Flow rate*
       - The pipette aspirates or dispenses liquid at this speed. 
-    * - 
+    * - *rectract position and speed icons*
       - Retract position, speed
       - 
         * The pipette retract from the liquid and moves to this position. 
         * The pipette retracts from the liquid at this speed. 
-    * - 
+    * - *push out icon*
       - Push out
       - The pipette dispenses a small amount of air to ensure all liquid leaves the tip. 
-    * - 
+    * - *touch tip icon*
       - Touch tip
       - The pipette touches the attached tip to the sides of a well to remove droplets from the pipette. 
-    * - 
+    * - *air gap icon*
       - Air gap
       - The pipette aspirates a small amount of air after an aspirate or dispense.
-    * - 
+    * - *blowout icon*
       - Blowout
       - The pipette dispenses a larger amount of air to ensure all liquid leaves the tip. 
 
@@ -245,6 +247,6 @@ You can also create a new liquid class for your Flex protocols. Instead of using
                 }
 
 The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for required properties like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See :ref:`liquid-class-definitions` for a complete list of liquid class properties to include.
-## TODO: or link users to github here 
+## TODO: and/or link users to github here.  
 
 
