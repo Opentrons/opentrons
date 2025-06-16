@@ -1,0 +1,20 @@
+# Rules for checking the security of our GitHub Actions with zizmor.
+
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Allow these Actions to be specified by ref like "@v4" instead of an exact Git SHA.
+        #
+        # Ref pins are OK for "big," widely-used providers like AWS, because we can
+        # trust them to have effective defenses against their repo being hijacked.
+        #
+        # They are probably not a good idea for random Actions provided by individuals,
+        # on the other hand.
+        actions/*: ref-pin
+        astral-sh/*: ref-pin
+        aws-actions/*: ref-pin
+        codecov/*: ref-pin
+        docker/*: ref-pin
+        octokit/*: ref-pin
+        slackapi/*: ref-pin
