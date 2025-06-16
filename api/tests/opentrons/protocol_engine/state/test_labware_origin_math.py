@@ -23,6 +23,7 @@ from opentrons_shared_data.labware.types import LocatingFeatures
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
     get_parent_placement_origin_to_lw_origin,
+    _LabwareOriginLocation,
 )
 from opentrons.protocol_engine.types import (
     ModuleModel,
@@ -38,7 +39,6 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
 )
 from opentrons.types import DeckSlotName
-
 
 _LABWARE_DEF_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     namespace="test",
@@ -85,6 +85,66 @@ _LABWARE_DEF_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
             frontRight=Vector2D(x=1100, y=-800),
         ),
     ),
+    stackingOffsetWithLabware={
+        "default": Vector3D(x=0, y=0, z=0),
+    },
+    locatingFeaturesAsParent=LocatingFeatures(),
+)
+
+_LABWARE_DEF_V3_WITH_OFFSET = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=50, y=100, z=25),
+            frontRightTop=Vector3D(x=850, y=-700, z=525),
+        ),
+        footprint=AxisAlignedBoundingBox2D(
+            backLeft=Vector2D(x=50, y=100),
+            frontRight=Vector2D(x=850, y=-700),
+        ),
+    ),
+    locatingFeaturesAsParent=LocatingFeatures(),
+)
+
+_LABWARE_DEF_V3_PARENT = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    parameters=type("MockParams", (), {"loadName": "parent-labware"})(),
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=0, y=0, z=0),
+            frontRightTop=Vector3D(x=2000, y=-1500, z=800),
+        ),
+        footprint=AxisAlignedBoundingBox2D(
+            backLeft=Vector2D(x=0, y=0),
+            frontRight=Vector2D(x=2000, y=-1500),
+        ),
+    ),
+    locatingFeaturesAsParent=LocatingFeatures(),
+)
+
+_LABWARE_DEF_V3_CHILD_WITH_STACKING = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=25, y=50, z=10),
+            frontRightTop=Vector3D(x=525, y=-450, z=310),
+        ),
+        footprint=AxisAlignedBoundingBox2D(
+            backLeft=Vector2D(x=25, y=50),
+            frontRight=Vector2D(x=525, y=-450),
+        ),
+    ),
+    stackingOffsetWithLabware={
+        "parent-labware": Vector3D(x=100, y=150, z=75),
+        "default": Vector3D(x=200, y=250, z=125),
+    },
+    locatingFeaturesAsParent=LocatingFeatures(),
 )
 
 _LABWARE_DEF_V2_2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -116,6 +176,7 @@ _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg
         labwareInterfaceXDimension=1000,
         labwareInterfaceYDimension=700,
     ),
+    locatingFeaturesAsParent=LocatingFeatures(),
 )
 
 _MODULE_DEF_TC_V1 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
@@ -124,7 +185,10 @@ _MODULE_DEF_TC_V1 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
     dimensions=ModuleDimensions(
         bareOverallHeight=800,
         overLabwareHeight=900,
+        labwareInterfaceXDimension=1200,
+        labwareInterfaceYDimension=900,
     ),
+    locatingFeaturesAsParent=LocatingFeatures(),
 )
 
 _MODULE_DEF_TC_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
@@ -133,7 +197,10 @@ _MODULE_DEF_TC_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
     dimensions=ModuleDimensions(
         bareOverallHeight=1000,
         overLabwareHeight=1100,
+        labwareInterfaceXDimension=1400,
+        labwareInterfaceYDimension=1100,
     ),
+    locatingFeaturesAsParent=LocatingFeatures(),
 )
 
 _ADDRESSABLE_AREA = AddressableArea(
@@ -177,6 +244,17 @@ class AddressableAreaSpec(NamedTuple):
     addressable_area: AddressableArea
     is_topmost_labware: bool
     labware_location: AddressableAreaLocation
+    expected_total_offset: Point
+
+
+class LabwareV3Spec(NamedTuple):
+    """Spec data to test LabwareDefinition3 behavior through get_parent_placement_origin_to_lw_origin."""
+
+    child_definition: LabwareDefinition3
+    parent_entity: object
+    module_parent_to_child_offset: LabwareOffsetVector | None
+    is_topmost_labware: bool
+    labware_location: _LabwareOriginLocation
     expected_total_offset: Point
 
 
@@ -321,6 +399,41 @@ ADDRESSABLE_AREA_SPECS: List[AddressableAreaSpec] = [
     ),
 ]
 
+LABWARE_V3_SPECS: List[LabwareV3Spec] = [
+    LabwareV3Spec(
+        child_definition=_LABWARE_DEF_V3,
+        parent_entity=_ADDRESSABLE_AREA,
+        module_parent_to_child_offset=None,
+        is_topmost_labware=True,
+        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
+        expected_total_offset=Point(x=-50, y=-350, z=-300),
+    ),
+    LabwareV3Spec(
+        child_definition=_LABWARE_DEF_V3_WITH_OFFSET,
+        parent_entity=_ADDRESSABLE_AREA,
+        module_parent_to_child_offset=None,
+        is_topmost_labware=True,
+        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
+        expected_total_offset=Point(x=75, y=-400, z=-25),
+    ),
+    LabwareV3Spec(
+        child_definition=_LABWARE_DEF_V3,
+        parent_entity=_MODULE_DEF_TEMP_V2,
+        module_parent_to_child_offset=LabwareOffsetVector(x=100, y=200, z=50),
+        is_topmost_labware=True,
+        labware_location=ModuleLocation(moduleId="module-1"),
+        expected_total_offset=Point(x=50, y=250, z=-250),
+    ),
+    LabwareV3Spec(
+        child_definition=_LABWARE_DEF_V3_CHILD_WITH_STACKING,
+        parent_entity=_LABWARE_DEF_V3_PARENT,
+        module_parent_to_child_offset=None,
+        is_topmost_labware=True,
+        labware_location=OnLabwareLocation(labwareId="parent-labware"),
+        expected_total_offset=Point(x=837.5, y=-375, z=715),
+    ),
+]
+
 
 @pytest.mark.parametrize(
     argnames=ModuleOverlapSpec._fields,
@@ -396,16 +509,66 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     assert result == expected_total_offset
 
 
-def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
-    """It should handle LabwareDefinition3 correctly."""
-    result = get_parent_placement_origin_to_lw_origin(
-        child_labware=_LABWARE_DEF_V3,
-        parent_entity=_ADDRESSABLE_AREA,
-        module_parent_to_child_offset=None,
+@pytest.mark.parametrize(
+    argnames=LabwareV3Spec._fields,
+    argvalues=LABWARE_V3_SPECS,
+)
+def test_get_parent_placement_origin_to_lw_origin_bottom_center_lf(
+    child_definition: LabwareDefinition3,
+    parent_entity: object,
+    module_parent_to_child_offset: LabwareOffsetVector | None,
+    is_topmost_labware: bool,
+    labware_location: _LabwareOriginLocation,
+    expected_total_offset: Point,
+) -> None:
+    """It should calculate the correct offset for LabwareDefinition3 using bottom-center locating feature."""
+    result = get_parent_placement_origin_to_lw_origin(  # type: ignore[call-overload]
+        child_labware=child_definition,
+        parent_entity=parent_entity,
+        module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        is_topmost_labware=True,
-        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
+        is_topmost_labware=is_topmost_labware,
+        labware_location=labware_location,
     )
 
-    expected_offset = Point(x=-100, y=800, z=-300)
-    assert result == expected_offset
+    assert result == expected_total_offset
+
+
+def test_labware_v3_on_module_with_none_dimensions() -> None:
+    """It should handle modules with None labware interface dimensions by raising an error."""
+    module_with_none_dims = ModuleDefinition.model_construct(  # type: ignore[call-arg]
+        schemaVersion=2,
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        dimensions=ModuleDimensions(
+            bareOverallHeight=100,
+            overLabwareHeight=150,
+            labwareInterfaceXDimension=None,
+            labwareInterfaceYDimension=None,
+        ),
+        locatingFeaturesAsParent=LocatingFeatures(),
+    )
+
+    with pytest.raises(
+        ValueError, match="Bottom center locating feature is not supported"
+    ):
+        get_parent_placement_origin_to_lw_origin(
+            child_labware=_LABWARE_DEF_V3,
+            parent_entity=module_with_none_dims,
+            module_parent_to_child_offset=LabwareOffsetVector(x=0, y=0, z=0),
+            deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+            is_topmost_labware=True,
+            labware_location=ModuleLocation(moduleId="module-1"),
+        )
+
+
+def test_labware_v2_on_labware_v3_not_implemented() -> None:
+    """It should raise NotImplementedError for LabwareDefinition2 as parent entity to a LabwareDefinition3 child labware."""
+    with pytest.raises(NotImplementedError):
+        get_parent_placement_origin_to_lw_origin(
+            child_labware=_LABWARE_DEF_V3,
+            parent_entity=_LABWARE_DEF_V2_2,
+            module_parent_to_child_offset=None,
+            deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+            is_topmost_labware=True,
+            labware_location=OnLabwareLocation(labwareId="parent-labware"),
+        )
