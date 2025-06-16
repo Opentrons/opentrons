@@ -241,6 +241,10 @@ export type MultiselectFieldValues = Record<
     isIndeterminate: boolean
   }
 >
+
+const getUniqueValues = (key: string, forms: FormData[]) =>
+  Array.from(new Set(forms.map(form => form[key])))
+
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
@@ -259,6 +263,20 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
       return null
     }
 
+    const uniqueTipRackFieldValues = getUniqueValues('tipRack', forms)
+    const uniquePipetteFieldValues = getUniqueValues('pipette', forms)
+
+    //  since a lot liquid class advanced settings rely on
+    //  knowing the pipette and tiprack, we can't support
+    //  batch edit if the steps have multiple tiprack types
+    //  or multiple pipette types
+    if (
+      uniqueTipRackFieldValues.length > 1 ||
+      uniquePipetteFieldValues.length > 1
+    ) {
+      return null
+    }
+
     const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
     return allFieldNames.reduce(
       (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
@@ -266,20 +284,7 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
         const isFieldValueIndeterminant = forms.some(
           form => form[fieldName] !== firstFieldValue
         )
-
-        const uniqueFieldValues: string[] = Array.from(
-          new Set(forms.map(form => form[fieldName]))
-        )
-        //  special-casing the tipRack field has not indeterminate
-        //  if steps use multiple tiprack types because the FlowRate
-        //  depends on the tiprack type
-        if (fieldName === 'tipRack' && uniqueFieldValues.length > 1) {
-          acc[fieldName] = {
-            value: firstFieldValue,
-            isIndeterminate: false,
-          }
-          return acc
-        } else if (isFieldValueIndeterminant) {
+        if (isFieldValueIndeterminant) {
           acc[fieldName] = {
             isIndeterminate: true,
           }
