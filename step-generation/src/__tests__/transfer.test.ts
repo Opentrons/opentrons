@@ -170,93 +170,67 @@ mock_pipette.transfer_with_liquid_class(
     trash_location=waste_chute,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
-        properties={
-            "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
-                "aspirate": {
-                    "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 0, "y": 0, "z": 2},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 10)],
+                "pre_wet": False,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 50,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 0, "z": 5},
                         "position_reference": "well-bottom",
                     },
-                    "flow_rate_by_volume": [(0, 10)],
-                    "pre_wet": False,
-                    "correction_by_volume": [(0, 0)],
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 50,
-                        "start_position": {
-                            "offset": {
-                                "x": 1,
-                                "y": 0,
-                                "z": 5,
-                            },
-                            "position_reference": "well-bottom",
-                        },
+                    "end_position": {
+                        "offset": {"x": 2, "y": -1, "z": -4},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 0)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": -1,
-                                "z": -4,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 51,
-                        "touch_tip": {"enabled": False},
+                    "speed": 51,
+                    "touch_tip": {"enabled": False},
+                },
+            },
+            "dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "push_out_by_volume": [(0, 0)],
+                "flow_rate_by_volume": [(0, 12)],
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 52,
+                    "start_position": {
+                        "offset": {"x": 2, "y": 1, "z": -2},
+                        "position_reference": "well-center",
                     },
                 },
-                "dispense": {
-                    "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
-                        "position_reference": "well-bottom",
-                    },
-                    "push_out_by_volume": [(0, 0)],
-                    "flow_rate_by_volume": [(0, 12)],
-                    "correction_by_volume": [(0, 0)],
+                "retract": {
+                    "air_gap_by_volume": [(0, 5)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 52,
-                        "start_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": 1,
-                                "z": -2,
-                            },
-                            "position_reference": "well-center",
-                        },
+                    "end_position": {
+                        "offset": {"x": 3, "y": -2, "z": -5},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 5)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 3,
-                                "y": -2,
-                                "z": -5,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 53,
-                        "touch_tip": {"enabled": False},
-                        "blowout": {"enabled": False},
-                    },
+                    "speed": 53,
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": False},
                 },
-            }},
-        },
+            },
+        }}},
     ),
 )`.trimStart()
     )
@@ -386,93 +360,67 @@ mock_pipette.transfer_with_liquid_class(
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
-        properties={
-            "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
-                "aspirate": {
-                    "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 0, "y": 0, "z": 2},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 10)],
+                "pre_wet": False,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 50,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 0, "z": 5},
                         "position_reference": "well-bottom",
                     },
-                    "flow_rate_by_volume": [(0, 10)],
-                    "pre_wet": False,
-                    "correction_by_volume": [(0, 0)],
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 50,
-                        "start_position": {
-                            "offset": {
-                                "x": 1,
-                                "y": 0,
-                                "z": 5,
-                            },
-                            "position_reference": "well-bottom",
-                        },
+                    "end_position": {
+                        "offset": {"x": 2, "y": -1, "z": -4},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 0)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": -1,
-                                "z": -4,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 51,
-                        "touch_tip": {"enabled": False},
+                    "speed": 51,
+                    "touch_tip": {"enabled": False},
+                },
+            },
+            "dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "push_out_by_volume": [(0, 0)],
+                "flow_rate_by_volume": [(0, 12)],
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 52,
+                    "start_position": {
+                        "offset": {"x": 2, "y": 1, "z": -2},
+                        "position_reference": "well-center",
                     },
                 },
-                "dispense": {
-                    "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
-                        "position_reference": "well-bottom",
-                    },
-                    "push_out_by_volume": [(0, 0)],
-                    "flow_rate_by_volume": [(0, 12)],
-                    "correction_by_volume": [(0, 0)],
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 52,
-                        "start_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": 1,
-                                "z": -2,
-                            },
-                            "position_reference": "well-center",
-                        },
+                    "end_position": {
+                        "offset": {"x": 3, "y": -2, "z": -5},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 0)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 3,
-                                "y": -2,
-                                "z": -5,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 53,
-                        "touch_tip": {"enabled": False},
-                        "blowout": {"enabled": False},
-                    },
+                    "speed": 53,
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": False},
                 },
-            }},
-        },
+            },
+        }}},
     ),
 )`.trimStart()
   )
@@ -664,93 +612,67 @@ mock_pipette.transfer_with_liquid_class(
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
-        properties={
-            "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
-                "aspirate": {
-                    "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 0, "y": 0, "z": 2},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 10)],
+                "pre_wet": False,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 50,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 0, "z": 5},
                         "position_reference": "well-bottom",
                     },
-                    "flow_rate_by_volume": [(0, 10)],
-                    "pre_wet": False,
-                    "correction_by_volume": [(0, 0)],
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 50,
-                        "start_position": {
-                            "offset": {
-                                "x": 1,
-                                "y": 0,
-                                "z": 5,
-                            },
-                            "position_reference": "well-bottom",
-                        },
+                    "end_position": {
+                        "offset": {"x": 2, "y": -1, "z": -4},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 0)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": -1,
-                                "z": -4,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 51,
-                        "touch_tip": {"enabled": False},
+                    "speed": 51,
+                    "touch_tip": {"enabled": False},
+                },
+            },
+            "dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "push_out_by_volume": [(0, 0)],
+                "flow_rate_by_volume": [(0, 12)],
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 52,
+                    "start_position": {
+                        "offset": {"x": 2, "y": 1, "z": -2},
+                        "position_reference": "well-center",
                     },
                 },
-                "dispense": {
-                    "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
-                        "position_reference": "well-bottom",
-                    },
-                    "push_out_by_volume": [(0, 0)],
-                    "flow_rate_by_volume": [(0, 12)],
-                    "correction_by_volume": [(0, 0)],
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
                     "delay": {"enabled": False},
-                    "mix": {"enabled": False},
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 52,
-                        "start_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": 1,
-                                "z": -2,
-                            },
-                            "position_reference": "well-center",
-                        },
+                    "end_position": {
+                        "offset": {"x": 3, "y": -2, "z": -5},
+                        "position_reference": "well-top",
                     },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 0)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 3,
-                                "y": -2,
-                                "z": -5,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 53,
-                        "touch_tip": {"enabled": False},
-                        "blowout": {"enabled": False},
-                    },
+                    "speed": 53,
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": False},
                 },
-            }},
-        },
+            },
+        }}},
     ),
 )`.trimStart()
   )
@@ -5590,117 +5512,67 @@ mock_pipette.transfer_with_liquid_class(
     trash_location=trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
-        properties={
-            "p300_single": {"fixture/fixture_tiprack_300_ul/1": {
-                "aspirate": {
-                    "aspirate_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 2,
-                        },
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 0, "y": 0, "z": 2},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 10)],
+                "pre_wet": True,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": True, "duration": 11},
+                "mix": {"enabled": True, "repetitions": 1, "volume": 35},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 50,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 0, "z": 5},
                         "position_reference": "well-bottom",
                     },
-                    "flow_rate_by_volume": [(0, 10)],
-                    "pre_wet": True,
-                    "correction_by_volume": [(0, 0)],
-                    "delay": {
-                        "enabled": True,
-                        "duration": 11,
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 31)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 2, "y": -1, "z": -4},
+                        "position_reference": "well-top",
                     },
-                    "mix": {
-                        "enabled": True,
-                        "repetitions": 1,
-                        "volume": 35,
-                    },
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 50,
-                        "start_position": {
-                            "offset": {
-                                "x": 1,
-                                "y": 0,
-                                "z": 5,
-                            },
-                            "position_reference": "well-bottom",
-                        },
-                    },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 31)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": -1,
-                                "z": -4,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 51,
-                        "touch_tip": {
-                            "enabled": True,
-                            "z_offset": -14.5,
-                        },
+                    "speed": 51,
+                    "touch_tip": {"enabled": True, "z_offset": -14.5},
+                },
+            },
+            "dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "push_out_by_volume": [(0, 0)],
+                "flow_rate_by_volume": [(0, 12)],
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": True, "duration": 12},
+                "mix": {"enabled": True, "repetitions": 1, "volume": 36},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 52,
+                    "start_position": {
+                        "offset": {"x": 2, "y": 1, "z": -2},
+                        "position_reference": "well-center",
                     },
                 },
-                "dispense": {
-                    "dispense_position": {
-                        "offset": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 3,
-                        },
-                        "position_reference": "well-bottom",
+                "retract": {
+                    "air_gap_by_volume": [(0, 3)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 3, "y": -2, "z": -5},
+                        "position_reference": "well-top",
                     },
-                    "push_out_by_volume": [(0, 0)],
-                    "flow_rate_by_volume": [(0, 12)],
-                    "correction_by_volume": [(0, 0)],
-                    "delay": {
-                        "enabled": True,
-                        "duration": 12,
-                    },
-                    "mix": {
-                        "enabled": True,
-                        "repetitions": 1,
-                        "volume": 36,
-                    },
-                    "submerge": {
-                        "delay": {"enabled": False},
-                        "speed": 52,
-                        "start_position": {
-                            "offset": {
-                                "x": 2,
-                                "y": 1,
-                                "z": -2,
-                            },
-                            "position_reference": "well-center",
-                        },
-                    },
-                    "retract": {
-                        "air_gap_by_volume": [(0, 3)],
-                        "delay": {"enabled": False},
-                        "end_position": {
-                            "offset": {
-                                "x": 3,
-                                "y": -2,
-                                "z": -5,
-                            },
-                            "position_reference": "well-top",
-                        },
-                        "speed": 53,
-                        "touch_tip": {
-                            "enabled": True,
-                            "z_offset": -3.4,
-                        },
-                        "blowout": {
-                            "enabled": True,
-                            "location": "fixedTrash",
-                            "flow_rate": 2.3,
-                        },
-                    },
+                    "speed": 53,
+                    "touch_tip": {"enabled": True, "z_offset": -3.4},
+                    "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
-            }},
-        },
+            },
+        }}},
     ),
 )`.trimStart()
       )

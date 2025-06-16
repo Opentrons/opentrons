@@ -90,19 +90,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.24"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "Flex",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "Flex", "apiLevel": "2.24"}`
     )
   })
 })
@@ -407,7 +399,7 @@ pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
 
 const liquid1 = 'liquid1'
 const liquid2 = 'liquid2'
-let mockLiquidEntities: LiquidEntities = {
+const mockLiquidEntities: LiquidEntities = {
   [liquid1]: {
     liquidGroupId: liquid1,
     pythonName: 'liquid_1',
@@ -519,19 +511,13 @@ waste_chute = protocol.load_waste_chute()`.trimStart()
 
 describe('getLoadLiquidClasses', () => {
   it('should load a liquid class for each liquid class types', () => {
-    const liquid3 = 'liquid3'
-    mockLiquidEntities = {
-      ...mockLiquidEntities,
-      [liquid3]: {
-        liquidGroupId: liquid3,
-        pythonName: 'liquid_3',
-        description: '',
-        displayName: 'honey',
-        displayColor: 'mock display color 3',
-        liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
-      },
-    }
-    expect(getLoadLiquidClasses(mockLiquidEntities)).toBe(
+    expect(
+      getLoadLiquidClasses([
+        WATER_LIQUID_CLASS_NAME,
+        ETHANOL_LIQUID_CLASS_NAME,
+        GLYCEROL_LIQUID_CLASS_NAME,
+      ])
+    ).toBe(
       `
 # Load Liquid Classes:
 water_v1 = protocol.get_liquid_class("water")

@@ -113,10 +113,7 @@ function _getSelectedWellsForStep(
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
       let channels = pipetteSpec.channels
-      if (
-        stepArgs.commandCreatorFnName === 'mix' ||
-        stepArgs.commandCreatorFnName === 'transfer'
-      ) {
+      if ('nozzles' in stepArgs) {
         if (stepArgs.nozzles === COLUMN) {
           channels = 8
         } else if (stepArgs.nozzles === SINGLE) {

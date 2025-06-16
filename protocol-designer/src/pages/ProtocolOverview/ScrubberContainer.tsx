@@ -19,6 +19,7 @@ import {
   getInitialDeckSetup,
   getInvariantContext,
   getLiquidEntities,
+  getSavedStepForms,
 } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
@@ -44,6 +45,7 @@ export function ScrubberContainer(): JSX.Element | null {
   const ingredientLocations = useSelector(ingredSelectors.getLiquidsByLabwareId)
   const invariantContext = useSelector(getInvariantContext)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const savedStepForms = useSelector(getSavedStepForms)
 
   if (robotType === OT2_ROBOT_TYPE) {
     return null
@@ -59,7 +61,8 @@ export function ScrubberContainer(): JSX.Element | null {
     labwareEntities,
     labwareNickNames,
     liquidEntities,
-    ingredientLocations
+    ingredientLocations,
+    savedStepForms
   )
   const nonLoadCommands = flatMap(
     robotStateTimeline.timeline,

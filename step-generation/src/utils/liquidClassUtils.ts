@@ -1,14 +1,23 @@
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from './misc'
 import { formatPyDict } from './pythonFormat'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { TransferArgs } from '../types'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  InnerMixArgs,
+  TransferArgs,
+} from '../types'
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
-  args: TransferArgs
+  args: TransferArgs | ConsolidateArgs | DistributeArgs
   pipetteName: PipetteName
   tiprackUri: string
   aspirateCorrectionVolume: number
@@ -26,6 +35,12 @@ export const getCustomLiquidClassProperties = (
     dispenseCorrectionVolume,
   } = props
 
+  let aspirateMixArgs: InnerMixArgs | null = null
+  if ('mixBeforeAspirate' in args) {
+    aspirateMixArgs = args.mixBeforeAspirate as InnerMixArgs | null
+  } else if ('mixFirstAspirate' in args) {
+    aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
+  }
   //    properties object is based off of liquid class schema
   //    shared-data/liquid-class/schemas/1.json
   const customLiquidClassProperties = {
@@ -49,9 +64,9 @@ export const getCustomLiquidClassProperties = (
             duration: args.aspirateDelay?.seconds ?? undefined,
           },
           mix: {
-            enabled: args.mixBeforeAspirate != null,
-            repetitions: args.mixBeforeAspirate?.times ?? undefined,
-            volume: args.mixBeforeAspirate?.volume ?? undefined,
+            enabled: aspirateMixArgs != null,
+            repetitions: aspirateMixArgs?.times ?? undefined,
+            volume: aspirateMixArgs?.volume ?? undefined,
           },
           submerge: {
             delay: {
@@ -111,15 +126,24 @@ export const getCustomLiquidClassProperties = (
           push_out_by_volume: [[0, args.pushOut ?? 0]],
           flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
           correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
-
           delay: {
             enabled: args.dispenseDelay != null,
             duration: args.dispenseDelay?.seconds ?? undefined,
           },
+
           mix: {
-            enabled: args.mixInDestination != null,
-            repetitions: args.mixInDestination?.times ?? undefined,
-            volume: args.mixInDestination?.volume ?? undefined,
+            enabled:
+              'mixInDestination' in args
+                ? args.mixInDestination != null
+                : false,
+            repetitions:
+              'mixInDestination' in args
+                ? args.mixInDestination?.times ?? undefined
+                : undefined,
+            volume:
+              'mixInDestination' in args
+                ? args.mixInDestination?.volume ?? undefined
+                : undefined,
           },
           submerge: {
             delay: {
@@ -167,12 +191,23 @@ export const getCustomLiquidClassProperties = (
             },
             blowout: {
               enabled: args.blowoutLocation != null,
-              location: (args.blowoutLocation as BlowoutLocation) ?? undefined,
+              location: getBlowoutPythonLocation(args.blowoutLocation),
               flow_rate:
                 args.blowoutLocation != null
                   ? args.blowoutFlowRateUlSec
                   : undefined,
             },
+            //  distribute specific args
+            ...('conditioningVolume' in args
+              ? {
+                  conditioning_by_volume: [[0, args.conditioningVolume ?? 0]],
+                }
+              : {}),
+            ...('disposalVolume' in args
+              ? {
+                  disposal_by_volume: [[0, args.disposalVolume ?? 0]],
+                }
+              : {}),
           },
         },
       },
@@ -183,11 +218,25 @@ export const getCustomLiquidClassProperties = (
     string,
     any
   > = JSON.parse(JSON.stringify(customLiquidClassProperties))
-  return formatPyDict(stringifiedCustomLiquidClassProperties, true)
+  return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 
 export const getPythonLiquidClassName = (liquidClass: string): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef = allLiquidClassDefs[liquidClass]
   return `${liquidClassDef.liquidClassName}_v${liquidClassDef.schemaVersion}`
+}
+
+const getBlowoutPythonLocation = (
+  blowoutLocation?: string | null
+): BlowoutLocation | undefined => {
+  if (blowoutLocation == null) {
+    return undefined
+  } else if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
+    return 'source'
+  } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
+    return 'destination'
+  } else {
+    return 'trash'
+  }
 }
