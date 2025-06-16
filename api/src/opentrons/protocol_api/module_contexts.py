@@ -177,7 +177,7 @@ class ModuleContext(CommandPublisher):
 
         labware_core = self._protocol_core.load_labware(
             load_name=name,
-            label=label,
+            label=label if label is None else str(label),
             namespace=namespace,
             version=version,
             location=load_location,
@@ -246,7 +246,10 @@ class ModuleContext(CommandPublisher):
         """
         _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(
-            name=name, label=label, namespace=namespace, version=version
+            name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
         )
 
     @requires_version(2, 15)
