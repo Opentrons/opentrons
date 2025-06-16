@@ -147,6 +147,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
       ) {
         return
       }
+
       dispatch({
         type: ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE,
         disposalVolumeDispenseSettings: {
