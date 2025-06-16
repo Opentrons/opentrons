@@ -103,7 +103,6 @@ export function DropdownStepFormField(
           dropdownType="neutral"
           filterOptions={options}
           title={title}
-          onBlur={onFieldBlur}
           onFocus={onFieldFocus}
           currentOption={
             availableOptionId ?? { name: 'Choose option', value: '' }

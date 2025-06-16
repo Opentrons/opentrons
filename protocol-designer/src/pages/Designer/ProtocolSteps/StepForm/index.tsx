@@ -70,6 +70,10 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   const pipetteEntities = useSelector(getPipetteEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  //  TODO: refactor this state. We could add it to redux's unsavedForm state
+  //  but its a bit tricky since some forms need to reset it upon field changes
+  //  and not upon pressing "save"
+  const [showFormErrors, setShowFormErrorsInNewField] = useState<boolean>(false)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(
       isNewStep,
@@ -90,6 +94,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       }
       return prevDirtyFields
     })
+    setShowFormErrorsInNewField(false)
   }
   const stepId = formData?.id
   const handleDelete = (): void => {
@@ -193,6 +198,8 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           formData,
           handleClose: confirmClose,
           handleSave,
+          showFormErrors,
+          setShowFormErrorsInNewField,
           hydratedForm,
         }}
       />

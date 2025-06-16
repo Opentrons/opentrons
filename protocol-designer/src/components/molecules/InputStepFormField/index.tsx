@@ -53,7 +53,6 @@ export function InputStepFormField(
         caption={caption}
         name={name}
         error={formLevelError ?? errorToShow}
-        onBlur={onFieldBlur}
         onClick={e => {
           e.stopPropagation()
         }}

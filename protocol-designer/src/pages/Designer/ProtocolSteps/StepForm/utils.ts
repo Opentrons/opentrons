@@ -109,19 +109,18 @@ export const getDirtyFields = (
           setHeaterShakerTemperature,
           targetHeaterShakerTemperature,
         } = formData
-        const heaterShakerDirtyFields = ['moduleId']
-        if (heaterShakerSetTimer && heaterShakerTimer == null) {
-          heaterShakerDirtyFields.push('heaterShakerTimer')
-        }
-        if (setShake && targetSpeed == null) {
-          heaterShakerDirtyFields.push('targetSpeed')
-        }
-        if (
-          setHeaterShakerTemperature &&
+
+        const heaterShakerDirtyFields = [
+          'moduleId',
+          ...(heaterShakerSetTimer && heaterShakerTimer == null
+            ? ['heaterShakerTimer']
+            : []),
+          ...(setShake && targetSpeed == null ? ['targetSpeed'] : []),
+          ...(setHeaterShakerTemperature &&
           targetHeaterShakerTemperature == null
-        ) {
-          heaterShakerDirtyFields.push('targetHeaterShakerTemperature')
-        }
+            ? ['targetHeaterShakerTemperature']
+            : []),
+        ]
         dirtyFields = heaterShakerDirtyFields
         break
       }

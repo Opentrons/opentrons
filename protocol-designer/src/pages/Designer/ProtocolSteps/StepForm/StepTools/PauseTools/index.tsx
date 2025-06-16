@@ -33,7 +33,7 @@ import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, setShowFormErrorsInNewField } = props
+  const { propsForFields } = props
 
   const tempModuleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
@@ -90,7 +90,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
         <RadioButton
           onChange={(e: ChangeEvent<any>) => {
             propsForFields.pauseAction.updateValue(e.currentTarget.value)
-            setShowFormErrorsInNewField?.(false)
+            propsForFields.pauseAction.onFieldBlur()
           }}
           buttonLabel={t(
             'form:step_edit_form.field.pauseAction.options.untilResume'
@@ -102,7 +102,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
         <RadioButton
           onChange={(e: ChangeEvent<any>) => {
             propsForFields.pauseAction.updateValue(e.currentTarget.value)
-            setShowFormErrorsInNewField?.(false)
+            propsForFields.pauseAction.onFieldBlur()
           }}
           buttonLabel={t(
             'form:step_edit_form.field.pauseAction.options.untilTime'
@@ -114,7 +114,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
         <RadioButton
           onChange={(e: ChangeEvent<any>) => {
             propsForFields.pauseAction.updateValue(e.currentTarget.value)
-            setShowFormErrorsInNewField?.(false)
+            propsForFields.pauseAction.onFieldBlur()
           }}
           buttonLabel={t(
             'form:step_edit_form.field.pauseAction.options.untilTemperature'

@@ -31,6 +31,7 @@ export function CheckboxStepFormField(
     children,
     tooltipPlacement = TOOLTIP_TOP,
     padding = `0 ${SPACING.spacing16}`,
+    onFieldBlur,
   } = props
 
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -49,6 +50,9 @@ export function CheckboxStepFormField(
             isChecked={disabled ? false : Boolean(value)}
             onClick={() => {
               updateValue(!value)
+              if (!value) {
+                onFieldBlur()
+              }
             }}
             labelText={label ?? ''}
             disabled={disabled}

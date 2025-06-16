@@ -78,7 +78,7 @@ import {
   makeSingleEditFieldProps,
 } from './utils'
 
-import type { ComponentType } from 'react'
+import type { ComponentType, Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type {
@@ -125,6 +125,8 @@ interface StepFormToolboxProps {
   hydratedForm: HydratedFormData
   handleClose: () => void
   handleSave: () => void
+  setShowFormErrorsInNewField: Dispatch<SetStateAction<boolean>>
+  showFormErrors: boolean
 }
 
 export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
@@ -137,6 +139,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dirtyFields,
     focusedField,
     hydratedForm,
+    setShowFormErrorsInNewField,
+    showFormErrors,
   } = props
   const { t, i18n } = useTranslation([
     'application',
@@ -204,10 +208,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     moduleId as string | null
   )
   const [toolboxStep, setToolboxStep] = useState<number>(0)
-  //  TODO: refactor this state. We could add it to redux's unsavedForm state
-  //  but its a bit tricky since some forms need to reset it upon field changes
-  //  and not upon pressing "save"
-  const [showFormErrors, setShowFormErrorsInNewField] = useState<boolean>(false)
   const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
   // state used to determine if user has seen advanced settings page (relevant for presaved forms)
   const [

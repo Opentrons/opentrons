@@ -33,6 +33,7 @@ export function CheckboxExpandStepFormField(
     updateValue,
     tooltipContent = tooltipOverride,
     disabled = false,
+    onFieldBlur,
   } = fieldProps
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -66,6 +67,9 @@ export function CheckboxExpandStepFormField(
                 data-testid={testId}
                 onClick={() => {
                   updateValue(!value)
+                  if (!value) {
+                    onFieldBlur()
+                  }
                 }}
                 disabled={disabled}
               >
