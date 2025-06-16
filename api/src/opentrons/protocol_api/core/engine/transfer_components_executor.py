@@ -38,6 +38,9 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
+AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP = 2
+
+
 @dataclass
 class LiquidAndAirGapPair:
     """Pairing of a liquid and air gap in a tip, with air gap below the liquid in a tip."""
@@ -412,10 +415,39 @@ class TransferComponentsExecutor:
         else:
             volume_for_air_gap = volume
         if add_air_gap:
+            # If we need to add air gap, move to a safe location above the well if
+            # the retract location is not already at or above this safe location
+
+            assert (
+                retract_location is not None and self._target_well is not None
+            )  # Assert for mypy purposes
+            if (
+                retract_location.point.z
+                < self._target_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z
+            ):
+                self._instrument.move_to(
+                    location=Location(
+                        point=Point(
+                            retract_location.point.x,
+                            retract_location.point.y,
+                            self._target_well.get_top(
+                                AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP
+                            ).z,
+                        ),
+                        labware=retract_location.labware,
+                    ),
+                    well_core=self._target_well,
+                    force_direct=True,
+                    minimum_z_height=None,
+                    # Full speed because the tip will already be out of the liquid
+                    speed=None,
+                )
             self._add_air_gap(
                 air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                     volume_for_air_gap
-                )
+                ),
+                retract_location=retract_location,
+                retract_well=self._target_well,
             )
 
     def retract_after_dispensing(
@@ -770,7 +802,18 @@ class TransferComponentsExecutor:
         well: Optional[WellCore],
         add_air_gap: bool,
     ) -> None:
-        """Perform touch tip and air gap as part of post-dispense retract."""
+        """Perform touch tip and air gap as part of post-dispense retract.
+
+        If the retract location is at or above the safe location of
+        AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP, then add the air gap at the retract location
+        (where the pipette is already assumed to be at).
+
+        If the retract location is below the safe location, then move to the safe location
+        and then add the air gap.
+
+        Note: if the plunger needs to be adjusted to prepare for aspirate, it will be done
+        at the same location where the air gap will be added.
+        """
         if touch_tip_properties.enabled:
             assert (
                 touch_tip_properties.speed is not None
@@ -803,8 +846,33 @@ class TransferComponentsExecutor:
                     # Full speed because the tip will already be out of the liquid
                     speed=None,
                 )
+        if add_air_gap or not self._tip_state.ready_to_aspirate:
+            # If we need to move the plunger up either to prepare for aspirate or to add air gap,
+            # move to a safe location above the well if the retract location is not already
+            # at or above this safe location
 
-        # TODO: check if it is okay to just do `prepare_to_aspirate` unconditionally
+            if location is None or well is None:
+                # This can only mean that we are above the trash fixture.
+                # Since we do not move inside the trash fixture, we can assume it is
+                # safe to move the plunger up in-place
+                pass
+            elif location.point.z < well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z:
+                self._instrument.move_to(
+                    location=Location(
+                        point=Point(
+                            location.point.x,
+                            location.point.y,
+                            well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z,
+                        ),
+                        labware=location.labware,
+                    ),
+                    well_core=well,
+                    force_direct=True,
+                    minimum_z_height=None,
+                    # Full speed because the tip will already be out of the liquid
+                    speed=None,
+                )
+
         if not self._tip_state.ready_to_aspirate:
             self._instrument.prepare_to_aspirate()
             self._tip_state.ready_to_aspirate = True
@@ -812,10 +880,17 @@ class TransferComponentsExecutor:
             self._add_air_gap(
                 air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                     0
-                )
+                ),
+                retract_location=location,
+                retract_well=well,
             )
 
-    def _add_air_gap(self, air_gap_volume: float) -> None:
+    def _add_air_gap(
+        self,
+        air_gap_volume: float,
+        retract_location: Optional[Location],
+        retract_well: Optional[WellCore],
+    ) -> None:
         """Add an air gap."""
         if air_gap_volume == 0:
             return
