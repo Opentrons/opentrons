@@ -289,7 +289,7 @@ Flex provides a protocol recovery path for the following error conditions.
 | General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
 
 !!! note
-    The tip presence sensor is disabled for [partial tip pickup](system-description/#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
+    The tip presence sensor is disabled for [partial tip pickup](system-description.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
 
 You can view the status of a finished protocol and review any resolved errors on the run completion screen.
 
