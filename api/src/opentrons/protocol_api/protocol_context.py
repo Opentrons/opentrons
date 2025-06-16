@@ -499,7 +499,7 @@ class ProtocolContext(CommandPublisher):
         labware_core = self._core.load_labware(
             load_name=load_name,
             location=load_location,
-            label=label,
+            label=label if label is None else str(label),
             namespace=namespace,
             version=version,
         )
