@@ -39,5 +39,10 @@ jobs:
           yarn install
 
       - name: 'create release'
+        env:
+          # todo(mm, 2025-06-24): # Is there a more secret way to pass along this secret?
+          # We're currently relying on GitHub to autodetect and censor the token in the logs.
+          TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          node ./scripts/deploy/create-release.js ${{ github.token }} ${{ github.ref_name }} --deploy
+          node ./scripts/deploy/create-release.js "$TOKEN" "$REF_NAME" --deploy

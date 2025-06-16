@@ -204,8 +204,11 @@ jobs:
       should_publish: ${{steps.publish-switch.outputs.should_publish}}
     steps:
       - id: publish-switch
+        env:
+          EVENT_TYPE: ${{ github.event_type }}
+          REF: ${{ github.ref }}
         run: |
-          echo "Determining whether to publish artifacts for event ${{github.event_type}} and ref ${{github.ref}}"
+          echo "Determining whether to publish artifacts for event $EVENT_TYPE and ref $REF"
           if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" = "true" ] ; then
             echo "Publishing builds for shared-data@ tags"
             echo 'should_publish=true' >> $GITHUB_OUTPUT
@@ -213,7 +216,7 @@ jobs:
             echo "Publishing builds for components@ tags"
             echo 'should_publish=true' >> $GITHUB_OUTPUT
           else 
-            echo "No publish for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo "No publish for ref $REF and event $EVENT_TYPE"
             echo 'should_publish=false' >> $GITHUB_OUTPUT
           fi
 

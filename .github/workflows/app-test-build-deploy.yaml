@@ -104,8 +104,12 @@ jobs:
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
       - id: determine-build-type
+        env:
+          EVENT_TYPE: ${{ github.event_type }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
         run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
+          echo "Determining build type for event $EVENT_TYPE and ref $REF"
           if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
             echo "No builds for pull requests"
             echo 'variants=[]' >> $GITHUB_OUTPUT
@@ -160,14 +164,17 @@ jobs:
                echo 'type=develop' >> $GITHUB_OUTPUT
             fi
           else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo "No build for ref $REF and event $EVENT_TYPE"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
       - name: set summary
+        env:
+          TYPE: ${{steps.determine-build-type.outputs.type}}
+          VARIANTS: ${{steps.determine-build-type.outputs.variants}}
         run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+          echo "Type: $TYPE Variants: $VARIANTS" >> $GITHUB_STEP_SUMMARY
 
   build-app:
     needs: [determine-build-type]
@@ -190,8 +197,10 @@ jobs:
       - name: 'Get project name for variant'
         id: project
         shell: bash
+        env:
+          VARIANT: ${{ matrix.variant }}
         run: |
-          if [ "${{matrix.variant}}" = "release" ] ; then
+          if [ "$VARIANT" = "release" ] ; then
              echo "Configuring project, bucket, and folder for robot-stack"
              echo "project=robot-stack" >> $GITHUB_OUTPUT
              echo "bucket=${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}" >> $GITHUB_OUTPUT

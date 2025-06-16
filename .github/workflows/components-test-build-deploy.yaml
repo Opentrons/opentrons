@@ -117,19 +117,26 @@ jobs:
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
       - id: determine-build-type
+        env:
+          REF: ${{ github.ref }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_IS_PULL_REQUEST: ${{ format('{0}', github.event_name == 'pull_request') }}
+          REF_IS_BRANCH: ${{ format('{0}', startsWith(github.ref, 'refs/heads/')) }}
+          REF_IS_COMPONENTS_TAG: ${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}
         run: |
-          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
+          echo "Determining build type for event $EVENT_NAME and ref $REF"
           if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
             echo "No builds for pull requests"
             echo 'type=none' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/')) }}" = "true" ] ; then
-            echo "storybook s3 builds for branch ${{ github.ref_name }}"
+          elif [ "$REF_IS_BRANCH" = "true" ] ; then
+            echo "storybook s3 builds for branch $REF_NAME"
             echo 'type=storybook' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
+          elif [ "$REF_IS_COMPONENTS_TAG" = "true" ] ; then
             echo "publish builds for components tags"
             echo 'type=publish' >> $GITHUB_OUTPUT
           else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
+            echo "No build for ref $REF and event $EVENT_NAME"
             echo 'type=none' >> $GITHUB_OUTPUT
           fi
 

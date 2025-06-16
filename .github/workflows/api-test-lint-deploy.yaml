@@ -177,10 +177,15 @@ jobs:
           path: package-testing/results
       - name: Set job summary
         if: ${{ always() }}
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+          UNIXY_OUTCOME: ${{ steps.test.outcome }}
+          WINDOWS_OUTCOME: ${{ steps.test-windows.outcome }}
+          ARTIFACT_URL: ${{steps.results.outputs.artifact-url}}
         run: |
-          echo "## Opentrons Package Test Results ${{matrix.os}}" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Outcome: Unixy ${{ steps.test.outcome }} Windows: ${{ steps.test-windows.outcome }}" >> $GITHUB_STEP_SUMMARY
-          echo "[Download the test results artifact](${{steps.results.outputs.artifact-url}})" >> $GITHUB_STEP_SUMMARY
+          echo "## Opentrons Package Test Results $MATRIX_OS" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Outcome: Unixy $UNIXY_OUTCOME Windows: $WINDOWS_OUTCOME" >> $GITHUB_STEP_SUMMARY
+          echo "[Download the test results artifact]($ARTIFACT_URL)" >> $GITHUB_STEP_SUMMARY
 
   deploy:
     name: 'deploy opentrons package'

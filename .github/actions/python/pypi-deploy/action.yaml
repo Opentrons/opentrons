@@ -13,23 +13,31 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
-      run: |
+      env:
+        INPUTS_REPOSITORY_URL: ${{ inputs.repository_url }}
+        INPUTS_PROJECT: ${{ inputs.project }}
+      # todo(mm, 2025-06-16):
+      # Template-injecting inputs.password is technically a vulnerability
+      # (https://docs.zizmor.sh/audits/#template-injection). We could fix it by going
+      # through environment variables like we do for the inputs above, but I worry that
+      # the contents of `env` might get logged somewhere.
+      run: | # zizmor: ignore[template-injection]
         echo "::add-mask::${{ inputs.password }}"
-        if [[ ${{ inputs.repository_url }} =~ "test" ]]; then
+        if [[ $INPUTS_PROJECT =~ "test" ]]; then
           echo "Uploading to test pypi"
-        else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
+        else if [[ $INPUTS_REPOSITORY_URL =~ "upload.pypi.org" ]]; then
           echo "Uploading to prod pypi"
           # this needs to be cleared otherwise the makefiles append a dev tag
           OT_BUILD=
                  
           else
-            echo "::error ::Invalid repository url ${{ inputs.repository_url }}"
+            echo "::error ::Invalid repository url $INPUTS_REPOSITORY_URL"
             exit 1
           fi
         fi
         status=0
-        CI=1 QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=__token__ pypi_password=${{ inputs.password }} || status=$?
-        if [[ ${status} != 0 ]] && [[ ${{ inputs.repository_url }} =~ "test.pypi.org" ]]; then
+        CI=1 QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C "$INPUTS_PROJECT" clean deploy "twine_repository_url=$INPUTS_REPOSITORY_URL" pypi_username=__token__ pypi_password=${{ inputs.password }} || status=$?
+        if [[ ${status} != 0 ]] && [[ $INPUTS_REPOSITORY_URL =~ "test.pypi.org" ]]; then
           echo "upload failures allowed to test pypi"
           exit 0
         fi

@@ -80,8 +80,9 @@ jobs:
     steps:
       - name: Extract Version
         id: extract_version
+        env:
+          TAG_REF: ${{ github.ref }}
         run: |
-          TAG_REF=${{ github.ref }}
           SERVER_VERSION=${TAG_REF#refs/tags/ai-server@}
           echo "SERVER_VERSION=$SERVER_VERSION" >> "$GITHUB_OUTPUT"
       - name: Checkout opentrons repo
@@ -103,5 +104,7 @@ jobs:
           aws-region: ${{ secrets.PROD_AI_REGION }}
       - name: 'deploy api to prod'
         working-directory: ./opentrons-ai-server
+        env:
+          TAG: ${{ steps.extract_version.outputs.SERVER_VERSION }}
         run: |
-          make deploy ENV=prod TAG=${{ steps.extract_version.outputs.SERVER_VERSION }}
+          make deploy ENV=prod "TAG=$TAG"

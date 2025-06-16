@@ -14,5 +14,9 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
+      env:
+        INPUTS_DIST_PATH: ${{ inputs.distPath }}
+        INPUTS_DOMAIN: ${{ inputs.domain }}
+        INPUTS_DEST_PREFIX: ${{ inputs.destPrefix }}
       run: |
-        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ inputs.destPrefix }}
+        aws s3 sync "$INPUTS_DIST_PATH" "s3://sandbox.$INPUTS_DOMAIN/$INPUTS_DEST_PREFIX"
