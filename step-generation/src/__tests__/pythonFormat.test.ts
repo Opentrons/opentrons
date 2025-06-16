@@ -30,6 +30,13 @@ describe('pythonFormat utils', () => {
     expect(
       formatPyValue(['hello', 'world', 2.71828, true, false, undefined])
     ).toBe('["hello", "world", 2.71828, True, False, None]')
+    // arrays of pairs should be formatted as tuples:
+    expect(
+      formatPyValue([
+        [0, 123],
+        [1, 456],
+      ])
+    ).toBe('[(0, 123), (1, 456)]')
   })
 
   it('format dict', () => {
@@ -42,13 +49,18 @@ describe('pythonFormat utils', () => {
     expect(formatPyValue({ 3: 4 })).toBe('{"3": 4}')
     // multiple entries:
     expect(formatPyValue({ yes: true, no: false })).toBe(
-      '{\n    "yes": True,\n    "no": False,\n}'
+      '{"yes": True, "no": False}'
     )
     // nested entries:
     expect(
       formatPyValue({ hello: 'world', nested: { inner: 5, extra: 6 } })
     ).toBe(
-      '{\n    "hello": "world",\n    "nested": {\n        "inner": 5,\n        "extra": 6,\n    },\n}'
+      `
+{
+    "hello": "world",
+    "nested": {"inner": 5, "extra": 6},
+}
+`.trim()
     )
   })
 })
