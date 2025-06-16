@@ -2,7 +2,7 @@
 
 Opentrons Flex integrates with a number of Opentrons hardware modules. All modules are peripherals that occupy deck slots, and most are controlled by the robot over a USB connection.
 
-This chapter describes the functions and physical specifications of modules that are compatible with the Opentrons Flex system, as well as how to attach and calibrate them. For further details on module setup and use, consult the manuals for the individual modules. For details on integrating modules into your protocols, see the [Protocol Designer section][protocol-designer] of the Protocol Development chapter or the online [Python Protocol API documentation](https://docs.opentrons.com/v2/).
+This chapter describes the functions and physical specifications of modules that are compatible with the Opentrons Flex system, as well as how to attach and calibrate them. For further details on module setup and use, consult the manuals for the individual modules. For details on integrating modules into your protocols, see the [Protocol Designer section](protocol-development.md#protocol-designer) of the Protocol Development chapter or the online [Python Protocol API documentation](https://docs.opentrons.com/v2/).
 
 ## Supported modules
 

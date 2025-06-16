@@ -38,7 +38,7 @@ A metal pin you attach to the *gripper's jaws* during gripper calibration. See t
 
 ##### Calibration probe
 
-A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section][module-calibration] in the Modules chapter. See also the [Labware Position Check section][labware-position-check] of the Software and Operation chapter.
+A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section][module-calibration] in the Modules chapter. See also the [Labware Position Check section](software-operation.md#labware-position-check) of the Software and Operation chapter.
 
 ##### Calibration square
 
@@ -86,7 +86,7 @@ The mechanism that automatically pushes tips off the *nozzle* of a pipette. See 
 
 ##### Emergency Stop Pendant
 
-An external accessory that you press to stop the robot immediately. Also referred to as the E-stop. See the [Emergency Stop Pendant section][emergency-stop-pendant] in the System Description chapter.
+An external accessory that you press to stop the robot immediately. Also referred to as the E-stop. See the [Emergency Stop Pendant section](system-description.md#emergency-stop-pendant) in the System Description chapter.
 
 ##### Expansion slot
 
@@ -166,7 +166,7 @@ Positional data that is created and stored by running *Labware Position Check*. 
 
 ##### Labware Position Check
 
-A guided process to visually check and adjust pipette movement relative to a piece of labware, with a resolution of 0.1 mm. See the [Labware Position Check section][labware-position-check] in the Software and Operation chapter.
+A guided process to visually check and adjust pipette movement relative to a piece of labware, with a resolution of 0.1 mm. See the [Labware Position Check section](software-operation.md#labware-position-check) in the Software and Operation chapter.
 
 ##### Lift handles
 
@@ -202,7 +202,7 @@ The working end of a pipette. Flex pipettes pick up disposable tips by pressing 
 
 ##### Opentrons App
 
-Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App section][opentrons-app] in the Software and Operation chapter.
+Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App section](software-operation.md#opentrons-app) in the Software and Operation chapter.
 
 ##### Paddle
 
@@ -230,11 +230,11 @@ An automated task or procedure you program to run on Opentrons robots, including
 
 ##### Protocol Designer
 
-A web-based, no-code tool for developing *JSON protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section][protocol-designer] in the Protocol Development chapter and <https://designer.opentrons.com>.
+A web-based, no-code tool for developing *JSON protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocol-development.md#protocol-designer) in the Protocol Development chapter and <https://designer.opentrons.com>.
 
 ##### Protocol Library
 
-A public, searchable library that hosts protocols authored by Opentrons or by members of the Opentrons community. See the [Protocol Library section][protocol-library] in the Protocol Development chapter and <https://library.opentrons.com>.
+A public, searchable library that hosts protocols authored by Opentrons or by members of the Opentrons community. See the [Protocol Library section](protocol-development.md#protocol-library) in the Protocol Development chapter and <https://library.opentrons.com>.
 
 ##### Protocol run
 
@@ -246,7 +246,7 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 ##### Python Protocol API
 
-A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section][python-protocol-api] in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
+A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocol-development.md#python-protocol-api) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
 
 ##### Removable deck slot
 
@@ -266,11 +266,11 @@ Fixed clear panels on the right and left sides of the robot.
 
 ##### Staging area
 
-The right-hand side of the *deck* (column 4), which is only accessible by the *gripper*. This area requires special *staging area slots* for use. See the [Staging area section][staging-area] in the System Description chapter.
+The right-hand side of the *deck* (column 4), which is only accessible by the *gripper*. This area requires special *staging area slots* for use. See the [Staging area section](system-description.md#staging-area) in the System Description chapter.
 
 ##### Staging area slot
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the *staging area*. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the *deck*. See the [Staging area section][staging-area] in the System Description chapter.
+Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the *staging area*. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the *deck*. See the [Staging area section](system-description.md#staging-area) in the System Description chapter.
 
 ##### Status light
 
