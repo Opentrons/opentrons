@@ -271,6 +271,7 @@ export const mix: CommandCreator<MixArgs> = (
     xOffset,
     yOffset,
     finalPushOut,
+    nozzles,
   } = data
 
   const aspirateDelaySeconds = data.aspirateDelaySeconds ?? 0
@@ -373,6 +374,7 @@ export const mix: CommandCreator<MixArgs> = (
             pipette,
             dropTipLocation,
             tipRack,
+            nozzles: nozzles ?? undefined,
           }),
         ]
       }

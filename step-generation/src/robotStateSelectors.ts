@@ -118,7 +118,7 @@ export function getNextTiprack(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
   }
-
+console.log('nozzles', nozzles)
   // filter out unmounted or non-compatible tiprack models
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
@@ -135,6 +135,7 @@ export function getNextTiprack(
     }
   )
   const is96Channel = pipetteEntity.spec.channels === 96
+  console.log('sortedTipracksIds', sortedTipracksIds)
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
       const tipRackLocation = robotState.labware[tiprackId].stack[1]
@@ -147,6 +148,10 @@ export function getNextTiprack(
 
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }
+  )
+  console.log(
+    'filteredSortedTipRackIdsFor96Channel',
+    filteredSortedTipRackIdsFor96Channel
   )
   const firstAvailableTiprack = (is96Channel
     ? filteredSortedTipRackIdsFor96Channel
