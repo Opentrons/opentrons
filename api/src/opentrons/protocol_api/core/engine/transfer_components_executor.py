@@ -445,9 +445,7 @@ class TransferComponentsExecutor:
             self._add_air_gap(
                 air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                     volume_for_air_gap
-                ),
-                retract_location=retract_location,
-                retract_well=self._target_well,
+                )
             )
 
     def retract_after_dispensing(
@@ -880,16 +878,12 @@ class TransferComponentsExecutor:
             self._add_air_gap(
                 air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                     0
-                ),
-                retract_location=location,
-                retract_well=well,
+                )
             )
 
     def _add_air_gap(
         self,
         air_gap_volume: float,
-        retract_location: Optional[Location],
-        retract_well: Optional[WellCore],
     ) -> None:
         """Add an air gap."""
         if air_gap_volume == 0:
