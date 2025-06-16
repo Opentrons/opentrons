@@ -77,6 +77,8 @@ class LoadModuleParams(BaseModel):
 class LoadModuleResult(BaseModel):
     """The results of loading a module."""
 
+    # The `definition` used to exist here, but we intentionally removed it. See #18639.
+
     moduleId: str = Field(
         description="An ID to reference this module in subsequent commands."
     )

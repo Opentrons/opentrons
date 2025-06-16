@@ -41,6 +41,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
+from opentrons.protocol_engine.state.update_types import LoadModuleUpdate
 
 
 @pytest.mark.parametrize(
@@ -173,13 +174,14 @@ async def test_load_module_implementation(
         )
     )
 
-    expected_state_update = StateUpdate()
-    expected_state_update.set_load_module(
-        module_id="module-id",
-        definition=module_definition,
-        requested_model=module_model,
-        serial_number="mod-serial",
-        slot_name=load_slot_name,
+    expected_state_update = StateUpdate(
+        loaded_module=LoadModuleUpdate(
+            module_id="module-id",
+            definition=module_definition,
+            requested_model=module_model,
+            serial_number="mod-serial",
+            slot_name=load_slot_name,
+        )
     )
 
     assert result == SuccessData(

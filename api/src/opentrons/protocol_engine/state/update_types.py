@@ -417,9 +417,9 @@ class LoadModuleUpdate:
 
     module_id: str
     definition: ModuleDefinition
+    slot_name: DeckSlotName
+    requested_model: ModuleModel
     serial_number: Optional[str]
-    slot_name: Optional[DeckSlotName]
-    requested_model: Optional[ModuleModel]
 
 
 @dataclasses.dataclass
@@ -684,9 +684,9 @@ class StateUpdate:
         self: Self,
         module_id: str,
         definition: ModuleDefinition,
+        slot_name: DeckSlotName,
+        requested_model: ModuleModel,
         serial_number: Optional[str],
-        slot_name: Optional[DeckSlotName],
-        requested_model: Optional[ModuleModel],
     ) -> Self:
         """Add a new module to state. See `LoadModuleUpdate`."""
         self.loaded_module = LoadModuleUpdate(

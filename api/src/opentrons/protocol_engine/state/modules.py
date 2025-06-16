@@ -297,15 +297,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._handle_thermocycler_module_commands(command)
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_module != update_types.NO_CHANGE:
+            self._handle_load_module(state_update.loaded_module)
+
         if state_update.absorbance_reader_state_update != update_types.NO_CHANGE:
             self._handle_absorbance_reader_commands(
                 state_update.absorbance_reader_state_update
             )
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
-
-        if state_update.loaded_module != update_types.NO_CHANGE:
-            self._handle_load_module(state_update.loaded_module)
 
     def _add_module_substate(
         self,

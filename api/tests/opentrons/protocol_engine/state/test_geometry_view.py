@@ -100,13 +100,7 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     WellLocationFunction,
 )
-from opentrons.protocol_engine.commands import (
-    CommandStatus,
-    Command,
-    LoadModuleResult,
-    LoadModule,
-    LoadModuleParams,
-)
+from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import (
     SucceedCommandAction,
     SetDeckConfigurationAction,
@@ -467,20 +461,7 @@ def load_module_action(
     )
 
     return SucceedCommandAction(
-        command=LoadModule(
-            params=LoadModuleParams(
-                location=location,
-                model=module_def.model,
-            ),
-            id=f"load-module-{module_id}",
-            createdAt=datetime.now(),
-            key=f"load-module-{module_id}",
-            status=CommandStatus.SUCCEEDED,
-            result=LoadModuleResult(
-                moduleId=module_id,
-                model=module_def.model,
-            ),
-        ),
+        command=_dummy_command(),
         state_update=state_update,
     )
 
