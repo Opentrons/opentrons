@@ -29,7 +29,9 @@ import {
   getFlexDeckDefAAByFixtureIdForCutoutId,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  ModuleModel,
   MODULE_CUTOUT_FIXTURE_ID,
+  MODULE_FIXTURES_BY_MODEL,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
@@ -125,42 +127,32 @@ export function AddFixtureModal({
   const getModuleUnconfiguredFixtures = (
     unconfiguredMods: AttachedModule[],
     cutoutId: CutoutId,
-    moduleModel: string
+    moduleModel: ModuleModel
   ): CutoutConfigMap[][] => {
-    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
-      cutoutId
-    )
-    const keys = Object.keys(addressableAreasById)
-    const filteredMods = unconfiguredMods.filter(
-      mod => mod.moduleModel === moduleModel
-    )
-    const mappedWithAA = filteredMods.map(({ serialNumber, moduleModel }) => {
-      const cutoutFixtureId = keys.find(
-        key => key === moduleModel
-      ) as CutoutFixtureId
-      const aaforModule = getAddressableAreaMatchForAreaId(
-        cutoutId,
-        cutoutFixtureId,
-        addressableAreaId
-      )
-      return {
-        serialNumber,
-        cutoutFixtureId,
-        aaforModule,
-      }
-    })
-
-    const filteredModsNoMatch = mappedWithAA.filter(
-      ({ aaforModule }) => aaforModule != null
-    )
-    return filteredModsNoMatch.map((mod: any) => [
-      {
-        cutoutId,
-        addressableAreaId: mod.aaforModule,
-        cutoutFixtureId: mod.cutoutFixtureId,
-        opentronsModuleSerialNumber: mod.serialNumber,
-      },
-    ])
+    const fixtureIds = MODULE_FIXTURES_BY_MODEL[moduleModel]
+    if (!fixtureIds || fixtureIds.length === 0) return []
+    
+    return unconfiguredMods
+      .filter(mod => mod.moduleModel === moduleModel)
+      .flatMap(mod => {
+        return fixtureIds.flatMap((fixtureId: CutoutFixtureId) => {
+          const aaforModule = getAddressableAreaMatchForAreaId(
+            cutoutId,
+            fixtureId,
+            addressableAreaId
+          )
+  
+          if (!aaforModule) return []
+          return [[
+            {
+              cutoutId,
+              addressableAreaId: aaforModule,
+              cutoutFixtureId: fixtureId,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ]]
+        })
+      })
   }
 
   const getThermoUnconfiguredFixtures = (
@@ -198,41 +190,24 @@ export function AddFixtureModal({
     unconfiguredMods: AttachedModule[]
   ): CutoutConfigMap[][] => {
     const availableOptions: CutoutConfigMap[][] = []
+
     if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-      const unconfiguredTCs = getThermoUnconfiguredFixtures(
-        unconfiguredMods,
-        cutoutId
-      )
-      availableOptions.push(...unconfiguredTCs)
+      availableOptions.push(...getThermoUnconfiguredFixtures(unconfiguredMods, cutoutId))
     }
-    const unconfiguredHeaterShakers = getModuleUnconfiguredFixtures(
+  
+  // Loop over all module models in the fixture mapping (excluding Thermocycler)
+  Object.entries(MODULE_FIXTURES_BY_MODEL).forEach(([model, _]) => {
+    if (model === THERMOCYCLER_MODULE_V2) return
+
+    const moduleOptions = getModuleUnconfiguredFixtures(
       unconfiguredMods,
       cutoutId,
-      HEATERSHAKER_MODULE_V1
+      model as ModuleModel
     )
-    availableOptions.push(...unconfiguredHeaterShakers)
 
-    const unconfiguredTemperatureModules = getModuleUnconfiguredFixtures(
-      unconfiguredMods,
-      cutoutId,
-      TEMPERATURE_MODULE_V2
-    )
-    availableOptions.push(...unconfiguredTemperatureModules)
-
-    const unconfiguredAbsorbanceReaders = getModuleUnconfiguredFixtures(
-      unconfiguredMods,
-      cutoutId,
-      ABSORBANCE_READER_V1
-    )
-    availableOptions.push(...unconfiguredAbsorbanceReaders)
-
-    const unconfiguredFlexStacker = getModuleUnconfiguredFixtures(
-      unconfiguredMods,
-      cutoutId,
-      FLEX_STACKER_MODULE_V1
-    )
-    availableOptions.push(...unconfiguredFlexStacker)
-
+    availableOptions.push(...moduleOptions)
+  })
+  
     return availableOptions
   }
 

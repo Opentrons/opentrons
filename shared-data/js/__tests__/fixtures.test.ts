@@ -13,6 +13,7 @@ import {
   getAAFromCutoutFixtureId,
   getAddressableAreaMatchForAreaId,
   getCutoutFixtureReplacementIfNeeded,
+  getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFixtureRemoval,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
@@ -226,5 +227,97 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
     )
 
     expect(result).toEqual(SINGLE_CENTER_SLOT_FIXTURE)
+  })
+})
+
+describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
+  it('Should return a dic of fixtures and aa for cutoutA3', () => {
+    const cutoutA3Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutA3')
+
+    expect(cutoutA3Result).toEqual({
+      singleRightSlot: ['A3'],
+      stagingAreaRightSlot: ['A3', 'A4'],
+      trashBinAdapter: ['movableTrashA3'],
+      flexStackerModuleV1WithMagneticBlockV1: [
+        'flexStackerModuleV1A4',
+        'magneticBlockV1A3',
+      ],
+      heaterShakerModuleV1: ['heaterShakerV1A3'],
+      temperatureModuleV2: ['temperatureModuleV2A3'],
+      magneticBlockV1: ['magneticBlockV1A3'],
+      stagingAreaSlotWithMagneticBlockV1: ['magneticBlockV1A3', 'A4'],
+      absorbanceReaderV1: [
+        'absorbanceReaderV1A3',
+        'absorbanceReaderV1LidDockA4',
+      ],
+      flexStackerModuleV1: ['flexStackerModuleV1A4', 'A3'],
+    })
+  })
+
+  it('Should return a dic of fixtures and aa for cutoutD3', () => {
+    const cutoutD3Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutD3')
+    expect(cutoutD3Result).toEqual({
+      singleRightSlot: ['D3'],
+      stagingAreaRightSlot: ['D3', 'D4'],
+      trashBinAdapter: ['movableTrashD3'],
+      wasteChuteRightAdapterCovered: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+      ],
+      wasteChuteRightAdapterNoCover: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+        '96ChannelWasteChute',
+        'gripperWasteChute',
+      ],
+      stagingAreaSlotWithWasteChuteRightAdapterCovered: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+        'D4',
+      ],
+      stagingAreaSlotWithWasteChuteRightAdapterNoCover: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+        '96ChannelWasteChute',
+        'gripperWasteChute',
+        'D4',
+      ],
+      flexStackerModuleV1WithWasteChuteRightAdapterCovered: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+        'flexStackerModuleV1D4',
+      ],
+      flexStackerModuleV1WithWasteChuteRightAdapterNoCover: [
+        '1ChannelWasteChute',
+        '8ChannelWasteChute',
+        '96ChannelWasteChute',
+        'gripperWasteChute',
+        'flexStackerModuleV1D4',
+      ],
+      flexStackerModuleV1WithMagneticBlockV1: [
+        'flexStackerModuleV1D4',
+        'magneticBlockV1D3',
+      ],
+      heaterShakerModuleV1: ['heaterShakerV1D3'],
+      temperatureModuleV2: ['temperatureModuleV2D3'],
+      magneticBlockV1: ['magneticBlockV1D3'],
+      stagingAreaSlotWithMagneticBlockV1: ['magneticBlockV1D3', 'D4'],
+      absorbanceReaderV1: [
+        'absorbanceReaderV1D3',
+        'absorbanceReaderV1LidDockD4',
+      ],
+      flexStackerModuleV1: ['flexStackerModuleV1D4', 'D3'],
+    })
+  })
+  it('Should return a dic of fixtures and aa for cutoutA1', () => {
+    const cutoutA1Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutA1')
+    expect(cutoutA1Result).toEqual({
+      singleLeftSlot: ['A1'],
+      trashBinAdapter: ['movableTrashA1'],
+      thermocyclerModuleV2Rear: [],
+      heaterShakerModuleV1: ['heaterShakerV1A1'],
+      temperatureModuleV2: ['temperatureModuleV2A1'],
+      magneticBlockV1: ['magneticBlockV1A1'],
+    })
   })
 })
