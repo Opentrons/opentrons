@@ -45,7 +45,7 @@ SLOW = 100  # speed up
 
 H_DISCARD = 0.65
 D_1K = -3.2
-D_200 = -2.7
+D_200 = -2.1
 
 
 def add_parameters(parameters: ParameterContext) -> None:

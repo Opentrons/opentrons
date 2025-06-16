@@ -23,7 +23,7 @@ MIN_BLOCK = 60
 
 H_DISCARD = 0.7
 D_1K = -3.2
-D_200 = -2.7
+D_200 = -2.1
 
 DEFAULT_RATE = 700
 SLOW = 100  # speed up

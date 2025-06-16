@@ -23,7 +23,7 @@ MIN_BLOCK = 60
 
 H_DISCARD = 0.7
 D_1K = -2.3
-D_200 = -2.3
+D_200 = -2.1
 
 DEFAULT_RATE = 700
 SLOW = 100  # speed up
@@ -88,7 +88,7 @@ def run(ctx: ProtocolContext) -> None:
     waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
     waste = waste_res.wells()[0]
 
-    ctx.load_trash_bin("A3")
+    ctx.load_trash_bin("D3")
 
     tips_1k = ctx.load_labware("opentrons_flex_96_tiprack_1000ul", "B3", "1000uL TIPS")
     tips_200 = ctx.load_labware("opentrons_flex_96_tiprack_200ul", "B2", "200uL TIPS")

@@ -198,6 +198,15 @@ def run(protocol: ProtocolContext) -> None:
         )
 
     if protocol_name == "duolink_day2_square":
+        reservoir_12well = protocol.load_labware(
+            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0])
+        )
+        nest_deepwell = protocol.load_labware(
+            "nest_96_wellplate_2ml_deep", str(SLOTS["LABWARE"][1])
+        )
+        pipette.configure_nozzle_layout(
+            style=COLUMN, tip_racks=[tip_rack_partial_1], start="A12"
+        )
         pipette.distribute(
             10000 / 8,
             src_reservoir["A1"],
@@ -261,5 +270,49 @@ def run(protocol: ProtocolContext) -> None:
             [reservoir_12well["A3"], reservoir_12well["A10"]],
             blow_out=True,
             new_tip="once",
+            blowout_destination="destination well",
+        )
+    if protocol_name == "milliplex_day1":
+        reservoir_12well = protocol.load_labware(
+            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0])
+        )
+        nest_deepwell = protocol.load_labware(
+            "nest_96_wellplate_2ml_deep", str(SLOTS["LABWARE"][1])
+        )
+        pipette.configure_nozzle_layout(
+            style=COLUMN, tip_racks=[tip_rack_partial_1], start="A12"
+        )
+        pipette.transfer(
+            [5100 / 8, 10000 / 8, 10000 / 8, 100, 100, 100, 100, 100],
+            src_reservoir["A1"],
+            [
+                reservoir_12well["A1"],
+                reservoir_12well["A2"],
+                reservoir_12well["A3"],
+                nest_deepwell["A3"],
+                nest_deepwell["A4"],
+                nest_deepwell["A5"],
+                nest_deepwell["A6"],
+                nest_deepwell["A7"],
+                nest_deepwell["A8"],
+            ],
+            blow_out=True,
+            new_tip="once",
+            blowout_destination="destination well",
+        )
+        pipette.configure_nozzle_layout(
+            style=SINGLE, tip_racks=[tip_rack_partial_1], start="A1"
+        )
+        pipette.distribute(
+            [100, 100, 550, 150],
+            source=src_reservoir["A1"],
+            dest=[
+                nest_deepwell["A1"],
+                nest_deepwell["B1"],
+                nest_deepwell["C1"],
+                nest_deepwell["H2"],
+            ],
+            new_tip="once",
+            blow_out=True,
             blowout_destination="destination well",
         )
