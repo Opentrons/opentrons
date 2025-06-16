@@ -216,14 +216,15 @@ class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
         stacker_hw = self._equipment.get_module_hardware_api(
             module_id=stacker_state.module_id
         )
-        if stacker_hw:
-            stacker_hw.set_stacker_identify(True)
+        try:
+            if stacker_hw:
+                stacker_hw.set_stacker_identify(True)
 
-        if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
-            await self._run_control.wait_for_resume()
-
-        if stacker_hw:
-            stacker_hw.set_stacker_identify(False)
+            if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
+                await self._run_control.wait_for_resume()
+        finally:
+            if stacker_hw:
+                stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=FillResult.model_construct(

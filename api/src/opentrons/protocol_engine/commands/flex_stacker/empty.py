@@ -205,14 +205,16 @@ class EmptyImpl(AbstractCommandImpl[EmptyParams, SuccessData[EmptyResult]]):
         stacker_hw = self._equipment.get_module_hardware_api(
             module_id=stacker_state.module_id
         )
-        if stacker_hw:
-            stacker_hw.set_stacker_identify(True)
+        try:
+            if stacker_hw:
+                stacker_hw.set_stacker_identify(True)
 
-        if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
-            await self._run_control.wait_for_resume()
+            if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
+                await self._run_control.wait_for_resume()
 
-        if stacker_hw:
-            stacker_hw.set_stacker_identify(False)
+        finally:
+            if stacker_hw:
+                stacker_hw.set_stacker_identify(False)
 
         if stacker_state.pool_primary_definition is None:
             raise FlexStackerLabwarePoolNotYetDefinedError(

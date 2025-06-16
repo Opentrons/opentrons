@@ -280,9 +280,8 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update
                 )
-
-        if stacker_hw is not None:
-            stacker_hw.set_stacker_identify(False)
+            finally:
+                stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=RetrieveResult.model_construct(
