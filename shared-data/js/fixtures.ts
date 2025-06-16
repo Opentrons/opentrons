@@ -175,7 +175,7 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
           yDimension: 86.0,
           zDimension: 0,
         },
-        displayName: 'Slot A4',
+        displayName: 'Slot B4',
         compatibleModuleTypes: [],
       },
       {
@@ -188,7 +188,7 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
           yDimension: 86.0,
           zDimension: 0,
         },
-        displayName: 'Slot A4',
+        displayName: 'Slot C4',
         compatibleModuleTypes: [],
       },
       {
@@ -201,7 +201,7 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
           yDimension: 86.0,
           zDimension: 0,
         },
-        displayName: 'Slot A4',
+        displayName: 'Slot D4',
         compatibleModuleTypes: [],
       },
     ],
