@@ -74,9 +74,8 @@ MAX_LABWARE_HEIGHT = 102.5
 # This lets us use `move_axis` to move fast, leaving the axis OFFSET mm
 # from the limit switch. Then we can use `home_axis` to move the axis the rest
 # of the way until we trigger the expected limit switch.
-OFFSET_SM = 5.0
-OFFSET_MD = 10.0
-OFFSET_LG = 20.0
+HOME_OFFSET_SM = 5.0
+HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
@@ -425,22 +424,27 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
-        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM)
 
         # Transfer
         await self.open_latch()
+        # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
+        # sure the bottom of the next labware is sitting 2.5mm above the latch.
+        # So when moving the labware_height we dont need to add an additional
+        # offset to make sure we arent cutting it too close since the labware
+        # will always be above the latch.
         await self.move_axis(StackerAxis.Z, Direction.RETRACT, labware_height)
         await self.close_latch()
 
         # Move Z down the rest of the way
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
         await self.move_axis(StackerAxis.Z, Direction.RETRACT, z_distance)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def store_labware(
         self,
@@ -452,7 +456,7 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move the X and check that labware is detected
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
@@ -462,19 +466,19 @@ class FlexStacker(mod_abc.AbstractModule):
 
         await self.open_latch()
         # Move the labware the rest of the way at half move speed to increase torque.
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - distance - OFFSET_SM
-        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
-        await self.move_axis(StackerAxis.Z, Direction.EXTEND, z_distance, z_speed)
-        await self.home_axis(StackerAxis.Z, Direction.EXTEND, z_speed)
+        remaining_z = labware_height + PLATFORM_OFFSET - HOME_OFFSET_SM
+        speed_z = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
+        await self.move_axis(StackerAxis.Z, Direction.EXTEND, remaining_z, speed_z)
+        await self.home_axis(StackerAxis.Z, Direction.EXTEND, speed_z)
         await self.close_latch()
 
         # Move the Z down and check that labware is not detected.
-        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, HOME_OFFSET_MD)
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
 
         # Move the X to the gripper position
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def _move_and_home_axis(
         self,
