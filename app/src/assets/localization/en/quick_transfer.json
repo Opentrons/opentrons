@@ -34,6 +34,7 @@
   "blow_out_trash_bin": "Trash bin",
   "blow_out_waste_chute": "Waste chute",
   "blow_out": "Blowout",
+  "blowout_flow_rate_µL": "Blowout flow rate (µL/second)",
   "both_mounts": "Left + Right Mount",
   "change_tip": "Change tip",
   "character_limit_error": "Character limit exceeded",
@@ -69,6 +70,7 @@
   "dispense_volume_µL": "Dispense volume per well (µL)",
   "dispense_volume": "Dispense volume per well",
   "dispense": "Dispense",
+  "disposal_volume_label": "{{volume}}, {{location}}, {{flowRate}} µL/s",
   "disposal_volume_µL": "Disposal volume (µL)",
   "disposal_volume": "Disposal volume",
   "distance_bottom_of_well_mm": "Distance from bottom of well (mm)",
@@ -204,7 +206,6 @@
   "well": "well",
   "wellPlate": "Well plates",
   "wells": "wells",
-  "blowout_flow_rate_µL": "Blowout flow rate (µL/second)",
   "will_be_deleted": "<strong>{{transferName}}</strong> will be permanently deleted.",
   "withdraw_tip_from_liquid_aspirate": "Withdraw the tip from the liquid after aspirating",
   "withdraw_tip_from_liquid_dispense": "Withdraw the tip from the liquid after dispensing"

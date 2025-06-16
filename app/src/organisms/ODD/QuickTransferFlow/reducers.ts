@@ -275,7 +275,7 @@ export function quickTransferSummaryReducer(
     case 'SET_DISPOSAL_VOLUME_DISPENSE': {
       return {
         ...state,
-        disposalVolumeDispense: action.disposalVolumeDispense,
+        disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
       }
     }
   }

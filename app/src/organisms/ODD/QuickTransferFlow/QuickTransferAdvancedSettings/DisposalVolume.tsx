@@ -13,6 +13,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import {
+  getTipTypeFromTipRackDefinition,
+  LOW_VOLUME_PIPETTES,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -20,11 +27,14 @@ import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
+import type { SupportedTip } from '@opentrons/shared-data'
 import type {
+  BlowOutLocation,
   FlowRateKind,
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
@@ -42,45 +52,83 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
-
-  const [touchTipIsEnabled, setTouchTipIsEnabled] = useState<boolean>(
-    kind === 'aspirate'
-      ? state.touchTipAspirate != null
-      : state.touchTipDispense != null
-  )
-  const initialSpeed =
-    kind === 'aspirate' ? state.touchTipAspirate : state.touchTipDispense
-  const [speed, setSpeed] = useState<number | null>(initialSpeed ?? null)
   const [currentStep, setCurrentStep] = useState<number>(1)
-  const touchTipAspirate =
-    state.touchTipAspirate != null ? state.touchTipAspirate.toString() : null
-  const touchTipDispense =
-    state.touchTipDispense != null ? state.touchTipDispense.toString() : null
-  const [position, setPosition] = useState<string | null>(
-    kind === 'aspirate' ? touchTipAspirate : touchTipDispense
+  const [volume, setVolume] = useState<number | null>(null)
+  const [
+    selectedBlowoutLocation,
+    setSelectedBlowoutLocation,
+  ] = useState<string>(
+    state.blowOut
+      ? typeof state.blowOut === 'string'
+        ? state.blowOut
+        : `trashBin:${state.blowOut.cutoutId}`
+      : ''
+  )
+  const [flowRate, setFlowRate] = useState<number | null>(null)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+  const fixtureLocationOptions = deckConfig.filter(
+    cutoutConfig =>
+      WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
+      TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
   )
 
-  const touchTipAction =
-    kind === 'aspirate'
-      ? ACTIONS.SET_TOUCH_TIP_ASPIRATE
-      : ACTIONS.SET_TOUCH_TIP_DISPENSE
+  const trashBinCutoutId = fixtureLocationOptions.find(
+    option => option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+  )?.cutoutId
 
-  const enableTouchTipDisplayItems = [
+  const trashBinOption: BlowOutLocation | undefined =
+    trashBinCutoutId != null
+      ? {
+          cutoutId: trashBinCutoutId,
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+        }
+      : undefined
+
+  const blowoutLocationOptions = [
+    ...(trashBinOption != null
+      ? [
+          {
+            option: trashBinOption,
+            value: `trashBin:${trashBinOption.cutoutId}`,
+            description: t('trashBin'),
+          },
+        ]
+      : []),
     {
-      option: true,
-      description: t('option_enabled'),
-      onClick: () => {
-        setTouchTipIsEnabled(true)
-      },
-    },
-    {
-      option: false,
-      description: t('option_disabled'),
-      onClick: () => {
-        setTouchTipIsEnabled(false)
-      },
+      option: SOURCE_WELL_BLOWOUT_DESTINATION,
+      value: SOURCE_WELL_BLOWOUT_DESTINATION,
+      description: t('blow_out_source_well'),
     },
   ]
+
+  let pipetteName = state.pipette.model
+  if (state.pipette.channels === 1) {
+    pipetteName = pipetteName + `_single_flex`
+  } else if (state.pipette.channels === 8) {
+    pipetteName = pipetteName + `_multi_flex`
+  } else {
+    pipetteName = pipetteName + `_96`
+  }
+
+  // use lowVolume for volumes lower than 5ml
+  const liquidSpecs = state.pipette.liquids
+  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+  const flowRatesForSupportedTip: SupportedTip | undefined =
+    state.volume < 5 &&
+    `lowVolumeDefault` in liquidSpecs &&
+    LOW_VOLUME_PIPETTES.includes(pipetteName)
+      ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
+      : liquidSpecs.default.supportedTips[tipType]
+  const minFlowRate = 1
+  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
+
+  const flowRateError =
+    flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
+      ? t(`value_out_of_range`, {
+          min: minFlowRate,
+          max: maxFlowRate,
+        })
+      : null
 
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
@@ -92,17 +140,25 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     } else if (currentStep === 2) {
       setCurrentStep(3)
     } else if (currentStep === 3) {
+      if (
+        volume == null ||
+        flowRate == null ||
+        selectedBlowoutLocation == null
+      ) {
+        return
+      }
       dispatch({
-        type: touchTipAction,
-        position: position != null ? parseInt(position) : undefined,
-        [kind === 'aspirate'
-          ? 'touchTipAspirateSpeed'
-          : 'touchTipDispenseSpeed']: speed,
+        type: ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE,
+        disposalVolumeDispenseSettings: {
+          volume,
+          blowOutLocation: selectedBlowoutLocation as BlowOutLocation,
+          flowRate,
+        },
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
         properties: {
-          setting: `TouchTip_${kind}`,
+          setting: `DisposalVolume_${kind}`,
         },
       })
       onBack()
@@ -112,53 +168,30 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const setSaveOrContinueButtonText =
     currentStep < 3 ? t('shared:continue') : t('shared:save')
 
-  let wellHeight = 1
-  if (kind === 'aspirate') {
-    wellHeight = Math.max(
-      ...state.sourceWells.map(well =>
-        state.source !== null ? state.source.wells[well].depth : 0
-      )
-    )
-  } else if (kind === 'dispense') {
-    const destLabwareDefinition =
-      state.destination === 'source' ? state.source : state.destination
-    wellHeight = Math.max(
-      ...state.destinationWells.map(well =>
-        destLabwareDefinition !== null
-          ? destLabwareDefinition.wells[well].depth
-          : 0
-      )
-    )
-  }
-
-  // the allowed range for touch tip is half the height of the well to 1x the height
-  const positionRange = { min: -Math.round(wellHeight / 2), max: 0 }
-  const positionError =
-    position !== null &&
-    (position === '-' ||
-      position.indexOf('-') !== position.lastIndexOf('-') ||
-      Number(position) < positionRange.min ||
-      Number(position) > positionRange.max)
-      ? t(`value_out_of_range`, {
-          min: positionRange.min,
-          max: Math.floor(positionRange.max),
-        })
-      : null
+  // ToDo Add flowRate range
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = speed == null
+    buttonIsDisabled = volume == null
   }
   if (currentStep === 3) {
-    buttonIsDisabled = position == null || positionError != null
+    buttonIsDisabled = flowRate == null || flowRateError != null
   }
 
-  const handleSpeedChange = (userInput: string): void => {
+  const handleVolumeChange = (userInput: string): void => {
     if (userInput === '') {
-      setSpeed(null)
+      setVolume(null)
     }
-    const parsedSpeed = parseInt(userInput)
-    setSpeed(!isNaN(parsedSpeed) ? parsedSpeed : null)
+    const parsedVolume = parseInt(userInput)
+    setVolume(!isNaN(parsedVolume) ? parsedVolume : null)
+  }
+
+  const handleFlowRateChange = (userInput: string): void => {
+    if (userInput === '') {
+      setFlowRate(null)
+    }
+    const parsedFlowRate = parseInt(userInput)
+    setFlowRate(!isNaN(parsedFlowRate) ? parsedFlowRate : null)
   }
 
   return createPortal(
@@ -190,7 +223,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <InputField
               type="text"
-              value={String(speed ?? '')}
+              value={String(volume ?? '')}
               title={t('disposal_volume_µL')}
               readOnly
             />
@@ -203,45 +236,41 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(speed ?? '')}
+              initialValue={String(volume ?? '')}
               onChange={e => {
-                handleSpeedChange(e)
+                handleVolumeChange(e)
               }}
             />
           </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
-        <>second step</>
-      ) : // <Flex
-      //   marginTop={SPACING.spacing120}
-      //   flexDirection={DIRECTION_COLUMN}
-      //   padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-      //   gridGap={SPACING.spacing4}
-      //   width="100%"
-      // >
-      //   {tipDropLocationOptions.map(option => (
-      //     <RadioButton
-      //       key={option.cutoutId}
-      //       isSelected={selectedTipDropLocation.cutoutId === option.cutoutId}
-      //       onChange={() => {
-      //         setSelectedTipDropLocation(option)
-      //       }}
-      //       buttonValue={option.cutoutId}
-      //       buttonLabel={t(
-      //         `${
-      //           option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
-      //             ? 'trashBin'
-      //             : 'wasteChute'
-      //         }_location`,
-      //         {
-      //           slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[option.cutoutId],
-      //         }
-      //       )}
-      //     />
-      //   ))}
-      // </Flex>
-      null}
+        <Flex
+          marginTop={SPACING.spacing120}
+          flexDirection={DIRECTION_COLUMN}
+          padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+          gridGap={SPACING.spacing24}
+          width="100%"
+        >
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('select_blow_out_location')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {blowoutLocationOptions.map(option => (
+              <RadioButton
+                key={option.value}
+                isSelected={selectedBlowoutLocation === option.value}
+                onChange={() => {
+                  setSelectedBlowoutLocation(option.value)
+                }}
+                buttonValue={option.value}
+                buttonLabel={option.description}
+              />
+            ))}
+          </Flex>
+        </Flex>
+      ) : null}
+
       {currentStep === 3 ? (
         <Flex
           alignSelf={ALIGN_CENTER}
@@ -261,9 +290,9 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <InputField
               type="text"
-              value={String(position ?? '')}
+              value={String(flowRate ?? '')}
               title={t('blowout_flow_rate_µL')}
-              //   error={positionError}
+              error={flowRateError}
               readOnly
             />
           </Flex>
@@ -275,9 +304,9 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(position ?? '')}
+              initialValue={String(flowRate ?? '')}
               onChange={e => {
-                setPosition(e)
+                handleFlowRateChange(e)
               }}
             />
           </Flex>
