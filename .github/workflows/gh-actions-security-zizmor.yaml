@@ -1,0 +1,29 @@
+name: GitHub Actions security checks
+
+on:
+  push:
+    paths:
+      - .github/**
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@f52a838cfabf134edcbaa7c8b3677dde20045018 # v0.1.1
+        with:
+          # For now, report failures to the console, not the "Security" tab,
+          # because this needs less special configuration on the repo.
+          advanced-security: false
+          # Pin to a specific zizmor version so rules added in the future don't make random PRs fail.
+          # If we ever set `advanced-security: true`, we'll probably want to change this to `latest`.
+          version: 1.9.0
