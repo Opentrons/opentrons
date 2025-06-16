@@ -16,7 +16,14 @@ module.exports = {
     'plugin:react/jsx-runtime',
   ],
 
-  plugins: ['react', 'react-hooks', 'json', 'testing-library', 'opentrons'],
+  plugins: [
+    'react',
+    'react-hooks',
+    'json',
+    'testing-library',
+    'opentrons',
+    '@eslint-react',
+  ],
 
   rules: {
     camelcase: 'off',
@@ -123,6 +130,7 @@ module.exports = {
       files: ['./app/src/**/*.@(ts|tsx)'],
       rules: {
         'import/no-absolute-path': 'off',
+        '@eslint-react/no-nested-component-definitions': 'error',
       },
     },
     {
@@ -183,6 +191,7 @@ module.exports = {
         'opentrons/no-imports-up-the-tree-of-life': 'warn',
         'opentrons/no-margins-in-css': 'warn',
         'opentrons/no-margins-inline': 'warn',
+        '@eslint-react/no-nested-component-definitions': 'error',
       },
     },
     // apply application structure import requirements to app
