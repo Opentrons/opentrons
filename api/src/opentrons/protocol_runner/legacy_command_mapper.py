@@ -822,7 +822,6 @@ class LegacyCommandMapper:
             result=pe_commands.LoadModuleResult.model_construct(
                 moduleId=module_id,
                 serialNumber=module_load_info.module_serial,
-                definition=loaded_definition,
                 model=loaded_model,
             ),
         )
