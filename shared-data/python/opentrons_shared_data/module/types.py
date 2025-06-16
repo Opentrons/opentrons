@@ -4,7 +4,7 @@ for modules
 """
 
 from typing import Any, Dict, List, Union
-from typing_extensions import Literal, TypedDict, Optional
+from typing_extensions import Literal, TypedDict
 
 from opentrons_shared_data.labware.types import LocatingFeatures
 
@@ -115,7 +115,7 @@ ModuleDefinitionV3 = TypedDict(
         "model": ModuleModel,
         "labwareOffset": ModuleLabwareOffset,
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
-        "locatingFeaturesAsParent": Optional[LocatingFeatures],
+        "locatingFeaturesAsParent": LocatingFeatures,
         "dimensions": ModuleDimensions,
         "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
         "config": Dict[str, int],
