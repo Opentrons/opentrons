@@ -2424,6 +2424,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 18.5,
+            "labwareInterfaceXDimension": 127.76,
+            "labwareInterfaceYDimension": 85.48,
             "lidHeight": 60.0,
             "overLabwareHeight": 0.0
           },
@@ -2434,6 +2436,7 @@
             "y": 0.0,
             "z": 0.65
           },
+          "locatingFeaturesAsParent": {},
           "model": "absorbanceReaderV1",
           "moduleType": "absorbanceReaderType",
           "otSharedSchema": "module/schemas/2",

@@ -37,6 +37,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 110.152,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 4.052
           },
           "displayName": "Magnetic Module GEN1",
@@ -46,6 +48,7 @@
             "y": -0.125,
             "z": 82.25
           },
+          "locatingFeaturesAsParent": {},
           "model": "magneticModuleV1",
           "moduleType": "magneticModuleType",
           "otSharedSchema": "module/schemas/2",
@@ -83,6 +86,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 110.152,
+            "labwareInterfaceXDimension": 128.0,
+            "labwareInterfaceYDimension": 86.0,
             "overLabwareHeight": 4.052
           },
           "displayName": "Magnetic Module GEN2",
@@ -92,6 +97,7 @@
             "y": -0.125,
             "z": 82.25
           },
+          "locatingFeaturesAsParent": {},
           "model": "magneticModuleV2",
           "moduleType": "magneticModuleType",
           "otSharedSchema": "module/schemas/2",

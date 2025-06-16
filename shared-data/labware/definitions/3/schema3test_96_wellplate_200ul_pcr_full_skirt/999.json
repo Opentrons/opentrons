@@ -21,6 +21,8 @@
       "https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"
     ]
   },
+  "locatingFeaturesAsParent": {},
+  "locatingFeaturesAsChild": {},
   "extents": {
     "total": {
       "backLeftBottom": {
@@ -54,6 +56,11 @@
       "z": 10.95
     },
     "opentrons_96_well_aluminum_block": {
+      "x": 0,
+      "y": 0,
+      "z": 11.91
+    },
+    "schema3test_96_well_aluminum_block": {
       "x": 0,
       "y": 0,
       "z": 11.91

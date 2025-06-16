@@ -386,13 +386,11 @@ class GeometryView:
         stackup_origin_to_lw_origin = self._get_stackup_placement_origin_to_lw_origin(
             labware_id, is_topmost_labware=True
         )
-        module_cal_offset = self._get_calibrated_module_offset(labware_data.location)
+        module_cal_offset = self._get_calibrated_module_offset(
+            labware_data.location
+        ).to_point()
 
-        return Point(
-            x=slot_front_left.x + stackup_origin_to_lw_origin.x + module_cal_offset.x,
-            y=slot_front_left.y + stackup_origin_to_lw_origin.y + module_cal_offset.y,
-            z=slot_front_left.z + stackup_origin_to_lw_origin.z + module_cal_offset.z,
-        )
+        return slot_front_left + stackup_origin_to_lw_origin + module_cal_offset
 
     def _get_labware_ancestor_position(self, labware_id: str) -> Point:
         """Get the position of the labware's underlying ancestor."""

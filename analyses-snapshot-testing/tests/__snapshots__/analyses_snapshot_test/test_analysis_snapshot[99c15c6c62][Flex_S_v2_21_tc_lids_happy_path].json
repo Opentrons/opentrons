@@ -653,6 +653,8 @@
           "compatibleWith": [],
           "dimensions": {
             "bareOverallHeight": 108.96,
+            "labwareInterfaceXDimension": 127.76,
+            "labwareInterfaceYDimension": 85.48,
             "lidHeight": 61.7,
             "overLabwareHeight": 0.0
           },
@@ -676,6 +678,7 @@
             "y": 68.8,
             "z": 108.96
           },
+          "locatingFeaturesAsParent": {},
           "model": "thermocyclerModuleV2",
           "moduleType": "thermocyclerModuleType",
           "otSharedSchema": "module/schemas/2",

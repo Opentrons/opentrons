@@ -18,6 +18,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Dimensions,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
@@ -98,7 +99,11 @@ _LABWARE_DEF_V2_UNKNOWN = LabwareDefinition2.model_construct(  # type: ignore[ca
     namespace="test",
     version=1,
     schemaVersion=2,
-    dimensions=Dimensions(xDimension=800, yDimension=900, zDimension=1000),
+    dimensions=Dimensions(
+        xDimension=800,
+        yDimension=900,
+        zDimension=1000,
+    ),
     parameters=type("MockParams", (), {"loadName": "unknown-labware-name"})(),
 )
 
@@ -108,6 +113,8 @@ _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg
     dimensions=ModuleDimensions(
         bareOverallHeight=500,
         overLabwareHeight=600,
+        labwareInterfaceXDimension=1000,
+        labwareInterfaceYDimension=700,
     ),
 )
 
@@ -137,6 +144,7 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
+    locating_features_as_parent=LocatingFeatures(),
 )
 
 

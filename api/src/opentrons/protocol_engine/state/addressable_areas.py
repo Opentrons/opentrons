@@ -613,6 +613,7 @@ class AddressableAreaView:
             },
             "displayName": addressable_area.display_name,
             "compatibleModuleTypes": addressable_area.compatible_module_types,
+            "locatingFeaturesAsParent": addressable_area.locating_features_as_parent,
         }
 
     def get_deck_slot_definitions(self) -> Dict[str, SlotDefV3]:

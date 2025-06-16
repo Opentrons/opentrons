@@ -20,7 +20,7 @@ from opentrons.protocol_engine.state.update_types import (
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.labware.types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri, LocatingFeatures
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import (
@@ -208,6 +208,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     bounding_box=Dimensions(x=128, y=86, z=0),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
+    locating_features_as_parent=LocatingFeatures(),
 )
 
 
@@ -2991,6 +2992,7 @@ def test_get_slot_item(
         bounding_box=Dimensions(x=0, y=0, z=0),
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
+        locating_features_as_parent=LocatingFeatures(),
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(
