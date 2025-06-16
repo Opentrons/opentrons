@@ -19,24 +19,18 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  ABSORBANCE_READER_V1,
   DEFAULT_AA_FOR_WASTE_CHUTE,
-  FLEX_STACKER_MODULE_V1,
   getAADisplayName,
   getAddressableAreaMatchForAreaId,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getFlexDeckDefAAByFixtureIdForCutoutId,
-  HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
-  ModuleModel,
-  MODULE_CUTOUT_FIXTURE_ID,
   MODULE_FIXTURES_BY_MODEL,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -56,6 +50,7 @@ import type {
   CutoutFixtureId,
   CutoutId,
   CutoutIdToCutoutFixtureId,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -124,65 +119,93 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
+  const getFilteredModules = (
+    unconfiguredMods: AttachedModule[],
+    moduleModel: ModuleModel
+  ): AttachedModule[] =>
+    unconfiguredMods.filter(mod => mod.moduleModel === moduleModel)
+
+  const mapModuleToCutoutConfig = (
+    module: AttachedModule,
+    cutoutId: CutoutId,
+    addressableAreasById: Record<string, unknown>
+  ): CutoutConfigMap[] | null => {
+    const keys = Object.keys(addressableAreasById)
+    const cutoutFixtureId = keys.find(
+      key => key === module.moduleModel
+    ) as CutoutFixtureId
+
+    if (!cutoutFixtureId) return null
+
+    const aaforModule = getAddressableAreaMatchForAreaId(
+      cutoutId,
+      cutoutFixtureId,
+      addressableAreaId
+    )
+
+    if (!aaforModule) return null
+
+    return [
+      {
+        cutoutId,
+        addressableAreaId: aaforModule,
+        cutoutFixtureId,
+        opentronsModuleSerialNumber: module.serialNumber,
+      },
+    ]
+  }
+
   const getModuleUnconfiguredFixtures = (
     unconfiguredMods: AttachedModule[],
     cutoutId: CutoutId,
     moduleModel: ModuleModel
   ): CutoutConfigMap[][] => {
-    const fixtureIds = MODULE_FIXTURES_BY_MODEL[moduleModel]
-    if (!fixtureIds || fixtureIds.length === 0) return []
-    
-    return unconfiguredMods
-      .filter(mod => mod.moduleModel === moduleModel)
-      .flatMap(mod => {
-        return fixtureIds.flatMap((fixtureId: CutoutFixtureId) => {
-          const aaforModule = getAddressableAreaMatchForAreaId(
-            cutoutId,
-            fixtureId,
-            addressableAreaId
-          )
-  
-          if (!aaforModule) return []
-          return [[
-            {
-              cutoutId,
-              addressableAreaId: aaforModule,
-              cutoutFixtureId: fixtureId,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ]]
-        })
-      })
+    const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      cutoutId
+    )
+    const filteredMods = getFilteredModules(unconfiguredMods, moduleModel)
+
+    return filteredMods
+      .map(mod => mapModuleToCutoutConfig(mod, cutoutId, addressableAreasById))
+      .filter((config): config is CutoutConfigMap[] => config !== null)
   }
 
   const getThermoUnconfiguredFixtures = (
     unconfiguredMods: AttachedModule[],
     cutoutId: CutoutId
   ): CutoutConfigMap[][] => {
+    const fixtureIds = MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]
+    if (!fixtureIds || fixtureIds.length === 0) return []
+
     const deckDef = getDeckDefFromRobotType('OT-3 Standard')
 
-    const availableCutoutFixtuers = deckDef.cutoutFixtures.filter(
-      cf =>
-        cf.mayMountTo.includes(cutoutId) &&
-        MODULE_CUTOUT_FIXTURE_ID.includes(cf.id)
+    // Filter deck fixtures that match this cutout and are Thermocycler fixtures
+    const matchingFixtures = deckDef.cutoutFixtures.filter(
+      fixture =>
+        fixture.mayMountTo.includes(cutoutId) &&
+        fixtureIds.includes(fixture.id as CutoutFixtureId)
     )
-    const fixtureGroup = availableCutoutFixtuers.map(
-      mod => mod.fixtureGroup[cutoutId] ?? []
+
+    // Get fixture group mapping for this cutout
+    const fixtureGroups = matchingFixtures.map(
+      f => f.fixtureGroup[cutoutId] ?? []
     )
-    const fixtureGroupItem = fixtureGroup.filter(x => x.length > 0)
-    const fixtureGroupMatch = fixtureGroupItem[0][0] as CutoutIdToCutoutFixtureId[]
+    const firstValidGroup = fixtureGroups.find(group => group.length > 0)
+
+    if (!firstValidGroup) return []
+
+    const fixtureGroupMatch = firstValidGroup[0] as CutoutIdToCutoutFixtureId
     const fixtureGroupKeys = Object.keys(fixtureGroupMatch) as CutoutId[]
-    const matrix = unconfiguredMods
-      .filter(f => f.moduleModel === THERMOCYCLER_MODULE_V2)
-      .map(item =>
-        fixtureGroupKeys.map((mod: CutoutId) => ({
-          cutoutId: mod,
+
+    return getFilteredModules(unconfiguredMods, THERMOCYCLER_MODULE_V2).map(
+      mod =>
+        fixtureGroupKeys.map(cutout => ({
+          cutoutId: cutout,
           addressableAreaId: THERMOCYCLER_MODULE_V2,
-          cutoutFixtureId: fixtureGroupItem[0][0][mod] as CutoutFixtureId,
-          opentronsModuleSerialNumber: item.serialNumber,
+          cutoutFixtureId: fixtureGroupMatch[cutout] as CutoutFixtureId,
+          opentronsModuleSerialNumber: mod.serialNumber,
         }))
-      )
-    return matrix
+    )
   }
 
   const getUnconfiguredMods = (
@@ -192,22 +215,24 @@ export function AddFixtureModal({
     const availableOptions: CutoutConfigMap[][] = []
 
     if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-      availableOptions.push(...getThermoUnconfiguredFixtures(unconfiguredMods, cutoutId))
+      availableOptions.push(
+        ...getThermoUnconfiguredFixtures(unconfiguredMods, cutoutId)
+      )
     }
-  
-  // Loop over all module models in the fixture mapping (excluding Thermocycler)
-  Object.entries(MODULE_FIXTURES_BY_MODEL).forEach(([model, _]) => {
-    if (model === THERMOCYCLER_MODULE_V2) return
 
-    const moduleOptions = getModuleUnconfiguredFixtures(
-      unconfiguredMods,
-      cutoutId,
-      model as ModuleModel
-    )
+    // Loop over all module models in the fixture mapping (excluding Thermocycler)
+    Object.entries(MODULE_FIXTURES_BY_MODEL).forEach(([model, _]) => {
+      if (model === THERMOCYCLER_MODULE_V2) return
 
-    availableOptions.push(...moduleOptions)
-  })
-  
+      const moduleOptions = getModuleUnconfiguredFixtures(
+        unconfiguredMods,
+        cutoutId,
+        model as ModuleModel
+      )
+
+      availableOptions.push(...moduleOptions)
+    })
+
     return availableOptions
   }
 

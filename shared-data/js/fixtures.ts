@@ -751,18 +751,6 @@ export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
   movableTrashA3: 'A3',
 }
 
-export const MODULE_CUTOUT_FIXTURE_ID = [
-  'heaterShakerModuleV1',
-  'temperatureModuleV2',
-  'magneticBlockV1',
-  'stagingAreaSlotWithMagneticBlockV1',
-  'thermocyclerModuleV2Rear',
-  'thermocyclerModuleV2Front',
-  'absorbanceReaderV1',
-  'flexStackerModuleV1',
-  'flexStackerModuleV1WithMagneticBlockV1',
-]
-
 export const isAddressableAreaStandardSlot = (
   addressableAreaName: AddressableAreaName,
   deckDef: DeckDefinition
