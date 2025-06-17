@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getDeckDefAAWithFakeAA,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -29,7 +31,8 @@ interface DeckConfigurationEditingTools {
   ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -41,7 +44,10 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+    const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+      deckConfig
+    )  
+    const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
     addressableAreaId,
@@ -58,11 +64,14 @@ export function useDeckConfigurationEditingTools(
 
   const removeFixtureFromCutout = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
-      cutoutId
+      cutoutId,
+      addressableAreaId,
+      deckConfigWithAA
     )
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)

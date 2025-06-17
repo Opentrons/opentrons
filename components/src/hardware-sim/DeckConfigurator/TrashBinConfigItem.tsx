@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { AddressableAreaNamesWithFakes, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -29,10 +29,12 @@ import type {
 interface TrashBinConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  cutoutFixtureId: CutoutFixtureIdsWithFakes
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes,
   ) => void
   selected?: boolean
 }
@@ -47,6 +49,7 @@ export function TrashBinConfigItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -89,7 +92,7 @@ export function TrashBinConfigItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }
