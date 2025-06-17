@@ -5,7 +5,9 @@ import without from 'lodash/without'
 import {
   getLabwareDisplayLocation,
   getLoadedLabware,
+  KEYS_BY_COMMAND_TYPE,
 } from '@opentrons/components'
+import { useRunCurrentState } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
@@ -162,11 +164,7 @@ export function useFailedLabwareUtils({
     errorKind,
   })
 
-  const labwareQuantity = getFailedLabwareQuantity(
-    runCommands,
-    recentRelevantFailedLabwareCmd,
-    errorKind
-  )
+  const labwareQuantity = getFailedLabwareQuantity(failedCommand, runRecord)
 
   return {
     ...tipSelectionUtils,
@@ -340,70 +338,22 @@ function useTipSelectionUtils(
 }
 
 export function getFailedLabwareQuantity(
-  runCommands: CommandsData | undefined,
-  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
-  errorKind: ErrorKind
+  failedCommand: FailedCommandBySource | null,
+  runRecord: Run | undefined
 ): number | null {
-  if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
-    const failedCommandIndex = runCommands?.data.findIndex(
-      x => x.id === recentRelevantFailedLabwareCmd?.id
-    )
-
-    const commandsBeforefailedCmd = runCommands?.data.slice(
-      0,
-      failedCommandIndex ?? 0
-    )
-
-    const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
-      (
-        cmd
-      ): cmd is
-        | FlexStackerRetrieveRunTimeCommand
-        | FlexStackerStoreRunTimeCommand =>
-        cmd.commandType === 'flexStacker/retrieve' ||
-        cmd.commandType === 'flexStacker/store'
-    )
-    if (
-      storeOrRetrieveLabwareLast != null &&
-      'result' in storeOrRetrieveLabwareLast
-    ) {
-      return storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
-        ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length ??
-            0
-        : storeOrRetrieveLabwareLast?.result
-            ?.eventualDestinationLocationSequence?.length ?? 0
-    }
-    // in case there is no result calculate based on setStoredLabware count
-    else {
-      const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
-        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-      )
-      const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
-        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-      )
-      const itemsToCheck = commandsBeforefailedCmd?.slice(
-        setStoredLabwareLastIndex ?? 0,
-        failedCommandIndex ?? 0
-      )
-
-      if (
-        setStoredLabwareLast != null &&
-        'initialCount' in setStoredLabwareLast.params
-      ) {
-        const total = setStoredLabwareLast?.params.initialCount ?? 0
-        const retreiveCmds =
-          itemsToCheck?.filter(
-            cmd => cmd.commandType === 'flexStacker/retrieve'
-          ).length ?? 0
-        const storeCmds =
-          itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
-            .length ?? 0
-        return total - retreiveCmds + storeCmds
-      } else {
-        return 0
+  if (runRecord != undefined && failedCommand != null) {
+    const { data: runCurrentState } = useRunCurrentState(runRecord.data.id)
+    if ('moduleId' in failedCommand.byRunRecord.params) {
+      const flexStacker =
+        runCurrentState?.data.flexStackerStates?.[
+          failedCommand.byRunRecord.params.moduleId
+        ]
+      if (flexStacker) {
+        return flexStacker.count
       }
     }
   }
+
   return null
 }
 
