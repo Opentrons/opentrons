@@ -4684,7 +4684,7 @@
     }
   ],
   "parameters": {
-    "format": "384standard",
+    "format": "384Standard",
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
