@@ -1,0 +1,41 @@
+site_name: Flex Stacker Module GEN1 Instruction Manual
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+  favicon: images/favicon.png
+  logo: assets/logo.png
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - md_in_html
+  - toc:
+      permalink: true
+      title: <u>Page Contents</u>
+      toc_depth: 3
+  - admonition
+  - abbr
+  - pymdownx.blocks.caption
+  - attr_list
+  - sane_lists
+
+copyright:
+  Copyright &copy; OPENTRONS, 2025. ALL RIGHTS RESERVED
+
+nav:
+  - Product and Manufacturer Description: index.md
+  - Safety and Compliance: stacker-compliance.md
+  - Product Specifications: stacker-product-specifications.md
+  - Pre-installation Information: stacker-preinstall.md
+  - Installing the Stacker: stacker-install.md
+  - Post-installation Procedures: stacker-postinstall.md
+  - Loading and Unloading Labware: stacker-load-labware.md
+  - Maintenance and Cleaning: stacker-maintenance.md
+  - Additional Product Information: stacker-warranty.md
