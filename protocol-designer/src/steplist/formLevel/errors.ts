@@ -54,6 +54,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
 import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
@@ -585,6 +586,38 @@ const LID_TARGET_TEMP_HOLD_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['lidTargetTempHold'],
   location: 'field',
+}
+const ASPIRATE_SUBMERGE_SPEED_REQUIRED: FormError = {
+  title: 'Submerge speed required',
+  dependentFields: ['aspirate_submerge_speed'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'aspirate',
+}
+const ASPIRATE_RETRACT_SPEED_REQUIRED: FormError = {
+  title: 'Retract speed required',
+  dependentFields: ['aspirate_retract_speed'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'aspirate',
+}
+const DISPENSE_SUBMERGE_SPEED_REQUIRED: FormError = {
+  title: 'Submerge speed required',
+  dependentFields: ['dispense_submerge_speed'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'dispense',
+}
+const DISPENSE_RETRACT_SPEED_REQUIRED: FormError = {
+  title: 'Retract speed required',
+  dependentFields: ['dispense_retract_speed'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'dispense',
 }
 
 export type FormErrorChecker = (
@@ -1496,6 +1529,49 @@ export const targetSpeedRange = (
     (parseInt(targetSpeed) < MIN_HEATER_SHAKER_MODULE_RPM ||
       parseInt(targetSpeed) > MAX_HEATER_SHAKER_MODULE_RPM)
     ? TARGET_HEATER_SHAKER_SPEED_RANGE
+    : null
+}
+
+const _getIsDispenseTrash = (
+  dispenseLabware: LabwareOrAdditionalEquipmentEntity
+): boolean =>
+  'name' in dispenseLabware &&
+  (dispenseLabware.name === 'trashBin' || dispenseLabware.name === 'wasteChute')
+
+export const aspirateSubmergeSpeedRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { aspirate_submerge_speed, dispense_labware } = fields
+  const isDispenseTrash = _getIsDispenseTrash(dispense_labware)
+  return !aspirate_submerge_speed && !isDispenseTrash
+    ? ASPIRATE_SUBMERGE_SPEED_REQUIRED
+    : null
+}
+export const aspirateRetractSpeedRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { aspirate_retract_speed, dispense_labware } = fields
+  const isDispenseTrash = _getIsDispenseTrash(dispense_labware)
+  return !aspirate_retract_speed && !isDispenseTrash
+    ? ASPIRATE_RETRACT_SPEED_REQUIRED
+    : null
+}
+export const dispenseSubmergeSpeedRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { dispense_submerge_speed, dispense_labware } = fields
+  const isDispenseTrash = _getIsDispenseTrash(dispense_labware)
+  return !dispense_submerge_speed && !isDispenseTrash
+    ? DISPENSE_SUBMERGE_SPEED_REQUIRED
+    : null
+}
+export const dispenseRetractSpeedRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { dispense_retract_speed, dispense_labware } = fields
+  const isDispenseTrash = _getIsDispenseTrash(dispense_labware)
+  return !dispense_retract_speed && !isDispenseTrash
+    ? DISPENSE_RETRACT_SPEED_REQUIRED
     : null
 }
 

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { MoveLiquidTools } from '../'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
@@ -68,16 +68,15 @@ describe('MoveLiquidTools', () => {
     screen.getByText('mock SecondStepsMoveLiquidTools')
   })
 
-  it('renders LiquidClassesStepMoveLiquidTools when feature flag is on and robot is Flex', () => {
+  it('renders LiquidClassesStepMoveLiquidTools when feature flag is on', () => {
     vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
     props.toolboxStep = 1
     render(props)
     screen.getByText('mock LiquidClassesStepMoveLiquidTools')
   })
 
-  it('renders SecondStepsMoveLiquidTools when feature flag is on but robot is OT-2', () => {
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
-    vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+  it('renders SecondStepsMoveLiquidTools when feature flag off', () => {
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
     props.toolboxStep = 1
     render(props)
     screen.getByText('mock SecondStepsMoveLiquidTools')
