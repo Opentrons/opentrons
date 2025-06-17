@@ -373,6 +373,7 @@ export const mix: CommandCreator<MixArgs> = (
             pipette,
             dropTipLocation,
             tipRack,
+            isFromMixCommand: true,
           }),
         ]
       }

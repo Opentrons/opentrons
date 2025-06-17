@@ -19,6 +19,7 @@ import {
 
 import * as errorCreators from '../../errorCreators'
 import {
+  curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
@@ -559,7 +560,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
       const tipCommands = changeTipNow
         ? [
-            curryWithoutPython(replaceTip, {
+            curryCommandCreator(replaceTip, {
               pipette,
               dropTipLocation,
               tipRack,

@@ -16,6 +16,7 @@ import {
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
+  curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
@@ -478,7 +479,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
           const tipCommands = changeTipNow
             ? [
-                curryWithoutPython(replaceTip, {
+                curryCommandCreator(replaceTip, {
                   pipette,
                   dropTipLocation,
                   tipRack,
