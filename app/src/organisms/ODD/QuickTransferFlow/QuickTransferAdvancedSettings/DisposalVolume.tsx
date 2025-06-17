@@ -14,6 +14,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  getPipetteSpecsV2,
   getTipTypeFromTipRackDefinition,
   LOW_VOLUME_PIPETTES,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -54,16 +55,21 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const keyboardRef = useRef(null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [volume, setVolume] = useState<number | null>(null)
+
+  const getInitialBlowoutLocation = (blowOut: typeof state.blowOut): string => {
+    if (blowOut == null) {
+      return ''
+    }
+    if (typeof blowOut === 'string') {
+      return blowOut
+    }
+    return `trashBin:${blowOut.cutoutId}`
+  }
+
   const [
     selectedBlowoutLocation,
     setSelectedBlowoutLocation,
-  ] = useState<string>(
-    state.blowOut
-      ? typeof state.blowOut === 'string'
-        ? state.blowOut
-        : `trashBin:${state.blowOut.cutoutId}`
-      : ''
-  )
+  ] = useState<string>(getInitialBlowoutLocation(state.blowOut))
   const [flowRate, setFlowRate] = useState<number | null>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const fixtureLocationOptions = deckConfig.filter(
@@ -110,7 +116,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     pipetteName = pipetteName + `_96`
   }
 
-  // use lowVolume for volumes lower than 5ml
   const liquidSpecs = state.pipette.liquids
   const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
   const flowRatesForSupportedTip: SupportedTip | undefined =

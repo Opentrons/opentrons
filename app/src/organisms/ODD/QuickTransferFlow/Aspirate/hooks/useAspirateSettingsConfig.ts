@@ -176,14 +176,8 @@ export function useAspirateSettingsConfig({
     },
   ]
 
-  return aspirateSettingsItems.filter(item => {
-    // Hide condition setting when not multi-transfer
-    if (
-      item.option === SETTING_OPTIONS.ASPIRATE_CONDITION &&
-      !isMultiTransfer
-    ) {
-      return false
-    }
-    return true
-  })
+  return aspirateSettingsItems.filter(
+    item =>
+      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
+  )
 }
