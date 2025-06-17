@@ -12,7 +12,8 @@ from hardware_testing.data.csv_report import (
 from opentrons.hardware_control.modules import FlexStacker
 
 # TODO Determine number of cycles we actually want to use
-NUM_CYCLES = 10
+NUM_CYCLES = 100
+LABWARE_HEIGHT = 15  # mm
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
@@ -31,8 +32,8 @@ async def test_cycles(stacker: FlexStacker) -> Tuple[bool, int]:
 
     for cycle in range(NUM_CYCLES):
         try:
-            await stacker.dispense_labware(15)
-            await stacker.store_labware(15)
+            await stacker.dispense_labware(LABWARE_HEIGHT)
+            await stacker.store_labware(LABWARE_HEIGHT)
         except Exception as e:
             ui.print_error(f"{stacker.device_info['serial']}: An error occurred: {e}")
 
