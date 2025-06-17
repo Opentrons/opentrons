@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
-  getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
@@ -40,7 +39,6 @@ export function MixTools(
   const enableReturnTip = useSelector(getEnableReturnTip)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const robotType = useSelector(getRobotType)
 
   const pickUpTipLocationValue = propsForFields.pickUpTip_location?.value
@@ -79,7 +77,7 @@ export function MixTools(
     ),
     1: () => (
       <>
-        {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
+        {robotType === FLEX_ROBOT_TYPE ? (
           <LiquidClassesStepTools
             propsForFields={propsForFields}
             setShowFormErrors={setShowFormErrors}

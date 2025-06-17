@@ -34,7 +34,6 @@ import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
-import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
 import {
   getRobotStateTimeline,
   getRobotType,
@@ -79,6 +78,7 @@ import {
 } from './utils'
 
 import type { ComponentType } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type {
   FormData,
@@ -177,7 +177,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     location: error.location,
   }))
   const timeline = useSelector(getRobotStateTimeline)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
   const robotType = useSelector(getRobotType)
@@ -297,7 +296,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const numStepFormPages = getStepFormNumPages(
     formData.stepType,
     enableReadOrInitialization != null,
-    enableLiquidClasses
+    robotType
   )
   const isMultiStepToolbox =
     formData.stepType === 'absorbanceReader'
@@ -550,12 +549,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 const getStepFormNumPages = (
   stepType: StepType,
   enableReadOrInitialization: boolean,
-  enableLiquidClasses: boolean
+  robotType: RobotType
 ): number => {
   switch (stepType) {
     case 'mix':
     case 'moveLiquid':
-      return enableLiquidClasses ? 3 : 2
+      return robotType === FLEX_ROBOT_TYPE ? 3 : 2
     case 'thermocycler':
       return 2
     case 'absorbanceReader':

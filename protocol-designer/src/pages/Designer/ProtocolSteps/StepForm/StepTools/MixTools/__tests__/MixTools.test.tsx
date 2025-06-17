@@ -10,7 +10,6 @@ import {
 import { MixTools } from '..'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import {
-  getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
@@ -85,7 +84,6 @@ describe('MixToolFirstStep', () => {
     vi.mocked(SecondStepMixTools).mockReturnValue(
       <div>mock SecondStepMixTools</div>
     )
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
     vi.mocked(LiquidClassesStepTools).mockReturnValue(
       <div>mock LiquidClassesStepTools</div>
     )
@@ -96,29 +94,15 @@ describe('MixToolFirstStep', () => {
     render(props)
     screen.getByText('mock FirstStepMixTools')
   })
-  it('renders SecondStepMixTools when toolboxStep is 1', () => {
-    props.toolboxStep = 1
-    render(props)
-    screen.getByText('mock SecondStepMixTools')
-  })
 
-  it('renders LiquidClassesStepTools when toolboxStep is 2 and enableLiquidClasses is true', () => {
-    props.toolboxStep = 2
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
-    render(props)
-    screen.getByText('mock SecondStepMixTools')
-  })
-
-  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true and robot is Flex', () => {
+  it('renders LiquidClassesStepTools when toolboxStep is 1 and robot is Flex', () => {
     props.toolboxStep = 1
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
     render(props)
     screen.getByText('mock LiquidClassesStepTools')
   })
 
-  it('renders LiquidClassesStepTools when toolboxStep is 1 and enableLiquidClasses is true and robot is OT-2', () => {
-    props.toolboxStep = 1
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+  it('renders SecondStepMixTools when toolboxStep is 1 and robot is OT-2', () => {
+    props.toolboxStep = 2
     vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
     render(props)
     screen.getByText('mock SecondStepMixTools')

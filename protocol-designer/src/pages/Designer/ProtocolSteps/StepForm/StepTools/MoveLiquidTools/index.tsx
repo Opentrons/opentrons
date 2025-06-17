@@ -1,6 +1,3 @@
-import { useSelector } from 'react-redux'
-
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
 import { useAssignLiquidClass, useSupportedLiquidClassOptions } from './hooks'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
@@ -17,7 +14,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     tab,
     setTab,
   } = props
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
@@ -41,25 +37,13 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         )
       case 1:
         return (
-          <>
-            {enableLiquidClasses ? (
-              <LiquidClassesStepTools
-                propsForFields={propsForFields}
-                formData={formData}
-                setShowFormErrors={setShowFormErrors}
-                type="transfer"
-                orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
-              />
-            ) : (
-              <SecondStepsMoveLiquidTools
-                propsForFields={propsForFields}
-                formData={formData}
-                tab={tab}
-                setTab={setTab}
-                setShowFormErrors={setShowFormErrors}
-              />
-            )}
-          </>
+          <LiquidClassesStepTools
+            propsForFields={propsForFields}
+            formData={formData}
+            setShowFormErrors={setShowFormErrors}
+            type="transfer"
+            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
+          />
         )
       case 2:
         return (
