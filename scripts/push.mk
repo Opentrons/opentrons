@@ -35,6 +35,7 @@ $(if $(is-windows), echo "when using windows with an openSSH version larger then
 define push-python
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(dir $(realpath $(lastword $(MAKEFILE_LIST))))/install-dist-remote.sh root@$(1):/var/
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) chmod a+x /var/install-dist-remote.sh
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) /var/install-dist-remote.sh /var/$(notdir $(4)) $(5)
 endef
 
