@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from typing import Union, overload
 
-
 from typing_extensions import assert_type
 
 from opentrons.types import Point
@@ -13,17 +12,17 @@ from opentrons_shared_data.labware.labware_definition import (
     Vector3D,
 )
 from opentrons_shared_data.labware.types import LocatingFeatures
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from ..types import (
     LabwareParentDefinition,
     ModuleDefinition,
     ModuleModel,
     LabwareOffsetVector,
-    DeckLocationDefinition,
     ModuleLocation,
     DeckSlotLocation,
     AddressableAreaLocation,
     OnLabwareLocation,
+    AddressableArea,
 )
 
 _LabwareOriginLocation = Union[
@@ -65,11 +64,23 @@ def get_parent_placement_origin_to_lw_origin(
 @overload
 def get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_entity: DeckLocationDefinition,
+    parent_entity: SlotDefV3,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
-    labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
+    labware_location: DeckSlotLocation,
+) -> Point:
+    ...
+
+
+@overload
+def get_parent_placement_origin_to_lw_origin(
+    child_labware: LabwareDefinition,
+    parent_entity: AddressableArea,
+    module_parent_to_child_offset: None,
+    deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool,
+    labware_location: AddressableAreaLocation,
 ) -> Point:
     ...
 
@@ -234,8 +245,16 @@ def _get_parent_entity_info(
 
 @overload
 def _get_parent_entity_info(
-    parent_entity: DeckLocationDefinition,
-    labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
+    parent_entity: SlotDefV3,
+    labware_location: DeckSlotLocation,
+) -> _ParentEntityInfo:
+    ...
+
+
+@overload
+def _get_parent_entity_info(
+    parent_entity: AddressableArea,
+    labware_location: DeckSlotLocation,
 ) -> _ParentEntityInfo:
     ...
 
@@ -251,9 +270,9 @@ def _get_parent_entity_info(
         if isinstance(parent_entity, LabwareDefinition2):
             raise NotImplementedError()
         else:
-            footprint = parent_entity.extents.footprint
-            back_left = _Point2D(x=footprint.backLeft.x, y=footprint.backLeft.y)
-            front_right = _Point2D(x=footprint.frontRight.x, y=footprint.frontRight.y)
+            total = parent_entity.extents.total
+            back_left = _Point2D(x=total.backLeftBottom.x, y=total.backLeftBottom.y)
+            front_right = _Point2D(x=total.frontRightTop.x, y=total.frontRightTop.y)
             contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
 
             return _ParentEntityInfo(
@@ -282,16 +301,25 @@ def _get_parent_entity_info(
                 locating_features_as_parent=parent_entity.locatingFeaturesAsParent,
             )
 
-    else:
-        if hasattr(parent_entity, "bounding_box"):
-            definition_bounding_box = _Point2D(
-                parent_entity.bounding_box.x, parent_entity.bounding_box.y  # type: ignore[union-attr]
-            )
-        else:
-            definition_bounding_box = _Point2D(
-                parent_entity["boundingBox"]["xDimension"],  # type: ignore[index]
-                parent_entity["boundingBox"]["yDimension"],  # type: ignore[index]
-            )
+    elif isinstance(labware_location, AddressableAreaLocation):
+        assert isinstance(parent_entity, AddressableArea)
+        back_left = _Point2D(0, 0)
+        front_right = _Point2D(
+            x=parent_entity.bounding_box.x,
+            y=parent_entity.bounding_box.y * -1,
+        )
+        contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
+
+        return _ParentEntityInfo(
+            child_contact_plane=contact_plane,
+            locating_features_as_parent=parent_entity.locating_features_as_parent,
+        )
+
+    elif isinstance(labware_location, DeckSlotLocation):
+        definition_bounding_box = _Point2D(
+            parent_entity["boundingBox"]["xDimension"],  # type: ignore[index]
+            parent_entity["boundingBox"]["yDimension"],  # type: ignore[index]
+        )
 
         back_left = _Point2D(0, 0)
         front_right = _Point2D(
@@ -299,16 +327,14 @@ def _get_parent_entity_info(
             y=definition_bounding_box.y * -1,
         )
         contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
-
-        if hasattr(parent_entity, "locating_features_as_parent"):
-            locating_features_as_parent = parent_entity.locating_features_as_parent  # type: ignore[union-attr]
-        else:
-            locating_features_as_parent = parent_entity["locatingFeaturesAsParent"]  # type: ignore[index]
+        locating_features_as_parent = parent_entity["locatingFeaturesAsParent"]  # type: ignore[index]
 
         return _ParentEntityInfo(
             child_contact_plane=contact_plane,
             locating_features_as_parent=locating_features_as_parent,
         )
+    else:
+        raise TypeError(f"Unsupported labware location type: {labware_location}")
 
 
 def _get_parent_origin_to_bottom_center(

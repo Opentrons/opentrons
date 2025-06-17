@@ -477,7 +477,7 @@ class GeometryView:
                 is_topmost_labware=is_topmost_labware,
                 labware_location=labware_location,
             )
-        elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        elif isinstance(labware_location, DeckSlotLocation):
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
                 parent_entity=parent_entity,  # type: ignore[arg-type]
@@ -486,6 +486,16 @@ class GeometryView:
                 is_topmost_labware=is_topmost_labware,
                 labware_location=labware_location,
             )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            return get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_entity=parent_entity,  # type: ignore[arg-type]
+                module_parent_to_child_offset=None,
+                deck_definition=self._addressable_areas.deck_definition,
+                is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
+            )
+
         else:
             raise ValueError(f"Invalid labware location: {labware_location}")
 

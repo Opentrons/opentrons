@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
 )
+from opentrons_shared_data.deck.types import SlotDefV3
+from .deck_configuration import AddressableArea
 
 from .location import LabwareLocation
 from .labware_offset_location import (
@@ -20,7 +22,6 @@ from .labware_offset_location import (
 from .labware_offset_vector import LabwareOffsetVector
 from .util import Vec3f
 from .module import ModuleDefinition
-from .deck_configuration import DeckLocationDefinition
 
 
 class OverlapOffset(Vec3f):
@@ -118,6 +119,6 @@ class LoadedLabware(BaseModel):
 
 
 LabwareParentDefinition = Union[
-    DeckLocationDefinition, ModuleDefinition, LabwareDefinition
+    SlotDefV3, AddressableArea, ModuleDefinition, LabwareDefinition
 ]
 """Information pertaining to a labware's parent (deck slot, module, or another labware) location."""
