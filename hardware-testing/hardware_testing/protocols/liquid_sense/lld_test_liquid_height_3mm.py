@@ -68,6 +68,7 @@ SLOT_DIAL = "B2"
 #  VARIABLES - END
 ###########################################
 
+
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     from hardware_testing import protocols
@@ -77,11 +78,13 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
-        choices=
-        [{"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
-        {"display_name": "smc 384", "value": "smc_384_read_plate"},
-        {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"}],
-        default = "axygen_96_wellplate_500ul")
+        choices=[
+            {"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
+            {"display_name": "smc 384", "value": "smc_384_read_plate"},
+            {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
+        ],
+        default="axygen_96_wellplate_500ul",
+    )
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
     parameters.add_float(
@@ -120,13 +123,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Liq pipette probes every time.",
         default=False,
     )
-    parameters.add_float(
-        variable_name="DISPENSE_MM_FROM_MENISCUS",
-        display_name="Dispense mm from meniscus",
-        description="Dispense mm from meniscus.",
-        default=-0.5,
-        maximum=10.0,
-        minimum=-10.0,
+    parameters.add_str(
+        variable_name="dispense_location",
+        display_name="Dispense location relative to the well",
+        default="top",
+        choices=[
+            {"display_name": "Top", "value": "top"},
+            {"display_name": "1 mm from Bottom", "value": "bottom"},
+            {"display_name": "2 mm below meniscus", "value": "dispense_meniscus"},
+        ],
     )
     parameters.add_float(
         variable_name="ASPIRATE_MM_FROM_MENISCUS",
@@ -146,7 +151,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="pause_to_check_well",
         display_name="Pause to Check Well",
         description="If True, protocol will pause after each measurement",
-        default=False
+        default=False,
     )
 
 
@@ -188,7 +193,7 @@ def _setup(
     int,
     bool,
     Dict[str, List[float | SimulatedProbeResult]],
-    bool
+    bool,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     # TODO: use runtime-variables instead of constants
@@ -202,25 +207,14 @@ def _setup(
     volume_3mm_from_bottom = ctx.params.volume_3mm_from_bottom  # type: ignore[attr-defined]
     volume_3mm_from_top = ctx.params.volume_3mm_from_top  # type: ignore[attr-defined]
     volume_of_middle = ctx.params.volume_of_middle  # type: ignore[attr-defined]
-    measure_middle_height = ctx.params.measure_middle_height  # type: ignore[attr-defined]
-    pause_to_check_well = ctx.params.pause_to_check_well # type: ignore[attr-defined]
+    pause_to_check_well = ctx.params.pause_to_check_well  # type: ignore[attr-defined]
     VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
-
-    if LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
-        if measure_middle_height:
-            volumes_testing = [
-                volume_3mm_from_bottom,
-                volume_of_middle,
-                volume_3mm_from_top,
-                0.0,
-            ]
-        else:
-            volumes_testing = [
-                volume_3mm_from_bottom,
-                volume_3mm_from_top,
-                0.0,
-            ]
-        VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
+    volumes = [volume_3mm_from_bottom, volume_3mm_from_top, volume_of_middle]
+    volumes_testing = []
+    for volume in volumes:
+        if volume > 0 and LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
+            volumes_testing.append(volume)
+    VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
 
     labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     labware.load_empty(labware.wells())
@@ -329,7 +323,7 @@ def _setup(
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
-        pause_to_check_well
+        pause_to_check_well,
     )
 
 
@@ -453,13 +447,13 @@ def _test_for_finding_liquid_height(  # noqa: C901
     src_well: Well,
     wells: List[Well],
     liquid_pipette_probe_every_time: bool,
-    pause_to_check_well: bool
+    pause_to_check_well: bool,
 ) -> None:
     global _src_meniscus_height
     trial_counter = 0
     _store_dial_baseline(ctx, probing_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
-    DISPENSE_MM_FROM_MENISCUS = ctx.params.DISPENSE_MM_FROM_MENISCUS  # type: ignore[attr-defined]
+    DISPENSE_LOCATION = ctx.params.dispense_location  # type: ignore[attr-defined]
     ASPIRATE_MM_FROM_MENISCUS = ctx.params.ASPIRATE_MM_FROM_MENISCUS  # type: ignore[attr-defined]
     all_corrected_heights: List[float] = []
     for probe_tip, well in zip(probing_tips, wells):
@@ -485,10 +479,19 @@ def _test_for_finding_liquid_height(  # noqa: C901
                     liquid_pipette.flow_rate.aspirate, 50
                 )
                 liquid_pipette.flow_rate.blow_out = 100
-                dispense_loc = well.bottom(z=1)
+                if DISPENSE_LOCATION == "top":
+                    dispense_loc = well.top()
+                elif DISPENSE_LOCATION == "bottom":
+                    dispense_loc = well.bottom(z=1)
+                elif DISPENSE_LOCATION == "meniscus":
+                    dispense_loc = well.meniscus(z=-2, target="end")
                 if not liquid_pipette.has_tip:
                     # NOTE: only use new, dry tips to probe
-                    if not ctx.is_simulating() and trial_counter == 1:
+                    if (
+                        not ctx.is_simulating()
+                        and trial_counter == 1
+                        or liquid_pipette_probe_every_time
+                    ):
                         liquid_pipette.pick_up_tip()
                         _src_meniscus_height = liquid_pipette.measure_liquid_height(
                             src_well
@@ -513,8 +516,6 @@ def _test_for_finding_liquid_height(  # noqa: C901
                     dispense_loc,
                     new_tips="never",
                     touch_tip=True,
-                    blow_out=True,
-                    blowout_location="destination well",
                     air_gap=5,
                 )
                 if not liquid_pipette_probe_every_time:
@@ -580,7 +581,7 @@ def run(
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
-        pause_to_check_well
+        pause_to_check_well,
     ) = _setup(ctx)
     channels_probe = probe_pipette.channels
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
@@ -604,7 +605,7 @@ def run(
             src_well=reservoir["A1"],
             wells=test_wells[:num_trials],
             liquid_pipette_probe_every_time=liquid_pipette_probe_every_time,
-            pause_to_check_well=pause_to_check_well
+            pause_to_check_well=pause_to_check_well,
         )
         test_wells = test_wells[num_trials:]
         # test_tips_liquid = test_tips_liquid[num_trials:]
