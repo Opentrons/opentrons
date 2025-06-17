@@ -1,0 +1,66 @@
+/* Colors from the Opentrons color palette on Confluence */
+
+:root {
+  --md-primary-fg-color: #006CFA; /* Header and footer color */
+  --md-accent-fg-color: #F09D20; /* Accent color */
+  /* Creates a dot for stacker color statuses */
+  --my-dot-size: 24px;
+}
+
+.md-header {
+  background-color: var(--md-primary-fg-color);
+}
+
+.md-footer {
+  background-color: var(--md-primary-fg-color);
+}
+
+.md-footer-meta.md-typeset {
+  background-color: transparent;
+}
+/* stacker status light colors */
+.my-dot {
+  height: var(--my-dot-size);
+  width: var(--my-dot-size);
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid black;
+  margin-right: 5px;
+ }
+
+ .my-dot.white {
+  background-color: #F8F6F0;
+  animation: pulse-white 3s;
+  animation-iteration-count: 3;
+ }
+
+ .my-dot.green {
+  background-color: green;
+ }
+
+ .my-dot.blue {
+  background-color: #006CFA;
+ }
+
+ .my-dot.red {
+  background-color: red;
+ }
+
+ .my-dot.yellow {
+  background-color: #F09D20;
+ }
+
+.center-image {
+    display: block; /* Make the image a block-level element */
+    margin-left: auto; /* Push it to the center horizontally */
+    margin-right: auto; /* Push it to the center horizontally */
+}
+
+/* New class for end-of-doc trademark text */
+.trademark-text {
+    font-size: 0.85em;  /* set size */
+    color: #555;       /* set color */
+    display: block;     /* text acts like a paragraph */
+    margin-top: 2em;   /* spacing at top */
+}
