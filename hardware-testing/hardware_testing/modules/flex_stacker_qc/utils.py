@@ -1,8 +1,12 @@
 """Utility functions for the Flex Stacker EVT QC module."""
 from collections import defaultdict
+import re
 import statistics
 from typing import Any, Dict, List
-from opentrons.drivers.flex_stacker.driver import TOFSensor
+from serial.tools.list_ports import comports  # type: ignore[import]
+
+from opentrons.drivers.flex_stacker.driver import FlexStackerDriver, TOFSensor
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -10,14 +14,38 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
+
+STACKER_VID = 0x483
+STACKER_PID = 0xEF24
 
 TOF_DETECTION_CONFIG: Dict[TOFSensor, Dict[str, Any]] = {
     TOFSensor.X: {"zones": [5, 6, 7], "bins": list(range(10, 20)), "threshold": 30000},
     TOFSensor.Z: {"zones": [1], "bins": list(range(50, 56)), "threshold": 20000},
 }
+
+
+def find_stacker_port() -> str:
+    """Build FLEX Stacker driver."""
+    for i in comports():
+        if i.vid == STACKER_VID and i.pid == STACKER_PID:
+            print(f"Found FLEX Stacker at port: {i.device}")
+            return i.device
+    raise RuntimeError("could not find connected FLEX Stacker")
+
+
+async def get_estop(stacker: FlexStacker) -> bool:
+    """Get E-Stop status."""
+    if stacker.is_simulated:
+        return True
+
+    assert isinstance(stacker._driver, FlexStackerDriver)
+    _LS_RE = re.compile(r"^M112 E:(\d)$")
+    res = await stacker._driver._connection.send_data("M112\n")
+    match = _LS_RE.match(res)
+    assert match, f"Incorrect Response for E-Stop switch: {res}"
+    return bool(int(match.group(1)))
 
 
 async def test_limit_switches_per_direction(

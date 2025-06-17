@@ -143,7 +143,6 @@ class FlexStacker(mod_abc.AbstractModule):
             log.exception(f"First read of Flex-Stacker on port {port} failed")
 
         return module
-        
 
     @classmethod
     async def build(

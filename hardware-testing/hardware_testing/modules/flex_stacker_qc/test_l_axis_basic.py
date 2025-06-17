@@ -8,7 +8,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 
