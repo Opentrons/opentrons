@@ -1,6 +1,6 @@
 import { LegacyStyledText } from '../atoms/StyledText'
 import { BORDERS, COLORS } from '../helix-design-system'
-import { Box, Flex as FlexComponent } from '../primitives'
+import { Box, LegacyFlex as FlexComponent } from '../primitives'
 import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
 import { SPACING } from '../ui-style-constants'
 

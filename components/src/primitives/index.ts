@@ -1,6 +1,7 @@
 export * from './style-props'
 export * from './Box'
 export * from './Btn'
+export * from './LegacyFlex'
 export * from './Flex'
 export * from './ForeignObject'
 export * from './Link'
