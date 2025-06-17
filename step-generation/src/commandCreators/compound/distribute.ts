@@ -405,6 +405,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     `new_tip=${formatPyStr(changeTip)}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
+    `drop_tip_at_end=False`,
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({

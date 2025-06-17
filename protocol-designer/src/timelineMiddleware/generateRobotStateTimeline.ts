@@ -58,11 +58,6 @@ export const generateRobotStateTimeline = (
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
-      const commandCreator =
-        args.commandCreatorFnName === 'mix'
-          ? curryCommandCreator
-          : curryWithoutPython
-
       //  assume that whenever we have a pipetteId we also have a dropTipLocation
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
@@ -74,6 +69,11 @@ export const generateRobotStateTimeline = (
           nextStepArgsForPipette != null &&
           'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
+
+        const commandCreator =
+          args.commandCreatorFnName === 'mix' || !willReuseTip
+            ? curryCommandCreator
+            : curryWithoutPython
 
         const isWasteChute =
           invariantContext.wasteChuteEntities[dropTipLocation] != null
