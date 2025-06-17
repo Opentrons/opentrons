@@ -67,7 +67,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-  console.log('step form manager')
   const handleBlur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
