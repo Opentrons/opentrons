@@ -375,6 +375,7 @@ export const mix: CommandCreator<MixArgs> = (
             dropTipLocation,
             tipRack,
             ...(nozzles != null ? { nozzles } : {}),
+            isFromMixCommand: true,
           }),
         ]
       }

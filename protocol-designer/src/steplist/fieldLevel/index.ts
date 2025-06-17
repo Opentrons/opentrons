@@ -251,15 +251,19 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_submerge_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   aspirate_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   dispense_submerge_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   dispense_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   pipette: {
     hydrate: getPipetteEntity,
