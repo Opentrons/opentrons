@@ -14,7 +14,6 @@ from opentrons.protocol_api import (
     AbsorbanceReaderContext,
     OFF_DECK,
 )
-from opentrons.protocol_api.labware import OutOfTipsError
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -102,14 +101,18 @@ TRIALS_BY_PIPETTE_BY_TIP = {
     "flex_96channel_1000": {50: [1, 1, 1], 200: [1, 1, 1], 1000: [1, 1, 1]},
 }
 
+NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {
+    1: 1, 8: 3, 96: 5
+}
+
 # fmt: off
 # FIXME: create plate stack, to reduce number of slots in use (and increase plates)
 # TODO: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
     "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "reader_stage": "A4",
-    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_3":       "B4",
-    "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_2":       "C4",
-    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "chute_stage":  "D4",
+    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_2":       "B4",
+    "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_3":       "C4",
+    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "tips_4":       "D4",
 }
 # fmt: on
 
@@ -455,7 +458,8 @@ def run(ctx: ProtocolContext) -> None:
         ctx, test_pip, tip_ul, volumes, trials_list
     )
     inaccessible_racks = load_tip_racks(
-        ctx, test_pip, diluent_pipette, num_racks_needed=1
+        ctx, test_pip, diluent_pipette,
+        num_racks_needed=NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS[test_pip.channels]
     )
     dest_wells_by_volume: Dict[float, List[Well]] = gather_dest_wells(
         test_pip, plates, volumes, trials_list
@@ -532,7 +536,11 @@ def run(ctx: ProtocolContext) -> None:
             pip_for_dil.transfer_with_liquid_class(
                 diluent_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
-            pip_for_dil.drop_tip()
+            if pip_for_dil.channels == 96:
+                pip_for_dil.return_tip()
+                diluent_tips.reset()
+            else:
+                pip_for_dil.drop_tip()
 
         # PROBE DYE
         src_well: Well = dye_well_by_volume[ul]
@@ -552,18 +560,16 @@ def run(ctx: ProtocolContext) -> None:
             test_pip.distribute(*args, new_tip="always")
 
         # SWAP INACCESSIBLE TIP-RACKS
-        new_racks: List[Labware] = []
-        for rack in test_pip.tip_racks:
-            if rack.next_tip(test_pip.channels):
-                new_racks.append(rack)
-                continue
-            if not inaccessible_racks:
-                raise OutOfTipsError("no more tip-racks to replace the empty ones")
-            new_racks.append(inaccessible_racks.pop(0))
-            prev_parent = rack.parent
-            ctx.move_labware(rack, trash, use_gripper=True)
-            ctx.move_labware(new_racks[-1], prev_parent, use_gripper=True)
-        test_pip.tip_racks = new_racks
+        has_tips = bool(test_pip.tip_racks[0].next_tip(test_pip.channels))
+        if not has_tips and not inaccessible_racks:
+            raise RuntimeError(f"out of tips-racks when testing {ul} ul")
+        elif not has_tips:
+            old_rack = test_pip.tip_racks[0]
+            new_rack = inaccessible_racks.pop(0)
+            rack_adapter = old_rack.parent
+            ctx.move_labware(test_pip.tip_racks[0], trash, use_gripper=True)
+            ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
+            test_pip.tip_racks[0] = new_rack
 
     # don't forget final plate
     _on_plate_done()
