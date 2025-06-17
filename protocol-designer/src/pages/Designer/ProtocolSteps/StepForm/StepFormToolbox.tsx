@@ -413,6 +413,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     }
   }
 
+  const handleBack = (): void => {
+    setToolboxStep(currStep => currStep - strideForContinueOrBack)
+    setShowFormErrors(false)
+    handleScrollToTop()
+  }
+
   const transformedStepIndexForDisplay =
     isToolboxIndexTransformNeeded && toolboxStep === 2 ? 1 : toolboxStep
   const transformedStepTotalForDisplay = isToolboxIndexTransformNeeded
@@ -487,14 +493,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         confirmButton={
           <Flex gridGap={SPACING.spacing8}>
             {isMultiStepToolbox && toolboxStep >= 1 ? (
-              <SecondaryButton
-                width="100%"
-                onClick={() => {
-                  setToolboxStep(currStep => currStep - strideForContinueOrBack)
-                  setShowFormErrors(false)
-                  handleScrollToTop()
-                }}
-              >
+              <SecondaryButton width="100%" onClick={handleBack}>
                 {i18n.format(t('shared:back'), 'capitalize')}
               </SecondaryButton>
             ) : null}
