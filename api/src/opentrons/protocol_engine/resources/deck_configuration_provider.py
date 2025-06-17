@@ -123,7 +123,7 @@ def get_addressable_area_from_name(
                 y=addressable_area["boundingBox"]["yDimension"],
                 z=addressable_area["boundingBox"]["zDimension"],
             )
-            locating_features_as_parent = addressable_area["locatingFeaturesAsParent"]
+            locating_features_as_parent = addressable_area["features"]
 
             return AddressableArea(
                 area_name=addressable_area["id"],

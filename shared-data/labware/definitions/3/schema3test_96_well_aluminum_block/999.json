@@ -23,7 +23,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "locatingFeaturesAsParent": {},
+  "features": {},
   "locatingFeaturesAsChild": {},
   "extents": {
     "total": {

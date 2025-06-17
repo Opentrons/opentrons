@@ -208,7 +208,7 @@ class ModuleDefinition(BaseModel):
         description="Offsets to use for labware movement using gripper",
     )
 
-    locatingFeaturesAsParent: LocatingFeatures = Field(
+    features: LocatingFeatures = Field(
         ...,
         description="List of explict locating features when this module acts as the parent in a labware stackup",
     )

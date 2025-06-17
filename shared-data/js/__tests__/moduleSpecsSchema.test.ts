@@ -61,10 +61,10 @@ describe('validate all module specs with schema', () => {
     })
 
     // TODO(jh, 05-16-25): After adding all locating features, ensure the default case fails.
-    it(`validates expected locatingFeaturesAsParent for ${filename}`, () => {
+    it(`validates expected features for ${filename}`, () => {
       switch (filename) {
         default:
-          expect(moduleDef.locatingFeaturesAsParent).toEqual({})
+          expect(moduleDef.features).toEqual({})
       }
     })
   })

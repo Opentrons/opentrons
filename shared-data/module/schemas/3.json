@@ -61,7 +61,7 @@
     "model",
     "labwareOffset",
     "cornerOffsetFromSlot",
-    "locatingFeaturesAsParent",
+    "features",
     "dimensions",
     "calibrationPoint",
     "displayName",
@@ -94,9 +94,9 @@
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
-    "locatingFeaturesAsParent": {
+    "features": {
       "type": "object",
-      "description": "Explict locating features when this module acts as the parent in a stackup.",
+      "description": "Locating features when this module is a part of a stackup.",
       "required": [],
       "properties": {}
     },

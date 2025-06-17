@@ -589,7 +589,7 @@ class LabwareDefinition3(BaseModel):
     brand: BrandData
     parameters: Parameters3
     ordering: list[list[str]]
-    locatingFeaturesAsParent: LocatingFeatures
+    features: LocatingFeatures
     locatingFeaturesAsChild: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]

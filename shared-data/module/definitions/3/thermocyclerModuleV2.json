@@ -7,7 +7,7 @@
     "y": 68.8,
     "z": 108.96
   },
-  "locatingFeaturesAsParent": {},
+  "features": {},
   "dimensions": {
     "bareOverallHeight": 108.96,
     "overLabwareHeight": 0.0,
