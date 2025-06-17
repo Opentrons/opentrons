@@ -348,7 +348,7 @@ export function getFailedLabwareQuantity(
   failedCommand: FailedCommandBySource | null,
   runCurrentState: RunCurrentState | undefined
 ): number | null {
-  if (runCurrentState != undefined && failedCommand != null) {
+  if (runCurrentState !== undefined && failedCommand !== null) {
     if ('moduleId' in failedCommand.byRunRecord.params) {
       const flexStacker =
         runCurrentState?.data.flexStackerStates?.[
