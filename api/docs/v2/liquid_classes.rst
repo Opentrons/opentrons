@@ -51,7 +51,7 @@ When you select a liquid class to use in transfers on the the Flex, properties l
 Each Opentrons-verified liquid class is defined by a set of properties: 
 
 .. image:: /opentrons/api/docs/img/lc_icons/submerge_position.png
-    ## TODO: get images working in table. probably don't want the icon and text in different columns.
+    ## TODO: table under construction! 
 
 .. list-table:: 
     :header-rows: 1
@@ -140,7 +140,11 @@ You'll need to add a label, like ``liquid_1``, to liquid classes in your protoco
 Liquid Class Transfers
 =======================
 
-Use the :py:meth:`.InstrumentContext.transfer_with_liquid_class` method to transfer an aqueous, volatile, or viscous liquid defined in your protocol. This method accepts arguments that let you specify your liquid, volume, source and destination wells, tip handling preferences, and trash location. 
+Use the :py:meth:`.InstrumentContext.transfer_with_liquid_class` method to transfer an aqueous, volatile, or viscous liquid defined in a Flex protocol. This method accepts arguments that let you specify your liquid, volume, source and destination wells, tip handling preferences, and trash location. 
+
+Opentrons-verified liquid class definitions are based on Flex pipette and tip combinations. The API will raise an error if you try to perform a liquid class transfer with an OT-2 pipette and tips. 
+
+In the example below, a Flex P50 1-channel pipette will transfer 50 µL of your viscous ``liquid_1`` from each well of the  source plate to each well of the destination plate. A new tip is used for each well transfer, and each tip is dropped in the trash bin loaded in slot A3. 
 
 .. code-block:: python
 
@@ -153,9 +157,8 @@ Use the :py:meth:`.InstrumentContext.transfer_with_liquid_class` method to trans
         trash_location=trash
     )
 
-The Flex P50 1-channel pipette will transfer 50 µL of your viscous ``liquid_1`` from each well of the  source plate to each well of the destination plate. A new tip is used for each well transfer, and each tip is dropped in the trash bin loaded in slot A3. 
 
-The ``glycerol_50`` viscous liquid class definition accounts for all other transfer behavior, like flow rate, whether or not to add an air gap or delay, and submerge and retract speeds. For each aspirate, the pipette: 
+Here, the ``glycerol_50`` viscous liquid class definition accounts for all other transfer behavior, like flow rate, whether or not to add an air gap or delay, and submerge and retract speeds. For each aspirate, the pipette: 
 
 * Moves to the submerge start position of 2 mm above the top of the source well at 4 mm/sec.
 * Submerges into ``liquid_1`` at 4 mm/sec to the aspirate start position of 2 mm above the bottom of the well. 
@@ -229,14 +232,7 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 .. code-block:: python
 
-    # create a new liquid class
-    custom_viscous = protocol_context.define_liquid_class(
-        name="custom_viscous",
-        properties=custom_liquid_class_properties,
-        display_name="Custom Viscous",
-    )
-
-    # add aspirate properties for the pipette, tip rack, and liquid class
+ # add all required properties, like aspirate properties, for the pipette, tip rack, and liquid class
     custom_liquid_class_properties = {
        "p20_single_gen2": {
           "opentrons/opentrons_96_tiprack_20ul/1": {
@@ -245,8 +241,17 @@ You can also create a new liquid class for your Flex protocols. Instead of using
                     "offset": {"x": 1, "y": 2, "z": 3},
                     "position_reference": "well-bottom",
                 }
+    
+    # create a new liquid class
+    custom_viscous = protocol_context.define_liquid_class(
+        name="custom_viscous",
+        properties=custom_liquid_class_properties,
+        display_name="Custom Viscous",
+    )
 
-The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for required properties like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See :ref:`liquid-class-definitions` for a complete list of liquid class properties to include.
-## TODO: and/or link users to github here.  
+
+The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for required properties like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. 
+
+## TODO: link users directly to github at "every required property" and "required properties"
 
 

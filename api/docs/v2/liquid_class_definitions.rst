@@ -8,18 +8,15 @@ Liquid Class Definitions
 
 A *liquid class definition* specifies nearly all transfer behavior a Flex pipette will perform during a :py:meth:`.InstrumentContext.transfer_with_liquid_class`, :py:meth:`.InstrumentContext.distribute_with_liquid_class`, or :py:meth:`InstrumentContext.consolidate_with_liquid_class`. Properties, like aspirate flow rate, submerge speed, or dispense position, are required in every liquid class definition. 
 
-To create your own liquid class from scratch, you'll first need to choose the pipette and tip combination your Flex will use. Then, specify every required property: 
+This section details specific changes to transfer behavior for each Opentrons-verified liquid class. The transfer steps are listed in the order the robot performs them. Advanced settings like mix, pre-wet tip, touch tip, and blowout are automatically disabled in Opentrons-verified liquid class definitions. 
 
-.. list-table:: 
-    :header-rows: 1
+.. note:: 
+    You can customize a liquid class definition for your workflow by:
+    * Customizing individual properties of an Opentrons-verified liquid class definition. 
+    * Creating your own liquid class definition from scratch. 
+  
+  For more information, see :ref:`customizing-liquid-classes`. 
 
-    * - Property
-      - Arguments
-    * - 
- ## TODO: maybe add a table of liquid class properties here, and arguments.. and direct to the schema on github here. Or, direct users to github. Adding here could make this easier for intermediate users. 
-## TODO: give examples of which properties are absolutely required. for example, users don't need to specify optional properties like touch tip and mix that can be disabled. multi-dispense isn't required unless users plan to use distribute with multiple dispenses. 
-
-The rest of this section details specific changes to transfer behavior for each liquid class. The transfer steps are listed in the order the robot performs them. Advanced settings like mix, pre-wet tip, touch tip, and blowout are automatically disabled in Opentrons-verified liquid class definitions. 
 
 To use the tables below, select your liquid class: :ref:`aqueous`, :ref:`viscous`, or :ref:`volatile`. Then, click different tabs to view your pipette and tip combination. 
 
@@ -29,6 +26,7 @@ In a liquid class transfer, flow rates and air gap or push out volumes vary base
 * 200 µL/sec to aspirate 200 µL 
 
 When your aspirate volume falls in between, like 100 µL, a linear interpolation automatically determines the flow rate. 
+
 
 .. _aqueous: 
 

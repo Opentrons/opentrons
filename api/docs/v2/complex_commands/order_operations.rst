@@ -167,7 +167,9 @@ This command will blow out 200 total µL of liquid in the trash. If you need to 
 List of Volumes
 ===============
 
-Complex commands can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. To do this, set the ``volume`` parameter to a list of volumes instead of a single number. The list must be the same length as the number of ``source`` or ``dest`` (or the longer of the two for a basic ``transfer()``), or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
+Basic complex commands like ``transfer()`` can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. Liquid class complex commands, like ``transfer_with_liquid_class()`` only accept a single volume argument, and aspirate or dispense the same amount across wells. 
+
+In a basic complex command, set the ``volume`` parameter to a list of volumes instead of a single number. The list must be the same length as the number of ``source`` or ``dest`` (or the longer of the two for a basic ``transfer()``), or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
 
     pipette.transfer(
         volume=[20, 40, 60],
