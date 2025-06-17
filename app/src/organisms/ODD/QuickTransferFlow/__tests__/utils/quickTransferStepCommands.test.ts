@@ -269,7 +269,7 @@ pipette.transfer_with_liquid_class(
 )`.trimStart()
     )
   })
-  it.only('should generate a consolidate step in py', () => {
+  it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
       stepId: 1,
       commandCreatorFnName: 'consolidate',
@@ -302,7 +302,7 @@ pipette.transfer_with_liquid_class(
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       touchTipAfterAspirateMmFromEdge: null,
-      blowoutLocation: 'trash',
+      blowoutLocation: 'mockTrashBin',
       mixFirstAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
