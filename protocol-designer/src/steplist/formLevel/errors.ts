@@ -1533,15 +1533,16 @@ export const targetSpeedRange = (
 }
 
 const _getIsDispenseTrash = (
-  dispenseLabware: LabwareOrAdditionalEquipmentEntity
+  dispenseLabware: LabwareOrAdditionalEquipmentEntity | null
 ): boolean =>
+  dispenseLabware != null &&
   'name' in dispenseLabware &&
   (dispenseLabware.name === 'trashBin' || dispenseLabware.name === 'wasteChute')
 
 export const aspirateSubmergeSpeedRequired = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { aspirate_submerge_speed, dispense_labware } = fields
+  const { aspirate_submerge_speed, dispense_labware = null } = fields
   const isDispenseTrash = _getIsDispenseTrash(dispense_labware)
   return !aspirate_submerge_speed && !isDispenseTrash
     ? ASPIRATE_SUBMERGE_SPEED_REQUIRED

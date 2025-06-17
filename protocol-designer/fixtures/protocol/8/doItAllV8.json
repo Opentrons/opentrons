@@ -14,7 +14,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.4.4",
+    "version": "8.5.0",
     "data": {
       "_internalAppBuildDate": "Mon, 16 Jun 2025 20:43:09 GMT",
       "pipetteTiprackAssignments": {
