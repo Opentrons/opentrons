@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { AddressableAreaNamesWithFakes, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -32,9 +32,11 @@ interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }

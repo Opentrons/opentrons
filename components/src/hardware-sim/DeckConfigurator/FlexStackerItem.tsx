@@ -30,13 +30,14 @@ interface FlexStackerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   hasWasteChute: boolean
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
-  addressableArea: AddressableAreaNamesWithFakes
 }
 
 export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
@@ -46,7 +47,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
     fixtureLocation,
     cutoutFixtureId,
     hasWasteChute,
-    addressableArea,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -66,7 +67,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
   const offsetVector = getAALocationForCutoutAndFixtureId(
-    addressableArea,
+    addressableAreaId,
     deckDefinition
   )
   const y = ySlotPosition + Y_ADJUSTMENT
@@ -88,7 +89,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }

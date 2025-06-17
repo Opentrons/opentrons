@@ -29,11 +29,12 @@ interface StagingAreaConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
-  addressableArea: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
-  ) => void
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
+    ) => void
   selected?: boolean
 }
 
@@ -47,7 +48,7 @@ export function StagingAreaConfigItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    addressableArea,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -55,7 +56,7 @@ export function StagingAreaConfigItem(
     cutout => cutout.id === fixtureLocation
   )
   const offsetVector = getAALocationForCutoutAndFixtureId(
-    addressableArea,
+    addressableAreaId,
     deckDefinition
   )
   /**
@@ -84,7 +85,7 @@ export function StagingAreaConfigItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }

@@ -17,6 +17,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -26,9 +27,11 @@ interface AbsorbanceReaderItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -43,6 +46,7 @@ export function AbsorbanceReaderItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -77,7 +81,7 @@ export function AbsorbanceReaderItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }

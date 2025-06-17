@@ -17,6 +17,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -26,9 +27,11 @@ interface ThermocyclerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -41,6 +44,7 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -73,7 +77,7 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }
