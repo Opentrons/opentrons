@@ -11,6 +11,7 @@ from hardware_testing.data.csv_report import (
 
 from opentrons.hardware_control.modules import FlexStacker
 
+# TODO Determine number of cycles we actually want to use
 NUM_CYCLES = 10
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:

@@ -62,7 +62,7 @@ async def _main(cfg: TestConfig) -> None:
         report.set_tag(device_sn if device_sn else "UNKNOWN")
         stackers[device_sn] = (report, stacker)
 
-    # # RUN TESTS
+    # RUN TESTS
     try:
         for section, test_run in cfg.tests.items():
             ui.print_title(section.value)
@@ -73,14 +73,6 @@ async def _main(cfg: TestConfig) -> None:
     except Exception as e:
         ui.print_error(f"An error occurred: {e}")
 
-    # try:
-    #     for section, test_run in cfg.tests.items():
-    #         ui.print_title(section.value)
-    #         await test_run(stacker, report, section.value)
-    # except Exception as e:
-    #     ui.print_error(f"An error occurred: {e}")
-
-
     # SAVE REPORT
     ui.print_title("DONE")
     for sn, (report, stacker) in stackers.items():
@@ -88,9 +80,9 @@ async def _main(cfg: TestConfig) -> None:
         report.print_results()
 
     # Restart the robot server
-    # if not cfg.simulate:
-    #     print("Starting the robot server")
-    #     subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
+    if not cfg.simulate:
+        print("Starting the robot server")
+        subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 if __name__ == "__main__":
