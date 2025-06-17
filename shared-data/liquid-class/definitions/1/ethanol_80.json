@@ -1359,7 +1359,7 @@
               "y": 0,
               "z": -0.5
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [5.0, -0.75],
               [10.0, -0.7],
@@ -1602,7 +1602,7 @@
               "y": 0,
               "z": -0.5
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [5.0, -0.5],
               [50.0, -0.2],
@@ -1623,7 +1623,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -1844,7 +1844,7 @@
               "y": 0,
               "z": -1.5
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [10.0, -0.9],
               [100.0, -2.6],
@@ -1865,7 +1865,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
