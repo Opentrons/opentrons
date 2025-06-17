@@ -5,9 +5,7 @@ import without from 'lodash/without'
 import {
   getLabwareDisplayLocation,
   getLoadedLabware,
-  KEYS_BY_COMMAND_TYPE,
 } from '@opentrons/components'
-import { useRunCurrentState } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
@@ -18,7 +16,12 @@ import {
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
+import type {
+  CommandsData,
+  PipetteData,
+  Run,
+  RunCurrentState,
+} from '@opentrons/api-client'
 import type {
   DisplayLocationSlotOnlyParams,
   WellGroup,
@@ -28,7 +31,6 @@ import type {
   DispenseRunTimeCommand,
   Failed,
   FlexStackerRetrieveRunTimeCommand,
-  FlexStackerStoreRunTimeCommand,
   LabwareDefinition,
   LabwareLocation,
   LiquidProbeRunTimeCommand,
@@ -49,6 +51,7 @@ interface UseFailedLabwareUtilsProps {
   failedPipetteInfo: PipetteData | null
   runCommands?: CommandsData
   runRecord?: Run
+  runCurrentState?: RunCurrentState
 }
 
 interface RelevantFailedLabwareLocations {
@@ -100,6 +103,7 @@ export function useFailedLabwareUtils({
   failedPipetteInfo,
   runCommands,
   runRecord,
+  runCurrentState,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
   const errorKind = getErrorKind(failedCommand)
@@ -164,7 +168,10 @@ export function useFailedLabwareUtils({
     errorKind,
   })
 
-  const labwareQuantity = getFailedLabwareQuantity(failedCommand, runRecord)
+  const labwareQuantity = getFailedLabwareQuantity(
+    failedCommand,
+    runCurrentState
+  )
 
   return {
     ...tipSelectionUtils,
@@ -339,10 +346,9 @@ function useTipSelectionUtils(
 
 export function getFailedLabwareQuantity(
   failedCommand: FailedCommandBySource | null,
-  runRecord: Run | undefined
+  runCurrentState: RunCurrentState | undefined
 ): number | null {
-  if (runRecord != undefined && failedCommand != null) {
-    const { data: runCurrentState } = useRunCurrentState(runRecord.data.id)
+  if (runCurrentState != undefined && failedCommand != null) {
     if ('moduleId' in failedCommand.byRunRecord.params) {
       const flexStacker =
         runCurrentState?.data.flexStackerStates?.[
