@@ -65,14 +65,14 @@ def run(protocol: ProtocolContext) -> None:
     trash = protocol.load_trash_bin("A3")
 
 
-    # Dispense based on labware type
+    # Dispense based on labware type. Accounting for 3.3% liquid loss on ethanol 
     dispense_map = {
-        "corning_6_wellplate_16.8ml_flat": 2000,
-        "corning_12_wellplate_6.9ml_flat": 1000,
-        "corning_24_wellplate_3.4ml_flat": 1000,
-        "corning_48_wellplate_1.6ml_flat": 600,
-        "corning_96_wellplate_360ul_flat": 200,
-        "biorad_384_wellplate_50ul": 40,
+        "corning_6_wellplate_16.8ml_flat": 2068.25,
+        "corning_12_wellplate_6.9ml_flat": 1034.13,
+        "corning_24_wellplate_3.4ml_flat": 1034.13,
+        "corning_48_wellplate_1.6ml_flat": 620.476,
+        "corning_96_wellplate_360ul_flat": 206.825,
+        "biorad_384_wellplate_50ul": 41.365,
     }
 
     volume_to_dispense = dispense_map.get(labware_type)
