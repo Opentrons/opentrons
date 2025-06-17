@@ -14,7 +14,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  getPipetteSpecsV2,
   getTipTypeFromTipRackDefinition,
   LOW_VOLUME_PIPETTES,
   TRASH_BIN_ADAPTER_FIXTURE,
