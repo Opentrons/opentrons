@@ -8,6 +8,7 @@ import {
   getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  isFlexPipette,
   LOW_VOLUME_PIPETTES,
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
@@ -352,7 +353,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
-      pipetteName,
+      pipetteName: isFlexPipette(pipetteName)
+        ? getFlexNameConversion(pipetteSpecs)
+        : pipetteName,
       tiprackUri: tipRack,
       aspirateCorrectionVolume: aspirateCorrectionVolumeForSampleAspiration,
       dispenseCorrectionVolume: dispenseCorrectionForTotalDispense,
@@ -365,7 +368,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
-    `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
+    `dest=${
+      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
+    }`,
     //  TODO: fix bug where new_tip api arg does not allow
     //  changeTip: always but PD does
     `new_tip=${formatPyStr(changeTip)}`,
@@ -796,7 +801,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ]
         }
       )
-
       const moveToDispenseLocationCommands =
         // destination is well
         destWell != null
@@ -962,7 +966,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           flowRate: blowoutFlowRateUlSec,
         }),
       ]
-
       let advancedDispenseArgsCommands: CurriedCommandCreator[] = []
       if (
         blowoutLocation == null ||
@@ -998,7 +1001,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ...getAirGapAfterDispenseCommands(false),
           curryWithoutPython(moveToAddressableArea, {
             pipetteId: pipette,
-            fixtureId: blowoutLocation,
+            fixtureId:
+              Object.values(trashBinEntities).length > 0
+                ? Object.values(trashBinEntities)[0].id
+                : Object.values(wasteChuteEntities)[0].id,
             offset: {
               x: 0,
               y: 0,

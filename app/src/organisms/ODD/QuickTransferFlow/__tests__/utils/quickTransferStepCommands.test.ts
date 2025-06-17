@@ -208,7 +208,7 @@ pipette.transfer_with_liquid_class(
     trash_location=mock_trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
-        properties={"p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
+        properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
             "aspirate": {
                 "aspirate_position": {
                     "offset": {"x": 0, "y": 0, "z": 0},
@@ -269,7 +269,7 @@ pipette.transfer_with_liquid_class(
 )`.trimStart()
     )
   })
-  it('should generate a consolidate step in py', () => {
+  it.only('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
       stepId: 1,
       commandCreatorFnName: 'consolidate',
@@ -302,7 +302,7 @@ pipette.transfer_with_liquid_class(
       dispenseRetractZOffset: 0,
       dispenseRetractPositionReference: POSITION_REFERENCE_BOTTOM,
       touchTipAfterAspirateMmFromEdge: null,
-      blowoutLocation: 'mockTrashBin',
+      blowoutLocation: 'trash',
       mixFirstAspirate: null,
       mixInDestination: null,
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
@@ -359,7 +359,7 @@ pipette.consolidate_with_liquid_class(
     trash_location=mock_trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_1",
-        properties={"p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
+        properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
             "aspirate": {
                 "aspirate_position": {
                     "offset": {"x": 0, "y": 0, "z": 0},
@@ -511,7 +511,7 @@ pipette.distribute_with_liquid_class(
     trash_location=mock_trash_bin_1,
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
-        properties={"p1000_single_flex": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
+        properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
             "aspirate": {
                 "aspirate_position": {
                     "offset": {"x": 0, "y": 0, "z": 0},

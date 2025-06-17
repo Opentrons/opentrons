@@ -18,7 +18,7 @@ type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
   args: TransferArgs | ConsolidateArgs | DistributeArgs
-  pipetteName: PipetteName
+  pipetteName: string
   tiprackUri: string
   aspirateCorrectionVolume: number
   dispenseCorrectionVolume: number
