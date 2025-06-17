@@ -469,10 +469,10 @@ def run(ctx: ProtocolContext) -> None:
         ctx, test_pip, reservoirs_dye, volumes, tip_ul
     )
     load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
-    diluent_class = ctx.define_liquid_class("water")
+    diluent_class = ctx.get_liquid_class("water")
     test_class: Optional[LiquidClass] = None
     if str(ctx.params.liquid) != "legacy":  # type: ignore[attr-defined]
-        test_class = ctx.define_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+        test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # PROBE ALL SRC WELLS
     if reservoir_diluent["A1"].current_liquid_volume():
