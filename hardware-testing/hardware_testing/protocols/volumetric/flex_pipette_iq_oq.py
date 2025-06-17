@@ -474,17 +474,6 @@ def run(ctx: ProtocolContext) -> None:
     if str(ctx.params.liquid) != "legacy":  # type: ignore[attr-defined]
         test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
-    # PROBE ALL SRC WELLS
-    if reservoir_diluent["A1"].current_liquid_volume():
-        pip_for_dil.pick_up_tip(diluent_tips)
-        pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
-        pip_for_dil.drop_tip()
-    for ul in volumes:
-        well: Well = dye_well_by_volume[ul]
-        test_pip.pick_up_tip()
-        test_pip.require_liquid_presence(well)
-        test_pip.drop_tip()
-
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
@@ -526,19 +515,32 @@ def run(ctx: ProtocolContext) -> None:
         dil_ul = DYE_READER_IDEAL_UL - ul
         if dil_ul > 0:
             pip_for_dil.pick_up_tip(diluent_tips)
-            dest_columns = [
-                w.parent.columns_by_name()[w.well_name[1:]]
-                for w in dest_wells_by_volume[ul]
-                if "A" in w.well_name  # new column
-            ]
-            src_wells = [reservoir_diluent["A1"]] * len(dest_columns)
+            # FIXME: probing just 1x time means we cannot use >=2 source wells for diluent,
+            #        however probing >=2x times requires LLD support in liquid-classes.
+            pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
+            if pip_for_dil.channels == 96:
+                assert dest_wells_by_volume[ul][0].well_name == "A1"
+                diluent_dest = dest_wells_by_volume[ul][0].parent.wells()
+                diluent_src = reservoir_diluent["A1"]
+            else:
+                diluent_dest = [
+                    w.parent.columns_by_name()[w.well_name[1:]]
+                    for w in dest_wells_by_volume[ul]
+                    if "A" in w.well_name  # new column
+                ]
+                diluent_src = [reservoir_diluent["A1"]] * len(diluent_dest)
             pip_for_dil.transfer_with_liquid_class(
-                diluent_class, dil_ul, src_wells, dest_columns, new_tip="never"
+                diluent_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
             pip_for_dil.drop_tip()
 
-        # TRANSFER DYE TO PLATE
+        # PROBE DYE
         src_well: Well = dye_well_by_volume[ul]
+        test_pip.pick_up_tip()
+        test_pip.require_liquid_presence(src_well)
+        test_pip.drop_tip()
+
+        # TRANSFER DYE TO PLATE
         args = [ul / len(dest_wells), src_well, dest_wells]
         if test_class and len(dest_wells) == 1:
             test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
