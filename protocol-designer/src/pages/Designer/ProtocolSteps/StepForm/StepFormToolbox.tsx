@@ -78,7 +78,6 @@ import {
 } from './utils'
 
 import type { ComponentType } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
 import type {
   FormData,
@@ -295,8 +294,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
   const numStepFormPages = getStepFormNumPages(
     formData.stepType,
-    enableReadOrInitialization != null,
-    robotType
+    enableReadOrInitialization != null
   )
   const isMultiStepToolbox =
     formData.stepType === 'absorbanceReader'
@@ -548,13 +546,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
 const getStepFormNumPages = (
   stepType: StepType,
-  enableReadOrInitialization: boolean,
-  robotType: RobotType
+  enableReadOrInitialization: boolean
 ): number => {
   switch (stepType) {
     case 'mix':
     case 'moveLiquid':
-      return robotType === FLEX_ROBOT_TYPE ? 3 : 2
+      return 3
     case 'thermocycler':
       return 2
     case 'absorbanceReader':
