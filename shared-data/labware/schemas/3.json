@@ -497,7 +497,6 @@
     "ordering",
     "extents",
     "features",
-    "locatingFeaturesAsChild",
     "wells",
     "groups"
   ],
@@ -618,12 +617,6 @@
     "features": {
       "type": "object",
       "description": "Locating features when this labware is a part of a stackup.",
-      "required": [],
-      "properties": {}
-    },
-    "locatingFeaturesAsChild": {
-      "type": "object",
-      "description": "Explict locating features when this labware acts as the child in a stackup.",
       "required": [],
       "properties": {}
     },

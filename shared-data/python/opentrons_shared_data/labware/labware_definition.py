@@ -590,7 +590,6 @@ class LabwareDefinition3(BaseModel):
     parameters: Parameters3
     ordering: list[list[str]]
     features: LocatingFeatures
-    locatingFeaturesAsChild: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]

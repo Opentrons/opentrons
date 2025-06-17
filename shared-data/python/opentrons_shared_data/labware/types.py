@@ -213,7 +213,6 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     parameters: LabwareParameters3
     ordering: list[list[str]]
     features: LocatingFeatures
-    locatingFeaturesAsChild: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[WellGroup]
