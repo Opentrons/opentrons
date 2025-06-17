@@ -5,6 +5,8 @@ import {
   aspirateLabwareRequired,
   aspirateMixTimesRequired,
   aspirateMixVolumeRequired,
+  aspirateRetractSpeedRequired,
+  aspirateSubmergeSpeedRequired,
   aspirateTouchTipMmFromEdgeOutOfRange,
   aspirateTouchTipMmFromEdgeRequired,
   aspirateTouchTipSpeedRequired,
@@ -23,6 +25,8 @@ import {
   dispenseLabwareRequired,
   dispenseMixTimesRequired,
   dispenseMixVolumeRequired,
+  dispenseRetractSpeedRequired,
+  dispenseSubmergeSpeedRequired,
   dispenseTouchTipMmFromEdgeOutOfRange,
   dispenseTouchTipMmFromEdgeRequired,
   dispenseTouchTipSpeedRequired,
@@ -230,7 +234,11 @@ const stepFormHelperMap: {
       blowoutFlowRateRequired,
       transferVolumeMax,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      aspirateSubmergeSpeedRequired,
+      aspirateRetractSpeedRequired,
+      dispenseSubmergeSpeedRequired,
+      dispenseRetractSpeedRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

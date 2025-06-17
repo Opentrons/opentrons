@@ -21,6 +21,7 @@ import {
 } from '../../../../../../components/molecules'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
@@ -79,6 +80,7 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
+  const robotType = useSelector(getRobotType)
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
@@ -261,6 +263,7 @@ export const SecondStepsMoveLiquidTools = ({
               labwareEntities,
               additionalEquipmentEntities,
               liquidHandlingAction: tab,
+              robotType,
             })
           }}
           onClose={() => {
