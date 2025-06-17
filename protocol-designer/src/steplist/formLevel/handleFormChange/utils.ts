@@ -5,6 +5,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
+  NONE_LIQUID_CLASS_NAME,
   OT2_ROBOT_TYPE,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
@@ -1024,7 +1025,7 @@ export const getLiquidClassesValues = (args: {
   }
   const { spec: pipetteSpecs } = pipetteEntity
   const convertedPipetteName = getFlexNameConversion(pipetteEntity.spec)
-  if (liquidClass === 'none' || robotType === OT2_ROBOT_TYPE) {
+  if (liquidClass === NONE_LIQUID_CLASS_NAME || robotType === OT2_ROBOT_TYPE) {
     // OT-2 liquid class selection should always be "none"
     return stepType === 'moveLiquid'
       ? getNoLiquidClassValuesMoveLiquid(
