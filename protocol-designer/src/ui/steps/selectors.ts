@@ -242,7 +242,7 @@ export type MultiselectFieldValues = Record<
   }
 >
 
-const getUniqueValues = (key: string, forms: FormData[]) =>
+const getUniqueValues = (key: string, forms: FormData[]): string[] =>
   Array.from(new Set(forms.map(form => form[key])))
 
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
