@@ -406,7 +406,7 @@ LABWARE_V3_SPECS: List[LabwareV3Spec] = [
         module_parent_to_child_offset=None,
         is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
-        expected_total_offset=Point(x=-50, y=-350, z=-300),
+        expected_total_offset=Point(x=-50, y=1150, z=-300),
     ),
     LabwareV3Spec(
         child_definition=_LABWARE_DEF_V3_WITH_OFFSET,
@@ -414,7 +414,7 @@ LABWARE_V3_SPECS: List[LabwareV3Spec] = [
         module_parent_to_child_offset=None,
         is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
-        expected_total_offset=Point(x=75, y=-400, z=-25),
+        expected_total_offset=Point(x=75, y=1100, z=-25),
     ),
     LabwareV3Spec(
         child_definition=_LABWARE_DEF_V3,
@@ -422,7 +422,7 @@ LABWARE_V3_SPECS: List[LabwareV3Spec] = [
         module_parent_to_child_offset=LabwareOffsetVector(x=100, y=200, z=50),
         is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=50, y=250, z=-250),
+        expected_total_offset=Point(x=50, y=950, z=-250),
     ),
     LabwareV3Spec(
         child_definition=_LABWARE_DEF_V3_CHILD_WITH_STACKING,

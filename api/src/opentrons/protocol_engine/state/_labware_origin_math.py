@@ -293,7 +293,7 @@ def _get_parent_entity_info(
             )
         else:
             back_left = _Point2D(0, 0)
-            front_right = _Point2D(x=x_dim, y=y_dim * -1)
+            front_right = _Point2D(x=x_dim, y=y_dim)
             contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
 
             return _ParentEntityInfo(
@@ -306,7 +306,7 @@ def _get_parent_entity_info(
         back_left = _Point2D(0, 0)
         front_right = _Point2D(
             x=parent_entity.bounding_box.x,
-            y=parent_entity.bounding_box.y * -1,
+            y=parent_entity.bounding_box.y,
         )
         contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
 
@@ -324,7 +324,7 @@ def _get_parent_entity_info(
         back_left = _Point2D(0, 0)
         front_right = _Point2D(
             x=definition_bounding_box.x,
-            y=definition_bounding_box.y * -1,
+            y=definition_bounding_box.y,
         )
         contact_plane = _BoundingBox2D(back_left=back_left, front_right=front_right)
         locating_features_as_parent = parent_entity["locatingFeaturesAsParent"]  # type: ignore[index]
