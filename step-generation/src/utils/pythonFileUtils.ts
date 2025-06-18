@@ -110,7 +110,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace, version } = def
+      const { parameters, namespace } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -172,7 +172,7 @@ export function getLoadLabware(
   const pythonLabware = Object.values(labwareEntities)
     .map(labware => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace, version } = def
+      const { metadata, parameters, namespace } = def
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
