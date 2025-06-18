@@ -167,6 +167,22 @@ export const getToV8_1MigrationMessage = (props: ModalProps): ModalContents => {
   }
 }
 
+export const getToV8_5MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
+  return {
+    title: t('migration_header'),
+
+    body: (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('migrations.toV8_5Migration.body1')}
+        </StyledText>
+      </Flex>
+    ),
+  }
+}
+
 export const getToV3MigrationMessage = (props: ModalProps): ModalContents => {
   const { t } = props
 
@@ -226,7 +242,9 @@ export const getMigrationMessage = (
   ) {
     return getNoBehaviorChangeMessage({ t })
   }
-  if (migrationsRan.includes('8.1.0')) {
+  if (migrationsRan.includes('8.5.0')) {
+    return getToV8_5MigrationMessage({ t })
+  } else if (migrationsRan.includes('8.1.0')) {
     return getToV8_1MigrationMessage({ t })
   } else if (migrationsRan.includes('8.0.0')) {
     return getToV8MigrationMessage({ t })

@@ -44,7 +44,9 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       type={message?.isError ? 'error' : 'info'}
       title={title}
       closeOnOutsideClick
-      onClose={dismissModal}
+      onClose={() => {
+        dispatch(undoLoadFile())
+      }}
       footer={
         showButtons && (
           <Flex
@@ -59,7 +61,7 @@ export function FileUploadMessagesModal(): JSX.Element | null {
             >
               {t('cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={dismissModal}>{t('confirm')}</PrimaryButton>
+            <PrimaryButton onClick={dismissModal}>{t('import')}</PrimaryButton>
           </Flex>
         )
       }

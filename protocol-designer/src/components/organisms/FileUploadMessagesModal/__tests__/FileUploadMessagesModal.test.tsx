@@ -34,6 +34,25 @@ describe('FileUploadMessagesModal', () => {
       'Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.'
     )
   })
+  it('renders modal for a migration to v8.5', () => {
+    vi.mocked(getFileUploadMessages).mockReturnValue({
+      isError: false,
+      messageKey: 'DID_MIGRATE',
+      migrationsRan: ['8.5.0'],
+    })
+    render()
+    screen.getByText(
+      'Your protocol was made in an older version of Protocol Designer'
+    )
+    screen.getByText(
+      'Your protocol will be automatically updated to the latest version. We recommend making a separate copy of your file before importing.'
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Import' }))
+    expect(vi.mocked(dismissFileUploadMessage)).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(vi.mocked(undoLoadFile)).toHaveBeenCalled()
+  })
+
   it('renders modal for a migration', () => {
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: false,
@@ -47,7 +66,7 @@ describe('FileUploadMessagesModal', () => {
     screen.getByText(
       'Your protocol will be automatically updated to the latest version.'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Import' }))
     expect(vi.mocked(dismissFileUploadMessage)).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(vi.mocked(undoLoadFile)).toHaveBeenCalled()

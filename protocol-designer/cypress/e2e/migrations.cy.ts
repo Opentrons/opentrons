@@ -29,20 +29,20 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.5.x, schema 8',
       importTestFile: TestFilePath.DoItAllV3V4,
       expectedTestFile: TestFilePath.DoItAllV3MigratedToV8,
-      migrationModal: 'v8.1',
+      migrationModal: 'v8.5',
     },
     {
       title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.5.x, schema 8',
       importTestFile: TestFilePath.DoItAllV4V4,
       expectedTestFile: TestFilePath.DoItAllV4MigratedToV8,
-      migrationModal: 'v8.1',
+      migrationModal: 'v8.5',
     },
     {
       title:
         'doItAllv7MigratedToV8 (schema 7, PD version 8.0.0) -> should migrate to 8.5.x, schema 8',
       importTestFile: TestFilePath.DoItAllV7,
       expectedTestFile: TestFilePath.DoItAllV7MigratedToV8,
-      migrationModal: 'v8.1',
+      migrationModal: 'v8.5',
     },
     {
       title:
@@ -70,7 +70,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         'thermocycler on Ot2 (schema 7, PD version 7.0.0) -> should migrate to 8.5.x, schema 8',
       importTestFile: TestFilePath.ThermocyclerOnOt2V7,
       expectedTestFile: TestFilePath.ThermocyclerOnOt2V7MigratedToV8,
-      migrationModal: 'v8.1',
+      migrationModal: 'v8.5',
     },
   ]
 
