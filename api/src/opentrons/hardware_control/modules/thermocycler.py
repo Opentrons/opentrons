@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import asyncio
 import logging
 from typing import Callable, Optional, List, Dict, Mapping, Union, cast
@@ -241,24 +242,13 @@ class Thermocycler(mod_abc.AbstractModule):
         """Ensure the lid is closed after close command"""
         switch_status = await self._driver.check_lid_status_for_real_this_time()
         if switch_status != ThermocyclerLidStatus.CLOSED:
-            if retry:
-                self._retry_close_lid()
+            if not retry:
+                await self.open()
+                await self.close(retry = True)
             else:
-                raise ThermocyclerError(
-                    f"Lid status is {switch_status} after close command, expected CLOSED."
+                raise RuntimeError(
+                    f"Lid status is {switch_status} after close command, expected closed."
                 )
-        
-    async def _retry_close_lid(self) -> None:
-        """Retry closing the lid once if it is not closed after the first close command."""
-        try:
-            await self.open()
-            await self.close(retry = True)
-        except ThermocyclerError as e:
-            log.warning(f"Retrying close lid due to error: {e}")
-            await self._ensure_lid_closed()
-        else:
-            log.info("Lid closed successfully on retry.")
-
 
     async def lift_plate(self) -> str:
         """If the lid is open, lift the plate.

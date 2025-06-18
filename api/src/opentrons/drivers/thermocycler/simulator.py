@@ -56,6 +56,10 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     @ensure_yield
     async def get_lid_status(self) -> ThermocyclerLidStatus:
         return self._lid_status
+        
+    @ensure_yield
+    async def check_lid_status_for_real_this_time(self) -> ThermocyclerLidStatus:
+        return self._lid_status
 
     @ensure_yield
     async def get_lid_temperature(self) -> Temperature:
