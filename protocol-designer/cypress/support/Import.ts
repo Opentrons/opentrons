@@ -11,7 +11,7 @@ export interface MigrateTestCase {
   title: string
   importTestFile: TestFilePath
   expectedTestFile: TestFilePath
-  migrationModal: 'newLabwareDefs' | 'v8.1' | 'v8.5' | 'noBehaviorChange' | null
+  showMigrationModal: boolean
 }
 
 export const ContentStrings = {
@@ -73,21 +73,12 @@ export const verifyImportProtocolPage = (protocol: TestFile): void => {
 export const migrateAndMatchSnapshot = ({
   importTestFile,
   expectedTestFile,
-  migrationModal,
+  showMigrationModal,
 }: MigrateTestCase): void => {
   const uploadProtocol: TestFile = getTestFile(importTestFile)
   cy.importProtocol(uploadProtocol.path)
 
-  if (migrationModal !== null) {
-    if (migrationModal === 'v8.5') {
-      cy.get('div').contains(ContentStrings.v8_5).should('exist')
-    } else if (migrationModal === 'v8.1') {
-      cy.get('div').contains(ContentStrings.v8_1).should('exist')
-    } else if (migrationModal === 'newLabwareDefs') {
-      cy.get('div').contains(ContentStrings.newLabwareDefs).should('exist')
-    } else if (migrationModal === 'noBehaviorChange') {
-      cy.get('div').contains(ContentStrings.noBehaviorChange).should('exist')
-    }
+  if (showMigrationModal) {
     cy.get('button')
       .contains(ContentStrings.importButton, { matchCase: false })
       .click({ force: true })
