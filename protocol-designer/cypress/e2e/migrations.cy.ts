@@ -23,7 +23,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 8.5.x, schema 8',
       importTestFile: TestFilePath.Example_1_1_0,
       expectedTestFile: TestFilePath.Example_1_1_0V8,
-      migrationModal: 'newLabwareDefs',
+      migrationModal: 'v8.5',
     },
     {
       title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.5.x, schema 8',
