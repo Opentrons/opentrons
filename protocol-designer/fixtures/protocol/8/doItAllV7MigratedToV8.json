@@ -605,7 +605,7 @@
       },
       "labware": {
         "d95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1": {
-          "displayName": "Opentrons 96 Flat Bottom Adapter",
+          "displayName": "Opentrons 96 Flat Bottom Heater-Shaker Adapter",
           "labwareDefURI": "opentrons/opentrons_96_flat_bottom_adapter/1"
         },
         "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
