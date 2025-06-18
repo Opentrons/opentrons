@@ -2135,6 +2135,7 @@ def test_build_retrieve_labware_move_updates(
         pool_lid_definition=sentinel.pool_lid_definition,
         max_pool_count=3,
         pool_overlap=1,
+        pool_height=0,
         contained_labware_bottom_first=[group],
     )
     decoy.when(

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -23,7 +23,7 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 
@@ -59,8 +59,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
       : availableModules
 
   const isSingleModule = newModules.length === 1
-  const sendIdentifyModule = useSendIdentifyModule()
-  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
+  const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const usbPort = module.usbPort
@@ -76,7 +75,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   useEffect(() => {
     if (isSingleModule) {
       setSelectedModule(newModules[0])
-      sendIdentifyModule(newModules[0], true)
+      sendIdentifyStacker(newModules[0], true)
     }
   }, [isSingleModule])
 
@@ -84,12 +83,12 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
     if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
+      sendIdentifyStacker(selectedModule, false)
     }
-    // blink new module
+    // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
-        sendIdentifyModule(mod, true)
+        sendIdentifyStacker(mod, true)
         setSelectedModule(mod)
         break
       }
@@ -99,30 +98,10 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const handleStartSetup = (module: AttachedModule | null): void => {
     if (module != null) {
       // If this is a Flex Stacker makes sure its installed properly
-      if (
-        module.moduleType === 'flexStackerModuleType' &&
-        !module.data.installDetected
-      ) {
-        sendIdentifyModule(module, true, 'red')
-        setStackerNotInstalled(true)
-        return
-      }
       // Proceed to module setup
       buildFlowForSelectedModule(module)
       setShowLaunchSetup(false)
     }
-  }
-
-  const handleTryAgain = (): void => {
-    if (selectedModule != null) {
-      // Start blinking module, otherwise stop if multiple are available.
-      sendIdentifyModule(selectedModule, isSingleModule)
-      // Clear the selected module
-      if (!isSingleModule) {
-        setSelectedModule(null)
-      }
-    }
-    setStackerNotInstalled(false)
   }
 
   const BUTTON_STYLE = css`
@@ -138,31 +117,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
     }
   `
 
-  if (stackerNotInstalled) {
-    return (
-      <SimpleWizardBody
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('error_stacker_not_installed')}
-        subHeader={
-          <Trans t={t} i18nKey={t('error_stacker_not_installed_message')} />
-        }
-      >
-        {isOnDevice ? (
-          <SmallButton
-            buttonType="primary"
-            onClick={handleTryAgain}
-            buttonText={i18n.format(t('try_again'), 'capitalize')}
-          />
-        ) : (
-          <PrimaryButton onClick={handleTryAgain}>
-            {i18n.format(t('try_again'), 'capitalize')}
-          </PrimaryButton>
-        )}
-      </SimpleWizardBody>
-    )
-  } else if (isSingleModule && selectedModule != null) {
+  if (isSingleModule && selectedModule != null) {
     const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody

@@ -242,6 +242,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -304,7 +305,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number // TODO: this arg doesn't map to anything in transfer_with_liquid_class
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null

@@ -11,12 +11,14 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 
 import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
+import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
+import { CheckStackerInstall } from './CheckStackerInstall'
 import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -70,7 +72,7 @@ export function ModuleWizardFlows(
     }
   }, [])
 
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyStacker = useSendIdentifyStacker()
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
@@ -85,6 +87,8 @@ export function ModuleWizardFlows(
       enabled: wizardFlowBaseProps.attachedModule != null,
     })?.data?.data ?? []
 
+  const doorStatus = useIsDoorOpen(robotName).isDoorOpen
+
   if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
@@ -93,7 +97,7 @@ export function ModuleWizardFlows(
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={() => {
           if (selectedModule != null) {
-            sendIdentifyModule(selectedModule, false)
+            sendIdentifyStacker(selectedModule, false)
           }
           handleCleanUpAndClose()
         }}
@@ -307,6 +311,26 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.CHECK_INSTALLATION_PINS:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <CheckStackerInstall
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            doorOpenStatus={doorStatus}
+            deckConfig={deckConfig}
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>

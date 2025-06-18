@@ -10,6 +10,8 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   mockHeaterShaker,
   mockMagneticModule,
@@ -22,6 +24,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { ModuleCard } from '..'
+import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
@@ -57,6 +60,8 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/resources/devices')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('../../DoorOpenControl/useIsDoorOpen')
+vi.mock('/app/redux/discovery')
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -259,6 +264,14 @@ describe('ModuleCard', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectedRobot,
+      name: props.robotName,
+    })
+    vi.mocked(useIsDoorOpen).mockReturnValue({
+      isDoorOpen: true,
+      moduleDoorLocation: null,
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -402,6 +415,7 @@ describe('ModuleCard', () => {
   })
   it('renders module setup link for no-calibration required modules if firmware update available', () => {
     mockFlexStacker.hasAvailableUpdate = true
+
     render({
       ...props,
       module: mockFlexStacker,

@@ -8,6 +8,7 @@
   "add": "Add",
   "add_fixture_description": "Add this hardware to your deck configuration. It will be referenced during protocol analysis.",
   "add_to_slot": "Add to slot {{slotName}}",
+  "add_to": "Add to {{slotName}}",
   "an_error_occurred_while_updating": "An error occurred while updating your pipette's settings.",
   "an_error_occurred_while_updating_module": "An error occurred while updating your {{moduleName}}. Please try again.",
   "an_error_occurred_while_updating_please_try_again": "An error occurred while updating your pipette's settings. Please try again.",

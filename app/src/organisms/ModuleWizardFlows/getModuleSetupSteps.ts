@@ -20,7 +20,7 @@ export const getModuleSetupSteps = (
       ]
     case FLEX_STACKER_MODULE_TYPE:
       return [
-        // { section: SECTIONS.CHECK_INSTALLATION_PINS},
+        { section: SECTIONS.CHECK_INSTALLATION_PINS },
         { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
         { section: SECTIONS.CLOSE_DOOR },

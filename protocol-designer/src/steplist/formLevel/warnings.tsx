@@ -2,6 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getWellTotalVolume,
+  OT2_PIPETTES,
 } from '@opentrons/shared-data'
 
 import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../constants'
@@ -20,7 +21,6 @@ import type { FormError } from './errors'
  ********************/
 
 export type FormWarningType =
-  | 'BELOW_MIN_AIR_GAP_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'INCOMPATIBLE_ALL_PIPETTE'
@@ -35,14 +35,6 @@ export type FormWarningType =
 export type FormWarning = FormError & {
   type: FormWarningType
 }
-
-const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
-  type: 'BELOW_MIN_AIR_GAP_VOLUME',
-  title: `Air gap volume is below pipette minimum (${min} uL)`,
-  body: 'Pipettes cannot accurately handle volumes below their minimum.',
-  dependentFields: ['disposalVolume_volume', 'pipette'],
-  location: 'form',
-})
 
 const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
@@ -187,40 +179,6 @@ export const minDisposalVolume = (
   return isBelowMin ? belowMinDisposalVolumeWarning(minVolume as number) : null
 }
 
-// both aspirate and dispense air gap volumes have the same minimums
-export const _minAirGapVolume = (
-  checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
-  volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
-) => (fields: HydratedMoveLiquidFormData): FormWarning | null => {
-  const checkboxValue = fields[checkboxField]
-  const volumeValue = fields[volumeField]
-  const { pipette } = fields
-  if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) {
-    return null
-  }
-  const liquidSpecs = pipette.spec.liquids
-  const minVolume =
-    'lowVolumeDefault' in liquidSpecs
-      ? liquidSpecs.lowVolumeDefault.minVolume
-      : liquidSpecs.default.minVolume
-  const isBelowMin = Number(volumeValue) < minVolume
-  return isBelowMin ? belowMinAirGapVolumeWarning(minVolume as number) : null
-}
-
-export const minAspirateAirGapVolume: (
-  fields: HydratedMoveLiquidFormData
-) => FormWarning | null = _minAirGapVolume(
-  'aspirate_airGap_checkbox',
-  'aspirate_airGap_volume'
-)
-
-export const minDispenseAirGapVolume: (
-  fields: HydratedMoveLiquidFormData
-) => FormWarning | null = _minAirGapVolume(
-  'dispense_airGap_checkbox',
-  'dispense_airGap_volume'
-)
-
 export const _lowVolumeTransferWarning = (): FormWarning => ({
   type: 'LOW_VOLUME_TRANSFER',
   title: `Transfer volumes of ${MINIMUM_LIQUID_CLASS_VOLUME} µL or less are incompatible with liquid classes.`,
@@ -294,8 +252,12 @@ export const incompatibleLiquidClass: (
   fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ) => FormWarning | null = formData => {
   const { pipette, tipRack, volume: rawVolume } = formData
+  // don't show warnings for OT-2
+  const isOT2 = Object.values(OT2_PIPETTES).includes(pipette.name)
+  if (isOT2) {
+    return null
+  }
   const liquidClasses = getAllLiquidClassDefs()
-
   const pipetteName = getFlexNameConversion(pipette.spec)
   const volume = Number(rawVolume)
   const path = 'path' in formData ? (formData.path as PathOption) : null

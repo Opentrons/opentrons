@@ -496,6 +496,8 @@
     "parameters",
     "ordering",
     "extents",
+    "locatingFeaturesAsParent",
+    "locatingFeaturesAsChild",
     "wells",
     "groups"
   ],
@@ -612,6 +614,18 @@
           "type": "string"
         }
       }
+    },
+    "locatingFeaturesAsParent": {
+      "type": "object",
+      "description": "Explict locating features when this labware acts as the parent in a stackup.",
+      "required": [],
+      "properties": {}
+    },
+    "locatingFeaturesAsChild": {
+      "type": "object",
+      "description": "Explict locating features when this labware acts as the child in a stackup.",
+      "required": [],
+      "properties": {}
     },
     "extents": {
       "description": "The outer dimensions of the labware.",

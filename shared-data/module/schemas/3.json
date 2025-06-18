@@ -61,6 +61,7 @@
     "model",
     "labwareOffset",
     "cornerOffsetFromSlot",
+    "locatingFeaturesAsParent",
     "dimensions",
     "calibrationPoint",
     "displayName",
@@ -93,6 +94,12 @@
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "locatingFeaturesAsParent": {
+      "type": "object",
+      "description": "Explict locating features when this module acts as the parent in a stackup.",
+      "required": [],
+      "properties": {}
+    },
     "dimensions": {
       "type": "object",
       "required": [
@@ -107,10 +114,22 @@
         "lidHeight": { "type": "number" },
         "xDimension": { "type": "number" },
         "yDimension": { "type": "number" },
-        "footprintXDimension": { "type": "number" },
-        "footprintYDimension": { "type": "number" },
-        "labwareInterfaceXDimension": { "type": "number" },
-        "labwareInterfaceYDimension": { "type": "number" },
+        "footprintXDimension": {
+          "type": "number",
+          "description": "The x dimension of the module's bottom-most plane."
+        },
+        "footprintYDimension": {
+          "type": "number",
+          "description": "The y dimension of the module's bottom-most plane."
+        },
+        "labwareInterfaceXDimension": {
+          "type": "number",
+          "description": "The x dimension of the module's interaction plane (where labware is placed)."
+        },
+        "labwareInterfaceYDimension": {
+          "type": "number",
+          "description": "The y dimension of the module's interaction plane (where labware is placed)."
+        },
         "maxStackerFillHeight": { "type": "number" },
         "maxStackerRetrievableHeight": { "type": "number" }
       }

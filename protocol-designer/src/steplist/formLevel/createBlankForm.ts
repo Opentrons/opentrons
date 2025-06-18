@@ -47,6 +47,7 @@ export function createBlankForm(args: NewFormArgs): FormData {
     stepType: stepType,
     stepName: getStepType(stepType),
     stepDetails: '',
+    stepNumber: 0,
   }
   return { ...baseForm, ...getDefaultsForStepType(stepType) }
 }

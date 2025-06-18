@@ -216,7 +216,7 @@ push-ot3:
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3
-	cd ../ && $(MAKE) -C shared-data push-ot3
+	#cd ../ && $(MAKE) -C shared-data push-ot3
 
 .PHONE: open-dev-app
 open-dev-app:

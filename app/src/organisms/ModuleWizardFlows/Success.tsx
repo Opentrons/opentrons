@@ -18,7 +18,7 @@ import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
+import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardStepProps } from './types'
@@ -48,14 +48,14 @@ export function Success(props: SuccessProps): JSX.Element {
     setSelectedModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyStacker = useSendIdentifyStacker()
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const newModules = useGetNewModules()
 
   const handleOnClick = (restart: boolean): void => {
     if (restart) {
       setSelectedModule(null)
-      sendIdentifyModule(attachedModule, false)
+      sendIdentifyStacker(attachedModule, false)
       restartSetup()
       return
     }

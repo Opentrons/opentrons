@@ -36,7 +36,11 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
     AbsorbanceReaderMeasureMode,
 )
 from opentrons.types import DeckSlotName, MountType, StagingSlotName
-from .update_types import AbsorbanceReaderStateUpdate, FlexStackerStateUpdate
+from .update_types import (
+    AbsorbanceReaderStateUpdate,
+    FlexStackerStateUpdate,
+    LoadModuleUpdate,
+)
 from ..errors import ModuleNotConnectedError, AreaNotInDeckConfigurationError
 from ..resources import deck_configuration_provider
 
@@ -63,7 +67,6 @@ from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
     Command,
-    LoadModuleResult,
     heater_shaker,
     temperature_module,
     thermocycler,
@@ -237,8 +240,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif isinstance(action, AddModuleAction):
             self._add_module_substate(
                 module_id=action.module_id,
-                serial_number=action.serial_number,
                 definition=action.definition,
+                serial_number=action.serial_number,
                 slot_name=None,
                 requested_model=None,
                 module_live_data=action.module_live_data,
@@ -250,17 +253,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         # todo(mm, 2024-11-04): Delete this function. Port these isinstance()
         # checks to the update_types.StateUpdate mechanism.
-
-        if isinstance(command.result, LoadModuleResult):
-            slot_name = command.params.location.slotName
-            self._add_module_substate(
-                module_id=command.result.moduleId,
-                serial_number=command.result.serialNumber,
-                definition=command.result.definition,
-                slot_name=slot_name,
-                requested_model=command.params.model,
-                module_live_data=None,
-            )
 
         if isinstance(command.result, CalibrateModuleResult):
             self._update_module_calibration(
@@ -305,6 +297,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._handle_thermocycler_module_commands(command)
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_module != update_types.NO_CHANGE:
+            self._handle_load_module(state_update.loaded_module)
+
         if state_update.absorbance_reader_state_update != update_types.NO_CHANGE:
             self._handle_absorbance_reader_commands(
                 state_update.absorbance_reader_state_update
@@ -391,6 +386,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 contained_labware_bottom_first=[],
                 max_pool_count=0,
                 pool_overlap=0,
+                pool_height=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -578,6 +574,16 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=block_temperature,
                 target_lid_temperature=lid_temperature,
             )
+
+    def _handle_load_module(self, load_module_state_update: LoadModuleUpdate) -> None:
+        self._add_module_substate(
+            module_id=load_module_state_update.module_id,
+            definition=load_module_state_update.definition,
+            serial_number=load_module_state_update.serial_number,
+            slot_name=load_module_state_update.slot_name,
+            requested_model=load_module_state_update.requested_model,
+            module_live_data=None,
+        )
 
     def _handle_absorbance_reader_commands(
         self, absorbance_reader_state_update: AbsorbanceReaderStateUpdate
@@ -1481,3 +1487,17 @@ class ModuleView:
         """Get the max stored labware in this stacker configuration."""
         substate = self.get_flex_stacker_substate(module_id)
         return substate.get_max_pool_count()
+
+    def validate_stacker_overlap_offset(
+        self,
+        module_id: str,
+        overlap_offset: float,
+    ) -> None:
+        """The overlap offset provided should match the stacker configuration."""
+        substate = self.get_flex_stacker_substate(module_id)
+        configured = substate.get_pool_overlap()
+        if not math.isclose(overlap_offset, configured, rel_tol=1e-9):
+            raise ValueError(
+                f"Provided overlap offset {overlap_offset} does not match "
+                f"configured {configured}."
+            )

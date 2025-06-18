@@ -787,11 +787,14 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
+        "locatingFeaturesAsParent": {},
         "dimensions": {
             "bareOverallHeight": 84,
             "overLabwareHeight": 0,
             "xDimension": 123,
             "yDimension": 321,
+            "labwareInterfaceXDimension": 123,
+            "labwareInterfaceYDimension": 321,
         },
         "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
         "config": {},
@@ -1145,9 +1148,9 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
 
 
 @pytest.fixture
-def custom_pip_n_tip_transfer_properties_dict() -> Dict[
-    str, Dict[str, TransferPropertiesDict]
-]:
+def custom_pip_n_tip_transfer_properties_dict() -> (
+    Dict[str, Dict[str, TransferPropertiesDict]]
+):
     """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
     return {
         "a_custom_pipette_type": {

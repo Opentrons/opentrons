@@ -1,11 +1,9 @@
 import { useSelector } from 'react-redux'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { useAssignLiquidClass, useSupportedLiquidClassOptions } from './hooks'
+import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 
@@ -32,7 +30,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     orderedLiquidClassOptions,
     formData
   )
-  const robotType = useSelector(getRobotType)
 
   const renderStepComponent = (): JSX.Element => {
     switch (toolboxStep) {
@@ -46,7 +43,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
       case 1:
         return (
           <>
-            {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
+            {enableLiquidClasses ? (
               <LiquidClassesStepTools
                 propsForFields={propsForFields}
                 formData={formData}

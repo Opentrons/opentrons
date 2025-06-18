@@ -142,6 +142,7 @@ def test_set_stored_labware_all_elements(
         adapter_namespace="adapter-namespace",
         adapter_version=2,
         count=5,
+        stacking_offset_z=2.0,
     )
     decoy.verify(
         mock_engine_client.execute_command(
@@ -161,6 +162,7 @@ def test_set_stored_labware_all_elements(
                     namespace="adapter-namespace-verified",
                     version=20,
                 ),
+                poolOverlapOverride=2.0,
             )
         )
     )
@@ -222,13 +224,44 @@ def test_get_current_storable_labware_from_empty_list(subject: FlexStackerCore) 
     assert subject.get_current_storable_labware_from_list([]) == []
 
 
-def test_get_max_storable_labware_from_list_primary_only(
+@pytest.mark.parametrize("overlap_override", [None, sentinel.override_value])
+def test_get_max_storable_labware_from_list_configured(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: FlexStackerCore,
+    overlap_override: float | None,
+) -> None:
+    """It should use the substate's max pool count."""
+    cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
+    decoy.when(
+        mock_engine_client.state.modules.stacker_max_pool_count("1234")
+    ).then_return(3)
+    assert (
+        subject.get_max_storable_labware_from_list(cores, overlap_override) == cores[:3]
+    )
+    # If an overlap override is specified, it should be passed to the engine to make
+    # sure the value matches the substate's value
+    decoy.verify(
+        mock_engine_client.state.modules.validate_stacker_overlap_offset(
+            "1234", sentinel.override_value
+        ),
+        times=1 if overlap_override is not None else 0,
+    )
+
+
+def test_get_max_storable_labware_from_list_unconfigured_primary_only(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
     subject: FlexStackerCore,
 ) -> None:
     """It should marshal labware and ask the engine."""
+    # the stacker has not been configured, so it should return None
+    decoy.when(
+        mock_engine_client.state.modules.stacker_max_pool_count("1234")
+    ).then_return(None)
+
     cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     decoy.when(mock_protocol_core.get_labware_location(cores[0])).then_return(OFF_DECK)
     decoy.when(mock_protocol_core.get_labware_on_labware(cores[0])).then_return(None)
@@ -237,11 +270,18 @@ def test_get_max_storable_labware_from_list_primary_only(
     decoy.when(cores[0].get_engine_definition()).then_return(primary_def)
     decoy.when(primary_def.parameters.loadName).then_return("mock-load-name")
     decoy.when(
+        mock_engine_client.state.labware.stacker_labware_pool_to_ordered_list(
+            primary_labware_definition=primary_def,
+            lid_labware_definition=None,
+            adapter_labware_definition=None,
+        )
+    ).then_return([primary_def])
+    decoy.when(
         mock_engine_client.state.geometry.get_height_of_labware_stack([primary_def])
     ).then_return(10)
     decoy.when(
-        mock_engine_client.state.labware.get_labware_overlap_offsets(
-            primary_def, "mock-load-name"
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
+            [primary_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=2))
     decoy.when(
@@ -250,13 +290,18 @@ def test_get_max_storable_labware_from_list_primary_only(
     assert subject.get_max_storable_labware_from_list(cores) == cores[:3]
 
 
-def test_get_max_storable_labware_from_list_no_lid(
+def test_get_max_storable_labware_from_list_unconfigured_no_lid(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
     subject: FlexStackerCore,
 ) -> None:
     """It should marshal labware and ask the engine."""
+    # the stacker has not been configured, so it should return None
+    decoy.when(
+        mock_engine_client.state.modules.stacker_max_pool_count("1234")
+    ).then_return(None)
+
     primary_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     adapter_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     decoy.when(mock_protocol_core.get_labware_location(primary_cores[0])).then_return(
@@ -274,13 +319,20 @@ def test_get_max_storable_labware_from_list_no_lid(
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_def)
     decoy.when(adapter_def.parameters.loadName).then_return("mock-adapter-name")
     decoy.when(
+        mock_engine_client.state.labware.stacker_labware_pool_to_ordered_list(
+            primary_labware_definition=primary_def,
+            adapter_labware_definition=adapter_def,
+            lid_labware_definition=None,
+        )
+    ).then_return([primary_def, adapter_def])
+    decoy.when(
         mock_engine_client.state.geometry.get_height_of_labware_stack(
-            [adapter_def, primary_def]
+            [primary_def, adapter_def]
         )
     ).then_return(16)
     decoy.when(
-        mock_engine_client.state.labware.get_labware_overlap_offsets(
-            primary_def, "mock-adapter-name"
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
+            [primary_def, adapter_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=3.0))
     decoy.when(
@@ -293,13 +345,18 @@ def test_get_max_storable_labware_from_list_no_lid(
     )
 
 
-def test_get_max_storable_labware_from_list_no_adapter(
+def test_get_max_storable_labware_from_list_unconfigured_no_adapter(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
     subject: FlexStackerCore,
 ) -> None:
     """It should marshal labware and ask the engine."""
+    # the stacker has not been configured, so it should return None
+    decoy.when(
+        mock_engine_client.state.modules.stacker_max_pool_count("1234")
+    ).then_return(None)
+
     primary_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     lid_cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
     decoy.when(mock_protocol_core.get_labware_location(primary_cores[0])).then_return(
@@ -317,13 +374,20 @@ def test_get_max_storable_labware_from_list_no_adapter(
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_def)
     decoy.when(primary_def.parameters.loadName).then_return("mock-primary-name")
     decoy.when(
+        mock_engine_client.state.labware.stacker_labware_pool_to_ordered_list(
+            primary_labware_definition=primary_def,
+            lid_labware_definition=lid_def,
+            adapter_labware_definition=None,
+        )
+    ).then_return([lid_def, primary_def])
+    decoy.when(
         mock_engine_client.state.geometry.get_height_of_labware_stack(
-            [primary_def, lid_def]
+            [lid_def, primary_def]
         )
     ).then_return(11)
     decoy.when(
-        mock_engine_client.state.labware.get_labware_overlap_offsets(
-            lid_def, "mock-primary-name"
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
+            [lid_def, primary_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=1.0))
     decoy.when(
@@ -336,7 +400,7 @@ def test_get_max_storable_labware_from_list_no_adapter(
     )
 
 
-def test_get_max_storable_labware_from_list_full_group(
+def test_get_max_storable_labware_from_list_unconfigured_full_group(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
@@ -364,13 +428,20 @@ def test_get_max_storable_labware_from_list_full_group(
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_def)
     decoy.when(adapter_def.parameters.loadName).then_return("mock-adapter-name")
     decoy.when(
+        mock_engine_client.state.labware.stacker_labware_pool_to_ordered_list(
+            primary_labware_definition=primary_def,
+            lid_labware_definition=lid_def,
+            adapter_labware_definition=adapter_def,
+        )
+    ).then_return([lid_def, primary_def, adapter_def])
+    decoy.when(
         mock_engine_client.state.geometry.get_height_of_labware_stack(
-            [adapter_def, primary_def, lid_def]
+            [lid_def, primary_def, adapter_def]
         )
     ).then_return(20)
     decoy.when(
-        mock_engine_client.state.labware.get_labware_overlap_offsets(
-            lid_def, "mock-adapter-name"
+        mock_engine_client.state.labware.get_stacker_labware_overlap_offset(
+            [lid_def, primary_def, adapter_def]
         )
     ).then_return(OverlapOffset(x=0, y=0, z=2))
     decoy.when(
@@ -381,7 +452,7 @@ def test_get_max_storable_labware_from_list_full_group(
     )
 
 
-def test_get_current_storable_labware_from_list_primary_only(
+def test_get_current_storable_labware_from_list_primary_happypath(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_protocol_core: ProtocolCore,
@@ -389,28 +460,13 @@ def test_get_current_storable_labware_from_list_primary_only(
 ) -> None:
     """It should marshal labware and ask the engine."""
     cores = [decoy.mock(cls=LabwareCore) for _ in range(5)]
-    decoy.when(mock_protocol_core.get_labware_location(cores[0])).then_return(OFF_DECK)
-    decoy.when(mock_protocol_core.get_labware_on_labware(cores[0])).then_return(None)
-    decoy.when(cores[0].labware_id).then_return("core-0")
-    primary_def = decoy.mock(cls=LabwareDefinition2)
-    decoy.when(cores[0].get_engine_definition()).then_return(primary_def)
-    decoy.when(primary_def.parameters.loadName).then_return("mock-load-name")
     decoy.when(
-        mock_engine_client.state.geometry.get_height_of_labware_stack([primary_def])
-    ).then_return(10)
-    decoy.when(
-        mock_engine_client.state.labware.get_labware_overlap_offsets(
-            primary_def, "mock-load-name"
-        )
-    ).then_return(OverlapOffset(x=0, y=0, z=2))
-    decoy.when(
-        mock_engine_client.state.modules.stacker_max_pool_count_by_height("1234", 10, 2)
-    ).then_return(3)
-
+        mock_engine_client.state.modules.stacker_max_pool_count("1234")
+    ).then_return(5)
     decoy.when(
         mock_engine_client.state.modules.stacker_contained_labware("1234")
     ).then_return([sentinel.lw1, sentinel.lw2])
-    assert subject.get_current_storable_labware_from_list(cores) == cores[:1]
+    assert subject.get_current_storable_labware_from_list(cores) == cores[:3]
 
 
 def test_get_current_storable_labware_happypath(
@@ -471,7 +527,7 @@ def test_set_stored_labware_items_happypath_primary_only(
         decoy.when(primary.labware_id).then_return(f"primary-{idx}")
     primary_definition = _prime_definition(decoy, "primary")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -517,7 +573,7 @@ def test_set_stored_labware_items_happypath_no_adapter(
     lid_definition = _prime_definition(decoy, "lid")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -565,7 +621,7 @@ def test_set_stored_labware_items_happypath_no_lid(
     adapter_definition = _prime_definition(decoy, "adapter")
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -621,7 +677,7 @@ def test_set_stored_labware_items_happypath_all_elements(
     decoy.when(primary_cores[0].get_engine_definition()).then_return(primary_definition)
     decoy.when(adapter_cores[0].get_engine_definition()).then_return(adapter_definition)
     decoy.when(lid_cores[0].get_engine_definition()).then_return(lid_definition)
-    subject.set_stored_labware_items(primary_cores)
+    subject.set_stored_labware_items(primary_cores, None)
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.flex_stacker.SetStoredLabwareParams(
@@ -658,7 +714,7 @@ def test_set_stored_items_labware_fails_if_empty(
 ) -> None:
     """It should fail if given an empty list."""
     with pytest.raises(CommandPreconditionViolated):
-        subject.set_stored_labware_items([])
+        subject.set_stored_labware_items([], None)
 
 
 def test_fill_items_happypath(

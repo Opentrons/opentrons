@@ -44,6 +44,7 @@ _unzipdir="${_distpath}-unzip"
 
 cleanup () {
     cd /
+    pip3 config --global set install.root /var/user-packages
     rm -f "${_distpath:?}"
     unlink "${_me:?}"
     mount -o remount,ro /
@@ -52,5 +53,6 @@ cleanup () {
 trap cleanup EXIT
 
 mount -o remount,rw /
-pip3 install --no-deps --upgrade --force-reinstall -t "${_targetpath}" "${_distpath}"
+pip3 config --global unset install.root
+pip3 install --no-deps --upgrade --ignore-installed -t "${_targetpath}" "${_distpath}"
 exit 0

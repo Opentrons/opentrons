@@ -19,8 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
+  getLabwareViewBox,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
@@ -90,10 +89,7 @@ export const SlotDetailModal = (
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
-  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
-    labwareDefinition
-  )
-  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
 
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -128,6 +124,7 @@ export const SlotDetailModal = (
   const labwareRender = (
     <LabwareRender
       definition={labwareDefinition}
+      positioningMode="passThrough"
       wellFill={wellFill}
       wellLabelOption="SHOW_LABEL_INSIDE"
       highlightedWells={
@@ -229,7 +226,7 @@ export const SlotDetailModal = (
               ) : null}
             </Flex>
             <LabwareThumbnail
-              viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
+              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
               width={
                 selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'
               }

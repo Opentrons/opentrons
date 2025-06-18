@@ -6,7 +6,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "corning_96_wellplate_360ul_lid",
+    "displayName": "Corning 96 Wellplate 360ul Lid",
     "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -51,35 +51,10 @@
       "y": 0,
       "z": 8.193
     },
-    "ibidi_96_square_well_plate_300ul": {
-      "x": 0,
-      "y": 0,
-      "z": 8.75
-    },
     "corning_96_wellplate_360ul_flat": {
       "x": 0,
       "y": 0,
       "z": 6.5
-    },
-    "armadillo_96_wellplate_200ul_pcr_full_skirt": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "axygen_96_wellplate_500ul": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "opentrons_96_wellplate_200ul_pcr_full_skirt": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "biorad_96_wellplate_200ul_pcr": {
-      "x": 0,
-      "y": 0,
-      "z": 8.08
     },
     "opentrons_flex_deck_riser": {
       "x": 0,
@@ -100,11 +75,11 @@
       "pickUpOffset": {
         "x": 0,
         "y": 0,
-        "z": 1.5
+        "z": 0
       },
       "dropOffset": {
         "x": 0,
-        "y": 0.52,
+        "y": 0,
         "z": -6
       }
     },

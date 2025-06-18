@@ -20,7 +20,6 @@ import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
   LabwareDefinition2,
-  LiquidV2Mixin,
   LoadLabwareCreateCommand,
   PipetteV2Specs,
   ProtocolFile,
@@ -44,13 +43,7 @@ const getMigratedBlowoutFlowRate = (
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const {
-    designerApplication,
-    commands,
-    labwareDefinitions,
-    robot,
-    liquids,
-  } = appData
+  const { designerApplication, commands, labwareDefinitions, robot } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
@@ -302,19 +295,6 @@ export const migrateFile = (
     {}
   )
 
-  const migratedLiquidsWithLiquidClass = Object.entries(liquids).reduce<
-    LiquidV2Mixin['liquids']
-  >((acc, [liquidId, liquid]) => {
-    acc[liquidId] = {
-      ...liquid,
-      liquidClass: null,
-    }
-    return acc
-  }, {})
-  const liquidV2Mixin: LiquidV2Mixin = {
-    liquidSchemaId: 'opentronsLiquidSchemaV2',
-    liquids: migratedLiquidsWithLiquidClass,
-  }
   return {
     ...appData,
     metadata: {
@@ -333,6 +313,5 @@ export const migrateFile = (
         },
       },
     },
-    ...liquidV2Mixin,
   }
 }

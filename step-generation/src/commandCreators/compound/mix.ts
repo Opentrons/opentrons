@@ -1,7 +1,7 @@
 import flatMap from 'lodash/flatMap'
 
 import {
-  getCorrectionVolume,
+  getByVolumeValue,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
   WELL_ORIGIN_BOTTOM,
@@ -25,6 +25,7 @@ import {
   delay,
   dispenseInPlace,
   moveToWell,
+  prepareToAspirate,
   touchTip,
 } from '../atomic'
 import { replaceTip } from './replaceTip'
@@ -128,6 +129,7 @@ export const mixInPlaceUtil = (args: {
   invariantContext: InvariantContext
   liquidClass: string | null
   tiprack: string
+  generatePython: boolean
   moveToWellParams?: MoveToWellParams
 }): CurriedCommandCreator[] => {
   const {
@@ -143,6 +145,7 @@ export const mixInPlaceUtil = (args: {
     liquidClass,
     tiprack,
     moveToWellParams,
+    generatePython,
   } = args
 
   const pythonCommandCreator = makePythonCommandCreator({
@@ -169,20 +172,26 @@ export const mixInPlaceUtil = (args: {
 
   const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
 
-  const correctionVolumeAspirate = getCorrectionVolume({
-    liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: tiprack,
-    targetVolume: volume,
-    liquidHandlingAction: 'aspirate',
-  })
-  const correctionVolumeDispense = getCorrectionVolume({
-    liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: tiprack,
-    targetVolume: volume,
-    liquidHandlingAction: 'singleDispense',
-  })
+  const correctionVolumeAspirate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tiprack,
+      targetVolume: volume,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
+  const correctionVolumeDispense =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tiprack,
+      targetVolume: volume,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
 
   const moveToWellCommands: CurriedCommandCreator[] =
     moveToWellParams != null
@@ -227,7 +236,7 @@ export const mixInPlaceUtil = (args: {
       ]
     )
   }
-  return [...commandCreators, pythonCommandCreator]
+  return [...commandCreators, ...(generatePython ? [pythonCommandCreator] : [])]
 }
 
 export const mix: CommandCreator<MixArgs> = (
@@ -262,6 +271,7 @@ export const mix: CommandCreator<MixArgs> = (
     xOffset,
     yOffset,
     finalPushOut,
+    nozzles,
   } = data
 
   const aspirateDelaySeconds = data.aspirateDelaySeconds ?? 0
@@ -272,8 +282,8 @@ export const mix: CommandCreator<MixArgs> = (
 
   // Errors
   if (
-    !prevRobotState.pipettes[pipette] ||
-    !invariantContext.pipetteEntities[pipette]
+    prevRobotState.pipettes[pipette] == null ||
+    invariantContext.pipetteEntities[pipette] == null
   ) {
     // bail out before doing anything else
     return {
@@ -285,7 +295,7 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  if (!prevRobotState.labware[labware]) {
+  if (prevRobotState.labware[labware] == null) {
     return {
       errors: [
         errorCreators.labwareDoesNotExist({
@@ -341,13 +351,14 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
-  const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+  const shouldConfigureForVolume = LOW_VOLUME_PIPETTES.includes(
     invariantContext.pipetteEntities[pipette].name
   )
+  const configureForVolumeCommand: CurriedCommandCreator[] = shouldConfigureForVolume
     ? [
         curryCommandCreator(configureForVolume, {
           pipetteId: pipette,
-          volume: volume,
+          volume,
         }),
       ]
     : []
@@ -363,9 +374,22 @@ export const mix: CommandCreator<MixArgs> = (
             pipette,
             dropTipLocation,
             tipRack,
+            ...(nozzles != null ? { nozzles } : {}),
+            isFromMixCommand: true,
           }),
         ]
       }
+
+      // need to prepare to aspirate if configuring for volume or have previously blown out (after the first well)
+      const prepareToAspirateCommand: CurriedCommandCreator[] =
+        shouldConfigureForVolume ||
+        (data.blowoutLocation != null && wellIndex > 0)
+          ? [
+              curryCommandCreator(prepareToAspirate, {
+                pipetteId: pipette,
+              }),
+            ]
+          : []
 
       const touchTipCommands = data.touchTip
         ? [
@@ -388,6 +412,17 @@ export const mix: CommandCreator<MixArgs> = (
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
       })
+      const trashLikeEntityIds = [
+        ...Object.keys(invariantContext.wasteChuteEntities),
+        ...Object.keys(invariantContext.trashBinEntities),
+      ]
+      const isBlowoutLocationTrashLikeEntity = trashLikeEntityIds.some(
+        id => id === data.blowoutLocation
+      )
+      const advancedDispenseCommands = isBlowoutLocationTrashLikeEntity
+        ? [...touchTipCommands, ...blowoutCommand]
+        : [...blowoutCommand, ...touchTipCommands]
+
       const mixCommands = mixInPlaceUtil({
         pipette,
         volume,
@@ -413,13 +448,14 @@ export const mix: CommandCreator<MixArgs> = (
             },
           },
         },
+        generatePython: true,
       })
       return [
         ...tipCommands,
         ...configureForVolumeCommand,
+        ...prepareToAspirateCommand,
         ...mixCommands,
-        ...blowoutCommand,
-        ...touchTipCommands,
+        ...advancedDispenseCommands,
       ]
     }
   )

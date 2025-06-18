@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
   getLabwareDefIsStandard,
@@ -8,6 +9,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { getPythonLiquidClassName } from './liquidClassUtils'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
@@ -32,13 +34,10 @@ import type {
 } from '../types'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+export const PD_APPLICATION_VERSION = '8.5.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
-  return [
-    'import json',
-    'from contextlib import nullcontext as pd_step',
-    'from opentrons import protocol_api, types',
-  ].join('\n')
+  return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
@@ -307,6 +306,28 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
+export function getLoadLiquidClasses(
+  allUniqueLiquidClassesFromForms: string[]
+): string {
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const pythonLoadLiquidClasses = allUniqueLiquidClassesFromForms
+    .map(liquidClass => {
+      if (liquidClass == null) {
+        return ''
+      }
+      return `${getPythonLiquidClassName(
+        liquidClass
+      )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
+        allLiquidClassDefs[liquidClass].liquidClassName
+      )})`
+    })
+    .join('\n')
+
+  return allUniqueLiquidClassesFromForms.length > 0
+    ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
+    : ''
+}
+
 export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {
   const pythonLoadTrashBins = Object.values(trashBinEntities)
     ?.map(trashBin => {
@@ -351,7 +372,8 @@ export function pythonDefRun(
   robotStateTimeline: Timeline,
   liquidsByLabwareId: LabwareLiquidState,
   labwareNicknamesById: Record<string, string>,
-  robotType: RobotType
+  robotType: RobotType,
+  allUniqueLiquidClassesFromForms: string[]
 ): string {
   const {
     moduleEntities,
@@ -380,6 +402,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
+    getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

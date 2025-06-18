@@ -10,6 +10,7 @@ const getRobotInitialState = (): any => {
 }
 
 const mockPipette = 'mockPipette'
+const mockTiprack = 'mockTiprack'
 const invariantContext: any = {
   pipetteEntities: {
     [mockPipette]: {
@@ -17,6 +18,11 @@ const invariantContext: any = {
       id: mockPipette,
       pythonName: 'mock_pipette',
       spec: fixtureP100096V2Specs,
+    },
+  },
+  labwareEntities: {
+    [mockTiprack]: {
+      pythonName: 'mock_tiprack',
     },
   },
 }
@@ -31,6 +37,7 @@ describe('configureNozzleLayout', () => {
           style: ALL,
         },
         pipetteId: mockPipette,
+        tiprackId: mockTiprack,
       },
       invariantContext,
       robotInitialState
@@ -47,7 +54,11 @@ describe('configureNozzleLayout', () => {
       },
     ])
     expect(res.python).toBe(
-      'mock_pipette.configure_nozzle_layout(protocol_api.ALL)'
+      `
+mock_pipette.configure_nozzle_layout(
+    protocol_api.ALL,
+    tip_racks=[mock_tiprack],
+)`.trimStart()
     )
   })
   it('should call configureNozzleLayout with correct params for column tip', () => {
@@ -58,6 +69,7 @@ describe('configureNozzleLayout', () => {
           style: COLUMN,
         },
         pipetteId: mockPipette,
+        tiprackId: mockTiprack,
       },
       invariantContext,
       robotInitialState
@@ -74,7 +86,12 @@ describe('configureNozzleLayout', () => {
       },
     ])
     expect(res.python).toBe(
-      'mock_pipette.configure_nozzle_layout(protocol_api.COLUMN, start="A12")'
+      `
+mock_pipette.configure_nozzle_layout(
+    protocol_api.COLUMN,
+    start="A12",
+    tip_racks=[mock_tiprack],
+)`.trimStart()
     )
   })
 })
