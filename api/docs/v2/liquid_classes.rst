@@ -50,52 +50,97 @@ When you select a liquid class to use in transfers on the the Flex, properties l
 
 Each Opentrons-verified liquid class is defined by a set of properties: 
 
-.. image:: /opentrons/api/docs/img/lc_icons/submerge_position.png
-    ## TODO: table under construction! 
+.. figure:: ../img/lc_icons/submerge_position.png
+    :name: Submerge position
+    :scale: 35%
+    :align: left
 
-.. list-table:: 
-    :header-rows: 1
+.. figure:: ../img/lc_icons/submerge_speed.png
+    :name: Submerge speed
+    :scale: 35%
+    :align: right
+    
+    The pipette begins at this position above the liquid and submerges into the liquid at this speed.
 
-    * -  
-      - Property
-      - Description
-    * - *submerge position, speed icons*
-      - Submerge position, speed 
-      - 
-        * The pipette begins at this position above the liquid, before submerging. 
-        * The pipette submerges into the liquid at this speed. 
-    * - *delay icon*
-      - Delay
-      - The pipette delays a specified amount of time: 
-        * before submerging into or retracting from liquid  
-        * before or after an aspirate or dispense
-        * after a push out. 
-    * - *mix icon*
-      - Mix
-      - The pipette mixes liquid inside the well before an aspirate or after a dispense.
-    * - *pre-wet tip icon*
-      - Pre-wet tip
-      - The pipette pre-wets the attached tip before aspirating liquid.
-    * - *flow rate icon*
-      - Flow rate*
-      - The pipette aspirates or dispenses liquid at this speed. 
-    * - *rectract position and speed icons*
-      - Retract position, speed
-      - 
-        * The pipette retract from the liquid and moves to this position. 
-        * The pipette retracts from the liquid at this speed. 
-    * - *push out icon*
-      - Push out
-      - The pipette dispenses a small amount of air to ensure all liquid leaves the tip. 
-    * - *touch tip icon*
-      - Touch tip
-      - The pipette touches the attached tip to the sides of a well to remove droplets from the pipette. 
-    * - *air gap icon*
-      - Air gap
-      - The pipette aspirates a small amount of air after an aspirate or dispense.
-    * - *blowout icon*
-      - Blowout
-      - The pipette dispenses a larger amount of air to ensure all liquid leaves the tip. 
+.. figure:: ../img/lc_icons/delay_after_submerge.png
+    :name: Delay after submerging
+    :scale: 35%
+    :align: center
+
+    The pipette delays a specified amount of time: 
+    * before submerging into or retracting from liquid.
+    * before or after an aspirate or dispense.
+    * after a push out. 
+
+.. figure:: ../img/lc_icons/mix.png
+    :name: Mix liquid
+    :scale: 35%
+    :align: center
+
+    The pipette mixes liquid inside the well before an aspirate or after a dispense. 
+
+.. figure:: ../img/lc_icons/prewet_tip.png
+    :name: Pre-wet tip
+    :scale: 35%
+    :align: center
+
+    The pipette pre-wets the attached tip before aspirating liquid. 
+
+.. figure:: ../img/lc_icons/flow_rate_aspirate.png
+    :name: Aspirate flow rate
+    :scale: 35%
+    :align: left
+
+.. figure:: ../img/lc_icons/flow_rate_dispense.png
+    :name: Dispense flow rate
+    :scale: 35%
+    :align: right
+
+    The pipette aspirates or dispense liquid at this speed. 
+
+.. figure:: ../img/lc_icons/retract_position.png
+    :name: Retract position
+    :scale: 35%
+    :align: left
+
+.. figure:: ../img/lc_icons/retract_speed.png
+    :name: Retract speed
+    :scale: 35%
+    :align: right
+
+    The pipette: 
+    * retracts from the liquid and moves to this position. 
+    * retracts from the liquid at the specified speed. 
+  
+.. figure:: ../img/lc_icons/push_out.png
+    :name: Push out
+    :scale: 35%
+    :align: center
+
+    The pipette dispenses a small amount of air to ensure all liquid leaves the tip. 
+
+.. figure:: ../img/lc_icons/touch_tip.png
+    :name: Touch tip
+    :scale: 35%
+    :align: center
+
+    The pipette touches the attached tip the sides of a well to remove droplets. 
+
+.. figure:: ../img/lc_icons/air_gap.png
+    :name: Air gap
+    :scale: 35%
+    :align: center
+
+    The pipette aspirates a small amount of air after an aspirate or dispense.
+
+.. figure:: ../img/lc_icons/blow_out.png
+    :name: Blow out
+    :scale: 35%
+    :align: center
+
+    The pipette dispenses a larger amount of air to ensure all liquid leaves the tip. 
+
+
 
 A :ref:`liquid class definition <liquid-class-definitions>` specifies values for each property. When your Flex protocol includes a liquid class, these property values automatically define transfer behavior. For example, if you use `.InstrumentContext.transfer_with_liquid_class` to transfer a viscous liquid, the pipette submerges into the liquid and aspirates more slowly to prevent air bubbles from forming. 
 
@@ -108,7 +153,7 @@ Selecting a Liquid Class
 
 You'll use a :ref:`liquid class definition <liquid-class-definitions>` in your protocol to optimize transfer behavior based on liquid properties, along with your chosen Flex pipettes and tips. 
 
-Start by definining the tips, trash, pipette, and labware used in your transfers. Then, use :py:meth:`.ProtocolContext.get_liquid_class` to select a liquid class.
+Start by definining the tips, trash, pipette, and labware used in your transfers. Then, use :py:meth:`.ProtocolContext.get_liquid_class` to select an Opentrons-verified liquid class.
 
 .. code-block:: python
     :substitutions: 
@@ -191,19 +236,18 @@ You can create your own liquid class to customize transfer behavior for any liqu
 * Edit individual properties of an existing liquid class, or 
 * Add properties to a new liquid class. 
 
-To customize an Opentrons-verified liquid class, use :py:meth:`InstrumentContext.define_liquid_class` to define your custom liquid class after adding your pipettes, tips, trash, and labware. 
+To customize an Opentrons-verified liquid class, use :py:meth:`InstrumentContext.define_liquid_class` to define your custom liquid class after adding your pipettes, tips, trash, and labware::
 
-.. code-block:: python
- requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+    requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
- def run(protocol_context):
-    tiprack = protocol_context.load_labware("opentrons_96_tiprack_20ul", "A2")
-    pipette_20 = protocol_context.load_instrument("p20_single_gen2", mount="left", tip_racks=[tiprack])
-    trash = protocol_context.load_trash_bin("A3")
-    nest_plate = protocol_context.load_labware("nest_96_wellplate_200ul_flat", "B1")
-    arma_plate = protocol_context.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "B2")
+    def run(protocol_context):
+       tiprack = protocol_context.load_labware("opentrons_96_tiprack_20ul", "A2")
+       pipette_20 = protocol_context.load_instrument("p20_single_gen2", mount="left", tip_racks=[tiprack])
+       trash = protocol_context.load_trash_bin("A3")
+       nest_plate = protocol_context.load_labware("nest_96_wellplate_200ul_flat", "B1")
+       arma_plate = protocol_context.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "B2")
 
-    # customize based on the aqueous liquid class  
+    ## customize based on the aqueous liquid class
     custom_water = protocol_context.define_liquid_class(
         name="custom_water",
         properties=custom_liquid_class_properties,
@@ -228,7 +272,7 @@ Next, edit indivual liquid class properties based on your Flex pipette and tip c
     custom_water_props.aspirate.delay = {"enabled": True} 
 
 
-You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified ``base_liquid_class``, you'll start from scratch, providing a value for every required property in your liquid class. 
+You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified ``base_liquid_class``, you'll start from scratch, providing a value for `every required property <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>` in your liquid class. 
 
 .. code-block:: python
 
@@ -250,8 +294,10 @@ You can also create a new liquid class for your Flex protocols. Instead of using
     )
 
 
-The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for required properties like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. 
+The example above only includes aspirate position properties. To create your liquid class, you'll need to define values for `required properties <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>` like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. 
 
-## TODO: link users directly to github at "every required property" and "required properties"
+.. note:: 
+
+    The :py:meth:`.InstrumentContext.get_liquid_class` method only accepts Opentrons-verified liquid classes, like ``glycerol_50``. You'll need to use :py:meth:`.InstrumentContext.define_liquid_class` in each Flex protocol that uses a custom liquid class.
 
 

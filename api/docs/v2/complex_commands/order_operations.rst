@@ -76,6 +76,7 @@ The smallest possible number of steps in a complex command like ``transfer()`` i
         dest=plate["B1"],
         new_tip="never",
     )
+
 You can also use ``new_tip="never"`` to reuse pipette tips and decrease the total number of steps in any liquid class complex command. 
 
 Here's another example, a distribute command that adds touch tip steps (and does not turn off tip handling). The code for this command is::

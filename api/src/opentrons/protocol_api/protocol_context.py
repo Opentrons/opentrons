@@ -1377,10 +1377,14 @@ class ProtocolContext(CommandPublisher):
         name: str,
     ) -> LiquidClass:
         """
-        Get an instance of a built-in liquid class for use in the protocol.
+        Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
 
         Args:
-            name: Name of an Opentrons-defined liquid class.
+            name: Name of an Opentrons-verified liquid class.
+
+            - ``"water"``: an Opentrons-verified liquid class based on deionized water. 
+            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol. 
+            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol. 
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
         """
@@ -1394,11 +1398,11 @@ class ProtocolContext(CommandPublisher):
         base_liquid_class: Optional[LiquidClass] = None,
         display_name: Optional[str] = None,
     ) -> LiquidClass:
-        """Define a custom liquid class, either a completely new one or based on an existing one.
+        """Define a custom liquid class, either based on an existing, Opentrons-verified liquid class, or to create a completely new one.
 
         Args:
-            name: The name to give to the new liquid class. Cannot use names of existing in-built liquid classes.
-            properties: A dict of transfer properties per tip per pipette.
+            name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
+            properties: A dict of transfer properties for the Flex pipette and tips to use for liquid class transfers. 
                 Accepts a nested dictionary in the following format:
 
                 .. code-block:: python
@@ -1411,11 +1415,10 @@ class ProtocolContext(CommandPublisher):
                         # transfer properties returned by the `LiquidClass.get_for(..)` function.
                     }}
 
-            base_liquid_class: A LiquidClass to base this liquid class on. The properties
-                specified in transfer_properties will override any existing ones
-                for the specified pipettes & tips.
-            display_name: An optional human-readable name for the liquid. If not provided,
-                will default to title-cased name.
+            base_liquid_class: An Opentrons-verified liquid class to base the newly defined liquid class on. The
+                specified ``transfer_properties`` will override any existing properties for the Flex pipette and tips. 
+                
+            display_name: An optional name for the liquid class. Defaults to the title-case ``name`` if a display name isn't provided.
 
         """
         if definition_exists(name, DEFAULT_LC_VERSION):
