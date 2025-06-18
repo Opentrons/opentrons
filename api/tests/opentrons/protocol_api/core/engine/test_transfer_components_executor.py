@@ -21,6 +21,7 @@ from opentrons.protocol_api.core.engine.transfer_components_executor import (
     LiquidAndAirGapPair,
     AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP,
 )
+from opentrons.protocol_api.disposal_locations import DisposalOffset
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
@@ -1452,6 +1453,7 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
     source_well = decoy.mock(cls=WellCore)
     dest_well = decoy.mock(cls=WellCore)
     trash_location = decoy.mock(cls=TrashBin)
+    trash_top = decoy.mock(cls=TrashBin)
     well_top_point = Point(1, 2, 3)
     well_bottom_point = Point(4, 5, 6)
     air_gap_volume = 0.123
@@ -1484,6 +1486,9 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
     decoy.when(dest_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
         Point(1, 2, 35)
     )
+    decoy.when(trash_location.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(trash_location.top(x=0, y=0, z=2)).then_return(trash_top)
+    decoy.when(trash_top.offset).then_return(DisposalOffset(x=1, y=2, z=3))
     subject.retract_after_dispensing(
         trash_location=trash_location,
         source_location=source_location,
@@ -1555,7 +1560,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
     source_location = Location(Point(1, 2, 3), labware=None)
     source_well = decoy.mock(cls=WellCore)
     target_chute = decoy.mock(cls=WasteChute)
-
+    chute_top = decoy.mock(cls=WasteChute)
     air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
@@ -1585,6 +1590,9 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
     decoy.when(source_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
         Point(10, 20, 29)
     )
+    decoy.when(target_chute.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(target_chute.top(x=0, y=0, z=2)).then_return(chute_top)
+    decoy.when(chute_top.offset).then_return(DisposalOffset(x=1, y=2, z=3))
     subject.retract_after_dispensing(
         trash_location=Location(Point(), labware=None),
         source_location=source_location,
@@ -1649,7 +1657,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
     """It should execute steps to retract after a dispense into a trash."""
     source_well = decoy.mock(cls=WellCore)
     target_trash = decoy.mock(cls=TrashBin)
-
+    trash_top = decoy.mock(cls=TrashBin)
     air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
@@ -1682,7 +1690,9 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
         ),
         transfer_type=TransferType.ONE_TO_ONE,
     )
-
+    decoy.when(target_trash.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(target_trash.top(x=0, y=0, z=2)).then_return(trash_top)
+    decoy.when(trash_top.offset).then_return(DisposalOffset(x=1, y=2, z=3))
     subject.retract_after_dispensing(
         trash_location=Location(Point(), labware=None),
         source_location=Location(Point(1, 2, 3), labware=None),
@@ -1726,7 +1736,9 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
     source_location = Location(Point(1, 2, 3), labware=None)
     source_well = decoy.mock(cls=WellCore)
     target_trash = decoy.mock(cls=TrashBin)
+    target_trash_top = decoy.mock(cls=TrashBin)
     trash_location = decoy.mock(cls=WasteChute)
+    waste_chute_top = decoy.mock(cls=WasteChute)
 
     air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
@@ -1752,6 +1764,12 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
         tip_state=TipState(),
         transfer_type=TransferType.ONE_TO_ONE,
     )
+    decoy.when(target_trash.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(target_trash.top(x=0, y=0, z=2)).then_return(target_trash_top)
+    decoy.when(target_trash_top.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(trash_location.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(trash_location.top(x=0, y=0, z=2)).then_return(waste_chute_top)
+    decoy.when(waste_chute_top.offset).then_return(DisposalOffset(x=1, y=2, z=3))
     subject.retract_after_dispensing(
         trash_location=trash_location,
         source_location=source_location,
