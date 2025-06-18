@@ -229,7 +229,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number // TODO: deprecate this
 }
 
 interface CommonArgs {
