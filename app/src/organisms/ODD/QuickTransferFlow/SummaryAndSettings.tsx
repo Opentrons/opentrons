@@ -95,6 +95,9 @@ export function SummaryAndSettings(
     host
   )
 
+  const isMultiTransferAspirate = state?.path === 'multiAspirate'
+  const isMultiTransferDispense = state?.path === 'multiDispense'
+
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
     const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -181,10 +184,18 @@ export function SummaryAndSettings(
         {enableLiquidClassesForQT ? (
           <>
             {selectedCategory === 'aspirate' ? (
-              <Aspirate state={state} dispatch={dispatch} />
+              <Aspirate
+                state={state}
+                dispatch={dispatch}
+                isMultiTransfer={isMultiTransferAspirate}
+              />
             ) : null}
             {selectedCategory === 'dispense' ? (
-              <Dispense state={state} dispatch={dispatch} />
+              <Dispense
+                state={state}
+                dispatch={dispatch}
+                isMultiTransfer={isMultiTransferDispense}
+              />
             ) : null}
           </>
         ) : (
