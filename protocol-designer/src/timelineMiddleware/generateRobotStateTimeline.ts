@@ -58,9 +58,8 @@ export const generateRobotStateTimeline = (
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
-      // TODO: update to only mix requiring curryCommandCreator
       const commandCreator =
-        args.commandCreatorFnName !== 'transfer'
+        args.commandCreatorFnName === 'mix'
           ? curryCommandCreator
           : curryWithoutPython
 

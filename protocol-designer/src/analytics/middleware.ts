@@ -8,7 +8,7 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
 } from '../constants'
 import {
-  createPythonFile,
+  createFile,
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
@@ -329,7 +329,7 @@ export const reduxActionToAnalyticsEvent = (
     }
   }
   if (action.type === 'SAVE_PROTOCOL_FILE') {
-    const file = createPythonFile(state)
+    const file = createFile(state)
     const { metadata, robot, designerApplication } = file.designerApplication
     const {
       ingredients,

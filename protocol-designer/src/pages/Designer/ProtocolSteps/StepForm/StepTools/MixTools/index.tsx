@@ -1,13 +1,9 @@
 import { useSelector } from 'react-redux'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import {
-  getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getLabwareEntities,
   getPipetteEntities,
@@ -40,8 +36,6 @@ export function MixTools(
   const enableReturnTip = useSelector(getEnableReturnTip)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-  const robotType = useSelector(getRobotType)
 
   const pickUpTipLocationValue = propsForFields.pickUpTip_location?.value
   const userSelectedPickUpTipLocation =
@@ -79,22 +73,13 @@ export function MixTools(
     ),
     1: () => (
       <>
-        {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
-          <LiquidClassesStepTools
-            propsForFields={propsForFields}
-            setShowFormErrors={setShowFormErrors}
-            formData={formData}
-            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
-            type="mix"
-          />
-        ) : (
-          <SecondStepMixTools
-            propsForFields={propsForFields}
-            formData={formData}
-            tab={tab}
-            setTab={setTab}
-          />
-        )}
+        <LiquidClassesStepTools
+          propsForFields={propsForFields}
+          setShowFormErrors={setShowFormErrors}
+          formData={formData}
+          orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
+          type="mix"
+        />
       </>
     ),
 

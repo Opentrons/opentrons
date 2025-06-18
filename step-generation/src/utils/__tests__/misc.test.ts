@@ -61,12 +61,19 @@ describe('getTransferPlanAndReferenceVolumes', () => {
     })
     expect(result).toEqual({
       referenceVolumes: {
-        airGap: 5,
-        correctionAspirate: 5,
-        correctionDispense: 5,
+        airGap: {
+          aspirate: 5,
+          dispense: 0,
+        },
+        correction: {
+          aspirate: 5,
+          dispense: 5,
+        },
+        flowRate: {
+          aspirate: 5,
+          dispense: 5,
+        },
         pushOut: 5,
-        flowRateAspirate: 5,
-        flowRateDispense: 5,
       },
       multiWellHandling: {
         isSupported: false,
@@ -85,12 +92,11 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.correctionAspirate).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.correctionDispense).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.pushOut).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.flowRateAspirate).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.flowRateDispense).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.airGap.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.correction.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.correction.dispense).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.flowRate.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.flowRate.dispense).toBeCloseTo(7.5)
     expect(result.multiWellHandling.isSupported).toBe(false)
   })
 
@@ -105,12 +111,11 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.correctionAspirate).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.correctionDispense).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.pushOut).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.flowRateAspirate).toBeCloseTo(7.5)
-    expect(result.referenceVolumes.flowRateDispense).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.airGap.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.correction.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.correction.dispense).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.flowRate.aspirate).toBeCloseTo(7.5)
+    expect(result.referenceVolumes.flowRate.dispense).toBeCloseTo(7.5)
     expect(result.multiWellHandling.isSupported).toBe(false)
   })
 
@@ -125,12 +130,11 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBeCloseTo(5)
-    expect(result.referenceVolumes.correctionAspirate).toBeCloseTo(5)
-    expect(result.referenceVolumes.correctionDispense).toBeCloseTo(5)
-    expect(result.referenceVolumes.pushOut).toBeCloseTo(5)
-    expect(result.referenceVolumes.flowRateAspirate).toBeCloseTo(5)
-    expect(result.referenceVolumes.flowRateDispense).toBeCloseTo(5)
+    expect(result.referenceVolumes.airGap.aspirate).toBeCloseTo(5)
+    expect(result.referenceVolumes.correction.aspirate).toBeCloseTo(5)
+    expect(result.referenceVolumes.correction.dispense).toBeCloseTo(5)
+    expect(result.referenceVolumes.flowRate.aspirate).toBeCloseTo(5)
+    expect(result.referenceVolumes.flowRate.dispense).toBeCloseTo(5)
     expect(result.multiWellHandling.isSupported).toBe(false)
   })
 
@@ -147,12 +151,19 @@ describe('getTransferPlanAndReferenceVolumes', () => {
     })
     expect(result).toEqual({
       referenceVolumes: {
-        airGap: 9,
-        correctionAspirate: 9,
-        correctionDispense: 9,
+        airGap: {
+          aspirate: 9,
+          dispense: 0,
+        },
+        correction: {
+          aspirate: 9,
+          dispense: 9,
+        },
+        flowRate: {
+          aspirate: 3,
+          dispense: 9,
+        },
         pushOut: 9,
-        flowRateAspirate: 3,
-        flowRateDispense: 9,
       },
       multiWellHandling: {
         isSupported: true,
@@ -172,7 +183,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBe(8)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(8)
     expect(result.multiWellHandling.numWellsToFitInTip).toBe(2)
   })
 
@@ -187,7 +198,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBe(8)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(8)
     expect(result.multiWellHandling.numWellsToFitInTip).toBe(2)
   })
 
@@ -208,14 +219,15 @@ describe('getTransferPlanAndReferenceVolumes', () => {
         [40, 4],
       ],
     })
-    expect(result.referenceVolumes.airGap).toBe(30 + 3)
-    expect(result.referenceVolumes.correctionAspirate).toBe(30 + 7.5 + 3)
-    expect(result.referenceVolumes.correctionDispense).toBe(10)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(30 + 3)
+    expect(result.referenceVolumes.airGap.dispense).toBe(20 + 2)
+    expect(result.referenceVolumes.correction.aspirate).toBe(30 + 7.5 + 3)
+    expect(result.referenceVolumes.correction.dispense).toBe(10)
     expect(result.referenceVolumes.pushOut).toBe(10)
     expect(result.referenceVolumes.conditioning).toBe(30)
     expect(result.referenceVolumes.disposal).toBe(30)
-    expect(result.referenceVolumes.flowRateAspirate).toBe(30 + 7.5 + 3)
-    expect(result.referenceVolumes.flowRateDispense).toBe(10)
+    expect(result.referenceVolumes.flowRate.aspirate).toBe(30 + 7.5 + 3)
+    expect(result.referenceVolumes.flowRate.dispense).toBe(10)
     expect(result.multiWellHandling.isSupported).toBe(true)
     expect(result.multiWellHandling.numWellsToFitInTip).toBe(3)
   })
@@ -237,14 +249,14 @@ describe('getTransferPlanAndReferenceVolumes', () => {
         [7, 3],
       ],
     })
-    expect(result.referenceVolumes.airGap).toBe(6 + 2)
-    expect(result.referenceVolumes.correctionAspirate).toBe(6 + 1 + 2)
-    expect(result.referenceVolumes.correctionDispense).toBe(3)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(6 + 2)
+    expect(result.referenceVolumes.airGap.dispense).toBe(3 + 1)
+    expect(result.referenceVolumes.correction.aspirate).toBe(6 + 1 + 2)
+    expect(result.referenceVolumes.correction.dispense).toBe(3)
     expect(result.referenceVolumes.pushOut).toBe(3)
     expect(result.referenceVolumes.conditioning).toBe(6)
     expect(result.referenceVolumes.disposal).toBe(6)
-    expect(result.referenceVolumes.flowRateAspirate).toBe(6 + 1 + 2)
-    expect(result.referenceVolumes.flowRateDispense).toBe(3)
+    expect(result.referenceVolumes.flowRate.aspirate).toBe(6 + 1 + 2)
     expect(result.multiWellHandling.isSupported).toBe(true)
     expect(result.multiWellHandling.numWellsToFitInTip).toBe(2)
   })
@@ -266,14 +278,14 @@ describe('getTransferPlanAndReferenceVolumes', () => {
         [7, 3],
       ],
     })
-    expect(result.referenceVolumes.airGap).toBe(6 + 2)
-    expect(result.referenceVolumes.correctionAspirate).toBe(6 + 1 + 2)
-    expect(result.referenceVolumes.correctionDispense).toBe(3)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(6 + 2)
+    expect(result.referenceVolumes.airGap.dispense).toBe(3 + 1)
+    expect(result.referenceVolumes.correction.aspirate).toBe(6 + 1 + 2)
+    expect(result.referenceVolumes.correction.dispense).toBe(3)
     expect(result.referenceVolumes.pushOut).toBe(3)
     expect(result.referenceVolumes.conditioning).toBe(6)
     expect(result.referenceVolumes.disposal).toBe(6)
-    expect(result.referenceVolumes.flowRateAspirate).toBe(6 + 1 + 2)
-    expect(result.referenceVolumes.flowRateDispense).toBe(3)
+    expect(result.referenceVolumes.flowRate.aspirate).toBe(6 + 1 + 2)
     expect(result.multiWellHandling.isSupported).toBe(true)
     expect(result.multiWellHandling.numWellsToFitInTip).toBe(2)
   })
@@ -316,7 +328,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBe(1)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(1)
   })
 
   it('should use default liquids if lowVolumeDefault is not defined', () => {
@@ -339,6 +351,6 @@ describe('getTransferPlanAndReferenceVolumes', () => {
       conditioningByVolume: null,
       disposalByVolume: null,
     })
-    expect(result.referenceVolumes.airGap).toBe(0.8)
+    expect(result.referenceVolumes.airGap.aspirate).toBe(0.8)
   })
 })

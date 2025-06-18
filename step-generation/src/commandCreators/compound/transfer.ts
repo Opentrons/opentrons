@@ -2,9 +2,11 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
-  getCorrectionVolume,
+  getByVolumeValue,
+  getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  isFlexPipette,
   LOW_VOLUME_PIPETTES,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
@@ -14,6 +16,7 @@ import {
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
+  curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
@@ -306,21 +309,27 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[args.pipette]
 
-  const dispenseCorrectionVolumeForSubtransferTarget = getCorrectionVolume({
-    liquidClass: args.liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: args.tipRack,
-    targetVolume: subTransferVol,
-    liquidHandlingAction: 'singleDispense',
-  })
+  const dispenseCorrectionVolumeForSubtransferTarget =
+    getByVolumeValue({
+      liquidClass: args.liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: args.tipRack,
+      targetVolume: subTransferVol,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
 
-  const aspirateCorrectionVolumeForSubtransferTarget = getCorrectionVolume({
-    liquidClass: args.liquidClass,
-    pipetteSpecs,
-    tiprackDefUri: args.tipRack,
-    targetVolume: subTransferVol,
-    liquidHandlingAction: 'aspirate',
-  })
+  const aspirateCorrectionVolumeForSubtransferTarget =
+    getByVolumeValue({
+      liquidClass: args.liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: args.tipRack,
+      targetVolume: subTransferVol,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
+    }) ?? 0
 
   /** needed for python generation! > */
   const destTrashPipetteName =
@@ -348,7 +357,9 @@ export const transfer: CommandCreator<TransferArgs> = (
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
-      pipetteName,
+      pipetteName: isFlexPipette(pipetteName)
+        ? getFlexNameConversion(pipetteSpecs)
+        : pipetteName,
       tiprackUri: tipRack,
       aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
       dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
@@ -361,7 +372,9 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
-    `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
+    `dest=${
+      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
+    }`,
     `new_tip=${formatPyStr(changeTip)}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
@@ -375,6 +388,46 @@ export const transfer: CommandCreator<TransferArgs> = (
   })
   /** < until here */
 
+  const aspirateAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVol,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const aspirateAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: aspirateAirGapVol,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
+  const dispenseAirGapAspirateFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVol,
+      liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? aspirateFlowRateUlSec
+  const dispenseAirGapDispenseFlowRate =
+    getByVolumeValue({
+      liquidClass,
+      pipetteSpecs,
+      tiprackDefUri: tipRack,
+      targetVolume: dispenseAirGapVol,
+      liquidHandlingAction: 'singleDispense',
+      byVolumeProperty: 'flowRateByVolume',
+      defaultValue: null,
+    }) ?? dispenseFlowRateUlSec
   // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
   const sourceDestPairs: Array<[string, string | null]> = zip(
     sourceWells,
@@ -426,7 +479,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
           const tipCommands = changeTipNow
             ? [
-                curryWithoutPython(replaceTip, {
+                curryCommandCreator(replaceTip, {
                   pipette,
                   dropTipLocation,
                   tipRack,
@@ -493,15 +546,16 @@ export const transfer: CommandCreator<TransferArgs> = (
               pipetteId: pipette,
             }),
           ]
-          const dispenseCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
-            {
+          const dispenseCorrectionVolumeForDispenseAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: dispenseAirGapVol,
               liquidHandlingAction: 'singleDispense',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const voidDispenseAirGapCommand =
             dispenseAirGapVol > 0 &&
             !changeTipNow &&
@@ -511,7 +565,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     isAirGap: true,
                     pipetteId: pipette,
                     volume: dispenseAirGapVol,
-                    flowRate: dispenseFlowRateUlSec,
+                    flowRate: dispenseAirGapDispenseFlowRate,
                     ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
@@ -631,22 +685,23 @@ export const transfer: CommandCreator<TransferArgs> = (
                   : []),
               ]
             : []
-          const aspirateCorrectionVolumeForAspirateAirGap = getCorrectionVolume(
-            {
+          const aspirateCorrectionVolumeForAspirateAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: aspirateAirGapVol,
               liquidHandlingAction: 'aspirate',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
           const airGapAfterAspirateRetractCommands =
             aspirateAirGapVol > 0
               ? [
                   curryWithoutPython(airGapInPlace, {
                     pipetteId: pipette,
                     volume: aspirateAirGapVol,
-                    flowRate: aspirateFlowRateUlSec,
+                    flowRate: aspirateAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
@@ -696,15 +751,17 @@ export const transfer: CommandCreator<TransferArgs> = (
                   }),
                 ]
               : []
-          const dispenseCorrectionVolumeForAspirateAirGap = getCorrectionVolume(
-            {
+          const dispenseCorrectionVolumeForAspirateAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: aspirateAirGapVol,
               liquidHandlingAction: 'singleDispense',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
+
           const dispenseSubmergeCommands =
             destinationWell != null
               ? [
@@ -720,7 +777,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                           isAirGap: true,
                           pipetteId: pipette,
                           volume: aspirateAirGapVol,
-                          flowRate: dispenseFlowRateUlSec,
+                          flowRate: aspirateAirGapDispenseFlowRate,
                           pushOut: 0,
                           ...(dispenseCorrectionVolumeForAspirateAirGap > 0
                             ? {
@@ -836,15 +893,16 @@ export const transfer: CommandCreator<TransferArgs> = (
             pipetteId: pipette,
             flowRate: blowoutFlowRateUlSec,
           })
-          const aspirateCorrectionVolumeForDispenseAirGap = getCorrectionVolume(
-            {
+          const aspirateCorrectionVolumeForDispenseAirGap =
+            getByVolumeValue({
               liquidClass,
               pipetteSpecs,
               tiprackDefUri: tipRack,
               targetVolume: dispenseAirGapVol,
               liquidHandlingAction: 'aspirate',
-            }
-          )
+              byVolumeProperty: 'correctionByVolume',
+              defaultValue: 0,
+            }) ?? 0
 
           const getAirGapAfterDispenseCommands = (
             considerUltimateSubtransfer: boolean
@@ -859,7 +917,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   curryWithoutPython(airGapInPlace, {
                     pipetteId: pipette,
                     volume: dispenseAirGapVol,
-                    flowRate: aspirateFlowRateUlSec,
+                    flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
                           correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,

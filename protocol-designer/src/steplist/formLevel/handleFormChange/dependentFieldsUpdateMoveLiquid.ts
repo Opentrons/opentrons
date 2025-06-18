@@ -23,7 +23,6 @@ import {
   getChannels,
   getDefaultWells,
   getMaxDisposalVolumeForMultidispense,
-  volumeInCapacityForMulti,
 } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
@@ -133,45 +132,6 @@ const wellRatioUpdatesMap = [
   },
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
-export function updatePatchPathField(
-  patch: FormPatch,
-  rawForm: FormData,
-  pipetteEntities: PipetteEntities
-): FormPatch {
-  const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData as FormPatch), ...patch }
-  const { path, changeTip } = appliedPatch
-
-  if (path == null) {
-    // invalid well ratio - fall back to 'single'
-    return { ...patch, path: 'single' }
-  }
-
-  let pipetteCapacityExceeded = false
-
-  if (
-    appliedPatch.volume != null &&
-    typeof appliedPatch.pipette === 'string' &&
-    appliedPatch.pipette in pipetteEntities
-  ) {
-    pipetteCapacityExceeded = !volumeInCapacityForMulti(
-      // @ts-expect-error(sa, 2021-6-14): appliedPatch is not of type FormData, address in #3161
-      appliedPatch,
-      pipetteEntities
-    )
-  }
-
-  // changeTip value incompatible with next path value
-  const incompatiblePath =
-    (changeTip === 'perSource' && path === 'multiAspirate') ||
-    (changeTip === 'perDest' && path === 'multiDispense')
-
-  if (pipetteCapacityExceeded || incompatiblePath) {
-    return { ...patch, path: 'single' }
-  }
-
-  return patch
-}
 
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
@@ -764,7 +724,6 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
-    chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch =>

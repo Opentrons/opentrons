@@ -5,12 +5,18 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
+  NONE_LIQUID_CLASS_NAME,
+  OT2_ROBOT_TYPE,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
-import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
+import {
+  getTransferPlanAndReferenceVolumes,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 
+import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../constants'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
@@ -27,6 +33,7 @@ import type {
   PositionReference,
   RetractAspirate,
   RetractDispense,
+  RobotType,
   Submerge,
   TouchTipProperties,
   Vector3D,
@@ -417,8 +424,8 @@ const getSubmergeRetractFields = (args: {
     liquidHandlingAction,
     tipMovement,
     additionalEquipmentEntities,
-    isDisposalVolumeEnabled = true,
-    isConditioningVolumeEnabled = true,
+    isDisposalVolumeEnabled = false,
+    isConditioningVolumeEnabled = false,
   } = args
 
   // all common submerge and retract fields
@@ -438,9 +445,10 @@ const getSubmergeRetractFields = (args: {
 
   // retract fields
   const airGapFields =
-    'airGapByVolume' in submergeRetractLookup && !isConditioningVolumeEnabled
+    'airGapByVolume' in submergeRetractLookup &&
+    !(liquidHandlingAction === 'aspirate' && isConditioningVolumeEnabled)
       ? getByVolumeField({
-          volume: volumes.airGap,
+          volume: volumes.airGap[liquidHandlingAction],
           byVolume: submergeRetractLookup.airGapByVolume,
           field: 'airGap',
           prefix: liquidHandlingAction,
@@ -475,7 +483,9 @@ const getSubmergeRetractFields = (args: {
 const getNoLiquidClassValuesMoveLiquid = (
   rawForm: FormData,
   convertedPipetteName: string,
-  liquidHandlingAction: LiquidClassSettingsType
+  liquidHandlingAction: LiquidClassSettingsType,
+  robotType: RobotType,
+  pipetteSpecs: PipetteV2Specs
 ): Record<string, any> => {
   const { tipRack: tiprack, path, volume: rawVolume, stepType } = rawForm
   if (stepType !== 'moveLiquid') {
@@ -490,6 +500,25 @@ const getNoLiquidClassValuesMoveLiquid = (
   const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
     tipObject => tipObject.tiprack === tiprack
   )
+  if (robotType === OT2_ROBOT_TYPE) {
+    const zSpeedOT2 =
+      CHANNELS_MAPPED_TO_MAX_SPEED[OT2_ROBOT_TYPE][pipetteSpecs.channels].z
+    const dipsosalFields =
+      rawForm.path === 'multiDispense'
+        ? {
+            disposalVolume_checkbox: true,
+            disposalVolume_volume: pipetteSpecs.liquids.default.minVolume,
+            blowout_location: SOURCE_WELL_BLOWOUT_DESTINATION,
+          }
+        : {}
+    return {
+      aspirate_submerge_speed: zSpeedOT2,
+      aspirate_retract_speed: zSpeedOT2,
+      dispense_submerge_speed: zSpeedOT2,
+      dispense_retract_speed: zSpeedOT2,
+      ...dipsosalFields,
+    }
+  }
   if (liquidClassValuesForTip == null) {
     return {}
   }
@@ -743,7 +772,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   )
   const aspirateOffsetFields = getOffsetFields(aspirateOffset, 'aspirate')
   const aspirateFlowRateFields = getFlowRateFields(
-    byVolumeLookup.flowRateAspirate,
+    byVolumeLookup.flowRate.aspirate,
     aspirateFlowRateByVolume,
     'aspirate'
   )
@@ -758,7 +787,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   )
   const dispenseOffsetFields = getOffsetFields(dispenseOffset, 'dispense')
   const dispenseFlowRateFields = getFlowRateFields(
-    byVolumeLookup.flowRateDispense,
+    byVolumeLookup.flowRate.dispense,
     dispenseFlowRateByVolume,
     'dispense'
   )
@@ -789,8 +818,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : {}
 
-  const isConditioningVolumeEnabled = conditioningFields.conditioning_volume > 0
-  const isDisposalVolumeEnabled = disposalFields.disposalVolume_volume > 0
+  const isConditioningVolumeEnabled =
+    conditioningFields.conditioning_volume > 0 && path === 'multiDispense'
+  const isDisposalVolumeEnabled =
+    disposalFields.disposalVolume_volume > 0 && path === 'multiDispense'
 
   // aspirate/dispense submerge fields
   const aspirateSubmergeFields = getSubmergeRetractFields({
@@ -970,6 +1001,7 @@ export const getLiquidClassesValues = (args: {
   labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction?: LiquidClassSettingsType
+  robotType: RobotType
 }): Record<string, any> => {
   const {
     rawForm,
@@ -977,6 +1009,7 @@ export const getLiquidClassesValues = (args: {
     labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction = 'all',
+    robotType,
   } = args
   const { liquidClass, pipette, tipRack, stepType } = rawForm
   if (stepType !== 'mix' && stepType !== 'moveLiquid') {
@@ -992,12 +1025,15 @@ export const getLiquidClassesValues = (args: {
   }
   const { spec: pipetteSpecs } = pipetteEntity
   const convertedPipetteName = getFlexNameConversion(pipetteEntity.spec)
-  if (liquidClass === 'none') {
+  if (liquidClass === NONE_LIQUID_CLASS_NAME || robotType === OT2_ROBOT_TYPE) {
+    // OT-2 liquid class selection should always be "none"
     return stepType === 'moveLiquid'
       ? getNoLiquidClassValuesMoveLiquid(
           rawForm,
           convertedPipetteName,
-          liquidHandlingAction
+          liquidHandlingAction,
+          robotType,
+          pipetteSpecs
         )
       : getNoLiquidClassValuesMix(
           rawForm,
@@ -1042,6 +1078,7 @@ export const updateFieldsForLiquidClass = (args: {
   labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction?: LiquidClassSettingsType
+  robotType: RobotType
 }): void => {
   const {
     propsForFields,
@@ -1050,6 +1087,7 @@ export const updateFieldsForLiquidClass = (args: {
     labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction = 'all',
+    robotType,
   } = args
   const fieldUpdates = getLiquidClassesValues({
     rawForm,
@@ -1057,6 +1095,7 @@ export const updateFieldsForLiquidClass = (args: {
     labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction,
+    robotType,
   })
   Object.entries(fieldUpdates).forEach(([field, value]) => {
     if (field in propsForFields) {

@@ -16,7 +16,7 @@ import {
   InputStepFormField,
 } from '../../../../../../components/molecules'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -57,12 +57,12 @@ export function SecondStepMixTools({
 }: SecondStepMixToolsProps): JSX.Element {
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteEntities = useSelector(getPipetteEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const robotType = useSelector(getRobotType)
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
@@ -108,6 +108,7 @@ export function SecondStepMixTools({
               labwareEntities,
               additionalEquipmentEntities,
               liquidHandlingAction: tab,
+              robotType,
             })
           }}
           onClose={() => {
@@ -285,14 +286,12 @@ export function SecondStepMixTools({
             </>
           ) : null}
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )

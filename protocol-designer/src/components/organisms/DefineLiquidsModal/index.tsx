@@ -27,7 +27,6 @@ import {
   getSortedLiquidClassDefs,
 } from '@opentrons/shared-data'
 
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
@@ -73,7 +72,6 @@ export function DefineLiquidsModal(
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const robotType = useSelector(getRobotType)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
@@ -240,7 +238,7 @@ export function DefineLiquidsModal(
                     height="4.75rem"
                   />
                 </Flex>
-                {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
+                {robotType === FLEX_ROBOT_TYPE ? (
                   <LiquidClassDropdown
                     control={control}
                     setValue={setValue}

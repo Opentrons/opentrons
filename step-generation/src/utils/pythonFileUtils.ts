@@ -34,13 +34,10 @@ import type {
 } from '../types'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+export const PD_APPLICATION_VERSION = '8.5.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
-  return [
-    'import json',
-    'from contextlib import nullcontext as pd_step',
-    'from opentrons import protocol_api, types',
-  ].join('\n')
+  return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
@@ -113,7 +110,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace, version } = def
+      const { parameters, namespace } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -135,7 +132,10 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -172,7 +172,7 @@ export function getLoadLabware(
   const pythonLabware = Object.values(labwareEntities)
     .map(labware => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace, version } = def
+      const { metadata, parameters, namespace } = def
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -204,7 +204,10 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_labware(\n` +
@@ -309,16 +312,12 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
-export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
+export function getLoadLiquidClasses(
+  allUniqueLiquidClassesFromForms: string[]
+): string {
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const allLiquidClasses = Object.values(liquidEntities)
-    .map(liquid => liquid.liquidClass)
-    .filter(liquidClass => liquidClass != null)
-  const uniqueLiquidClasses = Array.from(new Set(allLiquidClasses))
-  const pythonLoadLiquidClasses = uniqueLiquidClasses
+  const pythonLoadLiquidClasses = allUniqueLiquidClassesFromForms
     .map(liquidClass => {
-      // we check that liquidClass is not null earlier but i got a check error
-      // without specifying it here
       if (liquidClass == null) {
         return ''
       }
@@ -330,7 +329,7 @@ export function getLoadLiquidClasses(liquidEntities: LiquidEntities): string {
     })
     .join('\n')
 
-  return uniqueLiquidClasses.length > 0
+  return allUniqueLiquidClassesFromForms.length > 0
     ? `# Load Liquid Classes:\n${pythonLoadLiquidClasses}`
     : ''
 }
@@ -379,7 +378,8 @@ export function pythonDefRun(
   robotStateTimeline: Timeline,
   liquidsByLabwareId: LabwareLiquidState,
   labwareNicknamesById: Record<string, string>,
-  robotType: RobotType
+  robotType: RobotType,
+  allUniqueLiquidClassesFromForms: string[]
 ): string {
   const {
     moduleEntities,
@@ -408,7 +408,7 @@ export function pythonDefRun(
       : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
-    getLoadLiquidClasses(liquidEntities),
+    getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

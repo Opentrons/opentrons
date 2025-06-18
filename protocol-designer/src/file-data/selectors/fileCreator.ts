@@ -8,10 +8,12 @@ import { createSelector } from 'reselect'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
+  NONE_LIQUID_CLASS_NAME,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import {
+  PD_APPLICATION_VERSION,
   pythonCustomLabwareDict,
   pythonDefRun,
   pythonImports,
@@ -99,7 +101,8 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<ProtocolFile> = createSelector(
+//  eventually will be deprecated
+export const createJSONFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -141,7 +144,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareEntities,
       labwareNicknamesById,
       liquidEntities,
-      ingredLocations
+      ingredLocations,
+      savedStepForms
     )
 
     const name = fileMetadata.protocolName || 'untitled'
@@ -312,7 +316,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   }
 )
 
-export const createPythonFile: Selector<PDPythonFile> = createSelector(
+export const createFile: Selector<PDPythonFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -352,15 +356,30 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
       ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
     )
 
+    const allUniqueLiquidClassesFromForms = Array.from(
+      Object.values(savedStepForms).reduce<Set<string>>((acc, stepForm) => {
+        if (
+          'liquidClass' in stepForm &&
+          stepForm.liquidClass != null &&
+          stepForm.liquidClass !== NONE_LIQUID_CLASS_NAME
+        ) {
+          acc.add(stepForm.liquidClass as string)
+        }
+        return acc
+      }, new Set())
+    )
+
     const designerApplication: PythonDesignerApplication = {
       robot: {
         model: robotType,
       },
       designerApplication: {
         name: 'opentrons/protocol-designer',
-        //  hardcoding this version in to avoid unnecessary migrating
-        //  TODO: remember to update to the applicationVersion const
-        version: '8.5.0',
+        // NOTE: hardcoding in the version like this could be tricky since we
+        // will have to remember to update the version with every release. But this solves
+        // the issues where you have to manually update when importing back to PD, before the release
+        // since using `applicationVersion` means that the version is tied to the release tag.
+        version: PD_APPLICATION_VERSION,
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
@@ -393,7 +412,8 @@ export const createPythonFile: Selector<PDPythonFile> = createSelector(
           robotStateTimeline,
           ingredLocations,
           labwareNicknamesById,
-          robotType
+          robotType,
+          allUniqueLiquidClassesFromForms
         ),
         pythonCustomLabwareDict(invariantContext.labwareEntities),
       ]
