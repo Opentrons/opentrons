@@ -3,10 +3,8 @@ import { useState } from 'react'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
-  getDeckDefAAWithFakeAA,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
-  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -44,9 +42,6 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
