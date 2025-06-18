@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons.types import Point
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
 from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
@@ -211,6 +211,11 @@ class ModuleDefinition(BaseModel):
     features: LocatingFeatures = Field(
         ...,
         description="List of explict locating features when this module acts as the parent in a labware stackup",
+    )
+
+    extents: Extents = Field(
+        ...,
+        description="The outer dimensions of the module.",
     )
 
 

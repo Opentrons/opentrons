@@ -7,7 +7,19 @@
     "y": 68.8,
     "z": 108.96
   },
-  "features": {},
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 172,
+        "y": -245.2
+      }
+    }
+  },
   "dimensions": {
     "bareOverallHeight": 108.96,
     "overLabwareHeight": 0.0,
@@ -16,6 +28,20 @@
     "yDimension": 245.2,
     "labwareInterfaceXDimension": 127.76,
     "labwareInterfaceYDimension": 85.48
+  },
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": -22.125,
+        "y": 0,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 149.875,
+        "y": -245.2,
+        "z": 108.96
+      }
+    }
   },
   "cornerOffsetFromSlot": {
     "x": -22.125,

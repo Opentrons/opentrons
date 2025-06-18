@@ -51,6 +51,37 @@
           "description": "Attributes for the element"
         }
       }
+    },
+    "vector3D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "(-x, +y, -z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "(+x, -y, +z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
     }
   },
   "description": "Module specification",
@@ -94,6 +125,18 @@
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "extents": {
+      "description": "The outer dimensions of the addressable area.",
+      "type": "object",
+      "required": ["total"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "description": "The all-encompassing outer dimensions of the labware.",
+          "$ref": "#/definitions/axisAlignedBoundingBox3D"
+        }
+      }
+    },
     "features": {
       "type": "object",
       "description": "Locating features when this module is a part of a stackup.",
