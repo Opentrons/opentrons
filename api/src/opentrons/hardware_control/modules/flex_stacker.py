@@ -521,7 +521,7 @@ class FlexStacker(mod_abc.AbstractModule):
                 if self.latch_state == LatchState.OPENED:
                     # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
                     await self.home_axis(StackerAxis.Z, Direction.EXTEND)
-                    await self.close_latch()
+            await self.close_latch()
 
         if (
             # if the platform is on the z or if x has not been homed
