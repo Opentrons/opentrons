@@ -168,6 +168,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                     <DropdownStepFormField
                       {...propsForFields.moduleId}
                       tooltipContent={null}
+                      padding="0"
                       title={i18n.format(
                         t(
                           'form:step_edit_form.field.moduleActionLabware.label'
