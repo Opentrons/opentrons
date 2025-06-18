@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { AddressableAreaNamesWithFakes, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -21,6 +21,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -90,7 +91,11 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }
