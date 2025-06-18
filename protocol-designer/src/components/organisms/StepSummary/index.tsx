@@ -41,7 +41,7 @@ interface StepSummaryProps {
 export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const { currentStep, stepDetails } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
-  const unknownModule = t('unkonwn_module')
+  const unknownModule = t('unknown_module')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
