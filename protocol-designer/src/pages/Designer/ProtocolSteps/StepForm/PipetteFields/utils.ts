@@ -190,20 +190,9 @@ export function getDisabledPathMap(
 const _getPipetteAccuracyUlPerMm = (args: {
   targetVolume: number
   tipLiquidSpecs: SupportedTip
-  flowRateType: FlowRateType
-  shaftULperMM: number
-  maxPlungerSpeed: number
+  flowRateType: Exclude<FlowRateType, 'blowout'>
 }): number => {
-  const {
-    targetVolume,
-    tipLiquidSpecs,
-    flowRateType,
-    shaftULperMM,
-    maxPlungerSpeed,
-  } = args
-  if (flowRateType === 'blowout') {
-    return shaftULperMM * maxPlungerSpeed
-  }
+  const { targetVolume, tipLiquidSpecs, flowRateType } = args
 
   const flowRateFunction = tipLiquidSpecs[flowRateType].default['1']
   let pipetteAccuracyUlPerMm = null
@@ -236,14 +225,16 @@ export const getMaxUiFlowRate = (args: {
     correctionVolume,
     shaftULperMM,
   } = args
+
   const maxPlungerSpeed =
     CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channels].plunger
+  if (flowRateType === 'blowout') {
+    return round(shaftULperMM * maxPlungerSpeed)
+  }
   const pipetteAccuracyUlPerMm = _getPipetteAccuracyUlPerMm({
     targetVolume,
     tipLiquidSpecs,
     flowRateType,
-    shaftULperMM,
-    maxPlungerSpeed,
   })
   const correctionMultiplier = 1.0 + correctionVolume / targetVolume
   const travelMm = targetVolume / pipetteAccuracyUlPerMm

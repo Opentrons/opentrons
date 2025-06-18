@@ -186,10 +186,8 @@ describe('getMaxUiFlowRate', () => {
       correctionVolume: 0,
       shaftULperMM: 0.785,
     } as any
-    const expectedAccuracy = 0.785 * FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED
-    const expectedTravelMm = 80 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      80 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
+      0.785 * FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
