@@ -629,7 +629,7 @@
     "features": {
       "type": "object",
       "description": "Locating features when this labware is a part of a stackup.",
-      "required": ["slotFootprintAsChild"],
+      "required": [],
       "properties": {
         "slotFootprintAsChild": {
           "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
@@ -646,7 +646,7 @@
               "$ref": "#/definitions/vector2D"
             },
             "z": {
-              "description": "Always zero. Z-coordinate of the footprint plane.",
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
               "type": "number"
             }
           }
