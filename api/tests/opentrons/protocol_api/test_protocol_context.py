@@ -1900,13 +1900,13 @@ def test_customize_existing_liquid_class(
         existing_glycerol_class.get_for(
             "flex_1channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ).aspirate.submerge.speed
-        == 10
+        == 4
     )
     assert (
         existing_glycerol_class.get_for(
             "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ).aspirate.submerge.speed
-        == 10
+        == 4
     )
 
     my_liquid_class = subject.define_liquid_class(
@@ -1926,7 +1926,7 @@ def test_customize_existing_liquid_class(
         my_liquid_class.get_for(
             "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
         ).aspirate.submerge.speed
-        == 10
+        == 4
     )
 
     # Test that new entries are created for pipettes and tipracks not present in the base liquid class
