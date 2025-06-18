@@ -68,6 +68,19 @@
         }
       }
     },
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
     "axisAlignedBoundingBox3D": {
       "type": "object",
       "required": ["backLeftBottom", "frontRightTop"],
@@ -139,9 +152,30 @@
     },
     "features": {
       "type": "object",
-      "description": "Locating features when this module is a part of a stackup.",
-      "required": [],
-      "properties": {}
+      "description": "Locating features when this labware is a part of a stackup.",
+      "required": ["slotFootprintAsChild"],
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero. Z-coordinate of the footprint plane.",
+              "type": "number"
+            }
+          }
+        }
+      }
     },
     "dimensions": {
       "type": "object",

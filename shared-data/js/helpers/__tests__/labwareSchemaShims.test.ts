@@ -45,7 +45,6 @@ describe('getSchema2Dimensions()', () => {
             z: 3.0,
           },
         },
-        footprint: {} as any,
       },
     }
     const result = getSchema2Dimensions(definition as LabwareDefinition3)
@@ -98,7 +97,6 @@ describe('getLabwareViewBox()', () => {
             z: 10,
           },
         },
-        footprint: {} as any,
       },
     }
     const result = getLabwareViewBox(definition as LabwareDefinition3)
@@ -141,13 +139,16 @@ describe('getDeckSlotOriginToLabwareOrigin()', () => {
     const labwareDef: Partial<LabwareDefinition3> = {
       schemaVersion: 3,
       extents: {
-        footprint: {
-          backLeft: { x: 0, y: 0 },
-          frontRight: { x: 200, y: -100 },
-        },
         total: {
           backLeftBottom: { x: -10, y: 10, z: 0 },
           frontRightTop: { x: 210, y: -110, z: 1000 },
+        },
+      },
+      features: {
+        slotFootprintAsChild: {
+          z: 0,
+          backLeft: { x: 0, y: 0 },
+          frontRight: { x: 200, y: -100 },
         },
       },
     }
