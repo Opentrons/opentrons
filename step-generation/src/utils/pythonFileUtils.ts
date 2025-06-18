@@ -132,7 +132,10 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -201,7 +204,10 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_labware(\n` +
