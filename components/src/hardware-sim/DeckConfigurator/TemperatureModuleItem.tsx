@@ -51,6 +51,7 @@ export function TemperatureModuleItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -94,7 +95,7 @@ export function TemperatureModuleItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
               }
             : () => {}
         }

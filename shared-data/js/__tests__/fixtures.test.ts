@@ -10,8 +10,8 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
-  getAAFromCutoutFixtureId,
-  getAddressableAreaMatchForAreaId,
+  getAAWithFakesFromCutoutFixtureId,
+  replaceAAWithFakeAA,
   getCutoutFixtureReplacementIfNeeded,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFixtureRemoval,
@@ -21,7 +21,7 @@ import { getDeckDefFromRobotType } from '../helpers'
 
 describe('getAAFromCutoutFixtureId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
-    const result = getAAFromCutoutFixtureId(
+    const result = getAAWithFakesFromCutoutFixtureId(
       'cutoutD3',
       'flexStackerModuleV1',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -32,7 +32,7 @@ describe('getAAFromCutoutFixtureId', () => {
   })
 
   it('Should return undefined if there is no match for a cutoutId and a cutoutFixtureId', () => {
-    const result = getAAFromCutoutFixtureId(
+    const result = getAAWithFakesFromCutoutFixtureId(
       'cutoutA1',
       'flexStackerModuleV1',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -133,9 +133,9 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
   })
 })
 
-describe('getAddressableAreaMatchForAreaId', () => {
+describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   it('Should find an aa for flex stacker', () => {
-    const result = getAddressableAreaMatchForAreaId(
+    const result = replaceAAWithFakeAA(
       'cutoutD3',
       'flexStackerModuleV1',
       'fakeD4'
@@ -145,7 +145,7 @@ describe('getAddressableAreaMatchForAreaId', () => {
   })
 
   it('Should find an aa for waste chute', () => {
-    const result = getAddressableAreaMatchForAreaId(
+    const result = replaceAAWithFakeAA(
       'cutoutD3',
       'wasteChuteRightAdapterNoCover',
       'D3'
@@ -154,7 +154,7 @@ describe('getAddressableAreaMatchForAreaId', () => {
   })
 
   it('Should find an aa for staging area', () => {
-    const result = getAddressableAreaMatchForAreaId(
+    const result = replaceAAWithFakeAA(
       'cutoutD3',
       'stagingAreaRightSlot',
       'fakeD4'
@@ -163,7 +163,7 @@ describe('getAddressableAreaMatchForAreaId', () => {
   })
 
   it('Should find an aa for temp module', () => {
-    const result = getAddressableAreaMatchForAreaId(
+    const result = replaceAAWithFakeAA(
       'cutoutA1',
       'temperatureModuleV2',
       'A1'
@@ -196,7 +196,9 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
   it('Should get SINGLE_RIGHT_SLOT_FIXTURE to replace staging slot removal', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       STAGING_AREA_RIGHT_SLOT_FIXTURE,
-      'cutoutD3'
+      'cutoutD3',
+      'fakeD4',
+      [] // replace with actual mock
     )
 
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
@@ -205,7 +207,9 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
   it('Should return SINGLE_RIGHT_SLOT_FIXTURE when using a single right cutout', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       SINGLE_RIGHT_SLOT_FIXTURE,
-      'cutoutD3'
+      'cutoutD3',
+      'D3',
+      [] // replace with actual mock
     )
 
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
@@ -214,7 +218,9 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
   it('Should return SINGLE_LEFT_SLOT_FIXTURE when using a single right cutout', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       SINGLE_RIGHT_SLOT_FIXTURE,
-      'cutoutA1'
+      'cutoutA1',
+      'A1',
+      [] // replace with actual mock
     )
 
     expect(result).toEqual(SINGLE_LEFT_SLOT_FIXTURE)
@@ -223,7 +229,9 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
   it('Should return SINGLE_CENTER_SLOT_FIXTURE when using a single center cutout', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       SINGLE_RIGHT_SLOT_FIXTURE,
-      'cutoutA2'
+      'cutoutA2',
+      'A2',
+      [] // replace with actual mock
     )
 
     expect(result).toEqual(SINGLE_CENTER_SLOT_FIXTURE)

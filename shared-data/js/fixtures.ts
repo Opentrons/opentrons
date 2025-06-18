@@ -378,8 +378,20 @@ export const getCutoutFixtureReplacementIfNeeded = (
 
 export const getReplacementFixtureForFixtureRemoval = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  cutoutId: CutoutId
+  cutoutId: CutoutId,
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckConfigWithAA: CutoutConfigMap[]
 ): CutoutFixtureId => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const result = getAAWithFakesFromCutoutFixtureId(cutoutId, cutoutFixtureId, deckDef)
+  console.log("result: ", result)
+  const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
+    cutoutFixtureId,
+    deckConfigWithAA,
+    cutoutId,
+    addressableAreaId
+  )
+  console.log("cutoutFixtureReplacment: ", cutoutFixtureReplacment)
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
@@ -421,7 +433,7 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
       deckDef
     )
 
-    const aaPerCutoutFixture = getAAFromCutoutFixtureId(
+    const aaPerCutoutFixture = getAAWithFakesFromCutoutFixtureId(
       obj.cutoutId,
       cutoutFixtureReplacment,
       deckDef
@@ -442,7 +454,7 @@ export const filterAAByAreaType = (
   deckDef: DeckDefinition,
   areaType: AreaTypeWithFakes
 ): CutoutConfigMap[] => {
-  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDef)
+  const deckDefWithFakeLocations = getDeckDefWithFakes(deckDef)
   return cutoutFixtures.filter(({ addressableAreaId }) => {
     return deckDefWithFakeLocations.locations.addressableAreas.find(
       aa => aa.id === addressableAreaId && aa.areaType === areaType
@@ -455,7 +467,7 @@ export const filterAAByAreaType = (
  * @param deckDefinition: deck def we wish to extend
  * @returns a new deck def with fake fixtures
  */
-export const getDeckDefAAWithFakeAA = (
+export const getDeckDefWithFakes = (
   deckDefinition: DeckDefinition
 ): DeckDefinitionWithFakes => {
   const locationsWithFakeAA = [
@@ -486,7 +498,7 @@ export const getAAByAAId = (
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDefinition: DeckDefinition
 ): AddressableAreaWithFakes => {
-  const deckDefWithFakeLocations = getDeckDefAAWithFakeAA(deckDefinition)
+  const deckDefWithFakeLocations = getDeckDefWithFakes(deckDefinition)
   // there should be a match with addressableAreaId
   const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
     (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
@@ -497,13 +509,13 @@ export const getAAByAAId = (
   return aaItem
 }
 
-export const getAAFromCutoutFixtureId = (
+export const getAAWithFakesFromCutoutFixtureId = (
   inputCutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   deckDefinition: DeckDefinition
 ): AddressableAreaNamesWithFakes[] | null => {
   /**
-   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, or null if there is none
+   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, null if there is none
    */
   const cutoutFixturesWithFakeFixtures = [
     ...deckDefinition.cutoutFixtures,
@@ -770,7 +782,7 @@ export const getFlexDeckDefAAByFixtureIdForCutoutId = (
   cutoutId: CutoutId
 ): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const deckDefWithFakes = getDeckDefAAWithFakeAA(deckDef)
+  const deckDefWithFakes = getDeckDefWithFakes(deckDef)
   // replace staging area aaId to fake ones
   const availableCutoutFixtuers = deckDefWithFakes.cutoutFixtures.filter(cf =>
     cf.mayMountTo.includes(cutoutId)
@@ -794,7 +806,7 @@ export const getFlexDeckDefAAByFixtureIdForCutoutId = (
  * @param fixtureId - The fixtureId we are looking for.
  * @returns The aa name or null if not match found.
  */
-export const getAddressableAreaMatchForAreaId = (
+export const replaceAAWithFakeAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
   addressableAreaId: AddressableAreaNamesWithFakes
@@ -809,10 +821,31 @@ export const getAddressableAreaMatchForAreaId = (
     return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
     const aa = aaListForFixtureId.find(
-      (aa: AddressableAreaNamesWithFakes) =>
-        aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
+      (aa: AddressableAreaNamesWithFakes) => {
+        console.log("AA_TO_AA_SLOT[aa]: ", AA_TO_AA_SLOT[aa])
+        console.log("addressableAreaId!: ", addressableAreaId)
+        return aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
+      }
     )
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
+  }
+}
+
+const replaceFakeAAWithAA = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureIdsWithFakes,
+  addressableAreaId: AddressableAreaNamesWithFakes) => {
+  const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
+    cutoutId
+  )
+  const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
+  if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
+    return aaListForFixtureId[0]
+  } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
+    return DEFAULT_AA_FOR_WASTE_CHUTE
+  } else {
+    const aablah = aaListForFixtureId.find(aa => aa === addressableAreaId)
+    return aablah ? AA_TO_AA_SLOT[aablah] : addressableAreaId as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
 
@@ -877,3 +910,72 @@ export const replaceCutoutFixtureWithComboFixture = (
     return { ...aaCutoutItem }
   })
 }
+
+/**
+ * Given a cutout fixture to remove find what fixture to use instead
+ * @param addedCutoutConfigs: fixtures list selected to add to deck
+ * @param deckConfigWithAA: current deck state
+ * @param cutoutId:
+ * @returns update list of the current deck with the combo fixtures replacements
+ */
+ export const replaceCutoutFixtureRemove = (
+  cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
+  deckConfigWithAA: CutoutConfigMap[],
+  cutoutId: CutoutId,
+  addressableAreaId: AddressableAreaNamesWithFakes
+): CutoutConfigMap[] => {
+  const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
+  const aa = replaceFakeAAWithAA(cutoutId, cutoutFixtureRemoved, addressableAreaId)
+  console.log("replaceAAWithFakeAA: ", aa)
+console.log("cutoutFixtureRemoved: ", cutoutFixtureRemoved)
+  console.log("deckConfigWithAA: ", deckConfigWithAA)
+  console.log("given aa: ", addressableAreaId)
+  return []
+  // return addedCutoutConfigs.map(aaCutoutItem => {
+  //   console.log('Processing cutout item:', aaCutoutItem)
+
+  //   // Only handle SINGLE_RIGHT_CUTOUTS
+  //   if (!SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId)) {
+  //     return { ...aaCutoutItem }
+  //   }
+
+  //   // Filter potential combo fixture options
+  //   const comboFixturesOptions = Object.entries(
+  //     addressableAreasById
+  //   ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
+
+  //   // Try to match with deck config
+  //   for (const dc of deckConfigWithAA) {
+  //     const match = comboFixturesOptions.find(([, areaIds]) =>
+  //       areaIds.includes(dc.addressableAreaId)
+  //     )
+
+  //     if (match) {
+  //       if (match[0] === aaCutoutItem.cutoutFixtureId) {
+  //         return { ...aaCutoutItem }
+  //       } else {
+  //         const [fixtureId, areaList] = match
+  //         const otherModules = areaList.filter(
+  //           id => id !== aaCutoutItem.addressableAreaId
+  //         )
+  //         const matchedModule = deckConfigWithAA.find(dc =>
+  //           otherModules.includes(dc.addressableAreaId)
+  //         )
+  //         const sn = matchedModule?.opentronsModuleSerialNumber
+  //         return {
+  //           ...aaCutoutItem,
+  //           cutoutFixtureId: fixtureId as CutoutFixtureId,
+  //           opentronsModuleSerialNumber:
+  //             sn ?? aaCutoutItem.opentronsModuleSerialNumber,
+  //         }
+  //       }
+  //     } else {
+  //       console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
+  //       continue
+  //     }
+  //   }
+  //   // Fallback if no match found
+  //   return { ...aaCutoutItem }
+  // })
+}
+
