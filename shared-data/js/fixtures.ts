@@ -513,7 +513,7 @@ export function getCutoutIdsFromModuleSlotName(
   return Object.keys(fixtureIdByCutoutId) as CutoutId[]
 }
 
-// meant to provide an array of all addressable areas provided by a load module command
+// provides an array of all addressable areas provided by a load module command
 export function getAddressableAreaNamesFromLoadedModule(
   moduleModel: ModuleModel,
   slotName: ModuleLocation['slotName'],
