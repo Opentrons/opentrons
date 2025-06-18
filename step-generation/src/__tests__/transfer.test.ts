@@ -3245,7 +3245,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         preWetTip: true,
-        aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -3402,7 +3402,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         preWetTip: true,
-        dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4043,7 +4043,7 @@ describe('advanced options', () => {
           volume: 250,
           times: 2,
         },
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       // mixes will include the delays after aspirating
@@ -4202,7 +4202,7 @@ describe('advanced options', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4666,7 +4666,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4825,7 +4825,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -5149,7 +5149,7 @@ describe('advanced options', () => {
           volume: 250,
           times: 2,
         },
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       // mixes will include the delays after aspirating
@@ -5310,7 +5310,7 @@ describe('advanced options', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
