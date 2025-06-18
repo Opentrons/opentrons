@@ -149,6 +149,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.05 * 50 + 1
     const expectedTravelMm = 50 / expectedAccuracy
@@ -183,8 +184,9 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'blowout',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
-    const expectedAccuracy = 0.06 * 80 + 1.2
+    const expectedAccuracy = 0.785 * FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED
     const expectedTravelMm = 80 / expectedAccuracy
     const expectedMaxFlowRate = round(
       80 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
@@ -200,6 +202,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.1 * 5 + 0.5
     const expectedTravelMm = 5 / expectedAccuracy
@@ -217,6 +220,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'dispense',
       correctionVolume: 10,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.06 * 50 + 1.2
     const expectedTravelMm = 50 / expectedAccuracy
@@ -236,6 +240,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.05 * 150 + 1 // Using the last entry [100, 0.05, 1]
     const expectedTravelMm = 150 / expectedAccuracy
