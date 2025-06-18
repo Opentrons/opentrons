@@ -197,12 +197,6 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
     features=LocatingFeatures(),
-    extents={
-        "total": {
-            "backLeftBottom": {"x": 1, "y": 2, "z": 3},
-            "frontRightTop": {"x": 4, "y": 5, "z": 6},
-        },
-    },
 )
 
 
@@ -2982,12 +2976,6 @@ def test_get_slot_item(
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
         features=LocatingFeatures(),
-        extents={
-            "total": {
-                "backLeftBottom": {"x": 1, "y": 2, "z": 3},
-                "frontRightTop": {"x": 4, "y": 5, "z": 6},
-            },
-        },
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(

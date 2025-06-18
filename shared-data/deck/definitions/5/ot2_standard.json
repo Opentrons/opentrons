@@ -22,20 +22,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 1",
         "features": {},
         "compatibleModuleTypes": [
@@ -53,20 +39,6 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
-        },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
         },
         "displayName": "Slot 2",
         "features": {},
@@ -86,20 +58,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 3",
         "features": {},
         "compatibleModuleTypes": [
@@ -117,20 +75,6 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
-        },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
         },
         "displayName": "Slot 4",
         "features": {},
@@ -150,20 +94,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 5",
         "features": {},
         "compatibleModuleTypes": [
@@ -182,20 +112,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 6",
         "features": {},
         "compatibleModuleTypes": [
@@ -213,20 +129,6 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
-        },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
         },
         "displayName": "Slot 7",
         "features": {},
@@ -247,20 +149,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 8",
         "features": {},
         "compatibleModuleTypes": [
@@ -278,20 +166,6 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
-        },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
         },
         "displayName": "Slot 9",
         "features": {},
@@ -311,20 +185,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 10",
         "features": {},
         "compatibleModuleTypes": [
@@ -343,20 +203,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 11",
         "features": {},
         "compatibleModuleTypes": [
@@ -374,20 +220,6 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 128.0,
-              "y": -86.0,
-              "z": 0
-            }
-          }
-        },
         "displayName": "Slot 12",
         "features": {},
         "compatibleModuleTypes": []
@@ -400,20 +232,6 @@
           "xDimension": 107.11,
           "yDimension": 165.67,
           "zDimension": 82
-        },
-        "extents": {
-          "total": {
-            "backLeftBottom": {
-              "x": 0,
-              "y": 0,
-              "z": 0
-            },
-            "frontRightTop": {
-              "x": 107.11,
-              "y": -165.67,
-              "z": 82
-            }
-          }
         },
         "displayName": "Slot 12/Fixed Trash",
         "features": {},

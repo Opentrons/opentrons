@@ -136,12 +136,6 @@ def get_addressable_area_from_name(
                     "compatibleModuleTypes", []
                 ),
                 features=features,
-                extents={
-                    "total": {
-                        "backLeftBottom": {"x": 1, "y": 2, "z": 3},
-                        "frontRightTop": {"x": 4, "y": 5, "z": 6},
-                    },
-                },
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName
 
 from opentrons_shared_data.module.types import ModuleType as SharedDataModuleType
 from opentrons_shared_data.deck.types import SlotDefV3
-from opentrons_shared_data.labware.types import LocatingFeatures, Extents
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 
 from .util import Vec3f, Dimensions
@@ -56,7 +56,6 @@ class AddressableArea:
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
     features: LocatingFeatures
-    extents: Extents
 
 
 # TODO make the below some sort of better type
