@@ -25,19 +25,7 @@
       }
     }
   },
-  "features": {
-    "slotFootprintAsChild": {
-      "z": 0,
-      "backLeft": {
-        "x": 0,
-        "y": 0
-      },
-      "frontRight": {
-        "x": 111,
-        "y": -75
-      }
-    }
-  },
+  "features": {},
   "wells": {},
   "groups": [
     {

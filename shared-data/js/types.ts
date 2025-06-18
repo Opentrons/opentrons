@@ -270,7 +270,7 @@ export interface SlotFootprintAsChildFeature {
 }
 
 export interface LocatingFeatures {
-  slotFootprintAsChild: SlotFootprintAsChildFeature
+  slotFootprintAsChild?: SlotFootprintAsChildFeature
 }
 
 export type LabwareRoles =

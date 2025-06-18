@@ -97,9 +97,9 @@ export function getDeckSlotOriginToLabwareOrigin(
     // the slot. This is good enough for current display purposes and matches the schema 2 behavior.
     const slotFrontLeftToLabwareFrontLeftBottom = VEC_ZERO
     const labwareOriginToLabwareFrontLeftBottom = {
-      x: labwareDefinition.features.slotFootprintAsChild.backLeft.x,
-      y: labwareDefinition.features.slotFootprintAsChild.frontRight.y,
-      z: labwareDefinition.features.slotFootprintAsChild.z,
+      x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
+      y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,
+      z: labwareDefinition.features.slotFootprintAsChild?.z ?? 0,
     }
     const labwareFrontLeftBottomToLabwareOrigin = getVectorInverse(
       labwareOriginToLabwareFrontLeftBottom

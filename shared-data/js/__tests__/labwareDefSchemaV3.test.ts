@@ -62,9 +62,23 @@ const checkExtents = (labwareDef: LabwareDefinition3): void => {
     expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
   })
   test('slotFootprintAsChild feature should be oriented correctly', () => {
-    const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
-    expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
-    expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+    if (labwareDef.features.slotFootprintAsChild) {
+      const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
+      expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+      expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+    }
+  })
+  test('extents.footprint should be contained inside extents.total', () => {
+    if (labwareDef.features.slotFootprintAsChild) {
+      const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
+      const {
+        total: { backLeftBottom, frontRightTop },
+      } = labwareDef.extents
+      expect(backLeft.x).toBeGreaterThanOrEqual(backLeftBottom.x)
+      expect(backLeft.y).toBeLessThanOrEqual(backLeftBottom.y)
+      expect(frontRight.x).toBeLessThanOrEqual(frontRightTop.x)
+      expect(frontRight.y).toBeGreaterThanOrEqual(frontRightTop.y)
+    }
   })
 }
 
@@ -104,12 +118,17 @@ describe(`test labware definitions with schema v3`, () => {
     const labwareDef = require(labwarePath) as LabwareDefinition3
 
     test('extents properly use back-left bottom origin with quadrant IV coordinates', () => {
-      const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
+      if (labwareDef.features.slotFootprintAsChild) {
+        const {
+          backLeft,
+          frontRight,
+        } = labwareDef.features.slotFootprintAsChild
 
-      expect(backLeft.x).toBe(0)
-      expect(backLeft.y).toBe(0)
-      expect(frontRight.x).toBeGreaterThan(0)
-      expect(frontRight.y).toBeLessThan(0)
+        expect(backLeft.x).toBe(0)
+        expect(backLeft.y).toBe(0)
+        expect(frontRight.x).toBeGreaterThan(0)
+        expect(frontRight.y).toBeLessThan(0)
+      }
     })
 
     test('all wells have quadrant IV coordinates', () => {
