@@ -88,69 +88,12 @@ class FlexStacker(mod_abc.AbstractModule):
     MODULE_TYPE = ModuleType.FLEX_STACKER
 
     @classmethod
-    async def build_standalone(
-        cls,
-        port: str,
-        hw_control_loop: asyncio.AbstractEventLoop,
-        simulating: bool = False,
-        sim_serial_number: Optional[str] = None,
-        poll_interval_seconds: Optional[float] = None,
-    ) -> "FlexStacker":
-        """
-        Build a FlexStacker in standalone mode, without an execution manager.
-        This is useful for testing or when the module is used outside a protocol.
-
-        Args:
-            port: The port to connect to
-            usb_port: USB Port
-            simulating: whether to build a simulating driver
-            sim_serial_number: Serial number for the simulated driver
-
-        Returns:
-            FlexStacker instance
-        """
-        driver: AbstractFlexStackerDriver
-        if not simulating:
-            driver = await FlexStackerDriver.create(port=port, loop=hw_control_loop)
-            poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
-        else:
-            driver = SimulatingDriver(serial_number=sim_serial_number)
-            poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
-
-        reader = FlexStackerReader(driver=driver)
-        poller = Poller(reader=reader, interval=poll_interval_seconds)
-        module = cls(
-            port=port,
-            driver=driver,
-            reader=reader,
-            poller=poller,
-            device_info=(await driver.get_device_info()).to_dict(),
-            hw_control_loop=hw_control_loop,
-        )
-
-        # Set initialized callback
-        reader.set_initialized_callback(module._initialized_callback)
-
-        # Enable stallguard
-        for axis, config in STALLGUARD_CONFIG.items():
-            await driver.set_stallguard_threshold(
-                axis, config.enabled, config.threshold
-            )
-
-        try:
-            await poller.start()
-        except Exception:
-            log.exception(f"First read of Flex-Stacker on port {port} failed")
-
-        return module
-
-    @classmethod
     async def build(
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -215,23 +158,22 @@ class FlexStacker(mod_abc.AbstractModule):
     def __init__(
         self,
         port: str,
+        usb_port: USBPort,
         driver: AbstractFlexStackerDriver,
         reader: FlexStackerReader,
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
-        usb_port: Optional[USBPort] = None,
         execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ):
-        if execution_manager is not None and usb_port is not None:
-            super().__init__(
-                port=port,
-                usb_port=usb_port,
-                hw_control_loop=hw_control_loop,
-                execution_manager=execution_manager,
-                disconnected_callback=disconnected_callback,
-            )
+        super().__init__(
+            port=port,
+            usb_port=usb_port,
+            hw_control_loop=hw_control_loop,
+            execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
+        )
         self._device_info = device_info
         self._driver = driver
         self._reader = reader

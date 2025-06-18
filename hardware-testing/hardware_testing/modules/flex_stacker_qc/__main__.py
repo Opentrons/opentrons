@@ -16,6 +16,7 @@ from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from .utils import find_stacker_port, get_estop
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.hardware_control.modules.types import PlatformState
 
@@ -27,8 +28,10 @@ async def build_stacker_report(
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
 
-    stacker = await FlexStacker.build_standalone(
-        port="" if is_simulating else find_stacker_port(),
+    port = "" if is_simulating else find_stacker_port()
+    stacker = await FlexStacker.build(
+        port=port,
+        usb_port=USBPort(port, 0),
         hw_control_loop=asyncio.get_running_loop(),
         simulating=is_simulating,
         sim_serial_number="FLEX1234" if is_simulating else None,
