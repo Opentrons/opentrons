@@ -34,7 +34,6 @@ import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
-import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
 import {
   getRobotStateTimeline,
   getRobotType,
@@ -177,7 +176,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     location: error.location,
   }))
   const timeline = useSelector(getRobotStateTimeline)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
   const robotType = useSelector(getRobotType)
@@ -296,8 +294,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
   const numStepFormPages = getStepFormNumPages(
     formData.stepType,
-    enableReadOrInitialization != null,
-    enableLiquidClasses
+    enableReadOrInitialization != null
   )
   const isMultiStepToolbox =
     formData.stepType === 'absorbanceReader'
@@ -549,13 +546,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
 const getStepFormNumPages = (
   stepType: StepType,
-  enableReadOrInitialization: boolean,
-  enableLiquidClasses: boolean
+  enableReadOrInitialization: boolean
 ): number => {
   switch (stepType) {
     case 'mix':
     case 'moveLiquid':
-      return enableLiquidClasses ? 3 : 2
+      return 3
     case 'thermocycler':
       return 2
     case 'absorbanceReader':

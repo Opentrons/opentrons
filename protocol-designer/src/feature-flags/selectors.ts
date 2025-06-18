@@ -43,10 +43,6 @@ export const getEnableReactScan: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_REACT_SCAN ?? false
 )
-export const getEnableLiquidClasses: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_LIQUID_CLASSES ?? false
-)
 export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 ?? false
