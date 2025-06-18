@@ -304,7 +304,9 @@ export const makeSingleEditFieldProps = (
   handleChangeFormInput: (name: string, value: unknown) => void,
   hydratedForm: HydratedFormData,
   t: any,
-  visibleFormErrors: StepFormErrors
+  visibleFormErrors: StepFormErrors,
+  showFormErrors: boolean,
+  currentFormIsPresaved: boolean
 ): FieldPropsByName => {
   const { blur, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(
@@ -323,7 +325,12 @@ export const makeSingleEditFieldProps = (
     //  NOTE: some fields can have multiple errors, but we
     //  will always just show the first one until they're all
     //  resolved
-    const error = mappedErrorsToField[name]?.[0]?.title
+    const error = mappedErrorsToField[name]?.[0]
+    const errorTitle =
+      error != null &&
+      (showFormErrors || (!currentFormIsPresaved && error.showOnReopen))
+        ? error.title
+        : null
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }
@@ -346,7 +353,7 @@ export const makeSingleEditFieldProps = (
 
     const fieldProps: FieldProps = {
       disabled,
-      errorToShow: error,
+      errorToShow: errorTitle,
       name,
       updateValue,
       value,

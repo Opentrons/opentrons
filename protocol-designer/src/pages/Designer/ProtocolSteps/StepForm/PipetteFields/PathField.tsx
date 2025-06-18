@@ -120,8 +120,6 @@ const getSubtitle = (
 
 export function PathField(props: PathFieldProps): JSX.Element {
   const {
-    aspirate_airGap_checkbox,
-    aspirate_airGap_volume,
     aspirate_wells,
     changeTip,
     dispense_wells,
@@ -138,8 +136,6 @@ export function PathField(props: PathFieldProps): JSX.Element {
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const disabledPathMap = getDisabledPathMap(
     {
-      aspirate_airGap_checkbox,
-      aspirate_airGap_volume,
       aspirate_wells,
       changeTip,
       dispense_wells,

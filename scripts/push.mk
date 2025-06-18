@@ -26,6 +26,7 @@ PLATFORM := $(shell uname -s)
 is-windows=$(findstring $(PLATFORM), Windows)
 $(if $(is-windows), echo "when using windows with an openSSH version larger then 9 add -O flag to scp command. see comments for more details")
 
+here=$(dir $(lastword "$(MAKEFILE_LIST)"))
 # push-python: universal installer for python dists to robots
 # argument 1 is the host to push to
 # argument 2 is the identity file to use, if any
@@ -33,9 +34,17 @@ $(if $(is-windows), echo "when using windows with an openSSH version larger then
 # argument 4 is the path to the sdist locally
 # argument 5 is the path to go to on the remote side
 define push-python
+<<<<<<< Updated upstream
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(dir $(realpath $(lastword $(MAKEFILE_LIST))))/install-dist-remote.sh root@$(1):/var/
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) chmod a+x /var/install-dist-remote.sh
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) /var/install-dist-remote.sh /var/$(notdir $(4)) $(5)
+=======
+scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/var/$(notdir $(4))
+scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(here)/install-dist-remote.sh" root@$(1):/var/
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) "chmod a+x /var/install-dist-remote.sh"
+ssh $(call id-file-arg,$(2)) $(3) root@$(1) "/var/install-dist-remote.sh \"/var/$(notdir $(4))\" \"$(5)\""
+>>>>>>> Stashed changes
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units
@@ -57,13 +66,13 @@ endef
 # argument 4 is the unit file path
 define push-systemd-unit
 	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
-	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
+	ssh $(call id-file-arg,$(2)) "$(3)" root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
 
 # id-file-arg: Internal helper for generating the -i arg for ssh/scp commands
 #
 # argument 1 is the identity file to use, if any
-id-file-arg = $(if $(1),-i $(1))
+id-file-arg = $(if $(1),-i "$(1)")
 
 # VERSION_HELPER: helper python script to update a dict with some entries
 # NOTE: This is only to be used in the context of sync-version-file function
@@ -87,7 +96,7 @@ define sync-version-file
 	@echo package-version: $(4)
 	$(shell python -c '$(VERSION_HELPER)')
 	$(eval filepath=$(shell find . -type f -name new_version_file.json))
-	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) ${filepath} root@$(1):/data/VERSION.json
+	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) "$(3)" "${filepath} root@$(1):/data/VERSION.json
 	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && cp /data/VERSION.json /etc/VERSION.json && mount -o remount,ro / || mount -o remount,ro /"
-	rm -rf ${filepath}
+	rm -rf "${filepath}"
 endef
