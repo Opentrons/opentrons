@@ -1029,6 +1029,11 @@
       "x": 0,
       "y": 0,
       "z": 10.16
+    },
+    "biorad_96_wellplate_200ul_pcr": {
+      "x": 0,
+      "y": 0,
+      "z": 2.42
     }
   },
   "stackingOffsetWithModule": {

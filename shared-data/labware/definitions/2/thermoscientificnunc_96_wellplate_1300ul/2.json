@@ -1112,6 +1112,13 @@
     "y": 0,
     "z": 0
   },
+  "stackingOffsetWithLabware":{
+    "thermoscientificnunc_96_wellplate_1300ul":{
+      "x":0,
+      "y": 0,
+      "z": 1.7 
+    }
+  },
   "innerLabwareGeometry": {
     "conicalWell": {
       "sections": [

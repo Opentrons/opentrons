@@ -4327,5 +4327,12 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "biorad_384_wellplate_50ul": {
+      "x": 0,
+      "y": 0,
+      "z": 2.7
+    }
   }
 }

@@ -1204,6 +1204,13 @@
   "namespace": "opentrons",
   "version": 2,
   "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "usascientific_96_wellplate_2.4ml_deep": {
+      "x": 0,
+      "y": 0,
+      "z": 0.7
+    }
+  },
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
