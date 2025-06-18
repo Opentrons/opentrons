@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
-  getDeckDefAAWithFakeAA,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,

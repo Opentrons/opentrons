@@ -333,7 +333,8 @@ export const getNewConfig = (
 ): DeckConfiguration => {
   const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
     cutoutFixtureId,
-    cutoutId
+    cutoutId,
+    addressableAreaId
   )
 
   const fixtureGroup =

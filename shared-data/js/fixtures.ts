@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual'
+
 import {
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -379,24 +381,26 @@ export const getCutoutFixtureReplacementIfNeeded = (
 export const getReplacementFixtureForFixtureRemoval = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes,
-  deckConfigWithAA: CutoutConfigMap[]
+  addressableAreaId?: AddressableAreaNamesWithFakes,  //nullable for PD
+  deckConfigWithAA?: CutoutConfigMap[]
 ): CutoutFixtureId => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const result = getAAWithFakesFromCutoutFixtureId(cutoutId, cutoutFixtureId, deckDef)
-  console.log("result: ", result)
-  const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
-    cutoutFixtureId,
-    deckConfigWithAA,
-    cutoutId,
-    addressableAreaId
-  )
-  console.log("cutoutFixtureReplacment: ", cutoutFixtureReplacment)
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+  }
+  else if(addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)){
+    const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
+      cutoutFixtureId,
+      cutoutId,
+      addressableAreaId,
+      deckConfigWithAA ?? []
+    )
+    console.log("cutoutFixtureReplacment: ", cutoutFixtureReplacment)
+    return cutoutFixtureReplacment
+  }
+  else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+  } 
+  else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_LEFT_SLOT_FIXTURE
   }
   return SINGLE_CENTER_SLOT_FIXTURE
@@ -474,8 +478,13 @@ export const getDeckDefWithFakes = (
     ...deckDefinition.locations.addressableAreas,
     ...FAKE_FIXTURES_AND_AA.locations.addressableAreas,
   ]
+  const fixturesWithFakes = [
+    ...deckDefinition.cutoutFixtures,
+    ...FAKE_FIXTURES_AND_AA.cutoutFixtures
+  ]
   return {
     ...deckDefinition,
+    cutoutFixtures: fixturesWithFakes,
     locations: {
       ...deckDefinition.locations,
       addressableAreas: locationsWithFakeAA,
@@ -783,6 +792,7 @@ export const getFlexDeckDefAAByFixtureIdForCutoutId = (
 ): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
   const deckDefWithFakes = getDeckDefWithFakes(deckDef)
+  console.log("deckDefWithFakes: ", deckDefWithFakes)
   // replace staging area aaId to fake ones
   const availableCutoutFixtuers = deckDefWithFakes.cutoutFixtures.filter(cf =>
     cf.mayMountTo.includes(cutoutId)
@@ -920,62 +930,53 @@ export const replaceCutoutFixtureWithComboFixture = (
  */
  export const replaceCutoutFixtureRemove = (
   cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
-  deckConfigWithAA: CutoutConfigMap[],
   cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes
-): CutoutConfigMap[] => {
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckConfigWithAA: CutoutConfigMap[],
+): CutoutFixtureIdsWithFakes => {
   const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
-  const aa = replaceFakeAAWithAA(cutoutId, cutoutFixtureRemoved, addressableAreaId)
-  console.log("replaceAAWithFakeAA: ", aa)
-console.log("cutoutFixtureRemoved: ", cutoutFixtureRemoved)
-  console.log("deckConfigWithAA: ", deckConfigWithAA)
-  console.log("given aa: ", addressableAreaId)
-  return []
-  // return addedCutoutConfigs.map(aaCutoutItem => {
-  //   console.log('Processing cutout item:', aaCutoutItem)
+  console.log("addressableAreasById: ", addressableAreasById)
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const aaForCutoutAndFixture = getAAWithFakesFromCutoutFixtureId(cutoutId, cutoutFixtureRemoved, deckDef)
+  const updated = aaForCutoutAndFixture?.map(aa => aa === addressableAreaId ? replaceFakeAAWithAA(cutoutId, cutoutFixtureRemoved, aa) : aa)
+  console.log("updated: ", updated)
 
-  //   // Only handle SINGLE_RIGHT_CUTOUTS
-  //   if (!SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId)) {
-  //     return { ...aaCutoutItem }
-  //   }
+  const match = Object.entries(addressableAreasById).find(([, value]) => {
+    console.log("value: ", value, "updated: ", updated)
+    console.log("isEqual(value ?? [], updated): ", isEqual(value ?? [], updated))
+    return isEqual(value.sort(), updated?.sort())})
+    console.log("match: ", match)
 
-  //   // Filter potential combo fixture options
-  //   const comboFixturesOptions = Object.entries(
-  //     addressableAreasById
-  //   ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
+  // Filter potential combo fixture options
+  const comboFixturesOptions = Object.entries(
+    addressableAreasById
+  ).filter(([_, areaIds]) => areaIds.includes(addressableAreaId))
 
-  //   // Try to match with deck config
-  //   for (const dc of deckConfigWithAA) {
-  //     const match = comboFixturesOptions.find(([, areaIds]) =>
-  //       areaIds.includes(dc.addressableAreaId)
-  //     )
+  // Try to match with deck config
+  for (const dc of deckConfigWithAA) {
+    const match = comboFixturesOptions.find(([, areaIds]) =>
+      areaIds.includes(dc.addressableAreaId)
+    )
 
-  //     if (match) {
-  //       if (match[0] === aaCutoutItem.cutoutFixtureId) {
-  //         return { ...aaCutoutItem }
-  //       } else {
-  //         const [fixtureId, areaList] = match
-  //         const otherModules = areaList.filter(
-  //           id => id !== aaCutoutItem.addressableAreaId
-  //         )
-  //         const matchedModule = deckConfigWithAA.find(dc =>
-  //           otherModules.includes(dc.addressableAreaId)
-  //         )
-  //         const sn = matchedModule?.opentronsModuleSerialNumber
-  //         return {
-  //           ...aaCutoutItem,
-  //           cutoutFixtureId: fixtureId as CutoutFixtureId,
-  //           opentronsModuleSerialNumber:
-  //             sn ?? aaCutoutItem.opentronsModuleSerialNumber,
-  //         }
-  //       }
-  //     } else {
-  //       console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
-  //       continue
-  //     }
-  //   }
-  //   // Fallback if no match found
-  //   return { ...aaCutoutItem }
-  // })
+    if (match) {
+      if (match[0] === cutoutFixtureRemoved) {
+        return cutoutFixtureRemoved
+      } else {
+        const [fixtureId, areaList] = match
+        const otherModules = areaList.filter(
+          id => id !== addressableAreaId
+        )
+        console.log("[fixtureId, areaList] ", [fixtureId, areaList])
+        console.log("otherModules: ", otherModules)
+      }
+    } else {
+      console.warn('Invalid match for:', cutoutFixtureRemoved)
+      continue
+    }
+  }
+  // Fallback if no match found
+  return cutoutFixtureRemoved
+
+  //return match[0] as CutoutFixtureIdsWithFakes
 }
 
