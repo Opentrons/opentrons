@@ -44,10 +44,10 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-    const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      deckConfig
-    )  
-    const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
     addressableAreaId,
@@ -69,9 +69,9 @@ export function useDeckConfigurationEditingTools(
   ): void => {
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
-      cutoutId,
-      addressableAreaId,
-      deckConfigWithAA
+      cutoutId
+      // addressableAreaId,
+      // deckConfigWithAA
     )
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)

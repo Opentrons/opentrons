@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { AddressableAreaNamesWithFakes, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -21,6 +21,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -51,6 +52,7 @@ export function TemperatureModuleItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -94,7 +96,11 @@ export function TemperatureModuleItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }
