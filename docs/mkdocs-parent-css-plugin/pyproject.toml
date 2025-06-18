@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mkdocs-parent-css-plugin"
+version = "1.0.0"
+description = "An MkDocs plugin to allow extra_css from parent directories."
+authors = [
+  { name="Opentrons" },
+]
+license = { text="Apache 2.0" }
+requires-python = ">=3.8"
+dependencies = [
+    "mkdocs>=1.0"
+]
+
+[project.entry-points."mkdocs.plugins"]
+parent-css = "parent_css_plugin.plugin:ParentCssPlugin"
+
+[project.urls]
+Homepage = "https://github.com/Opentrons/opentrons"
