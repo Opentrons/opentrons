@@ -1038,6 +1038,11 @@
       "x": 0,
       "y": 0,
       "z": 121
+    },
+    "schema3test_flex_96_tiprack_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 121
     }
   },
   "$otSharedSchema": "#/labware/schemas/3"
