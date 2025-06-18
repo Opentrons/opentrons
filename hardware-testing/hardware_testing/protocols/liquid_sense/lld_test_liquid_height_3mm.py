@@ -101,7 +101,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Volume 3 mm from top",
         description="Volume of liquid 3 mm from top of labware.",
         default=0.0,
-        maximum=10000.0,
+        maximum=500000.0,
         minimum=-100.0,
     )
     parameters.add_float(
@@ -109,7 +109,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Volume of Middle",
         description="Volume of liquid when well is half full.",
         default=0.0,
-        maximum=10000.0,
+        maximum=500000.0,
         minimum=-100.0,
     )
     parameters.add_bool(
