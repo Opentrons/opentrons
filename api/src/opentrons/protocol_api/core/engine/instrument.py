@@ -1205,6 +1205,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
+        keep_last_tip: bool,
     ) -> None:
         """Execute transfer using liquid class properties.
 
@@ -1405,14 +1406,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_contents=post_asp_tip_contents,
                     add_final_air_gap=(
                         False
-                        if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                        if is_last_step
+                        and (keep_last_tip or new_tip == TransferTipPolicyV2.NEVER)
                         else True
                     ),
                     trash_location=trash_location,
                 )
             prev_src = step_source
             prev_dest = step_destination
-        if new_tip != TransferTipPolicyV2.NEVER:
+        if not keep_last_tip or new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
     # TODO(spp, 2025-02-25): wire up return tip
@@ -1427,6 +1429,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
+        keep_last_tip: bool,
     ) -> None:
         """Execute a distribution using liquid class properties.
 
@@ -1510,6 +1513,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 starting_tip=starting_tip,
                 trash_location=trash_location,
                 return_tip=return_tip,
+                keep_last_tip=keep_last_tip,
             )
             return
 
@@ -1694,7 +1698,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         tip_contents=tip_contents,
                         add_final_air_gap=(
                             False
-                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            if is_last_step
+                            and (keep_last_tip or new_tip == TransferTipPolicyV2.NEVER)
                             else True
                         ),
                         trash_location=trash_location,
@@ -1709,7 +1714,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         tip_contents=tip_contents,
                         add_final_air_gap=(
                             False
-                            if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                            if is_last_step
+                            and (keep_last_tip or new_tip == TransferTipPolicyV2.NEVER)
                             else True
                         ),
                         trash_location=trash_location,
@@ -1718,7 +1724,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 is_first_step = False
 
-        if new_tip != TransferTipPolicyV2.NEVER:
+        if not keep_last_tip or new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
     def _tip_can_hold_volume_for_multi_dispensing(
@@ -1753,6 +1759,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
+        keep_last_tip: bool,
     ) -> None:
         if not tip_racks:
             raise RuntimeError(
@@ -1924,12 +1931,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_contents=tip_contents,
                 add_final_air_gap=(
                     False
-                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                    if is_last_step
+                    and (keep_last_tip or new_tip == TransferTipPolicyV2.NEVER)
                     else True
                 ),
                 trash_location=trash_location,
             )
-        if new_tip != TransferTipPolicyV2.NEVER:
+        if not keep_last_tip or new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
 
     def _get_location_and_well_core_from_next_tip_info(
