@@ -47,6 +47,37 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
+    },
+    "vector3D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "(-x, +y, -z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "(+x, -y, +z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
     }
   },
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
@@ -167,6 +198,18 @@
               "displayName": {
                 "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
+              },
+              "extents": {
+                "description": "The outer dimensions of the addressable area.",
+                "type": "object",
+                "required": ["total"],
+                "additionalProperties": false,
+                "properties": {
+                  "total": {
+                    "description": "The all-encompassing outer dimensions of the labware.",
+                    "$ref": "#/definitions/axisAlignedBoundingBox3D"
+                  }
+                }
               },
               "features": {
                 "type": "object",

@@ -82,10 +82,6 @@ _LABWARE_DEF_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
             backLeftBottom=Vector3D(x=100, y=200, z=300),
             frontRightTop=Vector3D(x=1100, y=-800, z=1300),
         ),
-        footprint=AxisAlignedBoundingBox2D(
-            backLeft=Vector2D(x=100, y=200),
-            frontRight=Vector2D(x=1100, y=-800),
-        ),
     ),
     features=LocatingFeatures(
         slotFootprintAsChild=SlotFootprintAsChildFeature(
@@ -151,7 +147,13 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    locating_features_as_parent=LocatingFeatures(),
+    features=LocatingFeatures(),
+    extents={
+        "total": {
+            "backLeftBottom": {"x": 1, "y": 2, "z": 3},
+            "frontRightTop": {"x": 4, "y": 5, "z": 6},
+        },
+    },
 )
 
 

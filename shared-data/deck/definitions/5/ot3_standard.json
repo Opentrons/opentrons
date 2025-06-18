@@ -22,6 +22,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot D1",
         "features": {}
       },
@@ -34,6 +48,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot D2",
         "features": {}
@@ -48,6 +76,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot D3",
         "features": {}
       },
@@ -60,6 +102,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot C1",
         "features": {}
@@ -74,6 +130,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot C2",
         "features": {}
       },
@@ -86,6 +156,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot C3",
         "features": {}
@@ -100,6 +184,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot B1",
         "features": {}
       },
@@ -112,6 +210,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot B2",
         "features": {}
@@ -126,6 +238,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot B3",
         "features": {}
       },
@@ -139,6 +265,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot A1",
         "features": {}
       },
@@ -151,6 +291,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot A2",
         "features": {},
@@ -166,6 +320,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot A3",
         "features": {},
         "compatibleModuleTypes": []
@@ -179,6 +347,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot A4",
         "features": {},
@@ -194,6 +376,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot B4",
         "features": {},
         "compatibleModuleTypes": []
@@ -207,6 +403,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Slot C4",
         "features": {},
@@ -222,6 +432,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Slot D4",
         "features": {},
         "compatibleModuleTypes": []
@@ -234,6 +458,20 @@
           "xDimension": 225,
           "yDimension": 78,
           "zDimension": 40
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
         },
         "displayName": "Trash Bin in D1",
         "features": {},
@@ -248,6 +486,20 @@
           "yDimension": 78,
           "zDimension": 40
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
+        },
         "displayName": "Trash Bin in C1",
         "features": {},
         "ableToDropTips": true
@@ -260,6 +512,20 @@
           "xDimension": 225,
           "yDimension": 78,
           "zDimension": 40
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
         },
         "displayName": "Trash Bin in B1",
         "features": {},
@@ -274,6 +540,20 @@
           "yDimension": 78,
           "zDimension": 40
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
+        },
         "displayName": "Trash Bin in A1",
         "features": {},
         "ableToDropTips": true
@@ -286,6 +566,20 @@
           "xDimension": 225,
           "yDimension": 78,
           "zDimension": 40
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
         },
         "displayName": "Trash Bin in D3",
         "features": {},
@@ -300,6 +594,20 @@
           "yDimension": 78,
           "zDimension": 40
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
+        },
         "displayName": "Trash Bin in C3",
         "features": {},
         "ableToDropTips": true
@@ -312,6 +620,20 @@
           "xDimension": 225,
           "yDimension": 78,
           "zDimension": 40
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
         },
         "displayName": "Trash Bin in B3",
         "features": {},
@@ -326,6 +648,20 @@
           "yDimension": 78,
           "zDimension": 40
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 225,
+              "y": -78,
+              "z": 40
+            }
+          }
+        },
         "displayName": "Trash Bin in A3",
         "features": {},
         "ableToDropTips": true
@@ -338,6 +674,20 @@
           "xDimension": 0,
           "yDimension": 0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Waste Chute",
         "features": {},
@@ -352,6 +702,20 @@
           "yDimension": 63,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 0,
+              "y": -63,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Waste Chute",
         "features": {},
         "ableToDropTips": true
@@ -365,6 +729,20 @@
           "yDimension": 63,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 99,
+              "y": -63,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Waste Chute",
         "features": {},
         "ableToDropTips": true
@@ -377,6 +755,20 @@
           "xDimension": 0,
           "yDimension": 0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Waste Chute",
         "features": {},
@@ -392,6 +784,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Thermocycler Module Slot",
         "features": {}
       },
@@ -403,6 +809,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Heater Shaker in D1",
         "features": {}
@@ -416,6 +836,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Heater Shaker in C1",
         "features": {}
       },
@@ -427,6 +861,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Heater Shaker in B1",
         "features": {}
@@ -440,6 +888,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Heater Shaker in A1",
         "features": {}
       },
@@ -451,6 +913,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Heater Shaker in D3",
         "features": {}
@@ -464,6 +940,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Heater Shaker in C3",
         "features": {}
       },
@@ -475,6 +965,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Heater Shaker in B3",
         "features": {}
@@ -488,6 +992,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Heater Shaker in A3",
         "features": {}
       },
@@ -499,6 +1017,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Temperature Module in D1",
         "features": {}
@@ -512,6 +1044,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Temperature Module in C1",
         "features": {}
       },
@@ -523,6 +1069,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Temperature Module in B1",
         "features": {}
@@ -536,6 +1096,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Temperature Module in A1",
         "features": {}
       },
@@ -547,6 +1121,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Temperature Module in D3",
         "features": {}
@@ -560,6 +1148,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Temperature Module in C3",
         "features": {}
       },
@@ -571,6 +1173,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Temperature Module in B3",
         "features": {}
@@ -584,6 +1200,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Temperature Module in A3",
         "features": {}
       },
@@ -595,6 +1225,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in D1",
         "features": {}
@@ -608,6 +1252,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in C1",
         "features": {}
       },
@@ -619,6 +1277,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in B1",
         "features": {}
@@ -632,6 +1304,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in A1",
         "features": {}
       },
@@ -643,6 +1329,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in D2",
         "features": {}
@@ -656,6 +1356,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in C2",
         "features": {}
       },
@@ -667,6 +1381,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in B2",
         "features": {}
@@ -680,6 +1408,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in A2",
         "features": {}
       },
@@ -691,6 +1433,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in D3",
         "features": {}
@@ -704,6 +1460,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in C3",
         "features": {}
       },
@@ -715,6 +1485,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Magnetic Block in B3",
         "features": {}
@@ -728,6 +1512,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Magnetic Block in A3",
         "features": {}
       },
@@ -739,6 +1537,20 @@
           "xDimension": 127.8,
           "yDimension": 85.5,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
         },
         "displayName": "Absorbance Reader in D3",
         "features": {}
@@ -752,6 +1564,20 @@
           "yDimension": 85.5,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Absorbance Reader in C3",
         "features": {}
       },
@@ -763,6 +1589,20 @@
           "xDimension": 127.8,
           "yDimension": 85.5,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
         },
         "displayName": "Absorbance Reader in B3",
         "features": {}
@@ -776,6 +1616,20 @@
           "yDimension": 85.5,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Absorbance Reader in A3",
         "features": {}
       },
@@ -787,6 +1641,20 @@
           "xDimension": 127.8,
           "yDimension": 85.5,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
         },
         "displayName": "Absorbance Reader Lid Dock in D4",
         "features": {}
@@ -800,6 +1668,20 @@
           "yDimension": 85.5,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Absorbance Reader Lid Dock in C4",
         "features": {}
       },
@@ -811,6 +1693,20 @@
           "xDimension": 127.8,
           "yDimension": 85.5,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
         },
         "displayName": "Absorbance Reader Lid Dock in B4",
         "features": {}
@@ -824,6 +1720,20 @@
           "yDimension": 85.5,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 127.8,
+              "y": -85.5,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Absorbance Reader Lid Dock in A4",
         "features": {}
       },
@@ -835,6 +1745,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Flex Stacker in D4",
         "features": {}
@@ -848,6 +1772,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Flex Stacker in C4",
         "features": {}
       },
@@ -860,6 +1798,20 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
+        },
         "displayName": "Flex Stacker in B4",
         "features": {}
       },
@@ -871,6 +1823,20 @@
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
+        },
+        "extents": {
+          "total": {
+            "backLeftBottom": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "frontRightTop": {
+              "x": 128.0,
+              "y": -86.0,
+              "z": 0
+            }
+          }
         },
         "displayName": "Flex Stacker in A4",
         "features": {}

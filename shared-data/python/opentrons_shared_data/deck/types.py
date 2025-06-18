@@ -8,8 +8,7 @@ from typing import Any, Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
 from ..module.types import ModuleType
-from opentrons_shared_data.labware.types import LocatingFeatures
-
+from opentrons_shared_data.labware.types import LocatingFeatures, Extents
 
 DeckSchemaVersion5 = Literal[5]
 DeckSchemaVersion4 = Literal[4]
@@ -46,6 +45,7 @@ class SlotDefV3(TypedDict, total=False):
     compatibleModuleTypes: List[ModuleType]
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     features: LocatingFeatures
+    extents: Extents
 
 
 class CalibrationPoint(TypedDict):
@@ -112,6 +112,7 @@ class AddressableAreaV5(_RequiredAddressableArea, total=False):
     ableToDropTips: bool
     ableToDropLabware: bool
     features: LocatingFeatures
+    extents: Extents
 
 
 class Cutout(TypedDict):
