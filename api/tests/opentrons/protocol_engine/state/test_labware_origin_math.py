@@ -13,12 +13,14 @@ from opentrons_shared_data.labware.labware_definition import (
     Vector3D,
     Extents,
     AxisAlignedBoundingBox3D,
-    AxisAlignedBoundingBox2D,
-    Vector2D,
     Dimensions,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.labware.types import (
+    LocatingFeatures,
+    SlotFootprintAsChildFeature,
+    Vector2D,
+)
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
@@ -84,6 +86,11 @@ _LABWARE_DEF_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
             backLeft=Vector2D(x=100, y=200),
             frontRight=Vector2D(x=1100, y=-800),
         ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=-10, y=5), frontRight=Vector2D(x=30, y=-20), z=0
+        )
     ),
 )
 
@@ -407,5 +414,5 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
     )
 
-    expected_offset = Point(x=-100, y=800, z=-300)
+    expected_offset = Point(x=10, y=20, z=0)
     assert result == expected_offset

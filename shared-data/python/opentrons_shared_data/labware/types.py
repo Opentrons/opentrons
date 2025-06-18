@@ -3,7 +3,6 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from enum import Enum
 from typing import NewType
 from typing_extensions import Literal, TypedDict, NotRequired
 from .constants import (
@@ -155,19 +154,18 @@ class WellGroup(TypedDict):
 
 class Extents(TypedDict):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
 
 
-class LocatingFeatureKeys(str, Enum):
-    """Keys for LocatingFeatures."""
+class SlotFootprintAsChildFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
 
-    pass
 
-
-class LocatingFeatures(TypedDict):
+class LocatingFeatures(TypedDict, total=False):
     """A dictionary of locating features."""
 
-    pass
+    slotFootprintAsChild: SlotFootprintAsChildFeature
 
 
 class LabwareDefinition2(TypedDict):

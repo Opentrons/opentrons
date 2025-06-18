@@ -552,7 +552,6 @@ class InnerWellGeometry(BaseModel):
 
 class Extents(BaseModel):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
 
 
 class LabwareDefinition2(BaseModel):

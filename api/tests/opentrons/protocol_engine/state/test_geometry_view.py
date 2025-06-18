@@ -45,9 +45,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3,
     Extents,
     AxisAlignedBoundingBox3D,
-    AxisAlignedBoundingBox2D,
     Vector3D,
-    Vector2D,
 )
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.labware import load_definition as load_labware_definition

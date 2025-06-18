@@ -23,7 +23,6 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "features": {},
   "extents": {
     "total": {
       "backLeftBottom": {
@@ -36,8 +35,11 @@
         "y": -85.75,
         "z": 99
       }
-    },
-    "footprint": {
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
       "backLeft": {
         "x": 0,
         "y": 0

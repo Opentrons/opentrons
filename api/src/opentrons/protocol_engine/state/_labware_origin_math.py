@@ -10,6 +10,9 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3,
     Vector3D,
 )
+from opentrons_shared_data.labware.types import (
+    SlotFootprintAsChildFeature,
+)
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from ..types import (
     LabwareParentDefinition,
@@ -232,8 +235,23 @@ def _to_point_from_lw_offset_vector(offset_vector: LabwareOffsetVector) -> Point
 
 def _get_back_left_bottom_position(labware: LabwareDefinition3) -> Point:
     """Get the back left bottom position from a v3 labware definition."""
+    footprint_as_child = _get_labware_footprint_as_child(labware)
+
     return Point(
-        x=labware.extents.footprint.backLeft.x,
-        y=labware.extents.footprint.frontRight.y,
-        z=labware.extents.total.backLeftBottom.z,
+        x=footprint_as_child["backLeft"]["x"],
+        y=footprint_as_child["frontRight"]["y"],
+        z=footprint_as_child["z"],
     )
+
+
+def _get_labware_footprint_as_child(
+    labware: LabwareDefinition3,
+) -> SlotFootprintAsChildFeature:
+    """Get the SlotFootprintAsChildFeature for labware definitions."""
+    footprint_as_child = labware.features.get("slotFootprintAsChild")
+    if footprint_as_child is None:
+        raise ValueError(
+            f"Expected labware {labware.metadata.displayName} to have a SlotFootprintAsChild feature"
+        )
+    else:
+        return footprint_as_child
