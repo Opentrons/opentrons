@@ -238,3 +238,7 @@ class AbstractModule(abc.ABC):
     async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
         pass
+
+    def state_reset(self) -> None:
+        """Reset any persistent data on the module."""
+        pass
