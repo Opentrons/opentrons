@@ -8,29 +8,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
-    cy.window().then(win => {
-      if (typeof win.enablePrereleaseMode === 'function') {
-        console.log('Calling enablePrereleaseMode()') // Optional: Keep the console log for visual confirmation in the test runner
-        win.enablePrereleaseMode()
-      } else {
-        console.warn(
-          'Warning: enablePrereleaseMode function not found on the window object.'
-        )
-      }
-    })
   })
-
-  const getAllWells = (): string[] => {
-    const allWells: string[] = []
-    const rows = 'ABCDEFGH'
-    const cols = Array.from({ length: 12 }, (_, i) => i + 1)
-    for (const row of rows) {
-      for (const col of cols) {
-        allWells.push(`${row}${col}`)
-      }
-    }
-    return allWells
-  }
 
   /**
    * Generates multiple transfer steps for a single-channel pipette,
@@ -87,11 +65,11 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
       for (const tip of tips) {
         let volumes: string[] = []
         if (tip === '50') {
-          volumes = ['5', '10', '50']
+          volumes = ['6', '22.1', '48']
         } else if (tip === '200') {
-          volumes = ['5', '50', '200']
+          volumes = ['5', '48', '197']
         } else if (tip === '1000') {
-          volumes = ['10', '100', '1000']
+          volumes = ['12', '111', '944']
         }
 
         for (const volume of volumes) {
@@ -138,9 +116,6 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     const protocol = getTestFile(TestFilePath.P1000STransferSingle)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
-    cy.openSettingsPage()
-    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
-    cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     const steps = new StepBuilder()
     GenerateMultipleTransferStepsForSingleChannel(

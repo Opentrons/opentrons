@@ -8,16 +8,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
-    cy.window().then(win => {
-      if (typeof win.enablePrereleaseMode === 'function') {
-        console.log('Calling enablePrereleaseMode()') // Optional: Keep the console log for visual confirmation in the test runner
-        win.enablePrereleaseMode()
-      } else {
-        console.warn(
-          'Warning: enablePrereleaseMode function not found on the window object.'
-        )
-      }
-    })
   })
   /**
    * Generates multiple transfer steps specifically for a P50 8-channel pipette.
@@ -39,7 +29,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     destinationLabware2: string
   ) => {
     const tip: string = '50' // Fixed tip for P50
-    const volumes: string[] = ['5', '20', '50'] // Fixed volumes for P50
+    const volumes: string[] = ['4', '19', '49'] // Fixed volumes for P50
     const liquidClasses: string[] = [
       "Don't use a liquid class",
       'Aqueous',
@@ -105,8 +95,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     const protocol = getTestFile(TestFilePath.P50MTransferMulti)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
-    cy.openSettingsPage()
-    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     const steps = new StepBuilder()

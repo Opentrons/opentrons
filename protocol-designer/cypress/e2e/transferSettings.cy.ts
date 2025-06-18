@@ -13,16 +13,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
-    cy.window().then(win => {
-      if (typeof win.enablePrereleaseMode === 'function') {
-        console.log('Calling enablePrereleaseMode()') // Optional: Keep the console log for visual confirmation in the test runner
-        win.enablePrereleaseMode()
-      } else {
-        console.warn(
-          'Warning: enablePrereleaseMode function not found on the window object.'
-        )
-      }
-    })
   })
 
   const getAllWells = (): string[] => {
@@ -74,8 +64,6 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     const protocol = getTestFile(TestFilePath.P50_Single_Import_T_Liquid)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
-    cy.openSettingsPage()
-    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     /*

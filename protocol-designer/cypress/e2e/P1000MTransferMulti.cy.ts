@@ -11,24 +11,12 @@ describe('Transfer stepform testing P1000M', () => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
-    cy.window().then(win => {
-      if (typeof win.enablePrereleaseMode === 'function') {
-        console.log('Calling enablePrereleaseMode()')
-        win.enablePrereleaseMode()
-      } else {
-        console.warn(
-          'Warning: enablePrereleaseMode function not found on the window object.'
-        )
-      }
-    })
 
     // This is the "COMMON SETUP FOR IT BLOCKS" that should run once
     // before each 'it' block, directly within this beforeEach.
     const protocol = getTestFile(TestFilePath.P1000MTransferMulti)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
-    cy.openSettingsPage()
-    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
     cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     // Add an assertion to confirm we are in the expected state, e.g.,
@@ -67,11 +55,11 @@ describe('Transfer stepform testing P1000M', () => {
       for (const tip of tips) {
         let volumes: string[] = []
         if (tip === '50') {
-          volumes = ['5', '10', '50']
+          volumes = ['7', '14', '48']
         } else if (tip === '200') {
-          volumes = ['5', '50', '200']
+          volumes = ['8', '44', '199']
         } else if (tip === '1000') {
-          volumes = ['10', '100', '1000']
+          volumes = ['11', '101', '999']
         }
 
         for (const volume of volumes) {

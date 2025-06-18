@@ -3,22 +3,6 @@ import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 
 describe('P20 single-channel OT-2 Transfers', () => {
-  beforeEach(() => {
-    console.log('enablePrereleaseMode()')
-    cy.visit('/')
-    cy.verifyHomePage()
-    cy.closeAnalyticsModal()
-    cy.window().then(win => {
-      if (typeof win.enablePrereleaseMode === 'function') {
-        console.log('Calling enablePrereleaseMode()') // Optional: Keep the console log for visual confirmation in the test runner
-        win.enablePrereleaseMode()
-      } else {
-        console.warn(
-          'Warning: enablePrereleaseMode function not found on the window object.'
-        )
-      }
-    })
-  })
   /**
    * It covers all combinations of the predefined liquid classes and volumes (12 total transfers).
    * Each transfer uses a sequential well from A1 to A12.
@@ -200,9 +184,6 @@ describe('P20 single-channel OT-2 Transfers', () => {
     const protocol = getTestFile(TestFilePath.GEN2P300SingleOT2)
     cy.importProtocol(protocol.path)
     cy.contains('Confirm').click()
-    cy.openSettingsPage()
-    cy.get('[aria-label="Settings_OT_PD_ENABLE_LIQUID_CLASSES"]').click()
-    cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     const steps = new StepBuilder()
 
