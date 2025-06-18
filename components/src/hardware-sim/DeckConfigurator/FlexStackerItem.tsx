@@ -89,7 +89,11 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }

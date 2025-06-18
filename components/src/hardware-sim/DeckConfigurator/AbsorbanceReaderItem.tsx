@@ -81,7 +81,11 @@ export function AbsorbanceReaderItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }

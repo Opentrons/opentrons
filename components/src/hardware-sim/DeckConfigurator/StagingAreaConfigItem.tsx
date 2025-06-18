@@ -34,7 +34,7 @@ interface StagingAreaConfigItemProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureIdsWithFakes,
     addressableAreaId: AddressableAreaNamesWithFakes
-    ) => void
+  ) => void
   selected?: boolean
 }
 
@@ -85,7 +85,11 @@ export function StagingAreaConfigItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }
