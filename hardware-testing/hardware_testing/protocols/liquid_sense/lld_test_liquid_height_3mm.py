@@ -82,6 +82,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
+            {"display_name": "nest 8", "value": "nest_8_reservoir_22ml"},
         ],
         default="axygen_96_wellplate_500ul",
     )
@@ -92,7 +93,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Volume 3 mm from bottom",
         description="Volume of liquid 3 mm from bottom of labware.",
         default=0.0,
-        maximum=10000.0,
+        maximum=500000.0,
         minimum=-100.0,
     )
     parameters.add_float(
@@ -125,7 +126,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
     parameters.add_str(
         variable_name="dispense_location",
-        display_name="Dispense location relative to the well",
+        display_name="Dspnse location rel. to well",
         default="top",
         choices=[
             {"display_name": "Top", "value": "top"},
