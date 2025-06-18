@@ -237,9 +237,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                     errorInfo={"labwareId": primary_id},
                 ),
             )
-        finally:
-            if stacker_hw is not None:
-                stacker_hw.set_stacker_identify(False)
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None
@@ -275,6 +272,9 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 ),
             ),
         )
+
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=StoreResult.model_construct(

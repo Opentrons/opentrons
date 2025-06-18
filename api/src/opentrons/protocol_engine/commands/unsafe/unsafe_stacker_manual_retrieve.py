@@ -176,6 +176,7 @@ class UnsafeFlexStackerManualRetrieveImpl(
 
         # Validate that the stacker is fully in the gripper position
         if stacker_hw:
+            stacker_hw.set_stacker_identify(True)
             if stacker_hw.platform_state != PlatformState.EXTENDED:
                 raise CannotPerformModuleAction(
                     f"Cannot manually retrieve a labware from Flex Stacker in {location} if the carriage is not in gripper position."
@@ -221,6 +222,9 @@ class UnsafeFlexStackerManualRetrieveImpl(
                 ModuleLocation(moduleId=params.moduleId)
             ),
         )
+
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
             public=UnsafeFlexStackerManualRetrieveResult(
