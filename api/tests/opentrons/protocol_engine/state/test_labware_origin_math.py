@@ -347,7 +347,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
     """It should calculate the correct offset from module parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=module_definition,
+        parent_deck_item=module_definition,
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
         is_topmost_labware=is_topmost_labware,
@@ -371,7 +371,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
     """It should calculate the correct offset from labware parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=parent_definition,
+        parent_deck_item=parent_definition,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
@@ -395,7 +395,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     """It should calculate the correct offset from addressable area to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=addressable_area,
+        parent_deck_item=addressable_area,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
@@ -409,7 +409,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
     """It should handle LabwareDefinition3 correctly."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=_LABWARE_DEF_V3,
-        parent_entity=_ADDRESSABLE_AREA,
+        parent_deck_item=_ADDRESSABLE_AREA,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=True,

@@ -453,7 +453,7 @@ class GeometryView:
         labware_definition: LabwareDefinition,
         is_topmost_labware: bool,
     ) -> Point:
-        parent_entity = self._get_parent_definition(labware_location)
+        parent_deck_item = self._get_parent_definition(labware_location)
 
         if isinstance(labware_location, ModuleLocation):
             module_parent_to_child_offset = self._modules.get_nominal_offset_to_child(
@@ -462,7 +462,7 @@ class GeometryView:
             )
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
-                parent_entity=parent_entity,  # type: ignore[arg-type]
+                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
                 module_parent_to_child_offset=module_parent_to_child_offset,
                 deck_definition=self._addressable_areas.deck_definition,
                 is_topmost_labware=is_topmost_labware,
@@ -471,7 +471,7 @@ class GeometryView:
         elif isinstance(labware_location, OnLabwareLocation):
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
-                parent_entity=parent_entity,  # type: ignore[arg-type]
+                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
                 module_parent_to_child_offset=None,
                 deck_definition=self._addressable_areas.deck_definition,
                 is_topmost_labware=is_topmost_labware,
@@ -480,7 +480,7 @@ class GeometryView:
         elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
-                parent_entity=parent_entity,  # type: ignore[arg-type]
+                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
                 module_parent_to_child_offset=None,
                 deck_definition=self._addressable_areas.deck_definition,
                 is_topmost_labware=is_topmost_labware,
