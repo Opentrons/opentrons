@@ -13,7 +13,6 @@ import {
   makeContext,
 } from '@opentrons/step-generation'
 
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
 import {
   getAirGapData,
@@ -239,7 +238,6 @@ describe('move liquid step form -> command creator args', () => {
       expectedArgsChecked: {
         aspirateDelay: {
           seconds: 11,
-          mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
         },
       },
     },
@@ -247,10 +245,9 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 11,
-        dispense_mmFromBottom: 12,
       },
       expectedArgsUnchecked: { dispenseDelay: null },
-      expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },
+      expectedArgsChecked: { dispenseDelay: { seconds: 11 } },
     },
     // AIRGAP
     {

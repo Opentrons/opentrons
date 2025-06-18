@@ -19,7 +19,6 @@ import {
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
 import { removeWellsContents } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { getLabwareEntities } from '../../../step-forms/selectors'
@@ -50,7 +49,6 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const wellContents =
     allWellContentsForActiveItem != null && labwareId != null
       ? allWellContentsForActiveItem[labwareId]
@@ -125,7 +123,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             >
               {name}
             </StyledText>
-            {liquidClassDisplayName != null && enableLiquidClasses ? (
+            {liquidClassDisplayName != null ? (
               <Tag
                 text={liquidClassDisplayName}
                 type="default"
