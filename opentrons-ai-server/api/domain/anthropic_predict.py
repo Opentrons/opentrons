@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
+import weave  # type: ignore
 from anthropic import Anthropic
 from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
@@ -16,7 +17,7 @@ from api.settings import Settings
 
 MessageType = Literal["create", "update"]
 
-# weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
