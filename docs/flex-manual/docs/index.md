@@ -1,5 +1,5 @@
 <style>
-article {
+article.md-content__inner {
   text-align: center;
 }
 </style>
