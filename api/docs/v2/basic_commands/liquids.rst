@@ -84,7 +84,15 @@ Flex and OT-2 pipettes aspirate at :ref:`default flow rates <new-plunger-flow-ra
 
     pipette.aspirate(200, plate["A1"], rate=2.0)
 
+You can also specify an absolute ``flow_rate`` to change the default flow rate for your pipette::
+
+    pipette.aspirate(200, plate["A1"], flow_rate=50)
+
+The ``rate`` and ``flow_rate`` parameters are mutually exclusive. If you choose to change the ``flow_rate``, specifying a ``rate`` will raise an error. 
+
 .. versionadded:: 2.0
+.. versionchanged:: 2.24
+    Add the aspirate ``flow_rate`` parameter. 
 
 .. _new-dispense:
 
@@ -161,7 +169,15 @@ Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-ra
 
     pipette.dispense(200, plate["B1"], rate=2.0)
 
+You can also specify an absolute ``flow_rate`` to change the default flow rate for your pipette::
+
+    pipette.dispense(200, plate["B1"], flow_rate=50)
+
+The ``rate`` and ``flow_rate`` parameters are mutually exclusive. If you choose to change the ``flow_rate``, specifying a ``rate`` will raise an error.  
+
 .. versionadded:: 2.0
+.. versionchanged:: 2.24
+    Add the dispense ``flow_rate`` parameter. 
 
 .. _push-out-dispense:
 
@@ -256,10 +272,17 @@ This example moves the pipette 75% of well's total radius and 2 mm below the top
                       radius=0.75,
                       v_offset=-2)
 
-The ``touch_tip`` feature allows the pipette to touch the edges of a well gently instead of crashing into them. It includes the ``radius`` argument. When ``radius=1`` the robot moves the centerline of the pipette’s plunger axis to the edge of a well. This means a pipette tip may sometimes touch the well wall too early, causing it to bend inwards. A smaller radius helps avoid premature wall collisions and a lower speed produces gentler motion. Different liquid droplets behave differently, so test out these parameters in a single well before performing a full protocol run.
+And this example uses ``mm_from edge`` to set the touch tip location 0 mm, or the edge of the current well::
+
+    pipette.touch_tip(plate["B1"],
+                      mm_from_edge=0)
+
+The ``touch_tip`` feature allows the pipette to touch the edges of a well gently instead of crashing into them. It includes the ``radius`` and ``mm_from_edge`` arguments. When ``radius=1`` or ``mm_from_edge=0``,the robot moves the centerline of the pipette’s plunger axis to the edge of a well. This means a pipette tip may sometimes touch the well wall too early, causing it to bend inwards. A smaller radius or larger ``mm_from_edge``, like 1 mm, help avoid premature wall collisions and a lower speed produces gentler motion. Different liquid droplets behave differently, so test out these parameters in a single well before performing a full protocol run.
+
+The ``radius`` and ``mm_from_edge`` arguments are mutually exclusive. If you choose to set touch tip location using a ``radius``, specifying a ``mm_from_edge`` will raise an error. 
 
 .. warning::
-    *Do not* set the ``radius`` value greater than ``1.0``. When ``radius`` is > ``1.0``, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
+    *Do not* set the ``radius`` value greater than ``1.0`` or a negative ``mm_from_edge`` value. When ``radius`` is > ``1.0`` or ``mm_from_edge`` is < ``0.0``, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
 
 Touch Speed
 -----------
@@ -280,6 +303,9 @@ This example uses the current well and sets the speed to 80 mm/s::
 
 .. versionchanged:: 2.4
     Lowered minimum speed to 1 mm/s.
+
+.. versionchanged:: 2.24
+    Add the ``mm_from_edge`` parameter.
 
 .. _mix:
 
@@ -311,7 +337,7 @@ This example draws an amount equal to the pipette's maximum rated volume and mix
 Air Gap
 =======
 
-The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the pipette's height (in mm) above the well. By default, the pipette moves 5 mm above a well before aspirating air. Calling :py:meth:`~.InstrumentContext.air_gap` with no arguments uses the entire remaining volume in the pipette.
+The :py:meth:`.InstrumentContext.air_gap` method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the position at the target well to add the air gap. By default, the pipette moves 5 mm above a well before aspirating air. Calling :py:meth:`~.InstrumentContext.air_gap` with no arguments uses the entire remaining volume in the pipette.
 
 This example aspirates 200 µL of air 5 mm above the current well::
 
@@ -325,7 +351,25 @@ This example aspirates enough air to fill the remaining volume in a pipette::
 
     pipette.air_gap()
 
+Instead of moving to a distance above the target well, this example uses the ``in_place`` parameter to immediately add add an air gap after an aspirate or dispense. Here, the pipette aspirates 200 µL of air while still inside the target well:: 
+
+    pipette.air_gap(volume=200, in_place=True)
+
+Just like in an ``aspirate()`` or ``dispense()``, you can use the ``rate`` and ``flow_rate`` parameters to change the flow rate. 
+
+This example uses the ``rate`` parameter to aspirate 200 µL of air at twice the default flow rate:: 
+
+    pipette.air_gap(volume=200, rate=2.0)
+
+This example uses the ``flow_rate`` parameter to aspirate 200 µL of air at 50 µL/sec::
+
+    pipette.air_gap(volume=200, flow_rate=50)
+
+The ``rate`` and ``flow_rate`` parameters are mutually exclusive. If you choose to change the ``flow_rate``, specifying a ``rate`` will raise an error. 
+
 .. versionadded:: 2.0
+.. versionchanged:: 2.24
+    Add the ``in_place`` and ``flow_rate`` parameters. 
 
 .. _detect-liquid-presence:
 
