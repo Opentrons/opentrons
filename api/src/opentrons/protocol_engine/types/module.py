@@ -16,7 +16,6 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons.types import Point
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
 from opentrons_shared_data.labware.types import LocatingFeatures
 

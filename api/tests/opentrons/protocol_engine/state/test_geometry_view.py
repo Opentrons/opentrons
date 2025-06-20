@@ -541,14 +541,14 @@ def test_module_calibration_offset_rotation(
 
     # the module has not changed location after calibration, so there is no rotation
     result = subject._get_calibrated_module_offset(ModuleLocation(moduleId="module-id"))
-    assert result == ModuleOffsetVector(x=2, y=3, z=4)
+    assert result == Point(x=2, y=3, z=4)
 
     # the module has changed from slot D1 to D3, so we should rotate the calibration offset 180 degrees along the z axis
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
     )
     result = subject._get_calibrated_module_offset(ModuleLocation(moduleId="module-id"))
-    assert result == ModuleOffsetVector(x=-2, y=-3, z=4)
+    assert result == Point(x=-2, y=-3, z=4)
 
     # attempting to load the module calibration offset from an invalid slot in the middle of the deck (A2, B2, C2, D2)
     # is not be allowed since you can't even load a module in the middle to perform a module calibration in the
@@ -720,7 +720,7 @@ def test_get_module_labware_highest_z(
         mock_module_view.get_nominal_offset_to_child_from_addressable_area(
             module_id="module-id"
         )
-    ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
+    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
     )
@@ -1197,7 +1197,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         mock_module_view.get_nominal_offset_to_child_from_addressable_area(
             module_id="module-id"
         )
-    ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
+    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
         "magneticModuleV2Slot3"
     )
@@ -1491,7 +1491,7 @@ def test_get_module_labware_well_position(
         mock_module_view.get_nominal_offset_to_child_from_addressable_area(
             module_id="module-id"
         )
-    ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
+    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetData(
             moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
@@ -2808,7 +2808,7 @@ def test_get_labware_grip_point_for_labware_on_module(
         mock_module_view.get_nominal_offset_to_child(
             module_id="module-id", addressable_areas=addressable_area_view
         )
-    ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
+    ).then_return(Point(x=0, y=0, z=0))
 
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
@@ -3328,7 +3328,7 @@ def test_get_total_nominal_gripper_offset(
         move_type=_GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-d"),
     )
-    assert result1 == LabwareOffsetVector(x=1, y=2, z=3)
+    assert result1 == Point(x=1, y=2, z=3)
 
     # Case 2: labware on module
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
@@ -3336,7 +3336,7 @@ def test_get_total_nominal_gripper_offset(
         move_type=_GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
-    assert result2 == LabwareOffsetVector(x=33, y=22, z=11)
+    assert result2 == Point(x=33, y=22, z=11)
 
 
 def test_get_stacked_labware_total_nominal_offset_slot_specific(
@@ -3381,14 +3381,14 @@ def test_get_stacked_labware_total_nominal_offset_slot_specific(
         move_type=_GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
-    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+    assert result1 == Point(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
-    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
+    assert result2 == Point(x=333, y=222, z=111)
 
 
 def test_get_stacked_labware_total_nominal_offset_default(
@@ -3438,14 +3438,14 @@ def test_get_stacked_labware_total_nominal_offset_default(
         move_type=_GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
-    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+    assert result1 == Point(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
-    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
+    assert result2 == Point(x=333, y=222, z=111)
 
 
 def test_check_gripper_labware_tip_collision(

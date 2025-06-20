@@ -354,13 +354,15 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
+
             user_offset_data = LabwareMovementOffsetData(
                 pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
                 dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
-
             if trash_lid_drop_offset:
-                user_offset_data.dropOffset += trash_lid_drop_offset
+                user_offset_data.dropOffset.x += trash_lid_drop_offset.x
+                user_offset_data.dropOffset.y += trash_lid_drop_offset.y
+                user_offset_data.dropOffset.z += trash_lid_drop_offset.z
 
             immediate_destination_location_sequence = (
                 self._state_view.geometry.get_predicted_location_sequence(
