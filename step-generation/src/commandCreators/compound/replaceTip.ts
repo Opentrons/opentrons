@@ -10,6 +10,7 @@ import * as errorCreators from '../../errorCreators'
 import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
+  curryWithoutPython,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
@@ -32,6 +33,9 @@ interface ReplaceTipArgs {
   dropTipLocation: string
   tipRack: string | null
   nozzles?: NozzleConfigurationStyle
+  //  we need to emit atomic commands for python
+  //  if this replaceTip is for the mix compound command
+  isFromMixCommand?: boolean
 }
 
 /**
@@ -44,7 +48,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation, nozzles, tipRack } = args
+  const {
+    pipette,
+    dropTipLocation,
+    nozzles,
+    tipRack,
+    isFromMixCommand = false,
+  } = args
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles
   if (tipRack == null) {
     return {
@@ -172,6 +182,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     primaryNozzle = 'H1'
   }
 
+  const curryCommand = isFromMixCommand
+    ? curryCommandCreator
+    : curryWithoutPython
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
     (channels === 96 || channels === 8) &&
@@ -184,17 +197,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
               style: args.nozzles,
             },
             pipetteId: args.pipette,
+            tiprackId: nextTiprack.tiprackId,
           }),
         ]
       : []
 
   let commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(dropTip, {
+    curryCommand(dropTip, {
       pipette,
       dropTipLocation,
     }),
     ...configureNozzleLayoutCommand,
-    curryCommandCreator(pickUpTip, {
+    curryCommand(pickUpTip, {
       pipetteId: pipette,
       labwareId: nextTiprack.tiprackId,
       wellName: nextTiprack.well,
@@ -203,13 +217,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      curryCommandCreator(dropTipInWasteChute, {
+      curryCommand(dropTipInWasteChute, {
         pipetteId: args.pipette,
         wasteChuteId:
           invariantContext.wasteChuteEntities[args.dropTipLocation].id,
       }),
       ...configureNozzleLayoutCommand,
-      curryCommandCreator(pickUpTip, {
+      curryCommand(pickUpTip, {
         pipetteId: pipette,
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,
@@ -219,13 +233,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      curryCommandCreator(dropTipInTrash, {
+      curryCommand(dropTipInTrash, {
         pipetteId: pipette,
         trashLocation: invariantContext.trashBinEntities[args.dropTipLocation]
           .location as CutoutId,
       }),
       ...configureNozzleLayoutCommand,
-      curryCommandCreator(pickUpTip, {
+      curryCommand(pickUpTip, {
         pipetteId: pipette,
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,

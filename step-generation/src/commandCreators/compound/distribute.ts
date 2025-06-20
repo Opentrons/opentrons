@@ -8,6 +8,7 @@ import {
   getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  isFlexPipette,
   LOW_VOLUME_PIPETTES,
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
@@ -19,6 +20,7 @@ import {
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
+  curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
@@ -386,7 +388,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
-      pipetteName,
+      pipetteName: isFlexPipette(pipetteName)
+        ? getFlexNameConversion(pipetteSpecs)
+        : pipetteName,
       tiprackUri: tipRack,
       aspirateCorrectionVolume: aspirateCorrectionVolume,
       dispenseCorrectionVolume: dispenseCorrectionVolumeForDestination,
@@ -527,7 +531,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
       const tipCommands = changeTipNow
         ? [
-            curryWithoutPython(replaceTip, {
+            curryCommandCreator(replaceTip, {
               pipette,
               dropTipLocation,
               tipRack,
@@ -1087,7 +1091,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...getAirGapAfterDispenseCommands(false),
               curryWithoutPython(moveToAddressableArea, {
                 pipetteId: pipette,
-                fixtureId: blowoutLocation,
+                fixtureId:
+                  Object.values(trashBinEntities).length > 0
+                    ? Object.values(trashBinEntities)[0].id
+                    : Object.values(wasteChuteEntities)[0].id,
                 offset: {
                   x: 0,
                   y: 0,

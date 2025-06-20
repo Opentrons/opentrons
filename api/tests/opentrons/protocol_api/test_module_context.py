@@ -1,4 +1,5 @@
 """Tests for Protocol API module contexts."""
+
 from typing import cast
 
 import pytest
@@ -110,6 +111,49 @@ def test_load_labware(
     result = subject.load_labware(
         name="Infinite Tip Rack",
         label="it doesn't run out",
+        namespace="ideal",
+        version=101,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+    assert result.api_version == api_version
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 1234)])
+@pytest.mark.parametrize(
+    "label,sanitized_label", [(7, "7"), ("hi", "hi"), (None, None)]
+)
+def test_load_labware_sanitizes_label(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_core: ModuleCore,
+    api_version: APIVersion,
+    label: str | None,
+    sanitized_label: str | None,
+    subject: ModuleContext,
+) -> None:
+    """It should load labware by load parameters."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(
+        mock_protocol_core.load_labware(
+            load_name="infinite tip rack",
+            label=sanitized_label,
+            namespace="ideal",
+            version=101,
+            location=mock_core,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        name="Infinite Tip Rack",
+        label=label,
         namespace="ideal",
         version=101,
     )

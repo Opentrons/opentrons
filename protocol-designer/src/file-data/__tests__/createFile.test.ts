@@ -141,7 +141,6 @@ describe('createFile selector', () => {
     expect(result.pythonProtocol).toBe(
       `
 import json
-from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
 
 metadata = {
@@ -167,14 +166,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         location="1",
         label="Opentrons 96 Tip Rack 10 µL",
         namespace="opentrons",
-        version=1,
     )
     mock_python_name_3 = protocol.load_labware(
         "fixture_96_plate",
         location="7",
         label="NEST 96 Well Plate 100 µL PCR Full Skirt",
         namespace="opentrons",
-        version=1,
     )
 
     # Load Pipettes:

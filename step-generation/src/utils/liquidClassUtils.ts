@@ -6,7 +6,6 @@ import {
 } from './misc'
 import { formatPyDict } from './pythonFormat'
 
-import type { PipetteName } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -18,7 +17,7 @@ type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
   args: TransferArgs | ConsolidateArgs | DistributeArgs
-  pipetteName: PipetteName
+  pipetteName: string
   tiprackUri: string
   aspirateCorrectionVolume: number
   dispenseCorrectionVolume: number
