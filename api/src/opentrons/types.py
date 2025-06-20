@@ -61,9 +61,7 @@ class Point(NamedTuple):
     def __str__(self) -> str:
         return "({}, {}, {})".format(self.x, self.y, self.z)
 
-    def magnitude_to(self, other: Any) -> float:
-        if not isinstance(other, Point):
-            return NotImplemented
+    def magnitude_to(self, other: Point) -> float:
         x_diff = self.x - other.x
         y_diff = self.y - other.y
         z_diff = self.z - other.z
