@@ -702,7 +702,9 @@ def test_get_module_labware_highest_z(
         calibration_offset
     )
     decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+        mock_addressable_area_view.get_addressable_area_position(
+            "magneticModuleV2Slot3"
+        )
     ).then_return(slot_pos)
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
@@ -721,8 +723,8 @@ def test_get_module_labware_highest_z(
         )
     )
     decoy.when(
-        mock_module_view.get_nominal_offset_to_child(
-            module_id="module-id", addressable_areas=mock_addressable_area_view
+        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
+            module_id="module-id"
         )
     ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
@@ -830,12 +832,10 @@ def test_get_obstacle_highest_z_with_labware(
     shuttle_height = addressable_area_view.get_addressable_area_position(
         "flexStackerModuleV1D4"
     ).z
-    monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
-        lambda *args, **kwargs: Point(10, 20, shuttle_height),
-    )
 
-    assert subject.get_all_obstacle_highest_z() == 300 + shuttle_height
+    expected_height = 300 + shuttle_height + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
+
+    assert subject.get_all_obstacle_highest_z() == expected_height
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -1200,13 +1200,21 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         errors.LabwareNotLoadedOnLabwareError("top labware")
     )
     decoy.when(
-        mock_module_view.get_nominal_offset_to_child(
-            module_id="module-id", addressable_areas=mock_addressable_area_view
+        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
+            module_id="module-id"
         )
     ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
-
+    decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
+        "magneticModuleV2Slot3"
+    )
     decoy.when(mock_labware_view.get("adapter-id")).then_return(adapter)
     decoy.when(mock_labware_view.get("top-labware-id")).then_return(top_labware)
+    decoy.when(mock_labware_view.get_definition("top-labware-id")).then_return(
+        _MOCK_LABWARE_DEFINITION3
+    )
+    decoy.when(mock_labware_view.get_definition("adapter-id")).then_return(
+        _MOCK_LABWARE_DEFINITION3
+    )
     decoy.when(
         mock_labware_view.get_dimensions(labware_id="top-labware-id")
     ).then_return(Dimensions(x=0, y=0, z=1000))
@@ -1214,12 +1222,17 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         mock_labware_view.get_labware_offset_vector("top-labware-id")
     ).then_return(top_lw_lpc_offset)
     decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+        mock_addressable_area_view.get_addressable_area_position(
+            "magneticModuleV2Slot3"
+        )
     ).then_return(Point(11, 22, 33))
 
     expected_highest_z = (
-        33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
-    )  # Both the adapter and top labware
+        33
+        + 1000
+        + 3
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2  # Both the adapter and top labware
+    )
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1466,18 +1479,23 @@ def test_get_module_labware_well_position(
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
+    decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
+        "magneticModuleV2Slot3"
+    )
     decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+        mock_addressable_area_view.get_addressable_area_position(
+            "magneticModuleV2Slot3"
+        )
     ).then_return(slot_pos)
     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
     decoy.when(mock_module_view.get_location("module-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
     decoy.when(
-        mock_module_view.get_nominal_offset_to_child(
-            module_id="module-id", addressable_areas=mock_addressable_area_view
+        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
+            module_id="module-id"
         )
     ).then_return(LabwareOffsetVector(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
@@ -2726,9 +2744,9 @@ def test_get_labware_grip_point_on_labware(
     )
 
     assert grip_point == Point(
-        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        110.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and adapter
+        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
+        110.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
     )
 
 
@@ -2889,9 +2907,10 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
     )
 
     assert result_grip_point == Point(
-        x=492.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        x=492.0
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and module beneath it.
+        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
+        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
     )
 
 

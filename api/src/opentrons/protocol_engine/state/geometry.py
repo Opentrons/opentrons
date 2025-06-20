@@ -380,15 +380,14 @@ class GeometryView:
 
         This includes module calibration but excludes the calibration of the given labware.
         """
-        labware_data = self._labware.get(labware_id)
+        location = self._labware.get(labware_id).location
+        definition = self._labware.get_definition(labware_id)
 
         slot_front_left = self._get_labware_ancestor_position(labware_id)
         stackup_origin_to_lw_origin = self._get_stackup_placement_origin_to_lw_origin(
-            labware_id, is_topmost_labware=True
+            location=location, definition=definition, is_topmost_labware=True
         )
-        module_cal_offset = self._get_calibrated_module_offset(
-            labware_data.location
-        ).to_point()
+        module_cal_offset = self._get_calibrated_module_offset(location).to_point()
 
         return slot_front_left + stackup_origin_to_lw_origin + module_cal_offset
 
@@ -402,12 +401,12 @@ class GeometryView:
         return parent_pos
 
     def _get_stackup_placement_origin_to_lw_origin(
-        self, labware_id: str, is_topmost_labware: bool
+        self,
+        location: LabwareLocation,
+        definition: LabwareDefinition,
+        is_topmost_labware: bool,
     ) -> Point:
         """Get the offset vector from the lowest entity in a stackup to the labware."""
-        location = self._labware.get(labware_id).location
-        definition = self._labware.get_definition(labware_id)
-
         if isinstance(
             location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
         ):
@@ -417,6 +416,10 @@ class GeometryView:
                 is_topmost_labware=is_topmost_labware,
             )
         elif isinstance(location, OnLabwareLocation):
+            parent_id = location.labwareId
+            parent_location = self._labware.get(parent_id).location
+            parent_definition = self._labware.get_definition(parent_id)
+
             parent_placement_origin_to_lw_origin = (
                 self._get_parent_placement_origin_to_lw_origin(
                     labware_location=location,
@@ -428,7 +431,8 @@ class GeometryView:
             return (
                 parent_placement_origin_to_lw_origin
                 + self._get_stackup_placement_origin_to_lw_origin(
-                    labware_id=location.labwareId,
+                    location=parent_location,
+                    definition=parent_definition,
                     is_topmost_labware=False,
                 )
             )
@@ -1040,9 +1044,9 @@ class GeometryView:
             self._labware.get_grip_height_from_labware_bottom(labware_definition)
         )
         location_name = self._get_underlying_addressable_area_name(location)
-        parent_to_lw_offset = self._get_parent_placement_origin_to_lw_origin(
-            labware_location=location,
-            labware_definition=labware_definition,
+        parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
+            location=location,
+            definition=labware_definition,
             is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
         )
         mod_cal_offset = self._get_calibrated_module_offset(location)
