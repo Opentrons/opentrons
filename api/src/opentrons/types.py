@@ -73,6 +73,25 @@ class Point(NamedTuple):
         pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
         return all(isclose(s, o, rel_tol=rel_tol, abs_tol=abs_tol) for s, o in pairs)
 
+    @classmethod
+    def from_xyz_attrs(cls, has_xyz: _HasXYZ) -> Point:
+        """Construct a Point from another object that has .x/.y/.z attributes."""
+        return cls(has_xyz.x, has_xyz.y, has_xyz.z)
+
+
+class _HasXYZ(Protocol):
+    @property
+    def x(self) -> float:
+        ...
+
+    @property
+    def y(self) -> float:
+        ...
+
+    @property
+    def z(self) -> float:
+        ...
+
 
 LocationLabware = Union[
     "Labware",

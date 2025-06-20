@@ -261,42 +261,6 @@ class ModuleOffsetVector(BaseModel):
     y: float
     z: float
 
-    def __add__(self, other: Any) -> ModuleOffsetVector:
-        """Adds two vectors together."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
-        )
-
-    def __radd__(self, other: Any) -> ModuleOffsetVector:
-        """Adds two vectors together, the other way."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=other.x + self.x, y=other.y + self.y, z=other.z + self.z
-        )
-
-    def __sub__(self, other: Any) -> ModuleOffsetVector:
-        """Subtracts two vectors."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
-        )
-
-    def __rsub__(self, other: Any) -> ModuleOffsetVector:
-        """Subtracts two vectors, the other way."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=other.x - self.x, y=other.y - self.y, z=other.z - self.z
-        )
-
-    def to_point(self) -> Point:
-        """Convert the vector to a Point."""
-        return Point(x=self.x, y=self.y, z=self.z)
-
 
 @dataclass
 class ModuleOffsetData:
