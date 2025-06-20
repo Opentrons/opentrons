@@ -1422,7 +1422,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume: float,
         source: Tuple[Location, WellCore],
         dest: List[Tuple[Location, WellCore]],
-        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
+        new_tip: Literal[
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ],
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
