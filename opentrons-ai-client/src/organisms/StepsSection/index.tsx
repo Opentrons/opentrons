@@ -41,7 +41,7 @@ export function StepsSection(): JSX.Element | null {
       >
         <ControlledTextAreaField
           name={STEPS_FIELD_NAME}
-          height="180px"
+          height="12.25rem"
           rules={{
             required: true,
           }}
