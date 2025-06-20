@@ -1834,7 +1834,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :parm keep_last_tip: If set to ``True``, do not drop or return the last tip used in the transfer. If set to
+        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the transfer. If set to
             ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
             tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
 
@@ -1961,7 +1961,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :parm keep_last_tip: If set to ``True``, do not drop or return the last tip used in the distribute. If set to
+        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the distribute. If set to
             ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
             tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
 
@@ -2096,7 +2096,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :parm keep_last_tip: If set to ``True``, do not drop or return the last tip used in the consolidate. If set to
+        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the consolidate. If set to
             ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
             tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
 
