@@ -113,9 +113,15 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
     parameters.add_bool(
         variable_name="no_gripper",
-        display_name="Use No Gripper",
-        default=True,
+        display_name="Only Test Stacker",
+        default=False,
         description="If True, the protocol will only store and retrieve.",
+    )
+    parameters.add_bool(
+        variable_name="no_stacker",
+        display_name="Only Deck Movements",
+        default=True,
+        description="If True, the protocol will stack labware on the deck.",
     )
     parameters.add_float(
         variable_name="offset",
@@ -135,6 +141,7 @@ def run(protocol: ProtocolContext) -> None:
     labware_location = protocol.params.labware_location  # type: ignore[attr-defined]
     no_gripper = protocol.params.no_gripper  # type: ignore[attr-defined]
     offset = protocol.params.offset  # type: ignore[attr-defined]
+    no_stacker = protocol.params.no_stacker  # type: ignore[attr-defined]
     # Load first labware on deck
     initial_labware = protocol.load_labware(
         labware_type, location=labware_location, version=2
@@ -149,28 +156,64 @@ def run(protocol: ProtocolContext) -> None:
                 list_of_labware.append(next_labware)
 
     # Load stacker module
-    stacker: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", stacker_location
-    )  # type: ignore[assignment]
-    if no_gripper:
-        stacker.set_stored_labware(
-            load_name=labware_type, count=num_of_labware, stacking_offset_z=offset
-        )
-    else:
-        stacker.set_stored_labware(load_name=labware_type, count=0)
-
-    if not no_gripper:
-        # Store all labware into the stacker
-        for labware in reversed(list_of_labware):
-            protocol.move_labware(labware, stacker, use_gripper=True)
-            stacker.store()
-        # Retrieve all labware and return them to their original location
-        moved_labware: List[Labware] = []
-        for labware in list_of_labware:
+    if not no_stacker:
+        stacker: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", stacker_location
+        )  # type: ignore[assignment]
+        if no_gripper:
+            if offset > 0:
+                stacker.set_stored_labware(
+                    load_name=labware_type,
+                    count=num_of_labware,
+                    stacking_offset_z=offset,
+                )
+            else:
+                stacker.set_stored_labware(load_name=labware_type, count=num_of_labware)
+        else:
+            if offset > 0:
+                stacker.set_stored_labware(
+                    load_name=labware_type, count=0, stack_offset_z=offset
+                )
+            else:
+                stacker.set_stored_labware(load_name=labware_type, count=0)
+        if not no_gripper:
+            # Store all labware into the stacker
+            for labware in reversed(list_of_labware):
+                protocol.move_labware(labware, stacker, use_gripper=True)
+                stacker.store()
+            # Retrieve all labware and return them to their original location
+            moved_labware: List[Labware] = []
+            for labware in list_of_labware:
+                stacker.retrieve()
+                dest = (
+                    labware_location if len(moved_labware) == 0 else moved_labware[-1]
+                )
+                protocol.move_labware(labware, dest, use_gripper=True)
+                moved_labware.append(labware)
+        for i in range(10):
             stacker.retrieve()
-            dest = labware_location if len(moved_labware) == 0 else moved_labware[-1]
-            protocol.move_labware(labware, dest, use_gripper=True)
-            moved_labware.append(labware)
-    for i in range(10):
-        stacker.retrieve()
-        stacker.store()
+            stacker.store()
+    if no_stacker:
+        letter = labware_location[0]
+        location_2 = letter + "2"
+        deck_locations = [labware_location, location_2]
+
+        original_order = list(list_of_labware)
+        reversed_order = list(reversed(original_order))
+
+        for i in range(10):
+            n = 1  # toggle between 0 and 1
+            for i, labware in enumerate(reversed_order):
+                if i == 0:
+                    protocol.move_labware(labware, deck_locations[n], use_gripper=True)
+                else:
+                    protocol.move_labware(labware, top_labware, use_gripper=True)
+                top_labware = labware
+            for i, labware in enumerate(original_order):
+                if i == 0:
+                    protocol.move_labware(
+                        labware, deck_locations[n - 1], use_gripper=True
+                    )
+                else:
+                    protocol.move_labware(labware, top_labware, use_gripper=True)
+                top_labware = labware
