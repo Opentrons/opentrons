@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 
+import { CommandData } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -39,12 +40,17 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
-import { getModuleImage } from '/app/local-resources/modules'
+import {
+  getFlexStackerPrepCommands,
+  getModuleImage,
+  ModulePrepCommandsType,
+} from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
+  useChainLiveCommands,
   useModuleRenderInfoForProtocolById,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
@@ -85,6 +91,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+  const { chainLiveCommands } = useChainLiveCommands()
 
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
@@ -129,6 +136,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               }
               isFlex={isFlex}
               calibrationStatus={calibrationStatus}
+              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}
@@ -148,6 +156,10 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
+  chainLiveCommands: (
+    commands: ModulePrepCommandsType[],
+    continuePastCommandFailure: boolean
+  ) => Promise<CommandData[]>
   deckDef: DeckDefinition
   conflictedFixture: CutoutConfig | null
   robotName: string
@@ -160,6 +172,7 @@ export function ModulesListItem({
   attachedModuleMatch,
   isFlex,
   calibrationStatus,
+  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
@@ -179,8 +192,18 @@ export function ModulesListItem({
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
 
-  const handleCalibrateClick = (): void => {
+  const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
+  }
+
+  const handleHomeStackerClick = (): void => {
+    if (attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
+      chainLiveCommands(
+        getFlexStackerPrepCommands(attachedModuleMatch),
+        // if the close latch command fails, we still want to home the shuttle
+        true
+      )
+    }
   }
 
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -244,6 +267,12 @@ export function ModulesListItem({
       textColor={COLORS.green60}
     />
   )
+  const stackerNeedsHome =
+    attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
+      ? attachedModuleMatch?.data.platformState === 'unknown' ||
+        attachedModuleMatch?.data.platformState === 'retracted' ||
+        attachedModuleMatch?.data.latchState !== 'closed'
+      : false
   const stackerShuttleMissing =
     attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
       ? attachedModuleMatch?.data.platformState === 'missing'
@@ -255,12 +284,31 @@ export function ModulesListItem({
     attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
 
-  if (needsCalibration || stackerShuttleMissing) {
+  if (stackerNeedsHome) {
     renderModuleStatus = (
       <>
         <TertiaryButton
           {...targetProps}
-          onClick={handleCalibrateClick}
+          onClick={handleHomeStackerClick}
+          width="max-content"
+          disabled={!calibrationStatus?.complete || isModuleTooHot}
+        >
+          {t('home_stacker')}
+        </TertiaryButton>
+        {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
+        isModuleTooHot ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {calibrateDisabledReason}
+          </Tooltip>
+        ) : null}
+      </>
+    )
+  } else if (needsCalibration || stackerShuttleMissing) {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
+          {...targetProps}
+          onClick={handleSetupModuleClick}
           width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
