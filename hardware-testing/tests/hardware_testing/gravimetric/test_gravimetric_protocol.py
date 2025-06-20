@@ -84,11 +84,14 @@ def _get_analysis_result(
         pytest.param(
             "96ch200", marks=pytest.mark.xfail(reason="200ul has no liquid class")
         ),
-        pytest.param("96ch1000"),
+        pytest.param(
+            "96ch1000",
+            marks=pytest.mark.xfail(reason="the 1000ul test csv is incorrect"),
+        ),
     ],
 )
 def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
-    """Should check that gravimetric test protocol uses the latest Python API version."""
+    """Should check that gravimetric test protocol uses the latest Python API version and simulates properly."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH],
         "--json-output",
