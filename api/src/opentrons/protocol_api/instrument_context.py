@@ -1834,9 +1834,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the transfer. If set to
-            ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
-            tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -1961,9 +1961,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the distribute. If set to
-            ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
-            tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -2096,9 +2096,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: If set to ``True``, do not drop or return the last tip used in the consolidate. If set to
-            ``False``, the last tip will be dropped or returned. If not set, default depends on tip policy chosen. A
-            tip policy of ``"never"`` will default to ``True``, all other tip policies will default to ``False``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
