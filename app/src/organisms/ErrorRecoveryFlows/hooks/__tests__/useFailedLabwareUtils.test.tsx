@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { NozzleLayoutValues, RunCurrentState } from '@opentrons/api-client'
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
@@ -14,7 +13,7 @@ import {
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
 
-import type { RunCommandSummary } from '@opentrons/api-client'
+import type { RunCommandSummary, RunCurrentState } from '@opentrons/api-client'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -289,52 +288,6 @@ describe('getFailedLabwareQuantity', () => {
     },
   }
 
-  const runCommands = {
-    data: [
-      {
-        id: 'set-stored-labware-1',
-        commandType: 'flexStacker/setStoredLabware',
-        params: {
-          initialCount: 2,
-        },
-      } as any,
-      {
-        id: 'retrive-id-1',
-        commandType: 'flexStacker/retrieve',
-        params: {
-          moduleId: 'module-id',
-        },
-      } as any,
-      {
-        id: 'retrive-id-2',
-        commandType: 'flexStacker/retrieve',
-        params: {
-          moduleId: 'module-id',
-        },
-      } as any,
-      {
-        id: 'set-stored-labware',
-        commandType: 'flexStacker/setStoredLabware',
-        params: {
-          initialCount: 5,
-        },
-      } as any,
-      {
-        id: 'retrive-id',
-        commandType: 'flexStacker/retrieve',
-        params: {
-          moduleId: 'module-id',
-        },
-      } as any,
-      { ...failedRetriveCommand },
-    ] as RunCommandSummary[],
-    meta: {
-      totalLength: 10,
-      pageLength: 1,
-    },
-    links: {},
-  }
-
   it('should return the quantity for stacker error kinds', () => {
     const errors = [
       ERROR_KINDS.STACKER_SHUTTLE_MISSING,
@@ -437,14 +390,6 @@ describe('getFailedLabwareQuantity', () => {
   })
 
   it('should return 0 if there is no commands in list', () => {
-    const emptyRunCommands = {
-      data: [{ ...failedRetriveCommand }] as RunCommandSummary[],
-      meta: {
-        totalLength: 10,
-        pageLength: 1,
-      },
-      links: {},
-    }
     const failedLocalRetriveCommand = {
       byRunRecord: {
         ...failedCommand,
