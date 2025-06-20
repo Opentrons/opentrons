@@ -87,6 +87,7 @@ import type {
   DeckDefinitionWithFakes,
   ModuleModel,
 } from './types'
+import { WASTE_CHUTE_FIXTURES } from '.'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
@@ -415,6 +416,7 @@ export const getReplacementFixtureForFixtureRemoval = (
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    console.log("addressableAreaId: ", addressableAreaId)
     const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
       cutoutFixtureId,
       cutoutId,
@@ -925,10 +927,10 @@ export const replaceCutoutFixtureWithComboFixture = (
     console.log('Processing cutout item:', aaCutoutItem)
 
     // Only handle SINGLE_RIGHT_CUTOUTS
-    if (!SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId)) {
+    if (!SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId) || aaCutoutItem.cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
       return { ...aaCutoutItem }
     }
-
+    console.log("aaCutoutItem.cutoutFixtureId: ", aaCutoutItem.cutoutFixtureId, "aaCutoutItem.addressableAreaId", aaCutoutItem.addressableAreaId)
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById
@@ -988,18 +990,34 @@ export const replaceCutoutFixtureRemove = (
     cutoutFixtureRemoved,
     deckDef
   )
-  const updated = aaForCutoutAndFixture?.map(aa =>
-    aa === addressableAreaId
-      ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
-      : aa
-  )
-  const match = Object.entries(addressableAreasById).find(([, value]) =>
-    isEqual(value.sort(), updated?.sort()))
-  console.log('match: ', match)
-
-  if (match) {
-    return match[0] as CutoutFixtureIdsWithFakes
+  console.log("aaForCutoutAndFixture: ", aaForCutoutAndFixture)
+  console.log("addressableAreaId: ", addressableAreaId)
+  if (WASTE_CHUTE_FIXTURES.includes(cutoutFixtureRemoved)){
+    console.log("yes")
+    if(addressableAreaId == DEFAULT_AA_FOR_WASTE_CHUTE){
+      switch(cutoutFixtureRemoved){
+        case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+          return FLEX_STACKER_V1_FIXTURE
+        case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+        return SINGLE_RIGHT_SLOT_FIXTURE
+      }
+    }
   }
-  // Fallback if no match found
-  return cutoutFixtureRemoved
+  else{
+    const updated = aaForCutoutAndFixture?.map(aa =>
+      aa === addressableAreaId
+        ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
+        : aa
+    )
+    console.log("updated: ", updated)
+    const match = Object.entries(addressableAreasById).find(([, value]) =>
+      isEqual(value.sort(), WASTE_CHUTE_FIXTURES.includes(cutoutFixtureRemoved) ? aaForCutoutAndFixture?.sort() : updated?.sort()))
+    console.log('match: ', match)
+  
+    if (match) {
+      return match[0] as CutoutFixtureIdsWithFakes
+    }
+    // Fallback if no match found
+    return cutoutFixtureRemoved
+  }
 }

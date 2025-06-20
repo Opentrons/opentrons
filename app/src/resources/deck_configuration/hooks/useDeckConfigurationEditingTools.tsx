@@ -45,9 +45,6 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
@@ -93,7 +90,7 @@ export function useDeckConfigurationEditingTools(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
+              opentronsModuleSerialNumber: cutoutConfig.opentronsModuleSerialNumber ?? undefined,
             }
           : cutoutConfig
       )
@@ -107,9 +104,7 @@ export function useDeckConfigurationEditingTools(
         cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
-              cutoutFixtureId: getReplacementFixtureForFakeFixture(
-                replacementFixtureId
-              ),
+              cutoutFixtureId: replacementFixtureId,
               opentronsModuleSerialNumber: undefined,
             }
           : cutoutConfig
