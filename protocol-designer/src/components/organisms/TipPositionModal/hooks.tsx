@@ -23,12 +23,14 @@ export function usePositionReference(args: {
   zValue: number
   updateZValue: Dispatch<SetStateAction<string | null>>
   wellDepth: number
-  initialReference?: PositionReference | null
+  initialReference?: unknown
 }): UsePositionReferenceResult {
   const { initialReference, zValue, updateZValue, wellDepth } = args
   const { t } = useTranslation('modal')
   const [reference, setReference] = useState<PositionReference>(
-    initialReference ?? POSITION_REFERENCE_BOTTOM
+    initialReference != null
+      ? (initialReference as PositionReference)
+      : POSITION_REFERENCE_BOTTOM
   )
 
   const handleUpdateReference = (

@@ -113,7 +113,7 @@ export function TipPositionModal(
     reference,
     setReference,
   } = usePositionReference({
-    initialReference: referenceSpec?.value as PositionReference,
+    initialReference: referenceSpec?.value,
     zValue: Number(zValue),
     updateZValue: setZValue,
     wellDepth: wellDepthMm,
