@@ -24,7 +24,7 @@ CSV_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "96ch200.csv"
 class _AnalysisCLIResult:
     exit_code: int
     json_output: Optional[Dict[str, Any]]
-    stdout_stderr: str
+    stdout_stderr: bytes
 
 
 # Function copied from api/tests/opentrons/cli/test_cli.py
@@ -91,7 +91,7 @@ def _get_analysis_result(
     ],
 )
 def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
-    """Should check that gravimetric test protocol uses the latest Python API version and simulates properly."""
+    """Check that gravimetric test protocol uses the latest Python API version and simulates."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH],
         "--json-output",
@@ -105,7 +105,8 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
     )
     print(result.stdout_stderr)
     assert result.exit_code == 0
-    assert result.json_output["errors"] is None, f"Analysis failed: " + str(
+    assert result.json_output
+    assert result.json_output.get("errors", None) is None, "Analysis failed: " + str(
         result.json_output
     )
     assert result.json_output["config"]["apiVersion"] == [
