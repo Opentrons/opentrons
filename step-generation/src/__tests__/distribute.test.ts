@@ -164,6 +164,7 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["A2"], mock_dest_plate["A3"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -974,6 +975,7 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["B1"], mock_dest_plate["B2"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
