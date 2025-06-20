@@ -32,18 +32,11 @@ def raise_if_location_inside_liquid(
 ) -> None:
     """Raise an error if the location in question would be inside the liquid.
 
-    This checker will raise an error if:
-    - the location in question is below the target well location during aspirate/dispense or,
-    - if we can find the liquid height AND the location in question is below this height.
-      If we can't find the liquid height, then we simply log a warning and no error is raised.
+    This checker will raise an error if we can find the liquid height
+    AND the location in question is below this height.
+
+    If we can't find the liquid height, then we simply log the details and no error is raised.
     """
-    if location.point.z < well_location.point.z:
-        raise RuntimeError(
-            f"Received {location_check_descriptors.location_type} location of {location}"
-            f" and {location_check_descriptors.pipetting_action} location of {well_location}."
-            f" {location_check_descriptors.location_type.capitalize()} location z should not be lower"
-            f" than the {location_check_descriptors.pipetting_action} location z."
-        )
     try:
         liquid_height_from_bottom = well_core.current_liquid_height()
     except LiquidHeightUnknownError:
@@ -59,8 +52,8 @@ def raise_if_location_inside_liquid(
         # We could raise an error here but that would restrict the use of
         # liquid classes-based transfer to only when LPD is enabled or when liquids are
         # loaded in protocols using `load_liquid`. This can be quite restrictive
-        # so we will not raise but just log a warning.
-        logger.warning(
+        # so we will not raise but just log the details.
+        logger.info(
             f"Could not verify height of liquid in well {well_core.get_display_name()}, either"
             f" because the liquid in this well has not been probed or because"
             f" liquid was not loaded in this well using `load_liquid`."
