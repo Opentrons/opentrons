@@ -1457,7 +1457,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
-        assert new_tip in [TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS]
+        assert new_tip in [
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ]
 
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         working_volume = min(
@@ -1763,7 +1767,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume: float,
         source: List[Tuple[Location, WellCore]],
         dest: Union[Tuple[Location, WellCore], TrashBin, WasteChute],
-        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS],
+        new_tip: Literal[
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ],
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
         trash_location: Union[Location, TrashBin, WasteChute],
@@ -1775,7 +1783,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         # NOTE: Tip option of "always" in consolidate is equivalent to "after every dispense",
         #       or more specifically, "before the next chunk of aspirates".
-        assert new_tip in [TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS]
+        assert new_tip in [
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ]
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         try:
             transfer_props = liquid_class.get_for(
@@ -2038,10 +2050,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 location=prep_location,
             )
             last_liquid_and_airgap_in_tip.air_gap = 0
-            if (
-                transfer_type != tx_comps_executor.TransferType.MANY_TO_ONE
-                and self.get_liquid_presence_detection()
-            ):
+            if self.get_liquid_presence_detection():
                 self.liquid_probe_with_recovery(
                     well_core=source_well, loc=prep_location
                 )

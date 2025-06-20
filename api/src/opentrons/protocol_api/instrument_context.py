@@ -1939,6 +1939,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"never"``: Do not pick up or drop tips at all.
+              - ``"always"``: Pick up a new tip before every aspirate.
 
             See :ref:`param-tip-handling` for details.
 
@@ -1985,11 +1986,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `distribute_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         verified_source = transfer_args.source[0]
@@ -2065,6 +2067,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"never"``: Do not pick up or drop tips at all.
+              - ``"always"``: Pick up a new tip before going back to source for refilling after a dispense.
 
             See :ref:`param-tip-handling` for details.
 
@@ -2114,11 +2117,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         with publisher.publish_context(
