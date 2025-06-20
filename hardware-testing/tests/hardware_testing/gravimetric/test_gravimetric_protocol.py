@@ -84,10 +84,7 @@ def _get_analysis_result(
         pytest.param(
             "96ch200", marks=pytest.mark.xfail(reason="200ul has no liquid class")
         ),
-        pytest.param(
-            "96ch1000",
-            marks=pytest.mark.xfail(reason="the 1000ul test csv is incorrect"),
-        ),
+        pytest.param("96ch1000"),
     ],
 )
 def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
