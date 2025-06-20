@@ -615,7 +615,7 @@
       }
     },
     "extents": {
-      "description": "The outer dimensions of the labware.",
+      "description": "The outer dimensions of the labware. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
       "required": ["total"],
       "additionalProperties": false,

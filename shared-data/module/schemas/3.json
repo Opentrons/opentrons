@@ -139,7 +139,7 @@
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "extents": {
-      "description": "The outer dimensions of the addressable area.",
+      "description": "The outer dimensions of the addressable area. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
       "required": ["total"],
       "additionalProperties": false,
@@ -295,7 +295,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A compatible module model (e.g. temperatureModuleV1)"
+        "description": "List of module models this model is compatible with (e.g. temperatureModuleV1)"
       }
     },
     "incompatibleWithDecks": {
