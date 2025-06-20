@@ -176,6 +176,7 @@ export function AddFixtureModal({
     }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
 
     updateDeckConfiguration(newDeckConfig)
+    console.log('deckConfigWithAA: ', deckConfigWithAA)
     closeModal()
   }
 

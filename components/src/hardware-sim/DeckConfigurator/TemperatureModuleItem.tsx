@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-import { AddressableAreaNamesWithFakes, SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
+import {
+  AddressableAreaNamesWithFakes,
+  SINGLE_LEFT_CUTOUTS,
+} from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -95,7 +98,11 @@ export function TemperatureModuleItem(
         onClick={
           handleClickRemove != null
             ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+                handleClickRemove(
+                  fixtureLocation,
+                  cutoutFixtureId,
+                  addressableAreaId
+                )
               }
             : () => {}
         }

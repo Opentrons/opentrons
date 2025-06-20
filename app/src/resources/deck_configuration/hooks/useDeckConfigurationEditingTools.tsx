@@ -2,8 +2,10 @@ import { useState } from 'react'
 
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  AA_TO_AA_SLOT,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
@@ -43,10 +45,10 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-    const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      deckConfig
-    )  
-    const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [
     addressableAreaId,
@@ -72,6 +74,7 @@ export function useDeckConfigurationEditingTools(
       addressableAreaId,
       deckConfigWithAA
     )
+
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}
@@ -97,11 +100,18 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
+      // const itemsToUpdate = deckConfigWithAA.filter(x=> x.cutoutFixtureId === cutoutFixtureId)
+      // const itemsToUpdateWithFakes = itemsToUpdate.map(x =>  {return {...x, cutoutFixtureId: replacementFixtureId , addressableAreaId: x.addressableAreaId == addressableAreaId ? AA_TO_AA_SLOT[addressableAreaId] : x.addressableAreaId}})
+
+      // console.log("itemsToUpdateWithFakes: ", itemsToUpdateWithFakes)
+
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
+              cutoutFixtureId: getReplacementFixtureForFakeFixture(
+                replacementFixtureId
+              ),
               opentronsModuleSerialNumber: undefined,
             }
           : cutoutConfig

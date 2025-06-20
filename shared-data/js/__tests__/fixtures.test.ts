@@ -11,10 +11,10 @@ import {
 } from '..'
 import {
   getAAWithFakesFromCutoutFixtureId,
-  replaceAAWithFakeAA,
   getCutoutFixtureReplacementIfNeeded,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFixtureRemoval,
+  replaceAAWithFakeAA,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
@@ -163,11 +163,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   })
 
   it('Should find an aa for temp module', () => {
-    const result = replaceAAWithFakeAA(
-      'cutoutA1',
-      'temperatureModuleV2',
-      'A1'
-    )
+    const result = replaceAAWithFakeAA('cutoutA1', 'temperatureModuleV2', 'A1')
     expect(result).toEqual('temperatureModuleV2A1')
   })
 })

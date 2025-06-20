@@ -1,10 +1,10 @@
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
-  replaceAAWithFakeAA,
   getDeckDefFromRobotType,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  replaceAAWithFakeAA,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
@@ -252,11 +252,7 @@ export const getOptions = (
       )
       const aaProvidedFixtureOptions = addressableAreasById[o]
       if (aaProvidedFixtureOptions != null) {
-        const aaForFixture = replaceAAWithFakeAA(
-          cutoutId,
-          o,
-          addressableAreaId
-        )
+        const aaForFixture = replaceAAWithFakeAA(cutoutId, o, addressableAreaId)
         if (aaForFixture != null) {
           return [
             {
