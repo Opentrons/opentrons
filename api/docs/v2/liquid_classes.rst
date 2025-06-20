@@ -50,95 +50,55 @@ When you select a liquid class to use in transfers on the the Flex, properties l
 
 Each Opentrons-verified liquid class is defined by a set of properties: 
 
-.. figure:: ../img/lc_icons/submerge_position.png
-    :name: Submerge position
-    :scale: 35%
-    :align: left
+.. list-table::
+    :header-rows: 1
+    :widths: 1 3
 
-.. figure:: ../img/lc_icons/submerge_speed.png
-    :name: Submerge speed
-    :scale: 35%
-    :align: right
-    
-    The pipette begins at this position above the liquid and submerges into the liquid at this speed.
+    * - Property
+      - Description
+    * - .. image:: ../img/lc_icons/submerge_position.png
+        **Submerge position**
+      - The pipette begins at this position above the liquid.
+    * - .. image:: ../img/lc_icons/submerge_speed.png
+        **Submerge speed**
+      - The pipette submerges into the liquid at this speed.
+    * - .. image:: ../img/lc_icons/delay_after_submerge.png
+        **Delay after submerging**
+      - The pipette delays a specified amount of time:
 
-.. figure:: ../img/lc_icons/delay_after_submerge.png
-    :name: Delay after submerging
-    :scale: 35%
-    :align: center
-
-    The pipette delays a specified amount of time: 
-    * before submerging into or retracting from liquid.
-    * before or after an aspirate or dispense.
-    * after a push out. 
-
-.. figure:: ../img/lc_icons/mix.png
-    :name: Mix liquid
-    :scale: 35%
-    :align: center
-
-    The pipette mixes liquid inside the well before an aspirate or after a dispense. 
-
-.. figure:: ../img/lc_icons/prewet_tip.png
-    :name: Pre-wet tip
-    :scale: 35%
-    :align: center
-
-    The pipette pre-wets the attached tip before aspirating liquid. 
-
-.. figure:: ../img/lc_icons/flow_rate_aspirate.png
-    :name: Aspirate flow rate
-    :scale: 35%
-    :align: left
-
-.. figure:: ../img/lc_icons/flow_rate_dispense.png
-    :name: Dispense flow rate
-    :scale: 35%
-    :align: right
-
-    The pipette aspirates or dispense liquid at this speed. 
-
-.. figure:: ../img/lc_icons/retract_position.png
-    :name: Retract position
-    :scale: 35%
-    :align: left
-
-.. figure:: ../img/lc_icons/retract_speed.png
-    :name: Retract speed
-    :scale: 35%
-    :align: right
-
-    The pipette: 
-    * retracts from the liquid and moves to this position. 
-    * retracts from the liquid at the specified speed. 
-  
-.. figure:: ../img/lc_icons/push_out.png
-    :name: Push out
-    :scale: 35%
-    :align: center
-
-    The pipette dispenses a small amount of air to ensure all liquid leaves the tip. 
-
-.. figure:: ../img/lc_icons/touch_tip.png
-    :name: Touch tip
-    :scale: 35%
-    :align: center
-
-    The pipette touches the attached tip the sides of a well to remove droplets. 
-
-.. figure:: ../img/lc_icons/air_gap.png
-    :name: Air gap
-    :scale: 35%
-    :align: center
-
-    The pipette aspirates a small amount of air after an aspirate or dispense.
-
-.. figure:: ../img/lc_icons/blow_out.png
-    :name: Blow out
-    :scale: 35%
-    :align: center
-
-    The pipette dispenses a larger amount of air to ensure all liquid leaves the tip. 
+        - before submerging into or retracting from liquid.
+        - before or after an aspirate or dispense.
+        - after a push out.
+    * - .. image:: ../img/lc_icons/mix.png
+        **Mix liquid**
+      - The pipette mixes liquid inside the well before an aspirate or after a dispense.
+    * - .. image:: ../img/lc_icons/prewet_tip.png
+        **Pre-wet tip**
+      - The pipette pre-wets the attached tip before aspirating liquid.
+    * - .. image:: ../img/lc_icons/flow_rate_aspirate.png
+        **Aspirate flow rate**
+      - The pipette aspirates liquid at this speed.
+    * - .. image:: ../img/lc_icons/flow_rate_dispense.png
+        **Dispense flow rate**
+      - The pipette dispenses liquid at this speed.
+    * - .. image:: ../img/lc_icons/retract_position.png
+        **Retract position**
+      - The pipette retracts from the liquid and moves to this position.
+    * - .. image:: ../img/lc_icons/retract_speed.png
+        **Retract speed**
+      - The pipette retracts from the liquid at the specified speed.
+    * - .. image:: ../img/lc_icons/push_out.png
+        **Push out**
+      - The pipette dispenses a small amount of air to ensure all liquid leaves the tip.
+    * - .. image:: ../img/lc_icons/touch_tip.png
+        **Touch tip**
+      - The pipette touches the attached tip to the sides of a well to remove droplets.
+    * - .. image:: ../img/lc_icons/air_gap.png
+        **Air gap**
+      - The pipette aspirates a small amount of air after an aspirate or dispense.
+    * - .. image:: ../img/lc_icons/blow_out.png
+        **Blow out**
+      - The pipette dispenses a larger amount of air to ensure all liquid leaves the tip.
 
 
 
@@ -299,5 +259,3 @@ The example above only includes aspirate position properties. To create your liq
 .. note:: 
 
     The :py:meth:`.InstrumentContext.get_liquid_class` method only accepts Opentrons-verified liquid classes, like ``glycerol_50``. You'll need to use :py:meth:`.InstrumentContext.define_liquid_class` in each Flex protocol that uses a custom liquid class.
-
-
