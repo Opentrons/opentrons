@@ -39,7 +39,10 @@ from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from ._liquid import LiquidClass
-from ._transfer_liquid_validation import verify_and_normalize_transfer_args
+from ._transfer_liquid_validation import (
+    verify_and_normalize_transfer_args,
+    resolve_keep_last_tip,
+)
 from . import labware, validation
 from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
@@ -1795,6 +1798,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1830,6 +1834,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -1852,6 +1859,9 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+        )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
         )
 
         verified_dest: Union[
@@ -1899,6 +1909,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
@@ -1917,6 +1928,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1949,6 +1961,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -1972,6 +1987,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             raise ValueError(
                 "distribute_with_liquid_class() does not support trash bin or waste chute"
@@ -2024,6 +2043,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
@@ -2042,6 +2062,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2075,6 +2096,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -2098,6 +2122,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         verified_dest: Union[Tuple[types.Location, WellCore], TrashBin, WasteChute]
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             verified_dest = transfer_args.dest
@@ -2149,6 +2177,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
