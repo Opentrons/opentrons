@@ -13,12 +13,14 @@ from opentrons_shared_data.labware.labware_definition import (
     Vector3D,
     Extents,
     AxisAlignedBoundingBox3D,
-    AxisAlignedBoundingBox2D,
-    Vector2D,
     Dimensions,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.labware.types import (
+    LocatingFeatures,
+    SlotFootprintAsChildFeature,
+    Vector2D,
+)
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
@@ -80,10 +82,11 @@ _LABWARE_DEF_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
             backLeftBottom=Vector3D(x=100, y=200, z=300),
             frontRightTop=Vector3D(x=1100, y=-800, z=1300),
         ),
-        footprint=AxisAlignedBoundingBox2D(
-            backLeft=Vector2D(x=100, y=200),
-            frontRight=Vector2D(x=1100, y=-800),
-        ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=-10, y=5), frontRight=Vector2D(x=30, y=-20), z=0
+        )
     ),
 )
 
@@ -144,7 +147,7 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    locating_features_as_parent=LocatingFeatures(),
+    features=LocatingFeatures(),
 )
 
 
@@ -338,7 +341,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
     """It should calculate the correct offset from module parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=module_definition,
+        parent_deck_item=module_definition,
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
         is_topmost_labware=is_topmost_labware,
@@ -362,7 +365,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
     """It should calculate the correct offset from labware parent to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=parent_definition,
+        parent_deck_item=parent_definition,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
@@ -386,7 +389,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     """It should calculate the correct offset from addressable area to labware origin."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=child_definition,
-        parent_entity=addressable_area,
+        parent_deck_item=addressable_area,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=is_topmost_labware,
@@ -400,12 +403,12 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definition() -> None:
     """It should handle LabwareDefinition3 correctly."""
     result = get_parent_placement_origin_to_lw_origin(
         child_labware=_LABWARE_DEF_V3,
-        parent_entity=_ADDRESSABLE_AREA,
+        parent_deck_item=_ADDRESSABLE_AREA,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
     )
 
-    expected_offset = Point(x=-100, y=800, z=-300)
+    expected_offset = Point(x=10, y=20, z=0)
     assert result == expected_offset

@@ -45,9 +45,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3,
     Extents,
     AxisAlignedBoundingBox3D,
-    AxisAlignedBoundingBox2D,
     Vector3D,
-    Vector2D,
 )
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons_shared_data.labware import load_definition as load_labware_definition
@@ -187,10 +185,6 @@ _MOCK_LABWARE_DEFINITION3 = LabwareDefinition3.model_construct(  # type: ignore[
             backLeftBottom=Vector3D(x=0, y=0, z=0),
             frontRightTop=Vector3D(x=200, y=-50, z=30),
         ),
-        footprint=AxisAlignedBoundingBox2D(
-            backLeft=Vector2D(x=0, y=0),
-            frontRight=Vector2D(x=200, y=-50),
-        ),
     ),
 )
 
@@ -202,7 +196,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     bounding_box=Dimensions(x=128, y=86, z=0),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    locating_features_as_parent=LocatingFeatures(),
+    features=LocatingFeatures(),
 )
 
 
@@ -3000,7 +2994,7 @@ def test_get_slot_item(
         bounding_box=Dimensions(x=0, y=0, z=0),
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
-        locating_features_as_parent=LocatingFeatures(),
+        features=LocatingFeatures(),
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(

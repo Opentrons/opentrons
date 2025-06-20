@@ -10,6 +10,9 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3,
     Vector3D,
 )
+from opentrons_shared_data.labware.types import (
+    SlotFootprintAsChildFeature,
+)
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from ..types import (
     LabwareParentDefinition,
@@ -28,7 +31,7 @@ from ..types import (
 @overload
 def get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_entity: ModuleDefinition,
+    parent_deck_item: ModuleDefinition,
     module_parent_to_child_offset: LabwareOffsetVector,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -40,7 +43,7 @@ def get_parent_placement_origin_to_lw_origin(
 @overload
 def get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_entity: DeckLocationDefinition,
+    parent_deck_item: DeckLocationDefinition,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -52,7 +55,7 @@ def get_parent_placement_origin_to_lw_origin(
 @overload
 def get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_entity: LabwareDefinition,
+    parent_deck_item: LabwareDefinition,
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -63,7 +66,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 def get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_entity: LabwareParentDefinition,
+    parent_deck_item: LabwareParentDefinition,
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -77,10 +80,10 @@ def get_parent_placement_origin_to_lw_origin(
     Only parent-child specific offsets are calculated. Offsets that apply to a single entity
     (ex., module cal) or the entire stackup (ex., LPC) are handled elsewhere.
     """
-    parent_entity_origin_to_child_labware_placement_origin = (
-        _get_parent_entity_origin_to_child_labware_placement_origin(
+    parent_deck_item_origin_to_child_labware_placement_origin = (
+        _get_parent_deck_item_origin_to_child_labware_placement_origin(
             child_labware=child_labware,
-            parent_entity=parent_entity,
+            parent_deck_item=parent_deck_item,
             module_parent_to_child_offset=module_parent_to_child_offset,
             deck_definition=deck_definition,
             labware_location=labware_location,
@@ -91,32 +94,32 @@ def get_parent_placement_origin_to_lw_origin(
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
         # For compatibility with historical (buggy?) behavior,
         # we only consider it when the child labware is the topmost labware in a stackup.
-        parent_entity_origin_to_child_labware_origin = (
+        parent_deck_item_origin_to_child_labware_origin = (
             _to_point(child_labware.cornerOffsetFromSlot)
             if is_topmost_labware
             else Point(0, 0, 0)
         )
 
         return (
-            parent_entity_origin_to_child_labware_placement_origin
-            + parent_entity_origin_to_child_labware_origin
+            parent_deck_item_origin_to_child_labware_placement_origin
+            + parent_deck_item_origin_to_child_labware_origin
         )
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
         assert_type(child_labware, LabwareDefinition3)
-        parent_entity_origin_to_child_labware_origin = (
+        parent_deck_item_origin_to_child_labware_origin = (
             _get_back_left_bottom_position(child_labware) * -1
         )
 
         return (
-            parent_entity_origin_to_child_labware_placement_origin
-            + parent_entity_origin_to_child_labware_origin
+            parent_deck_item_origin_to_child_labware_placement_origin
+            + parent_deck_item_origin_to_child_labware_origin
         )
 
 
-def _get_parent_entity_origin_to_child_labware_placement_origin(
+def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
-    parent_entity: LabwareParentDefinition,
+    parent_deck_item: LabwareParentDefinition,
     module_parent_to_child_offset: Union[LabwareOffsetVector, None],
     deck_definition: DeckDefinitionV5,
     labware_location: LabwareLocation,
@@ -126,13 +129,13 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
         return Point(x=0, y=0, z=0)
 
     elif isinstance(labware_location, ModuleLocation):
-        assert isinstance(parent_entity, ModuleDefinition)
+        assert isinstance(parent_deck_item, ModuleDefinition)
         assert module_parent_to_child_offset is not None
 
-        child_labware_overlap_with_parent_entity = (
+        child_labware_overlap_with_parent_deck_item = (
             _get_child_labware_overlap_with_parent_module(
                 child_labware=child_labware,
-                parent_module_model=parent_entity.model,
+                parent_module_model=parent_deck_item.model,
                 deck_definition=deck_definition,
             )
         )
@@ -140,32 +143,32 @@ def _get_parent_entity_origin_to_child_labware_placement_origin(
         module_offset_point = _to_point_from_lw_offset_vector(
             module_parent_to_child_offset
         )
-        return module_offset_point - child_labware_overlap_with_parent_entity
+        return module_offset_point - child_labware_overlap_with_parent_deck_item
 
     elif isinstance(labware_location, OnLabwareLocation):
-        assert isinstance(parent_entity, (LabwareDefinition2, LabwareDefinition3))
+        assert isinstance(parent_deck_item, (LabwareDefinition2, LabwareDefinition3))
 
         # TODO(jh, 06-05-25): This logic is slightly duplicative of LabwareView get_dimensions. Can we unify?
-        if isinstance(parent_entity, LabwareDefinition2):
-            parent_entity_height = parent_entity.dimensions.zDimension
+        if isinstance(parent_deck_item, LabwareDefinition2):
+            parent_deck_item_height = parent_deck_item.dimensions.zDimension
         else:
-            assert_type(parent_entity, LabwareDefinition3)
-            parent_entity_height = (
-                parent_entity.extents.total.frontRightTop.z
-                - parent_entity.extents.total.backLeftBottom.z
+            assert_type(parent_deck_item, LabwareDefinition3)
+            parent_deck_item_height = (
+                parent_deck_item.extents.total.frontRightTop.z
+                - parent_deck_item.extents.total.backLeftBottom.z
             )
 
-        child_labware_overlap_with_parent_entity = (
+        child_labware_overlap_with_parent_deck_item = (
             _get_child_labware_overlap_with_parent_labware(
                 child_labware=child_labware,
-                parent_labware_name=parent_entity.parameters.loadName,
+                parent_labware_name=parent_deck_item.parameters.loadName,
             )
         )
 
         return Point(
-            x=child_labware_overlap_with_parent_entity.x,
-            y=child_labware_overlap_with_parent_entity.y,
-            z=parent_entity_height - child_labware_overlap_with_parent_entity.z,
+            x=child_labware_overlap_with_parent_deck_item.x,
+            y=child_labware_overlap_with_parent_deck_item.y,
+            z=parent_deck_item_height - child_labware_overlap_with_parent_deck_item.z,
         )
 
     else:
@@ -232,8 +235,23 @@ def _to_point_from_lw_offset_vector(offset_vector: LabwareOffsetVector) -> Point
 
 def _get_back_left_bottom_position(labware: LabwareDefinition3) -> Point:
     """Get the back left bottom position from a v3 labware definition."""
+    footprint_as_child = _get_labware_footprint_as_child(labware)
+
     return Point(
-        x=labware.extents.footprint.backLeft.x,
-        y=labware.extents.footprint.frontRight.y,
-        z=labware.extents.total.backLeftBottom.z,
+        x=footprint_as_child["backLeft"]["x"],
+        y=footprint_as_child["frontRight"]["y"],
+        z=footprint_as_child["z"],
     )
+
+
+def _get_labware_footprint_as_child(
+    labware: LabwareDefinition3,
+) -> SlotFootprintAsChildFeature:
+    """Get the SlotFootprintAsChildFeature for labware definitions."""
+    footprint_as_child = labware.features.get("slotFootprintAsChild")
+    if footprint_as_child is None:
+        raise ValueError(
+            f"Expected labware {labware.metadata.displayName} to have a SlotFootprintAsChild feature"
+        )
+    else:
+        return footprint_as_child

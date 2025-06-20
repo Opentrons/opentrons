@@ -38,6 +38,10 @@ ROBOT_TYPES = ["Flex", "OT-2"]
 
 # Labware URI, version
 TEST_LATEST_LABWARE: List[Tuple[str, int]] = [
+    ("schema3test_flex_tiprack_lid", 999),
+    ("schema3test_tough_pcr_auto_sealing_lid", 999),
+    ("schema3test_flex_96_tiprack_200ul", 999),
+    ("schema3test_96_wellplate_200ul_pcr_full_skirt", 999),
     ("agilent_1_reservoir_290ml", 3),
     ("appliedbiosystemsmicroamp_384_wellplate_40ul", 2),
     ("armadillo_96_wellplate_200ul_pcr_full_skirt", 3),
@@ -145,6 +149,10 @@ TEST_LATEST_LABWARE: List[Tuple[str, int]] = [
 ]
 
 FLEX_TEST_ADAPTERS: List[Tuple[str, int]] = [
+    ("schema3test_flex_96_tiprack_adapter", 999),
+    ("schema3test_universal_flat_adapter", 999),
+    ("schema3test_aluminum_flat_bottom_plate", 999),
+    ("schema3test_96_well_aluminum_block", 999),
     ("opentrons_96_deep_well_adapter", 1),
     ("opentrons_96_deep_well_temp_mod_adapter", 1),
     ("opentrons_96_flat_bottom_adapter", 1),
