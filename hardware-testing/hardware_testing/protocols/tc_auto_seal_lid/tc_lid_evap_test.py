@@ -47,7 +47,8 @@ def _fill_with_liquid_and_measure(
         plate_in_cycler["A11"],
         plate_in_cycler["A12"],
     ]
-    volumes = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+    volume = protocol.params.volume  # type: ignore[attr-defined]
+    volumes = [volume] * 12
     protocol.pause("Weight Armadillo Plate, place on thermocycler")
     # pipette 10uL into Armadillo wells
     source_well: Well = reservoir["A1"]
@@ -145,6 +146,14 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "Long Hold Test", "value": "long_hold_test"},
         ],
     )
+    parameters.add_float(
+        variable_name="volume",
+        display_name="Test Volume (ul)",
+        description="Volume to dispense in each well",
+        default=100,
+        minimum=0,
+        maximum=200,
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -155,6 +164,9 @@ def run(protocol: ProtocolContext) -> None:
     tc_lid_temp = protocol.params.tc_lid_temp  # type: ignore[attr-defined]
     tc_block_temp = protocol.params.tc_block_temp  # type: ignore[attr-defined]
     test_type = protocol.params.test_type  # type: ignore[attr-defined]
+    volume = protocol.params.volume  # type: ignore[attr-defined]
+    total_volume = volume * 96
+    print(f"total volume    = {total_volume} ul")
     # SETUP
     # Thermocycler
     thermocycler: ThermocyclerContext = protocol.load_module(
@@ -168,6 +180,8 @@ def run(protocol: ProtocolContext) -> None:
     # Labware
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "A2")
+    water = protocol.define_liquid(name="water", display_color="#0000FF")
+    reservoir["A1"].load_liquid(water, volume=total_volume)
     lids: List[Labware] = [
         protocol.load_labware("opentrons_tough_pcr_auto_sealing_lid", "D2")
     ]
