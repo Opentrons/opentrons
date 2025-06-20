@@ -113,8 +113,10 @@ def run(ctx: ProtocolContext) -> None:
     probing_pipette.pick_up_tip()
     liquid_pipette.pick_up_tip()
     liquid_pipette.measure_liquid_height(src_reservoir["A1"])
-    # TODO: determine the fill increment
-    initial_iterations = max_volume / fill_increment
-    for i in range(int(initial_iterations)):
-
+    # TODO: determine the fill increment 
+    steps = 20 #optimize later
+    step_volume = max_volume / steps 
+    for i in range(int(steps)):
+        liquid_pipette.transfer(step_volume, source_well, labware["bottom_left"], return_tips=False, blow_out=False)
+        probing_pipette. #probes -> height exported to csv with the volume it probed at. 
         
