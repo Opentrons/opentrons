@@ -105,10 +105,6 @@ test-protocol-iq-oq:
 
 .PHONY: test-protocol-iq-oq-1ch
 test-protocol-iq-oq-1ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=legacy
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_1channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
@@ -124,10 +120,6 @@ test-protocol-iq-oq-1ch:
 
 .PHONY: test-protocol-iq-oq-8ch
 test-protocol-iq-oq-8ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=legacy
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_50 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_8channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
@@ -143,9 +135,6 @@ test-protocol-iq-oq-8ch:
 
 .PHONY: test-protocol-iq-oq-96ch
 test-protocol-iq-oq-96ch:
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=legacy
-	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=legacy
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_50ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_200ul liquid=water
 	$(python) -m opentrons.simulate $(protocols_dir)/volumetric/flex_pipette_iq_oq.py $(custom_lw_args) --parameters pipette=flex_96channel_1000 tips=opentrons_flex_96_filtertiprack_1000ul liquid=water

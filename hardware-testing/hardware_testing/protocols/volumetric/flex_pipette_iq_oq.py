@@ -9,7 +9,6 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Labware,
     Well,
-    LiquidClass,
     HeaterShakerContext,
     AbsorbanceReaderContext,
     OFF_DECK,
@@ -89,8 +88,8 @@ VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_tiprack_50ul": [1, 10, 50],
     "opentrons_flex_96_filtertiprack_200ul": [5, 50, 200],
     "opentrons_flex_96_tiprack_200ul": [5, 50, 200],
-    "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
-    "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
+    "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 250],
+    "opentrons_flex_96_tiprack_1000ul": [10, 100, 250],
 }
 # TODO: increase 96ch trials by loading off-deck labware somehow
 TRIALS_BY_PIPETTE_BY_TIP = {
@@ -102,7 +101,7 @@ TRIALS_BY_PIPETTE_BY_TIP = {
 }
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {
-    1: 1, 8: 3, 96: 5
+    1: 1, 8: 5, 96: 5
 }
 
 # fmt: off
@@ -159,7 +158,6 @@ def add_parameters(params: ParameterContext) -> None:
             {"display_name": "water", "value": "water"},
             {"display_name": "glycerol_50", "value": "glycerol_50"},
             {"display_name": "ethanol_80", "value": "ethanol_80"},
-            {"display_name": "legacy", "value": "legacy"},
         ],
     )
     params.add_bool(
@@ -474,9 +472,7 @@ def run(ctx: ProtocolContext) -> None:
     )
     load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
     diluent_class = ctx.get_liquid_class("water")
-    test_class: Optional[LiquidClass] = None
-    if str(ctx.params.liquid) != "legacy":  # type: ignore[attr-defined]
-        test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+    test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
@@ -523,13 +519,13 @@ def run(ctx: ProtocolContext) -> None:
             #        however probing >=2x times requires LLD support in liquid-classes.
             pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
             if pip_for_dil.channels == 96:
-                assert dest_wells_by_volume[ul][0].well_name == "A1"
-                diluent_dest = dest_wells_by_volume[ul][0].parent.wells()
+                assert dest_wells[0].well_name == "A1"
+                diluent_dest = dest_wells[0].parent.wells()
                 diluent_src = reservoir_diluent["A1"]
             else:
                 diluent_dest = [
                     w.parent.columns_by_name()[w.well_name[1:]]
-                    for w in dest_wells_by_volume[ul]
+                    for w in dest_wells
                     if "A" in w.well_name  # new column
                 ]
                 diluent_src = [reservoir_diluent["A1"]] * len(diluent_dest)
@@ -548,28 +544,44 @@ def run(ctx: ProtocolContext) -> None:
         test_pip.require_liquid_presence(src_well)
         test_pip.drop_tip()
 
+        # ORGANIZE WELLS FOR PIPETTES
+        dst_wells_organized: List[List[Well]] = []
+        if test_pip.channels == 1:
+            dst_wells_organized = dest_wells
+        elif test_pip.channels == 8:
+            dst_wells_organized = [
+                w.parent.columns_by_name()[w.well_name[1:]]
+                for w in dest_wells
+                if "A" in w.well_name  # new column
+            ]
+        else:
+            dst_wells_organized = [dest_wells[0].parent.wells()]
+        src_wells_organized: List[Well] = [src_well] * len(dst_wells_organized)
+
         # TRANSFER DYE TO PLATE
-        args = [ul / len(dest_wells), src_well, dest_wells]
-        if test_class and len(dest_wells) == 1:
-            test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
-        elif test_class and len(dest_wells) == 4:
-            test_pip.distribute_with_liquid_class(test_class, *args, new_tip="always")
-        elif not test_class and len(dest_wells) == 1:
-            test_pip.transfer(*args, new_tip="always")
-        elif not test_class and len(dest_wells) == 4:
-            test_pip.distribute(*args, new_tip="always")
+        args = [ul, src_wells_organized, dst_wells_organized]
+        if ul <= DYE_SHAKER_MAX_UL:
+            try:
+                test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
+            except RuntimeError as e:
+                if test_pip.channels == 96:
+                    ctx.pause("replace all empty tip-racks on deck (not in staging slots)")
+                    test_pip.reset_tipracks()
+                    test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
+                else:
+                    raise e
+        else:
+            raise NotImplementedError("distribute not implemented yet")
 
         # SWAP INACCESSIBLE TIP-RACKS
-        has_tips = bool(test_pip.tip_racks[0].next_tip(test_pip.channels))
-        if not has_tips and not inaccessible_racks:
-            raise RuntimeError(f"out of tips-racks when testing {ul} ul")
-        elif not has_tips:
-            old_rack = test_pip.tip_racks[0]
-            new_rack = inaccessible_racks.pop(0)
-            rack_adapter = old_rack.parent
-            ctx.move_labware(test_pip.tip_racks[0], trash, use_gripper=True)
-            ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
-            test_pip.tip_racks[0] = new_rack
+        for i, old_rack in enumerate(test_pip.tip_racks):
+            has_tips = bool(old_rack.next_tip(test_pip.channels))
+            if not has_tips and inaccessible_racks:
+                new_rack = inaccessible_racks.pop(0)
+                rack_adapter = old_rack.parent
+                ctx.move_labware(old_rack, trash, use_gripper=True)
+                ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
+                test_pip.tip_racks[i] = new_rack
 
     # don't forget final plate
     _on_plate_done()
