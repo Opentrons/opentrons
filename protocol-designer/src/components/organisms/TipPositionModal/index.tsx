@@ -108,12 +108,13 @@ export function TipPositionModal(
   const [xValue, setXValue] = useState<string | null>(
     xSpec?.value == null ? null : String(xSpec?.value)
   )
+  console.log('referenceSpec',referenceSpec)
   const {
     positionReferenceDropdown,
     reference,
     setReference,
   } = usePositionReference({
-    initialReference: referenceSpec?.value as PositionReference,
+    initialReference: referenceSpec?.value,
     zValue: Number(zValue),
     updateZValue: setZValue,
     wellDepth: wellDepthMm,
