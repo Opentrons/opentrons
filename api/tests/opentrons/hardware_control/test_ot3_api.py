@@ -1616,7 +1616,6 @@ async def test_gripper_action_works_with_gripper(
         ),
         autospec=True,
     ):
-        gripper._jaw_max_offset = None if needs_calibration else calibration_offset
         gripper._encoder_position_at_jaw_closed = (
             None if needs_calibration else fake_jaw_encoder_val
         )
@@ -1628,7 +1627,6 @@ async def test_gripper_action_works_with_gripper(
             mock_ungrip.assert_called_once()
         mock_ungrip.reset_mock()
         mock_grip.reset_mock()
-        gripper._jaw_max_offset = None if needs_calibration else 5
         gripper._encoder_position_at_jaw_closed = (
             None if needs_calibration else fake_jaw_encoder_val
         )
@@ -1666,7 +1664,6 @@ async def test_gripper_action_works_with_gripper(
         # specified
         mock_ungrip.reset_mock()
         mock_grip.reset_mock()
-        gripper._jaw_max_offset = None if needs_calibration else 5
         gripper._encoder_position_at_jaw_closed = (
             None if needs_calibration else fake_jaw_encoder_val
         )

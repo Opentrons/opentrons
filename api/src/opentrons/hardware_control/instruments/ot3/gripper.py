@@ -55,7 +55,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         config: GripperDefinition,
         gripper_cal_offset: GripperCalibrationOffset,
         gripper_id: str,
-        jaw_max_offset: Optional[float] = None,
     ) -> None:
         self._config = config
         self._model = config.model
@@ -87,7 +86,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
-        self._jaw_max_offset = jaw_max_offset
         self._encoder_position_at_jaw_closed: Optional[float] = None
 
     @property
@@ -114,6 +112,22 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     @property
     def max_allowed_grip_error(self) -> float:
         return self._geometry.max_allowed_grip_error
+
+    @property
+    def _jaw_min(self) -> float:
+        return self._config.geometry.jaw_width["min"]
+
+    @property
+    def _jaw_nominal_max(self) -> float:
+        return self._config.geometry.jaw_width["max"]
+
+    @property
+    def _jaw_max_offset(self) -> float | None:
+        if self._encoder_position_at_jaw_closed is None:
+            return None
+        return self._jaw_min - (
+            self._jaw_nominal_max - (self._encoder_position_at_jaw_closed * 2)
+        )
 
     @property
     def max_jaw_width(self) -> float:
@@ -197,12 +211,9 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         """
         if jaw_at_closed is None:
             self._encoder_position_at_jaw_closed = jaw_at_closed
-            self._jaw_max_offset = None
             return
-        jaw_min = self._config.geometry.jaw_width["min"]
-        jaw_nominal_max = self._config.geometry.jaw_width["max"]
         if (
-            abs((jaw_at_closed * 2) - (jaw_nominal_max - jaw_min))
+            abs((jaw_at_closed * 2) - (self._jaw_nominal_max - self._jaw_min))
             > MAX_ACCEPTABLE_JAW_DISPLACEMENT
         ):
             raise MotionFailedError(
@@ -210,14 +221,13 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 detail={
                     "type": "gripper-jaw-calibration-out-of-bounds",
                     "actual-displacement": str(jaw_at_closed * 2),
-                    "nominal-displacement": str(jaw_nominal_max - jaw_min),
+                    "nominal-displacement": str(self._jaw_nominal_max - self._jaw_min),
                 },
             )
         save_gripper_jaw_width_data(
             gripper_id=self._gripper_id,
             encoder_position_at_closed=jaw_at_closed,
         )
-        self._jaw_max_offset = jaw_min - (jaw_nominal_max - (jaw_at_closed * 2))
         self._encoder_position_at_jaw_closed = jaw_at_closed
         self._log.info(
             f"Gripper max jaw offset is now {self._jaw_max_offset} from input position {jaw_at_closed}"
@@ -249,7 +259,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             )
 
     def reset_jaw_width_calibration(self, to_default: bool) -> None:
-        """Temporarily reset the gripper jaw width measurement."""
+        """Reset the gripper jaw width measurement in the protocol engine."""
         if to_default:
             loaded_jaw_width_data = load_gripper_jaw_width(gripper_id=None)
         else:
@@ -366,7 +376,6 @@ def _reload_gripper(
                     new_config,
                     cal_offset,
                     attached_instr._gripper_id,
-                    None,
                 ),
                 False,
             )

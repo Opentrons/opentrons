@@ -136,7 +136,6 @@ def test_reload_instrument_cal_ot3(fake_offset: GripperCalibrationOffset) -> Non
         fake_gripper_conf,
         fake_offset,
         "fakeid123",
-        jaw_max_offset=15,
     )
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(
@@ -164,7 +163,6 @@ def test_reload_instrument_cal_ot3_conf_changed(
         fake_gripper_conf,
         fake_offset,
         "fakeid123",
-        jaw_max_offset=15,
     )
     new_conf = fake_gripper_conf.model_copy(
         update={
