@@ -187,7 +187,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   const referencePositionText = t(
     `protocol_steps:reference_positions.${referencePosition}`
   )
-console.log('zValue', zValue)
+  console.log('zValue', zValue)
   return (
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
