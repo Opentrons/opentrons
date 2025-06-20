@@ -1901,6 +1901,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         next_step_volume, next_source = next(source_per_volume_step)
         is_first_step = True
         is_last_step = False
+        prev_src: Optional[tuple[Location, WellCore]] = None
         while not is_last_step:
             total_dispense_volume = 0.0
             vol_aspirate_combo = []
@@ -1933,7 +1934,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         air_gap=0,
                     )
                 ]
-                enable_lpd = self.get_liquid_presence_detection()
+                # Enable LPD if it's globally enabled, as long as
+                # the next source is different from previous source
+                enable_lpd = (
+                    self.get_liquid_presence_detection()
+                    and prev_src != vol_aspirate_combo[0][1]
+                )
             else:
                 enable_lpd = False
 
@@ -1951,6 +1957,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         ),
                         current_volume=total_aspirated_volume,
                     )
+                prev_src = step_source
                 total_aspirated_volume += step_volume
                 is_first_step = False
                 enable_lpd = False

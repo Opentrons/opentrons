@@ -2252,16 +2252,6 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
             new_tip="never",
             trash_location=trash,
         )
-        pipette_1k.drop_tip()
-        pipette_1k.consolidate_with_liquid_class(
-            liquid_class=water,
-            volume=40,
-            source=nest_plate.rows()[0],
-            dest=arma_plate.rows()[0][0],
-            new_tip="once",
-            trash_location=trash,
-        )
-        patched_liquid_probe.assert_not_called()
 
 
 @pytest.mark.ot3_only
