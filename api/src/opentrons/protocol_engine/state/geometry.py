@@ -394,21 +394,12 @@ class GeometryView:
 
     def _get_labware_ancestor_position(self, labware_id: str) -> Point:
         """Get the position of the labware's underlying ancestor."""
-        slot_name = self._get_underlying_slot_name(labware_id)
+        slot_name = self._get_underlying_addressable_area_name(
+            self._labware.get(labware_id).location
+        )
         parent_pos = self._addressable_areas.get_addressable_area_position(slot_name)
 
         return parent_pos
-
-    def _get_underlying_slot_name(self, labware_id: str) -> str:
-        """Get the name of the labware's underlying slot."""
-        try:
-            slot_name = self.get_ancestor_slot_name(labware_id).id
-        except errors.LocationIsStagingSlotError:
-            slot_name = self._get_staging_slot_name(labware_id)
-        except errors.LocationIsLidDockSlotError:
-            slot_name = self._get_lid_dock_slot_name(labware_id)
-
-        return slot_name
 
     def _get_stackup_placement_origin_to_lw_origin(
         self, labware_id: str, is_topmost_labware: bool
@@ -456,9 +447,10 @@ class GeometryView:
         parent_entity = self._get_parent_definition(labware_location)
 
         if isinstance(labware_location, ModuleLocation):
-            module_parent_to_child_offset = self._modules.get_nominal_offset_to_child(
-                module_id=labware_location.moduleId,
-                addressable_areas=self._addressable_areas,
+            module_parent_to_child_offset = (
+                self._modules.get_nominal_offset_to_child_from_addressable_area(
+                    module_id=labware_location.moduleId,
+                )
             )
             return get_parent_placement_origin_to_lw_origin(
                 child_labware=labware_definition,
@@ -526,7 +518,6 @@ class GeometryView:
                 f"Cannot get ancestor from location {location}"
             )
 
-    # TODO(jh, 06-12-25): This is suspiciously similar to get_ancestor_addressable_area_name. Can we unify these two?
     def _get_underlying_addressable_area_name(self, location: LabwareLocation) -> str:
         if isinstance(location, DeckSlotLocation):
             return location.slotName.id
@@ -817,28 +808,6 @@ class GeometryView:
             origin=WellOrigin(well_location.origin.value), offset=well_location.offset
         )
 
-    # TODO(jbl 11-30-2023) fold this function into get_ancestor_slot_name see RSS-411
-    def _get_staging_slot_name(self, labware_id: str) -> str:
-        """Get the staging slot name that the labware is on."""
-        labware_location = self._labware.get(labware_id).location
-        if isinstance(labware_location, OnLabwareLocation):
-            below_labware_id = labware_location.labwareId
-            return self._get_staging_slot_name(below_labware_id)
-        elif isinstance(
-            labware_location, AddressableAreaLocation
-        ) and fixture_validation.is_staging_slot(labware_location.addressableAreaName):
-            return labware_location.addressableAreaName
-        else:
-            raise ValueError(
-                "Cannot get staging slot name for labware not on staging slot."
-            )
-
-    def _get_lid_dock_slot_name(self, labware_id: str) -> str:
-        """Get the staging slot name that the labware is on."""
-        labware_location = self._labware.get(labware_id).location
-        assert isinstance(labware_location, AddressableAreaLocation)
-        return labware_location.addressableAreaName
-
     def get_ancestor_slot_name(
         self, labware_id: str
     ) -> Union[DeckSlotName, StagingSlotName]:
@@ -1074,7 +1043,7 @@ class GeometryView:
         parent_to_lw_offset = self._get_parent_placement_origin_to_lw_origin(
             labware_location=location,
             labware_definition=labware_definition,
-            is_topmost_labware=True,  # We only ever get the grip point for the topmost labware in a stackup.
+            is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
         )
         mod_cal_offset = self._get_calibrated_module_offset(location)
         location_center = self._addressable_areas.get_addressable_area_center(
