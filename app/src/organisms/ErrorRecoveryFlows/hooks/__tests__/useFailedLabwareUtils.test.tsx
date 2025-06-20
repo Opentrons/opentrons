@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { NozzleLayoutValues, RunCurrentState } from '@opentrons/api-client'
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
@@ -342,62 +343,44 @@ describe('getFailedLabwareQuantity', () => {
     ]
     errors.forEach(errorType => {
       const failedLocalRetriveCommand = {
-        ...failedCommand,
-        commandType: 'flexStacker/retrieve',
-        error: {
-          isDefined: true,
-          errorType,
+        byRunRecord: {
+          ...failedCommand,
+          error: { errorType: 'SOME_UNHANDLED_ERROR' },
+        },
+        byAnalysis: {
+          ...failedCommand,
+          error: { errorType: 'SOME_UNHANDLED_ERROR' },
         },
       }
-      const localRunCommands = {
-        data: [
-          {
-            id: 'set-stored-labware-1',
-            commandType: 'flexStacker/setStoredLabware',
-            params: {
-              initialCount: 2,
+
+      const currentRunState = {
+        data: {
+          estopEngaged: false,
+          activeNozzleLayouts: {
+            abc: {
+              startingNozzle: 'A1',
+              activeNozzles: ['A1'],
+              config: 'single',
             },
-          } as any,
-          {
-            id: 'retrive-id-1',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
+          },
+          tipStates: { abc: { hasTip: false } },
+          placeLabwareState: undefined,
+          flexStackerStates: {
+            'module-id': {
+              primaryLabwareURI: 'huh',
+              adapterLabwareURI: 'whu',
+              lidLabwareURI: 'buh',
+              count: 4,
+              maxCount: 5,
             },
-          } as any,
-          {
-            id: 'retrive-id-2',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
-            },
-          } as any,
-          {
-            id: 'set-stored-labware',
-            commandType: 'flexStacker/setStoredLabware',
-            params: {
-              initialCount: 5,
-            },
-          } as any,
-          {
-            id: 'retrive-id',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
-            },
-          } as any,
-          { ...failedLocalRetriveCommand },
-        ] as RunCommandSummary[],
-        meta: {
-          totalLength: 10,
-          pageLength: 1,
+          },
         },
-        links: {},
+        links: { lastCompleted: { id: 'test', href: 'test2' } },
       }
+
       const result = getFailedLabwareQuantity(
-        localRunCommands,
         failedLocalRetriveCommand,
-        errorType
+        currentRunState as RunCurrentState
       )
       expect(result).toEqual(4)
     })
@@ -409,67 +392,45 @@ describe('getFailedLabwareQuantity', () => {
       ERROR_KINDS.STACKER_HOPPER_EMPTY,
       ERROR_KINDS.STACKER_STALLED,
     ]
-    errors.forEach(errorType => {
+    errors.forEach(errorKind => {
       const failedLocalRetriveCommand = {
-        ...failedCommand,
-        commandType: 'flexStacker/retrieve',
-        error: {
-          isDefined: true,
-          errorType,
+        byRunRecord: {
+          ...failedCommand,
+          error: { errorType: errorKind },
+        },
+        byAnalysis: {
+          ...failedCommand,
+          error: { errorType: errorKind },
         },
       }
-      const localRunCommands = {
-        data: [
-          {
-            id: 'set-stored-labware-1',
-            commandType: 'flexStacker/setStoredLabware',
-            params: {
-              initialCount: 2,
+
+      const currentRunState = {
+        data: {
+          estopEngaged: false,
+          activeNozzleLayouts: {
+            abc: {
+              startingNozzle: 'A1',
+              activeNozzles: ['A1'],
+              config: 'single',
             },
-          } as any,
-          {
-            id: 'retrive-id-1',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
+          },
+          tipStates: { abc: { hasTip: false } },
+          placeLabwareState: undefined,
+          flexStackerStates: {
+            'module-id': {
+              primaryLabwareURI: 'huh',
+              adapterLabwareURI: 'whu',
+              lidLabwareURI: 'buh',
+              count: 4,
+              maxCount: 5,
             },
-          } as any,
-          {
-            id: 'retrive-id-2',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
-            },
-          } as any,
-          {
-            id: 'set-stored-labware',
-            commandType: 'flexStacker/setStoredLabware',
-            params: {
-              initialCount: 5,
-            },
-          } as any,
-          {
-            id: 'retrive-id',
-            commandType: 'flexStacker/retrieve',
-            params: {
-              moduleId: 'module-id',
-            },
-            result: {
-              primaryLocationSequence: [1, 2, 3, 4],
-            },
-          } as any,
-          { ...failedLocalRetriveCommand },
-        ] as RunCommandSummary[],
-        meta: {
-          totalLength: 10,
-          pageLength: 1,
+          },
         },
-        links: {},
+        links: { lastCompleted: { id: 'test', href: 'test2' } },
       }
       const result = getFailedLabwareQuantity(
-        localRunCommands,
         failedLocalRetriveCommand,
-        errorType
+        currentRunState as RunCurrentState
       )
       expect(result).toEqual(4)
     })
@@ -484,37 +445,55 @@ describe('getFailedLabwareQuantity', () => {
       },
       links: {},
     }
+    const failedLocalRetriveCommand = {
+      byRunRecord: {
+        ...failedCommand,
+        error: { errorType: ERROR_KINDS.STACKER_STALLED },
+      },
+      byAnalysis: {
+        ...failedCommand,
+        error: { errorType: ERROR_KINDS.STACKER_STALLED },
+      },
+    }
+
+    const currentRunState = {
+      data: {
+        estopEngaged: false,
+        activeNozzleLayouts: {
+          abc: {
+            startingNozzle: 'A1',
+            activeNozzles: ['A1'],
+            config: 'single',
+          },
+        },
+        tipStates: { abc: { hasTip: false } },
+        placeLabwareState: undefined,
+        flexStackerStates: {
+          'module-id': {
+            primaryLabwareURI: 'huh',
+            adapterLabwareURI: 'whu',
+            lidLabwareURI: 'buh',
+            count: 0,
+            maxCount: 5,
+          },
+        },
+      },
+      links: { lastCompleted: { id: 'test', href: 'test2' } },
+    }
     const result = getFailedLabwareQuantity(
-      emptyRunCommands,
-      failedRetriveCommand,
-      ERROR_KINDS.STACKER_STALLED
+      failedLocalRetriveCommand,
+      currentRunState as RunCurrentState
     )
     expect(result).toEqual(0)
   })
 
   it('should return null if there is no runCommands', () => {
-    const result = getFailedLabwareQuantity(
-      undefined,
-      failedRetriveCommand,
-      ERROR_KINDS.STACKER_STALLED
-    )
-    expect(result).toBeNull()
-  })
+    const failedLocalRetriveCommand = null
 
-  it('should return null for unhandled error kinds', () => {
-    const failedMoveLabwareCommand = {
-      ...failedCommand,
-      commandType: 'flexStacker/moveLabware',
-      error: {
-        isDefined: true,
-        errorType: DEFINED_ERROR_TYPES.GRIPPER_MOVEMENT,
-      },
-    }
-
+    const currentRunState = undefined
     const result = getFailedLabwareQuantity(
-      runCommands,
-      failedMoveLabwareCommand,
-      ERROR_KINDS.GRIPPER_ERROR
+      failedLocalRetriveCommand,
+      currentRunState
     )
     expect(result).toBeNull()
   })
