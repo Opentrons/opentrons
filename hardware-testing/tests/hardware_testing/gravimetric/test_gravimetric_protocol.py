@@ -103,7 +103,7 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
     print(result.stdout_stderr)
     assert result.exit_code == 0
     assert result.json_output
-    assert result.json_output.get("errors", None) is None, "Analysis failed: " + str(
+    assert result.json_output["errors"] == [], "Analysis failed: " + str(
         result.json_output
     )
     assert result.json_output["config"]["apiVersion"] == [
