@@ -13,7 +13,7 @@ import {
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
 
-import type { RunCommandSummary, RunCurrentState } from '@opentrons/api-client'
+import type { RunCurrentState } from '@opentrons/api-client'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -278,15 +278,6 @@ describe('getFailedLabwareQuantity', () => {
       moduleId: 'module-id',
     },
   } as any
-
-  const failedRetriveCommand = {
-    ...failedCommand,
-    commandType: 'flexStacker/retrieve',
-    error: {
-      isDefined: true,
-      errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
-    },
-  }
 
   it('should return the quantity for stacker error kinds', () => {
     const errors = [
