@@ -310,6 +310,7 @@ export type FlexFakeAddressableAreaName =
 export type FakeCutoutFixtureId =
   | 'fakeStagingAreaRightSlot'
   | 'fakeWasteChuteWithEmptySlot'
+  | 'fakeStagingSlotWithMagBlockV1'
 
 export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
@@ -588,6 +589,8 @@ export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
 
 export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' =
   'fakeWasteChuteWithEmptySlot'
+
+export const FAKE_STAGING_SLOT_WITH_MAG_BLOCK: 'fakeStagingSlotWithMagBlockV1' = 'fakeStagingSlotWithMagBlockV1'
 
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'

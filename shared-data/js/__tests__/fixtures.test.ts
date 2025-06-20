@@ -172,6 +172,7 @@ describe('getCutoutFixtureReplacementIfNeeded', () => {
   it('Should get FAKE_STAGING_AREA_RIGHT_SLOT if matches condition', () => {
     const result = getCutoutFixtureReplacementIfNeeded(
       SINGLE_RIGHT_SLOT_FIXTURE,
+      'cutoutA3',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
 
@@ -181,6 +182,7 @@ describe('getCutoutFixtureReplacementIfNeeded', () => {
   it('Should return current cutoutfixtureid when does not match condition', () => {
     const result = getCutoutFixtureReplacementIfNeeded(
       STAGING_AREA_RIGHT_SLOT_FIXTURE,
+      'cutoutB3',
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
 

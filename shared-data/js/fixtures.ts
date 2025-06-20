@@ -59,6 +59,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
 } from './constants'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
@@ -422,7 +423,7 @@ export const getReplacementFixtureForFixtureRemoval = (
       deckConfigWithAA ?? []
     )
     console.log('cutoutFixtureReplacment: ', cutoutFixtureReplacment)
-    return cutoutFixtureReplacment
+    return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
@@ -445,7 +446,7 @@ export const getReplacementFixtureForFakeFixture = (
   if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT) {
     return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
   }
-  if (cutoutFixtureId === 'fakeStagingSlotWithMagBlockV1') {
+  if (cutoutFixtureId === FAKE_STAGING_SLOT_WITH_MAG_BLOCK) {
     return MAGNETIC_BLOCK_V1
   }
   return cutoutFixtureId
