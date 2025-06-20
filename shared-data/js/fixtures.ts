@@ -411,7 +411,6 @@ export const getReplacementFixtureForFixtureRemoval = (
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId,
   addressableAreaId?: AddressableAreaNamesWithFakes, //nullable for PD
-  deckConfigWithAA?: CutoutConfigMap[]
 ): CutoutFixtureId => {
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -420,7 +419,6 @@ export const getReplacementFixtureForFixtureRemoval = (
       cutoutFixtureId,
       cutoutId,
       addressableAreaId,
-      deckConfigWithAA ?? []
     )
     console.log('cutoutFixtureReplacment: ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
@@ -786,6 +784,14 @@ export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
   magneticBlockV1B3: 'B3',
   magneticBlockV1C3: 'C3',
   magneticBlockV1D3: 'D3',
+  magneticBlockV1D2: 'D2',
+  magneticBlockV1C2: 'C2',
+  magneticBlockV1B2: 'B2',
+  magneticBlockV1A2: 'A2',
+  magneticBlockV1D1: 'D1',
+  magneticBlockV1C1: 'C1',
+  magneticBlockV1B1: 'B1',
+  magneticBlockV1A1: 'A1',
   '1ChannelWasteChute': 'D3',
   '8ChannelWasteChute': 'D3',
   '96ChannelWasteChute': 'D3',
@@ -794,14 +800,30 @@ export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
   temperatureModuleV2C3: 'C3',
   temperatureModuleV2B3: 'B3',
   temperatureModuleV2A3: 'A3',
+  temperatureModuleV2D2: 'D2',
+  temperatureModuleV2C2: 'C2',
+  temperatureModuleV2B2: 'B2',
+  temperatureModuleV2A2: 'A2',
+  temperatureModuleV2D1: 'D1',
+  temperatureModuleV2C1: 'C1',
+  temperatureModuleV2B1: 'B1',
+  temperatureModuleV2A1: 'A1',
   heaterShakerV1D3: 'D3',
   heaterShakerV1C3: 'C3',
   heaterShakerV1B3: 'B3',
   heaterShakerV1A3: 'A3',
+  heaterShakerV1D1: 'D1',
+  heaterShakerV1C1: 'C1',
+  heaterShakerV1B1: 'B1',
+  heaterShakerV1A1: 'A1',
   movableTrashD3: 'D3',
   movableTrashC3: 'C3',
   movableTrashB3: 'B3',
   movableTrashA3: 'A3',
+  movableTrashD1: 'D1',
+  movableTrashC1: 'C1',
+  movableTrashB1: 'B1',
+  movableTrashA1: 'A1',
 }
 
 export const isAddressableAreaStandardSlot = (
@@ -863,33 +885,26 @@ export const replaceAAWithFakeAA = (
     return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
-      console.log('AA_TO_AA_SLOT[aa]: ', AA_TO_AA_SLOT[aa])
-      console.log('addressableAreaId!: ', addressableAreaId)
       return aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
 
-const replaceFakeAAWithAA = (
+export const getAASlotNameForAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   addressableAreaId: AddressableAreaNamesWithFakes
-) => {
+): AddressableAreaNamesWithFakes => {
   const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
     cutoutId
   )
+  console.log("addressableAreasByFIxtureId: ", addressableAreasByFIxtureId)
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
-  if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
-    return aaListForFixtureId[0]
-  } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
-    return DEFAULT_AA_FOR_WASTE_CHUTE
-  } else {
-    const aablah = aaListForFixtureId.find(aa => aa === addressableAreaId)
-    return aablah
-      ? AA_TO_AA_SLOT[aablah]
-      : (addressableAreaId as AddressableAreaNamesWithFakes) // we can cast this bc there should me a match for every fixtureId
-  }
+    const aaMatchInDef = aaListForFixtureId.find(aa => aa === addressableAreaId)
+    return aaMatchInDef
+      ? AA_TO_AA_SLOT[aaMatchInDef]
+      : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
 /**
@@ -965,7 +980,6 @@ export const replaceCutoutFixtureRemove = (
   cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
-  deckConfigWithAA: CutoutConfigMap[]
 ): CutoutFixtureIdsWithFakes => {
   const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
@@ -976,17 +990,11 @@ export const replaceCutoutFixtureRemove = (
   )
   const updated = aaForCutoutAndFixture?.map(aa =>
     aa === addressableAreaId
-      ? replaceFakeAAWithAA(cutoutId, cutoutFixtureRemoved, aa)
+      ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
       : aa
   )
-  const match = Object.entries(addressableAreasById).find(([, value]) => {
-    console.log('value: ', value, 'updated: ', updated)
-    console.log(
-      'isEqual(value ?? [], updated): ',
-      isEqual(value ?? [], updated)
-    )
-    return isEqual(value.sort(), updated?.sort())
-  })
+  const match = Object.entries(addressableAreasById).find(([, value]) =>
+    isEqual(value.sort(), updated?.sort()))
   console.log('match: ', match)
 
   if (match) {

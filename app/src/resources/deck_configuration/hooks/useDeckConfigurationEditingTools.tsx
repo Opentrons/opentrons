@@ -71,9 +71,7 @@ export function useDeckConfigurationEditingTools(
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
-      addressableAreaId,
-      deckConfigWithAA
-    )
+      addressableAreaId    )
 
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
