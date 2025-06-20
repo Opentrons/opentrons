@@ -1,6 +1,4 @@
 """Tests for the transfer APIs using liquid classes."""
-from typing import Literal
-
 import pytest
 import mock
 
