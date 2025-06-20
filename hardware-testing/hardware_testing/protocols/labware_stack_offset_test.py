@@ -17,13 +17,75 @@ requirements = {
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    from hardware_testing import protocols
-
-    protocols.create_labware_parameters(parameters)
+    parameters.add_str(
+        variable_name="labware_type",
+        display_name="Labware Type",
+        choices=[
+            {
+                "display_name": "Opentrons 96 200µl PCR",
+                "value": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            },
+            {
+                "display_name": "Nest 96 100µl PCR",
+                "value": "nest_96_wellplate_100ul_pcr_full_skirt",
+            },
+            {"display_name": "Nest 96 2ml Deep", "value": "nest_96_wellplate_2ml_deep"},
+            {
+                "display_name": "Nest 96 200µl Flat",
+                "value": "nest_96_wellplate_200ul_flat",
+            },
+            {
+                "display_name": "Corning 12 6.9ml Flat",
+                "value": "corning_12_wellplate_6.9ml_flat",
+            },
+            {
+                "display_name": "Corning 24 3.4ml Flat",
+                "value": "corning_24_wellplate_3.4ml_flat",
+            },
+            {
+                "display_name": "Corning 384 112µl Flat",
+                "value": "corning_384_wellplate_112ul_flat",
+            },
+            {
+                "display_name": "Corning 48 1.6ml Flat",
+                "value": "corning_48_wellplate_1.6ml_flat",
+            },
+            {
+                "display_name": "Corning 6 16.8ml Flat",
+                "value": "corning_6_wellplate_16.8ml_flat",
+            },
+            {
+                "display_name": "Corning 96 360µl Flat",
+                "value": "corning_96_wellplate_360ul_flat",
+            },
+            {"display_name": "Bio-Rad 384 50µl", "value": "biorad_384_wellplate_50ul"},
+            {
+                "display_name": "Bio-Rad 96 200µl PCR",
+                "value": "biorad_96_wellplate_200ul_pcr",
+            },
+            {
+                "display_name": "ABI MicroAmp 384 40µl",
+                "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
+            },
+            {
+                "display_name": "Nunc 96 1300µl",
+                "value": "thermoscientificnunc_96_wellplate_1300ul",
+            },
+            {
+                "display_name": "Nunc 96 2000µl",
+                "value": "thermoscientificnunc_96_wellplate_2000ul",
+            },
+            {
+                "display_name": "USA Scientific 96 2.4ml Deep",
+                "value": "usascientific_96_wellplate_2.4ml_deep",
+            },
+        ],
+        default="biorad_96_wellplate_200ul_pcr",
+    )
     parameters.add_int(
         variable_name="number_of_labware",
         display_name="Number of Labware on Deck",
-        default=1,
+        default=2,
         minimum=1,
         maximum=100,
     )
@@ -49,6 +111,20 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "A1", "value": "A1"},
         ],
     )
+    parameters.add_bool(
+        variable_name="no_gripper",
+        display_name="Use No Gripper",
+        default=True,
+        description="If True, the protocol will only store and retrieve.",
+    )
+    parameters.add_float(
+        variable_name="offset",
+        display_name="Stack Offset",
+        default=0.0,
+        minimum=-10.0,
+        maximum=10.0,
+        description="The offset to apply to the Z position of stacked labware.",
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -57,30 +133,44 @@ def run(protocol: ProtocolContext) -> None:
     num_of_labware = protocol.params.number_of_labware  # type: ignore[attr-defined]
     stacker_location = protocol.params.stacker_location  # type: ignore[attr-defined]
     labware_location = protocol.params.labware_location  # type: ignore[attr-defined]
+    no_gripper = protocol.params.no_gripper  # type: ignore[attr-defined]
+    offset = protocol.params.offset  # type: ignore[attr-defined]
     # Load first labware on deck
-    initial_labware = protocol.load_labware(labware_type, location=labware_location)
+    initial_labware = protocol.load_labware(
+        labware_type, location=labware_location, version=2
+    )
     list_of_labware: List[Labware] = [initial_labware]
 
     # Load additional labware stacked on top
-    if num_of_labware > 1:
-        for _ in range(num_of_labware - 1):
-            next_labware = list_of_labware[-1].load_labware(labware_type)
-            list_of_labware.append(next_labware)
+    if not no_gripper:
+        if num_of_labware > 1:
+            for _ in range(num_of_labware - 1):
+                next_labware = list_of_labware[-1].load_labware(labware_type)
+                list_of_labware.append(next_labware)
 
     # Load stacker module
     stacker: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", stacker_location
     )  # type: ignore[assignment]
-    stacker.set_stored_labware(load_name=labware_type, count=0)
-    # Store all labware into the stacker
-    for labware in list_of_labware:
-        protocol.move_labware(labware, stacker, use_gripper=True)
-        stacker.store()
+    if no_gripper:
+        stacker.set_stored_labware(
+            load_name=labware_type, count=num_of_labware, stacking_offset_z=offset
+        )
+    else:
+        stacker.set_stored_labware(load_name=labware_type, count=0)
 
-    # Retrieve all labware and return them to their original location
-    moved_labware: List[Labware] = []
-    for labware in list_of_labware:
+    if not no_gripper:
+        # Store all labware into the stacker
+        for labware in reversed(list_of_labware):
+            protocol.move_labware(labware, stacker, use_gripper=True)
+            stacker.store()
+        # Retrieve all labware and return them to their original location
+        moved_labware: List[Labware] = []
+        for labware in list_of_labware:
+            stacker.retrieve()
+            dest = labware_location if len(moved_labware) == 0 else moved_labware[-1]
+            protocol.move_labware(labware, dest, use_gripper=True)
+            moved_labware.append(labware)
+    for i in range(10):
         stacker.retrieve()
-        dest = labware_location if len(moved_labware) == 0 else moved_labware[-1]
-        protocol.move_labware(labware, dest, use_gripper=True)
-        moved_labware.append(labware)
+        stacker.store()
