@@ -111,6 +111,11 @@
       "x": 0,
       "y": 0,
       "z": 4.5
+    },
+    "corning_6_wellplate_16.8ml_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.74
     }
   },
   "innerLabwareGeometry": {

@@ -1220,7 +1220,13 @@
       "x": 0,
       "y": 0,
       "z": 16.1
+    },
+    "nest_96_wellplate_2ml_deep": {
+      "x": 0, 
+      "y": 0, 
+      "z": 2.6
     }
+
   },
   "stackingOffsetWithModule": {
     "magneticBlockV1": {
