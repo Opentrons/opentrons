@@ -12,3 +12,8 @@ tests/helpers/*_cached_token.txt
 tests/helpers/test.env
 tests/helpers/*.env
 evaluation/
+api/storage/api_docs/1_generate_doc_structure_md.py
+api/storage/api_docs/2_get_api_info.py
+api/storage/api_docs/need.md
+api/storage/api_docs/docs/
+ai-server/

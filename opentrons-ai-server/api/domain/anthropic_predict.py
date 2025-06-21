@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,13 +12,14 @@ from anthropic import Anthropic
 from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
 
-from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, SYSTEM_PROMPT
+from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
 MessageType = Literal["create", "update"]
 
-weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+# weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+weave.init("pentronsai-junk-may-28-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -35,7 +37,7 @@ class AnthropicPredict:
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
-        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "v2_structure.xml"
+        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct.md"
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = cast(
@@ -157,38 +159,81 @@ class AnthropicPredict:
             v2_doc_content = f.read()
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
+    def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
+        """
+        Parse the output of get_api_info and construct XML content with file contents.
+
+        Args:
+            api_info_output: The output from get_api_info containing <relevant_files> tags
+
+        Returns:
+            String containing XML formatted file contents
+        """
+        match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
+        if not match:
+            return "<relevant_file_content>\n</relevant_file_content>"
+
+        files_content = match.group(1).strip()
+        filenames = [f.strip() for f in files_content.split(",") if f.strip()]
+        xml_content = "<relevant_file_content>\n"
+
+        for filename in filenames:
+            filepath = f"{self.path_api_docs.parent}/{filename}"
+            try:
+                with open(filepath, "r") as f:
+                    content = f.read()
+
+                xml_content += f"<file name='{filename}'>\n"
+                xml_content += "<content>\n"
+                xml_content += content
+                xml_content += "\n</content>\n"
+                xml_content += "</file>\n"
+            except FileNotFoundError:
+                # Skip files that don't exist
+                continue
+            except Exception:
+                # Skip files that can't be read
+                continue
+
+        xml_content += "</relevant_file_content>"
+        return xml_content
+
     @tracer.wrap()
     def get_relevant_api_docs(self, query: str, user_id: str) -> str:
         """
         Get relevant API docs based on the user's prompt
         """
+        with open(self.path_api_docs, "r") as f:
+            api_docs_structure = f.read()
+
         msg = [
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "document",
-                        "source": {"type": "text", "media_type": "text/plain", "data": self.get_api_docs()},
-                        "title": "Python API V2 Documentation",
-                        "context": "This is an Official Python API V2 Documentation for Opentrons robots.",
+                        "source": {"type": "text", "media_type": "text/plain", "data": api_docs_structure},
+                        "title": "API Documentation Structure",
+                        "context": "This is the structure of Opentrons Python API V2 Documentation with descriptions of each file.",
                         "cache_control": {"type": "ephemeral"},
                     },
-                    {"type": "text", "text": PROMPT_RELEVANT_API.format(API_QUERY=query)},
+                    {"type": "text", "text": PROMPT_FIND_RELEVANT_DOCS.format(USER_QUERY=query)},
                 ],
             }
         ]
 
         response = self.client.messages.create(  # type: ignore[call-overload]
-            max_tokens=4096,
-            temperature=0.0,
-            messages=msg,
             model=self.model_helper,
-            system="""You are a helpful assistant to collect relevant information to the query. You find information
-                given in tags <python_v2_api_doc>.
-            """,
+            messages=msg,
+            max_tokens=1024,
+            temperature=0.0,
+            system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
         )
-        return response.content[0].text  # type: ignore[no-any-return]
+
+        files_content = response.content[0].text.strip()
+        xml_content = self.parse_relevant_files_and_get_content(files_content)
+        return xml_content
 
     @tracer.wrap()
     def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
