@@ -112,6 +112,7 @@ Follow these instructions to handle the user's prompt:
 
       ```python
       from opentrons import protocol_api
+      from opentrons.protocol_api import COLUMN, ALL, SINGLE # for 96-channel-pipette
 
       metadata = {{
           'protocolName': '[Protocol name]',
@@ -144,6 +145,7 @@ Follow these instructions to handle the user's prompt:
 
           # Load pipettes
           [Pipette loading code with comments]
+          [For 96-channel pipette, loading FULL 96-tip pickup requires adapter.]
 
           # For Flex protocols using API version 2.16 or later, load trash bin
           trash = protocol.load_trash_bin('A3')
