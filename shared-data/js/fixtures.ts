@@ -994,13 +994,15 @@ export const replaceCutoutFixtureRemove = (
   console.log("addressableAreaId: ", addressableAreaId)
   if (WASTE_CHUTE_FIXTURES.includes(cutoutFixtureRemoved)){
     console.log("yes")
-    if(addressableAreaId == DEFAULT_AA_FOR_WASTE_CHUTE){
-      switch(cutoutFixtureRemoved){
-        case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+    if(addressableAreaId == DEFAULT_AA_FOR_WASTE_CHUTE){ 
+      if(cutoutFixtureRemoved === FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE){
           return FLEX_STACKER_V1_FIXTURE
-        case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-        return SINGLE_RIGHT_SLOT_FIXTURE
       }
+      else        
+      {return SINGLE_RIGHT_SLOT_FIXTURE}
+    }
+      else{
+            return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
   }
   else{

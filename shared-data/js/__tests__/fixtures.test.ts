@@ -15,7 +15,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   TEMPERATURE_MODULE_V2_FIXTURE,
-  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
   getAAWithFakesFromCutoutFixtureId,
@@ -416,7 +416,7 @@ describe('replaceCutoutFixtureRemove', () => {
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE, 'cutoutD3', 'flexStackerModuleV1D4')
+    const result = replaceCutoutFixtureRemove(FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE, 'cutoutD3', 'flexStackerModuleV1D4')
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
 })

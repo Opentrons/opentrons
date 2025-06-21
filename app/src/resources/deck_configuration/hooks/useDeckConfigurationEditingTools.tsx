@@ -90,25 +90,25 @@ export function useDeckConfigurationEditingTools(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: cutoutConfig.opentronsModuleSerialNumber ?? undefined,
-            }
-          : cutoutConfig
-      )
-    } else {
-      // const itemsToUpdate = deckConfigWithAA.filter(x=> x.cutoutFixtureId === cutoutFixtureId)
-      // const itemsToUpdateWithFakes = itemsToUpdate.map(x =>  {return {...x, cutoutFixtureId: replacementFixtureId , addressableAreaId: x.addressableAreaId == addressableAreaId ? AA_TO_AA_SLOT[addressableAreaId] : x.addressableAreaId}})
-
-      // console.log("itemsToUpdateWithFakes: ", itemsToUpdateWithFakes)
-
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId === cutoutId
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
               opentronsModuleSerialNumber: undefined,
             }
           : cutoutConfig
       )
+    } else {
+      const itemsToUpdateIndex = deckConfig.findIndex(x=> x.cutoutFixtureId === cutoutFixtureId)
+      // const itemsToUpdateWithFakes = itemsToUpdate.map(x =>  {return {...x, cutoutFixtureId: replacementFixtureId , addressableAreaId: x.addressableAreaId == addressableAreaId ? AA_TO_AA_SLOT[addressableAreaId] : x.addressableAreaId}})
+
+      // console.log("itemsToUpdateWithFakes: ", itemsToUpdateWithFakes)
+      newDeckConfig = deckConfig.map(cutoutConfig => {
+        console.log("cutoutConfig: ", cutoutConfig)
+        return cutoutConfig.cutoutId === cutoutId
+          ? {
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: cutoutConfig.opentronsModuleSerialNumber ?? undefined,
+            }
+          : cutoutConfig
+          })
     }
     updateDeckConfiguration(newDeckConfig)
   }
