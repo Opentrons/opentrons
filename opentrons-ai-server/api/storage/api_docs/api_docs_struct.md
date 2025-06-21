@@ -54,13 +54,6 @@ This file is the main index page for the Pipettes section of the Opentrons Pytho
 This file provides ready-made protocol examples for Opentrons Flex and OT-2 robots, designed to help users learn and build upon basic liquid handling skills. The protocols demonstrate various liquid handling techniques including basic and advanced liquid transfers, loops for automation, creating multiple air gaps, serial dilutions, and plate mapping with automatic tip refilling. All examples use API level 2.20 and are compatible with both Flex (OT-3) and OT-2 robots, utilizing 1-channel pipettes (flex_1channel_1000 for Flex, p300_single_gen2 for OT-2). The protocols use standard labware including USA Scientific 12-well reservoirs, Corning 96-well plates, and appropriate tip racks for each robot type. While no modules, fixtures, adapters, or specific liquids are mentioned, the protocols demonstrate key steps like transferring 100 µL between wells, distributing liquids across rows, creating air gaps between samples, performing serial dilutions with mixing, and dispensing varying volumes across an entire plate.
 </about>
 
----
-
-## docs/v2/conf.py
-
-<about>
-This is a Sphinx configuration file (conf.py) for building the Opentrons Python Protocol API v2 documentation, not a protocol file. It configures various documentation build settings including extensions (autodoc, napoleon, sphinx-tabs), theme options (using alabaster theme with custom styling), version information (dynamically pulled from the API package), and output formats (HTML, LaTeX, man pages). The file sets up intersphinx mapping for Python documentation, configures OpenGraph metadata for social sharing, defines custom sidebar templates, and includes extensive nitpick ignore patterns to suppress warnings for internal/undocumented API references. It also sets up RST prolog substitutions for the current API level (2.23) and release version, making these values available throughout the documentation.
-</about>
 
 ---
 
