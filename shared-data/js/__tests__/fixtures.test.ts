@@ -2,31 +2,31 @@ import { describe, expect, it } from 'vitest'
 
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
-  FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   TEMPERATURE_MODULE_V2_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
+  getAASlotNameForAA,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   replaceAAWithFakeAA,
+  replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
-  getAASlotNameForAA,
-  replaceCutoutFixtureRemove
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
@@ -206,7 +206,8 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       STAGING_AREA_RIGHT_SLOT_FIXTURE,
       'cutoutD3',
-      'fakeD4'    )
+      'fakeD4'
+    )
 
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
@@ -215,7 +216,8 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       SINGLE_RIGHT_SLOT_FIXTURE,
       'cutoutD3',
-      'D3'    )
+      'D3'
+    )
 
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
@@ -224,7 +226,8 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
     const result = getReplacementFixtureForFixtureRemoval(
       SINGLE_RIGHT_SLOT_FIXTURE,
       'cutoutA1',
-      'A1'    )
+      'A1'
+    )
 
     expect(result).toEqual(SINGLE_LEFT_SLOT_FIXTURE)
   })
@@ -234,7 +237,7 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
       SINGLE_RIGHT_SLOT_FIXTURE,
       'cutoutA2',
       'A2'
-          )
+    )
 
     expect(result).toEqual(SINGLE_CENTER_SLOT_FIXTURE)
   })
@@ -244,7 +247,7 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
       STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
       'cutoutD3',
       'magneticBlockV1D3'
-      )
+    )
 
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
   })
@@ -254,7 +257,7 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'cutoutD3',
       'magneticBlockV1D3'
-      )
+    )
 
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
@@ -271,15 +274,9 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1A4',
         'magneticBlockV1A3',
-      ],      
-      fakeStagingAreaRightSlot: [
-        "A3",
-        "fakeA4",
-        ],
-      fakeStagingSlotWithMagBlockV1: [
-        "magneticBlockV1A3",
-        "fakeA4",
-        ],
+      ],
+      fakeStagingAreaRightSlot: ['A3', 'fakeA4'],
+      fakeStagingSlotWithMagBlockV1: ['magneticBlockV1A3', 'fakeA4'],
       heaterShakerModuleV1: ['heaterShakerV1A3'],
       temperatureModuleV2: ['temperatureModuleV2A3'],
       magneticBlockV1: ['magneticBlockV1A3'],
@@ -299,18 +296,9 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
         'absorbanceReaderV1D3',
         'absorbanceReaderV1LidDockD4',
       ],
-      fakeStagingAreaRightSlot: [
-        "D3",
-        "fakeD4",
-        ],
-      fakeStagingSlotWithMagBlockV1: [
-        "fakeD4",
-        "magneticBlockV1D3",
-        ],
-      fakeWasteChuteWithEmptySlot: [
-        "96ChannelWasteChute",
-       "fakeD4",
-      ],
+      fakeStagingAreaRightSlot: ['D3', 'fakeD4'],
+      fakeStagingSlotWithMagBlockV1: ['fakeD4', 'magneticBlockV1D3'],
+      fakeWasteChuteWithEmptySlot: ['96ChannelWasteChute', 'fakeD4'],
       flexStackerModuleV1: ['D3', 'flexStackerModuleV1D4'],
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1D4',
@@ -326,7 +314,7 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
         '8ChannelWasteChute',
         '96ChannelWasteChute',
         'flexStackerModuleV1D4',
-        'gripperWasteChute'
+        'gripperWasteChute',
       ],
       singleRightSlot: ['D3'],
       stagingAreaRightSlot: ['D3', 'D4'],
@@ -374,49 +362,79 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
 
 describe('getReplacementFixtureForFakeFixture', () => {
   it('should return staging slot fixture instead of FAKE_STAGING_AREA_RIGHT_SLOT', () => {
-    const result = getReplacementFixtureForFakeFixture(FAKE_STAGING_AREA_RIGHT_SLOT)
+    const result = getReplacementFixtureForFakeFixture(
+      FAKE_STAGING_AREA_RIGHT_SLOT
+    )
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
 
   it('should return waste chute fixture instead of FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT', () => {
-    const result = getReplacementFixtureForFakeFixture(FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT)
+    const result = getReplacementFixtureForFakeFixture(
+      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT
+    )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
 
   it('should return mag block fixture instead of FAKE_STAGING_SLOT_WITH_MAG_BLOCK', () => {
-    const result = getReplacementFixtureForFakeFixture(FAKE_STAGING_SLOT_WITH_MAG_BLOCK)
+    const result = getReplacementFixtureForFakeFixture(
+      FAKE_STAGING_SLOT_WITH_MAG_BLOCK
+    )
     expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
   })
 })
 
-describe('getAASlotNameForAA', ()=> {
+describe('getAASlotNameForAA', () => {
   it('should get aa name for single right slot', () => {
-    const result = getAASlotNameForAA('cutoutA3', FAKE_STAGING_SLOT_WITH_MAG_BLOCK, 'magneticBlockV1A3')
+    const result = getAASlotNameForAA(
+      'cutoutA3',
+      FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
+      'magneticBlockV1A3'
+    )
     expect(result).toEqual('A3')
   })
 
   it('should return aa name for single center slot', () => {
-    const result = getAASlotNameForAA('cutoutD1', TEMPERATURE_MODULE_V2_FIXTURE, 'temperatureModuleV2D1')
+    const result = getAASlotNameForAA(
+      'cutoutD1',
+      TEMPERATURE_MODULE_V2_FIXTURE,
+      'temperatureModuleV2D1'
+    )
     expect(result).toEqual('D1')
   })
 
   it('should get input aa name for single center slot', () => {
-    const result = getAASlotNameForAA('cutoutD2', MAGNETIC_BLOCK_V1_FIXTURE, 'magneticBlockV1D2')
+    const result = getAASlotNameForAA(
+      'cutoutD2',
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      'magneticBlockV1D2'
+    )
     expect(result).toEqual('D2')
   })
 })
 
 describe('replaceCutoutFixtureRemove', () => {
   it('should get fixture replacment for FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE, 'cutoutD3', 'magneticBlockV1D3')
+    const result = replaceCutoutFixtureRemove(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'cutoutD3',
+      'magneticBlockV1D3'
+    )
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
   it('should get fixture replacment for MAGNETIC_BLOCK_V1_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(MAGNETIC_BLOCK_V1_FIXTURE, 'cutoutD3', 'magneticBlockV1D3')
+    const result = replaceCutoutFixtureRemove(
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      'cutoutD3',
+      'magneticBlockV1D3'
+    )
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE, 'cutoutD3', 'flexStackerModuleV1D4')
+    const result = replaceCutoutFixtureRemove(
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      'cutoutD3',
+      'flexStackerModuleV1D4'
+    )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
 })

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AddressableAreaNamesWithFakes,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
 
@@ -27,6 +26,7 @@ import type {
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
+  AddressableAreaNamesWithFakes
 } from '@opentrons/shared-data'
 
 interface MagneticBlockItemProps {

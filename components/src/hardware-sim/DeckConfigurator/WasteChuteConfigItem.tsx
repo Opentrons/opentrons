@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AddressableAreaNamesWithFakes,
-  CutoutFixtureIdsWithFakes,
-  CutoutId,
-  DeckDefinition,
+  type AddressableAreaNamesWithFakes,
+  type CutoutFixtureIdsWithFakes,
+  type CutoutId,
+  type DeckDefinition,
   DEFAULT_AA_FOR_WASTE_CHUTE,
 } from '@opentrons/shared-data'
 

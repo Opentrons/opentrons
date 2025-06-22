@@ -2,12 +2,10 @@ import { useState } from 'react'
 
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  AA_TO_AA_SLOT,
+  CutoutFixtureIdsWithFakes,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
-  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -19,8 +17,8 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
-  CutoutFixtureIdsWithFakes,
   CutoutId,
+  CutoutFixtureId
 } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -68,7 +66,8 @@ export function useDeckConfigurationEditingTools(
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
-      addressableAreaId    )
+      addressableAreaId
+    )
 
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
@@ -95,20 +94,17 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
-      const itemsToUpdateIndex = deckConfig.findIndex(x=> x.cutoutFixtureId === cutoutFixtureId)
-      // const itemsToUpdateWithFakes = itemsToUpdate.map(x =>  {return {...x, cutoutFixtureId: replacementFixtureId , addressableAreaId: x.addressableAreaId == addressableAreaId ? AA_TO_AA_SLOT[addressableAreaId] : x.addressableAreaId}})
-
-      // console.log("itemsToUpdateWithFakes: ", itemsToUpdateWithFakes)
       newDeckConfig = deckConfig.map(cutoutConfig => {
-        console.log("cutoutConfig: ", cutoutConfig)
+        console.log('cutoutConfig: ', cutoutConfig)
         return cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: cutoutConfig.opentronsModuleSerialNumber ?? undefined,
+              opentronsModuleSerialNumber:
+                cutoutConfig.opentronsModuleSerialNumber ?? undefined,
             }
           : cutoutConfig
-          })
+      })
     }
     updateDeckConfiguration(newDeckConfig)
   }
