@@ -7,8 +7,8 @@ import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
@@ -68,7 +68,7 @@ export function AbsorbanceReaderItem(
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={LARGE_SINGLE_ITEM_SLOT_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

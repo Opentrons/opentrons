@@ -13,12 +13,12 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -84,7 +84,7 @@ export function TemperatureModuleItem(
       width={
         isColumnOne
           ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-          : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
+          : LARGE_SINGLE_ITEM_SLOT_WIDTH
       }
       height={FIXTURE_HEIGHT}
       x={x}
