@@ -1,7 +1,9 @@
 """Inner Well Geometry Creator Protocol."""
 
+from typing import List
 from opentrons.protocol_api import ProtocolContext, ParameterContext, InstrumentContext, Well, Labware
 from opentrons.types import Point
+
 
 
 ###########################################
