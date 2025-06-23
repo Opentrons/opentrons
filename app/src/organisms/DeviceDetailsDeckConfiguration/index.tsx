@@ -107,8 +107,8 @@ export function DeviceDetailsDeckConfiguration({
     ) => {
       const areaInCheck = getAAByAAId(addressableAreaId, deckDef)
       const shouldShowAA =
-        areaInCheck.areaType != 'slot' &&
-        areaInCheck.areaType != 'fakeStagingSlot'
+        areaInCheck.areaType !== 'slot' &&
+        areaInCheck.areaType !== 'fakeStagingSlot'
       if (
         cutoutFixtureId == null ||
         SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
