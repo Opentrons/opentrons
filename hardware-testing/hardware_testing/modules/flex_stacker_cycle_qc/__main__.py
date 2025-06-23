@@ -1,12 +1,6 @@
 """FLEX Stacker Cycle QC Test."""
 from os import environ
 from serial.tools.list_ports import comports  # type: ignore[import]
-STACKER_VID = 0x483
-STACKER_PID = 0xEF24
-
-# NOTE: this is required to get WIFI test to work
-if "OT_SYSTEM_VERSION" not in environ:
-    environ["OT_SYSTEM_VERSION"] = "0.0.0"
 
 import argparse
 import asyncio
@@ -19,18 +13,29 @@ from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from opentrons.hardware_control.modules import FlexStacker
+from opentrons.drivers.rpi_drivers.types import USBPort
+
+STACKER_VID = 0x483
+STACKER_PID = 0xEF24
+
+# NOTE: this is required to get WIFI test to work
+if "OT_SYSTEM_VERSION" not in environ:
+    environ["OT_SYSTEM_VERSION"] = "0.0.0"
+
 
 async def build_stacker_report(
-    is_simulating: bool, operator: str, port: str = "",
+    is_simulating: bool,
+    operator: str,
+    port: str = "",
 ) -> Tuple[CSVReport, FlexStacker]:
     """Report setup for FLEX Stacker Cycle QC Test."""
     test_name = Path(__file__).parent.name.replace("_", "-")
-    stacker = await FlexStacker.build(port=port,
-                                usb_port=None,
-                                execution_manager=None,
-                                hw_control_loop=asyncio.get_running_loop(),
-                                simulating=is_simulating)
-
+    stacker = await FlexStacker.build(
+        port=port,
+        usb_port=USBPort(port, 0),
+        hw_control_loop=asyncio.get_running_loop(),
+        simulating=is_simulating,
+    )
 
     report = build_report(test_name)
     report.set_operator("simulating" if is_simulating else operator)
@@ -57,8 +62,10 @@ async def _main(cfg: TestConfig) -> None:
 
     stackers = {}
     for p in ports:
-        report, stacker = await build_stacker_report(cfg.simulate, operator=operator, port=p)
-        device_sn = stacker.device_info['serial']
+        report, stacker = await build_stacker_report(
+            cfg.simulate, operator=operator, port=p
+        )
+        device_sn = stacker.device_info["serial"]
         report.set_tag(device_sn if device_sn else "UNKNOWN")
         stackers[device_sn] = (report, stacker)
 
@@ -79,10 +86,12 @@ async def _main(cfg: TestConfig) -> None:
         report.save_to_disk()
         report.print_results()
 
+    # TODO: Do we want to restart the server here?
+    # # It will just have to be disabled to rerun the script again?
     # Restart the robot server
-    if not cfg.simulate:
-        print("Starting the robot server")
-        subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
+    # if not cfg.simulate:
+    #     print("Starting the robot server")
+    #     subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 if __name__ == "__main__":
