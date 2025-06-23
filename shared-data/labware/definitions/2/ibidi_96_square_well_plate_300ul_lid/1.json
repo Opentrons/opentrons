@@ -39,11 +39,6 @@
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
-    "default": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
     "ibidi_96_square_well_plate_300ul_lid": {
       "x": 0,
       "y": 0,
@@ -66,6 +61,12 @@
     }
   },
   "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "ibidi_96_square_well_plate_300ul",
+    "ibidi_96_square_well_plate_300ul_lid"
+  ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 5,
   "gripperOffsets": {
