@@ -164,6 +164,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           tipLiquidSpecs: matchingTipLiquidSpecs,
           flowRateType,
           correctionVolume: correctionVolume ?? 0,
+          shaftULperMM: pipette.spec.shaftULperMM,
         })
       : null
 
