@@ -195,12 +195,11 @@ export const getPipettingCommandText = ({
 const formatCmdParamDecimal = (
   command: RunTimeCommand | null | undefined,
   paramName: string
-): string | null => {
-  return command?.params &&
-    paramName in command.params &&
-    command.params[paramName as keyof typeof command.params] != null
+): string | null =>
+  command?.params &&
+  paramName in command.params &&
+  command.params[paramName as keyof typeof command.params] != null
     ? Number(command.params[paramName as keyof typeof command.params]).toFixed(
         2
       )
     : null
-}
