@@ -165,6 +165,11 @@ def add_parameters(params: ParameterContext) -> None:
         variable_name="use_artel",
         default=False,
     )
+    params.add_bool(
+        display_name="pipette_at_liquid_meniscus",
+        variable_name="pipette_at_liquid_meniscus",
+        default=False,
+    )
 
 
 def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
@@ -177,7 +182,7 @@ def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float)
     # NOTE: configuring for MINIMUM tip uL before calculate test volumes
     pipette.configure_for_volume(1)
     return [
-        min(max(v, pipette.min_volume), tip_ul, max_possible_ul)
+        float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
         for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
     ]
 
@@ -474,6 +479,15 @@ def run(ctx: ProtocolContext) -> None:
     diluent_class = ctx.get_liquid_class("water")
     test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
+    # ENABLE LIQUID-MENISCUS PIPETTING
+    if ctx.params.pipette_at_liquid_meniscus:
+        for base_class in [diluent_class, test_class]:
+            _cls = base_class.get_for(test_pip, test_pip.tip_racks[0])
+            _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            _cls.aspirate.aspirate_position.offset.z = -1.5
+            _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
+            _cls.dispense.dispense_position.offset.z = -1.5
+
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
@@ -497,10 +511,10 @@ def run(ctx: ProtocolContext) -> None:
 
     for ul in volumes:
 
-        dest_wells: List[Well] = dest_wells_by_volume[ul]
+        dest_wells: List[Well] = dest_wells_by_volume[float(ul)]
 
         # SHAKE/READ the CURRENT PLATE
-        if plate and dest_wells[0] not in plate:
+        if plate and dest_wells[0] not in plate.wells():
             _on_plate_done()
 
         # SWAP INACCESSIBLE TIP-RACKS
