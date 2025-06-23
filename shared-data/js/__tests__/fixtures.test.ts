@@ -18,6 +18,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
+  getAAFixtureDisplayName,
   getAASlotNameForAA,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
@@ -436,5 +437,39 @@ describe('replaceCutoutFixtureRemove', () => {
       'flexStackerModuleV1D4'
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+  })
+})
+
+describe('getAAFixtureDisplayName', () => {
+  it('Should return flex stacker name when using combo fixtures and aa for stacker', () => {
+    const name = getAAFixtureDisplayName(
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      'flexStackerModuleV1D4'
+    )
+    expect(name).toEqual('Flex Stacker Module GEN1 in USB-0')
+  })
+
+  it('Should return mag block name when using combo fixtures with mag block', () => {
+    const name = getAAFixtureDisplayName(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'magneticBlockV1D3'
+    )
+    expect(name).toEqual('Magnetic block')
+  })
+
+  it('Should return mag block name when using combo fixtures with mag block', () => {
+    const name = getAAFixtureDisplayName(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'magneticBlockV1D3'
+    )
+    expect(name).toEqual('Magnetic block')
+  })
+
+  it('Should return waste chute name when using waste chute fixture', () => {
+    const name = getAAFixtureDisplayName(
+      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
+      '96ChannelWasteChute'
+    )
+    expect(name).toEqual('Waste chute')
   })
 })

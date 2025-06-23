@@ -1,6 +1,10 @@
 import isEqual from 'lodash/isEqual'
 
-import { WASTE_CHUTE_FIXTURES, WASTE_CHUTE_WITH_FAKE_FIXTURES } from '.'
+import {
+  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_STAGING_AREA_FIXTURES,
+  WASTE_CHUTE_WITH_FAKE_FIXTURES,
+} from '.'
 import {
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -463,19 +467,37 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
       obj.cutoutId,
       deckDef
     )
-
     const aaPerCutoutFixture = getAAWithFakesFromCutoutFixtureId(
       obj.cutoutId,
       cutoutFixtureReplacment ?? obj.cutoutFixtureId,
       deckDef
     )
-    aaPerCutoutFixture?.forEach(item => {
+
+    if (WASTE_CHUTE_FIXTURES.includes(obj.cutoutFixtureId)) {
       acc.push({
         ...obj,
-        addressableAreaId: item,
+        addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
         cutoutFixtureId: cutoutFixtureReplacment,
       })
-    })
+      const otherWasteChuteAA = aaPerCutoutFixture?.find(
+        aa => getAAByAAId(aa, deckDef).areaType !== 'wasteChute'
+      )
+      if (otherWasteChuteAA != null) {
+        acc.push({
+          ...obj,
+          addressableAreaId: otherWasteChuteAA,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      }
+    } else {
+      aaPerCutoutFixture?.forEach(item => {
+        acc.push({
+          ...obj,
+          addressableAreaId: item,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      })
+    }
     return acc
   }, [])
 }
@@ -652,6 +674,51 @@ export function getAddressableAreaNamesFromLoadedModule(
     return [...acc, ...providedAddressableAreas]
   }, [])
 }
+
+export function getAAFixtureDisplayName(
+  cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  usbPortNumber?: number | string
+): string | null {
+  switch (cutoutFixtureId) {
+    case STAGING_AREA_RIGHT_SLOT_FIXTURE:
+      return 'Staging area slot'
+    case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+      console.log('in combo')
+      if (addressableAreaId.includes('flexStackerModuleV1')) {
+        return usbPortNumber != null
+          ? `${getModuleDisplayName(
+              FLEX_STACKER_MODULE_V1
+            )} in USB-${usbPortNumber}`
+          : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
+      } else {
+        return 'Waste chute'
+      }
+    case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
+      if (addressableAreaId.includes('flexStackerModuleV1')) {
+        return usbPortNumber != null
+          ? `${getModuleDisplayName(
+              FLEX_STACKER_MODULE_V1
+            )} in USB-${usbPortNumber}`
+          : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
+      } else {
+        return 'Magnetic block'
+      }
+    case FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT:
+      if (addressableAreaId.includes('WasteChute')) {
+        return 'Waste chute'
+      }
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      if (addressableAreaId.includes('WasteChute')) {
+        return 'Waste chute'
+      } else {
+        return 'Staging area slot'
+      }
+    default:
+      return null
+  }
+}
+
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
