@@ -340,7 +340,7 @@ def load_liquid_dye(
         ), t)
         for v, t in zip(volumes, trials_list)
         for name, cfg in DYE_CONFIGS.items()
-        if cfg[0] <= v <= cfg[1]
+        if "diluent" not in name and cfg[0] <= v <= cfg[1]
     }
 
     load_name = reservoirs_dye[0].load_name
@@ -483,6 +483,7 @@ def run(ctx: ProtocolContext) -> None:
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
     def _on_plate_done():
+        nonlocal plate, ul_in_this_plate
         heater_shaker.open_labware_latch()
         if not plate_reader:
             # REMOVE AND TAKE TO ARTEL READER
@@ -491,15 +492,26 @@ def run(ctx: ProtocolContext) -> None:
             shake_and_read_plate(
                 ctx, plate, heater_shaker, plate_reader, filename()
             )
+        plate = None
+        ul_in_this_plate = []
 
     for ul in volumes:
 
-        # PROCESS FULL PLATE
         dest_wells: List[Well] = dest_wells_by_volume[ul]
-        if plate and dest_wells[0] not in plate.wells():
+
+        # SHAKE/READ the CURRENT PLATE
+        if plate and dest_wells[0] not in plate:
             _on_plate_done()
-            plate = None
-            ul_in_this_plate = []
+
+        # SWAP INACCESSIBLE TIP-RACKS
+        for i, old_rack in enumerate(test_pip.tip_racks):
+            has_tips = bool(old_rack.next_tip(test_pip.channels))
+            if not has_tips and inaccessible_racks:
+                new_rack = inaccessible_racks.pop(0)
+                rack_adapter = old_rack.parent
+                ctx.move_labware(old_rack, trash, use_gripper=True)
+                ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
+                test_pip.tip_racks[i] = new_rack
 
         # GET NEW (EMPTY) PLATE
         if not plate:
@@ -573,15 +585,6 @@ def run(ctx: ProtocolContext) -> None:
         else:
             raise NotImplementedError("distribute not implemented yet")
 
-        # SWAP INACCESSIBLE TIP-RACKS
-        for i, old_rack in enumerate(test_pip.tip_racks):
-            has_tips = bool(old_rack.next_tip(test_pip.channels))
-            if not has_tips and inaccessible_racks:
-                new_rack = inaccessible_racks.pop(0)
-                rack_adapter = old_rack.parent
-                ctx.move_labware(old_rack, trash, use_gripper=True)
-                ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
-                test_pip.tip_racks[i] = new_rack
-
-    # don't forget final plate
-    _on_plate_done()
+        # SHAKE/READ the FINAL PLATE
+        if ul == volumes[-1]:
+            _on_plate_done()
