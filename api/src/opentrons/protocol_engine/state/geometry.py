@@ -1321,20 +1321,27 @@ class GeometryView:
         self,
         from_location: OnDeckLabwareLocation,
         to_location: OnDeckLabwareLocation,
-        additional_offset_vector: LabwareMovementOffsetData,
+        additional_pick_up_offset: Point,
+        additional_drop_offset: Point,
         current_labware: LabwareDefinition,
     ) -> LabwareMovementOffsetData:
         """Calculate the final labware offset vector to use in labware movement."""
-        pick_up_offset = self.get_total_nominal_gripper_offset_for_move_type(
-            location=from_location,
-            move_type=_GripperMoveType.PICK_UP_LABWARE,
-            current_labware=current_labware,
-        ) + Point.from_xyz_attrs(additional_offset_vector.pickUpOffset)
-        drop_offset = self.get_total_nominal_gripper_offset_for_move_type(
-            location=to_location,
-            move_type=_GripperMoveType.DROP_LABWARE,
-            current_labware=current_labware,
-        ) + Point.from_xyz_attrs(additional_offset_vector.dropOffset)
+        pick_up_offset = (
+            self.get_total_nominal_gripper_offset_for_move_type(
+                location=from_location,
+                move_type=_GripperMoveType.PICK_UP_LABWARE,
+                current_labware=current_labware,
+            )
+            + additional_pick_up_offset
+        )
+        drop_offset = (
+            self.get_total_nominal_gripper_offset_for_move_type(
+                location=to_location,
+                move_type=_GripperMoveType.DROP_LABWARE,
+                current_labware=current_labware,
+            )
+            + additional_drop_offset
+        )
 
         return LabwareMovementOffsetData(
             pickUpOffset=LabwareOffsetVector(

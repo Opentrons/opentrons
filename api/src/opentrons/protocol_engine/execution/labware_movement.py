@@ -96,7 +96,8 @@ class LabwareMovementHandler:
         labware_id: str,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         ...
@@ -108,7 +109,8 @@ class LabwareMovementHandler:
         labware_definition: LabwareDefinition,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         ...
@@ -120,7 +122,8 @@ class LabwareMovementHandler:
         labware_definition: LabwareDefinition | None = None,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
@@ -193,7 +196,8 @@ class LabwareMovementHandler:
                 self._state_store.geometry.get_final_labware_movement_offset_vectors(
                     from_location=current_location,
                     to_location=new_location,
-                    additional_offset_vector=user_offset_data,
+                    additional_pick_up_offset=user_pick_up_offset,
+                    additional_drop_offset=user_drop_offset,
                     current_labware=labware_definition,
                 )
             )
