@@ -415,13 +415,11 @@ export const getReplacementFixtureForFixtureRemoval = (
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    console.log('addressableAreaId: ', addressableAreaId)
     const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
       cutoutFixtureId,
       cutoutId,
       addressableAreaId
     )
-    console.log('cutoutFixtureReplacment: ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -897,7 +895,6 @@ export const getAASlotNameForAA = (
   const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
     cutoutId
   )
-  console.log('addressableAreasByFIxtureId: ', addressableAreasByFIxtureId)
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   const aaMatchInDef = aaListForFixtureId.find(aa => aa === addressableAreaId)
   return aaMatchInDef
@@ -989,8 +986,6 @@ export const replaceCutoutFixtureRemove = (
     cutoutFixtureRemoved,
     deckDef
   )
-  console.log('aaForCutoutAndFixture: ', aaForCutoutAndFixture)
-  console.log('addressableAreaId: ', addressableAreaId)
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
       if (
@@ -1010,7 +1005,6 @@ export const replaceCutoutFixtureRemove = (
         ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
         : aa
     )
-    console.log('updated: ', updated)
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(
         value.sort(),
@@ -1019,7 +1013,6 @@ export const replaceCutoutFixtureRemove = (
           : updated?.sort()
       )
     )
-    console.log('match: ', match)
 
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes

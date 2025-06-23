@@ -8,11 +8,11 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_DEFAULT_X_ADJUSTMENT,
-  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 

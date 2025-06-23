@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  SINGLE_LEFT_CUTOUTS,
-} from '@opentrons/shared-data'
+import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -23,10 +21,10 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
-  AddressableAreaNamesWithFakes
 } from '@opentrons/shared-data'
 
 interface MagneticBlockItemProps {

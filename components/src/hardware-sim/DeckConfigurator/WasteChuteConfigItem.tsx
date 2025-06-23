@@ -1,12 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  type AddressableAreaNamesWithFakes,
-  type CutoutFixtureIdsWithFakes,
-  type CutoutId,
-  type DeckDefinition,
-  DEFAULT_AA_FOR_WASTE_CHUTE,
-} from '@opentrons/shared-data'
+import { DEFAULT_AA_FOR_WASTE_CHUTE } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
@@ -23,6 +17,13 @@ import {
   FIXTURE_HEIGHT,
   Y_ADJUSTMENT,
 } from './constants'
+
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface WasteChuteConfigItemProps {
   deckDefinition: DeckDefinition

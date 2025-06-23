@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  CutoutFixtureIdsWithFakes,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
@@ -17,8 +16,8 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
-  CutoutFixtureId
 } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -95,7 +94,6 @@ export function useDeckConfigurationEditingTools(
       )
     } else {
       newDeckConfig = deckConfig.map(cutoutConfig => {
-        console.log('cutoutConfig: ', cutoutConfig)
         return cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
