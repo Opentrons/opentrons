@@ -24,7 +24,7 @@
   },
   "wells": {
     "A1": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -34,7 +34,7 @@
       "z": 2.66
     },
     "B1": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -44,7 +44,7 @@
       "z": 2.66
     },
     "C1": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -54,7 +54,7 @@
       "z": 2.66
     },
     "D1": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -64,7 +64,7 @@
       "z": 2.66
     },
     "A2": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -74,7 +74,7 @@
       "z": 2.66
     },
     "B2": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -84,7 +84,7 @@
       "z": 2.66
     },
     "C2": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -94,7 +94,7 @@
       "z": 2.66
     },
     "D2": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -104,7 +104,7 @@
       "z": 2.66
     },
     "A3": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -114,7 +114,7 @@
       "z": 2.66
     },
     "B3": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -124,7 +124,7 @@
       "z": 2.66
     },
     "C3": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -134,7 +134,7 @@
       "z": 2.66
     },
     "D3": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -144,7 +144,7 @@
       "z": 2.66
     },
     "A4": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -154,7 +154,7 @@
       "z": 2.66
     },
     "B4": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -164,7 +164,7 @@
       "z": 2.66
     },
     "C4": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -174,7 +174,7 @@
       "z": 2.66
     },
     "D4": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -184,7 +184,7 @@
       "z": 2.66
     },
     "A5": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -194,7 +194,7 @@
       "z": 2.66
     },
     "B5": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -204,7 +204,7 @@
       "z": 2.66
     },
     "C5": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -214,7 +214,7 @@
       "z": 2.66
     },
     "D5": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -224,7 +224,7 @@
       "z": 2.66
     },
     "A6": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -234,7 +234,7 @@
       "z": 2.66
     },
     "B6": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -244,7 +244,7 @@
       "z": 2.66
     },
     "C6": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
@@ -254,7 +254,7 @@
       "z": 2.66
     },
     "D6": {
-      "depth": 40.84,
+      "depth": 41,
       "totalLiquidVolume": 10400,
       "shape": "rectangular",
       "xDimension": 17.2,
