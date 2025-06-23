@@ -675,41 +675,47 @@ export function getAddressableAreaNamesFromLoadedModule(
   }, [])
 }
 
+export const getModuleDisplayNameWithPort = (
+  usbPortNumber: number | string
+) => {
+  return `${getModuleDisplayName(
+    FLEX_STACKER_MODULE_V1
+  )} in USB-${usbPortNumber}`
+}
+
 export function getAAFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDef: DeckDefinition,
   usbPortNumber?: number | string
 ): string | null {
+  const aaItem = getAAByAAId(addressableAreaId, deckDef)
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
       return 'Staging area slot'
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
-      console.log('in combo')
-      if (addressableAreaId.includes('flexStackerModuleV1')) {
+      if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayName(
-              FLEX_STACKER_MODULE_V1
-            )} in USB-${usbPortNumber}`
+          ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return 'Waste chute'
       }
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
-      if (addressableAreaId.includes('flexStackerModuleV1')) {
+      if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayName(
-              FLEX_STACKER_MODULE_V1
-            )} in USB-${usbPortNumber}`
+          ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return 'Magnetic block'
       }
     case FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT:
-      if (addressableAreaId.includes('WasteChute')) {
+      if (aaItem.areaType === 'wasteChute') {
         return 'Waste chute'
       }
+      break
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      if (addressableAreaId.includes('WasteChute')) {
+      if (aaItem.areaType === 'wasteChute') {
         return 'Waste chute'
       } else {
         return 'Staging area slot'
@@ -728,7 +734,6 @@ export function getFixtureDisplayName(
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
       return 'Staging area slot'
     case FAKE_STAGING_AREA_RIGHT_SLOT:
-      // for debugging perpuses change to display name
       return 'Fake Staging area slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
       return 'Trash bin'

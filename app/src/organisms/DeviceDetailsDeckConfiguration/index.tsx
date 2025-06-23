@@ -128,6 +128,7 @@ export function DeviceDetailsDeckConfiguration({
         getAAFixtureDisplayName(
           cutoutFixtureId,
           addressableAreaId,
+          deckDef,
           portDisplay
         ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
       const fixtureGroup =
