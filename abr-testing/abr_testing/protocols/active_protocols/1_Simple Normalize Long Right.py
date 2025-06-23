@@ -15,7 +15,7 @@ metadata = {
     "source": "Protocol Library",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -90,6 +90,23 @@ def run(protocol: ProtocolContext) -> None:
         "Dye": [{"well": [Dye_1, Dye_2, Dye_3], "volume": 675.0}],
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
     }
+    water = protocol.get_liquid_class("water")
+    lm = "liquid-meniscus"
+    tip_racks = [tiprack_x_2, tiprack_x_3]
+    for tip in tip_racks:
+        props = water.get_for(p1000_single, tip)
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        props.aspirate.aspirate_position.offset.z = meniscus_z
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+        props.dispense.dispense_position.offset.z = meniscus_z
+    tip_racks_multi = [tiprack_x_1]
+    for tip in tip_racks_multi:
+        props = water.get_for(p1000, tip)
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        props.aspirate.aspirate_position.offset.z = meniscus_z
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+        props.dispense.dispense_position.offset.z = meniscus_z
+
     # CONFIGURE SINGLE LAYOUT
     p1000.configure_nozzle_layout(style=SINGLE, start="H1", tip_racks=[tiprack_x_1])
     try:
@@ -112,11 +129,12 @@ def run(protocol: ProtocolContext) -> None:
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
                 while Dye_1.current_liquid_volume() < (DyeVol * 8):
-                    p1000.transfer(
+                    p1000.transfer_with_liquid_class(
+                        water,
                         DyeVol,
-                        Dye_1.meniscus(z=meniscus_z, target="end"),
-                        sample_plate_1.wells_by_name()[CurrentWell].top(z=1),
-                        new_tip="never",
+                        Dye_1,
+                        sample_plate_1.wells_by_name()[CurrentWell],
+                        return_tip=True,
                     )
                 current += 1
             p1000.blow_out(location=waste_reservoir["A1"])
@@ -156,10 +174,11 @@ def run(protocol: ProtocolContext) -> None:
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
                 while Dye_2.current_liquid_volume() < (DyeVol * 8):
-                    p1000_single.transfer(
+                    p1000_single.transfer_with_liquid_class(
+                        water,
                         DyeVol,
-                        Dye_2.meniscus(z=meniscus_z, target="end"),
-                        sample_plate_2.wells_by_name()[CurrentWell].top(z=1),
+                        Dye_2,
+                        sample_plate_2.wells_by_name()[CurrentWell],
                         new_tip="never",
                     )
                 current += 1
@@ -199,13 +218,12 @@ def run(protocol: ProtocolContext) -> None:
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
                 if Dye_3.current_liquid_volume() < (DyeVol * 8):
-                    p1000_single.transfer(
+                    p1000_single.transfer_with_liquid_class(
+                        water,
                         DyeVol,
-                        Dye_3.meniscus(z=meniscus_z, target="end"),
-                        sample_plate_3.wells_by_name()[CurrentWell].top(z=1),
-                        blow_out=True,
-                        blowout_location="destination well",
-                        new_tip="never",
+                        Dye_3,
+                        sample_plate_3.wells_by_name()[CurrentWell],
+                        return_tip=True,
                     )
                 current += 1
             p1000_single.blow_out(location=waste_reservoir["A1"])
@@ -242,13 +260,12 @@ def run(protocol: ProtocolContext) -> None:
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
                 if DyeVol != 0 and DyeVol < 100:
-                    p1000_single.transfer(
+                    p1000_single.transfer_with_liquid_class(
+                        water,
                         DyeVol,
-                        Dye_3.bottom(z=2),
-                        sample_plate_4.wells_by_name()[CurrentWell].top(z=1),
-                        blow_out=True,
-                        blowout_location="destination well",
-                        new_tip="never",
+                        Dye_3,
+                        sample_plate_4.wells_by_name()[CurrentWell],
+                        return_tip=True,
                     )
                     if DyeVol > 20:
                         wells.append(sample_plate_4.wells_by_name()[CurrentWell])

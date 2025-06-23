@@ -19,7 +19,7 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 """
 Slot A1: Tips 1000
 Slot A2: Tips 1000
@@ -148,7 +148,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "B3", "Liquid Waste"
     )
-    waste = waste_reservoir.wells()[0].top()
+    waste = waste_reservoir.wells()[0]
     res1 = protocol.load_labware(res_type, "D2", "reagent reservoir 1")
     res2 = protocol.load_labware(res_type, "C2", "reagent reservoir 2")
     res3 = protocol.load_labware(res_type, "B2", "reagent reservoir 3")
@@ -160,9 +160,17 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     tips1002 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B1", "Tips 3")
     tips_sn = tips1000.wells()[:num_samples]
     # load instruments
-    m1000 = protocol.load_instrument(
-        "flex_8channel_1000", mount, tip_racks=[tips1000, tips1001, tips1002]
-    )
+    tip_racks = [tips1000, tips1001, tips1002]
+
+    m1000 = protocol.load_instrument("flex_8channel_1000", mount, tip_racks=tip_racks)
+    water = protocol.get_liquid_class("water")
+    lm = "liquid-meniscus"
+    for tip in tip_racks:
+        props = water.get_for(m1000, tip)
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        props.aspirate.aspirate_position.offset.z = meniscus_z
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+        props.dispense.dispense_position.offset.z = meniscus_z
 
     def remove_supernatant(vol: float) -> None:
         """Remove supernatant."""
@@ -173,12 +181,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
         for i, m in enumerate(samples_m):
             m1000.pick_up_tip(tips_sn[8 * i])
-            loc = m.meniscus(z=meniscus_z, target="end")
+            loc = m
             for _ in range(num_trans):
                 m1000.move_to(m.center())
                 if vol_per_trans > m.current_liquid_volume():
                     vol_per_trans = m.current_liquid_volume() - 100  # type: ignore
-                m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
+                m1000.transfer_with_liquid_class(
+                    water, vol_per_trans, loc, waste, return_tip=True
+                )
                 m1000.blow_out(waste)
                 m1000.air_gap(20)
             m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
@@ -325,18 +335,20 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             num_trans = math.ceil(vol1 / 980)
             vol_per_trans = vol1 / num_trans
             source = binding_buffer[i // 2]
+            print(source)
             if i == 0:
                 reps = 5
             else:
                 reps = 2
+            print(well)
             bead_mixing(source, m1000, vol_per_trans, reps=reps if not dry_run else 1)
             # Transfer beads and binding from source to H-S plate
             for t in range(num_trans):
                 if m1000.current_volume > 0:
                     # void air gap if necessary
                     m1000.dispense(m1000.current_volume, source.top())
-                m1000.transfer(
-                    vol_per_trans, source, well.top(), air_gap=20, new_tip="never"
+                m1000.transfer_with_liquid_class(
+                    water, vol_per_trans, source, well, return_tip=True
                 )
                 m1000.air_gap(20)
             bead_mixing(well, m1000, vol_per_trans, reps=bead_reps_2)
@@ -375,12 +387,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                 if m1000.current_volume > 0:
                     # void air gap if necessary
                     m1000.dispense(m1000.current_volume, source.top())
-                m1000.transfer(
-                    vol_per_trans,
-                    source.meniscus(z=meniscus_z, target="end"),
-                    well.top(),
-                    air_gap=20,
-                    new_tip="never",
+                m1000.transfer_with_liquid_class(
+                    water, vol_per_trans, source, well, return_tip=True
                 )
                 m1000.air_gap(20)
 
@@ -424,12 +432,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             for n in range(num_trans):
                 if vol_per_trans > src.current_liquid_height():
                     vol_per_trans = src.current_liquid_height() - 100  # type: ignore[assignment]
-                m1000.transfer(
-                    vol_per_trans,
-                    src.meniscus(z=meniscus_z, target="end"),
-                    m.top(),
-                    air_gap=20,
-                    new_tip="never",
+                m1000.transfer_with_liquid_class(
+                    water, vol_per_trans, src, m, return_tip=True
                 )
                 wash_volume_tracker += vol_per_trans * 8
                 if wash_volume_tracker >= 9600:
@@ -483,13 +487,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             tipcheck(m1000)
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 25
-            m1000.transfer(
-                vol,
-                m.meniscus(z=meniscus_z, target="end"),
-                e.meniscus(z=5, target="end"),
-                air_gap=20,
-                new_tip="never",
-            )
+            m1000.transfer_with_liquid_class(water, vol, m, e, return_tip=True)
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
