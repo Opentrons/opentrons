@@ -66,6 +66,15 @@
     }
   },
   "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "ibidi_96_square_well_plate_300ul",
+    "ibidi_96_square_well_plate_300ul_lid",
+    "armadillo_96_wellplate_200ul_pcr_full_skirt",
+    "opentrons_96_wellplate_200ul_pcr_full_skirt",
+    "biorad_96_wellplate_200ul_pcr"
+  ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 5,
   "gripperOffsets": {
