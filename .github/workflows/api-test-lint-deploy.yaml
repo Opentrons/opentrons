@@ -120,7 +120,7 @@ jobs:
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel
-      - name: Check labware stacking regression tests
+      - name: Check stacking regression tests
         run: make -C api test-integration
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
