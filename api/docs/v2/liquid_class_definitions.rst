@@ -32,7 +32,7 @@ When your aspirate volume falls in between, like 100 µL, a linear interpolation
 
 Aqueous
 --------
-The Opentrons-verified ``aqueous`` liquid class is the Flex system default and is based on deionized water.
+The Opentrons-verified ``aqueous`` liquid class is based on deionized water.
 
 .. tabs::
 
@@ -153,3 +153,17 @@ The Opentrons-verified ``aqueous`` liquid class is the Flex system default and i
 
 Dispense
 ^^^^^^^^^
+
+
+Multi-dispense
+^^^^^^^^^^^^^^^
+
+.. _viscous: 
+
+Viscous
+--------
+
+.. _volatile: 
+
+Volatile
+--------
