@@ -8,7 +8,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
+from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
 )
@@ -81,7 +82,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
 
     # Prompt operator to place the crash block into the stacker
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Place the crash block into the stacker")
 
     # Test Axes
@@ -96,7 +97,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     # report(section, f"stallguard-z", [CSVResult.from_bool(z_result)])
 
     # Prompt operator to remove the crash block
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Remove the crash block from the stacker")
 
     # Attetmpt to rehome
@@ -110,5 +111,5 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             # Double check if crash block was actually removed
             await stacker.home_axis(StackerAxis.Z, Direction.EXTEND)
             await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
-            if not stacker._simulating:
+            if not stacker.is_simulated:
                 ui.get_user_ready("Remove the crash block from the stacker")
