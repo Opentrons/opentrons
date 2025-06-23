@@ -64,7 +64,7 @@ import {
   getLabwareIsRecommended,
   getStackerDefinition,
 } from '../../../pages/Designer/DeckSetup/utils'
-import { TC_LID_LOADNAME } from '../../../pages/Designer/utils'
+import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
@@ -118,6 +118,14 @@ export function SelectLabwareModal(
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
+  const lidLoadNames = Object.values(defs)
+    .filter(
+      def =>
+        def.allowedRoles?.includes('lid') &&
+        def.parameters.loadName !== TIPRACK_LID_LOADNAME
+    )
+    ?.map(def => def.parameters.loadName)
+
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -542,7 +550,7 @@ export function SelectLabwareModal(
                                     loadName={loadName}
                                     allowInputField={
                                       onFlexStacker ||
-                                      loadName === TC_LID_LOADNAME
+                                      lidLoadNames.includes(loadName)
                                     }
                                     stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
@@ -736,11 +744,10 @@ export function SelectLabwareModal(
                                                       nestedDef.parameters
                                                         .loadName
                                                     }
-                                                    allowInputField={
+                                                    allowInputField={lidLoadNames.includes(
                                                       nestedDef.parameters
-                                                        .loadName ===
-                                                      TC_LID_LOADNAME
-                                                    }
+                                                        .loadName
+                                                    )}
                                                     stackingProps={
                                                       stackingProps ?? undefined
                                                     }
