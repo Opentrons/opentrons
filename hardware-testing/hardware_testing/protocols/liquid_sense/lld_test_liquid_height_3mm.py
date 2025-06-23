@@ -83,6 +83,8 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 8", "value": "nest_8_reservoir_22ml"},
+            {"display_name": "nest 12", "value": "nest_12_reservoir_22ml"},
+            {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
         ],
         default="axygen_96_wellplate_500ul",
     )
