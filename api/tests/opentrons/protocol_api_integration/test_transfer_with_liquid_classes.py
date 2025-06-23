@@ -2365,3 +2365,199 @@ def test_raises_no_tips_available_error(
             new_tip="once",
             trash_location=trash,
         )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_transfer_with_keep_last_tip(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should keep the last tip instead of dropping the last one."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    pipette_1k = simulated_protocol_context.load_instrument(
+        "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.get_liquid_class("water")
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip_in_disposal_location",
+            side_effect=InstrumentCore.drop_tip_in_disposal_location,
+            autospec=True,
+        ) as patched_drop_tip,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip_in_disposal_location")
+        pipette_1k.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=400,
+            source=nest_plate.wells()[:2],
+            dest=arma_plate.wells()[:2],
+            new_tip="always",
+            trash_location=trash,
+            keep_last_tip=True,
+        )
+        expected_calls = [
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_transfer_with_keep_last_tip_false(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should not keep the last tip for a tip policy of never."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    pipette_1k = simulated_protocol_context.load_instrument(
+        "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.get_liquid_class("water")
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip_in_disposal_location",
+            side_effect=InstrumentCore.drop_tip_in_disposal_location,
+            autospec=True,
+        ) as patched_drop_tip,
+    ):
+        pipette_1k.pick_up_tip()
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip_in_disposal_location")
+        pipette_1k.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=400,
+            source=nest_plate.wells()[:2],
+            dest=arma_plate.wells()[:2],
+            new_tip="never",
+            trash_location=trash,
+            keep_last_tip=True,
+        )
+        assert mock_manager.mock_calls == []
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_transfer_with_keep_last_tip_chained(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should be able to use the last kept tip when calling with never after another transfer."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    pipette_1k = simulated_protocol_context.load_instrument(
+        "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.get_liquid_class("water")
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip_in_disposal_location",
+            side_effect=InstrumentCore.drop_tip_in_disposal_location,
+            autospec=True,
+        ) as patched_drop_tip,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip_in_disposal_location")
+        pipette_1k.distribute_with_liquid_class(
+            liquid_class=water,
+            volume=400,
+            source=nest_plate.wells()[0],
+            dest=arma_plate.wells()[:2],
+            new_tip="always",
+            trash_location=trash,
+            keep_last_tip=True,
+        )
+        pipette_1k.consolidate_with_liquid_class(
+            liquid_class=water,
+            volume=400,
+            source=nest_plate.wells()[:2],
+            dest=arma_plate.wells()[0],
+            new_tip="never",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            )
+        ]
+        assert mock_manager.mock_calls == expected_calls
