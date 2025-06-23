@@ -269,8 +269,15 @@ export interface SlotFootprintAsChildFeature {
   frontRight: Vector2D
 }
 
+export interface SlotFootprintAsParentFeature {
+  z: number
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
 export interface LocatingFeatures {
   slotFootprintAsChild?: SlotFootprintAsChildFeature
+  slotFootprintAsParent?: SlotFootprintAsParentFeature
 }
 
 export type LabwareRoles =

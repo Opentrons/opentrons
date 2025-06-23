@@ -7,7 +7,10 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.labware.types import (
+    LocatingFeatures,
+    SlotFootprintAsParentFeature,
+)
 
 from opentrons.types import DeckSlotName
 
@@ -297,7 +300,11 @@ def test_get_potential_cutout_fixtures_raises(
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
-                features=LocatingFeatures(),
+                features=LocatingFeatures(
+                    slotFootprintAsParent=SlotFootprintAsParentFeature(
+                        backLeft={"x": 0, "y": 0}, frontRight={"x": 128, "y": -86}, z=0
+                    )
+                ),
                 compatible_module_types=[
                     "magneticModuleType",
                     "temperatureModuleType",
@@ -320,7 +327,11 @@ def test_get_potential_cutout_fixtures_raises(
                     "temperatureModuleType",
                     "heaterShakerModuleType",
                 ],
-                features=LocatingFeatures(),
+                features=LocatingFeatures(
+                    slotFootprintAsParent=SlotFootprintAsParentFeature(
+                        backLeft={"x": 0, "y": 0}, frontRight={"x": 128, "y": -86}, z=0
+                    )
+                ),
             ),
             lazy_fixture("ot2_short_trash_deck_def"),
         ),
@@ -334,7 +345,11 @@ def test_get_potential_cutout_fixtures_raises(
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                features=LocatingFeatures(),
+                features=LocatingFeatures(
+                    slotFootprintAsParent=SlotFootprintAsParentFeature(
+                        backLeft={"x": 0, "y": 0}, frontRight={"x": 128, "y": -86}, z=0
+                    )
+                ),
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),

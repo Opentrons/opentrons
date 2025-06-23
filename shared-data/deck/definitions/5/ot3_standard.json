@@ -23,7 +23,19 @@
           "zDimension": 0
         },
         "displayName": "Slot D1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "D2",
@@ -36,7 +48,19 @@
           "zDimension": 0
         },
         "displayName": "Slot D2",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "D3",
@@ -49,7 +73,19 @@
           "zDimension": 0
         },
         "displayName": "Slot D3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "C1",
@@ -62,7 +98,19 @@
           "zDimension": 0
         },
         "displayName": "Slot C1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "C2",
@@ -75,7 +123,19 @@
           "zDimension": 0
         },
         "displayName": "Slot C2",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "C3",
@@ -88,7 +148,19 @@
           "zDimension": 0
         },
         "displayName": "Slot C3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "B1",
@@ -101,7 +173,19 @@
           "zDimension": 0
         },
         "displayName": "Slot B1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "B2",
@@ -114,7 +198,19 @@
           "zDimension": 0
         },
         "displayName": "Slot B2",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "B3",
@@ -127,7 +223,19 @@
           "zDimension": 0
         },
         "displayName": "Slot B3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "A1",
@@ -140,7 +248,19 @@
           "zDimension": 0
         },
         "displayName": "Slot A1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "A2",
@@ -153,7 +273,19 @@
           "zDimension": 0
         },
         "displayName": "Slot A2",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -167,7 +299,19 @@
           "zDimension": 0
         },
         "displayName": "Slot A3",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -181,7 +325,19 @@
           "zDimension": 0
         },
         "displayName": "Slot A4",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -195,7 +351,19 @@
           "zDimension": 0
         },
         "displayName": "Slot B4",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -209,7 +377,19 @@
           "zDimension": 0
         },
         "displayName": "Slot C4",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -223,7 +403,19 @@
           "zDimension": 0
         },
         "displayName": "Slot D4",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {
@@ -405,7 +597,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in D1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1C1",
@@ -417,7 +621,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in C1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1B1",
@@ -429,7 +645,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in B1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1A1",
@@ -441,7 +669,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in A1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1D3",
@@ -453,7 +693,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in D3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1C3",
@@ -465,7 +717,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in C3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1B3",
@@ -477,7 +741,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in B3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "heaterShakerV1A3",
@@ -489,7 +765,19 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in A3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2D1",
@@ -501,7 +789,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in D1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2C1",
@@ -513,7 +813,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in C1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2B1",
@@ -525,7 +837,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in B1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2A1",
@@ -537,7 +861,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in A1",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2D3",
@@ -549,7 +885,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in D3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2C3",
@@ -561,7 +909,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in C3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2B3",
@@ -573,7 +933,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in B3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "temperatureModuleV2A3",
@@ -585,7 +957,19 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in A3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "magneticBlockV1D1",
@@ -741,7 +1125,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in D3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1C3",
@@ -753,7 +1149,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in C3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1B3",
@@ -765,7 +1173,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in B3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1A3",
@@ -777,7 +1197,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in A3",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1LidDockD4",
@@ -789,7 +1221,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in D4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1LidDockC4",
@@ -801,7 +1245,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in C4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1LidDockB4",
@@ -813,7 +1269,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in B4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "absorbanceReaderV1LidDockA4",
@@ -825,7 +1293,19 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in A4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 127.8,
+              "y": -85.5
+            }
+          }
+        }
       },
       {
         "id": "flexStackerModuleV1D4",
@@ -837,7 +1317,19 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in D4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "flexStackerModuleV1C4",
@@ -849,7 +1341,19 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in C4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "flexStackerModuleV1B4",
@@ -861,7 +1365,19 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in B4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       },
       {
         "id": "flexStackerModuleV1A4",
@@ -873,7 +1389,19 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in A4",
-        "features": {}
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        }
       }
     ],
     "cutouts": [

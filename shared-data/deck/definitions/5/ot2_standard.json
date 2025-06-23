@@ -23,7 +23,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -41,7 +53,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -59,7 +83,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -77,7 +113,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -95,7 +143,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -113,7 +173,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -131,7 +203,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 7",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -150,7 +234,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -168,7 +264,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -186,7 +294,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -204,7 +324,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -221,7 +353,19 @@
           "zDimension": 0
         },
         "displayName": "Slot 12",
-        "features": {},
+        "features": {
+          "slotFootprintAsParent": {
+            "z": 0,
+            "backLeft": {
+              "x": 0,
+              "y": 0
+            },
+            "frontRight": {
+              "x": 128.0,
+              "y": -86.0
+            }
+          }
+        },
         "compatibleModuleTypes": []
       },
       {

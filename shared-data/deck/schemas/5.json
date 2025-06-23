@@ -47,6 +47,19 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
+    },
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
     }
   },
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
@@ -172,7 +185,28 @@
                 "type": "object",
                 "description": "Locating features when this addressable area is a part of a stackup.",
                 "required": [],
-                "properties": {}
+                "properties": {
+                  "slotFootprintAsParent": {
+                    "description": "The 2D plane on which a child deck item resides.",
+                    "type": "object",
+                    "required": ["backLeft", "frontRight", "z"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "backLeft": {
+                        "description": "(-x, +y), the back left corner of an addressable area.",
+                        "$ref": "#/definitions/vector2D"
+                      },
+                      "frontRight": {
+                        "description": "(+x, -y), the back left corner of an addressable area.",
+                        "$ref": "#/definitions/vector2D"
+                      },
+                      "z": {
+                        "description": "Always zero by convention. The z-offset from the bottom of the addressable area's plane to the plane on which a child deck item resides.",
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
               },
               "compatibleModuleTypes": {
                 "description": "OT-2 Only parameter. An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",

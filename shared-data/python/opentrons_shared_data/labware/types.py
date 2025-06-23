@@ -162,10 +162,17 @@ class SlotFootprintAsChildFeature(TypedDict):
     frontRight: Vector2D
 
 
+class SlotFootprintAsParentFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
     slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
+    slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
 
 
 class LabwareDefinition2(TypedDict):
