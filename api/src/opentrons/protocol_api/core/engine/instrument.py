@@ -1221,8 +1221,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     types.Location is only necessary for saving the last accessed location.
             new_tip: Whether the transfer should use a new tip 'once', 'never', 'always',
                      or 'per source'.
-            tiprack_uri: The URI of the tiprack that the transfer settings are for.
-            tip_drop_location: Location where the tip will be dropped (if appropriate).
+            tip_racks: List of tipracks that the transfer will pick up tips from, represented
+                       as tuples of types.Location and WellCore.
+            starting_tip: The user-chosen starting tip to use when deciding what tip to pick
+                          up, if the user has set it.
+            trash_location: The chosen trash container to drop tips in and dispose liquid in.
+            return_tip: If `True`, return tips to the tip rack location they were picked up from,
+                        otherwise drop in `trash_location`
+            keep_last_tip: When set to `True`, do not drop the final tip used in the transfer.
+            last_tip_used: If a tip is already attached, this will be the tiprack and well it was
+                           picked up from, represented as a tuple of types.Location and WellCore.
+                           Used so a tip can be returned if it was picked up outside this function
+                           as could be the case for a new_tip of `never`.
         """
         if not tip_racks:
             raise RuntimeError(
@@ -1419,7 +1429,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         return last_tip
 
-    # TODO(spp, 2025-02-25): wire up return tip
     def distribute_with_liquid_class(  # noqa: C901
         self,
         liquid_class: LiquidClass,
@@ -1452,8 +1461,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                      'never': the transfer will never pick up a new tip
                      'once': the transfer will pick up a new tip once at the start of transfer
                      'always': the transfer will pick up a new tip before every aspirate
-            tiprack_uri: The URI of the tiprack that the transfer settings are for.
-            tip_drop_location: Location where the tip will be dropped (if appropriate).
+            tip_racks: List of tipracks that the transfer will pick up tips from, represented
+                       as tuples of types.Location and WellCore.
+            starting_tip: The user-chosen starting tip to use when deciding what tip to pick
+                          up, if the user has set it.
+            trash_location: The chosen trash container to drop tips in and dispose liquid in.
+            return_tip: If `True`, return tips to the tip rack location they were picked up from,
+                        otherwise drop in `trash_location`
+            keep_last_tip: When set to `True`, do not drop the final tip used in the distribute.
+            last_tip_used: If a tip is already attached, this will be the tiprack and well it was
+                           picked up from, represented as a tuple of types.Location and WellCore.
+                           Used so a tip can be returned if it was picked up outside this function
+                           as could be the case for a new_tip of `never`
 
         This method distributes the liquid in the source well into multiple destinations.
         It can accomplish this by either doing a multi-dispense (aspirate once and then
@@ -1461,7 +1480,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         (going back to aspirate after each dispense). Whether it does a multi-dispense or
         multiple single dispenses is determined by whether multi-dispense properties
         are available in the liquid class and whether the tip in use can hold multiple
-        volumes to be dispensed whithout having to refill.
+        volumes to be dispensed without having to refill.
         """
         if not tip_racks:
             raise RuntimeError(
@@ -1789,6 +1808,34 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         keep_last_tip: bool,
         last_tip_used: Optional[Tuple[Location, WellCore]],
     ) -> Optional[Tuple[Location, WellCore]]:
+        """Execute consolidate using liquid class properties.
+
+        Args:
+            liquid_class: The liquid class to use for transfer properties.
+            volume: Volume to transfer per well.
+            source: List of source wells, with each well represented as a tuple of
+                    types.Location and WellCore.
+                    types.Location is only necessary for saving the last accessed location.
+            dest: List of destination wells, with each well represented as a tuple of
+                    types.Location and WellCore.
+                    types.Location is only necessary for saving the last accessed location.
+            new_tip: Whether the transfer should use a new tip 'once', 'always' or 'never'.
+                     'never': the transfer will never pick up a new tip
+                     'once': the transfer will pick up a new tip once at the start of transfer
+                     'always': the transfer will pick up a new tip after every dispense
+            tip_racks: List of tipracks that the transfer will pick up tips from, represented
+                       as tuples of types.Location and WellCore.
+            starting_tip: The user-chosen starting tip to use when deciding what tip to pick
+                          up, if the user has set it.
+            trash_location: The chosen trash container to drop tips in and dispose liquid in.
+            return_tip: If `True`, return tips to the tip rack location they were picked up from,
+                        otherwise drop in `trash_location`
+            keep_last_tip: When set to `True`, do not drop the final tip used in the consolidate.
+            last_tip_used: If a tip is already attached, this will be the tiprack and well it was
+                           picked up from, represented as a tuple of types.Location and WellCore.
+                           Used so a tip can be returned if it was picked up outside this function
+                           as could be the case for a new_tip of `never`.
+        """
         if not tip_racks:
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
