@@ -333,7 +333,7 @@ This example draws 100 µL from the current well and mixes it three times, with 
     pipette.mix(
         repetitions=3,
         volume=100,
-        aspirate_flow_rate=50
+        aspirate_flow_rate=50,
         aspirate_delay=5
     )
 
