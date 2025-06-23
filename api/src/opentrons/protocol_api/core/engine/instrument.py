@@ -1206,7 +1206,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-    ) -> None:
+    ) -> Optional[Tuple[Location, WellCore]]:
         """Execute transfer using liquid class properties.
 
         Args:
@@ -1273,14 +1273,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip_picked_up_from: Optional[WellCore] = None
+        last_tip: Optional[Tuple[Location, WellCore]] = None
 
         def _drop_tip() -> None:
             if return_tip:
-                assert last_tip_picked_up_from is not None
+                assert last_tip is not None
+                _, tip_well = last_tip
                 self.drop_tip(
                     location=None,
-                    well_core=last_tip_picked_up_from,
+                    well_core=tip_well,
                     home_after=False,
                     alternate_drop_location=False,
                 )
@@ -1298,7 +1299,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     alternate_drop_location=True,
                 )
 
-        def _pick_up_tip() -> WellCore:
+        def _pick_up_tip() -> Tuple[Location, WellCore]:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
                 starting_well=starting_tip,
@@ -1324,10 +1325,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 presses=None,
                 increment=None,
             )
-            return tip_well
+            return tiprack_loc, tip_well
 
         if new_tip == TransferTipPolicyV2.ONCE:
-            last_tip_picked_up_from = _pick_up_tip()
+            last_tip = _pick_up_tip()
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
         prev_dest: Optional[
@@ -1365,7 +1366,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             ):
                 if prev_src is not None and prev_dest is not None:
                     _drop_tip()
-                last_tip_picked_up_from = _pick_up_tip()
+                last_tip = _pick_up_tip()
                 post_disp_tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
                         liquid=0,
@@ -1415,6 +1416,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             _drop_tip()
 
+        return last_tip
+
     # TODO(spp, 2025-02-25): wire up return tip
     def distribute_with_liquid_class(  # noqa: C901
         self,
@@ -1432,7 +1435,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-    ) -> None:
+    ) -> Optional[Tuple[Location, WellCore]]:
         """Execute a distribution using liquid class properties.
 
         Args:
@@ -1512,7 +1515,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_working_volume=working_volume,
             )
         ):
-            self.transfer_with_liquid_class(
+            return self.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[source for _ in range(len(dest))],
@@ -1524,7 +1527,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 return_tip=return_tip,
                 keep_last_tip=keep_last_tip,
             )
-            return
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1551,14 +1553,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip_picked_up_from: Optional[WellCore] = None
+        last_tip: Optional[Tuple[Location, WellCore]] = None
 
         def _drop_tip() -> None:
             if return_tip:
-                assert last_tip_picked_up_from is not None
+                assert last_tip is not None
+                _, tip_well = last_tip
                 self.drop_tip(
                     location=None,
-                    well_core=last_tip_picked_up_from,
+                    well_core=tip_well,
                     home_after=False,
                     alternate_drop_location=False,
                 )
@@ -1576,7 +1579,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     alternate_drop_location=True,
                 )
 
-        def _pick_up_tip() -> WellCore:
+        def _pick_up_tip() -> Tuple[Location, WellCore]:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
                 starting_well=starting_tip,
@@ -1602,10 +1605,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 presses=None,
                 increment=None,
             )
-            return tip_well
+            return tiprack_loc, tip_well
 
         if new_tip != TransferTipPolicyV2.NEVER:
-            last_tip_picked_up_from = _pick_up_tip()
+            last_tip = _pick_up_tip()
 
         tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
@@ -1682,7 +1685,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
             if not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 _drop_tip()
-                last_tip_picked_up_from = _pick_up_tip()
+                last_tip = _pick_up_tip()
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
                         liquid=0,
@@ -1742,6 +1745,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             _drop_tip()
 
+        return last_tip
+
     def _tip_can_hold_volume_for_multi_dispensing(
         self,
         transfer_volume: float,
@@ -1779,7 +1784,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-    ) -> None:
+    ) -> Optional[Tuple[Location, WellCore]]:
         if not tip_racks:
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
@@ -1839,14 +1844,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip_picked_up_from: Optional[WellCore] = None
+        last_tip: Optional[Tuple[Location, WellCore]] = None
 
         def _drop_tip() -> None:
             if return_tip:
-                assert last_tip_picked_up_from is not None
+                assert last_tip is not None
+                _, tip_well = last_tip
                 self.drop_tip(
                     location=None,
-                    well_core=last_tip_picked_up_from,
+                    well_core=tip_well,
                     home_after=False,
                     alternate_drop_location=False,
                 )
@@ -1864,7 +1870,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     alternate_drop_location=True,
                 )
 
-        def _pick_up_tip() -> WellCore:
+        def _pick_up_tip() -> Tuple[Location, WellCore]:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
                 starting_well=starting_tip,
@@ -1890,10 +1896,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 presses=None,
                 increment=None,
             )
-            return tip_well
+            return tiprack_loc, tip_well
 
         if new_tip in [TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS]:
-            last_tip_picked_up_from = _pick_up_tip()
+            last_tip = _pick_up_tip()
 
         tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
@@ -1930,7 +1936,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 enable_lpd = True
             elif not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 _drop_tip()
-                last_tip_picked_up_from = _pick_up_tip()
+                last_tip = _pick_up_tip()
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
                         liquid=0,
@@ -1977,6 +1983,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             _drop_tip()
+
+        return last_tip
 
     def _get_location_and_well_core_from_next_tip_info(
         self,
