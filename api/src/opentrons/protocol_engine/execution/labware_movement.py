@@ -30,7 +30,6 @@ from ..errors import (
 from ..types import (
     OnLabwareLocation,
     LabwareLocation,
-    LabwareMovementOffsetData,
     OnDeckLabwareLocation,
 )
 

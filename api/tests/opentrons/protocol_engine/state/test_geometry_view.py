@@ -3266,10 +3266,8 @@ def test_get_final_labware_movement_offset_vectors(
     final_offsets = subject.get_final_labware_movement_offset_vectors(
         from_location=DeckSlotLocation(slotName=DeckSlotName("D2")),
         to_location=ModuleLocation(moduleId="module-id"),
-        additional_offset_vector=LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
-            dropOffset=LabwareOffsetVector(x=400, y=500, z=600),
-        ),
+        additional_pick_up_offset=Point(x=100, y=200, z=300),
+        additional_drop_offset=Point(x=400, y=500, z=600),
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert final_offsets == LabwareMovementOffsetData(
