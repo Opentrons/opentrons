@@ -85,7 +85,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     TIP_TRASH = (
         False  # True = Used tips go i n Trash, False = Used tips go back into rack
     )
-    res_type = "nest_12_reservoir_15ml"
+    res_type = "opentrons_tough_12_reservoir_22ml"
     global m1000_tips
     num_samples = 96
     wash1_vol = wash2_vol = wash3_vol = 400.0

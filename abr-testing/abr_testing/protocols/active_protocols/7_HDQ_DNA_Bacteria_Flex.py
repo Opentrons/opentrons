@@ -82,7 +82,7 @@ def run(protocol: ProtocolContext) -> None:
 
     dry_run = False
     TIP_TRASH = False
-    res_type = "nest_12_reservoir_22ml"
+    res_type = "opentrons_tough_12_reservoir_22ml"
 
     num_samples = 96
     wash1_vol = 600.0

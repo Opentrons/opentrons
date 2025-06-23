@@ -80,7 +80,7 @@ def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     dry_run = False
     inc_lysis = True
-    res_type = "nest_12_reservoir_15ml"
+    res_type = "opentrons_tough_12_reservoir_22ml"
     TIP_TRASH = False
     num_samples = 96
     wash_vol = 150.0

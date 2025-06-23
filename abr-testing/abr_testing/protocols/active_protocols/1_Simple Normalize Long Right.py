@@ -45,7 +45,7 @@ def run(protocol: ProtocolContext) -> None:
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "D3"
     )
 
-    reservoir = protocol.load_labware("nest_12_reservoir_15ml", "B3")
+    reservoir = protocol.load_labware("opentrons_tough_12_reservoir_22ml", "B3")
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C1", "Liquid Waste"
     )
