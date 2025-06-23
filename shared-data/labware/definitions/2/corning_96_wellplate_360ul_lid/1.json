@@ -68,6 +68,13 @@
     }
   },
   "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "armadillo_96_wellplate_200ul_pcr_full_skirt",
+    "opentrons_96_wellplate_200ul_pcr_full_skirt",
+    "biorad_96_wellplate_200ul_pcr"
+  ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 7,
   "gripperOffsets": {
