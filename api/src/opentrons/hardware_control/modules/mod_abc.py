@@ -239,6 +239,6 @@ class AbstractModule(abc.ABC):
         """Identify the module."""
         pass
 
-    def state_reset(self) -> None:
-        """Reset any persistent data on the module."""
+    def cleanup_persistent(self) -> None:
+        """Reset any persistent data on the module that should not exist outside of a run."""
         pass

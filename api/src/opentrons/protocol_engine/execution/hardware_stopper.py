@@ -133,14 +133,15 @@ class HardwareStopper:
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        if drop_tips_after_run:
-            await self._try_to_drop_tips()
+        try:
+            if drop_tips_after_run:
+                await self._try_to_drop_tips()
 
-        await self._hardware_api.stop(home_after=False)
+            await self._hardware_api.stop(home_after=False)
 
-        if home_after_stop:
-            await self._home_everything_except_plungers()
-
-        # Ensure module state recovery is handled
-        for module in self._hardware_api.attached_modules:
-            module.state_reset()
+            if home_after_stop:
+                await self._home_everything_except_plungers()
+        finally:
+            # Ensure module state recovery is handled
+            for module in self._hardware_api.attached_modules:
+                module.cleanup_persistent()
