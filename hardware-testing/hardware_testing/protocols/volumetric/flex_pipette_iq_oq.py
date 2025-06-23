@@ -591,9 +591,21 @@ def run(ctx: ProtocolContext) -> None:
             try:
                 test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
             except RuntimeError as e:
+                # NOTE: 96ch can run out of tips, so ask operator to switch them
                 if test_pip.channels == 96:
-                    ctx.pause("replace all empty tip-racks on deck (not in staging slots)")
-                    test_pip.reset_tipracks()
+                    adapters = []
+                    # first throwout the empty racks
+                    for rack in test_pip.tip_racks:
+                        adapters.append(rack.parent)
+                        ctx.move_labware(rack, trash, use_gripper=True)
+                    # ask operator to load new tip-racks
+                    tips_ln = ctx.params.tips  # type: ignore[attr-defined]
+                    ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
+                    # load new tip-racks for pipette
+                    test_pip.tip_racks = [
+                        adapter.load_labware(tips_ln)
+                        for adapter in adapters
+                    ]
                     test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
                 else:
                     raise e
