@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union, Sequence, Optional
+from typing import List, Union, Sequence, Optional, Tuple
 
 from opentrons.types import Location, NozzleMapInterface
 from opentrons.protocols.api_support import instrument
@@ -13,6 +13,7 @@ from opentrons.protocols.advanced_control.transfers.common import (
 
 from .disposal_locations import TrashBin, WasteChute
 from .labware import Labware, Well
+from .core.common import WellCore
 from . import validation
 
 
@@ -24,6 +25,7 @@ class TransferInfo:
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
+    last_tip_used: Optional[Tuple[Location, WellCore]]
 
 
 def verify_and_normalize_transfer_args(
@@ -86,12 +88,22 @@ def verify_and_normalize_transfer_args(
         trash_location=_trash_location
     )
 
+    if last_tip_picked_up_from is not None:
+        parent_tip_rack = last_tip_picked_up_from.parent
+        last_tip_used = (
+            Location(last_tip_picked_up_from.top().point, parent_tip_rack),
+            last_tip_picked_up_from._core,
+        )
+    else:
+        last_tip_used = None
+
     return TransferInfo(
         source=flat_sources_list,
         dest=flat_dests_list if not isinstance(dest, (TrashBin, WasteChute)) else dest,
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
+        last_tip_used=last_tip_used,
     )
 
 

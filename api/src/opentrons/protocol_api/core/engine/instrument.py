@@ -1206,6 +1206,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        last_tip_used: Optional[Tuple[Location, WellCore]],
     ) -> Optional[Tuple[Location, WellCore]]:
         """Execute transfer using liquid class properties.
 
@@ -1273,7 +1274,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip: Optional[Tuple[Location, WellCore]] = None
+        last_tip = last_tip_used
 
         def _drop_tip() -> None:
             if return_tip:
@@ -1435,6 +1436,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        last_tip_used: Optional[Tuple[Location, WellCore]],
     ) -> Optional[Tuple[Location, WellCore]]:
         """Execute a distribution using liquid class properties.
 
@@ -1526,6 +1528,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 trash_location=trash_location,
                 return_tip=return_tip,
                 keep_last_tip=keep_last_tip,
+                last_tip_used=last_tip_used,
             )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
@@ -1553,7 +1556,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip: Optional[Tuple[Location, WellCore]] = None
+        last_tip = last_tip_used
 
         def _drop_tip() -> None:
             if return_tip:
@@ -1784,6 +1787,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        last_tip_used: Optional[Tuple[Location, WellCore]],
     ) -> Optional[Tuple[Location, WellCore]]:
         if not tip_racks:
             raise RuntimeError(
@@ -1844,7 +1848,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
 
-        last_tip: Optional[Tuple[Location, WellCore]] = None
+        last_tip = last_tip_used
 
         def _drop_tip() -> None:
             if return_tip:

@@ -1910,6 +1910,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_used=transfer_args.last_tip_used,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
@@ -2055,6 +2056,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_used=transfer_args.last_tip_used,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
@@ -2200,6 +2202,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_used=transfer_args.last_tip_used,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
