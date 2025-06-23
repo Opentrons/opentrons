@@ -22,20 +22,11 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
-  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_FIXTURES,
-  getAAByAAId,
-  getAADisplayName,
-  getAASlotNameForAA,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
-  getDeckDefWithFakes,
   getFixtureDisplayName,
-  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
-  SINGLE_RIGHT_CUTOUTS,
   SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -76,10 +67,6 @@ export function DeviceDetailsDeckConfiguration({
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-    
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      deckConfig
-  )
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -96,17 +83,14 @@ export function DeviceDetailsDeckConfiguration({
   } = useDeckConfigurationEditingTools(false)
 
   // do not show standard slot in fixture display list
-  const { displayList: fixtureDisplayList } = deckConfigWithAA.reduce<{
+  const { displayList: fixtureDisplayList } = deckConfig.reduce<{
     displayList: Array<{ displayLocation: string; displayName: string }>
     groupedCutoutIds: CutoutId[]
   }>(
-    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber, addressableAreaId }) => {
-      const areaInCheck = getAAByAAId(addressableAreaId, deckDef)
-      const shouldShow = areaInCheck.areaType != 'slot' && areaInCheck.areaType!= 'stagingSlot'
+    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
       if (
         cutoutFixtureId == null ||
         SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-        || FAKE_STAGING_AREA_RIGHT_SLOT === cutoutFixtureId || !shouldShow
       ) {
         return acc
       }
@@ -118,11 +102,9 @@ export function DeviceDetailsDeckConfiguration({
           ? `${usbPort.port}.${usbPort.hubPort}`
           : usbPort?.port
       const displayName = getFixtureDisplayName(cutoutFixtureId, portDisplay)
-      console.log("displayName: ", displayName)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
-      const name = getAASlotNameForAA(cutoutId, cutoutFixtureId, addressableAreaId)
       if (cutoutId in fixtureGroup) {
         const groupMap =
           fixtureGroup[cutoutId]?.find(group =>
@@ -135,14 +117,11 @@ export function DeviceDetailsDeckConfiguration({
           ) ?? {}
         const groupedCutoutIds = Object.keys(groupMap) as CutoutId[]
         const displayLocation = getDisplayLocationForCutoutIds(groupedCutoutIds)
-        console.log("displayLocation: ", displayLocation
-        )
         if (acc.groupedCutoutIds.includes(cutoutId)) {
           return acc // only list grouped fixtures once
         } else {
-          console.log("in elsse")
           return {
-            displayList: [...acc.displayList, {  displayLocation: (name ??  displayLocation), displayName }],
+            displayList: [...acc.displayList, { displayLocation, displayName }],
             groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds],
           }
         }
@@ -152,7 +131,7 @@ export function DeviceDetailsDeckConfiguration({
         displayList: [
           ...acc.displayList,
           {
-            displayLocation: name ? name.replace('fake', '') : getDisplayLocationForCutoutIds([cutoutId]),
+            displayLocation: getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
         ],
