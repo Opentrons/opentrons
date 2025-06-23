@@ -1777,7 +1777,7 @@ class InstrumentContext(publisher.CommandPublisher):
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -1913,7 +1913,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -2049,7 +2049,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -2607,10 +2607,9 @@ class InstrumentContext(publisher.CommandPublisher):
         From API version 2.15 to 2.22, this property returned an internal name for Flex
         pipettes. (e.g., ``"p1000_single_flex"``).
 
-        .. TODO uncomment when 2.23 is ready
-          In API version 2.23 and later, this property returns the Python Protocol API
-          :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
-          ``"flex_1channel_1000"``).
+        In API version 2.23 and later, this property returns the Python Protocol API
+        :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
+        ``"flex_1channel_1000"``).
         """
         return self._core.get_pipette_name()
 
