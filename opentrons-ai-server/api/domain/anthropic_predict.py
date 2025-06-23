@@ -273,9 +273,8 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            if len(messages) == 1:
-                relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
-                prompt = f"{prompt}\n\n{relevant_api_docs}"
+            relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
+            prompt = f"{prompt}\n\n{relevant_api_docs}"
 
             messages.append({"role": "user", "content": PROMPT.format(USER_PROMPT=prompt)})
             response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)

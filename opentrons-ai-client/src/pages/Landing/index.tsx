@@ -8,16 +8,21 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   LargeButton,
+  Link as LinkButton,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { headerWithMeterAtom } from '../../resources/atoms'
+import {
+  headerWithMeterAtom,
+  updateProtocolChatAtom,
+} from '../../resources/atoms'
 import { useIsMobile } from '../../resources/hooks/useIsMobile'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
@@ -29,6 +34,7 @@ export function Landing(): JSX.Element | null {
   const isMobile = useIsMobile()
   const trackEvent = useTrackEvent()
   const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
+  const [, setUpdateProtocolChatAtom] = useAtom(updateProtocolChatAtom)
 
   useEffect(() => {
     setHeaderWithMeterAtom({ displayHeaderWithMeter: false, progress: 0.0 })
@@ -42,6 +48,20 @@ export function Landing(): JSX.Element | null {
   function handleUpdateProtocol(): void {
     trackEvent({ name: 'update-protocol', properties: {} })
     navigate('/update-protocol')
+  }
+
+  function handleGoToChat(): void {
+    trackEvent({ name: 'go-to-chat', properties: {} })
+    // Set a special marker to indicate direct chat access
+    setUpdateProtocolChatAtom({
+      prompt: '',
+      protocol_text: '',
+      regenerate: false,
+      update_type: 'other',
+      update_details: 'direct_chat_access', // Special marker
+      fake: false,
+    })
+    navigate('/chat')
   }
 
   return (
@@ -79,17 +99,38 @@ export function Landing(): JSX.Element | null {
           </StyledText>
         </Flex>
         {!isMobile && (
-          <>
-            <LargeButton
-              buttonText={t('landing_page_button_new_protocol')}
-              onClick={handleCreateNewProtocol}
-            />
-            <LargeButton
-              buttonText={t('landing_page_button_update_protocol')}
-              buttonType="stroke"
-              onClick={handleUpdateProtocol}
-            />
-          </>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing16}
+          >
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+              <LargeButton
+                buttonText={t('landing_page_button_update_protocol')}
+                onClick={handleUpdateProtocol}
+                borderRadius="0.75rem"
+                padding="1rem 1.5rem"
+                css="border-radius: 0.75rem !important; padding: 1rem 1.5rem !important;"
+              />
+              <LargeButton
+                buttonText={t('landing_page_button_new_protocol')}
+                onClick={handleCreateNewProtocol}
+                borderRadius="0.75rem"
+                padding="1rem 1.5rem"
+                css="border-radius: 0.75rem !important; padding: 1rem 1.5rem !important;"
+              />
+            </Flex>
+            <LinkButton
+              role="button"
+              onClick={handleGoToChat}
+              color={COLORS.grey60}
+              textDecoration="underline"
+            >
+              <StyledText desktopStyle="bodyLargeSemiBold">
+                {t('go_directly_to_chat')}
+              </StyledText>
+            </LinkButton>
+          </Flex>
         )}
       </Flex>
     </Flex>

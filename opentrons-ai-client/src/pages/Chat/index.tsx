@@ -35,10 +35,17 @@ export function Chat(): JSX.Element | null {
   const navigate = useNavigate()
   const [updateProtocolChat] = useAtom(updateProtocolChatAtom)
   const [createProtocolChat] = useAtom(createProtocolChatAtom)
+  const isDirectChatAccess =
+    updateProtocolChat.update_details === 'direct_chat_access'
 
   // Redirect to home page if there is no prompt (user has refreshed the page)
+  // Exception: Allow direct chat access
   useEffect(() => {
-    if (updateProtocolChat.prompt === '' && createProtocolChat.prompt === '') {
+    if (
+      updateProtocolChat.prompt === '' &&
+      createProtocolChat.prompt === '' &&
+      !isDirectChatAccess
+    ) {
       navigate('/')
     }
   }, [])
@@ -66,15 +73,23 @@ export function Chat(): JSX.Element | null {
           gridGap={SPACING.spacing24}
         >
           <ChatDataContainer>
-            {chatData.length > 0
-              ? chatData.map((chat, index) => (
-                  <ChatDisplay
-                    key={`prompt-from_${chat.role}_${index}`}
-                    chat={chat}
-                    chatId={`${chat.role}_${index}`}
-                  />
-                ))
-              : null}
+            {isDirectChatAccess && (
+              <ChatDisplay
+                chat={{
+                  role: 'assistant',
+                  reply: 'How can I help you today?',
+                  requestId: 'welcome-message',
+                }}
+                chatId="welcome-message"
+              />
+            )}
+            {chatData.map((chat, index) => (
+              <ChatDisplay
+                key={`prompt-from_${chat.role}_${index}`}
+                chat={chat}
+                chatId={`${chat.role}_${index}`}
+              />
+            ))}
           </ChatDataContainer>
         </Flex>
         <ChatFooter />

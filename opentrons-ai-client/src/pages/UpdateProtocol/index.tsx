@@ -160,6 +160,7 @@ export function UpdateProtocol(): JSX.Element {
       progress += progressIncrement
     }
 
+    // File upload is required for all update options
     if (pythonText !== '' && fileValue !== null && errorText === null) {
       progress += progressIncrement
     }
@@ -205,13 +206,14 @@ export function UpdateProtocol(): JSX.Element {
   }
 
   function processDataAndNavigateToChat(): void {
+    // Format the prompt for all update types
     const introText = t('modify_intro')
-    const originalCodeText =
-      t('modify_python_code') + `\`\`\`python\n` + pythonText + `\n\`\`\`\n\n`
+    const originalCodeText = pythonText
+      ? t('modify_python_code') + `\`\`\`python\n` + pythonText + `\n\`\`\`\n\n`
+      : ''
     const updateTypeText =
       t('modify_type_of_update') + updateType?.value + `\n\n`
     const detailsText = t('modify_details_of_change') + detailsValue + '\n'
-
     const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
 
     setUpdateProtocolChatAtom({
@@ -319,7 +321,7 @@ export function UpdateProtocol(): JSX.Element {
                 name: t('update_option_select'),
               }
             }
-            onClick={value => {
+            onClick={(value: string) => {
               const selectedOption = updateOptions.find(v => v.value === value)
               if (selectedOption != null) {
                 setUpdateType(selectedOption)
