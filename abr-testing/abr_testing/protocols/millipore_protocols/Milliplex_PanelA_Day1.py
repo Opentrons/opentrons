@@ -109,7 +109,7 @@ def run(ctx: ProtocolContext) -> None:
     waste_plate = ctx.load_labware("nest_1_reservoir_290ml", "C1", "WASTE")
     waste = waste_plate.wells()[0]
 
-    ctx.load_trash_bin("A3")
+    ctx.load_trash_bin("D3")
 
     tips_1k = ctx.load_labware("opentrons_flex_96_tiprack_1000ul", "C3", "1000uL TIPS")
     tips_200 = [

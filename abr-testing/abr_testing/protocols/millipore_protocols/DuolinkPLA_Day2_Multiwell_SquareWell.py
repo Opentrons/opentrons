@@ -123,15 +123,15 @@ def run(ctx: ProtocolContext) -> None:
 
     wash_a_plate = ctx.load_labware("nest_1_reservoir_290ml", "C3", "WASH BUFFER A")
     wash_other_plate = ctx.load_labware(
-        "nest_12_reservoir_15ml", "B2", "WASH BUFFER B, B(0.01x), and PBS"
+        "nest_12_reservoir_15ml", "D3", "WASH BUFFER B, B(0.01x), and PBS"
     )
     waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
 
-    ctx.load_trash_bin("D3")
+    ctx.load_trash_bin("A3")
 
     tips_1k = [
         ctx.load_labware("opentrons_flex_96_tiprack_1000ul", slot, "1000uL TIPS")
-        for slot in ["B3", "A3"]
+        for slot in ["B3", "B2"]
     ]
 
     tips_200_reuse = [
