@@ -46,11 +46,6 @@
     }
   },
   "stackingOffsetWithLabware": {
-    "default": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
     "corning_96_wellplate_360ul_flat": {
       "x": 0,
       "y": 0,
@@ -71,9 +66,7 @@
   "compatibleParentLabware": [
     "protocol_engine_lid_stack_object",
     "opentrons_flex_deck_riser",
-    "armadillo_96_wellplate_200ul_pcr_full_skirt",
-    "opentrons_96_wellplate_200ul_pcr_full_skirt",
-    "biorad_96_wellplate_200ul_pcr"
+    "corning_96_wellplate_360ul_flat"
   ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 7,
