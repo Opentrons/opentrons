@@ -8,7 +8,7 @@
     "z": 97.8
   },
   "features": {
-    "slotFootprintAsChild": {
+    "slotFootprintAsParent": {
       "z": 0,
       "backLeft": {
         "x": 0,

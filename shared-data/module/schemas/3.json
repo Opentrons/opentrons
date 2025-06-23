@@ -156,7 +156,7 @@
       "required": ["slotFootprintAsChild"],
       "properties": {
         "slotFootprintAsChild": {
-          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "description": "The 3D plane of the module that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
           "type": "object",
           "required": ["backLeft", "frontRight", "z"],
           "additionalProperties": false,
@@ -170,7 +170,27 @@
               "$ref": "#/definitions/vector2D"
             },
             "z": {
-              "description": "Always zero. Z-coordinate of the footprint plane.",
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
+              "type": "number"
+            }
+          }
+        },
+        "slotFootprintAsParent": {
+          "description": "The 2D plane on which a child deck item resides.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y), the back left corner of a module's mating plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y), the back left corner of a module's module plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero by convention. The z-offset from the bottom of the module's mating plane to the plane on which a child deck item resides.",
               "type": "number"
             }
           }
