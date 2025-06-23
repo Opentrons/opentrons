@@ -35,6 +35,17 @@
         "x": 128,
         "y": -86
       }
+    },
+    "slotFootprintAsParent": {
+      "z": 0,
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 134,
+        "y": -92
+      }
     }
   },
   "wells": {},

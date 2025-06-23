@@ -650,6 +650,26 @@
               "type": "number"
             }
           }
+        },
+        "slotFootprintAsParent": {
+          "description": "The 2D plane on which a child deck item resides.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y), the back left corner of a labware's mating plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y), the back left corner of a labware's module plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "The z-offset from the bottom of the labware to the plane on which a child deck item resides.",
+              "type": "number"
+            }
+          }
         }
       }
     },
