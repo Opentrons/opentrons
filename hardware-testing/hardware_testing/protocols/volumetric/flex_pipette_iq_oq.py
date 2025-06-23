@@ -486,7 +486,8 @@ def run(ctx: ProtocolContext) -> None:
             _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
             _cls.aspirate.aspirate_position.offset.z = -1.5
             _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
-            _cls.dispense.dispense_position.offset.z = -1.5
+            is_eth = bool("ethanol" in base_class.name.lower() or "volatile" in base_class.name.lower())
+            _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
