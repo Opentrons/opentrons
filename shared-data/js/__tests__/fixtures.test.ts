@@ -446,7 +446,7 @@ describe('getAAFixtureDisplayName', () => {
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'flexStackerModuleV1D4'
     )
-    expect(name).toEqual('Flex Stacker Module GEN1 in USB-0')
+    expect(name).toEqual('Flex Stacker Module GEN1')
   })
 
   it('Should return mag block name when using combo fixtures with mag block', () => {

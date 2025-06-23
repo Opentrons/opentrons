@@ -91,7 +91,6 @@ export function DeviceDetailsDeckConfiguration({
     addFixtureModal,
   } = useDeckConfigurationEditingTools(false)
 
-  console.log('deckConfigWithAA: ', deckConfigWithAA)
   // do not show standard slot in fixture display list
   const { displayList: fixtureDisplayList } = deckConfigWithAA.reduce<{
     displayList: Array<{ displayLocation: string; displayName: string }>
@@ -176,7 +175,6 @@ export function DeviceDetailsDeckConfiguration({
     { displayList: [], groupedCutoutIds: [] }
   )
 
-  console.log('fixtureDisplayList: ', fixtureDisplayList)
   return (
     <>
       {addFixtureModal}
