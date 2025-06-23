@@ -55,7 +55,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         display_name = "Quick Mode",
         variable_name = "quick_mode",
-        description = "If true, dial indicator is not used and tips are reused."
+        description = "If true, dial indicator is not used and tips are reused.",
+        default = False,
     )
 
     parameters.add_bool(
@@ -166,7 +167,7 @@ def run(ctx: ProtocolContext) -> None:
     probe_pipette = ctx.load_instrument(probing_pip_name, PROBING_MOUNT)
 
     #load labware 
-    labware_type = ctx.parameters.labware_type # type: ignore[attr-defined]
+    labware_type = ctx.params.labware_type # type: ignore[attr-defined]
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
     src_well = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
