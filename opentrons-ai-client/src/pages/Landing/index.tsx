@@ -106,18 +106,16 @@ export function Landing(): JSX.Element | null {
           >
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
               <LargeButton
-                buttonText={t('landing_page_button_update_protocol')}
+                buttonText="Get help with an existing protocol"
                 onClick={handleUpdateProtocol}
-                borderRadius="0.75rem"
-                padding="1rem 1.5rem"
-                css="border-radius: 0.75rem !important; padding: 1rem 1.5rem !important;"
+                height="3.5rem"
+                css="border-radius: 8px !important; text-align: center !important; display: flex !important; align-items: center !important; justify-content: center !important; width: auto !important; padding: 0 2rem !important; white-space: nowrap !important;"
               />
               <LargeButton
-                buttonText={t('landing_page_button_new_protocol')}
+                buttonText="Create a new protocol"
                 onClick={handleCreateNewProtocol}
-                borderRadius="0.75rem"
-                padding="1rem 1.5rem"
-                css="border-radius: 0.75rem !important; padding: 1rem 1.5rem !important;"
+                height="3.5rem"
+                css="border-radius: 8px !important; text-align: center !important; display: flex !important; align-items: center !important; justify-content: center !important; width: auto !important; padding: 0 2rem !important; white-space: nowrap !important;"
               />
             </Flex>
             <LinkButton
