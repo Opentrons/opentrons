@@ -32,6 +32,14 @@ class TestResults:
     passed: dict[str, SuccessfulTest]
 
 
+def _init_swallow_logging() -> None:
+    import sys
+    import io
+
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+
+
 def run_test(
     specs: list[StackupSpec],
 ) -> TestResults:
@@ -47,7 +55,7 @@ def run_test(
     )
 
     print(f"Processing {robot_info}...")
-    executor = ProcessPoolExecutor()
+    executor = ProcessPoolExecutor(initializer=_init_swallow_logging)
     futures = [executor.submit(_process_single_test, spec) for spec in specs]
     try:
         return _collate_results(futures, specs)
