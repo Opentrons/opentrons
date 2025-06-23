@@ -55,13 +55,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name = "quick_mode",
         description = "If true, dial indicator is not used and tips are reused."
     )
+
     parameters.add_bool(
-        display_name = "Reservoir Used?"
+        display_name = "Reservoir Used?",
         variable_name = "reservoir_used",
         description = "If true, a reservoir is used for liquid pipetting.",
+        default = False,
     )
 
-
+    
 def _read_dial_indicator(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
