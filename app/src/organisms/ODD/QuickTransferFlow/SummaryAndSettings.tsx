@@ -17,6 +17,7 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -80,6 +81,9 @@ export function SummaryAndSettings(
     quickTransferSummaryReducer,
     initialSummaryState
   )
+
+  console.log('SummaryAndSettings state', state)
+  console.log(getLabwareDefURI(state.tipRack))
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
