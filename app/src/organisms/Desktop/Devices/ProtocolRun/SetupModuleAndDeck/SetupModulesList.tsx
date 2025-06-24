@@ -284,26 +284,9 @@ export function ModulesListItem({
     attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
 
-  if (stackerNeedsHome) {
-    renderModuleStatus = (
-      <>
-        <TertiaryButton
-          {...targetProps}
-          onClick={handleHomeStackerClick}
-          width="max-content"
-          disabled={!calibrationStatus?.complete || isModuleTooHot}
-        >
-          {t('home_stacker')}
-        </TertiaryButton>
-        {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
-        isModuleTooHot ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {calibrateDisabledReason}
-          </Tooltip>
-        ) : null}
-      </>
-    )
-  } else if (needsCalibration || stackerShuttleMissing) {
+  console.log(attachedModuleMatch?.data)
+  console.log(needsCalibration, stackerShuttleMissing, stackerNeedsHome)
+  if (needsCalibration || stackerShuttleMissing) {
     renderModuleStatus = (
       <>
         <TertiaryButton
@@ -320,6 +303,18 @@ export function ModulesListItem({
             {calibrateDisabledReason}
           </Tooltip>
         ) : null}
+      </>
+    )
+  } else if (stackerNeedsHome) {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
+          {...targetProps}
+          onClick={handleHomeStackerClick}
+          width="max-content"
+        >
+          {t('home_stacker')}
+        </TertiaryButton>
       </>
     )
   } else if (attachedModuleMatch == null) {

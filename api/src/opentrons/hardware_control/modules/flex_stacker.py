@@ -253,21 +253,11 @@ class FlexStacker(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
-    def _get_platform_live_data(self) -> PlatformState:
-        """Get the platform state for live data."""
-        if self.initialized and self.platform_state == PlatformState.UNKNOWN:
-            # If the platform state is unknown, we need to poll it
-            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
-                # Set flag so the reader can poll the limit switch state
-                self._reader.set_refresh_state()
-                return PlatformState.MISSING
-        return self.platform_state
-
     @property
     def live_data(self) -> LiveData:
         data: FlexStackerData = {
             "latchState": self.latch_state.value,
-            "platformState": self._get_platform_live_data().value,
+            "platformState": self.platform_state.value,
             "hopperDoorState": self.hopper_door_state.value,
             "installDetected": self.install_detected,
             "errorDetails": self._reader.error,
@@ -751,7 +741,14 @@ class FlexStackerReader(Reader):
     async def get_platform_sensor_state(self) -> None:
         """Get the platform state."""
         status = await self._driver.get_platform_status()
-        self.platform_state = PlatformState.from_status(status)
+        platform_state = PlatformState.from_status(status)
+        if self.initialized and platform_state == PlatformState.UNKNOWN:
+            # If the platform state is unknown but the X axis is known,
+            # the platform is missing.
+            await self.get_limit_switch_status()
+            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
+                platform_state = PlatformState.MISSING
+        self.platform_state = platform_state
 
     async def get_door_closed(self) -> None:
         """Check if the hopper door is closed."""
