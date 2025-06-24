@@ -116,12 +116,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=-100.0,
     )
     parameters.add_bool(
-        variable_name="measure_middle_height",
-        display_name="Measure Middle Height",
-        description="Measure middle height of liquid in well.",
-        default=False,
-    )
-    parameters.add_bool(
         variable_name="liquid_pipette_probe_every_time",
         display_name="Liq Pipette Probe Every Time",
         description="Liq pipette probes every time.",
@@ -228,7 +222,6 @@ def _setup(
     liquid_pipette_probe_every_time: bool = (
         ctx.params.liquid_pipette_probe_every_time  # type: ignore[attr-defined]
     )
-    input(VOLUMES_3MM_TOP_BOTTOM[LABWARE])
     if labware_max_volume < 50:
         LIQUID_TIP_SIZE = 50
     else:
