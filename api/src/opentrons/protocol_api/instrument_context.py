@@ -1837,7 +1837,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -1966,7 +1965,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -2104,7 +2102,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(

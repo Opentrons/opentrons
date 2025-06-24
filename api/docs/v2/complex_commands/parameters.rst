@@ -113,7 +113,7 @@ For example, this basic transfer command will mix 50 µL of liquid 3 times befor
 
 Mixing occurs before every aspiration, including when :ref:`tip refilling <complex-tip-refilling>` is required.
 
-Liquid class definitions determine mix behavior in liquid class complex commands like ``transfer_with_liquid_class()``. For more information, see the :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>`. 
+Liquid class definitions determine mix behavior in liquid class complex commands like ``transfer_with_liquid_class()``. If mixing is enabled before an aspiration, the pipette will mix in place at the aspirate position. You can see position and other values in the  :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>`. 
 
 .. note::
     :py:meth:`~.InstrumentContext.consolidate` ignores any value of ``mix_before``. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
@@ -285,7 +285,7 @@ For example, this ``transfer()`` command will mix 50 µL of liquid 3 times after
         mix_after=(3, 50),
     )
 
-Liquid class definitions determine mix behavior in liquid class complex commands like ``transfer_with_liquid_class()``. For more information, see the :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>`. 
+Liquid class definitions determine mix behavior in liquid class complex commands like ``transfer_with_liquid_class()``. If mixing is enabled after a dispense, the pipette will mix in place at the dispense position. You can see position and other values in the  :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>`. 
 
 .. versionadded:: 2.0
 
