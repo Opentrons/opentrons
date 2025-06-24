@@ -166,7 +166,6 @@ export function AddFixtureModal({
   }
 
   const sendIdentifyStacker = useSendIdentifyStacker()
-  const attachedModules = useModulesQuery().data?.data
 
   const handleAddFixture = (
     addedCutoutConfigs: CutoutConfigMap[],
@@ -187,7 +186,7 @@ export function AddFixtureModal({
 
     if (fixtureSerialNumber) {
       const module =
-        attachedModules?.find(m => m.serialNumber === fixtureSerialNumber) ??
+        unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
         null
       if (module !== null) {
         sendIdentifyStacker(module, false)
@@ -200,7 +199,8 @@ export function AddFixtureModal({
 
   const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
     const module =
-      attachedModules?.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+      unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
+      null
     if (module !== null) {
       // Identify the stacker module
       sendIdentifyStacker(module, true, 'blue')
