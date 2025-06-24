@@ -124,7 +124,6 @@ def run(protocol: ProtocolContext) -> None:
 
             current = 0
 
-            p1000.pick_up_tip()
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
@@ -137,9 +136,6 @@ def run(protocol: ProtocolContext) -> None:
                         return_tip=True,
                     )
                 current += 1
-            p1000.blow_out(location=waste_reservoir["A1"])
-            p1000.touch_tip()
-            p1000.drop_tip()
 
             protocol.comment("==============================================")
             protocol.comment("Adding Diluent Sample Plate 1")
@@ -169,7 +165,6 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("Adding Dye Sample Plate 2")
             protocol.comment("==============================================")
             current = 0
-            p1000_single.pick_up_tip()
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
@@ -182,9 +177,6 @@ def run(protocol: ProtocolContext) -> None:
                         new_tip="never",
                     )
                 current += 1
-            p1000_single.blow_out(location=waste_reservoir["A1"])
-            p1000_single.touch_tip()
-            p1000_single.return_tip()
 
             protocol.comment("==============================================")
             protocol.comment("Adding Diluent Sample Plate 2")
@@ -213,7 +205,6 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("==============================================")
 
             current = 0
-            p1000_single.pick_up_tip()
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
@@ -226,9 +217,6 @@ def run(protocol: ProtocolContext) -> None:
                         return_tip=True,
                     )
                 current += 1
-            p1000_single.blow_out(location=waste_reservoir["A1"])
-            p1000_single.touch_tip()
-            p1000_single.return_tip()
             protocol.comment("==============================================")
             protocol.comment("Adding Diluent Sample Plate 3")
             protocol.comment("==============================================")
@@ -255,7 +243,6 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("==============================================")
             p1000_single.reset_tipracks()
             current = 0
-            p1000_single.pick_up_tip()
             while current < len(data):
                 CurrentWell = str(data[current][0])
                 DyeVol = float(data[current][1])
@@ -270,9 +257,6 @@ def run(protocol: ProtocolContext) -> None:
                     if DyeVol > 20:
                         wells.append(sample_plate_4.wells_by_name()[CurrentWell])
                 current += 1
-            p1000_single.blow_out(location=waste_reservoir["A1"])
-            p1000_single.touch_tip()
-            p1000_single.return_tip()
             protocol.comment("==============================================")
             protocol.comment("Adding Diluent Sample Plate 4")
             protocol.comment("==============================================")
