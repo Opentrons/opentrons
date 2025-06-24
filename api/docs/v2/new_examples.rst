@@ -193,7 +193,7 @@ This protocol uses some :ref:`building block commands <v2-atomic-commands>` to t
 Advanced Method
 ---------------
 
-These protocols accomplishes the same thing as the previous example, but does it a little more efficiently. Notice how it uses the :py:meth:`.InstrumentContext.transfer` or :py:meth:`InstrumentContext.transfer_with_liquid_class` method to move liquid between well plates. Because each is a complex command, you don't need separate calls to ``aspirate`` or ``dispense`` here.
+These protocols accomplishes the same thing as the previous example, but does it a little more efficiently. Notice how it uses the :py:meth:`.InstrumentContext.transfer` or :py:meth:`.InstrumentContext.transfer_with_liquid_class` method to move liquid between well plates. Because each is a complex command, you don't need separate calls to ``aspirate`` or ``dispense`` here.
 
 Let's start with a basic complex command, using ``transfer()``. The source and destination well  arguments (e.g., ``plate["A1"], plate["B1"]``) are part of ``transfer()`` method parameters. 
 
