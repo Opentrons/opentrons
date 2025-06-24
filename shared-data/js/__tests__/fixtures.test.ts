@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
-
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import type { Mock } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
@@ -33,6 +31,8 @@ import {
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
+
+import type { Mock } from 'vitest'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),

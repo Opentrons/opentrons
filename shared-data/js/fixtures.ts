@@ -1,9 +1,6 @@
 import isEqual from 'lodash/isEqual'
 
-import {
-  WASTE_CHUTE_FIXTURES,
-  WASTE_CHUTE_WITH_FAKE_FIXTURES,
-} from '.'
+import { WASTE_CHUTE_FIXTURES, WASTE_CHUTE_WITH_FAKE_FIXTURES } from '.'
 import {
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -695,8 +692,10 @@ export function getAAComboFixtureDisplayName(
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? t(`${translationFileName}:module_in_port`, {moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1), usbPortNumber})
-
+          ? t(`${translationFileName}:module_in_port`, {
+              moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+              usbPortNumber,
+            })
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return t(`${translationFileName}:waste_chute`)
@@ -704,8 +703,11 @@ export function getAAComboFixtureDisplayName(
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-        ? t(`${translationFileName}:module_in_port`, {moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1), usbPortNumber})
-        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
+          ? t(`${translationFileName}:module_in_port`, {
+              moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+              usbPortNumber,
+            })
+          : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return t(`${translationFileName}:magnetic_block`)
       }
@@ -974,7 +976,9 @@ export const getAASlotIdForAA = (
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
-export const getAASlotDisplayName = (addressableAreaId: AddressableAreaNamesWithFakes): string => {
+export const getAASlotDisplayName = (
+  addressableAreaId: AddressableAreaNamesWithFakes
+): string => {
   return addressableAreaId.replace('fake', '')
 }
 

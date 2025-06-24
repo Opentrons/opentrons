@@ -130,7 +130,7 @@ export function DeviceDetailsDeckConfiguration({
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
-          t,
+          t[1],
           'deck_configuration',
           portDisplay
         ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
