@@ -30,6 +30,7 @@ import {
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 import { getOptions } from './utils'
 
 import type { ModalProps } from '@opentrons/components'
@@ -41,7 +42,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000
@@ -168,7 +168,10 @@ export function AddFixtureModal({
   const sendIdentifyStacker = useSendIdentifyStacker()
   const attachedModules = useModulesQuery().data?.data
 
-  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[], fixtureSerialNumber?: string): void => {
+  const handleAddFixture = (
+    addedCutoutConfigs: CutoutConfigMap[],
+    fixtureSerialNumber?: string
+  ): void => {
     const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
       addedCutoutConfigs,
       deckConfigWithAA,
@@ -182,11 +185,11 @@ export function AddFixtureModal({
       )
     }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
 
-    if (fixtureSerialNumber){
-      const module = attachedModules?.find(
-        m => m.serialNumber === fixtureSerialNumber
-      ) ?? null
-      if ( module !== null){
+    if (fixtureSerialNumber) {
+      const module =
+        attachedModules?.find(m => m.serialNumber === fixtureSerialNumber) ??
+        null
+      if (module !== null) {
         sendIdentifyStacker(module, false)
       }
     }
@@ -196,16 +199,16 @@ export function AddFixtureModal({
   }
 
   const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
-    const module = attachedModules?.find(
-      m => m.serialNumber === fixtureSerialNumber
-    ) ?? null
-    if ( module !== null){
+    const module =
+      attachedModules?.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+    if (module !== null) {
       // Identify the stacker module
       sendIdentifyStacker(module, true, 'blue')
-      //Ensure that the module reverts after a set time
-      setTimeout(() =>{sendIdentifyStacker(module, false)}, MODULE_IDENTIFY_TIME_MS)
+      // Ensure that the module reverts after a set time
+      setTimeout(() => {
+        sendIdentifyStacker(module, false)
+      }, MODULE_IDENTIFY_TIME_MS)
     }
-
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
@@ -216,9 +219,12 @@ export function AddFixtureModal({
       usbPort?.hubPort != null
         ? `${usbPort.port}.${usbPort.hubPort}`
         : usbPort?.port
-    
+
     const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
-    if (fixtureSerialNumber !== undefined && cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)){
+    if (
+      fixtureSerialNumber !== undefined &&
+      cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)
+    ) {
       return (
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
@@ -232,13 +238,12 @@ export function AddFixtureModal({
           }}
           secondaryButtonText={t('identify')}
           secondaryOnClickHandler={() => {
-            handleIdentifyFixture(fixtureSerialNumber)}
-          }
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
           isOnDevice={isOnDevice}
         />
       )
-    }
-    else{
+    } else {
       return (
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
@@ -278,7 +283,7 @@ export function AddFixtureModal({
       ) : (
         // This is the modal with the module fixtures
         // Something that checks if this is a stacker module with a TODO to remove/update if other identifiable modules are added
-        // Call to the use identify thing that transitions back to regular after a second? 
+        // Call to the use identify thing that transitions back to regular after a second?
         <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText desktopStyle="bodyDefaultRegular">
