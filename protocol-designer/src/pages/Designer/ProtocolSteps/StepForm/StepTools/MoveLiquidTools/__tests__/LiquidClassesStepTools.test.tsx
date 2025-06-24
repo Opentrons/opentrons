@@ -1,10 +1,9 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../../../../assets/localization'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { i18n } from '../../../../../../../assets/localization'
 import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
-
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../../../../../step-forms/selectors')
@@ -47,7 +46,9 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     screen.getByText('80% ethanol')
 
     fireEvent.click(
-      screen.getByRole('label', { name: 'Aqueous (Deionized water) Deionized water' })
+      screen.getByRole('label', {
+        name: 'Aqueous (Deionized water) Deionized water',
+      })
     )
     expect(props.propsForFields.liquidClass.updateValue).toHaveBeenCalled()
   })
