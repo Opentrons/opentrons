@@ -56,3 +56,19 @@ rules:
       - test-edge-with-hypothesis.yaml
       - update-server-lint-test.yaml
       - usb-bridge-lint-test.yaml
+
+  cache-poisoning:
+    # todo(mm, 2025-06-24): Fix these violations.
+    #
+    # Cache poisoning allows an attacker to move from a workflow that's vulnerable but not highly-privileged,
+    # to a workflow that's ostensibly secure and more highly-privileged, often a deploy workflow.
+    #
+    # https://docs.zizmor.sh/audits/#cache-poisoning
+    ignore:
+      - components-test-build-deploy.yaml
+      - g-code-testing-lint-test.yaml
+      - ll-test-build-deploy.yaml
+      - opentrons-ai-client-test.yaml
+      - opentrons-ai-production-deploy.yaml
+      - shared-data-test-lint-deploy.yaml
+      - tag-releases.yaml
