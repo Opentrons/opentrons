@@ -94,9 +94,7 @@ const isValidProtocolFileName = (protocolFileName: string): boolean => {
 export function UpdateProtocol(): JSX.Element {
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
-  const { t }: { t: (key: string) => string } = useTranslation(
-    'protocol_generator'
-  )
+  const { t } = useTranslation('protocol_generator')
   const [headerState, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
   const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
@@ -148,7 +146,12 @@ export function UpdateProtocol(): JSX.Element {
     })
     setChatHistoryAtom([])
     setChatData([])
-  }, [])
+  }, [
+    setCreateProtocolChatAtom,
+    setUpdateProtocolChatAtom,
+    setChatHistoryAtom,
+    setChatData,
+  ])
 
   useEffect(() => {
     let progress = 0.0
@@ -176,6 +179,7 @@ export function UpdateProtocol(): JSX.Element {
     errorText,
     fileValue,
     setHeaderWithMeterAtom,
+    progressIncrement,
   ])
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>): void => {
@@ -186,31 +190,43 @@ export function UpdateProtocol(): JSX.Element {
     file: File & { name: string }
   ): Promise<void> => {
     if (isValidProtocolFileName(file.name)) {
-      const text = await file.text().catch(error => {
+      const text = await file.text().catch((error: unknown) => {
         console.error('Error reading file:', error)
-        setErrorText(t('python_file_read_error'))
+        setErrorText(String(t('python_file_read_error')))
+        return undefined
       })
 
       if (typeof text === 'string' && text !== '') {
         setErrorText(null)
         setPythonTextValue(text)
       } else {
-        setErrorText(t('file_length_error'))
+        setErrorText(String(t('file_length_error')))
       }
 
       setFile(file)
     } else {
-      setErrorText(t('python_file_type_error'))
+      setErrorText(String(t('python_file_type_error')))
       setFile(file)
+    }
+  }
+
+  function handleUpdateTypeSelect(value: string): void {
+    const selectedOption = updateOptions.find(option => option.value === value)
+    if (selectedOption != null) {
+      setUpdateType(selectedOption)
     }
   }
 
   function processDataAndNavigateToChat(): void {
     // Format the prompt for all update types
     const introText = t('modify_intro')
-    const originalCodeText = pythonText
-      ? t('modify_python_code') + `\`\`\`python\n` + pythonText + `\n\`\`\`\n\n`
-      : ''
+    const originalCodeText =
+      pythonText !== ''
+        ? t('modify_python_code') +
+          `\`\`\`python\n` +
+          pythonText +
+          `\n\`\`\`\n\n`
+        : ''
     const updateTypeText =
       t('modify_type_of_update') + updateType?.value + `\n\n`
     const detailsText = t('modify_details_of_change') + detailsValue + '\n'
@@ -321,12 +337,7 @@ export function UpdateProtocol(): JSX.Element {
                 name: t('update_option_select'),
               }
             }
-            onClick={(value: string) => {
-              const selectedOption = updateOptions.find(v => v.value === value)
-              if (selectedOption != null) {
-                setUpdateType(selectedOption)
-              }
-            }}
+            onClick={handleUpdateTypeSelect}
           />
         </Flex>
         <BodyText>{t('provide_details_of_changes')}</BodyText>

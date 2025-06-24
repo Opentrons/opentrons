@@ -75,7 +75,7 @@ export function Chat(): JSX.Element | null {
           gridGap={SPACING.spacing24}
         >
           <ChatDataContainer>
-            {isDirectChatAccess && (
+            {isDirectChatAccess ? (
               <ChatDisplay
                 chat={{
                   role: 'assistant',
@@ -84,14 +84,16 @@ export function Chat(): JSX.Element | null {
                 }}
                 chatId="welcome-message"
               />
-            )}
-            {chatData.map((chat, index) => (
-              <ChatDisplay
-                key={`prompt-from_${chat.role}_${index}`}
-                chat={chat}
-                chatId={`${chat.role}_${index}`}
-              />
-            ))}
+            ) : null}
+            {chatData.length > 0
+              ? chatData.map((chat, index) => (
+                  <ChatDisplay
+                    key={`prompt-from_${chat.role}_${index}`}
+                    chat={chat}
+                    chatId={`${chat.role}_${index}`}
+                  />
+                ))
+              : null}
           </ChatDataContainer>
         </Flex>
         <ChatFooter />

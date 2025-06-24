@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -80,7 +80,7 @@ describe('Landing', () => {
   it('should redirect to the new protocol page when the create a new protocol button is clicked', () => {
     render()
     const createProtocolButton = screen.getByText('Create a new protocol')
-    createProtocolButton.click()
+    fireEvent.click(createProtocolButton)
     expect(mockNavigate).toHaveBeenCalledWith('/new-protocol')
   })
 
@@ -89,21 +89,21 @@ describe('Landing', () => {
     const updateProtocolButton = screen.getByText(
       'Get help with an existing protocol'
     )
-    updateProtocolButton.click()
+    fireEvent.click(updateProtocolButton)
     expect(mockNavigate).toHaveBeenCalledWith('/update-protocol')
   })
 
   it('should redirect to the chat page when the go directly to chat link is clicked', () => {
     render()
     const chatLink = screen.getByText('Go directly to chat')
-    chatLink.click()
+    fireEvent.click(chatLink)
     expect(mockNavigate).toHaveBeenCalledWith('/chat')
   })
 
   it('should track new protocol event when new protocol button is clicked', () => {
     render()
     const createProtocolButton = screen.getByText('Create a new protocol')
-    createProtocolButton.click()
+    fireEvent.click(createProtocolButton)
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
       name: 'create-new-protocol',
@@ -116,7 +116,7 @@ describe('Landing', () => {
     const updateProtocolButton = screen.getByText(
       'Get help with an existing protocol'
     )
-    updateProtocolButton.click()
+    fireEvent.click(updateProtocolButton)
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
       name: 'update-protocol',
@@ -127,7 +127,7 @@ describe('Landing', () => {
   it('should track go-to-chat event when go directly to chat link is clicked', () => {
     render()
     const chatLink = screen.getByText('Go directly to chat')
-    chatLink.click()
+    fireEvent.click(chatLink)
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
       name: 'go-to-chat',
