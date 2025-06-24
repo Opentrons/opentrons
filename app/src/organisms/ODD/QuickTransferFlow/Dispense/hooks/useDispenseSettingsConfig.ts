@@ -4,6 +4,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -18,11 +19,13 @@ import type {
 interface UseDispenseSettingsConfigProps {
   state: QuickTransferSummaryState
   setSelectedSetting: (setting: DispenseSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useDispenseSettingsConfig({
   state,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -162,6 +165,26 @@ export function useDispenseSettingsConfig({
         } else {
           setSelectedSetting('dispense_blow_out')
         }
+      },
+    },
+    {
+      option: 'dispense_disposal_volume',
+      copy: t('disposal_volume'),
+      value:
+        state.disposalVolumeDispenseSettings != null
+          ? t('disposal_volume_label', {
+              volume: state.disposalVolumeDispenseSettings.volume,
+              location:
+                state.disposalVolumeDispenseSettings.blowOutLocation ===
+                SOURCE_WELL_BLOWOUT_DESTINATION
+                  ? t('blow_out_source_well')
+                  : t('trashBin'),
+              flowRate: state.disposalVolumeDispenseSettings.flowRate,
+            })
+          : '',
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting('dispense_disposal_volume')
       },
     },
     {

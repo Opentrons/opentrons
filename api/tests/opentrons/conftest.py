@@ -787,7 +787,13 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
-        "locatingFeaturesAsParent": {},
+        "features": {},
+        "extents": {
+            "total": {
+                "backLeftBottom": {"x": -5, "y": -10, "z": -15},
+                "frontRightTop": {"x": 15, "y": -20, "z": 30},
+            },
+        },
         "dimensions": {
             "bareOverallHeight": 84,
             "overLabwareHeight": 0,

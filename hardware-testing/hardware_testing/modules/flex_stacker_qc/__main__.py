@@ -15,22 +15,27 @@ from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
-from .driver import FlexStackerInterface, PlatformState
+from .utils import find_stacker_port, get_estop
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
+from opentrons.hardware_control.modules.types import PlatformState
 
 
 async def build_stacker_report(
     is_simulating: bool,
-) -> Tuple[CSVReport, FlexStackerInterface]:
+) -> Tuple[CSVReport, FlexStacker]:
     """Report setup for FLEX Stacker qc script."""
     test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
 
-    stacker = (
-        await FlexStackerInterface.build_simulator()
-        if is_simulating
-        else await FlexStackerInterface.build()
+    port = "" if is_simulating else find_stacker_port()
+    stacker = await FlexStacker.build(
+        port=port,
+        usb_port=USBPort(port, 0),
+        hw_control_loop=asyncio.get_running_loop(),
+        simulating=is_simulating,
+        sim_serial_number="FLEX1234" if is_simulating else None,
     )
-
     report = build_report(test_name)
     report.set_operator(
         "simulating" if is_simulating else input("enter OPERATOR name: ")
@@ -48,19 +53,21 @@ async def _main(cfg: TestConfig) -> None:
         # Perform initial checks before starting tests
         # 1. estop should not be pressed
         # 2. platform should be removed
-        if await stacker.get_estop():
+        if await get_estop(stacker):
             ui.print_error("ESTOP is pressed, please release it before starting")
             ui.get_user_ready("Release ESTOP")
-            if stacker.get_estop():
+            if await get_estop(stacker):
                 ui.print_error("ESTOP is still pressed, cannot start tests")
                 return
 
         # TODO: This check should be in the basic axes tests
-        platform_state = await stacker.get_platform_state()
-        if platform_state is not PlatformState.UNKNOWN:
+        await stacker.home_all()
+        await stacker._reader.read()
+        if stacker.platform_state is not PlatformState.UNKNOWN:
             ui.print_error("Platform must be removed from the carrier before starting")
-            ui.get_user_ready("Remove platform from {platform_state.value}")
-            if await stacker.get_platform_state() is not PlatformState.UNKNOWN:
+            ui.get_user_ready(f"Remove platform from {stacker.platform_state.value}")
+            await stacker._reader.get_platform_sensor_state()
+            if stacker.platform_state is not PlatformState.UNKNOWN:
                 ui.print_error("Platform is still detected, cannot start tests")
                 return
 

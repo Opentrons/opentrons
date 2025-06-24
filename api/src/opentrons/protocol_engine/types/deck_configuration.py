@@ -55,7 +55,7 @@ class AddressableArea:
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
-    locating_features_as_parent: LocatingFeatures
+    features: LocatingFeatures
 
 
 # TODO make the below some sort of better type

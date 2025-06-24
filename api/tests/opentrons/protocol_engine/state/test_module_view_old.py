@@ -26,7 +26,7 @@ from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedModule,
@@ -360,59 +360,59 @@ def test_get_properties_by_id(
         (
             lazy_fixture("tempdeck_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-0.15, y=-0.15, z=80.09),
+            Point(x=-0.15, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-1.45, y=-0.15, z=80.09),
+            Point(x=-1.45, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=1.15, y=-0.15, z=80.09),
+            Point(x=1.15, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("magdeck_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=0.125, y=-0.125, z=82.25),
+            Point(x=0.125, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("magdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-1.175, y=-0.125, z=82.25),
+            Point(x=-1.175, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("magdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=1.425, y=-0.125, z=82.25),
+            Point(x=1.425, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=82.56, z=97.8),
+            Point(x=0, y=82.56, z=97.8),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=68.8, z=108.96),
+            Point(x=0, y=68.8, z=108.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-0.125, y=1.125, z=68.275),
+            Point(x=-0.125, y=1.125, z=68.275),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=0.125, y=-1.125, z=68.275),
+            Point(x=0.125, y=-1.125, z=68.275),
         ),
     ],
 )
 def test_get_module_offset_for_ot2_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
-    expected_offset: LabwareOffsetVector,
+    expected_offset: Point,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(

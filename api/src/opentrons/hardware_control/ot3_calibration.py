@@ -802,6 +802,7 @@ async def calibrate_gripper(
     offset = gripper_pin_offsets_mean(front=offset_front, rear=offset_rear)
     LOG.info(f"Gripper calibration offset: {offset}")
     await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
+    await hcapi.home_gripper_jaw(recalibrate_jaw_width=True)
     return offset
 
 
