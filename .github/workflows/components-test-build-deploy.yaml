@@ -216,9 +216,11 @@ jobs:
         run: make -C components build-ts
       # replace package.json stub version number with version from tag
       - name: 'set version number'
+        env:
+          REF: ${{ github.ref }}
         run: |
           npm install -g json
-          VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
+          VERSION_STRING=$(echo "$REF" | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"

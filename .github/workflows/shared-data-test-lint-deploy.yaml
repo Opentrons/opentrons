@@ -267,9 +267,11 @@ jobs:
           make -C shared-data lib-js
       # replace package.json stub version number with version from tag
       - name: 'set version number'
+        env:
+          REF: ${{ github.ref }}
         run: |
           npm install -g json
-          VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
+          VERSION_STRING=$(echo "$REF" | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
           cd ./shared-data
       - uses: 'actions/setup-node@v4'
