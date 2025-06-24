@@ -12,10 +12,12 @@ from opentrons.protocol_api.module_contexts import (
 )
 from abr_testing.protocols import helpers
 
+
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
     "protocolName": "Flex ZymoBIOMICS Magbead DNA Extraction: Cells",
 }
+
 
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 """
@@ -30,6 +32,9 @@ Slot D1: H-S with Nest 96 Well Deepwell and DW Adapter
 Slot D2: Nest 12 well 15 ml Reservoir
 Slot D3: Trash
 
+
+
+
 Reservoir 1:
 Well 1 - 12,320 ul
 Wells 2-4 - 11,875 ul
@@ -37,8 +42,14 @@ Wells 5-6 - 13,500 ul
 Wells 7-8 - 13,500 ul
 Well 12 - 5,200 ul
 
+
+
+
 Reservoir 2:
 Wells 1-12 - 9,000 ul
+
+
+
 
 """
 whichwash = 0
@@ -135,7 +146,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_290ml", "B3", "Liquid Waste"
+        "opentrons_tough_1_reservoir_300ml", "B3", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0].top()
     res1 = protocol.load_labware(res_type, "D2", "reagent reservoir 1")
@@ -411,8 +422,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         for i, m in enumerate(samples_m):
             src = source[whichwash]
             for n in range(num_trans):
-                if m1000.current_volume > 0:
-                    m1000.dispense(m1000.current_volume, src.top())
+                if vol_per_trans > src.current_liquid_height():
+                    vol_per_trans = src.current_liquid_height() - 100  # type: ignore[assignment]
                 m1000.transfer(
                     vol_per_trans,
                     src.meniscus(z=meniscus_z, target="end"),
@@ -494,6 +505,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     all_washes = res2.wells()[1:]
     elution_solution = res2.wells()[0]
     all_washes.extend(res3.wells()[:2])
+    res3.load_empty(res3.wells()[2:])
     samples_m = sample_plate.rows()[0][:num_cols]
     elution_samples_m = elutionplate.rows()[0][:num_cols]
     # Redefine per well for liquid definitions
@@ -509,11 +521,11 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     try:
         elutionplate.load_empty(elutionplate.wells())
         if probe_height_bool:
-            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
-        else:
             helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, m1000
             )
+        else:
+            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
 
         m1000.flow_rate.aspirate = 300
         m1000.flow_rate.dispense = 300

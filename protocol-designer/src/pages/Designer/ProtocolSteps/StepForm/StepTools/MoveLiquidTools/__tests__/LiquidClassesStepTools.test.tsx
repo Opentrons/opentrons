@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { WATER_LIQUID_CLASS_NAME } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../../assets/localization'
 import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
@@ -34,7 +36,11 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
       },
       formData: { liquidClass: 'none' } as any,
       orderedLiquidClassOptions: [
-        { name: 'mockname', value: 'waterV1', subButtonLabel: '' },
+        {
+          name: 'mockname',
+          value: WATER_LIQUID_CLASS_NAME,
+          subButtonLabel: '',
+        },
       ],
       type: 'transfer',
     }

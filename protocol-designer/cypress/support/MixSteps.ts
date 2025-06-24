@@ -19,8 +19,10 @@ enum MixContent {
   ChooseOption = 'Choose option',
   Reservoir = 'Axygen 1 Well Reservoir 90 mL',
   WellPlate = 'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt',
-  PartOne = 'Part 1 / 2',
-  PartTwo = 'Part 2 / 2',
+  PartOne = 'Part 1 / 3',
+  PartTwo = 'Part 2 / 3',
+  PartThree = 'Part 3 / 3',
+  ApplyLiquidClass = 'Apply liquid class settings for this mix',
   WellSelectTitle = 'Select wells using a Flex 1-Channel 1000 µL',
   ClickAndDragWellSelect = 'Click and drag to select wells',
   PipettePreselect = 'Flex 1-Channel 1000 µL',
@@ -177,8 +179,14 @@ export const MixSteps = {
       cy.contains(MixContent.OnceAtStartStep)
         .should('exist')
         .should('be.visible')
-      cy.contains(MixContent.PerSourceWell).should('exist').should('be.visible')
-      cy.contains(MixContent.PerDestWell).should('exist').should('be.visible')
+      cy.contains(MixContent.PerSourceWell)
+        .scrollIntoView()
+        .should('exist')
+        .should('be.visible')
+      cy.contains(MixContent.PerDestWell)
+        .scrollIntoView()
+        .should('exist')
+        .should('be.visible')
       cy.contains(MixContent.Never).should('exist').should('be.visible')
       cy.contains(MixContent.OnceAtStartStep).click()
     },
@@ -451,6 +459,17 @@ export const MixVerifications = {
     },
   }),
 
+  PartTwo: (): StepThunk => ({
+    call: () => {
+      cy.contains(MixContent.PartTwo).should('exist').should('be.visible')
+      cy.contains(MixContent.Mix).should('exist').should('be.visible')
+      cy.contains(MixContent.ApplyLiquidClass)
+        .should('exist')
+        .should('be.visible')
+      cy.get(MixLocators.Continue).should('exist').should('be.visible')
+    },
+  }),
+
   /**
    * "Verify labware image and available wells"
    */
@@ -473,9 +492,9 @@ export const MixVerifications = {
   /**
    * "Verify Part 2, the configuration of asp settings and check go back and save button"
    */
-  PartTwoAsp: (): StepThunk => ({
+  PartThreeAsp: (): StepThunk => ({
     call: () => {
-      cy.contains(MixContent.PartTwo).should('exist').should('be.visible')
+      cy.contains(MixContent.PartThree).should('exist').should('be.visible')
       cy.contains(MixContent.Mix).should('exist').should('be.visible')
       cy.get(MixLocators.Aspirate).should('exist').should('be.visible')
       cy.contains(MixContent.AspFlowRate).should('exist').should('be.visible')
@@ -558,9 +577,9 @@ export const MixVerifications = {
   /**
    * "Verify Part 2, the configuration of dispense settings and check go back and save button"
    */
-  PartTwoDisp: (): StepThunk => ({
+  PartThreeDisp: (): StepThunk => ({
     call: () => {
-      cy.contains(MixContent.PartTwo).should('exist').should('be.visible')
+      cy.contains(MixContent.PartThree).should('exist').should('be.visible')
       cy.contains(MixContent.Mix).should('exist').should('be.visible')
       cy.get(MixLocators.Aspirate).should('exist').should('be.visible')
       cy.get(MixLocators.Dispense).should('exist').should('be.visible')

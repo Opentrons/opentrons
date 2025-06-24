@@ -67,6 +67,7 @@ from .flex_protocol import (
     FlexBackend,
 )
 
+
 log = logging.getLogger(__name__)
 
 AXIS_TO_SUBSYSTEM = {
@@ -227,12 +228,6 @@ class OT3Simulator(FlexBackend):
             log.debug("Simulating restoring system constraints")
 
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
-        self._sim_gantry_load = gantry_load
-
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
         self._sim_gantry_load = gantry_load
 
     def update_constraints_for_plunger_acceleration(
@@ -877,3 +872,29 @@ class OT3Simulator(FlexBackend):
 
     async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
         pass
+
+    async def read_env_temp_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0
+
+    async def read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0

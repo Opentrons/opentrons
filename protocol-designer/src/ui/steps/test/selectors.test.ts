@@ -447,10 +447,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
-        blowout_z_offset: {
-          isIndeterminate: false,
-          value: undefined,
-        },
         aspirate_wells: {
           isIndeterminate: true,
         },
@@ -512,10 +508,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         aspirate_delay_seconds: {
           value: '2',
-          isIndeterminate: false,
-        },
-        aspirate_delay_mmFromBottom: {
-          value: '1',
           isIndeterminate: false,
         },
         aspirate_airGap_checkbox: {
@@ -609,10 +601,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         dispense_delay_seconds: {
           value: '1',
-          isIndeterminate: false,
-        },
-        dispense_delay_mmFromBottom: {
-          value: '0.5',
           isIndeterminate: false,
         },
         dispense_airGap_checkbox: {
@@ -875,10 +863,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
-        blowout_z_offset: {
-          isIndeterminate: false,
-          value: undefined,
-        },
         preWetTip: {
           isIndeterminate: true,
         },
@@ -915,10 +899,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
         aspirate_delay_seconds: {
           isIndeterminate: false,
           value: '2',
-        },
-        aspirate_delay_mmFromBottom: {
-          isIndeterminate: false,
-          value: '1',
         },
         aspirate_airGap_checkbox: {
           isIndeterminate: true,
@@ -1003,10 +983,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: {
           isIndeterminate: false,
           value: '1',
-        },
-        dispense_delay_mmFromBottom: {
-          isIndeterminate: false,
-          value: '0.5',
         },
         dispense_airGap_checkbox: {
           isIndeterminate: true,
@@ -1279,7 +1255,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           blowout_checkbox: true,
           blowout_location: 'some_blowout_location',
           mix_mmFromBottom: 2,
-          pipette: 'other_pipette_id',
+          pipette: 'some_pipette_id',
           wells: ['A2'],
           aspirate_flowRate: '11.1',
           dispense_flowRate: '11.2',
@@ -1316,7 +1292,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_checkbox: { isIndeterminate: true },
         blowout_location: { isIndeterminate: true },
         mix_mmFromBottom: { isIndeterminate: true },
-        pipette: { isIndeterminate: true },
+        pipette: { isIndeterminate: false, value: 'some_pipette_id' },
         wells: { isIndeterminate: true },
         aspirate_flowRate: { isIndeterminate: true },
         dispense_flowRate: { isIndeterminate: true },

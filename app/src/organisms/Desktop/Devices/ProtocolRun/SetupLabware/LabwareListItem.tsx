@@ -27,6 +27,7 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
+  getLabwareViewBox,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -46,7 +47,7 @@ import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
@@ -390,15 +391,16 @@ const LabwareThumbnail = styled.svg`
 `
 
 function StandaloneLabware(props: {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
+
   return (
-    <LabwareThumbnail
-      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
-    >
+    <LabwareThumbnail viewBox={`${minX} ${minY} ${xDimension} ${yDimension}`}>
       <LabwareRender
         definition={definition}
+        positioningMode="passThrough"
         wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
       />
     </LabwareThumbnail>

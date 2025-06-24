@@ -194,8 +194,7 @@ export const updateInitialDeckState = (
           ? getLabwareNotCompatibleWithModule(
               matchingModuleForAboveStaging.type,
               labwareOnDeck,
-              value.cutoutId,
-              'A1'
+              value.cutoutId
             )
           : null
       //  if deleting staging area where labware is in 4th column slot
@@ -347,8 +346,7 @@ export const updateInitialDeckState = (
         const labwareNotCompatible = getLabwareNotCompatibleWithModule(
           type,
           labwareOnDeck,
-          value.cutoutId,
-          'A1'
+          value.cutoutId
         )
         const slot = value.cutoutId.split('cutout')[1]
         //   creating module

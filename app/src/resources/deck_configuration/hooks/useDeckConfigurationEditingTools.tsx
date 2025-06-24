@@ -4,11 +4,7 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
+  getReplacementFixtureForFixtureRemoval,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -18,15 +14,22 @@ import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/A
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
 import type { ReactNode } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
+  CutoutId,
+} from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 interface DeckConfigurationEditingTools {
-  addFixtureToCutout: (cutoutId: CutoutId) => void
+  addFixtureToCutout: (
+    cutoutId: CutoutId,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -40,22 +43,27 @@ export function useDeckConfigurationEditingTools(
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
+  const [
+    addressableAreaId,
+    setAddressableAreaId,
+  ] = useState<AddressableAreaNamesWithFakes | null>(null)
 
-  const addFixtureToCutout = (cutoutId: CutoutId): void => {
+  const addFixtureToCutout = (
+    cutoutId: CutoutId,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ): void => {
     setTargetCutoutId(cutoutId)
+    setAddressableAreaId(addressableAreaId)
   }
 
   const removeFixtureFromCutout = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureId
+    cutoutFixtureId: CutoutFixtureIdsWithFakes
   ): void => {
-    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-    }
-
+    const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
+      cutoutFixtureId,
+      cutoutId
+    )
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}
@@ -98,9 +106,10 @@ export function useDeckConfigurationEditingTools(
     addFixtureToCutout,
     removeFixtureFromCutout,
     addFixtureModal:
-      targetCutoutId != null ? (
+      targetCutoutId != null && addressableAreaId != null ? (
         <AddFixtureModal
           cutoutId={targetCutoutId}
+          addressableAreaId={addressableAreaId}
           closeModal={() => {
             setTargetCutoutId(null)
           }}

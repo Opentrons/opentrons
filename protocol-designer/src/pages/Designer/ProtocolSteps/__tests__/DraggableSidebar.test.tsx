@@ -39,6 +39,7 @@ describe('DraggableSidebar', () => {
   beforeEach(() => {
     props = {
       setTargetWidth: mockSetTargetWidth,
+      showLiquidOverflowMenu: vi.fn(),
     }
     vi.mocked(getFileMetadata).mockReturnValue({
       protocolName: 'mock protocolName',

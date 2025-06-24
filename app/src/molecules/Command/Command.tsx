@@ -18,7 +18,7 @@ import { CommandIcon } from './CommandIcon'
 
 import type { CommandTextData, StyleProps } from '@opentrons/components'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -41,7 +41,7 @@ interface SkeletonCommandProps extends FundamentalProps {
 interface NonSkeletonCommandProps extends FundamentalProps {
   state: NonSkeletonCommandState
   command: RunTimeCommand
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData
 }
 

@@ -9,7 +9,7 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { flowRate, pipetteId, volume } = args
+  const { flowRate, pipetteId, volume, correctionVolume } = args
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
   if (!pipetteSpec) {
@@ -30,6 +30,7 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
         flowRate,
         pipetteId,
         volume,
+        ...(correctionVolume != null ? { correctionVolume } : {}),
       },
     },
   ]
@@ -39,6 +40,7 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
       `volume=${volume}`,
       `in_place=True`,
       `flow_rate=${flowRate}`,
+      // Note that correction volume is not supported in our public atomic liquid handling APIs
     ].join(', ')})`,
   }
 }

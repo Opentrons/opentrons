@@ -1,19 +1,13 @@
-import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../helix-design-system'
 import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
 import type { CSSProperties } from 'styled-components'
 import type { SVGProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
-export interface LabwareOutlineProps {
-  /** Labware definition to outline */
-  definition?: LabwareDefinition2
-  /** x dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 127.76 */
-  width?: number
-  /** y dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 85.48 */
-  height?: number
+export type LabwareOutlineProps = {
   /** if this labware is a tip rack, darken background and lighten borderx dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to false */
   isTiprack?: boolean
   /** adds thicker blue border with blur to labware, defaults to false */
@@ -24,6 +18,24 @@ export interface LabwareOutlineProps {
   stroke?: CSSProperties['stroke']
   fill?: CSSProperties['fill']
   showRadius?: boolean
+} & (DefinitionProps | DefinitionReplacementProps)
+
+interface DefinitionProps {
+  /** Labware definition to outline */
+  definition: LabwareDefinition
+}
+
+/** Used for rendering an outline without needing a full labware definition. */
+interface DefinitionReplacementProps {
+  definition?: undefined
+  /** x dimension in mm of the outline. */
+  width: number
+  /** y dimension in mm of the outline. */
+  height: number
+  /** minimum x-coordinate (i.e. the left side) of the outline. */
+  minX: number
+  /** minimum y-coordinate (i.e. the bottom) of the outline. */
+  minY: number
 }
 
 const OUTLINE_THICKNESS_MM = 1
@@ -31,8 +43,6 @@ const OUTLINE_THICKNESS_MM = 1
 export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   const {
     definition,
-    width = SLOT_RENDER_WIDTH,
-    height = SLOT_RENDER_HEIGHT,
     isTiprack = false,
     highlight = false,
     highlightShadow = false,
@@ -40,10 +50,18 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     fill,
     showRadius = true,
   } = props
-  const {
-    parameters = { isTiprack, loadName: '' },
-    dimensions = { xDimension: width, yDimension: height },
-  } = definition ?? {}
+
+  const { minX, minY, xDimension, yDimension } =
+    definition != null
+      ? getLabwareViewBox(definition)
+      : {
+          minX: props.minX,
+          minY: props.minY,
+          xDimension: props.width,
+          yDimension: props.height,
+        }
+
+  const { parameters = { isTiprack, loadName: '' } } = definition ?? {}
 
   let backgroundFill
   if (fill != null) {
@@ -86,8 +104,10 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           </defs>
           <LabwareBorder
             borderThickness={2.2 * OUTLINE_THICKNESS_MM}
-            xDimension={dimensions.xDimension}
-            yDimension={dimensions.yDimension}
+            minX={minX}
+            minY={minY}
+            xDimension={xDimension}
+            yDimension={yDimension}
             filter={highlightShadow ? 'url(#feOffset)' : ''}
             stroke={COLORS.blue50}
             rx="8"
@@ -99,8 +119,10 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
       ) : (
         <LabwareBorder
           borderThickness={OUTLINE_THICKNESS_MM}
-          xDimension={dimensions.xDimension}
-          yDimension={dimensions.yDimension}
+          minX={minX}
+          minY={minY}
+          xDimension={xDimension}
+          yDimension={yDimension}
           stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black90)}
           fill={backgroundFill}
           showRadius={showRadius}
@@ -112,6 +134,8 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
 
 interface LabwareBorderProps extends SVGProps<SVGRectElement> {
   borderThickness: number
+  minX: number
+  minY: number
   xDimension: number
   yDimension: number
   showRadius?: boolean
@@ -119,6 +143,8 @@ interface LabwareBorderProps extends SVGProps<SVGRectElement> {
 function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   const {
     borderThickness,
+    minX,
+    minY,
     xDimension,
     yDimension,
     showRadius = true,
@@ -126,8 +152,8 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   } = props
   return (
     <rect
-      x={borderThickness}
-      y={borderThickness}
+      x={minX + borderThickness}
+      y={minY + borderThickness}
       strokeWidth={2 * borderThickness}
       width={xDimension - 2 * borderThickness}
       height={yDimension - 2 * borderThickness}

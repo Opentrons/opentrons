@@ -32,7 +32,7 @@ import { StopButton } from './StopButton'
 import type { RunCommandSummary, RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -124,7 +124,7 @@ interface CurrentRunningProtocolCommandProps {
   lastAnimatedCommand: string | null
   lastRunCommand: RunCommandSummary | null
   updateLastAnimatedCommand: (newCommandKey: string) => void
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
   protocolName?: string
   currentRunCommandIndex?: number
 }

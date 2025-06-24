@@ -15,6 +15,8 @@ import {
 
 import type {
   LabwareBrand as Brand,
+  // todo(mm, 2025-05-13): We probably want these functions to be able to emit
+  // LabwareDefinition3, too. https://opentrons.atlassian.net/browse/EXEC-1491
   LabwareDefinition2 as Definition,
   LabwareDimensions as Dimensions,
   LabwareWellProperties as InputWell,
@@ -57,6 +59,8 @@ type InputWellGroup = Omit<WellGroup, 'wells'>
 export interface BaseLabwareProps {
   metadata: Metadata
   parameters: InputParams
+  // todo(mm, 2025-05-13): dimensions is currently coupled to LabwareDefinition2.
+  // Replace it with something that works with LabwareDefinition3.
   dimensions: Dimensions
   brand?: Brand
   version?: number

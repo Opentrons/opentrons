@@ -23,7 +23,6 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
     formData,
     toolboxStep,
     showFormErrors = true,
-    visibleFormErrors,
     focusedField,
     setShowFormErrors,
   } = props
@@ -76,7 +75,6 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
         propsForFields={propsForFields}
         formData={formData}
         showFormErrors={showFormErrors}
-        visibleFormErrors={visibleFormErrors}
         focusedField={focusedField}
         paddingY={SPACING.spacing16}
       />
@@ -91,7 +89,6 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
         <ProfileSettings
           propsForFields={propsForFields}
           showFormErrors={showFormErrors}
-          visibleFormErrors={visibleFormErrors}
           focusedField={focusedField}
         />
         <Divider marginY="0" />
@@ -106,7 +103,6 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
           formData={formData}
           isHold
           showFormErrors={showFormErrors}
-          visibleFormErrors={visibleFormErrors}
           focusedField={focusedField}
         />
       </Flex>

@@ -47,6 +47,7 @@ interface SelectedPipetteModalProps extends WizardTileProps {
   setPipetteGen: Dispatch<SetStateAction<'flex' | Gen>>
   setPipetteVolume: Dispatch<SetStateAction<string | null>>
   setPipetteType: Dispatch<SetStateAction<PipetteType | null>>
+  setSelectedPipetteName: Dispatch<SetStateAction<string | null>>
 }
 
 export function SelectPipetteModal(
@@ -63,6 +64,7 @@ export function SelectPipetteModal(
     setPipetteGen,
     setPipetteVolume,
     setPipetteType,
+    setSelectedPipetteName,
   } = props
   const { t } = useTranslation(['onboarding', 'shared'])
   const pipettesByMount = watch('pipettesByMount')
@@ -92,11 +94,6 @@ export function SelectPipetteModal(
       (pipettesByMount.right.tiprackDefURI == null ||
         pipettesByMount.right.tiprackDefURI.length === 0))
 
-  const handleProceed = (): void => {
-    setValue(`pipettesByMount.${mount}.pipetteName`, selectedPipetteName)
-    handleBack()
-  }
-
   if (robotType == null) {
     return null
   }
@@ -124,7 +121,12 @@ export function SelectPipetteModal(
             <SecondaryButton onClick={handleBack}>
               {t('shared:cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={handleProceed} disabled={isDisabled}>
+            <PrimaryButton
+              onClick={() => {
+                setSelectedPipetteName(selectedPipetteName)
+              }}
+              disabled={isDisabled}
+            >
               {t('shared:save')}
             </PrimaryButton>
           </Flex>

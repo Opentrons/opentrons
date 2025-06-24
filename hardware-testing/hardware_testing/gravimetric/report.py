@@ -78,77 +78,6 @@ class EnvironmentReportState(str, Enum):
     MAX = "environment-max"
 
 
-def create_csv_test_report_photometric(
-    volumes: List[float], trials: int, name: str, run_id: str
-) -> CSVReport:
-    """Create CSV test report."""
-    env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
-    meas_vols: List[Tuple[int, int, int]] = []
-
-    for vol in volumes:
-        meas_vols += [
-            (
-                vol,  # type: ignore[misc]
-                0,
-                trial,
-            )
-            for trial in range(trials)
-        ]
-
-    report = CSVReport(
-        test_name=name,
-        run_id=run_id,
-        sections=[
-            CSVSection(
-                title="SERIAL-NUMBERS",
-                lines=[
-                    CSVLine("robot", [str]),
-                    CSVLine("pipette", [str]),
-                    CSVLine("tips_20ul", [str]),
-                    CSVLine("tips_50ul", [str]),
-                    CSVLine("tips_200ul", [str]),
-                    CSVLine("tips_1000ul", [str]),
-                    CSVLine("environment", [str]),
-                    CSVLine("liquid", [str]),
-                ],
-            ),
-            CSVSection(
-                title="CONFIG",
-                lines=[
-                    CSVLine(field.name, [str])  # just convert to a string, always
-                    for field in fields(config.PhotometricConfig)
-                    if field.name not in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT
-                ],
-            ),
-            CSVSection(
-                title="MEASUREMENTS",
-                lines=[
-                    CSVLine(
-                        create_measurement_tag(measurement, volume, channel, trial)
-                        + f"-{e}",
-                        [float],
-                    )
-                    for volume, channel, trial in meas_vols
-                    for measurement in MeasurementType
-                    for e in env_info
-                    if volume is not None or trial < config.NUM_BLANK_TRIALS
-                ],
-            ),
-        ],
-    )
-    return report
-
-
-def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
-    """Store the config file list."""
-    for field in fields(config.PhotometricConfig):
-        if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
-            continue
-        val_str = str(getattr(cfg, field.name)).replace(" ", "")
-        val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
-        report("CONFIG", field.name, [val_str])
-
-
 def create_csv_test_report(
     volumes: List[float],
     pipette_channels: int,
@@ -312,34 +241,6 @@ def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
         val_str = str(getattr(cfg, field.name)).replace(" ", "")
         val_str = val_str.replace("[", "").replace("]", "").replace(",", "-")
         report("CONFIG", field.name, [val_str])
-
-
-def store_serial_numbers_pm(
-    report: CSVReport,
-    robot: str,
-    pipette: str,
-    tips: Dict[str, str],
-    environment: str,
-    liquid: str,
-) -> None:
-    """Report serial numbers."""
-    report("SERIAL-NUMBERS", "robot", [robot])
-    report("SERIAL-NUMBERS", "pipette", [pipette])
-    for tip in tips.keys():
-        report("SERIAL-NUMBERS", tip, [tips[tip]])
-    report("SERIAL-NUMBERS", "environment", [environment])
-    report("SERIAL-NUMBERS", "liquid", [liquid])
-
-
-def store_measurements_pm(
-    report: CSVReport,
-    tag: str,
-    data: EnvironmentData,
-) -> None:
-    """Report measurement."""
-    for field in fields(EnvironmentData):
-        f_tag = field.name.replace("_", "-")
-        report("MEASUREMENTS", f"{tag}-{f_tag}", [getattr(data, field.name)])
 
 
 def store_serial_numbers(

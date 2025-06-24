@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List
+from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TransferProperties as SharedDataTransferProperties,
     AspirateProperties as SharedDataAspirateProperties,
     SingleDispenseProperties as SharedDataSingleDispenseProperties,
     MultiDispenseProperties as SharedDataMultiDispenseProperties,
@@ -23,12 +24,12 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
     Coordinate,
 )
-
 from . import validation
 
 
 class LiquidHandlingPropertyByVolume:
     def __init__(self, by_volume_property: Sequence[Tuple[float, float]]) -> None:
+        self._initial_properties_by_volume = by_volume_property
         self._properties_by_volume: Dict[float, float] = {
             float(volume): value for volume, value in by_volume_property
         }
@@ -61,6 +62,11 @@ class LiquidHandlingPropertyByVolume:
                 interp(validated_volume, self._sorted_volumes, self._sorted_values)
             )
 
+    def set_for_all_volumes(self, value: float) -> None:
+        """Override all existing volume-dependent values with the given value."""
+        self.clear_values()
+        self.set_for_volume(0, value)
+
     def set_for_volume(self, volume: float, value: float) -> None:
         """Add a new volume and value for the property for the interpolation curve."""
         validated_volume = validation.ensure_positive_float(volume)
@@ -73,6 +79,17 @@ class LiquidHandlingPropertyByVolume:
             del self._properties_by_volume[volume]
         except KeyError:
             raise KeyError(f"No value set for volume {volume} uL")
+        self._sort_volume_and_values()
+
+    def clear_values(self) -> None:
+        """Removes all existing volume and value pairs from the curve."""
+        self._properties_by_volume = {}
+
+    def reset_values(self) -> None:
+        """Resets volumes and values to the default."""
+        self._properties_by_volume = {
+            float(volume): value for volume, value in self._initial_properties_by_volume
+        }
         self._sort_volume_and_values()
 
     def _sort_volume_and_values(self) -> None:
@@ -98,16 +115,28 @@ class TipPosition:
         return self._position_reference
 
     @position_reference.setter
-    def position_reference(self, new_position: str) -> None:
-        self._position_reference = PositionReference(new_position)
+    def position_reference(self, new_position: Union[str, PositionReference]) -> None:
+        self._position_reference = (
+            new_position
+            if isinstance(new_position, PositionReference)
+            else PositionReference(new_position)
+        )
 
     @property
     def offset(self) -> Coordinate:
         return self._offset
 
     @offset.setter
-    def offset(self, new_offset: Sequence[float]) -> None:
-        x, y, z = validation.validate_coordinates(new_offset)
+    def offset(self, new_offset: Union[Sequence[float], Coordinate]) -> None:
+        if isinstance(new_offset, Coordinate):
+            new_coordinate: Sequence[Union[int, float]] = [
+                new_offset.x,
+                new_offset.y,
+                new_offset.z,
+            ]
+        else:
+            new_coordinate = new_offset
+        x, y, z = validation.validate_coordinates(new_coordinate)
         self._offset = Coordinate(x=x, y=y, z=z)
 
     def as_shared_data_model(self) -> SharedDataTipPosition:
@@ -766,12 +795,20 @@ def build_multi_dispense_properties(
 
 
 def build_transfer_properties(
-    by_tip_type_setting: SharedByTipTypeSetting,
+    transfer_properties: Union[SharedDataTransferProperties, SharedByTipTypeSetting],
 ) -> TransferProperties:
+    if isinstance(transfer_properties, SharedByTipTypeSetting):
+        _transfer_properties = SharedDataTransferProperties(
+            aspirate=transfer_properties.aspirate,
+            singleDispense=transfer_properties.singleDispense,
+            multiDispense=transfer_properties.multiDispense,
+        )
+    else:
+        _transfer_properties = transfer_properties
     return TransferProperties(
-        _aspirate=build_aspirate_properties(by_tip_type_setting.aspirate),
-        _dispense=build_single_dispense_properties(by_tip_type_setting.singleDispense),
+        _aspirate=build_aspirate_properties(_transfer_properties.aspirate),
+        _dispense=build_single_dispense_properties(_transfer_properties.singleDispense),
         _multi_dispense=build_multi_dispense_properties(
-            by_tip_type_setting.multiDispense
+            _transfer_properties.multiDispense
         ),
     )

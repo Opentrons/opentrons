@@ -19,6 +19,7 @@ import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { Modules } from '@opentrons/api-client'
 import type {
+  AddressableAreaNamesWithFakes,
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -62,6 +63,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
     props = {
       cutoutId: 'cutoutD3',
       runId: 'mockRunId',
+      addressableAreaId: 'D3' as AddressableAreaNamesWithFakes,
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],
     }

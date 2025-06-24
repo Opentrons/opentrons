@@ -15,7 +15,7 @@ from opentrons.protocols.advanced_control.transfers.common import (
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_transfer_with_volume_more_than_tip_max(
     simulated_protocol_context: ProtocolContext,
@@ -40,7 +40,7 @@ def test_water_transfer_with_volume_more_than_tip_max(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with mock.patch.object(
         InstrumentCore,
         "pick_up_tip",
@@ -87,7 +87,7 @@ def test_water_transfer_with_volume_more_than_tip_max(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps(
     simulated_protocol_context: ProtocolContext,
@@ -112,7 +112,7 @@ def test_order_of_water_transfer_steps(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -238,7 +238,7 @@ def test_order_of_water_transfer_steps(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_new_tip_per_destination(
     simulated_protocol_context: ProtocolContext,
@@ -255,7 +255,7 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
         "nest_96_wellplate_200ul_flat", "C3"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -357,7 +357,7 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -382,7 +382,7 @@ def test_order_of_water_transfer_steps_with_return_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -512,7 +512,7 @@ def test_order_of_water_transfer_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_transfer_steps_with_no_new_tips(
     simulated_protocol_context: ProtocolContext,
@@ -537,7 +537,7 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     pipette_50.pick_up_tip()
     with (
         mock.patch.object(
@@ -639,10 +639,12 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
+@pytest.mark.parametrize("new_tip", ["once", "always"])
 def test_order_of_water_consolidate_steps(
     simulated_protocol_context: ProtocolContext,
+    new_tip: TransferTipPolicyV2Type,
 ) -> None:
     """It should run the consolidate steps without any errors.
 
@@ -664,7 +666,7 @@ def test_order_of_water_consolidate_steps(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -708,7 +710,7 @@ def test_order_of_water_consolidate_steps(
             volume=25,
             source=nest_plate.rows()[0][:2],
             dest=arma_plate.wells()[0],
-            new_tip="once",
+            new_tip=new_tip,
             trash_location=trash,
         )
         expected_calls = [
@@ -733,6 +735,7 @@ def test_order_of_water_consolidate_steps(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -742,6 +745,7 @@ def test_order_of_water_consolidate_steps(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -767,7 +771,7 @@ def test_order_of_water_consolidate_steps(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_larger_volume_than_tip(
     simulated_protocol_context: ProtocolContext,
@@ -792,7 +796,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -861,6 +865,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=30,
+                current_volume=0.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -881,6 +886,7 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=30,
+                current_volume=0.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -900,13 +906,179 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
                 alternate_tip_drop=True,
             ),
         ]
-        assert mock_manager.mock_calls[4] == expected_calls[4]
         assert mock_manager.mock_calls == expected_calls
 
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_order_of_water_consolidate_steps_larger_volume_than_tip_with_lpd_and_new_tip_always(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should pick up new tips & probe liquid before every group of aspirates."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50",
+        mount="left",
+        tip_racks=[tiprack],
+        liquid_presence_detection=True,
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "load_liquid_class",
+            side_effect=InstrumentCore.load_liquid_class,
+            autospec=True,
+        ) as patched_load_liquid_class,
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip_in_disposal_location",
+            side_effect=InstrumentCore.drop_tip_in_disposal_location,
+            autospec=True,
+        ) as patched_drop_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "liquid_probe_with_recovery",
+            autospec=True,
+        ) as patched_liquid_probe,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_load_liquid_class, "load_liquid_class")
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip_in_disposal_location")
+        mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
+        pipette_50.consolidate_with_liquid_class(
+            liquid_class=water,
+            volume=30,
+            source=nest_plate.rows()[0][:2],
+            dest=arma_plate.wells()[0],
+            new_tip="always",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.load_liquid_class(
+                mock.ANY,
+                name="water",
+                transfer_properties=mock.ANY,
+                tiprack_uri="opentrons/opentrons_flex_96_tiprack_50ul/1",
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=30,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                volume_for_pipette_mode_configuration=30.0,
+                current_volume=0.0,
+            ),
+            mock.call.liquid_probe_with_recovery(  # Called as part of aspirate_liquid_class
+                mock.ANY,
+                well_core=mock.ANY,
+                loc=mock.ANY,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=30,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=30, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=30,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                volume_for_pipette_mode_configuration=30.0,
+                current_volume=0.0,
+            ),
+            mock.call.liquid_probe_with_recovery(  # Called as part of aspirate_liquid_class
+                mock.ANY,
+                well_core=mock.ANY,
+                loc=mock.ANY,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=30,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=30, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_with_no_new_tips(
     simulated_protocol_context: ProtocolContext,
@@ -931,7 +1103,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     pipette_50.pick_up_tip()
     with (
         mock.patch.object(
@@ -994,6 +1166,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -1003,6 +1176,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -1022,7 +1196,7 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -1047,7 +1221,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -1117,6 +1291,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
                 volume_for_pipette_mode_configuration=50,
+                current_volume=0.0,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -1126,6 +1301,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
                 transfer_type=TransferType.MANY_TO_ONE,
                 tip_contents=[LiquidAndAirGapPair(liquid=25, air_gap=0.1)],
                 volume_for_pipette_mode_configuration=None,
+                current_volume=25.0,
             ),
             mock.call.dispense_liquid_class(
                 mock.ANY,
@@ -1152,7 +1328,7 @@ def test_order_of_water_consolidate_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribution_with_volume_more_than_tip_max(
     simulated_protocol_context: ProtocolContext,
@@ -1160,7 +1336,7 @@ def test_water_distribution_with_volume_more_than_tip_max(
     """It should execute the distribute steps with the expected tip pick ups."""
     trash = simulated_protocol_context.load_trash_bin("A3")
     tiprack = simulated_protocol_context.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "D1"
+        "opentrons_flex_96_tiprack_200ul", "D1"
     )
     pipette_1k = simulated_protocol_context.load_instrument(
         "flex_1channel_1000", mount="left", tip_racks=[tiprack]
@@ -1172,7 +1348,7 @@ def test_water_distribution_with_volume_more_than_tip_max(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[union-attr]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out  # type: ignore[union-attr]
@@ -1208,11 +1384,22 @@ def test_water_distribution_with_volume_more_than_tip_max(
         )
         pipette_1k.drop_tip()
         assert patched_pick_up_tip.call_count == 1
+        patched_pick_up_tip.reset_mock()
+
+        pipette_1k.distribute_with_liquid_class(
+            liquid_class=water,
+            volume=50,
+            source=nest_plate.rows()[0][0],
+            dest=arma_plate.rows()[0],
+            new_tip="always",
+            trash_location=trash,
+        )
+        assert patched_pick_up_tip.call_count == 3
 
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_distribution_steps_using_multi_dispense(
     simulated_protocol_context: ProtocolContext,
@@ -1232,7 +1419,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[union-attr]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out  # type: ignore[union-attr]
@@ -1372,7 +1559,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     ["distribute_volume", "multi_dispense_props_present"],
@@ -1400,7 +1587,7 @@ def test_order_of_water_distribute_steps_using_one_to_one_transfers(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_50, tiprack)
     if not multi_dispense_props_present:
         water_props._multi_dispense = None
@@ -1534,7 +1721,7 @@ def test_order_of_water_distribute_steps_using_one_to_one_transfers(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_distribution_steps_using_mixed_dispense(
     simulated_protocol_context: ProtocolContext,
@@ -1554,7 +1741,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -1734,7 +1921,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribute_steps_with_return_tip(
     simulated_protocol_context: ProtocolContext,
@@ -1759,7 +1946,7 @@ def test_water_distribute_steps_with_return_tip(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with (
         mock.patch.object(
@@ -1808,7 +1995,7 @@ def test_water_distribute_steps_with_return_tip(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     simulated_protocol_context: ProtocolContext,
@@ -1824,7 +2011,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     nest_plate = simulated_protocol_context.load_labware(
         "nest_96_wellplate_200ul_flat", "C3"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     water_props.multi_dispense.retract.blowout.enabled = False  # type: ignore[union-attr]
     with pytest.raises(
@@ -1843,7 +2030,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     ["new_tip", "expected_number_of_calls"],
@@ -1871,7 +2058,7 @@ def test_water_transfer_with_lpd(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with mock.patch.object(
         InstrumentCore,
@@ -1893,7 +2080,7 @@ def test_water_transfer_with_lpd(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(
     "new_tip",
@@ -1920,7 +2107,7 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
 
     with mock.patch.object(
         InstrumentCore,
@@ -1942,10 +2129,12 @@ def test_water_transfer_does_lpd_only_once_for_a_source_well(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
+@pytest.mark.parametrize("new_tip", ["once", "always"])
 def test_water_distribution_with_lpd(
     simulated_protocol_context: ProtocolContext,
+    new_tip: TransferTipPolicyV2Type,
 ) -> None:
     """It should send a single liquid probing command for the source well."""
     trash = simulated_protocol_context.load_trash_bin("A3")
@@ -1965,7 +2154,7 @@ def test_water_distribution_with_lpd(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -1984,7 +2173,7 @@ def test_water_distribution_with_lpd(
             volume=40,
             source=nest_plate.rows()[0][1],
             dest=arma_plate.rows()[0],
-            new_tip="once",
+            new_tip=new_tip,
             trash_location=trash,
         )
         patched_liquid_probe.assert_called_once()
@@ -1992,7 +2181,7 @@ def test_water_distribution_with_lpd(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_incompatible_transfers_skip_probing_even_with_lpd_on(
     simulated_protocol_context: ProtocolContext,
@@ -2015,7 +2204,7 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
     water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
@@ -2055,21 +2244,11 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
             new_tip="never",
             trash_location=trash,
         )
-        pipette_1k.drop_tip()
-        pipette_1k.consolidate_with_liquid_class(
-            liquid_class=water,
-            volume=40,
-            source=nest_plate.rows()[0],
-            dest=arma_plate.rows()[0][0],
-            new_tip="once",
-            trash_location=trash,
-        )
-        patched_liquid_probe.assert_not_called()
 
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_water_transfer_with_multi_channel_pipette(
     simulated_protocol_context: ProtocolContext,
@@ -2094,7 +2273,7 @@ def test_water_transfer_with_multi_channel_pipette(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     with (
         mock.patch.object(
             InstrumentCore,
@@ -2126,7 +2305,7 @@ def test_water_transfer_with_multi_channel_pipette(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_raises_no_tips_available_error(
     simulated_protocol_context: ProtocolContext,
@@ -2148,7 +2327,7 @@ def test_raises_no_tips_available_error(
     arma_plate = simulated_protocol_context.load_labware(
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
-    water = simulated_protocol_context.define_liquid_class("water")
+    water = simulated_protocol_context.get_liquid_class("water")
     expected_error_msg = (
         "No tip available among the tipracks assigned for flex_1channel_50:"
         " \\['Opentrons Flex 96 Tip Rack 50 µL in D1', 'Opentrons Flex 96 Tip Rack 50 µL in D2'\\]"

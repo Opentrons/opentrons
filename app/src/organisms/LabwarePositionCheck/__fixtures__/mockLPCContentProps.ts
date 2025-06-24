@@ -7,4 +7,5 @@ export const mockLPCContentProps: LPCWizardContentProps = {
   commandUtils: {} as any,
   proceedStep: vi.fn(),
   goBackLastStep: vi.fn(),
+  analytics: {} as any,
 }

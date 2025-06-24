@@ -247,7 +247,7 @@ function SubmergeSettingComponent({
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-              {t('submerge_from_bottom', { max: positionRange.max })}
+              {t('from_bottom', { max: positionRange.max })}
             </StyledText>
           ) : null}
         </Flex>

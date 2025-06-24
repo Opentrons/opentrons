@@ -6,29 +6,45 @@ import {
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_POINTER,
   DISPLAY_FLEX,
   Icon,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
+import type { Dispatch, SetStateAction } from 'react'
+
+const BUTTON_HEIGHT_IN_TOOLBOX = '2.4375rem'
 interface LiquidButtonProps {
-  showLiquidOverflowMenu: (liquidOverflowMenu: boolean) => void
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  isInToolbox?: boolean
 }
 
 export function LiquidButton({
   showLiquidOverflowMenu,
+  isInToolbox = false,
 }: LiquidButtonProps): JSX.Element {
   const { t } = useTranslation('starting_deck_state')
   return (
     <Btn
-      css={LIQUID_BUTTON_STYLE}
+      css={isInToolbox ? LIQUID_BUTTON_STYLE_IN_TOOLBOX : LIQUID_BUTTON_STYLE}
       onClick={() => {
         showLiquidOverflowMenu(true)
       }}
     >
-      <Icon size="1rem" name="water-drop" data-testid="water-drop" />
-      <StyledText desktopStyle="bodyDefaultSemiBold">{t('liquid')}</StyledText>
+      <Icon
+        size={isInToolbox ? '1.25rem' : '1rem'}
+        name="water-drop"
+        data-testid="water-drop"
+      />
+      <StyledText
+        desktopStyle={
+          isInToolbox ? 'bodyDefaultRegular' : 'bodyDefaultSemiBold'
+        }
+      >
+        {t('liquids')}
+      </StyledText>
     </Btn>
   )
 }
@@ -58,5 +74,23 @@ const LIQUID_BUTTON_STYLE = css`
   &:disabled {
     background-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
+  }
+`
+const LIQUID_BUTTON_STYLE_IN_TOOLBOX = css`
+  ${LIQUID_BUTTON_STYLE}
+  height: ${BUTTON_HEIGHT_IN_TOOLBOX}
+ padding: ${SPACING.spacing4} ${SPACING.spacing12};
+  background-color: ${COLORS.blue20};
+  color: ${COLORS.black90};
+  cursor: ${CURSOR_POINTER};
+
+  &:hover {
+    background-color: ${COLORS.blue30};
+    color: ${COLORS.black90};
+  }
+
+  &:active {
+    background-color: ${COLORS.blue50};
+    color: ${COLORS.white};
   }
 `

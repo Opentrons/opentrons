@@ -7,11 +7,11 @@ import {
 
 import type { i18n, TFunction } from 'i18next'
 import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export function getDisplayLocation(
   location: LegacyLabwareOffsetLocation,
-  labwareDefinitions: LabwareDefinition2[],
+  labwareDefinitions: LabwareDefinition[],
   t: TFunction,
   i18n: i18n,
   slotOnly?: boolean

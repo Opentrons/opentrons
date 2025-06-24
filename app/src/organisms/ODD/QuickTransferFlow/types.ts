@@ -64,11 +64,16 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOut: boolean
   mixOnAspirate?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeAspirate?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractAspirate?: {
     speed: number
     positionFromBottom: number
   }
@@ -82,9 +87,13 @@ export interface QuickTransferSummaryState {
   tipPositionDispense: number
   mixOnDispense?: {
     mixVolume: number
-    repititions: number
+    repetitions: number
   }
   submergeDispense?: {
+    speed: number
+    positionFromBottom: number
+  }
+  retractDispense?: {
     speed: number
     positionFromBottom: number
   }
@@ -100,6 +109,12 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass
+  conditionAspirate?: number
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 
 export type TransferType =
@@ -131,6 +146,7 @@ export type QuickTransferSummaryAction =
   | SetTouchTipAspirate
   | SetAirGapAspirate
   | SetSubmergeAspirate
+  | SetRetractAspirate
   | SetDispenseTipPosition
   | SetMixOnDispense
   | SetDelayDispense
@@ -138,8 +154,12 @@ export type QuickTransferSummaryAction =
   | SetBlowOut
   | SetAirGapDispense
   | SetSubmergeDispense
+  | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
+  | SetPushOut
+  | SetConditionAspirate
+  | SetDisposalVolumeDispense
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -165,7 +185,7 @@ interface SetPreWetTip {
 }
 interface SetMixOnAspirate {
   type: typeof ACTIONS.SET_MIX_ON_ASPIRATE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
@@ -177,6 +197,7 @@ interface SetDelayAspirate {
 interface SetTouchTipAspirate {
   type: typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
   position?: number
+  touchTipAspirateSpeed?: number
 }
 interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
@@ -189,13 +210,20 @@ interface SetSubmergeAspirate {
     positionFromBottom: number
   }
 }
+interface SetRetractAspirate {
+  type: typeof ACTIONS.SET_RETRACT_ASPIRATE
+  retractSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
 interface SetDispenseTipPosition {
   type: typeof ACTIONS.SET_DISPENSE_TIP_POSITION
   position: number
 }
 interface SetMixOnDispense {
   type: typeof ACTIONS.SET_MIX_ON_DISPENSE
-  mixSettings?: { mixVolume: number; repititions: number }
+  mixSettings?: { mixVolume: number; repetitions: number }
 }
 interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
@@ -207,6 +235,7 @@ interface SetDelayDispense {
 interface SetTouchTipDispense {
   type: typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
   position?: number
+  touchTipDispenseSpeed?: number
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
@@ -219,6 +248,13 @@ interface SetAirGapDispense {
 interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
   submergeSettings?: {
+    speed: number
+    positionFromBottom: number
+  }
+}
+interface SetRetractDispense {
+  type: typeof ACTIONS.SET_RETRACT_DISPENSE
+  retractSettings?: {
     speed: number
     positionFromBottom: number
   }
@@ -265,4 +301,23 @@ interface SetDestWellsAction {
 interface SetVolumeAction {
   type: typeof ACTIONS.SET_VOLUME
   volume: number
+}
+
+interface SetPushOut {
+  type: typeof ACTIONS.SET_PUSH_OUT
+  pushOut: boolean
+}
+
+interface SetConditionAspirate {
+  type: typeof ACTIONS.SET_CONDITION_ASPIRATE
+  conditionAspirate: number
+}
+
+interface SetDisposalVolumeDispense {
+  type: typeof ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }

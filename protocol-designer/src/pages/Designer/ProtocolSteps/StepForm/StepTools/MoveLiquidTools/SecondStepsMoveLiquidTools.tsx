@@ -20,7 +20,7 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
@@ -34,7 +34,6 @@ import {
 } from '../../../../../../utils'
 import {
   BlowoutLocationField,
-  BlowoutOffsetField,
   DisposalField,
   FlowRateField,
   PositionField,
@@ -42,8 +41,6 @@ import {
 } from '../../PipetteFields'
 import {
   getBlowoutLocationOptionsForForm,
-  getFormErrorsMappedToField,
-  getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
 import { MultiInputField } from './MultiInputField'
@@ -51,7 +48,6 @@ import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
@@ -64,7 +60,6 @@ interface SecondStepsMoveLiquidToolsProps {
   tab: LiquidHandlingTab
   setTab: Dispatch<SetStateAction<LiquidHandlingTab>>
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
-  visibleFormErrors: StepFormErrors
 }
 
 export const SecondStepsMoveLiquidTools = ({
@@ -73,7 +68,6 @@ export const SecondStepsMoveLiquidTools = ({
   tab,
   setTab,
   setShowFormErrors,
-  visibleFormErrors,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
@@ -85,7 +79,7 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
 
@@ -138,27 +132,17 @@ export const SecondStepsMoveLiquidTools = ({
   const hideWellOrderField =
     tab === 'dispense' && (isWasteChuteSelected || isTrashBinSelected)
 
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
-
   const getFields = (type: 'submerge' | 'retract'): StepInputFieldProps[] => {
     return [
       {
         fieldTitle: t(`protocol_steps:${type}_speed`),
         fieldKey: `${tab}_${type}_speed`,
         units: 'application:units.millimeterPerSec',
-        errorToShow: getFormLevelError(
-          `${tab}_${type}_speed`,
-          mappedErrorsToField
-        ),
       },
       {
         fieldTitle: t('protocol_steps:delay_duration'),
         fieldKey: `${tab}_${type}_delay_seconds`,
         units: 'application:units.seconds_long',
-        errorToShow: getFormLevelError(
-          `${tab}_${type}_delay_seconds`,
-          mappedErrorsToField
-        ),
       },
     ]
   }
@@ -223,10 +207,6 @@ export const SecondStepsMoveLiquidTools = ({
             title={t('protocol_steps:delay_duration')}
             {...propsForFields[`${tab}_delay_seconds`]}
             units={t('application:units.seconds')}
-            errorToShow={getFormLevelError(
-              `${tab}_delay_seconds`,
-              mappedErrorsToField
-            )}
           />
         </Flex>
       ) : null}
@@ -255,10 +235,6 @@ export const SecondStepsMoveLiquidTools = ({
             title={t('protocol_steps:mix_volume')}
             {...propsForFields[`${tab}_mix_volume`]}
             units={t('application:units.microliter')}
-            errorToShow={getFormLevelError(
-              `${tab}_mix_volume`,
-              mappedErrorsToField
-            )}
           />
           <InputStepFormField
             showTooltip={false}
@@ -266,10 +242,6 @@ export const SecondStepsMoveLiquidTools = ({
             title={t('protocol_steps:mix_times')}
             {...propsForFields[`${tab}_mix_times`]}
             units={t('application:units.times')}
-            errorToShow={getFormLevelError(
-              `${tab}_mix_times`,
-              mappedErrorsToField
-            )}
           />
         </Flex>
       ) : null}
@@ -289,6 +261,7 @@ export const SecondStepsMoveLiquidTools = ({
               labwareEntities,
               additionalEquipmentEntities,
               liquidHandlingAction: tab,
+              robotType,
             })
           }}
           onClose={() => {
@@ -321,39 +294,47 @@ export const SecondStepsMoveLiquidTools = ({
           showTooltip={false}
           formData={formData}
         />
-        <Divider marginY="0" />
         {hideWellOrderField ? null : (
-          <WellsOrderField
-            prefix={tab}
-            updateFirstWellOrder={
-              propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
-            }
-            updateSecondWellOrder={
-              propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
-            }
-            firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
-            secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
-            firstName={addFieldNamePrefix('wellOrder_first')}
-            secondName={addFieldNamePrefix('wellOrder_second')}
-          />
+          <>
+            <Divider marginY="0" />
+            <WellsOrderField
+              prefix={tab}
+              updateFirstWellOrder={
+                propsForFields[addFieldNamePrefix('wellOrder_first')]
+                  .updateValue
+              }
+              updateSecondWellOrder={
+                propsForFields[addFieldNamePrefix('wellOrder_second')]
+                  .updateValue
+              }
+              firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+              secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
+              firstName={addFieldNamePrefix('wellOrder_first')}
+              secondName={addFieldNamePrefix('wellOrder_second')}
+            />
+          </>
         )}
-        <Divider marginY="0" />
-        <PositionField
-          prefix={tab}
-          propsForFields={propsForFields}
-          zField={`${tab}_mmFromBottom`}
-          xField={`${tab}_x_position`}
-          yField={`${tab}_y_position`}
-          labwareId={
-            formData[
-              getLabwareFieldForPositioningField(
-                addFieldNamePrefix('mmFromBottom')
-              )
-            ]
-          }
-          referenceField={`${tab}_position_reference`}
-        />
-        {enableLiquidClasses ? (
+        {isDestinationTrash ? null : (
+          <>
+            <Divider marginY="0" />
+            <PositionField
+              prefix={tab}
+              propsForFields={propsForFields}
+              zField={`${tab}_mmFromBottom`}
+              xField={`${tab}_x_position`}
+              yField={`${tab}_y_position`}
+              labwareId={
+                formData[
+                  getLabwareFieldForPositioningField(
+                    addFieldNamePrefix('mmFromBottom')
+                  )
+                ]
+              }
+              referenceField={`${tab}_position_reference`}
+            />
+          </>
+        )}
+        {!isDestinationTrash ? (
           <>
             <Divider marginY="0" />
             <MultiInputField
@@ -411,6 +392,7 @@ export const SecondStepsMoveLiquidTools = ({
               toggleUpdateValue={propsForFields.preWetTip.updateValue}
               toggleElement="checkbox"
               tooltipContent={propsForFields.preWetTip.tooltipContent ?? null}
+              isDisabled={propsForFields.preWetTip.disabled}
             />
           ) : null}
           {tab === 'aspirate' ? (
@@ -433,10 +415,6 @@ export const SecondStepsMoveLiquidTools = ({
                       padding="0"
                       {...propsForFields.conditioning_volume}
                       showTooltip={false}
-                      errorToShow={getFormLevelError(
-                        'conditioning_volume',
-                        mappedErrorsToField
-                      )}
                     />
                   ) : null}
                 </CheckboxExpandStepFormField>
@@ -456,6 +434,7 @@ export const SecondStepsMoveLiquidTools = ({
               >
                 {formData.pushOut_checkbox === true ? (
                   <InputStepFormField
+                    {...propsForFields.pushOut_volume}
                     showTooltip={false}
                     padding="0"
                     title={t(
@@ -465,12 +444,7 @@ export const SecondStepsMoveLiquidTools = ({
                       'form:step_edit_form.field.pushOut.pushOut_volume.caption',
                       { min: 0, max: maxPushoutVolume }
                     )}
-                    {...propsForFields.pushOut_volume}
                     units={t('application:units.microliter')}
-                    errorToShow={getFormLevelError(
-                      'pushOut_volume',
-                      mappedErrorsToField
-                    )}
                   />
                 ) : null}
               </CheckboxExpandStepFormField>
@@ -493,10 +467,6 @@ export const SecondStepsMoveLiquidTools = ({
                         path: formData.path,
                         stepType: formData.stepType,
                       })}
-                      errorToShow={getFormLevelError(
-                        'blowout_location',
-                        mappedErrorsToField
-                      )}
                       padding="0"
                     />
                     <FlowRateField
@@ -508,12 +478,6 @@ export const SecondStepsMoveLiquidTools = ({
                       tiprack={propsForFields.tipRack.value}
                       padding="0"
                       formData={formData}
-                    />
-                    <BlowoutOffsetField
-                      {...propsForFields.blowout_z_offset}
-                      sourceLabwareId={propsForFields.aspirate_labware.value}
-                      destLabwareId={propsForFields.dispense_labware.value}
-                      blowoutLabwareId={propsForFields.blowout_location.value}
                     />
                   </Flex>
                 ) : null}
@@ -527,7 +491,6 @@ export const SecondStepsMoveLiquidTools = ({
                   propsForFields={propsForFields}
                   stepType={formData.stepType}
                   volume={formData.volume}
-                  mappedErrorsToField={mappedErrorsToField}
                   formData={formData}
                 />
               ) : null}
@@ -550,10 +513,6 @@ export const SecondStepsMoveLiquidTools = ({
                   padding="0"
                   title={t('form:step_edit_form.field.touchTip_speed.label')}
                   {...propsForFields[`${tab}_touchTip_speed`]}
-                  errorToShow={getFormLevelError(
-                    `${tab}_touchTip_speed`,
-                    mappedErrorsToField
-                  )}
                   units={t('application:units.millimeterPerSec')}
                 />
                 <InputStepFormField
@@ -563,10 +522,6 @@ export const SecondStepsMoveLiquidTools = ({
                     'form:step_edit_form.field.touchTip_mmFromEdge.label'
                   )}
                   {...propsForFields[`${tab}_touchTip_mmFromEdge`]}
-                  errorToShow={getFormLevelError(
-                    `${tab}_touchTip_mmFromEdge`,
-                    mappedErrorsToField
-                  )}
                   caption={t(
                     `form:step_edit_form.field.touchTip_mmFromEdge.caption`,
                     {
@@ -596,34 +551,28 @@ export const SecondStepsMoveLiquidTools = ({
           </CheckboxExpandStepFormField>
           <CheckboxExpandStepFormField
             title={i18n.format(
-              t('form:step_edit_form.field.airGap.label'),
+              t('form:step_edit_form.field.airGap.title'),
               'capitalize'
             )}
             fieldProps={propsForFields[`${tab}_airGap_checkbox`]}
           >
             {formData[`${tab}_airGap_checkbox`] === true ? (
               <InputStepFormField
+                {...propsForFields[`${tab}_airGap_volume`]}
                 showTooltip={false}
                 padding="0"
-                title={t('protocol_steps:air_gap_volume')}
-                {...propsForFields[`${tab}_airGap_volume`]}
+                title={t('form:step_edit_form.field.airGap.label')}
                 units={t('application:units.microliter')}
-                errorToShow={getFormLevelError(
-                  `${tab}_airGap_volume`,
-                  mappedErrorsToField
-                )}
               />
             ) : null}
           </CheckboxExpandStepFormField>
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )

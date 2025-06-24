@@ -1,5 +1,3 @@
-import { ALL } from '@opentrons/shared-data'
-
 import { COLUMN_4_SLOTS } from '../../constants'
 import {
   pipettingIntoColumn4,
@@ -26,7 +24,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, labwareId, wellName, nozzles } = args
+  const { pipetteId, labwareId, wellName } = args
   const errors: CommandCreatorError[] = []
 
   const isMultiChannelPipette =
@@ -34,18 +32,15 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
 
   if (
     isMultiChannelPipette &&
-    nozzles !== ALL &&
-    !getIsSafePipetteMovement(
-      args.nozzles ?? null,
-      prevRobotState,
+    !getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      labwareId,
       //  we don't adjust the offset when moving to the tiprack
-      { x: 0, y: 0 },
-      wellName
-    )
+      wellLocationOffset: { x: 0, y: 0 },
+      wellTargetName: wellName,
+    })
   ) {
     errors.push(possiblePipetteCollision())
   }

@@ -133,7 +133,7 @@ export interface LiquidEntity {
   description: string | null
   pythonName: string
   liquidGroupId: string
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export interface LiquidEntities {
@@ -220,6 +220,8 @@ export type ChangeTipOptions =
   | 'perDest'
   | 'perSource'
 
+export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+
 export interface InnerMixArgs {
   volume: number
   times: number
@@ -227,7 +229,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number
 }
 
 interface CommonArgs {
@@ -240,6 +241,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -269,7 +271,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm: number
+  aspirateOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   aspirateXOffset: number
   /** y offset mm */
@@ -291,13 +293,17 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  dispenseOffsetFromBottomMm: number
+  dispenseOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   dispenseXOffset: number
   /** y offset mm */
   dispenseYOffset: number
   /** will be non-null once introduced to quick transfer */
   pushOut: number | null
+
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: string | null | undefined
+  blowoutFlowRateUlSec: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
@@ -337,11 +343,6 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   sourceWells: string[]
   destWell: string | null
 
-  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
-
   /** Mix in first well in chunk */
   mixFirstAspirate: InnerMixArgs | null | undefined
   /** Mix in destination well after dispense */
@@ -353,11 +354,6 @@ export type TransferArgs = SharedTransferLikeArgs & {
 
   sourceWells: string[]
   destWells: string[] | null
-
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined
@@ -373,11 +369,8 @@ export type DistributeArgs = SharedTransferLikeArgs & {
 
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: number | null | undefined
-  /** pass to blowout **/
-  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: string | null | undefined
-  blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
+  /** Volume to condition the tip with during aspiration sequence */
+  conditioningVolume: number | null
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: InnerMixArgs | null | undefined
@@ -643,7 +636,10 @@ export interface TimelineFrame {
       }
     }
     pipettes: {
-      [pipetteId: string]: boolean // true if pipette has tip(s)
+      [pipetteId: string]: {
+        hasTip: boolean
+        tiprackURI: string | null
+      } // true if pipette has tip(s)
     }
   }
   liquidState: {
@@ -696,6 +692,7 @@ export type ErrorType =
   | 'MISSING_MODULE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
+  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
@@ -705,7 +702,9 @@ export type ErrorType =
   | 'POSSIBLE_PIPETTE_COLLISION'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
+  | 'RETRACT_BELOW_DISPENSE'
   | 'SUBMERGE_BELOW_ASPIRATE'
+  | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

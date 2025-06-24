@@ -8,6 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   ModalHeader,
   ModalShell,
   SPACING,
@@ -15,7 +16,6 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { OddModal } from '/app/molecules/OddModal'
 
 import { ERROR_KINDS } from '../constants'
@@ -25,7 +25,7 @@ import { StepInfo } from './StepInfo'
 
 import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
-import type { LabwareDefinition2, RobotType } from '@opentrons/shared-data'
+import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
@@ -54,7 +54,7 @@ type ErrorDetailsModalProps = Omit<
     robotType: RobotType
     desktopType: DesktopSizeType
     failedCommand: ReturnType<typeof useRetainedFailedCommandBySource>
-    allRunDefs: LabwareDefinition2[]
+    allRunDefs: LabwareDefinition[]
   }
 
 export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
@@ -71,9 +71,9 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.GRIPPER_ERROR:
       case ERROR_KINDS.STALL_OR_COLLISION:
       case ERROR_KINDS.NO_LIQUID_DETECTED:
-      case ERROR_KINDS.STALL_WHILE_STACKING:
-      case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
-      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      case ERROR_KINDS.STACKER_STALLED:
+      case ERROR_KINDS.STACKER_HOPPER_EMPTY:
+      case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
         return true
       default:
         return false
@@ -224,11 +224,11 @@ export function NotificationBanner({
         return <StallErrorBanner />
       case ERROR_KINDS.NO_LIQUID_DETECTED:
         return <NoLiquidDetectedBanner />
-      case ERROR_KINDS.STALL_WHILE_STACKING:
+      case ERROR_KINDS.STACKER_STALLED:
         return <StackerStallErrorBanner />
-      case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+      case ERROR_KINDS.STACKER_HOPPER_EMPTY:
         return <LabwareMissingErrorBanner />
-      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
         return <LabwareMissingOnShuttleErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')

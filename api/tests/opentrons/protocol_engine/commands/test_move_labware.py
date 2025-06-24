@@ -31,10 +31,8 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LoadedLabware,
-    LoadedModule,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    LabwareMovementOffsetData,
     DeckType,
     AddressableAreaLocation,
     OnAddressableAreaLocationSequenceComponent,
@@ -42,7 +40,6 @@ from opentrons.protocol_engine.types import (
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
     LabwareLocationSequence,
-    ModuleModel,
 )
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -57,16 +54,6 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     LabwareMovementHandler,
 )
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerShuttleError,
-)
-from opentrons_shared_data.errors.exceptions import FlexStackerShuttleMissingError
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.hardware_control.modules import FlexStacker
-from opentrons.hardware_control.modules.types import PlatformState
 
 
 @pytest.fixture(autouse=True)
@@ -352,10 +339,10 @@ async def test_gripper_move_labware_implementation(
             labware_id="my-cool-labware-id",
             current_location=sentinel.from_location_validated_for_gripper,
             new_location=sentinel.new_location_validated_for_gripper,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=pick_up_offset,
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            user_pick_up_offset=Point(
+                pick_up_offset.x, pick_up_offset.y, pick_up_offset.z
             ),
+            user_drop_offset=Point(),
             post_drop_slide_offset=None,
         ),
     )
@@ -454,10 +441,8 @@ async def test_gripper_error(
             labware_id=labware_id,
             current_location=origin_location,
             new_location=new_location,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            ),
+            user_pick_up_offset=Point(),
+            user_drop_offset=Point(),
             post_drop_slide_offset=None,
         )
     ).then_raise(underlying_exception)
@@ -646,10 +631,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             labware_id="my-cool-labware-id",
             current_location=from_location,
             new_location=new_location,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            ),
+            user_pick_up_offset=Point(1, 2, 3),
+            user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
         ),
     )
@@ -721,121 +704,6 @@ async def test_move_labware_raises_for_labware_or_module_not_found(
 
     with pytest.raises(errors.ModuleNotLoadedError):
         await subject.execute(move_labware_from_questionable_module_params)
-
-
-async def test_move_labware_raises_for_missing_stacker_shuttle(
-    decoy: Decoy,
-    subject: MoveLabwareImplementation,
-    equipment: EquipmentHandler,
-    model_utils: ModelUtils,
-    state_view: StateView,
-) -> None:
-    """It should raise an error when the destination is a Stacker and the shuttle is missing."""
-    new_location = ModuleLocation(moduleId="the-coolest-stacker-ever")
-    from_location = DeckSlotLocation(slotName=DeckSlotName("D2"))
-    move_labware_shuttle_params = MoveLabwareParams(
-        labwareId="my-cool-labware-id",
-        newLocation=new_location,
-        strategy=LabwareMovementStrategy.USING_GRIPPER,
-    )
-    labware_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-        namespace="my-cool-namespace",
-        dimensions=Dimensions(yDimension=1, zDimension=2, xDimension=3),
-    )
-    decoy.when(
-        state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(labware_def)
-    from_loc_sequence: LabwareLocationSequence = [
-        OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")
-    ]
-    decoy.when(
-        state_view.geometry.get_location_sequence("my-cool-labware-id")
-    ).then_return(from_loc_sequence)
-
-    decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
-        LoadedLabware(
-            id="my-cool-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=from_location,
-            offsetId=None,
-        )
-    )
-
-    decoy.when(
-        state_view.geometry.ensure_location_not_occupied(
-            location=new_location,
-        )
-    ).then_return(new_location)
-    decoy.when(
-        equipment.find_applicable_labware_offset_id(
-            labware_definition_uri="opentrons-test/load-name/1",
-            labware_location=new_location,
-        )
-    ).then_return("wowzers-a-new-offset-id")
-
-    decoy.when(
-        state_view.geometry.ensure_valid_gripper_location(from_location)
-    ).then_return(from_location)
-    decoy.when(
-        state_view.geometry.ensure_valid_gripper_location(new_location)
-    ).then_return(new_location)
-    decoy.when(labware_validation.validate_gripper_compatible(labware_def)).then_return(
-        True
-    )
-    stacker_module_hw = decoy.mock(cls=FlexStacker)
-    stacker_module = LoadedModule(
-        id="the-coolest-stacker-ever",
-        model=ModuleModel.FLEX_STACKER_MODULE_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName("D3")),
-        serialNumber="cookiecrisp",
-    )
-
-    decoy.when(
-        state_view.modules.get(module_id="the-coolest-stacker-ever")
-    ).then_return(stacker_module)
-
-    decoy.when(
-        state_view.modules.get_flex_stacker_substate(
-            module_id="the-coolest-stacker-ever"
-        )
-    ).then_return(
-        FlexStackerSubState(
-            module_id=FlexStackerId("abc"),
-            pool_primary_definition=None,
-            pool_adapter_definition=None,
-            pool_lid_definition=None,
-            contained_labware_bottom_first=[],
-            max_pool_count=0,
-            pool_overlap=0,
-        )
-    )
-    decoy.when(
-        equipment.get_module_hardware_api(module_id=FlexStackerId("abc"))
-    ).then_return(stacker_module_hw)
-    decoy.when(
-        await stacker_module_hw.verify_shuttle_location(PlatformState.EXTENDED)
-    ).then_raise(
-        FlexStackerShuttleMissingError(
-            "cookiecrisp", PlatformState.EXTENDED, PlatformState.RETRACTED
-        )
-    )
-
-    decoy.when(model_utils.generate_id()).then_return("my_err")
-    decoy.when(model_utils.get_timestamp()).then_return(
-        datetime(year=2020, month=1, day=2)
-    )
-
-    result = await subject.execute(move_labware_shuttle_params)
-
-    assert result == DefinedErrorData(
-        public=FlexStackerShuttleError.model_construct(
-            id="my_err",
-            createdAt=datetime(year=2020, month=1, day=2),
-            wrappedErrors=[matchers.Anything()],
-            errorInfo={"labwareId": "my-cool-labware-id"},
-        )
-    )
 
 
 async def test_move_labware_raises_if_movement_obstructed(

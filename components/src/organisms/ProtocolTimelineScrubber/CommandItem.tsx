@@ -11,7 +11,7 @@ import { getCommandTextData } from './utils'
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   ProtocolAnalysisOutput,
   RobotType,
   RunTimeCommand,
@@ -24,7 +24,7 @@ interface CommandItemProps {
   setCurrentCommandIndex: (index: number) => void
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 }
 export function CommandItem({
   index,

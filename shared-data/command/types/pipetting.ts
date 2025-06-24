@@ -69,7 +69,9 @@ export interface ConfigureForVolumeRunTimeCommand
 
 export type AirGapInPlaceParams = FlowRateParams &
   PipetteIdentityParams &
-  VolumeParams
+  VolumeParams & {
+    correctionVolume?: number
+  }
 
 export interface AirGapInPlaceCreateCommand extends CommonCommandCreateInfo {
   commandType: 'airGapInPlace'
@@ -344,12 +346,14 @@ export interface DispenseInPlaceParams {
   volume: number
   flowRate: number // µL/s
   pushOut?: number
+  correctionVolume?: number
 }
 
 export interface AspirateInPlaceParams {
   pipetteId: string
   volume: number
   flowRate: number // µL/s
+  correctionVolume?: number
 }
 interface FlowRateParams {
   flowRate: number // µL/s

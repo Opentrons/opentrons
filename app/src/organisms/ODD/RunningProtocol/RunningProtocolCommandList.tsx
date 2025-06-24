@@ -34,7 +34,7 @@ import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { TrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -79,7 +79,7 @@ interface RunningProtocolCommandListProps {
   robotAnalyticsData: RobotAnalyticsData | null
   protocolName?: string
   currentRunCommandIndex?: number
-  allRunDefs: LabwareDefinition2[]
+  allRunDefs: LabwareDefinition[]
 }
 
 export function RunningProtocolCommandList({

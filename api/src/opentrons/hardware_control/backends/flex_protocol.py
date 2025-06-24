@@ -44,6 +44,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
 
+
 Cls = TypeVar("Cls")
 
 
@@ -70,12 +71,6 @@ class FlexBackend(Protocol):
         ...
 
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
-        ...
-
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
         ...
 
     def update_constraints_for_plunger_acceleration(
@@ -475,4 +470,28 @@ class FlexBackend(Protocol):
 
     async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
         """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        ...
+
+    async def read_env_temp_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
         ...

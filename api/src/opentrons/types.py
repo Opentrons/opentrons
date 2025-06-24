@@ -61,9 +61,7 @@ class Point(NamedTuple):
     def __str__(self) -> str:
         return "({}, {}, {})".format(self.x, self.y, self.z)
 
-    def magnitude_to(self, other: Any) -> float:
-        if not isinstance(other, Point):
-            return NotImplemented
+    def magnitude_to(self, other: Point) -> float:
         x_diff = self.x - other.x
         y_diff = self.y - other.y
         z_diff = self.z - other.z
@@ -74,6 +72,25 @@ class Point(NamedTuple):
     ) -> bool:
         pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
         return all(isclose(s, o, rel_tol=rel_tol, abs_tol=abs_tol) for s, o in pairs)
+
+    @classmethod
+    def from_xyz_attrs(cls, has_xyz: _HasXYZ) -> Point:
+        """Construct a Point from another object that has .x/.y/.z attributes."""
+        return cls(has_xyz.x, has_xyz.y, has_xyz.z)
+
+
+class _HasXYZ(Protocol):
+    @property
+    def x(self) -> float:
+        ...
+
+    @property
+    def y(self) -> float:
+        ...
+
+    @property
+    def z(self) -> float:
+        ...
 
 
 LocationLabware = Union[
@@ -199,7 +216,11 @@ class Location:
 
         """
 
-        return Location(point=self.point + point, labware=self._given_labware)
+        return Location(
+            point=self.point + point,
+            labware=self._given_labware,
+            _meniscus_tracking=self._meniscus_tracking,
+        )
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware}, meniscus_tracking={self._meniscus_tracking})"

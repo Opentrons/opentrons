@@ -1,7 +1,5 @@
 import type {
-  LabwareDefinition1,
-  LabwareDefinition2,
-  LabwareDefinition3,
+  LabwareDefinition,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -96,7 +94,7 @@ export interface LabwareOffset {
 }
 
 export interface RunLoadedLabwareDefinitions {
-  data: Array<LabwareDefinition1 | LabwareDefinition2 | LabwareDefinition3>
+  data: LabwareDefinition[]
 }
 
 export interface Run {

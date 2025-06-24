@@ -1,9 +1,9 @@
 import { getLabwareDefURI } from '.'
 
-import type { LabwareDefinition2, RunTimeCommand } from '..'
+import type { LabwareDefinition, RunTimeCommand } from '..'
 
 export interface LabwareDefinitionsByUri {
-  [defURI: string]: LabwareDefinition2
+  [defURI: string]: LabwareDefinition
 }
 
 export function getLoadedLabwareDefinitionsByUri(
@@ -15,7 +15,7 @@ export function getLoadedLabwareDefinitionsByUri(
       command.commandType === 'loadLid' ||
       command.commandType === 'loadLidStack'
     ) {
-      const labwareDef: LabwareDefinition2 | undefined =
+      const labwareDef: LabwareDefinition | undefined =
         command.result?.definition
       if (labwareDef == null) {
         console.warn(

@@ -30,7 +30,7 @@ import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   createFile,
-  createPythonFile,
+  createJSONFile,
   getLabwareDefinitionsInUse,
 } from '../selectors'
 
@@ -99,7 +99,7 @@ describe('createFile selector', () => {
   }
   it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createFile.resultFunc(
+    const result = createJSONFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
@@ -123,7 +123,7 @@ describe('createFile selector', () => {
 
   it('should return a valid Python protocol file', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createPythonFile.resultFunc(
+    const result = createFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
@@ -141,7 +141,6 @@ describe('createFile selector', () => {
     expect(result.pythonProtocol).toBe(
       `
 import json
-from contextlib import nullcontext as pd_step
 from opentrons import protocol_api, types
 
 metadata = {
@@ -153,10 +152,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}
+requirements = {"robotType": "OT-2", "apiLevel": "2.24"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
@@ -170,14 +166,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         location="1",
         label="Opentrons 96 Tip Rack 10 µL",
         namespace="opentrons",
-        version=1,
     )
     mock_python_name_3 = protocol.load_labware(
         "fixture_96_plate",
         location="7",
         label="NEST 96 Well Plate 100 µL PCR Full Skirt",
         namespace="opentrons",
-        version=1,
     )
 
     # Load Pipettes:

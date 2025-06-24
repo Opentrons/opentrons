@@ -27,12 +27,12 @@ describe('LiquidButton', () => {
   it('should render icon and text', () => {
     render(props)
     screen.getByTestId('water-drop')
-    screen.getByText('Liquid')
+    screen.getByText('Liquids')
   })
 
   it('should call a mock function when clicking', () => {
     render(props)
-    fireEvent.click(screen.getByText('Liquid'))
+    fireEvent.click(screen.getByText('Liquids'))
     expect(mockShowLiquidOverflowMenu).toHaveBeenCalled()
   })
 })

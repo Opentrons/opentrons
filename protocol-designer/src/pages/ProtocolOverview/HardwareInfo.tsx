@@ -41,14 +41,14 @@ export function HardwareInfo({
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const navigate = useNavigate()
   const isFlex = robotType === FLEX_ROBOT_TYPE
-  const tCSlot = isFlex ? 'A1, B1' : '7,8,10,11'
+  const tCSlot = isFlex ? 'A1+B1' : '7,8,10,11'
   const additionalEquipmentLength = Object.keys(additionalEquipment).length
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <StyledText desktopStyle="headingSmallBold">
-          {isFlex ? t('deck_hardware') : t('modules')}
+          {isFlex ? t('shared:deck_hardware') : t('modules')}
         </StyledText>
         <Flex padding={SPACING.spacing4}>
           <Btn

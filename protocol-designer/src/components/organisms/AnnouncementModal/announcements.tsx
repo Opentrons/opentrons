@@ -61,6 +61,19 @@ const APP = 'Opentrons App'
 const OPENTRONS_PD = 'Opentrons Protocol Designer'
 const OPENTRONS_ABSORBANCE_READER_URL =
   'https://opentrons.com/products/opentrons-flex-absorbance-plate-reader-module-gen1'
+const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = [
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+]
 
 export const useAnnouncements = (): Announcement[] => {
   const { t } = useTranslation('modal')
@@ -564,6 +577,62 @@ export const useAnnouncements = (): Announcement[] => {
               i18nKey="announcements.dragDropAndHotFix.body10"
             />
           </StyledText>
+        </Flex>
+      ),
+    },
+    {
+      announcementKey: 'liquidClassAndPythonExport',
+      image: <Flex />,
+      heading: t('announcements.liquidClassAndPythonExport.heading', {
+        version: pdVersion,
+      }),
+      message: (
+        <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('announcements.liquidClassAndPythonExport.body1', {
+              version: pdVersion,
+            })}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('announcements.liquidClassAndPythonExport.body2')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('announcements.liquidClassAndPythonExport.body3')}
+            </StyledText>
+            <Flex marginLeft={SPACING.spacing16}>
+              <ul>
+                {EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS.map(num => (
+                  <li key={num}>
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t(`announcements.liquidClassAndPythonExport.body${num}`)}
+                    </StyledText>
+                  </li>
+                ))}
+              </ul>
+            </Flex>
+          </Flex>
+          <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('announcements.liquidClassAndPythonExport.body15')}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              <Trans
+                t={t}
+                components={{
+                  link1: (
+                    <LinkComponent
+                      external
+                      href={DOC_URL}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      color={COLORS.black90}
+                    />
+                  ),
+                }}
+                i18nKey="announcements.liquidClassAndPythonExport.body16"
+              />
+            </StyledText>
+          </Flex>
         </Flex>
       ),
     },

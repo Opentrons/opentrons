@@ -40,6 +40,7 @@ import {
   ConfirmDeleteModal,
   getMainPagePortalEl,
 } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { OFFDECK } from '../../../../constants'
 import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
@@ -55,7 +56,7 @@ import {
   getIsMultiSelectMode,
   actions as stepsActions,
 } from '../../../../ui/steps'
-import { getIsAdapterFromDef } from '../../../../utils'
+import { getHasTrash, getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -68,8 +69,9 @@ interface AddStepButtonProps {
 }
 
 export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
-  const { t } = useTranslation(['tooltip', 'button'])
+  const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
   const enableComment = useSelector(getEnableComment)
+  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -82,7 +84,10 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
-  const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
+  const { modules, additionalEquipmentOnDeck } = useSelector(
+    stepFormSelectors.getInitialDeckSetup
+  )
+  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
   const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
     false
   )
@@ -163,9 +168,16 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
       />
     ))
 
+  const handleAddClick = (): void => {
+    if (hasTrash) {
+      setShowStepOverflowMenu(true)
+    } else {
+      makeSnackbar(t('starting_deck_state:trash_required') as string)
+    }
+  }
+
   return (
     <>
-      {/* TODO(ja): update this modal to match latest modal designs */}
       {enqueuedStepType !== null &&
         createPortal(
           <ConfirmDeleteModal
@@ -209,9 +221,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
         width="100%"
         {...targetProps}
         id="AddStepButton"
-        onClick={() => {
-          setShowStepOverflowMenu(true)
-        }}
+        onClick={handleAddClick}
         disabled={isStepCreationDisabled}
       >
         <Icon name="plus" size="1rem" />

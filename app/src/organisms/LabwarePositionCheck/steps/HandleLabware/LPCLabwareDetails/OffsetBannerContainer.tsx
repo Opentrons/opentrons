@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { InlineNotification } from '/app/atoms/InlineNotification'
+import { InlineNotification } from '@opentrons/components'
+
 import {
   selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,

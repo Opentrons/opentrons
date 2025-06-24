@@ -1,6 +1,17 @@
 import pytest
-from opentrons.types import DeckSlotName, Point, Location
+from opentrons.types import DeckSlotName, Point, Location, MeniscusTrackingTarget
 from opentrons.protocol_api.labware import Labware
+
+
+def test_point_from_xyz_attrs() -> None:
+    class Original:
+        def __init__(self) -> None:
+            self.x = 1
+            self.y = 2
+            self.z = 3
+
+    point = Point.from_xyz_attrs(Original())
+    assert point == Point(1, 2, 3)
 
 
 def test_point_mul() -> None:
@@ -91,3 +102,18 @@ def test_deck_slot_name_equivalencies(
 )
 def test_deck_slot_name_as_int(input: DeckSlotName, expected_int: int) -> None:
     assert input.as_int() == expected_int
+
+
+def test_location_move_preseves_meniscus() -> None:
+    """Location.move() should preserve meniscus relativeness."""
+    loc = Location(
+        point=Point(x=1, y=2, z=3),
+        labware=None,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )
+    moved = loc.move(Point(x=1, y=2, z=3))
+    assert moved == Location(
+        point=Point(x=2, y=4, z=6),
+        labware=None,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )

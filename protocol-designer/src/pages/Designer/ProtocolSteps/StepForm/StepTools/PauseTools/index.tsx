@@ -5,7 +5,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Divider,
-  DropdownMenu,
   Flex,
   RadioButton,
   SPACING,
@@ -18,6 +17,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  DropdownStepFormField,
   InputStepFormField,
   TextAreaField,
 } from '../../../../../../components/molecules'
@@ -28,13 +28,12 @@ import {
 } from '../../../../../../constants'
 import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, visibleFormErrors, setShowFormErrors } = props
+  const { propsForFields, setShowFormErrors } = props
 
   const tempModuleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
@@ -75,12 +74,6 @@ export function PauseTools(props: StepFormProps): JSX.Element {
   const pauseUntilModuleEnabled = moduleLabwareOptions.length > 0
 
   const { pauseAction } = props.formData
-
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
-
-  const formLevelErrorsWithoutField = visibleFormErrors.filter(
-    error => error.dependentFields.length === 0
-  )
 
   return (
     <Flex
@@ -131,15 +124,6 @@ export function PauseTools(props: StepFormProps): JSX.Element {
           largeDesktopBorderRadius
           disabled={!pauseUntilModuleEnabled}
         />
-        {formLevelErrorsWithoutField.map(error => (
-          <StyledText
-            key={error.title}
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.red50}
-          >
-            {error.title}
-          </StyledText>
-        ))}
       </Flex>
       {pauseAction != null ? (
         <>
@@ -171,45 +155,29 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                       units={t('application:units.time_hms')}
                       padding="0"
                       showTooltip={false}
-                      formLevelError={getFormLevelError(
-                        'pauseTime',
-                        mappedErrorsToField
-                      )}
                     />
                   </Flex>
                 </Flex>
               ) : null}
               {pauseAction === PAUSE_UNTIL_TEMP ? (
                 <>
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText desktopStyle="captionRegular">
-                      {i18n.format(
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing12}
+                  >
+                    <DropdownStepFormField
+                      {...propsForFields.moduleId}
+                      tooltipContent={null}
+                      padding="0"
+                      title={i18n.format(
                         t(
                           'form:step_edit_form.field.moduleActionLabware.label'
                         ),
                         'capitalize'
                       )}
-                    </StyledText>
-                    <DropdownMenu
-                      filterOptions={moduleOptions}
-                      onClick={value => {
-                        propsForFields.moduleId.updateValue(value)
-                      }}
-                      currentOption={
-                        moduleOptions.find(
-                          option =>
-                            option.value === propsForFields.moduleId.value
-                        ) ?? { name: '', value: '' }
-                      }
-                      dropdownType="neutral"
+                      options={moduleOptions}
                       width="100%"
-                      error={getFormLevelError('moduleId', mappedErrorsToField)}
                     />
-                  </Flex>
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                  >
                     <InputStepFormField
                       {...propsForFields.pauseTemperature}
                       title={t('application:temperature')}
@@ -217,10 +185,6 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                       errorToShow={propsForFields.pauseTemperature.errorToShow}
                       padding="0"
                       showTooltip={false}
-                      formLevelError={getFormLevelError(
-                        'pauseTemperature',
-                        mappedErrorsToField
-                      )}
                     />
                   </Flex>
                 </>

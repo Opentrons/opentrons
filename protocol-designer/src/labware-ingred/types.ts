@@ -39,10 +39,11 @@ export type Fixture =
   | 'wasteChuteAndStagingArea'
 
 export interface ZoomedIntoSlotInfoState {
-  selectedTopLabwareDefUri: string | null
-  selectedAdapterDefUri: string | null
+  selectedTopLabware: { labwareDefURI: string | null; amount: number }
+  selectedAdapterDefURI: string | null
   selectedModuleModel: ModuleModel | null
   selectedFixture: Fixture | null
+  selectedLidLabware: string | null
   selectedSlot: { slot: DeckSlot | null; cutout: CutoutId | null }
 }
 

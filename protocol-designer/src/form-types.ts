@@ -184,6 +184,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
 export interface AnnotationFields {
   stepName: string
   stepDetails: string
+  stepNumber: number
 }
 export interface BlowoutFields {
   blowout_checkbox?: boolean
@@ -285,7 +286,6 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pushOut_volume: number | null
   pushOut_checkbox: boolean
   aspirate_airGap_volume?: number | null
-  aspirate_delay_mmFromBottom?: number | null
   aspirate_delay_seconds?: number | null
   aspirate_flowRate?: number | null
   aspirate_mix_times?: number | null
@@ -312,11 +312,9 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_position_reference: PositionReference
   blowout_flowRate?: number | null
   blowout_location?: string | null
-  blowout_z_offset?: number | null
   conditioning_checkbox: boolean | null
   conditioning_volume: number | null
   dispense_airGap_volume?: number | null
-  dispense_delay_mmFromBottom?: number | null
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dispense_mix_times?: number | null

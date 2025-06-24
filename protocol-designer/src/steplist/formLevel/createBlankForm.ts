@@ -19,7 +19,7 @@ const getStepType = (stepType: StepType): string => {
       return 'absorbance plate reader'
     }
     case 'heaterShaker': {
-      return 'heater-Shaker state'
+      return 'Heater-Shaker'
     }
     case 'moveLabware': {
       return 'move'
@@ -47,6 +47,7 @@ export function createBlankForm(args: NewFormArgs): FormData {
     stepType: stepType,
     stepName: getStepType(stepType),
     stepDetails: '',
+    stepNumber: 0,
   }
   return { ...baseForm, ...getDefaultsForStepType(stepType) }
 }

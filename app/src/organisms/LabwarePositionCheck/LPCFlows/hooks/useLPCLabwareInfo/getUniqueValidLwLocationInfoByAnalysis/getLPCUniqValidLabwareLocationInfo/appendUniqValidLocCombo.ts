@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
 import type { LabwareLocationInfoWithLocSeq } from '.'
@@ -15,7 +15,7 @@ import type { LabwareLocationInfoWithLocSeq } from '.'
 // and "valid".
 export function appendUniqValidLocCombo(
   acc: LabwareLocationInfoWithLocSeq[],
-  lwDefs: LabwareDefinition2[],
+  lwDefs: LabwareDefinition[],
   combo: LabwareLocationInfoWithLocSeq | null
 ): LabwareLocationInfoWithLocSeq[] {
   if (combo == null) {
@@ -36,7 +36,7 @@ export function appendUniqValidLocCombo(
 // A combo is "valid" if it is LPC-able.
 // We should know that we are dealing strictly with labware at this point!
 function isValidLocCombo(
-  lwDefs: LabwareDefinition2[],
+  lwDefs: LabwareDefinition[],
   combo: LabwareLocationInfoWithLocSeq
 ): boolean {
   const lwDef = lwDefs.find(

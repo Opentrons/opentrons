@@ -39,7 +39,10 @@ from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from ._liquid import LiquidClass
-from ._transfer_liquid_validation import verify_and_normalize_transfer_args
+from ._transfer_liquid_validation import (
+    verify_and_normalize_transfer_args,
+    resolve_keep_last_tip,
+)
 from . import labware, validation
 from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
@@ -538,6 +541,8 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
         final_push_out: Optional[float] = None,
@@ -565,6 +570,10 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
+        :param aspirate_flow_rate: The flow rate for each aspirate in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
+        :param dispense_flow_rate: The flow rate for each dispense in the mix, in µL/s.
+                                   If this is specified, ``rate`` must not be set.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
         :param final_push_out: How much to push out after the final mix repetition. The
@@ -584,7 +593,8 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.21
             Does not repeatedly check for liquid presence.
         .. versionchanged:: 2.24
-            Adds the ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
+            Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``,
+            ``dispense_delay``, and ``final_push_out`` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -599,6 +609,28 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             c_vol = self._core.get_available_volume() if not volume else volume
 
+        if aspirate_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="aspirate_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if aspirate_flow_rate is specified"
+                )
+        if dispense_flow_rate:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="dispense_flow_rate",
+                    until_version="2.24",
+                    current_version=f"{self._api_version}",
+                )
+            if rate != 1.0:
+                raise ValueError(
+                    "rate must not be set if dispense_flow_rate is specified"
+                )
         if aspirate_delay and self.api_version < APIVersion(2, 24):
             raise APIVersionError(
                 api_element="aspirate_delay",
@@ -630,16 +662,14 @@ class InstrumentContext(publisher.CommandPublisher):
         def aspirate_with_delay(
             location: Optional[types.Location | labware.Well],
         ) -> None:
-            self.aspirate(volume, location, rate)
+            self.aspirate(volume, location, rate, flow_rate=aspirate_flow_rate)
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
-            # protocol_api_old/test_context.py does not allow push_out at all, even if
-            # it's set to None, so we have to hide the argument to make the test pass.
-            # I don't know if the test is even valid, but I'm afraid to change the test.
-            dispense_kwargs = {"push_out": push_out} if push_out is not None else {}
-            self.dispense(volume, None, rate, **dispense_kwargs)
+            self.dispense(
+                volume, None, rate, flow_rate=dispense_flow_rate, push_out=push_out
+            )
             if dispense_delay:
                 delay_with_publish(dispense_delay)
 
@@ -1767,7 +1797,8 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1800,6 +1831,12 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -1817,11 +1854,14 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+        )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
         )
 
         verified_dest: Union[
@@ -1869,6 +1909,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
@@ -1886,7 +1927,8 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1909,6 +1951,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"never"``: Do not pick up or drop tips at all.
+              - ``"always"``: Pick up a new tip before every aspirate.
 
             See :ref:`param-tip-handling` for details.
 
@@ -1916,6 +1959,12 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -1933,12 +1982,16 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             raise ValueError(
                 "distribute_with_liquid_class() does not support trash bin or waste chute"
@@ -1952,11 +2005,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `distribute_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         verified_source = transfer_args.source[0]
@@ -1991,6 +2045,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
@@ -2008,7 +2063,8 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
-        visit_every_well: bool = False,
+        group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2032,6 +2088,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
               - ``"once"``: Use one tip for the entire command.
               - ``"never"``: Do not pick up or drop tips at all.
+              - ``"always"``: Pick up a new tip before going back to source for refilling after a dispense.
 
             See :ref:`param-tip-handling` for details.
 
@@ -2039,6 +2096,12 @@ class InstrumentContext(publisher.CommandPublisher):
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
+        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
+            given into a single transfer step, taking into account the tip configuration. If ``False``, target
+            each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
         :meta private:
         """
@@ -2056,12 +2119,16 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
-            target_all_wells=visit_every_well,
+            group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         verified_dest: Union[Tuple[types.Location, WellCore], TrashBin, WasteChute]
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             verified_dest = transfer_args.dest
@@ -2078,11 +2145,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         with publisher.publish_context(
@@ -2113,6 +2181,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
             )
         return self
 
@@ -2337,12 +2406,10 @@ class InstrumentContext(publisher.CommandPublisher):
                        to the volume of liquid that will be dispensed.
         :type volume: float
 
-        :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
-                     in µL/s is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
+        :param rate: How quickly the plunger moves to displace the commanded volume, in µL/s. This rate does not directly relate to
                      the flow rate of liquid out of the resin tip.
 
-                     The default value of ``10.0`` is recommended.
+                     Defaults to ``10.0`` µL/s.
         :type rate: float
         """
         well: Optional[labware.Well] = None
@@ -2696,6 +2763,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
 
+    @publisher.publish(command=cmds.configure_for_volume)
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
         """Configure a pipette to handle a specific volume of liquid, measured in µL.
@@ -2790,6 +2858,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @publisher.publish(command=cmds.configure_nozzle_layout)
     @requires_version(2, 16)
     def configure_nozzle_layout(
         self,

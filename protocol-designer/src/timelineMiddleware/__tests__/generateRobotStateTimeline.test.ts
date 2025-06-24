@@ -28,6 +28,7 @@ describe('generateRobotStateTimeline', () => {
       a: {
         errors: false,
         stepArgs: {
+          stepId: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -64,7 +65,6 @@ describe('generateRobotStateTimeline', () => {
           aspirateOffsetFromBottomMm: 1,
           dispenseOffsetFromBottomMm: 0.5,
           blowoutFlowRateUlSec: 3.78,
-          blowoutOffsetFromTopMm: 0,
           changeTip: 'once',
           preWetTip: false,
           aspirateDelay: null,
@@ -102,6 +102,7 @@ describe('generateRobotStateTimeline', () => {
       b: {
         errors: false,
         stepArgs: {
+          stepId: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
           volume: 5,
@@ -112,7 +113,6 @@ describe('generateRobotStateTimeline', () => {
           aspirateOffsetFromBottomMm: 1,
           dispenseOffsetFromBottomMm: 0.5,
           blowoutFlowRateUlSec: 3.78,
-          blowoutOffsetFromTopMm: 0,
           changeTip: 'always',
           preWetTip: false,
           aspirateDelay: null,
@@ -265,17 +265,19 @@ describe('generateRobotStateTimeline', () => {
         ],
         [
           "pickUpTip",
-          "aspirate",
-          "dispense",
-          "aspirate",
-          "dispense",
+          "moveToWell",
+          "aspirateInPlace",
+          "dispenseInPlace",
+          "aspirateInPlace",
+          "dispenseInPlace",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
           "pickUpTip",
-          "aspirate",
-          "dispense",
-          "aspirate",
-          "dispense",
+          "moveToWell",
+          "aspirateInPlace",
+          "dispenseInPlace",
+          "aspirateInPlace",
+          "dispenseInPlace",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
@@ -289,54 +291,20 @@ describe('generateRobotStateTimeline', () => {
     expect(pythonCommandsOverview).toEqual([
       // Step a:
       `
-mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.move_to(mock_source_plate["A1"].top(z=2))
-mock_pipette.prepare_to_aspirate()
-mock_pipette.move_to(mock_source_plate["A1"].bottom())
-mock_pipette.move_to(mock_source_plate["A1"].bottom())
-mock_pipette.aspirate(...)
-mock_pipette.move_to(mock_source_plate["A1"].bottom())
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette.dispense(...)
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette.move_to(mock_source_plate["A2"].top(z=2))
-mock_pipette.prepare_to_aspirate()
-mock_pipette.move_to(mock_source_plate["A2"].bottom())
-mock_pipette.move_to(mock_source_plate["A2"].bottom())
-mock_pipette.aspirate(...)
-mock_pipette.move_to(mock_source_plate["A2"].bottom())
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette.dispense(...)
-mock_pipette.move_to(mock_dest_plate["A12"].bottom())
+mock_pipette.transfer_with_liquid_class(...)
 mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
-mock_pipette_p300_multi.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette_p300_multi.move_to(mock_source_plate["A1"].top(z=2))
-mock_pipette_p300_multi.prepare_to_aspirate()
-mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-mock_pipette_p300_multi.aspirate(...)
-mock_pipette_p300_multi.move_to(mock_source_plate["A1"].bottom())
-mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
-mock_pipette_p300_multi.dispense(...)
-mock_pipette_p300_multi.move_to(mock_dest_plate["A12"].bottom())
+mock_pipette_p300_multi.transfer_with_liquid_class(...)
 mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 3.78
-mock_pipette.flow_rate.dispense = 3.78
 mock_pipette.mix(...)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
-mock_pipette.flow_rate.aspirate = 3.78
-mock_pipette.flow_rate.dispense = 3.78
 mock_pipette.mix(...)
 mock_pipette.drop_tip()
 `.trim(),

@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import {
+  ABSORBANCE_READER_V1,
   fixture96Plate,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
@@ -13,7 +14,7 @@ import {
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { SelectLabwareModal } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   deleteContainer,
@@ -22,9 +23,11 @@ import {
 import { selectors } from '../../../../labware-ingred/selectors'
 import {
   getAdditionalEquipment,
+  getLabwareEntities,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getDismissedHints } from '../../../../tutorial/selectors'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
@@ -43,7 +46,8 @@ vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../../top-selectors/well-contents')
+vi.mock('../../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
 vi.mock('../../../../ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
@@ -67,12 +71,14 @@ describe('DeckSetupToolbox', () => {
       onCloseClick: vi.fn(),
     }
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: null,
-      selectedTopLabwareDefUri: null,
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
+    vi.mocked(getLabwareEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
@@ -92,26 +98,45 @@ describe('DeckSetupToolbox', () => {
       eatToast: vi.fn(),
     })
     vi.mocked(getLabwareNicknamesById).mockReturnValue({})
+    vi.mocked(
+      wellContentsSelectors.getAllWellContentsForActiveItem
+    ).mockReturnValue(null)
   })
   afterEach(() => {
     vi.resetAllMocks()
   })
   it('should render empty labware and add labware CTA opens modal ', () => {
     render(props)
-    screen.getByText('Customize slot')
+    screen.getByText('Edit labware')
     screen.getByText('Add labware')
     screen.getByText('No labware added')
     screen.getByText('Select labware to add to slot')
     fireEvent.click(screen.getByText('Add labware'))
     screen.getByText('mock SelectLabwareModal')
   })
+  it('renders correct copy for adding a labware onto a plate reader', () => {
+    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
+      selectedAdapterDefURI: null,
+      selectedTopLabware: { labwareDefURI: null, amount: 1 },
+      selectedLidLabware: null,
+      selectedFixture: null,
+      selectedModuleModel: ABSORBANCE_READER_V1,
+      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
+    })
+    render(props)
+    screen.getByText('Can’t add labware')
+    screen.getByText(
+      'The plate reader must start empty so it can be initialized.'
+    )
+  })
   it('should clear the slot from all items when the clear cta is called', () => {
     vi.mocked(getLabwareNicknamesById).mockReturnValue({
       labId: 'mock nickName',
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedAdapterDefUri: 'mockUri',
-      selectedTopLabwareDefUri: 'mockUri',
+      selectedAdapterDefURI: 'mockUri',
+      selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
+      selectedLidLabware: null,
       selectedFixture: null,
       selectedModuleModel: null,
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
@@ -151,13 +176,13 @@ describe('DeckSetupToolbox', () => {
     })
     render(props)
     screen.getAllByText('mock nickName')
-    screen.getByText('Add liquid')
+    screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
     fireEvent.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getByText('Add liquid'))
+    fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // add labware when there is no space

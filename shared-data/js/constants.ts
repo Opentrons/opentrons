@@ -1,6 +1,13 @@
-import type { WellOrigin } from '../command'
+import type { WellLocation, WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
-import type { ModuleModel, ModuleType, PositionReference } from './types'
+import type {
+  AddressableArea,
+  AreaType,
+  FakeAddressableArea,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -240,6 +247,11 @@ export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
   'cutoutD2',
 ]
 
+export const LEFT_AND_CENTER_CUTOUTS = [
+  ...SINGLE_LEFT_CUTOUTS,
+  ...SINGLE_CENTER_CUTOUTS,
+]
+
 export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
@@ -288,6 +300,26 @@ export const D1_ADDRESSABLE_AREA: 'D1' = 'D1'
 export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
+
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeCutoutFixtureId =
+  | 'fakeStagingAreaRightSlot'
+  | 'fakeWasteChuteWithEmptySlot'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
+
+export type CutoutFixtureIdsWithFakes = CutoutFixtureId | FakeCutoutFixtureId
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
 
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
@@ -551,6 +583,12 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
+  'fakeStagingAreaRightSlot'
+
+export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' =
+  'fakeWasteChuteWithEmptySlot'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -621,6 +659,7 @@ export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
 ]
 
 export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
+  // TODO (tz, 6-14-25): we need to remove this from our code base?
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -643,6 +682,15 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
+
+export const COMBO_FIXTURES: CutoutFixtureId[] = [
+  ...FLEX_STACKER_FIXTURES,
+  ...MAGNETIC_BLOCK_FIXTURES,
+  ...WASTE_CHUTE_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+]
+
+export const DEFAULT_AA_FOR_WASTE_CHUTE = '96ChannelWasteChute'
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
 
@@ -694,3 +742,12 @@ export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
 }
 
 export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+
+export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
+  origin: WELL_ORIGIN_TOP,
+  offset: {
+    x: 0,
+    y: 0,
+    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  },
+}

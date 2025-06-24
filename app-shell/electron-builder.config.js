@@ -46,7 +46,6 @@ module.exports = async () => ({
     ).versionForProject(project),
     productName: project === 'robot-stack' ? 'Opentrons' : 'Opentrons-OT3',
   },
-  extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
@@ -65,13 +64,16 @@ module.exports = async () => ({
   },
   win: {
     target: ['nsis'],
-    publisherName: 'Opentrons Labworks Inc.',
     icon: project === 'robot-stack' ? 'build/icon.ico' : 'build/three.ico',
     forceCodeSigning: WINDOWS_SIGN,
-    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
-    sign: 'scripts/windows-custom-sign.js',
-    signDlls: true,
-    signingHashAlgorithms: ['sha256'],
+    azureSignOptions: WINDOWS_SIGN
+      ? {
+          publisherName: 'OPENTRONS LABWORKS INC.',
+          codeSigningAccountName: 'desktop-app-signing',
+          certificateProfileName: 'OpentronsDesktopApp',
+          endpoint: 'https://eus.codesigning.azure.net',
+        }
+      : undefined,
   },
   nsis: {
     oneClick: false,
@@ -88,5 +90,5 @@ module.exports = async () => ({
   },
   publish: publishConfig,
   generateUpdatesFilesForAllChannels: true,
-  beforePack: path.join(__dirname, './scripts/before-pack.js'),
+  afterPack: path.join(__dirname, './scripts/after-pack.js'),
 })

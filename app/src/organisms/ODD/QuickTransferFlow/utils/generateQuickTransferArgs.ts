@@ -23,7 +23,7 @@ import {
 import type {
   CutoutConfig,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -51,7 +51,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 function getOrderedWells(
   unorderedWells: string[],
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): string[] {
   const allWellsOrdered = orderWells(labwareDef.ordering, 't2b', 'l2r')
   return intersection(allWellsOrdered, unorderedWells)
@@ -382,6 +382,7 @@ export function generateQuickTransferArgs(
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const commonFields = {
+    stepId: 1,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id as string,
@@ -401,14 +402,12 @@ export function generateQuickTransferArgs(
       quickTransferState.delayAspirate != null
         ? {
             seconds: quickTransferState.delayAspirate?.delayDuration,
-            mmFromBottom: quickTransferState.delayAspirate.positionFromBottom,
           }
         : null,
     dispenseDelay:
       quickTransferState.delayDispense != null
         ? {
             seconds: quickTransferState.delayDispense?.delayDuration,
-            mmFromBottom: quickTransferState.delayDispense.positionFromBottom,
           }
         : null,
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
@@ -475,30 +474,26 @@ export function generateQuickTransferArgs(
           quickTransferState.delayAspirate != null
             ? {
                 seconds: quickTransferState.delayAspirate.delayDuration,
-                mmFromBottom:
-                  quickTransferState.delayAspirate.positionFromBottom,
               }
             : null,
         dispenseDelay:
           quickTransferState.delayDispense != null
             ? {
                 seconds: quickTransferState.delayDispense.delayDuration,
-                mmFromBottom:
-                  quickTransferState.delayDispense.positionFromBottom,
               }
             : null,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         mixInDestination:
           quickTransferState.mixOnDispense != null
             ? {
                 volume: quickTransferState.mixOnDispense.mixVolume,
-                times: quickTransferState.mixOnDispense.repititions,
+                times: quickTransferState.mixOnDispense.repetitions,
               }
             : null,
       }
@@ -517,14 +512,14 @@ export function generateQuickTransferArgs(
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         mixInDestination:
           quickTransferState.mixOnDispense != null
             ? {
                 volume: quickTransferState.mixOnDispense.mixVolume,
-                times: quickTransferState.mixOnDispense.repititions,
+                times: quickTransferState.mixOnDispense.repetitions,
               }
             : null,
         sourceWells,
@@ -546,11 +541,12 @@ export function generateQuickTransferArgs(
           quickTransferState.mixOnAspirate != null
             ? {
                 volume: quickTransferState.mixOnAspirate.mixVolume,
-                times: quickTransferState.mixOnAspirate.repititions,
+                times: quickTransferState.mixOnAspirate.repetitions,
               }
             : null,
         sourceWell: sourceWells[0],
         destWells,
+        conditioningVolume: null,
       }
       return {
         stepArgs: distributeStepArguments,

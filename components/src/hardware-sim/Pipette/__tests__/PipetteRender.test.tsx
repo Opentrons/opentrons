@@ -16,13 +16,13 @@ import { EmanatingNozzle } from '../EmanatingNozzle'
 import { PipetteRender } from '../PipetteRender'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../../Deck/RobotCoordsForeignDiv')
 vi.mock('../EmanatingNozzle')
 vi.mock('../EightEmanatingNozzles')
 
-const fixtureTiprack300Ul = _fixtureTiprack300ul as LabwareDefinition2
+const fixtureTiprack300Ul = _fixtureTiprack300ul as LabwareDefinition
 
 const render = (props: ComponentProps<typeof PipetteRender>) => {
   return renderWithProviders(<PipetteRender {...props} />)[0]

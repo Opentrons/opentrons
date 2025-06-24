@@ -22,6 +22,7 @@ import {
 import {
   getLabwareDefIsStandard,
   getLabwareDisplayName,
+  getLabwareViewBox,
 } from '@opentrons/shared-data'
 
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
@@ -41,10 +42,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = getLabwareDisplayName(definition)
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = !getLabwareDefIsStandard(definition)
+
+  const viewBox = getLabwareViewBox(definition)
+
   const xDimensionOverride =
     definition.parameters.loadName === 'opentrons_universal_flat_adapter'
       ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
-      : definition.dimensions.xDimension
+      : viewBox.xDimension
 
   return (
     <Box
@@ -64,9 +68,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
-          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${xDimensionOverride} ${definition.dimensions.yDimension}`}
+          viewBox={`${viewBox.minX} ${viewBox.minY} ${xDimensionOverride} ${viewBox.yDimension}`}
         >
-          {() => <LabwareRender definition={definition} />}
+          {() => (
+            <LabwareRender
+              definition={definition}
+              positioningMode="passThrough"
+            />
+          )}
         </RobotWorkSpace>
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}

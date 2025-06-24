@@ -1,8 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import { css } from 'styled-components'
 
-import { LegacyStyledText, StyledText } from '@opentrons/components'
+import {
+  AnimationVideo,
+  LegacyStyledText,
+  StyledText,
+} from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
@@ -19,10 +23,6 @@ import {
 
 import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type {
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   const { proceedStep, goBackLastStep, commandUtils, runId } = props
@@ -36,20 +36,21 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   const currentSubstep = useSelector(selectCurrentSubstep(runId))
   const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
   const pipetteId = pipette.id
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails = selectedLwInfo?.offsetLocationDetails
 
   const handleGoBack = (): void => {
     void toggleRobotMoving(true)
       .then(() => {
         // On the desktop app, ensure the robot returns to the initial offset position instead of the home position
         // when actively calibrating an offset.
-        if (currentSubstep === 'handle-lw/edit-offset/check-labware') {
+        if (
+          currentSubstep === 'handle-lw/edit-offset/check-labware' &&
+          offsetLocationDetails != null
+        ) {
           return home()
             .then(() =>
               handleMoveToInitialOffsetPosition(
@@ -113,10 +114,8 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
             </StyledText>
           }
         />
-        <StyledVideo
-          autoPlay
-          loop
-          controls={false}
+        <AnimationVideo
+          css={VIDEO_STYLE}
           src={probeVideo()}
           data-testid="probe-video"
         />
@@ -125,7 +124,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   )
 }
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   height: 100%;
   width: 100%;
 `

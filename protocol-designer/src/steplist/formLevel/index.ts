@@ -5,11 +5,17 @@ import {
   aspirateLabwareRequired,
   aspirateMixTimesRequired,
   aspirateMixVolumeRequired,
+  aspirateRetractSpeedRequired,
+  aspirateSubmergeSpeedRequired,
   aspirateTouchTipMmFromEdgeOutOfRange,
   aspirateTouchTipMmFromEdgeRequired,
+  aspirateTouchTipSpeedRequired,
   aspirateWellsRequired,
+  blockTargetTempHoldRange,
+  blockTargetTempRange,
   blockTemperatureHoldRequired,
   blockTemperatureRequired,
+  blowoutFlowRateRequired,
   blowoutLocationRequired,
   composeErrors,
   conditioningVolumeOutOfRange,
@@ -19,8 +25,11 @@ import {
   dispenseLabwareRequired,
   dispenseMixTimesRequired,
   dispenseMixVolumeRequired,
+  dispenseRetractSpeedRequired,
+  dispenseSubmergeSpeedRequired,
   dispenseTouchTipMmFromEdgeOutOfRange,
   dispenseTouchTipMmFromEdgeRequired,
+  dispenseTouchTipSpeedRequired,
   dispenseWellsRequired,
   engageHeightRangeExceeded,
   engageHeightRequired,
@@ -29,19 +38,25 @@ import {
   incompatibleDispenseLabware,
   incompatibleLabware,
   labwareToMoveRequired,
+  lidTargetTempHoldRange,
+  lidTargetTempRange,
   lidTemperatureHoldRequired,
   lidTemperatureRequired,
   magnetActionRequired,
   magneticModuleIdRequired,
+  messageRequired,
   mixLabwareRequired,
   mixWellsRequired,
   moduleIdRequired,
   newLabwareLocationRequired,
   pauseActionRequired,
+  pauseForTimeOrUntilTold,
   pauseModuleRequired,
   pauseTemperatureRequired,
-  pauseTimeRequired,
+  pipetteRequired,
+  profileTargetLidTempRange,
   profileTargetLidTempRequired,
+  profileVolumeRange,
   profileVolumeRequired,
   pushOutVolumeOutOfRange,
   pushOutVolumeRequired,
@@ -49,9 +64,14 @@ import {
   referenceWavelengthRequired,
   shakeSpeedRequired,
   shakeTimeRequired,
+  targetHeaterShakerTemperatureRange,
+  targetSpeedRange,
+  targetTemperatureRange,
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
+  transferVolumeMax,
+  transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
   wavelengthOutOfRange,
@@ -61,9 +81,8 @@ import {
 import {
   belowPipetteMinimumVolume,
   composeWarnings,
+  incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minAspirateAirGapVolume,
-  minDispenseAirGapVolume,
   minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
@@ -141,7 +160,10 @@ const stepFormHelperMap: {
     getErrors: composeErrors(
       shakeSpeedRequired,
       shakeTimeRequired,
-      temperatureRequired
+      temperatureRequired,
+      targetSpeedRange,
+      targetHeaterShakerTemperatureRange,
+      moduleIdRequired
     ),
   },
   mix: {
@@ -156,19 +178,24 @@ const stepFormHelperMap: {
       dispenseDelayDurationRequired,
       blowoutLocationRequired,
       pushOutVolumeOutOfRange,
-      pushOutVolumeRequired
+      pushOutVolumeRequired,
+      blowoutFlowRateRequired,
+      transferVolumeMax,
+      transferVolumeMin,
+      pipetteRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
-      mixTipPositionInTube
+      mixTipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   pause: {
     getErrors: composeErrors(
       pauseActionRequired,
-      pauseTimeRequired,
       pauseTemperatureRequired,
-      pauseModuleRequired
+      pauseModuleRequired,
+      pauseForTimeOrUntilTold
     ),
   },
   moveLabware: {
@@ -194,8 +221,8 @@ const stepFormHelperMap: {
       aspirateWellsRequired,
       dispenseWellsRequired,
       // TODO (nd: 04/17/2025): re-wire up the following errors once speed getters are implemented in migration
-      // aspirateTouchTipSpeedRequired,
-      // dispenseTouchTipSpeedRequired,
+      aspirateTouchTipSpeedRequired,
+      dispenseTouchTipSpeedRequired,
       pushOutVolumeRequired,
       pushOutVolumeOutOfRange,
       aspirateTouchTipMmFromEdgeOutOfRange,
@@ -203,15 +230,22 @@ const stepFormHelperMap: {
       aspirateTouchTipMmFromEdgeRequired,
       dispenseTouchTipMmFromEdgeRequired,
       conditioningVolumeRequired,
-      conditioningVolumeOutOfRange
+      conditioningVolumeOutOfRange,
+      blowoutFlowRateRequired,
+      transferVolumeMax,
+      transferVolumeMin,
+      pipetteRequired,
+      aspirateSubmergeSpeedRequired,
+      aspirateRetractSpeedRequired,
+      dispenseSubmergeSpeedRequired,
+      dispenseRetractSpeedRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
       maxDispenseWellVolume,
       minDisposalVolume,
-      minAspirateAirGapVolume,
-      minDispenseAirGapVolume,
-      tipPositionInTube
+      tipPositionInTube,
+      incompatibleLiquidClass
     ),
   },
   magnet: {
@@ -224,7 +258,11 @@ const stepFormHelperMap: {
     ),
   },
   temperature: {
-    getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
+    getErrors: composeErrors(
+      targetTemperatureRequired,
+      moduleIdRequired,
+      targetTemperatureRange
+    ),
   },
   thermocycler: {
     getErrors: composeErrors(
@@ -233,11 +271,17 @@ const stepFormHelperMap: {
       profileVolumeRequired,
       profileTargetLidTempRequired,
       blockTemperatureHoldRequired,
-      lidTemperatureHoldRequired
+      lidTemperatureHoldRequired,
+      lidTargetTempHoldRange,
+      blockTargetTempHoldRange,
+      profileVolumeRange,
+      profileTargetLidTempRange,
+      lidTargetTempRange,
+      blockTargetTempRange
     ),
   },
   comment: {
-    getErrors: composeErrors(),
+    getErrors: composeErrors(messageRequired),
   },
 }
 

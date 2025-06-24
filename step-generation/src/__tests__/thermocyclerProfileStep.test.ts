@@ -55,13 +55,6 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/runProfile',
           key: expect.any(String),
           params: {
@@ -83,13 +76,6 @@ describe('thermocyclerProfileStep', () => {
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {
@@ -156,13 +142,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {
@@ -237,13 +216,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           },
         },
         {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/deactivateLid',
           key: expect.any(String),
           params: {
@@ -306,13 +278,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {

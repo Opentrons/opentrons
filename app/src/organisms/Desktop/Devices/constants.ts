@@ -2,14 +2,14 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { getLatestLabwareDef } from '/app/assets/labware/getLabware'
 
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 export const RUN_LOG_WINDOW_SIZE = 60 // number of command items rendered at a time
 
 // NOTE: this map is a duplicate of the TIP_RACK_LOOKUP_BY_MAX_VOL
 // found at robot_server/robot/calibration/constants.py
 const TIP_RACK_LOOKUP_BY_MAX_VOL: {
-  [maxVol: string]: LabwareDefinition2['parameters']['loadName']
+  [maxVol: string]: LabwareDefinition['parameters']['loadName']
 } = {
   10: 'opentrons_96_tiprack_10ul',
   20: 'opentrons_96_tiprack_20ul',
@@ -20,7 +20,7 @@ const TIP_RACK_LOOKUP_BY_MAX_VOL: {
 
 export function getDefaultTiprackDefForPipetteName(
   pipetteName: PipetteName
-): LabwareDefinition2 | null {
+): LabwareDefinition | null {
   const pipetteNameSpecs = getPipetteNameSpecs(pipetteName)
   if (pipetteNameSpecs != null) {
     return getLatestLabwareDef(

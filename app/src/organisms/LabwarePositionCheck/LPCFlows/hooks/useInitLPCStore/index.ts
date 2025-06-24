@@ -13,7 +13,7 @@ import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type { LPCLabwareInfo, LPCWizardState } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
@@ -24,7 +24,7 @@ export interface UseLPCInitialStateProps {
   analysis: CompletedProtocolAnalysis | null
   protocolName: string | undefined
   maintenanceRunId: string | null
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
   labwareInfo: LPCLabwareInfo
   deckConfig: DeckConfiguration | undefined
   isFlex: boolean

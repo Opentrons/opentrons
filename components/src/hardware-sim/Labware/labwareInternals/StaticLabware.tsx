@@ -10,12 +10,12 @@ import { Well } from './Well'
 
 import type { CSSProperties } from 'styled-components'
 import type { MemoExoticComponent } from 'react'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent, WellStroke } from './types'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
   /** adds a drop shadow to the highlight border */

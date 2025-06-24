@@ -93,7 +93,7 @@ export const flex50 = '#00BDFF'
 /**
  * extras
  */
-export const transparent = 'transparent'
+export const transparent = '#00000000'
 // opacity hex codes to append to 6-digit color hex codes
 export const opacity20HexCode = '33' // 20% opacity
 export const opacity40HexCode = '66' // 40% opacity

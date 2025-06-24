@@ -5,6 +5,7 @@ import {
   distribute,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLiquidClasses,
   getLoadPipettes,
   getLoadTrashBins,
   getLoadWasteChute,
@@ -108,6 +109,11 @@ export function pythonDef(
       getLoadTrashBins(trashBinEntities),
       getLoadWasteChute(wasteChuteEntities),
     ],
+    getLoadLiquidClasses(
+      stepArgs?.liquidClass != null && stepArgs?.liquidClass !== 'none'
+        ? [stepArgs.liquidClass]
+        : []
+    ),
     quickTransferStepCommands({
       stepArgs,
       invariantContext,

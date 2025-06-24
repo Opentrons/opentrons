@@ -3,7 +3,7 @@ import type {
   CommonCommandRunTimeInfo,
   RunCommandFlexStackerError,
 } from '.'
-import type { LabwareDefinition2 } from '../../js'
+import type { LabwareDefinition } from '../../js'
 import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
@@ -39,6 +39,7 @@ export type ModuleRunTimeCommand =
   | FlexStackerStoreRunTimeCommand
   | FlexStackerFillRunTimeCommand
   | FlexStackerEmptyRunTimeCommand
+  | IdentifyModuleRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -76,6 +77,7 @@ export type ModuleCreateCommand =
   | FlexStackerPrepareShuttleCreateCommand
   | FlexStackerOpenLatch
   | FlexStackerCloseLatch
+  | IdentifyModuleCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -444,9 +446,9 @@ export interface FlexStackerSetStoredLabwareRunTimeCommand
   extends FlexStackerSetStoredLabwareCreateCommand,
     CommonCommandRunTimeInfo {
   result?: {
-    primaryLabwareDefinition: LabwareDefinition2
-    lidLabwareDefinition?: LabwareDefinition2 | null
-    adapterLabwareDefinition?: LabwareDefinition2 | null
+    primaryLabwareDefinition: LabwareDefinition
+    lidLabwareDefinition?: LabwareDefinition | null
+    adapterLabwareDefinition?: LabwareDefinition | null
     count: number
     storedLabware: FlexStackerStoredLabwareGroup[]
   } & StackerStoredLabwareLocationSequences
@@ -589,4 +591,22 @@ export interface FlexStackerEmptyRunTimeCommand
     removedLabware?: FlexStackerStoredLabwareGroup[] | null
   } & StackerStoredLabwareLocationSequences &
     StackerStoredLabwareDefinitionURIs
+}
+
+export type IdentifyColor = 'white' | 'red' | 'green' | 'blue' | 'yellow' | null
+
+export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'identifyModule'
+  params: {
+    model: string
+    moduleId: string
+    start: boolean
+    color?: IdentifyColor
+  }
+}
+
+export interface IdentifyModuleRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    IdentifyModuleCreateCommand {
+  result?: any
 }

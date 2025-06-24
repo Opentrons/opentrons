@@ -12,6 +12,7 @@ import type { HydratedPauseFormData } from '../../../../form-types'
 describe('pauseFormToArgs', () => {
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TEMP,
@@ -33,6 +34,7 @@ describe('pauseFormToArgs', () => {
   })
   it('returns delay command creator when form specifies pause until resume', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_RESUME,
@@ -56,6 +58,7 @@ describe('pauseFormToArgs', () => {
 
   it('returns delay command creator when form specifies pause until time', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TIME,

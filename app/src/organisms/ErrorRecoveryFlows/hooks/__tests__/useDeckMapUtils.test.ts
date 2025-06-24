@@ -22,7 +22,7 @@ import {
   updateLabwareInModules,
 } from '../useDeckMapUtils'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
@@ -36,8 +36,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('@opentrons/components')
 
 describe('getRunCurrentModulesOnDeck', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -119,8 +119,8 @@ describe('getRunCurrentModulesOnDeck', () => {
 })
 
 describe('getRunCurrentLabwareOnDeck', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -341,8 +341,8 @@ describe('getRunCurrentModulesInfo', () => {
 })
 
 describe('getRunCurrentLabwareInfo', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -571,8 +571,8 @@ describe('getIsLabwareMatch', () => {
 })
 
 describe('updateLabwareInModules', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',

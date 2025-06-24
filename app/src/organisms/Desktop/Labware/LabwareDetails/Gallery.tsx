@@ -11,11 +11,18 @@ import {
   SPACING,
   SPACING_AUTO,
 } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import { labwareImages } from './labware-images'
 
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
+/**
+ * opentrons_universal_flat_adapter has a protrusion on one side, but the `dimensions`
+ * in the current version of the definition (v1) do not include it. This is a
+ * replacement xDimension that includes the protrusion so it doesn't get clipped off
+ * when we render an SVG of the adapter.
+ */
 export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
 
 export interface GalleryProps {
@@ -24,24 +31,27 @@ export interface GalleryProps {
 
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition } = props
-  const {
-    parameters: params,
-    dimensions: dims,
-    cornerOffsetFromSlot,
-  } = definition
-  const xDimension =
+  const { parameters: params } = definition
+
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
+  const xDimensionOverride =
     params.loadName === 'opentrons_universal_flat_adapter'
-      ? 127.4
-      : dims.xDimension
+      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
+      : xDimension
 
   const [currentImage, setCurrentImage] = useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimension} ${dims.yDimension}`}
+        viewBox={`${minX} ${minY} ${xDimensionOverride} ${yDimension}`}
       >
-        {() => <LabwareRender definition={definition} />}
+        {() => (
+          <LabwareRender
+            definition={definition}
+            positioningMode="passThrough"
+          />
+        )}
       </RobotWorkSpace>
     </Box>
   )

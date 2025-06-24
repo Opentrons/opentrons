@@ -49,7 +49,7 @@
   "select": "Select",
   "selected": "Selected",
   "source": "Source",
-  "temperature": "Temperature (˚C)",
+  "temperature": "Temperature (°C)",
   "time": "Time",
   "units": {
     "cycles": "cycles",

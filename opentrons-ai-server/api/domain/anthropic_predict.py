@@ -1,5 +1,4 @@
 import json
-import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,7 +15,9 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, 
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings
 
-weave.init("opentronsai/OpentronsAI-Phase-march-25")
+MessageType = Literal["create", "update"]
+
+weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -26,6 +27,7 @@ REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
 class AnthropicPredict:
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
+        self.max_tokens: int = 20000
         self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
@@ -177,7 +179,7 @@ class AnthropicPredict:
         ]
 
         response = self.client.messages.create(  # type: ignore[call-overload]
-            max_tokens=2048,
+            max_tokens=4096,
             temperature=0.0,
             messages=msg,
             model=self.model_helper,
@@ -189,16 +191,14 @@ class AnthropicPredict:
         return response.content[0].text  # type: ignore[no-any-return]
 
     @tracer.wrap()
-    def _process_message(
-        self, user_id: str, messages: List[MessageParam], message_type: Literal["create", "update"], max_tokens: int = 4096
-    ) -> Message:
+    def _process_message(self, user_id: str, messages: List[MessageParam], message_type: MessageType) -> Message:
         """
         Internal method to handle message processing with different system prompts.
         For now, system prompt is the same.
         """
 
         response: Message = self.client.messages.create(  # type: ignore[call-overload]
-            max_tokens=max_tokens,
+            max_tokens=self.max_tokens,
             messages=messages,
             model=self.model_name,
             system=self.system_prompt,
@@ -220,7 +220,7 @@ class AnthropicPredict:
 
     @tracer.wrap()
     def process_message(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: Literal["create", "update"] = "create"
+        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
         """Unified method for creating and updating messages"""
         try:
@@ -270,7 +270,7 @@ class AnthropicPredict:
 
     @tracer.wrap()
     def process_message_pd(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: Literal["create", "update"] = "create"
+        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
     ) -> str | None:
         """return a partial json protocol"""
         try:
@@ -282,7 +282,7 @@ class AnthropicPredict:
             messages.append({"role": "user", "content": self.PROMPT_PD.format(USER_PROMPT=prompt)})
 
             response: Message = self.client.messages.create(
-                max_tokens=20000,
+                max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
                 system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
@@ -291,21 +291,7 @@ class AnthropicPredict:
             )
             if response.content and response.content[0].type == "text":
                 response_text = response.content[0].text
-                # Look for JSON within <pd_json> tags or just assume the whole response is JSON
-                json_match = re.search(r"<pd_json>\s*(.*?)\s*</pd_json>", response_text, re.DOTALL)
-                if json_match:
-                    partial_json = json_match.group(1)
-                    # Clean up any markdown code block formatting if present
-                    if partial_json.startswith("```json") or partial_json.startswith("```"):
-                        partial_json = re.sub(r"^```(?:json)?\n(.*?)\n```$", r"\1", partial_json, flags=re.DOTALL)
-                else:
-                    # If no tags found, check if response is directly JSON
-                    if response_text.strip().startswith("{") and response_text.strip().endswith("}"):
-                        partial_json = response_text
-                    else:
-                        partial_json = f"No valid JSON protocol found in response:\n {response_text}"
-
-                return partial_json
+                return response_text
 
             logger.error("Unexpected response type")
             return None
@@ -321,7 +307,28 @@ class AnthropicPredict:
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
-    def standardize(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
+        """
+        Safely navigate nested dictionaries using a sequence of keys.
+
+        Args:
+            data: The dictionary to navigate
+            *keys: Variable number of keys to traverse
+            default: Default value to return if any key is missing
+
+        Returns:
+            The value at the nested path, or default if any key is missing
+        """
+        current = data
+        for key in keys:
+            if isinstance(current, dict) and key in current:
+                current = current[key]
+            else:
+                return default if default is not None else {}
+        return current
+
+    @tracer.wrap()
+    def standardize(self, protocol: Dict[str, Any]) -> Dict[str, Any]:
         """
         Reorganize the data structure according to the standard schema while preserving content.
         SCHEMA
@@ -373,85 +380,110 @@ class AnthropicPredict:
         }
         """
         now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
-        original_saved_forms = data.get("designerApplication", {}).get("data", {}).get("savedStepForms", {})
+        original_saved_forms = self.deep_get(protocol, "designerApplication", "data", "savedStepForms")
         # Make a copy to modify, or ensure original_steps is a new dict
         original_steps_without_initial = {k: v for k, v in original_saved_forms.items() if k != "__INITIAL_DECK_SETUP_STEP__"}
-        original_ordered_ids = data.get("designerApplication", {}).get("data", {}).get("orderedStepIds", [])
+        original_ordered_ids = self.deep_get(protocol, "designerApplication", "data", "orderedStepIds", default=[])
 
         standard = {
-            "$otSharedSchema": data.get("$otSharedSchema", "#/protocol/schemas/8"),
-            "schemaVersion": data.get("schemaVersion", 8),
+            "$otSharedSchema": self.deep_get(protocol, "$otSharedSchema", default="#/protocol/schemas/8"),
+            "schemaVersion": self.deep_get(protocol, "schemaVersion", default=8),
             "metadata": {
-                "protocolName": data.get("metadata", {}).get("protocolName", ""),
-                "author": data.get("metadata", {}).get("author", "AI"),
-                "description": data.get("metadata", {}).get("description", ""),
+                "protocolName": self.deep_get(protocol, "metadata", "protocolName", default=""),
+                "author": self.deep_get(protocol, "metadata", "author", default="OpentronsAI"),
+                "description": self.deep_get(protocol, "metadata", "description", default=""),
                 "created": now_ms,
                 "lastModified": now_ms,
                 "source": "OpentronsAI",
-                "category": data.get("metadata", {}).get("category", None),
-                "subcategory": data.get("metadata", {}).get("subcategory", None),
-                "tags": data.get("metadata", {}).get("tags", []),
+                "category": self.deep_get(protocol, "metadata", "category", default=None),
+                "subcategory": self.deep_get(protocol, "metadata", "subcategory", default=None),
+                "tags": self.deep_get(protocol, "metadata", "tags", default=[]),
             },
             "designerApplication": {
-                "name": data.get("designerApplication", {}).get("name", "opentrons/protocol-designer"),
+                "name": self.deep_get(protocol, "designerApplication", "name", default="opentrons/protocol-designer"),
                 "version": "8.4.4",
                 "data": {
-                    "_internalAppBuildDate": data.get("designerApplication", {})
-                    .get("data", {})
-                    .get("_internalAppBuildDate", "Wed, 06 May 2025 21:05:04 GMT"),
-                    "pipetteTiprackAssignments": data.get("designerApplication", {}).get("data", {}).get("pipetteTiprackAssignments", {}),
+                    "_internalAppBuildDate": self.deep_get(
+                        protocol, "designerApplication", "data", "_internalAppBuildDate", default="Wed, 06 May 2025 21:05:04 GMT"
+                    ),
+                    "pipetteTiprackAssignments": self.deep_get(protocol, "designerApplication", "data", "pipetteTiprackAssignments"),
                     "dismissedWarnings": {"form": [], "timeline": []},
-                    "ingredients": data.get("designerApplication", {}).get("data", {}).get("ingredients", {}),
-                    "ingredLocations": data.get("designerApplication", {}).get("data", {}).get("ingredLocations", {}),
+                    "ingredients": self.deep_get(protocol, "designerApplication", "data", "ingredients"),
+                    "ingredLocations": self.deep_get(protocol, "designerApplication", "data", "ingredLocations"),
                     "savedStepForms": {
                         "__INITIAL_DECK_SETUP_STEP__": {
                             "stepType": "manualIntervention",
                             "id": "__INITIAL_DECK_SETUP_STEP__",
-                            "labwareLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("labwareLocationUpdate", {}),
-                            "pipetteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("pipetteLocationUpdate", {}),
-                            "moduleLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("moduleLocationUpdate", {}),
-                            "trashBinLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("trashBinLocationUpdate", {}),
-                            "wasteChuteLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("wasteChuteLocationUpdate", {}),
-                            "stagingAreaLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("stagingAreaLocationUpdate", {}),
-                            "gripperLocationUpdate": data.get("designerApplication", {})
-                            .get("data", {})
-                            .get("savedStepForms", {})
-                            .get("__INITIAL_DECK_SETUP_STEP__", {})
-                            .get("gripperLocationUpdate", {}),
+                            "labwareLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "labwareLocationUpdate",
+                            ),
+                            "pipetteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "pipetteLocationUpdate",
+                            ),
+                            "moduleLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "moduleLocationUpdate",
+                            ),
+                            "trashBinLocationUpdate": (
+                                {"trashbin-1": "cutout12"}
+                                if self.deep_get(protocol, "robot", "model") == "OT-2 Standard"
+                                else self.deep_get(
+                                    protocol,
+                                    "designerApplication",
+                                    "data",
+                                    "savedStepForms",
+                                    "__INITIAL_DECK_SETUP_STEP__",
+                                    "trashBinLocationUpdate",
+                                )
+                            ),
+                            "wasteChuteLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "wasteChuteLocationUpdate",
+                            ),
+                            "stagingAreaLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "stagingAreaLocationUpdate",
+                            ),
+                            "gripperLocationUpdate": self.deep_get(
+                                protocol,
+                                "designerApplication",
+                                "data",
+                                "savedStepForms",
+                                "__INITIAL_DECK_SETUP_STEP__",
+                                "gripperLocationUpdate",
+                            ),
                         },
                         **original_steps_without_initial,
                     },
                     "orderedStepIds": original_ordered_ids,
-                    "pipettes": data.get("designerApplication", {}).get("data", {}).get("pipettes", {}),
-                    "modules": data.get("designerApplication", {}).get("data", {}).get("modules", {}),
-                    "labware": data.get("designerApplication", {}).get("data", {}).get("labware", {}),
+                    "pipettes": self.deep_get(protocol, "designerApplication", "data", "pipettes"),
+                    "modules": self.deep_get(protocol, "designerApplication", "data", "modules"),
+                    "labware": self.deep_get(protocol, "designerApplication", "data", "labware"),
                 },
             },
-            "robot": data.get("robot", {}),
+            "robot": self.deep_get(protocol, "robot"),
             "labwareDefinitions": {},
         }
 

@@ -4,12 +4,11 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import { RECOVERY_MAP } from '../constants'
 import {

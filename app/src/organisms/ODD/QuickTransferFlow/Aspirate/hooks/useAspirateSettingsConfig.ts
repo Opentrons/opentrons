@@ -2,10 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import {
-  ACTIONS,
-  ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS,
-} from '../../constants'
+import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
 
 import type { Dispatch } from 'react'
 import type {
@@ -19,12 +16,14 @@ interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   setSelectedSetting: (setting: AspirateSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useAspirateSettingsConfig({
   state,
   dispatch,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -72,13 +71,10 @@ export function useAspirateSettingsConfig({
     {
       option: SETTING_OPTIONS.PRE_WET_TIP,
       copy: t('pre_wet_tip'),
-      value: state.preWetTip ? t('option_enabled') : '',
+      value: state.preWetTip ? t('option_enabled') : t('option_disabled'),
       enabled: true,
       onClick: () => {
-        dispatch({
-          type: ACTIONS.SET_PRE_WET_TIP,
-          preWetTip: !state.preWetTip,
-        })
+        setSelectedSetting(SETTING_OPTIONS.PRE_WET_TIP)
       },
     },
     {
@@ -88,7 +84,7 @@ export function useAspirateSettingsConfig({
         state.mixOnAspirate !== undefined
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
-              reps: state.mixOnAspirate?.repititions,
+              reps: state.mixOnAspirate?.repetitions,
             })
           : '',
       enabled:
@@ -106,6 +102,18 @@ export function useAspirateSettingsConfig({
       },
     },
     {
+      option: SETTING_OPTIONS.ASPIRATE_CONDITION,
+      copy: t('condition'),
+      value:
+        state.conditionAspirate != null || state.conditionAspirate !== 0
+          ? t('volume', { volume: state.conditionAspirate })
+          : '',
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
+      },
+    },
+    {
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
@@ -120,20 +128,30 @@ export function useAspirateSettingsConfig({
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_DELAY)
       },
     },
-    // ToDo replace dummy configs for retract
     {
       option: SETTING_OPTIONS.ASPIRATE_RETRACT,
       copy: t('retract'),
-      value: '', // t('submerge_value', { volume: 'dummy' }),
-      enabled: false,
-      onClick: () => {},
+      value:
+        state.retractAspirate !== undefined
+          ? t('retract_value', {
+              speed: state.retractAspirate.speed,
+              position: state.retractAspirate.positionFromBottom,
+            })
+          : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_RETRACT)
+      },
     },
     {
       option: SETTING_OPTIONS.ASPIRATE_TOUCH_TIP,
       copy: t('touch_tip'),
       value:
         state.touchTipAspirate !== undefined
-          ? t('touch_tip_value', { position: state.touchTipAspirate })
+          ? t('touch_tip_value', {
+              speed: state.touchTipAspirateSpeed,
+              position: state.touchTipAspirate,
+            })
           : '',
       enabled: !sourceIsReservoir,
       onClick: () => {
@@ -150,7 +168,7 @@ export function useAspirateSettingsConfig({
       value:
         state.airGapAspirate !== undefined
           ? t('air_gap_value', { volume: state.airGapAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_AIR_GAP)
@@ -158,5 +176,8 @@ export function useAspirateSettingsConfig({
     },
   ]
 
-  return aspirateSettingsItems
+  return aspirateSettingsItems.filter(
+    item =>
+      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
+  )
 }

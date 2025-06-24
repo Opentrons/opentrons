@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { DefineLiquidsModal } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { getFileMetadata } from '../../file-data/selectors'
 import { generateNewProtocol } from '../../labware-ingred/actions'
@@ -42,6 +42,7 @@ export function Designer(): JSX.Element {
   const isNewProtocol = useSelector(selectors.getIsNewProtocol)
   const [liquidOverflowMenu, showLiquidOverflowMenu] = useState<boolean>(false)
   const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
+  const [targetWidth, setTargetWidth] = useState<number>(235)
 
   const { modules, additionalEquipmentOnDeck } = deckSetup
 
@@ -97,12 +98,15 @@ export function Designer(): JSX.Element {
             showLiquidOverflowMenu(false)
             setDefineLiquidModal(true)
           }}
+          targetWidth={targetWidth}
         />
       ) : null}
       <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
         <ProtocolSteps
           zoomedInSlot={zoomIn.slot}
           showLiquidOverflowMenu={showLiquidOverflowMenu}
+          targetWidth={targetWidth}
+          setTargetWidth={setTargetWidth}
         />
       </Flex>
     </>

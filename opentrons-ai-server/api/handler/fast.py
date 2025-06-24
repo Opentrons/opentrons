@@ -1,7 +1,6 @@
 import asyncio
 import json
 import os
-import re
 import time
 from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
 
@@ -25,6 +24,7 @@ from api.domain.anthropic_predict import AnthropicPredict
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
+from api.handler.utils_fast import parse_tagged_content
 from api.integration.auth import VerifyToken
 from api.integration.google_sheets import GoogleSheetsClient
 from api.models.chat_request import ChatRequest
@@ -229,24 +229,55 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
 
     if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
         logger.debug("Formatting response for Protocol Designer")
+        _, pd_json_content, comments = parse_tagged_content(response)
         try:
-            tag = "LIMITATION_REPLY"
-            if f"<{tag}>" in response:
-                pattern = rf"<{tag}>\s*(.*?)\s*</{tag}>"
-                match = re.search(pattern, response, flags=re.DOTALL | re.IGNORECASE)
-                if match is not None:
-                    return ChatResponse(reply=match.group(1).strip(), fake=bool(is_fake))
-                # Fallback if pattern unexpectedly not found
-                return ChatResponse(
-                    reply=f"LLM limitation reply detected but could not parse message. {response[:200]}", fake=bool(is_fake)
-                )
+            # Case 1: No PD JSON content, but comments are present.
+            if pd_json_content is None and comments is not None:
+                return ChatResponse(reply=comments, fake=bool(is_fake))
+
+            # Case 2: PD JSON content is present (comments may or may not be).
+            elif pd_json_content is not None:
+                pd_content_str = claude.fillup_pd(pd_json_content)
+                parsed_protocol_json = json.loads(pd_content_str)  # Can raise JSONDecodeError
+
+                reply_text = comments if comments is not None else ""  # Avoid literal "None"
+                return ChatResponse(reply=reply_text, fake=bool(is_fake), protocol_content=parsed_protocol_json)
+
+            # Case 3: No PD JSON content AND no comments.
             else:
-                pd_content = claude.fillup_pd(response)
-                pd_json = json.loads(pd_content)
-                return ChatResponse(reply="Here is your Protocol Designer protocol", fake=bool(is_fake), protocol_content=pd_json)
+                logger.info(
+                    "Formatting PD response: No PD_JSON and no comments found in LLM output.",
+                    extra={"llm_response_preview": str(response)[:250] if response else "None"},
+                )
+                return ChatResponse(
+                    reply="""The AI's response did not contain a parsable protocol or any specific
+                    comments. Please try rephrasing your request.""",
+                    fake=bool(is_fake),
+                )
+
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error: {str(e)}", extra={"response": response[:100]})
-            return ChatResponse(reply=f"Failed to parse Protocol Designer JSON: {str(e)}", fake=bool(is_fake))
+            logger.error(
+                f"JSON parsing error: {str(e)}",
+                extra={"pd_json_content_preview": str(pd_json_content)[:250] if pd_json_content else "None", "comments": comments},
+            )
+            if comments:
+                error_message = f"\nComments: {comments}"
+            else:
+                error_message = "Failed to generate a protocol. Please try again."
+
+            return ChatResponse(reply=error_message, fake=bool(is_fake))
+
+        except Exception as e:
+            logger.error(
+                f"Error processing PD content: {str(e)}",
+                extra={"pd_json_content_preview": str(pd_json_content)[:250] if pd_json_content else "None", "comments": comments},
+                exc_info=True,
+            )
+            if comments:
+                error_message = f"\nComments: {comments}"
+            else:
+                error_message = "An unexpected error occurred while preparing the protocol. Please try again."
+            return ChatResponse(reply=error_message, fake=bool(is_fake))
 
     return ChatResponse(reply=response, fake=bool(is_fake))
 

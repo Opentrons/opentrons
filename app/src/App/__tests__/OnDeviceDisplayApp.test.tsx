@@ -69,6 +69,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/shell')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks')
 vi.mock('../ODDTopLevelRedirects')
 

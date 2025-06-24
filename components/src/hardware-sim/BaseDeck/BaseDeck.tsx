@@ -40,7 +40,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   ModuleLocation,
   ModuleModel,
@@ -53,7 +53,7 @@ import type { StagingAreaLocation } from './StagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   wellFill?: WellFill
   missingTips?: WellGroup
   /** generic prop to render self-positioned children for each labware */
@@ -67,7 +67,7 @@ export interface LabwareOnDeck {
 export interface ModuleOnDeck {
   moduleModel: ModuleModel
   moduleLocation: ModuleLocation
-  nestedLabwareDef?: LabwareDefinition2 | null
+  nestedLabwareDef?: LabwareDefinition | null
   nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
   /** generic prop to render self-positioned children for each module */
@@ -79,7 +79,7 @@ export interface ModuleOnDeck {
   hopperLabware?: HopperLabwareProps
 }
 export interface HopperLabwareProps {
-  hopperLabwareDef: LabwareDefinition2 | null
+  hopperLabwareDef: LabwareDefinition | null
   hopperLabwareWellFill: WellFill
   hopperOnLabwareClick: () => void
   hopperHighlightLabware: boolean

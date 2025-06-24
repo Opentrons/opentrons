@@ -20,10 +20,6 @@ from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
     StallOrCollisionDetectedError,
-    FlexStackerShuttleMissingError,
-)
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerShuttleError,
 )
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
@@ -39,7 +35,6 @@ from ..types import (
     AddressableAreaLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    LabwareMovementOffsetData,
     LabwareLocationSequence,
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
@@ -59,9 +54,6 @@ from .command import (
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
-
-
-from opentrons.hardware_control.modules.types import PlatformState
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
@@ -161,11 +153,7 @@ class GripperMovementError(ErrorOccurrence):
     errorInfo: ErrorDetails
 
 
-_ExecuteReturn = (
-    SuccessData[MoveLabwareResult]
-    | DefinedErrorData[GripperMovementError]
-    | DefinedErrorData[FlexStackerShuttleError]
-)
+_ExecuteReturn = SuccessData[MoveLabwareResult] | DefinedErrorData[GripperMovementError]
 
 
 class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
@@ -186,31 +174,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         self._labware_movement = labware_movement
         self._run_control = run_control
 
-    async def _labware_movement_stacker_validation(
-        self, module_id: str, labware_to_move: str
-    ) -> FlexStackerShuttleError | None:
-        # Validate that a Flex Stacker is in position to receive labware
-        stacker_sub = self._state_view.modules.get_flex_stacker_substate(module_id)
-        stacker_hw = self._equipment.get_module_hardware_api(stacker_sub.module_id)
-        if stacker_hw is not None:
-            try:
-                await stacker_hw.verify_shuttle_location(PlatformState.EXTENDED)
-            except FlexStackerShuttleMissingError as e:
-                return FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": labware_to_move},
-                )
-
-        return None
-
     async def execute(self, params: MoveLabwareParams) -> _ExecuteReturn:  # noqa: C901
         """Move a loaded labware to a new location."""
         state_update = StateUpdate()
@@ -222,7 +185,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         )
         definition_uri = current_labware.definitionUri
         post_drop_slide_offset: Optional[Point] = None
-        trash_lid_drop_offset: Optional[LabwareOffsetVector] = None
+        trash_lid_drop_offset: Optional[Point] = None
 
         if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
@@ -279,16 +242,14 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 if labware_validation.validate_definition_is_lid(
                     self._state_view.labware.get_definition(params.labwareId)
                 ):
-                    lid_disposable_offfets = (
+                    lid_disposable_offsets = (
                         current_labware_definition.gripperOffsets.get(
                             "lidDisposalOffsets"
                         )
                     )
-                    if lid_disposable_offfets is not None:
-                        trash_lid_drop_offset = LabwareOffsetVector(
-                            x=lid_disposable_offfets.dropOffset.x,
-                            y=lid_disposable_offfets.dropOffset.y,
-                            z=lid_disposable_offfets.dropOffset.z,
+                    if lid_disposable_offsets is not None:
+                        trash_lid_drop_offset = Point.from_xyz_attrs(
+                            lid_disposable_offsets.dropOffset
                         )
                     else:
                         raise LabwareOffsetDoesNotExistError(
@@ -345,13 +306,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
                 )
-            if (
-                module is not None
-                and module.model == ModuleModel.FLEX_STACKER_MODULE_V1
-            ):
-                module_location_error = await self._labware_movement_stacker_validation(
-                    module.id, params.labwareId
-                )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
@@ -397,13 +351,20 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
-            user_offset_data = LabwareMovementOffsetData(
-                pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
+
+            user_pick_up_offset = (
+                Point.from_xyz_attrs(params.pickUpOffset)
+                if params.pickUpOffset is not None
+                else Point()
+            )
+            user_drop_offset = (
+                Point.from_xyz_attrs(params.dropOffset)
+                if params.dropOffset is not None
+                else Point()
             )
 
             if trash_lid_drop_offset:
-                user_offset_data.dropOffset += trash_lid_drop_offset
+                user_drop_offset += trash_lid_drop_offset
 
             immediate_destination_location_sequence = (
                 self._state_view.geometry.get_predicted_location_sequence(
@@ -421,7 +382,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     labware_id=params.labwareId,
                     current_location=validated_current_loc,
                     new_location=validated_new_loc,
-                    user_offset_data=user_offset_data,
+                    user_pick_up_offset=user_pick_up_offset,
+                    user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
                 )
             except (
@@ -552,7 +514,7 @@ class MoveLabware(
     BaseCommand[
         MoveLabwareParams,
         MoveLabwareResult,
-        GripperMovementError | FlexStackerShuttleError,
+        GripperMovementError,
     ]
 ):
     """A ``moveLabware`` command."""

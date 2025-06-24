@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -29,12 +30,15 @@ import {
   DELETE_STEP_FORM,
   getMainPagePortalEl,
 } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { actions as steplistActions } from '../../../../steplist'
+import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import {
   deselectAllSteps,
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
+import { getHasTrash } from '../../../../utils'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -91,12 +95,16 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     openedOverflowMenuId,
     sidebarWidth,
   } = props
+  const { t } = useTranslation('starting_deck_state')
+  const { makeSnackbar } = useKitchen()
   const [top, setTop] = useState<number>(0)
   const menuRootRef = useRef<HTMLDivElement | null>(null)
   const isStartingOrEndingState =
     title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const { additionalEquipmentOnDeck } = useSelector(getDeckSetupForActiveItem)
+  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
 
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
   let backgroundColor = isStartingOrEndingState ? COLORS.blue20 : COLORS.grey20
@@ -193,6 +201,17 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     cancel: cancelDelete,
   } = useConditionalConfirm(handleDelete, true)
 
+  const handleOpenForm = (clickNum: number, e: ReactMouseEvent): void => {
+    if (!hasTrash) {
+      makeSnackbar(t('trash_required') as string)
+    }
+
+    if (clickNum === 0) {
+      onClick?.(e)
+    } else {
+      onDoubleClick?.(e)
+    }
+  }
   return (
     <>
       {showDeleteConfirmation === true && (
@@ -211,18 +230,33 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       )}
       <Flex
         id={stepId}
-        {...{
-          onMouseEnter: isStepAfterError ? undefined : onMouseEnter,
-          onMouseLeave: isStepAfterError ? undefined : onMouseLeave,
-        }}
+        {...(!isStepAfterError
+          ? {
+              onMouseEnter,
+              onMouseLeave,
+            }
+          : {})}
         gridGap={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
+        {dragHovered ? (
+          <Divider
+            marginY="0"
+            height="0.25rem"
+            width="100%"
+            backgroundColor={COLORS.blue50}
+            borderRadius={BORDERS.borderRadius2}
+          />
+        ) : null}
         <Box
           role="button"
           data-testid={`StepContainer_${stepId}`}
-          onDoubleClick={onDoubleClick}
-          onClick={onClick}
+          onDoubleClick={(e: ReactMouseEvent) => {
+            handleOpenForm(1, e)
+          }}
+          onClick={(e: ReactMouseEvent) => {
+            handleOpenForm(0, e)
+          }}
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
           borderRadius={BORDERS.borderRadius8}
           width="100%"
@@ -278,15 +312,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             ) : null}
           </Flex>
         </Box>
-        {dragHovered ? (
-          <Divider
-            marginY="0"
-            height="0.25rem"
-            width="100%"
-            backgroundColor={COLORS.blue50}
-            borderRadius={BORDERS.borderRadius2}
-          />
-        ) : null}
       </Flex>
       {stepId != null &&
       openedOverflowMenuId === stepId &&

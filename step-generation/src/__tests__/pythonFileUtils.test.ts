@@ -1,24 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   fixture96Plate,
   fixtureP300MultiV2Specs,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
+  GLYCEROL_LIQUID_CLASS_NAME,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import {
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLiquidClasses,
   getLoadLiquids,
   getLoadModules,
   getLoadPipettes,
@@ -86,19 +90,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.24"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "Flex",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "Flex", "apiLevel": "2.24"}`
     )
   })
 })
@@ -217,7 +213,6 @@ describe('getLoadAdapters', () => {
 adapter_1 = magnetic_block_1.load_adapter(
     "fixture_flex_96_tiprack_adapter",
     namespace="opentrons",
-    version=1,
 )
 adapter_2 = protocol.load_adapter_from_definition(
     CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
@@ -243,12 +238,10 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
-    version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
-    version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
@@ -281,7 +274,6 @@ well_plate_5 = protocol.load_labware(
     "fixture_96_plate",
     location=protocol_api.OFF_DECK,
     namespace="opentrons",
-    version=1,
 )`.trimStart()
       )
     })
@@ -410,6 +402,7 @@ const mockLiquidEntities: LiquidEntities = {
     displayName: 'water',
     description: 'mock description',
     displayColor: 'mock display color',
+    liquidClass: WATER_LIQUID_CLASS_NAME,
   },
   [liquid2]: {
     liquidGroupId: liquid2,
@@ -417,6 +410,7 @@ const mockLiquidEntities: LiquidEntities = {
     description: '',
     displayName: 'sulfur',
     displayColor: 'mock display color 2',
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
   },
 }
 
@@ -507,6 +501,24 @@ describe('getLoadWasteChute', () => {
       `
 # Load Waste Chute:
 waste_chute = protocol.load_waste_chute()`.trimStart()
+    )
+  })
+})
+
+describe('getLoadLiquidClasses', () => {
+  it('should load a liquid class for each liquid class types', () => {
+    expect(
+      getLoadLiquidClasses([
+        WATER_LIQUID_CLASS_NAME,
+        ETHANOL_LIQUID_CLASS_NAME,
+        GLYCEROL_LIQUID_CLASS_NAME,
+      ])
+    ).toBe(
+      `
+# Load Liquid Classes:
+water_v1 = protocol.get_liquid_class("water")
+ethanol_80_v1 = protocol.get_liquid_class("ethanol_80")
+glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })

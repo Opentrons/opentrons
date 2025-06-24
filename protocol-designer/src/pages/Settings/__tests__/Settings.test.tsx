@@ -63,9 +63,7 @@ describe('Settings', () => {
       <div>mock AnnouncementModal</div>
     )
     render()
-    fireEvent.click(
-      screen.getByTestId('AnnouncementModal_viewReleaseNotesButton')
-    )
+    fireEvent.click(screen.getByTestId('basic_button_Release notes'))
     screen.getByText('mock AnnouncementModal')
   })
   it('renders the hints button and calls to dismiss them when text is pressed', () => {

@@ -21,46 +21,56 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../constants'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { selectors } from '../../../labware-ingred/selectors'
-import {
-  getLiquidEntities,
-  getUnsavedForm,
-} from '../../../step-forms/selectors'
+import { getLiquidEntities } from '../../../step-forms/selectors'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 
 import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
+const TOP_POSITION = '13.6875rem'
+const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '25.675rem'
 interface LiquidsOverflowMenuProps {
   onClose: () => void
   showLiquidsModal: () => void
   overflowWrapperRef: RefObject<HTMLDivElement>
+  targetWidth?: number
 }
 
-export function LiquidsOverflowMenu(
-  props: LiquidsOverflowMenuProps
-): JSX.Element {
-  const { onClose, showLiquidsModal, overflowWrapperRef } = props
-  const formData = useSelector(getUnsavedForm)
+export function LiquidsOverflowMenu({
+  onClose,
+  showLiquidsModal,
+  overflowWrapperRef,
+  targetWidth,
+}: LiquidsOverflowMenuProps): JSX.Element {
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const zoomIn = useSelector(selectors.getZoomedInSlot)
 
-  let right: string = SPACING.spacing12
-  if (formData != null || location.pathname === '/liquids') {
-    right = '7.4rem'
-  } else if (zoomIn?.slot === 'offDeck') {
-    right = '24.75rem'
+  let right: string | undefined
+  let top: string = TOP_POSITION
+  let left: string | undefined
+  if (location.pathname === '/liquids') {
+    right = RIGHT_POSITION_FOR_LIQUIDS_PAGE
+    top = `${NAV_BAR_HEIGHT_REM + 3.1}rem`
+    left = undefined
+  } else {
+    right = undefined
+    left =
+      targetWidth !== undefined
+        ? `${targetWidth - OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
+        : undefined
   }
+
   return (
     <Flex
       position={POSITION_ABSOLUTE}
       zIndex={12}
       right={right}
-      top={`calc(${NAV_BAR_HEIGHT_REM}rem + 3.1rem)`}
+      top={top}
+      left={left}
       ref={overflowWrapperRef}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"

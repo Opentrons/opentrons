@@ -377,16 +377,33 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const locationUpdate = `${name}LocationUpdate`
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          [locationUpdate]: {
-            ...prevInitialDeckSetupStep[locationUpdate],
-            [id]: location,
-          },
-        },
-      }
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            [locationUpdate]: {
+              ...prevInitialDeckSetupStep[locationUpdate],
+              [id]: location,
+            },
+          }
+        } else if (
+          savedForm.dropTip_location == null &&
+          (name === 'trashBin' || name === 'wasteChute')
+        ) {
+          return {
+            ...savedForm,
+            ...handleFormChange(
+              {
+                dropTip_location: id,
+              },
+              savedForm,
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
+            ),
+          }
+        }
+        return savedForm
+      })
     }
     case 'DELETE_DECK_FIXTURE': {
       const { id } = action.payload
@@ -396,13 +413,41 @@ export const savedStepForms = (
       return mapValues(
         savedStepForms,
         (form: FormData): FormData => {
-          const updatedLocation = omit(form[locationUpdate] || {}, id)
+          if (form.stepType === 'manualIntervention') {
+            const updatedLocation = omit(form[locationUpdate] || {}, id)
 
-          return {
-            ...form,
-            [locationUpdate]:
-              Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
+            return {
+              ...form,
+              [locationUpdate]:
+                Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
+            }
+          } else if (id.includes(form.dropTip_location as string)) {
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  dropTip_location: null,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
+          } else if (id.includes(form.newLocation as string)) {
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  newLocation: null,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
           }
+
+          return form
         }
       )
     }
@@ -668,7 +713,6 @@ export const savedStepForms = (
         return { ...savedForm, ...deleteLabwareUpdate }
       })
     }
-
     case 'DELETE_PIPETTES': {
       // remove references to pipettes that have been deleted
       const deletedPipetteIds = action.payload

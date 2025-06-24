@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -13,8 +12,9 @@ import {
   DISPLAY_GRID,
   Flex,
   JUSTIFY_CENTER,
-  JUSTIFY_END,
-  PrimaryButton,
+  OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   SPACING,
   StyledText,
   WELL_LABEL_OPTIONS,
@@ -26,44 +26,41 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import {
-  deselectAllWells,
-  deselectWells,
-  selectWells,
-} from '../../../well-selection/actions'
+import { deselectWells, selectWells } from '../../../well-selection/actions'
 import { getSelectedWells } from '../../../well-selection/selectors'
+import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidButton } from '../../molecules'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
-import { LiquidEditor } from './LiquidEditor'
+import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 
-const LIQUID_BOX_WIDTH = '52rem'
+const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
-  const { showLiquidOverflowMenu } = props
-  const { t } = useTranslation(['liquids', 'shared'])
+  const { showLiquidOverflowMenu, setDefineLiquidModal } = props
+  const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
-  const navigate = useNavigate()
+  const [showBadFormState, setShowBadFormState] = useState(false)
   const nickNames = useSelector(getLabwareNicknamesById)
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const dispatch = useDispatch()
+  const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsAllLabware
   )
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
-  const { labware } = useSelector(getInitialDeckSetup)
-  const [showBadFormState, setShowBadFormState] = useState(false)
 
   if (labwareId == null) {
     console.assert(
@@ -76,104 +73,123 @@ export function AssignLiquidsModal(
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 
-  const handleSave = (): void => {
-    if (Object.keys(selectedWells).length > 0) {
-      setShowBadFormState(true)
-    } else {
-      dispatch(deselectAllWells())
-      setShowBadFormState(false)
-      navigate('/designer')
-    }
-  }
-
   return (
     <Flex
-      height="100%"
+      height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
       backgroundColor={COLORS.grey10}
-      paddingBottom={SPACING.spacing40}
-      gridGap={SPACING.spacing40}
-      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing12}
+      position={POSITION_RELATIVE}
     >
-      <Flex
-        padding={`${SPACING.spacing12} ${SPACING.spacing12} 0`}
-        justifyContent={JUSTIFY_END}
-        gap={SPACING.spacing8}
-      >
-        <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
-        <PrimaryButton onClick={handleSave}>{t('shared:done')}</PrimaryButton>
-      </Flex>
-      <Flex
-        width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        gap={SPACING.spacing8}
-      >
-        <DeckInfoLabel
-          deckLabel={getSlotInLocationStack(labware[labwareId].stack) ?? ''}
-        />
-        <StyledText desktopStyle="headingLargeBold">
-          {t('add_liquids_to_labware', { labwareName: nickNames[labwareId] })}
-        </StyledText>
-      </Flex>
       <Flex
         width="100%"
         flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
+        overflow={OVERFLOW_AUTO}
       >
-        <Flex paddingX={SPACING.spacing40} gap={SPACING.spacing24}>
-          <Box
-            padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
-            backgroundColor={COLORS.white}
-            borderRadius={BORDERS.borderRadius12}
-            display={DISPLAY_GRID}
-            gap={SPACING.spacing12}
-            width={LIQUID_BOX_WIDTH}
-            minWidth={LIQUID_BOX_WIDTH}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gap={SPACING.spacing24}
+          paddingTop={SPACING.spacing120}
+          paddingBottom={SPACING.spacing60}
+          paddingX={SPACING.spacing24}
+          width="100%"
+          minWidth="fit-content"
+          alignItems={ALIGN_CENTER}
+        >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gap={SPACING.spacing24}
+            width={CONTAINER_WIDTH}
           >
             <Flex
-              justifyContent={JUSTIFY_CENTER}
               width="100%"
-              color={COLORS.grey60}
+              height="100%"
+              alignItems={ALIGN_CENTER}
+              gap={SPACING.spacing10}
             >
+              <DeckInfoLabel
+                size="large"
+                deckLabel={
+                  getSlotInLocationStack(labware[labwareId].stack) ?? ''
+                }
+              />
               <StyledText
-                desktopStyle="headingSmallBold"
-                css={{ userSelect: 'none' }}
+                desktopStyle="headingLargeBold"
+                css={LINE_CLAMP_TEXT_STYLE(3)}
               >
-                {t('click_and_drag')}
+                {t('add_liquids_to_labware', {
+                  labwareName: nickNames[labwareId],
+                })}
               </StyledText>
             </Flex>
-            <SelectableLabware
-              showBorder={false}
-              labwareProps={{
-                wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
-                definition: labwareDef,
-                highlightedWells,
-                wellFill: wellFillFromWellContents(
-                  wellContents,
-                  liquidDisplayColors
-                ),
-              }}
-              selectedPrimaryWells={selectedWells}
-              selectWells={(wells: WellGroup) => dispatch(selectWells(wells))}
-              deselectWells={(wells: WellGroup) =>
-                dispatch(deselectWells(wells))
-              }
-              updateHighlightedWells={(wells: WellGroup) => {
-                setHighlightedWells(wells)
-              }}
-              ingredNames={liquidNamesById}
-              wellContents={wellContents}
-              nozzleType={null}
-            />
-          </Box>
-          <Flex width="100%">
-            <LiquidEditor
-              showBadFormState={showBadFormState}
-              setShowBadFormState={setShowBadFormState}
-            />
+            <Box
+              width="100%"
+              padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
+              backgroundColor={COLORS.white}
+              borderRadius={BORDERS.borderRadius12}
+              display={DISPLAY_GRID}
+              gap={SPACING.spacing12}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+                <Flex
+                  justifyContent={JUSTIFY_CENTER}
+                  width="100%"
+                  color={COLORS.grey60}
+                >
+                  <StyledText
+                    desktopStyle="headingSmallRegular"
+                    css={{ userSelect: 'none' }}
+                  >
+                    {t('click_and_drag')}
+                  </StyledText>
+                </Flex>
+                <SelectableLabware
+                  showBorder={false}
+                  labwareProps={{
+                    wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
+                    definition: labwareDef,
+                    highlightedWells,
+                    wellFill: wellFillFromWellContents(
+                      wellContents,
+                      liquidDisplayColors
+                    ),
+                  }}
+                  selectedPrimaryWells={selectedWells}
+                  selectWells={(wells: WellGroup) =>
+                    dispatch(selectWells(wells))
+                  }
+                  deselectWells={(wells: WellGroup) =>
+                    dispatch(deselectWells(wells))
+                  }
+                  updateHighlightedWells={(wells: WellGroup) => {
+                    setHighlightedWells(wells)
+                  }}
+                  ingredNames={liquidNamesById}
+                  wellContents={wellContents}
+                  nozzleType={null}
+                />
+              </Flex>
+            </Box>
           </Flex>
         </Flex>
+      </Flex>
+      <Flex
+        height="100%"
+        padding={SPACING.spacing12}
+        position={POSITION_RELATIVE}
+      >
+        <Box
+          position={POSITION_ABSOLUTE}
+          top={SPACING.spacing12}
+          right="100%"
+          paddingRight={SPACING.spacing24}
+        >
+          <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
+        </Box>
+        <LiquidToolbox
+          showBadFormState={showBadFormState}
+          setShowBadFormState={setShowBadFormState}
+          setDefineLiquidModal={setDefineLiquidModal}
+        />
       </Flex>
     </Flex>
   )

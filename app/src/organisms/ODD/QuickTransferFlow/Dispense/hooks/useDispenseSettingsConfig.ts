@@ -4,6 +4,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -18,11 +19,13 @@ import type {
 interface UseDispenseSettingsConfigProps {
   state: QuickTransferSummaryState
   setSelectedSetting: (setting: DispenseSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useDispenseSettingsConfig({
   state,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -104,7 +107,7 @@ export function useDispenseSettingsConfig({
         state.mixOnDispense !== undefined
           ? t('mix_value', {
               volume: state.mixOnDispense?.mixVolume,
-              reps: state.mixOnDispense?.repititions,
+              reps: state.mixOnDispense?.repetitions,
             })
           : '',
       enabled:
@@ -121,26 +124,31 @@ export function useDispenseSettingsConfig({
         }
       },
     },
-    // ToDo replace dummy configs for push out
     {
       option: 'dispense_push_out',
       copy: t('push_out'),
-      value: 'dummy Push Out',
-      enabled: false,
+      value:
+        state.pushOut != null && state.pushOut
+          ? t('option_enabled')
+          : t('option_disabled'),
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add push out
-        // setSelectedSetting('push_out')
+        setSelectedSetting('dispense_push_out')
       },
     },
-    // ToDo replace dummy configs for retract
     {
       option: 'dispense_retract',
       copy: t('retract'),
-      value: 'dummy Retract',
-      enabled: false,
+      value:
+        state.retractDispense !== undefined
+          ? t('retract_value', {
+              speed: state.retractDispense.speed,
+              position: state.retractDispense.positionFromBottom,
+            })
+          : '',
+      enabled: true,
       onClick: () => {
-        // (kk: 04/07/2025)ToDo add retract
-        // setSelectedSetting('retract')
+        setSelectedSetting('dispense_retract')
       },
     },
     {
@@ -160,12 +168,47 @@ export function useDispenseSettingsConfig({
       },
     },
     {
+      option: 'dispense_disposal_volume',
+      copy: t('disposal_volume'),
+      value:
+        state.disposalVolumeDispenseSettings != null
+          ? t('disposal_volume_label', {
+              volume: state.disposalVolumeDispenseSettings.volume,
+              location:
+                state.disposalVolumeDispenseSettings.blowOutLocation ===
+                SOURCE_WELL_BLOWOUT_DESTINATION
+                  ? t('blow_out_source_well')
+                  : t('trashBin'),
+              flowRate: state.disposalVolumeDispenseSettings.flowRate,
+            })
+          : '',
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting('dispense_disposal_volume')
+      },
+    },
+    {
+      option: 'dispense_touch_tip',
+      copy: t('touch_tip'),
+      value:
+        state.touchTipDispense !== undefined
+          ? t('touch_tip_value', {
+              speed: state.touchTipDispenseSpeed,
+              position: state.touchTipDispense,
+            })
+          : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting('dispense_touch_tip')
+      },
+    },
+    {
       option: 'dispense_air_gap',
       copy: t('air_gap'),
       value:
         state.airGapDispense !== undefined
           ? t('air_gap_value', { volume: state.airGapDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_air_gap')

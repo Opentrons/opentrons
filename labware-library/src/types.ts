@@ -21,7 +21,7 @@ export type {
 
 export interface LabwareWellGroupProperties {
   xOffsetFromLeft: number
-  yOffsetFromTop: number
+  yOffsetFromBack: number
   xSpacing: number | null
   ySpacing: number | null
   wellCount: number

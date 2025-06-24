@@ -26,6 +26,7 @@ import type {
   DuplicateLabwareAction,
   EditLiquidGroupAction,
   EditMultipleLiquidGroupsAction,
+  EditSlotInfoAction,
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
@@ -33,9 +34,11 @@ import type {
   RenameLabwareAction,
   SelectAdapterAction,
   SelectFixtureAction,
+  SelectLidAction,
   SelectLiquidAction,
   SelectModuleAction,
   SelectTopLabwareAction,
+  SelectTopLabwareAmountAction,
   SetWellContentsAction,
   ZoomedIntoSlotAction,
 } from '../actions'
@@ -122,7 +125,7 @@ const selectedLiquidGroup = handleActions(
     EDIT_LIQUID_GROUP: () => unselectedLiquidGroupState, // clear on form save
   },
   unselectedLiquidGroupState
-)
+) as Reducer<SelectedLiquidGroupState, Action>
 const initialLabwareState: ContainersState = {}
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -302,14 +305,15 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
 )
 
 const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
-  selectedTopLabwareDefUri: null,
-  selectedAdapterDefUri: null,
+  selectedTopLabware: { labwareDefURI: null, amount: 1 },
+  selectedAdapterDefURI: null,
   selectedModuleModel: null,
   selectedFixture: null,
+  selectedLidLabware: null,
   selectedSlot: { slot: null, cutout: null },
 }
 
-export const zoomedInSlotInfo = (
+export const zoomedInSlotInfo = ((
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
     | SelectTopLabwareAction
@@ -317,15 +321,28 @@ export const zoomedInSlotInfo = (
     | SelectModuleAction
     | SelectFixtureAction
     | ZoomedIntoSlotAction
+    | SelectLidAction
+    | SelectTopLabwareAmountAction
+    | EditSlotInfoAction
 ): ZoomedIntoSlotInfoState => {
   switch (action.type) {
     case 'SELECT_TOP_LABWARE': {
-      const { labwareDefUri } = action.payload
-      return { ...state, selectedTopLabwareDefUri: labwareDefUri }
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI,
+          // defaults amount to 1 if labware is selected
+          amount:
+            labwareDefURI != null && state.selectedTopLabware.amount === 0
+              ? 1
+              : state.selectedTopLabware.amount,
+        },
+      }
     }
     case 'SELECT_ADAPTER': {
-      const { adapterDefUri } = action.payload
-      return { ...state, selectedAdapterDefUri: adapterDefUri }
+      const { adapterDefURI } = action.payload
+      return { ...state, selectedAdapterDefURI: adapterDefURI }
     }
     case 'SELECT_MODULE': {
       const { moduleModel } = action.payload
@@ -345,16 +362,54 @@ export const zoomedInSlotInfo = (
         },
       }
     }
+    case 'SELECT_LID': {
+      const { labwareDefURI } = action.payload
+      return {
+        ...state,
+        selectedLidLabware: labwareDefURI,
+      }
+    }
+    case 'SELECT_TOP_LABWARE_AMOUNT': {
+      const { amount } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: state.selectedTopLabware.labwareDefURI,
+          amount,
+        },
+      }
+    }
+    case 'EDIT_SLOT_INFO': {
+      const {
+        labwareDefURI,
+        adapterDefURI,
+        moduleModel,
+        fixture,
+        lidDefURI,
+        amount,
+      } = action.payload
+      return {
+        ...state,
+        selectedTopLabware: {
+          labwareDefURI: labwareDefURI ?? null,
+          amount: amount ?? 1,
+        },
+        selectedAdapterDefURI: adapterDefURI ?? null,
+        selectedModuleModel: moduleModel ?? null,
+        selectedFixture: fixture ?? null,
+        selectedLidLabware: lidDefURI ?? null,
+      }
+    }
     default:
       return state
   }
-}
+}) as Reducer<ZoomedIntoSlotInfoState, Action>
 
 const initialGenerateNewProtocolState: GenerateNewProtocolState = {
   isNewProtocol: false,
 }
 
-export const generateNewProtocol = (
+export const generateNewProtocol = ((
   state: GenerateNewProtocolState = initialGenerateNewProtocolState,
   action: GenerateNewProtocolAction
 ): GenerateNewProtocolState => {
@@ -366,7 +421,7 @@ export const generateNewProtocol = (
     default:
       return state
   }
-}
+}) as Reducer<GenerateNewProtocolState, Action>
 export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
@@ -378,8 +433,9 @@ export interface RootState {
   ingredLocations: LocationsState
   generateNewProtocol: GenerateNewProtocolState
 }
+
 // TODO Ian 2018-01-15 factor into separate files
-export const rootReducer: Reducer<RootState, Action> = combineReducers({
+export const rootReducer = combineReducers({
   zoomedInSlotInfo,
   modeLabwareSelection,
   selectedContainerId,
@@ -389,4 +445,4 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   ingredients,
   ingredLocations,
   generateNewProtocol,
-})
+}) as Reducer<RootState, Action>

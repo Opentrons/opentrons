@@ -22,6 +22,7 @@ from pydantic import (
 )
 from typing_extensions import Annotated, Literal
 
+from .types import LocatingFeatures
 from .constants import (
     Conical,
     Cuboidal,
@@ -551,7 +552,6 @@ class InnerWellGeometry(BaseModel):
 
 class Extents(BaseModel):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
 
 
 class LabwareDefinition2(BaseModel):
@@ -588,6 +588,7 @@ class LabwareDefinition3(BaseModel):
     brand: BrandData
     parameters: Parameters3
     ordering: list[list[str]]
+    features: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]

@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import last from 'lodash/last'
 
-// TODO (sb, 1/25): add correct flex stacker asset when it exits
-import flexStacker from '/app/assets/images/FLEX.png'
+import flexStacker from '/app/assets/images/flex_stacker_no_labware.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticModule from '/app/assets/images/magnetic_module_gen_2_transparent.png'
 import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'

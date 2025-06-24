@@ -6,6 +6,7 @@ import {
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_TOP,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
 
 import {
@@ -13,15 +14,31 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { getDefaultPushOutVolume } from '../../utils'
+import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
+  LabwareDefinition2,
   LoadLabwareCreateCommand,
+  PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
+import type { Ingredients } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
+import type { FormData } from '../../form-types'
+
+const getMigratedBlowoutFlowRate = (
+  form: FormData,
+  pipetteSpecs: PipetteV2Specs | null,
+  tipRackDef: LabwareDefinition2 | null
+): number | null =>
+  (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+  !form.blowout_flowRate &&
+  pipetteSpecs != null &&
+  tipRackDef != null
+    ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
+    : null
 
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
@@ -30,7 +47,7 @@ export const migrateFile = (
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms } = designerApplication.data
+  const { savedStepForms, ingredients } = designerApplication.data
   const { model: robotType } = robot
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
@@ -40,6 +57,16 @@ export const migrateFile = (
     commands,
     labwareDefinitions
   )
+
+  const migratedIngredients: Ingredients = Object.entries(
+    ingredients
+  ).reduce<Ingredients>((acc, [id, ingredient]) => {
+    acc[id] = {
+      ...ingredient,
+      liquidClass: null,
+    }
+    return acc
+  }, {})
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
@@ -55,6 +82,10 @@ export const migrateFile = (
         liquidClass,
         aspirate_touchTip_checkbox,
         dispense_touchTip_checkbox,
+        // intentionally destructure but do not pass these deprecated fields
+        aspirate_delay_mmFromBottom,
+        dispense_delay_mmFromBottom,
+        blowout_z_offset,
         ...rest
       } = form
       const aspirateLabwareUri =
@@ -63,10 +94,16 @@ export const migrateFile = (
         aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
       const dispenseLabwareUri =
-        equipmentLoadInfoFromCommands.labware[dispense_labware].labwareDefURI
-      const isDispenseLabwareTouchtipDisabled = labwareDefinitions[
-        dispenseLabwareUri
-      ].parameters.quirks?.includes('touchTipDisabled')
+        equipmentLoadInfoFromCommands.labware[dispense_labware]?.labwareDefURI
+
+      const isDispenseLabwareTouchtipDisabled =
+        //  dispense is in a waste chute/trash bin
+        labwareDefinitions[dispenseLabwareUri] == null
+          ? true
+          : labwareDefinitions[dispenseLabwareUri].parameters.quirks?.includes(
+              'touchTipDisabled'
+            )
+
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
@@ -93,7 +130,12 @@ export const migrateFile = (
               pipetteSpecs,
               tipRackDef
             )
-
+      // blowout flow rate is required, so we attempt to migrate it if it's not present
+      const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+        form,
+        pipetteSpecs,
+        tipRackDef
+      )
       const channelsForSpeed =
         pipetteSpecs?.channels ?? (robotType === FLEX_ROBOT_TYPE ? 96 : 8)
       const maxZSpeed =
@@ -148,20 +190,20 @@ export const migrateFile = (
           dispense_touchTip_mmFromEdge: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
           aspirate_position_reference: POSITION_REFERENCE_BOTTOM,
           aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
-          aspirate_retract_mmFromBottom: 0,
+          aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
           aspirate_retract_x_position: null,
           aspirate_retract_y_position: null,
-          aspirate_submerge_mmFromBottom: 0,
+          aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
           aspirate_submerge_x_position: null,
           aspirate_submerge_y_position: null,
           aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
           dispense_position_reference: POSITION_REFERENCE_BOTTOM,
           dispense_retract_position_reference: POSITION_REFERENCE_TOP,
-          dispense_retract_mmFromBottom: 0,
+          dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
           dispense_retract_x_position: null,
           dispense_retract_y_position: null,
           dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
-          dispense_submerge_mmFromBottom: 0,
+          dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
           dispense_submerge_x_position: null,
           dispense_submerge_y_position: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
@@ -171,6 +213,9 @@ export const migrateFile = (
           pushOut_volume: defaultPushOutVolume,
           conditioning_checkbox: false,
           conditioning_volume: null,
+          ...(migratedBlowoutFlowRate != null
+            ? { blowout_flowRate: migratedBlowoutFlowRate }
+            : {}),
         },
       }
     }
@@ -214,6 +259,13 @@ export const migrateFile = (
           labware as string,
           'mix'
         )
+
+        // blowout flow rate is required, so we attempt to migrate it if it's not present
+        const migratedBlowoutFlowRate = getMigratedBlowoutFlowRate(
+          form,
+          pipetteSpecs,
+          tipRackDef
+        )
         return {
           ...acc,
           [id]: {
@@ -236,6 +288,9 @@ export const migrateFile = (
             pushOut_checkbox:
               defaultPushOutVolume != null && defaultPushOutVolume > 0,
             pushOut_volume: defaultPushOutVolume,
+            ...(migratedBlowoutFlowRate != null
+              ? { blowout_flowRate: migratedBlowoutFlowRate }
+              : {}),
           },
         }
       }
@@ -254,6 +309,7 @@ export const migrateFile = (
       ...designerApplication,
       data: {
         ...designerApplication.data,
+        ingredients: migratedIngredients,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
           ...savedStepsWithUpdatedMoveLiquidFields,

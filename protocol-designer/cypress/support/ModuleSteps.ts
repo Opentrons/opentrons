@@ -21,7 +21,7 @@ export enum ModContent {
   DeactivateTempDeck = 'Off',
   Temperature = 'Temperature module state',
   Save = 'Save',
-  Temp4CVerification = `Build a pause step to wait until Temperature Module GEN2 reaches 4˚C`,
+  Temp4CVerification = `Build a pause step to wait until Temperature Module GEN2 reaches 4°C`,
   PlateReader = 'Absorbance Plate Reader Module GEN1',
 }
 

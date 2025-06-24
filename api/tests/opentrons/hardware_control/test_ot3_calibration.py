@@ -56,6 +56,17 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_find_edge_binary() -> Iterator[AsyncMock]:
+    with patch(
+        "opentrons.hardware_control.ot3_calibration.find_edge_binary",
+        AsyncMock(
+            spec=find_edge_binary,
+        ),
+    ) as mock_find_edge_binary:
+        yield mock_find_edge_binary
+
+
+@pytest.fixture
 def mock_capacitive_probe(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     managed = ot3_hardware.managed_obj
     assert managed
@@ -183,11 +194,13 @@ async def test_find_edge(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = probe_results
+    edge_settings = ot3_hardware.config.calibration.edge_sense
     result = await find_edge_binary(
         ot3_hardware,
         OT3Mount.RIGHT,
         Point(0, 0, 0),
         Axis.X,
+        edge_settings,
         direction_if_hit,
         False,
     )
@@ -200,6 +213,27 @@ async def test_find_edge(
         assert _other_axis_val(call[0][1], Axis.X) == pytest.approx(
             _other_axis_val(Point(0, 0, 0), Axis.X)
         )
+
+
+async def test_find_slot_center(
+    ot3_hardware: ThreadManager[OT3API], mock_find_edge_binary: AsyncMock
+) -> None:
+    await ot3_hardware.home()
+    mock_find_edge_binary.return_value = Point(0, 0, 0)
+    await find_slot_center_binary(
+        ot3_hardware,
+        OT3Mount.RIGHT,
+        Point(0, 0, 0),
+        False,
+    )
+    # we want to make sure that the final edge probe is at the same distance as the settings change
+    final_pass_distance = 0.046875
+    for call in mock_find_edge_binary.mock_calls:
+        # call[1] is positional args and [4] is the EdgeSenseSettings arg
+        settings = call[1][4]
+        start_tolerance = settings.search_initial_tolerance_mm
+        search_limit = settings.search_iteration_limit
+        assert start_tolerance / (2**search_limit) == final_pass_distance
 
 
 @pytest.mark.parametrize(
@@ -238,12 +272,14 @@ async def test_find_edge_early_trigger(
 ) -> None:
     await ot3_hardware.home()
     mock_capacitive_probe.side_effect = ((3, True), ())
+    edge_settings = ot3_hardware.config.calibration.edge_sense
     with pytest.raises(EarlyCapacitiveSenseTrigger):
         await find_edge_binary(
             ot3_hardware,
             OT3Mount.RIGHT,
             Point(0.0, 0.0, 0.0),
             Axis.Y,
+            edge_settings,
             -1,
         )
 

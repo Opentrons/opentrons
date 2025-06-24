@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-from typing_extensions import Self
+from typing_extensions import Self, Optional
 from datetime import datetime
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -20,8 +20,10 @@ from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     LiquidTrackingType,
     StackerStoredLabwareGroup,
+    ModuleModel,
+    ModuleDefinition,
 )
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -358,6 +360,7 @@ class FlexStackerPoolConstraint:
 
     max_pool_count: int
     pool_overlap: float
+    pool_height: float
     primary_definition: LabwareDefinition
     lid_definition: LabwareDefinition | None
     adapter_definition: LabwareDefinition | None
@@ -409,12 +412,25 @@ class AddressableAreaUsedUpdate:
 
 
 @dataclasses.dataclass
+class LoadModuleUpdate:
+    """An update that loads a module."""
+
+    module_id: str
+    definition: ModuleDefinition
+    slot_name: DeckSlotName
+    requested_model: ModuleModel
+    serial_number: Optional[str]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
+
+    loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
@@ -664,6 +680,24 @@ class StateUpdate:
         )
         return self
 
+    def set_load_module(
+        self: Self,
+        module_id: str,
+        definition: ModuleDefinition,
+        slot_name: DeckSlotName,
+        requested_model: ModuleModel,
+        serial_number: Optional[str],
+    ) -> Self:
+        """Add a new module to state. See `LoadModuleUpdate`."""
+        self.loaded_module = LoadModuleUpdate(
+            module_id=module_id,
+            definition=definition,
+            serial_number=serial_number,
+            slot_name=slot_name,
+            requested_model=requested_model,
+        )
+        return self
+
     def update_pipette_config(
         self: Self,
         pipette_id: str,
@@ -824,6 +858,7 @@ class StateUpdate:
         module_id: str,
         max_count: int,
         pool_overlap: float,
+        pool_height: float,
         primary_definition: LabwareDefinition,
         adapter_definition: LabwareDefinition | None,
         lid_definition: LabwareDefinition | None,
@@ -836,6 +871,7 @@ class StateUpdate:
             pool_constraint=FlexStackerPoolConstraint(
                 max_pool_count=max_count,
                 pool_overlap=pool_overlap,
+                pool_height=pool_height,
                 primary_definition=primary_definition,
                 lid_definition=lid_definition,
                 adapter_definition=adapter_definition,

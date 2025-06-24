@@ -21,7 +21,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   LPCWizardState,
@@ -46,7 +46,7 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as SelectedLwOverview
   const labwareDef = useSelector(
     selectSelectedLwDef(runId)
-  ) as LabwareDefinition2
+  ) as LabwareDefinition
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails

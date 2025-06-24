@@ -12,7 +12,7 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { WellDimensions } from './WellDimensions'
 import { WellProperties } from './WellProperties'
 
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface InsertDetailsProps {
   definition: LabwareDefinition

@@ -56,26 +56,54 @@ export function formatPyStr(str: string): string {
   return JSON.stringify(str)
 }
 
+/** Render an array value as a Python tuple. */
+export function formatPyTuple(list: any[]): string {
+  return `(${list.map(value => formatPyValue(value)).join(', ')})`
+}
+
 /** Render an array value as a Python list. */
 export function formatPyList(list: any[]): string {
+  // Format array of number pairs as Python list of tuples: [(10, 4), (12, 2)]
+  if (
+    list.every(
+      element =>
+        Array.isArray(element) &&
+        element.length === 2 &&
+        element.every(number => typeof number === 'number')
+    )
+  ) {
+    return `[${list.map((value: any[]) => formatPyTuple(value)).join(', ')}]`
+  }
+
   return `[${list.map(value => formatPyValue(value)).join(', ')}]`
+}
+
+function isScalar(value: any): boolean {
+  return (
+    ['undefined', 'boolean', 'number', 'string'].includes(typeof value) ||
+    value === null
+  )
 }
 
 /** Render an object as a Python dict. */
 export function formatPyDict(dict: Record<string, any>): string {
   const dictEntries = Object.entries(dict)
-  // Render dict on single line if it has 1 entry, else render 1 entry per line.
-  if (dictEntries.length <= 1) {
-    return `{${dictEntries
+  // Render dict on single line if it has 1 entry or if all entries are scalar and
+  // they fit on a short line.
+  const allScalar = dictEntries.every(([keyBy, value]) => isScalar(value))
+  if (dictEntries.length <= 1 || allScalar) {
+    const oneLiner = `{${dictEntries
       .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
       .join(', ')}}`
-  } else {
-    return `{\n${indentPyLines(
-      dictEntries
-        .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
-        .join(',\n')
-    )},\n}`
+    if (dictEntries.length <= 1 || oneLiner.length < 64) {
+      return oneLiner
+    }
   }
+  return `{\n${indentPyLines(
+    dictEntries
+      .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
+      .join(',\n')
+  )},\n}`
 }
 
 /** Render a WellLocation to Python.

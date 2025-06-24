@@ -26,9 +26,7 @@ describe('FeatureFlag', () => {
         OT_PD_ENABLE_COMMENT: true,
         OT_PD_ENABLE_RETURN_TIP: true,
         OT_PD_ENABLE_REACT_SCAN: true,
-        OT_PD_ENABLE_LIQUID_CLASSES: true,
         OT_PD_ENABLE_TIMELINE_SCRUBBER: true,
-        OT_PD_ENABLE_PYTHON_EXPORT: true,
       },
     }
   })
@@ -48,15 +46,9 @@ describe('FeatureFlag', () => {
     )
     screen.getByText('Enable React Scan')
     screen.getByText('Enable React Scan support for components rendering check')
-    screen.getByText('Enable liquid classes')
-    screen.getByText('Enable liquid classes support')
     screen.getByText('Enable timeline scrubber')
     screen.getByText('See the protocol timeline visualization in overview')
-    screen.getByText('Enable exporting python')
-    screen.getByText(
-      'Enables the ability to export python for pd/python interop'
-    )
-    expect(screen.getAllByRole('switch').length).toBe(8)
+    expect(screen.getAllByRole('switch').length).toBe(6)
   })
   it('should call function when clicking toggle switches', () => {
     render(props)
@@ -89,17 +81,7 @@ describe('FeatureFlag', () => {
 
     fireEvent.click(toggleButtons[5])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_LIQUID_CLASSES: false,
-    })
-
-    fireEvent.click(toggleButtons[6])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
-    })
-
-    fireEvent.click(toggleButtons[7])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_PYTHON_EXPORT: false,
     })
   })
 })

@@ -187,14 +187,9 @@ describe('path should update...', () => {
                 volume: '1',
               }
             )
-            const pathPatch =
-              path === expectedPath ? {} : { path: expectedPath }
 
-            const volumeChangeExpected = { volume, ...pathPatch }
-            const airGapChangeExpected = {
-              aspirate_airGap_volume,
-              ...pathPatch,
-            }
+            const volumeChangeExpected = { volume }
+            const airGapChangeExpected = { aspirate_airGap_volume }
             expect(airGapChange).toMatchObject(airGapChangeExpected)
             expect(volumeChange).toMatchObject(volumeChangeExpected)
           })
@@ -372,6 +367,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
+        preWetTip: false,
       })
     })
   })

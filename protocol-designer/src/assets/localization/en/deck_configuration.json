@@ -1,0 +1,12 @@
+{
+  "flex_stacker_display_name": "Stacker",
+  "flex_stacker_waste_chute_display_name": "Stacker + Waste chute",
+  "absorbance": "Absorbance",
+  "heater_Shaker": "Heater-Shaker",
+  "mag_block": "Mag Block",
+  "staging_area": "Stage",
+  "temperature": "Temperature",
+  "thermocycler": "Thermocycler",
+  "trash_bin": "Trash bin",
+  "waste": "Waste"
+}

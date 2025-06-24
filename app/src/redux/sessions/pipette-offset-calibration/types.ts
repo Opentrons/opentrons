@@ -1,5 +1,5 @@
 // pipette offset calibration types
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
+import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
 import type {
   PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
   PIP_OFFSET_STEP_INSPECTING_TIP,
@@ -30,7 +30,7 @@ export interface PipetteOffsetCalibrationInstrument {
   tipLength: number
   mount: string
   serial: string
-  defaultTipracks: LabwareDefinition2[]
+  defaultTipracks: LabwareDefinition[]
 }
 
 export interface PipetteOffsetCalibrationSessionParams {
@@ -38,7 +38,7 @@ export interface PipetteOffsetCalibrationSessionParams {
   // this will be false for pipette offset cal
   shouldRecalibrateTipLength: boolean
   hasCalibrationBlock: boolean
-  tipRackDefinition: LabwareDefinition2 | null
+  tipRackDefinition: LabwareDefinition | null
 }
 
 export interface PipetteOffsetCalibrationSessionDetails {

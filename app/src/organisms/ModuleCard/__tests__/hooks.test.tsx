@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -181,7 +181,7 @@ const mockFlexStacker = {
 } as any
 
 describe('useLatchControls', () => {
-  const store: Store<any> = createStore(vi.fn(), {})
+  const store: Store<any> = legacy_createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
@@ -261,7 +261,7 @@ describe('useLatchControls', () => {
 })
 
 describe('useModuleOverflowMenu', () => {
-  const store: Store<any> = createStore(vi.fn(), {})
+  const store: Store<any> = legacy_createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
@@ -672,12 +672,12 @@ describe('useModuleOverflowMenu', () => {
       },
     })
 
-    expect(flexStackerMenu[0].menuButtons).toHaveLength(1)
+    expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
   })
 })
 
 describe('useIsHeaterShakerInProtocol', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
 
   beforeEach(() => {
     when(useCurrentRunId).calledWith().thenReturn('1')

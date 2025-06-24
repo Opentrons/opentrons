@@ -21,7 +21,7 @@ export const dropTipInTrash: CommandCreator<DropTipInTrashParams> = (
   let commandCreators: CurriedCommandCreator[] = []
   const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
 
-  if (prevRobotState.tipState.pipettes[pipetteId]) {
+  if (prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     const pipettePythonName =
       invariantContext.pipetteEntities[pipetteId].pythonName
     const pythonCommandCreator: CurriedCommandCreator = () => ({

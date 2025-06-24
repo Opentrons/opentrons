@@ -27,444 +27,6 @@
         "model": "temperatureModuleV2"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 11.7,
-            "y": 8.75,
-            "z": 80.09
-          },
-          "compatibleWith": [
-            "temperatureModuleV1"
-          ],
-          "dimensions": {
-            "bareOverallHeight": 84.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Temperature Module GEN2",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.0
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": -1.45,
-            "y": -0.15,
-            "z": 80.09
-          },
-          "model": "temperatureModuleV2",
-          "moduleType": "temperatureModuleType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot2_standard": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot3_standard": {
-              "A1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "A3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "B1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "B3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "C1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "C3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "D1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "D3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              }
-            }
-          }
-        },
         "model": "temperatureModuleV2",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -2032,6 +1594,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2199,6 +1769,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2370,6 +1948,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2545,6 +2131,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
@@ -2724,6 +2318,14 @@
             "brand": "Opentrons",
             "brandId": []
           },
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_flex_deck_riser",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "protocol_engine_lid_stack_object"
+          ],
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,

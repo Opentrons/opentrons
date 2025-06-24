@@ -5,14 +5,15 @@ import { COLORS } from '@opentrons/components'
 
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const mockLabwareDef = {
+  schemaVersion: 2,
   dimensions: {
     xDimension: 84,
     yDimension: 42,
   },
-} as LabwareDefinition2
+} as LabwareDefinition
 
 describe('LabwareDisabledOverlay', () => {
   it("renders correctly for a given labware definition's dimensions", () => {

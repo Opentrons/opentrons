@@ -4,10 +4,6 @@ from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
-
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands import LoadModuleResult
-
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
@@ -35,7 +31,8 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
-
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     AddressableAreaLocation,
@@ -119,7 +116,7 @@ class ProtocolCore(
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
-        self._defined_liquid_class_defs_by_name: Dict[str, LiquidClassSchemaV1] = {}
+        self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
 
     @property
@@ -1071,20 +1068,22 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def define_liquid_class(self, name: str) -> LiquidClass:
-        """Define a liquid class for use in transfer functions."""
+    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+        """Get an instance of a built-in liquid class."""
         try:
             # Check if we have already loaded this liquid class' definition
-            liquid_class_def = self._defined_liquid_class_defs_by_name[name]
+            liquid_class_def = self._liquid_class_def_cache[(name, version)]
         except KeyError:
             try:
                 # Fetching the liquid class data from file and parsing it
                 # is an expensive operation and should be avoided.
                 # Calling this often will degrade protocol execution performance.
-                liquid_class_def = liquid_classes.load_definition(name)
-                self._defined_liquid_class_defs_by_name[name] = liquid_class_def
+                liquid_class_def = liquid_classes.load_definition(name, version=version)
+                self._liquid_class_def_cache[(name, version)] = liquid_class_def
             except LiquidClassDefinitionDoesNotExist:
-                raise ValueError(f"Liquid class definition not found for '{name}'.")
+                raise ValueError(
+                    f"Liquid class definition not found for '{name}' version {version}."
+                )
 
         return LiquidClass.create(liquid_class_def)
 

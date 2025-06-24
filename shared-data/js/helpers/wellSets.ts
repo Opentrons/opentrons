@@ -17,7 +17,7 @@ import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   NozzleLayoutConfig,
   PipetteV2Specs,
 } from '../types'
@@ -26,7 +26,7 @@ type WellSetByPrimaryWell = string[][]
 
 // Compute all well sets for a labware def (non-memoized)
 function _getAllWellSetsForLabware(
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): WellSetByPrimaryWell {
   const allWells: string[] = Object.keys(labwareDef.wells)
 
@@ -52,7 +52,7 @@ export interface NozzleLayoutDetails {
 }
 
 export interface WellSetForMultiChannelParams {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   wellName: string
   channels: 8 | 96
   pipetteNozzleDetails?: NozzleLayoutDetails
@@ -61,7 +61,7 @@ export interface WellSetForMultiChannelParams {
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
 export interface WellSetHelpers {
   getAllWellSetsForLabware: (
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition
   ) => WellSetByPrimaryWell
 
   /** Given a well for a labware, returns the well set it belongs to (or null)
@@ -78,7 +78,7 @@ export interface WellSetHelpers {
 
   canPipetteUseLabware: (
     pipetteSpec: PipetteV2Specs,
-    labwareDef?: LabwareDefinition2,
+    labwareDef?: LabwareDefinition,
     trashName?: string
   ) => boolean
 }
@@ -86,13 +86,13 @@ export interface WellSetHelpers {
 export const makeWellSetHelpers = (): WellSetHelpers => {
   const cache: Partial<{
     [labwareDefURI: string]: {
-      labwareDef: LabwareDefinition2
+      labwareDef: LabwareDefinition
       wellSetByPrimaryWell: WellSetByPrimaryWell
     } | null
   }> = {}
 
   const getAllWellSetsForLabware = (
-    labwareDef: LabwareDefinition2
+    labwareDef: LabwareDefinition
   ): WellSetByPrimaryWell => {
     const labwareDefURI = getLabwareDefURI(labwareDef)
     const c = cache[labwareDefURI]
@@ -217,7 +217,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const canPipetteUseLabware = (
     pipetteSpec: PipetteV2Specs,
-    labwareDef?: LabwareDefinition2,
+    labwareDef?: LabwareDefinition,
     trashName?: string
   ): boolean => {
     if (pipetteSpec.channels === 1 || trashName != null) {

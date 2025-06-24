@@ -62,7 +62,6 @@ describe('dispense', () => {
         },
         flowRate: 6,
         tipRack: 'tiprack1Id',
-        nozzles: null,
       }
     })
     it('dispense normally (with tip)', () => {
@@ -93,7 +92,7 @@ describe('dispense', () => {
 mock_pipette.dispense(
     volume=50,
     location=mock_source_plate["A1"].bottom(z=5),
-    rate=6 / mock_pipette.flow_rate.dispense,
+    flow_rate=6,
 )`.trimStart()
       )
     })
@@ -121,7 +120,6 @@ mock_pipette.dispense(
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
           tipRack: 'tiprack1Id',
-          nozzles: null,
         },
         invariantContext,
         initialRobotState

@@ -38,7 +38,7 @@ import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type { Jog } from '/app/molecules/JogControls'
 import type { useChainRunCommands } from '/app/resources/runs'
@@ -158,7 +158,7 @@ const VIEW_OFFSETS_BUTTON_STYLE = css`
 `
 interface ViewOffsetsProps {
   existingOffsets: LabwareOffset[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
   const { existingOffsets, labwareDefinitions } = props

@@ -1856,6 +1856,96 @@ def test_mix_with_lpd(
     )
 
 
+def test_mix_with_flow_rates(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        input_location,
+    )  # last location same as input_location, so in_place should be true
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.mix(
+        repetitions=1,
+        volume=10.0,
+        location=input_location,
+        aspirate_flow_rate=300.0,
+        dispense_flow_rate=400.0,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=3.0,  # requested aspirate_flow_rate is 3x default flow rate of 100
+            flow_rate=300.0,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=4.0,  # requested dispense_flow_rate is 4x default flow rate of 100
+            flow_rate=400.0,
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+    )
+
+    # Should fail if you try to set both rate and aspirate_flow_rate/dispense_flow_rate:
+    with pytest.raises(ValueError):
+        subject.mix(
+            repetitions=1,
+            volume=10.0,
+            location=input_location,
+            rate=1.23,
+            aspirate_flow_rate=300.0,
+            dispense_flow_rate=400.0,
+        )
+
+    # Bonus: If you only set aspirate_flow_rate, the dispense should use the pipette's
+    # default flow rate:
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1)).then_return(100.0)
+    subject.mix(
+        repetitions=1,
+        volume=10.0,
+        location=input_location,
+        aspirate_flow_rate=300.0,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=3.0,  # requested aspirate_flow_rate is 3x default flow rate of 100
+            flow_rate=300.0,
+            in_place=True,
+            meniscus_tracking=None,
+        ),
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,  # the default dispense flow rate
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+        ),
+    )
+
+
 def test_mix_with_delay_and_final_push_out(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -2404,6 +2494,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2461,6 +2552,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2511,6 +2603,7 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2661,7 +2754,7 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -2671,14 +2764,13 @@ def test_distribute_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
-    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     with pytest.raises(ValueError, match="Incompatible `new_tip` value"):
         subject.distribute_with_liquid_class(
@@ -2736,6 +2828,7 @@ def test_distribute_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2801,6 +2894,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2944,7 +3038,7 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -2954,7 +3048,7 @@ def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source" or "always"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -3019,6 +3113,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -3085,6 +3180,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -3136,5 +3232,6 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )

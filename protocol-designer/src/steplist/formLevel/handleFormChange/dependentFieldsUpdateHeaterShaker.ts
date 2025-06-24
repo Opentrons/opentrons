@@ -18,6 +18,21 @@ const updatePatchOnSetShakeChange = (
   return patch
 }
 
+const updatePatchOnTimer = (patch: FormPatch, rawForm: FormData): FormPatch => {
+  // when setShake is toggled to true, change latchOpen to false
+  if (
+    fieldHasChanged(rawForm, patch, 'heaterShakerSetTimer') &&
+    patch.heaterShakerSetTimer === false
+  ) {
+    return {
+      ...patch,
+      ...{ heaterShakerTimer: '' },
+    }
+  }
+
+  return patch
+}
+
 export function dependentFieldsUpdateHeaterShaker(
   originalPatch: FormPatch,
   rawForm: FormData // raw = NOT hydrated
@@ -25,5 +40,6 @@ export function dependentFieldsUpdateHeaterShaker(
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [
     chainPatch => updatePatchOnSetShakeChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnTimer(chainPatch, rawForm),
   ])
 }

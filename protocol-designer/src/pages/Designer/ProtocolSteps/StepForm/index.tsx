@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
@@ -18,10 +17,9 @@ import {
 } from '../../../../step-forms'
 import { getInvariantContext } from '../../../../step-forms/selectors'
 import { actions } from '../../../../steplist'
-import { maskField } from '../../../../steplist/fieldLevel'
 import { actions as stepsActions } from '../../../../ui/steps'
 import { StepFormToolbox } from './StepFormToolbox'
-import { getDirtyFields, makeSingleEditFieldProps } from './utils'
+import { getDirtyFields } from './utils'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
@@ -47,7 +45,6 @@ interface DispatchProps {
   saveSetTempFormWithAddedPauseUntilTemp: () => void
   saveHeaterShakerFormWithAddedPauseUntilTemp: () => void
   saveStepForm: () => void
-  handleChangeFormInput: (name: string, value: unknown) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -57,7 +54,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     deleteStep,
     formData,
     formHasChanges,
-    handleChangeFormInput,
     handleClose,
     isNewStep,
     isPristineSetTempForm,
@@ -67,7 +63,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
   } = props
-  const { t } = useTranslation('tooltip')
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
@@ -128,13 +123,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     focus: setFocusedField,
     blur: handleBlur,
   }
-  const propsForFields = makeSingleEditFieldProps(
-    focusHandlers,
-    formData,
-    handleChangeFormInput,
-    hydratedForm,
-    t
-  )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {
     handleSave = confirmAddPauseUntilTempStep
@@ -147,7 +135,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
 
   return (
     <>
-      {/* TODO: update these modals to match new modal design */}
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
@@ -192,7 +179,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           formData,
           handleClose: confirmClose,
           handleSave,
-          propsForFields,
+          hydratedForm,
         }}
       />
     </>
@@ -225,14 +212,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
   const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
-  const handleChangeFormInput = (name: string, value: unknown): void => {
-    const maskedValue = maskField(name, value)
-    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
-  }
-
   return {
     deleteStep,
-    handleChangeFormInput,
     handleClose,
     saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,

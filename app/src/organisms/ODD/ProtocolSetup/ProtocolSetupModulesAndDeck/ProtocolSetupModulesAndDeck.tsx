@@ -8,6 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   JUSTIFY_CENTER,
   LegacyStyledText,
   SPACING,
@@ -20,7 +21,6 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
@@ -40,7 +40,11 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureId,
+  CutoutId,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000
@@ -50,6 +54,9 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
+  setAddressableAreaId: (
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -60,6 +67,7 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setCutoutId,
+  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')

@@ -66,16 +66,20 @@ MAX_TRAVEL = {
     StackerAxis.L: 22.0,
 }
 
+# Min/Max height in mm of labware stack to store/dispense
+MIN_LABWARE_HEIGHT = 4.0
+MAX_LABWARE_HEIGHT = 102.5
+
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
 # This lets us use `move_axis` to move fast, leaving the axis OFFSET mm
 # from the limit switch. Then we can use `home_axis` to move the axis the rest
 # of the way until we trigger the expected limit switch.
-OFFSET_SM = 5.0
-OFFSET_MD = 10.0
-OFFSET_LG = 20.0
+HOME_OFFSET_SM = 5.0
+HOME_OFFSET_MD = 10.0
 
-# height limit in mm of labware to use OFFSET_MD used when storing labware.
-MEDIUM_LABWARE_Z_LIMIT = 20.0
+# The labware platform will contact the labware this mm before the platform
+# touches the +Z endstop.
+PLATFORM_OFFSET = 2.5
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -88,8 +92,8 @@ class FlexStacker(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -155,12 +159,12 @@ class FlexStacker(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractFlexStackerDriver,
         reader: FlexStackerReader,
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ):
         super().__init__(
@@ -232,6 +236,11 @@ class FlexStacker(mod_abc.AbstractModule):
         return self._reader.limit_switch_status
 
     @property
+    def install_detected(self) -> bool:
+        """Whether the stacker is installed on Flex."""
+        return self._reader.installation_detected
+
+    @property
     def device_info(self) -> Mapping[str, str]:
         return self._device_info
 
@@ -258,8 +267,7 @@ class FlexStacker(mod_abc.AbstractModule):
             "latchState": self.latch_state.value,
             "platformState": self._get_platform_live_data().value,
             "hopperDoorState": self.hopper_door_state.value,
-            "axisStateX": self.limit_switch_status[StackerAxis.X].value,
-            "axisStateZ": self.limit_switch_status[StackerAxis.Z].value,
+            "installDetected": self.install_detected,
             "errorDetails": self._reader.error,
         }
         return {"status": self.status.value, "data": data}
@@ -407,85 +415,77 @@ class FlexStacker(mod_abc.AbstractModule):
         labware_height: float,
         enforce_hopper_lw_sensing: bool = True,
         enforce_shuttle_lw_sensing: bool = True,
-    ) -> bool:
+    ) -> None:
         """Dispenses the next labware in the stacker."""
+        self.verify_labware_height(labware_height)
         if enforce_hopper_lw_sensing:
             await self.verify_hopper_labware_presence(True)
 
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
-
-        # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
-        # reading the platform sensor on the extended side. This is a temporary
-        # workaround to avoid the sensor check on the extended side and should be
-        # removed once dvt hardware is available. We should move this check
-        # to `prepare_for_action` instead
-        await self.verify_shuttle_location(PlatformState.RETRACTED)
-
-        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM)
 
         # Transfer
         await self.open_latch()
-        await self.move_axis(StackerAxis.Z, Direction.RETRACT, (labware_height / 2) + 2)
+        # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
+        # sure the bottom of the next labware is sitting 2.5mm above the latch.
+        # So when moving the labware_height we dont need to add an additional
+        # offset to make sure we arent cutting it too close since the labware
+        # will always be above the latch.
+        await self.move_axis(StackerAxis.Z, Direction.RETRACT, labware_height)
         await self.close_latch()
 
-        # Move platform along the Z then X axis
-        offset = labware_height / 2 + OFFSET_MD
-        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, offset)
+        # Move Z down the rest of the way
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        await self.move_axis(StackerAxis.Z, Direction.RETRACT, z_distance)
+        await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
-        return True
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def store_labware(
         self,
         labware_height: float,
         enforce_shuttle_lw_sensing: bool = True,
-    ) -> bool:
+    ) -> None:
         """Stores a labware in the stacker."""
+        self.verify_labware_height(labware_height)
         await self._prepare_for_action()
 
-        # Move X then Z axis
-        offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
-        distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_MD)
-
-        # TODO: (AA 2025-04-03) - The EVT Flex Stacker hardware has issues
-        # reading the platform sensor on the extended side. This is a temporary
-        # workaround to avoid the sensor check on the extended side and should be
-        # removed once dvt hardware is available. We should move this check
-        # to `prepare_for_action` instead
-        await self.verify_shuttle_location(PlatformState.RETRACTED)
-
+        # Move the X and check that labware is detected
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
+        # Move the Z so the labware sits right under any labware already stored
+        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
-        # Transfer
         await self.open_latch()
-        z_speed = (
-            STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
-        ) / 2
-        await self.move_axis(
-            StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
-        )
-        await self.home_axis(StackerAxis.Z, Direction.EXTEND, z_speed)
+        # Move the labware the rest of the way at half move speed to increase torque.
+        remaining_z = labware_height + PLATFORM_OFFSET - HOME_OFFSET_SM
+        speed_z = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
+        await self.move_axis(StackerAxis.Z, Direction.EXTEND, remaining_z, speed_z)
+        await self.home_axis(StackerAxis.Z, Direction.EXTEND, speed_z)
         await self.close_latch()
 
-        # Move Z then X axis
-        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_LG)
-
+        # Move the Z down and check that labware is not detected.
+        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, HOME_OFFSET_MD)
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_MD)
-        return True
+
+        # Move the X to the gripper position
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def _move_and_home_axis(
-        self, axis: StackerAxis, direction: Direction, offset: float = 0
+        self,
+        axis: StackerAxis,
+        direction: Direction,
+        offset: float = 0,
+        speed: Optional[float] = None,
     ) -> bool:
         """Move the axis in a direction by the given offset in mm and home it.
 
@@ -493,17 +493,16 @@ class FlexStacker(mod_abc.AbstractModule):
         before this function gets called. Do not use this function if the axis
         has not been homed/has recently stalled."""
         distance = MAX_TRAVEL[axis] - offset
-        await self.move_axis(axis, direction, distance)
-        return await self.home_axis(axis, direction)
+        await self.move_axis(axis, direction, distance, speed)
+        return await self.home_axis(axis, direction, speed)
 
-    async def _prepare_for_action(self) -> bool:
+    async def _prepare_for_action(self) -> None:
         """Helper to prepare axis for dispensing or storing labware."""
         # TODO: check if we need to home first
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.close_latch()
         await self.verify_shuttle_location(PlatformState.EXTENDED)
-        return True
 
     async def home_all(self, ignore_latch: bool = False) -> None:
         """Home all axes based on current state, assuming normal operation.
@@ -512,16 +511,31 @@ class FlexStacker(mod_abc.AbstractModule):
         is useful when we want the shuttle to be out of the way for error
         recovery (e.g. when the latch is stuck open).
         """
+        await self._reader.get_installation_detected()
         await self._reader.get_limit_switch_status()
-        # we should always be able to home the X axis first
-        await self.home_axis(StackerAxis.X, Direction.RETRACT)
-        # If latch is open, we must first close it
-        if not ignore_latch and self.latch_state == LatchState.OPENED:
-            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
-                # it was likely in the middle of a dispense/store command
-                # z should be moved up before we can safely close the latch
-                await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+        await self._reader.get_platform_sensor_state()
+
+        # Z axis is unknown, lets move it up in case it is holding a labware
+        if not ignore_latch:
+            if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
+                if self.latch_state == LatchState.OPENED:
+                    # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
+                    await self.home_axis(StackerAxis.Z, Direction.EXTEND)
             await self.close_latch()
+
+        if (
+            # if the platform is on the z or if x has not been homed
+            self.platform_state == PlatformState.UNKNOWN
+            or self.limit_switch_status[StackerAxis.X] == StackerAxisState.UNKNOWN
+        ):
+            # if the z is not retracted, we need to make sure the x is retracted
+            # so we can retract the z properly later
+            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
+                await self.home_axis(StackerAxis.X, Direction.RETRACT)
+            else:
+                await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
+        # Finally, retract Z and extend X if they are not already
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
@@ -590,6 +604,14 @@ class FlexStacker(mod_abc.AbstractModule):
                 labware_expected=labware_expected,
             )
 
+    def verify_labware_height(self, labware_height: float) -> None:
+        """Check that the labware height is within valid range."""
+        if labware_height < MIN_LABWARE_HEIGHT or labware_height > MAX_LABWARE_HEIGHT:
+            raise ValueError(
+                f"Labware height must be between {MIN_LABWARE_HEIGHT}-{MAX_LABWARE_HEIGHT}mm."
+                "Received {labware_height}mm."
+            )
+
     def event_listener(self, event: Any) -> None:
         if isinstance(event, StatusBarUpdateEvent):
             self._last_status_bar_event = event
@@ -646,10 +668,12 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _stacker_bar_idle(self) -> None:
         await self.set_led_state(0.5, LEDColor.WHITE, LEDPattern.STATIC)
 
-    async def identify(self) -> None:
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
-        await self.set_led_state(0.5, LEDColor.BLUE, LEDPattern.PULSE, reps=10)
-        if self._last_status_bar_event:
+        reps = -1 if start else 0
+        color = LEDColor.from_name(color_name or LEDColor.BLUE.name)
+        await self.set_led_state(0.5, color, LEDPattern.PULSE, reps=reps)
+        if not start and self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def set_stacker_identify(self, state: bool) -> None:
@@ -677,6 +701,7 @@ class FlexStackerReader(Reader):
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
         self.initialized = False
+        self.installation_detected = False
         self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
 
     def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
@@ -688,6 +713,7 @@ class FlexStackerReader(Reader):
         await self.get_platform_sensor_state()
         if not self.initialized:
             initialized = True
+            await self.get_installation_detected()
             await self.get_limit_switch_status()
             await self.get_motion_parameters()
             for sensor, status in self.tof_sensor_status.items():
@@ -729,6 +755,11 @@ class FlexStackerReader(Reader):
         self.hopper_door_closed = await self._driver.get_hopper_door_closed()
         if old_door_state != self.hopper_door_closed and self._initialized_callback:
             await self._initialized_callback()
+
+    async def get_installation_detected(self) -> None:
+        """Check if the stacker install detect is set."""
+        detected = await self._driver.get_installation_detected()
+        self.installation_detected = detected
 
     def on_error(self, exception: Exception) -> None:
         self._driver.reset_serial_buffers()

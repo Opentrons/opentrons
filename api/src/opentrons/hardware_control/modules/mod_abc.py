@@ -46,8 +46,8 @@ class AbstractModule(abc.ABC):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -64,8 +64,8 @@ class AbstractModule(abc.ABC):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         self._port = port
@@ -127,11 +127,12 @@ class AbstractModule(abc.ABC):
         return False
 
     async def wait_for_is_running(self) -> None:
-        if not self.is_simulated:
+        if not self.is_simulated and self._execution_manager is not None:
             await self._execution_manager.wait_for_is_running()
 
     def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
-        self._execution_manager.register_cancellable_task(task)
+        if self._execution_manager is not None:
+            self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
     async def deactivate(self, must_be_running: bool = True) -> None:
@@ -235,6 +236,6 @@ class AbstractModule(abc.ABC):
         """Listen for events and update the module state."""
         pass
 
-    async def identify(self) -> None:
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
         pass

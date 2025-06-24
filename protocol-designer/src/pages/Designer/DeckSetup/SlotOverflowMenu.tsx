@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   BORDERS,
@@ -16,7 +15,6 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
-import { FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
   getTopLocationInStack,
@@ -27,25 +25,19 @@ import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,
   duplicateLabware,
-  openIngredientSelector,
 } from '../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
-import type {
-  AddressableAreaName,
-  CoordinateTuple,
-  DeckSlotId,
-} from '@opentrons/shared-data'
+import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
@@ -89,7 +81,6 @@ export function SlotOverflowMenu(
     invertY = false,
   } = props
   const { t } = useTranslation('starting_deck_state')
-  const navigate = useNavigate()
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showDeleteLabwareModal, setShowDeleteLabwareModal] = useState<boolean>(
@@ -112,10 +103,6 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
 
   const robotType = useSelector(getRobotType)
 
@@ -147,11 +134,6 @@ export function SlotOverflowMenu(
 
   const adapterOnSlot = Object.values(deckSetupLabware).find(
     lw => lw.id === labwareStackOnSlot[1]
-  )
-  const hasNoItem = labwareStackOnSlot.length === 0
-
-  const isStagingSlot = FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
-    location as AddressableAreaName
   )
 
   const handleDuplicate = (): void => {
@@ -200,11 +182,6 @@ export function SlotOverflowMenu(
   if (isOffDeckLocation) {
     nickNameId = location
   }
-
-  const selectionHasLiquids =
-    nickNameId != null &&
-    liquidLocations[nickNameId] != null &&
-    Object.keys(liquidLocations[nickNameId]).length > 0
 
   const handleConfirmDeleteEntityInUseModal = (): void => {
     handleClear()
@@ -275,33 +252,7 @@ export function SlotOverflowMenu(
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {hasNoItem ? t('add_labware') : t('edit_labware')}
-          </StyledText>
-        </MenuItem>
-        {canRenameLabwareAndEditLiquids ? (
-          <MenuItem
-            onClick={(e: MouseEvent) => {
-              setShowNickNameModal(true)
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-          >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('rename_lab')}
-            </StyledText>
-          </MenuItem>
-        ) : null}
-        <MenuItem
-          onClick={() => {
-            if (topLabwareOnSlot != null) {
-              dispatch(openIngredientSelector(topLabwareOnSlot.id))
-            }
-            navigate('/liquids')
-          }}
-          disabled={!canRenameLabwareAndEditLiquids}
-        >
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {selectionHasLiquids ? t('edit_liquid') : t('add_liquid')}
+            {t('edit_labware')}
           </StyledText>
         </MenuItem>
         {showDuplicateBtn ? (
@@ -313,7 +264,6 @@ export function SlotOverflowMenu(
         ) : null}
         <Divider marginY="0" />
         <MenuItem
-          disabled={hasNoItem && !isStagingSlot}
           onClick={(e: MouseEvent) => {
             handleClearLabware(e)
           }}
