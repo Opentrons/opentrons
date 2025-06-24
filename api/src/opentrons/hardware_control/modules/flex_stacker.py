@@ -79,7 +79,7 @@ HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
-PLATFORM_OFFSET = 2.5
+PLATFORM_OFFSET = 4
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -430,7 +430,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Transfer
         await self.open_latch()
         # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
-        # sure the bottom of the next labware is sitting 2.5mm above the latch.
+        # sure the bottom of the next labware is sitting N mm above the latch.
         # So when moving the labware_height we dont need to add an additional
         # offset to make sure we arent cutting it too close since the labware
         # will always be above the latch.
