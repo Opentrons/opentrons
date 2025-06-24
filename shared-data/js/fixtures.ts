@@ -676,7 +676,7 @@ export function getAddressableAreaNamesFromLoadedModule(
 
 export const getModuleDisplayNameWithPort = (
   usbPortNumber: number | string
-) => {
+): string => {
   return `${getModuleDisplayName(
     FLEX_STACKER_MODULE_V1
   )} in USB-${usbPortNumber}`
@@ -695,7 +695,7 @@ export function getAAComboFixtureDisplayName(
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
+          ? t(`${translationFileName}:module_in_port`, {moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1), usbPortNumber})
 
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
@@ -704,8 +704,8 @@ export function getAAComboFixtureDisplayName(
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
-          : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
+        ? t(`${translationFileName}:module_in_port`, {moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1), usbPortNumber})
+        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return t(`${translationFileName}:magnetic_block`)
       }
