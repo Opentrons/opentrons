@@ -66,12 +66,10 @@ export function AbsorbanceReaderItem(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
-  const handleRemoveClick = () => {
-    handleClickRemove != null
-      ? () => {
-          handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
-        }
-      : () => {}
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
   }
   return (
     <RobotCoordsForeignObject

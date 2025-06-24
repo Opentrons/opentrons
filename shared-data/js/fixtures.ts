@@ -1,9 +1,6 @@
 import isEqual from 'lodash/isEqual'
 
-import {
-  WASTE_CHUTE_FIXTURES,
-  WASTE_CHUTE_WITH_FAKE_FIXTURES,
-} from '.'
+import { WASTE_CHUTE_FIXTURES, WASTE_CHUTE_WITH_FAKE_FIXTURES } from '.'
 import {
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -706,6 +703,7 @@ export function getAAFixtureDisplayName(
       if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
       }
+      break
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
