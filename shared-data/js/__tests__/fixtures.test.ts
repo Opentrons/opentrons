@@ -18,8 +18,8 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
-  getAAFixtureDisplayName,
-  getAASlotNameForAA,
+  getAAComboFixtureDisplayName,
+  getAASlotIdForAA,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
   getFlexDeckDefAAByFixtureIdForCutoutId,
@@ -386,7 +386,7 @@ describe('getReplacementFixtureForFakeFixture', () => {
 
 describe('getAASlotNameForAA', () => {
   it('should get aa name for single right slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutA3',
       FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
       'magneticBlockV1A3'
@@ -395,7 +395,7 @@ describe('getAASlotNameForAA', () => {
   })
 
   it('should return aa name for single center slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutD1',
       TEMPERATURE_MODULE_V2_FIXTURE,
       'temperatureModuleV2D1'
@@ -404,7 +404,7 @@ describe('getAASlotNameForAA', () => {
   })
 
   it('should get input aa name for single center slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutD2',
       MAGNETIC_BLOCK_V1_FIXTURE,
       'magneticBlockV1D2'
@@ -442,7 +442,7 @@ describe('replaceCutoutFixtureRemove', () => {
 
 describe('getAAFixtureDisplayName', () => {
   it('Should return flex stacker name when using combo fixtures and aa for stacker', () => {
-    const name = getAAFixtureDisplayName(
+    const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'flexStackerModuleV1D4'
     )
@@ -450,7 +450,7 @@ describe('getAAFixtureDisplayName', () => {
   })
 
   it('Should return mag block name when using combo fixtures with mag block', () => {
-    const name = getAAFixtureDisplayName(
+    const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'magneticBlockV1D3'
     )
@@ -458,7 +458,7 @@ describe('getAAFixtureDisplayName', () => {
   })
 
   it('Should return mag block name when using combo fixtures with mag block', () => {
-    const name = getAAFixtureDisplayName(
+    const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'magneticBlockV1D3'
     )
@@ -466,7 +466,7 @@ describe('getAAFixtureDisplayName', () => {
   })
 
   it('Should return waste chute name when using waste chute fixture', () => {
-    const name = getAAFixtureDisplayName(
+    const name = getAAComboFixtureDisplayName(
       FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
       '96ChannelWasteChute'
     )

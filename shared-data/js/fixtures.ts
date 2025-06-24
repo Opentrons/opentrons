@@ -683,7 +683,7 @@ export const getModuleDisplayNameWithPort = (
   )} in USB-${usbPortNumber}`
 }
 
-export function getAAFixtureDisplayName(
+export function getAAComboFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
@@ -691,8 +691,6 @@ export function getAAFixtureDisplayName(
 ): string | null {
   const aaItem = getAAByAAId(addressableAreaId, deckDef)
   switch (cutoutFixtureId) {
-    case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-      return 'Staging area slot'
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
@@ -717,9 +715,6 @@ export function getAAFixtureDisplayName(
       return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'wasteChute') {
-      return null
-    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
       } else {
         return 'Staging area slot'
@@ -963,7 +958,7 @@ export const replaceAAWithFakeAA = (
   }
 }
 
-export const getAASlotNameForAA = (
+export const getAASlotIdForAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   addressableAreaId: AddressableAreaNamesWithFakes
@@ -976,6 +971,10 @@ export const getAASlotNameForAA = (
   return aaMatchInDef
     ? AA_TO_AA_SLOT[aaMatchInDef]
     : (addressableAreaId as AddressableAreaNamesWithFakes)
+}
+
+export const getAASlotDisplayName = (  addressableAreaId: AddressableAreaNamesWithFakes) => {
+  
 }
 
 /**
@@ -1074,7 +1073,7 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa =>
       aa === addressableAreaId
-        ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
+        ? getAASlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
         : aa
     )
     const match = Object.entries(addressableAreasById).find(([, value]) =>

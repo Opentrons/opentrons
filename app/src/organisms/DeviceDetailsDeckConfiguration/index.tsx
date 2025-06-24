@@ -25,8 +25,9 @@ import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
   getAAByAAId,
-  getAAFixtureDisplayName,
-  getAASlotNameForAA,
+  getAAComboFixtureDisplayName,
+  getAASlotDisplayName,
+  getAASlotIdForAA,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -125,7 +126,7 @@ export function DeviceDetailsDeckConfiguration({
           ? `${usbPort.port}.${usbPort.hubPort}`
           : usbPort?.port
       const displayName =
-        getAAFixtureDisplayName(
+        getAAComboFixtureDisplayName(
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
@@ -155,7 +156,7 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
-      const name = getAASlotNameForAA(
+      const name = getAASlotIdForAA(
         cutoutId,
         cutoutFixtureId,
         addressableAreaId
@@ -166,7 +167,7 @@ export function DeviceDetailsDeckConfiguration({
           ...acc.displayList,
           {
             displayLocation: name
-              ? name.replace('fake', '')
+              ? getAASlotDisplayName(name)
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
