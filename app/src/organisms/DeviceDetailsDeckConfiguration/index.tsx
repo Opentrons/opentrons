@@ -62,7 +62,7 @@ function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
 export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
-  const { t, i18n } = useTranslation('device_details')
+  const { t, i18n } = useTranslation(['device_details', 'deck_configuration'])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -130,6 +130,8 @@ export function DeviceDetailsDeckConfiguration({
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
+          t,
+          'deck_configuration',
           portDisplay
         ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
       const fixtureGroup =

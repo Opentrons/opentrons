@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { useTranslation } from 'react-i18next'
+
+import { describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
@@ -30,6 +33,10 @@ import {
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
+
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
+}))
 
 describe('getAAFromCutoutFixtureId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
@@ -441,10 +448,20 @@ describe('replaceCutoutFixtureRemove', () => {
 })
 
 describe('getAAFixtureDisplayName', () => {
+  let t: Mock
+
+  beforeEach(() => {
+    t = vi.fn(key => key)
+
+    vi.mocked(useTranslation).mockReturnValue({ t } as any)
+  })
   it('Should return flex stacker name when using combo fixtures and aa for stacker', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-      'flexStackerModuleV1D4'
+      'flexStackerModuleV1D4',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      ''
     )
     expect(name).toEqual('Flex Stacker Module GEN1')
   })
@@ -452,7 +469,10 @@ describe('getAAFixtureDisplayName', () => {
   it('Should return mag block name when using combo fixtures with mag block', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-      'magneticBlockV1D3'
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      ''
     )
     expect(name).toEqual('Magnetic block')
   })
@@ -460,7 +480,10 @@ describe('getAAFixtureDisplayName', () => {
   it('Should return mag block name when using combo fixtures with mag block', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-      'magneticBlockV1D3'
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      ''
     )
     expect(name).toEqual('Magnetic block')
   })
@@ -468,7 +491,10 @@ describe('getAAFixtureDisplayName', () => {
   it('Should return waste chute name when using waste chute fixture', () => {
     const name = getAAComboFixtureDisplayName(
       FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
-      '96ChannelWasteChute'
+      '96ChannelWasteChute',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      ''
     )
     expect(name).toEqual('Waste chute')
   })

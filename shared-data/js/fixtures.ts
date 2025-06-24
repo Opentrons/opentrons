@@ -1,8 +1,8 @@
 import isEqual from 'lodash/isEqual'
+import { TFunction } from 'i18next';
 
 import {
   WASTE_CHUTE_FIXTURES,
-  WASTE_CHUTE_STAGING_AREA_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
 import {
@@ -687,6 +687,8 @@ export function getAAComboFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
+  t: TFunction,
+  translationFileName: string,
   usbPortNumber?: number | string
 ): string | null {
   const aaItem = getAAByAAId(addressableAreaId, deckDef)
@@ -698,7 +700,7 @@ export function getAAComboFixtureDisplayName(
 
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
-        return 'Waste chute'
+        return t(`${translationFileName}:waste_chute`)
       }
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
@@ -706,18 +708,18 @@ export function getAAComboFixtureDisplayName(
           ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
-        return 'Magnetic block'
+        return t('magnetic_block')
       }
     case FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT:
       if (aaItem.areaType === 'wasteChute') {
-        return 'Waste chute'
+        return t('waste_chute')
       }
       return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'wasteChute') {
-        return 'Waste chute'
+        return 'waste_chute'
       } else {
-        return 'Staging area slot'
+        return 'staging_area_slot'
       }
     default:
       return null
@@ -973,8 +975,8 @@ export const getAASlotIdForAA = (
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
-export const getAASlotDisplayName = (  addressableAreaId: AddressableAreaNamesWithFakes) => {
-  
+export const getAASlotDisplayName = (addressableAreaId: AddressableAreaNamesWithFakes) => {
+  return addressableAreaId.replace('fake', '')
 }
 
 /**
