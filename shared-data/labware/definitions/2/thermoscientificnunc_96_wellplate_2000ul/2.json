@@ -1114,8 +1114,8 @@
   },
   "stackingOffsetWithLabware": {
     "thermoscientificnunc_96_wellplate_2000ul": {
-      "x": 0, 
-      "y": 0, 
+      "x": 0,
+      "y": 0,
       "z": 1.4
     }
   },
