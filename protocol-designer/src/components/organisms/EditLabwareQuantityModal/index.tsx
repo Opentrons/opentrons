@@ -24,8 +24,8 @@ import { TC_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { getLabwareEntities } from '../../../step-forms/selectors'
 import { maskToPositiveInteger } from '../../../steplist/fieldLevel/processing'
 import { HandleEnter } from '../../atoms'
-import { TC_LID_DECK_MAX } from '../SelectLabwareModal'
 import { getMainPagePortalEl } from '../Portal'
+import { TC_LID_DECK_MAX } from '../SelectLabwareModal'
 
 import type { ThunkDispatch } from '../../../types'
 
@@ -38,14 +38,15 @@ interface EditLabwareQuantityModalProps {
 export function EditLabwareQuantityModal(
   props: EditLabwareQuantityModalProps
 ): JSX.Element {
-  const { onClose, allLabwareIdsOnStack, labwareId , isDirectlyOnDeck} = props
+  const { onClose, allLabwareIdsOnStack, labwareId, isDirectlyOnDeck } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const labwareEntities = useSelector(getLabwareEntities)
   const { labwareDefURI, def } = labwareEntities[labwareId]
-  const {loadName} = def.parameters
+  const { loadName } = def.parameters
   const isTcLid = loadName === TC_LID_LOADNAME
-  const stackingLimit = isTcLid && isDirectlyOnDeck ? TC_LID_DECK_MAX : def.stackLimit ?? 0
+  const stackingLimit =
+    isTcLid && isDirectlyOnDeck ? TC_LID_DECK_MAX : def.stackLimit ?? 0
   const initialQuantity = allLabwareIdsOnStack.length
   const [quantity, setQuantity] = useState<string>(initialQuantity.toString())
   const [showError, setError] = useState<boolean>(false)
