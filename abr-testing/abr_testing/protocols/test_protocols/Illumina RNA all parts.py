@@ -267,9 +267,7 @@ def run(protocol: ProtocolContext) -> None:
             lid="opentrons_flex_tiprack_lid",
             count=6,
         )
-        lids = protocol.load_lid_stack(
-            "opentrons_tough_pcr_auto_sealing_lid", "B3", 5
-        )
+        lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "B3", 5)
 
         # ========== THIRD ROW ===========
         stacker_50_1: FlexStackerContext = protocol.load_module(

@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }
 """
 Slot A1: Tips 200
@@ -99,7 +99,7 @@ def run(protocol: ProtocolContext) -> None:
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters
