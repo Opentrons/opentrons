@@ -703,7 +703,7 @@ export function getAAFixtureDisplayName(
       if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
       }
-      break
+      return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
