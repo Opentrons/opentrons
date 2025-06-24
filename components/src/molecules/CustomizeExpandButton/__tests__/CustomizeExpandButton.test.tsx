@@ -26,6 +26,7 @@ describe('CustomizeExpandButton', () => {
 
   beforeEach(() => {
     props = {
+      isDirectlyOnDeck: false,
       enableStackingFF: true,
       buttonText: 'mock text',
       buttonValue: 'mockValue',

@@ -48,6 +48,7 @@ describe('LabwareCard', () => {
 
   beforeEach(() => {
     props = {
+      isDirectlyOnDeck: false,
       labware: {
         id: 'labwareId',
         pythonName: 'mockPythonName',

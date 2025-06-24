@@ -64,7 +64,10 @@ import {
   getLabwareIsRecommended,
   getStackerDefinition,
 } from '../../../pages/Designer/DeckSetup/utils'
-import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
+import {
+  TC_LID_LOADNAME,
+  TIPRACK_LID_LOADNAME,
+} from '../../../pages/Designer/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
@@ -82,6 +85,7 @@ import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetup
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 
+export const TC_LID_DECK_MAX = 3
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
 const STACKING_LOADNAMES = [
@@ -440,6 +444,7 @@ export function SelectLabwareModal(
                   {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
                     ({ uri }, index) => (
                       <CustomizeExpandButton
+                        isDirectlyOnDeck={selectedModuleModel == null}
                         enableStackingFF={enableStacking}
                         loadName={customLabwareDefs[uri].parameters.loadName}
                         allowInputField={onFlexStacker}
@@ -494,6 +499,9 @@ export function SelectLabwareModal(
                                 },
                                 loadName
                               )
+                              const isTCLid = loadName === TC_LID_LOADNAME
+                              const isDirectlyOnDeck =
+                                selectedModuleModel == null
 
                               const stackingProps: StackingProps | null =
                                 stackingLabwareDefUri != null &&
@@ -503,8 +511,10 @@ export function SelectLabwareModal(
                                       ...stackingPropsShared,
                                       inputCaption: t('valid_range', {
                                         max:
-                                          defs[stackingLabwareDefUri]
-                                            .stackLimit,
+                                          isTCLid && isDirectlyOnDeck
+                                            ? TC_LID_DECK_MAX
+                                            : defs[stackingLabwareDefUri]
+                                                .stackLimit,
                                       }),
                                       definition: defs[stackingLabwareDefUri],
                                       inputFieldValue:
@@ -546,6 +556,7 @@ export function SelectLabwareModal(
                                   key={`${index}_${category}_${loadName}`}
                                 >
                                   <CustomizeExpandButton
+                                    isDirectlyOnDeck={isDirectlyOnDeck}
                                     enableStackingFF={enableStacking}
                                     loadName={loadName}
                                     allowInputField={
@@ -621,6 +632,7 @@ export function SelectLabwareModal(
                                                     defs[tiprackDefUri]
                                                   return (
                                                     <CustomizeExpandButton
+                                                      isDirectlyOnDeck={false}
                                                       enableStackingFF={
                                                         enableStacking
                                                       }
@@ -737,6 +749,7 @@ export function SelectLabwareModal(
 
                                                 return (
                                                   <CustomizeExpandButton
+                                                    isDirectlyOnDeck={false}
                                                     enableStackingFF={
                                                       enableStacking
                                                     }

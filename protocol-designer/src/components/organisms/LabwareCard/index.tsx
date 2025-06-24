@@ -36,13 +36,14 @@ import type { LabwareOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 
 interface LabwareCardProps {
+  isDirectlyOnDeck: boolean
   labware: LabwareOnDeck
   quantity: number
   lidDisplayName?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidDisplayName, quantity } = props
+  const { labware, lidDisplayName, quantity, isDirectlyOnDeck} = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -99,6 +100,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           }}
           labwareId={labware.id}
           allLabwareIdsOnStack={allLabwareIdsOnStack}
+          isDirectlyOnDeck={isDirectlyOnDeck}
         />
       ) : null}
       <Box position={POSITION_RELATIVE}>

@@ -25,6 +25,7 @@ export interface StackingProps {
 }
 
 interface CustomizeExpandButtonProps extends StyleProps {
+  isDirectlyOnDeck: boolean
   enableStackingFF: boolean
   allowInputField: boolean
   loadName: string
@@ -36,6 +37,8 @@ interface CustomizeExpandButtonProps extends StyleProps {
   isSelected?: boolean
   id?: string
 }
+
+const TC_LID_DECK_MAX = 3
 
 //  used for helix and as a child button to ListButtonAccordion
 export function CustomizeExpandButton(
@@ -52,11 +55,16 @@ export function CustomizeExpandButton(
     allowInputField,
     loadName,
     enableStackingFF,
+    isDirectlyOnDeck,
   } = props
   const isLid =
     stackingProps != null &&
     stackingProps.definition.allowedRoles?.includes('lid')
   const tcLidDef = loadName === 'opentrons_tough_pcr_auto_sealing_lid'
+  const stackLimit =
+    tcLidDef && isDirectlyOnDeck
+      ? TC_LID_DECK_MAX
+      : stackingProps?.definition.stackLimit ?? 1
 
   return (
     <Flex
@@ -105,9 +113,7 @@ export function CustomizeExpandButton(
                   label={stackingProps.checkboxCaption}
                 />
               ) : null}
-              {stackingProps.definition.stackLimit != null &&
-              stackingProps.definition.stackLimit > 1 &&
-              allowInputField ? (
+              {stackLimit > 1 && allowInputField ? (
                 <InputField
                   id="CustomizeExpandButton_inputField"
                   title={stackingProps.inputTitle}
@@ -118,8 +124,7 @@ export function CustomizeExpandButton(
                   type="number"
                   error={
                     !stackingProps.inputFieldValue ||
-                    stackingProps.inputFieldValue >
-                      stackingProps.definition.stackLimit
+                    stackingProps.inputFieldValue > stackLimit
                       ? stackingProps.errorMessage
                       : null
                   }

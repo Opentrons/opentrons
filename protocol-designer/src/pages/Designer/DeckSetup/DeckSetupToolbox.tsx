@@ -310,6 +310,10 @@ export function DeckSetupToolbox(
                       createdStackForSlot[createdStackForSlot.length - 1]
                     ]
                   }
+                  isDirectlyOnDeck={
+                    createdAdapterForSlot == null &&
+                    createdModuleForSlot == null
+                  }
                   lidDisplayName={
                     createdLidForSlot != null &&
                     createdStackForSlot.includes(createdLidForSlot?.id)
@@ -320,7 +324,11 @@ export function DeckSetupToolbox(
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
+                <LabwareCard
+                  labware={createdAdapterForSlot}
+                  quantity={1}
+                  isDirectlyOnDeck={false}
+                />
               ) : null}
               {slotFull ? (
                 <StyledText

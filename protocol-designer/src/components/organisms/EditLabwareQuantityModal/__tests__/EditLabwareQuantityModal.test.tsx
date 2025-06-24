@@ -29,6 +29,7 @@ describe('EditLabwareQuantityModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     props = {
+      isDirectlyOnDeck: false,
       onClose: vi.fn(),
       labwareId: 'mockId',
       allLabwareIdsOnStack: ['mockId'],

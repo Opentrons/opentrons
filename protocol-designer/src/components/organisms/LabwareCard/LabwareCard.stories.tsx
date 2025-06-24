@@ -43,6 +43,7 @@ export const LabwareCardField: Story = (
 }
 
 LabwareCardField.args = {
+  isDirectlyOnDeck: false,
   labware: {
     id: 'mockId',
     labwareDefURI: `${fixture96Plate.namespace}/${fixture96Plate.parameters.loadName}/${fixture96Plate.version}`,

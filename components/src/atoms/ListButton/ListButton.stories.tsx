@@ -58,6 +58,7 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
         <ListButtonAccordionContainer id="mainAccordionContainer">
           <>
             <CustomizeExpandButton
+              isDirectlyOnDeck={false}
               enableStackingFF={false}
               key="buttonNested"
               allowInputField={false}
@@ -81,6 +82,7 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                 >
                   <>
                     <CustomizeExpandButton
+                      isDirectlyOnDeck={false}
                       enableStackingFF={false}
                       allowInputField={false}
                       loadName="mockloadname1"
@@ -98,6 +100,7 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                     ) : null}
                   </>
                   <CustomizeExpandButton
+                    isDirectlyOnDeck={false}
                     enableStackingFF={false}
                     allowInputField={false}
                     loadName="mockloadname2"
@@ -109,6 +112,7 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                     }}
                   />
                   <CustomizeExpandButton
+                    isDirectlyOnDeck={false}
                     enableStackingFF={false}
                     allowInputField={false}
                     loadName="mockloadname3"
@@ -125,6 +129,7 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
           </>
           <>
             <CustomizeExpandButton
+              isDirectlyOnDeck={false}
               enableStackingFF={false}
               key="buttonNonNested"
               allowInputField={false}
