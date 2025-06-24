@@ -18,7 +18,7 @@ from typing import List, Dict
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Omega HDQ DNA Extraction: Bacteria- Tissue Protocol + Plate Reader",
+    "protocolName": "Omega HDQ DNA Extraction: Bacteria- Tissue Protocol",
 }
 
 requirements = {
@@ -88,7 +88,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # Protocol Parameters
     deepwell_type = "nest_96_wellplate_2ml_deep"
-    res_type = "nest_12_reservoir_15ml"
+    res_type = "opentrons_tough_12_reservoir_22ml"
     if not dry_run:
         settling_time = 2.0
         A_lysis_time_1 = 15.0
@@ -113,7 +113,7 @@ def run(protocol: ProtocolContext) -> None:
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
-    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "C3", 2)
+    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "C3", 2)
     protocol.move_lid(lid, elutionplate, use_gripper=True)
     magnetic_block: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -518,11 +518,11 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_lid(lid, elutionplate, use_gripper=True)
 
     try:
+        protocol.move_lid(elutionplate, lid, use_gripper=True)
         h_s.close_labware_latch()
-        if probe_height_bool:
+        if not probe_height_bool:
             helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         else:
-            protocol.move_lid(elutionplate, lid, use_gripper=True)
             helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, m1000
             )
