@@ -18,8 +18,8 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 STACKER_VID = 0x483
 STACKER_PID = 0xEF24
 
-DEFAULT_NUM_CYCLES = 100
-DEFAULT_LABWARE_HEIGHT = 16  # mm
+DEFAULT_NUM_CYCLES = 500
+DEFAULT_LABWARE_HEIGHT = 102.0  # mm, tiprack
 
 # NOTE: this is required to get WIFI test to work
 if "OT_SYSTEM_VERSION" not in environ:
@@ -91,19 +91,22 @@ async def _main(cfg: TestConfig, cycles: int, labware_height: int) -> None:
         report.save_to_disk()
         report.print_results()
 
-    # TODO: Do we want to restart the server here?
-    # # It will just have to be disabled to rerun the script again?
-    # Restart the robot server
-    # if not cfg.simulate:
-    #     print("Starting the robot server")
-    #     subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=DEFAULT_NUM_CYCLES)
-    parser.add_argument("--labware-height", type=int, default=DEFAULT_LABWARE_HEIGHT)
+    parser.add_argument(
+        "--cycles",
+        type=int,
+        default=DEFAULT_NUM_CYCLES,
+        help="number of load/store cycles to run",
+    )
+    parser.add_argument(
+        "--labware-height",
+        type=int,
+        default=DEFAULT_LABWARE_HEIGHT,
+        help="LabwareHeight - stackingOffsetWithLabware, in mm",
+    )
     # add each test-section as a skippable argument (eg: --skip-connectivity)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
