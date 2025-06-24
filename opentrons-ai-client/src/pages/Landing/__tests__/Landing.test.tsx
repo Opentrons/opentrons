@@ -53,10 +53,17 @@ describe('Landing', () => {
     ).toBeInTheDocument()
   })
 
-  it('should render create and update protocol buttons', () => {
+  it('should render create and update protocol buttons with correct text', () => {
     render()
     expect(screen.getByText('Create a new protocol')).toBeInTheDocument()
-    expect(screen.getByText('Update an existing protocol')).toBeInTheDocument()
+    expect(
+      screen.getByText('Get help with an existing protocol')
+    ).toBeInTheDocument()
+  })
+
+  it('should render the go directly to chat link', () => {
+    render()
+    expect(screen.getByText('Go directly to chat')).toBeInTheDocument()
   })
 
   it('should render the mobile body text if the screen width is less than 768px', () => {
@@ -77,11 +84,20 @@ describe('Landing', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/new-protocol')
   })
 
-  it('should redirect to the update protocol page when the update an existing protocol button is clicked', () => {
+  it('should redirect to the update protocol page when the get help with existing protocol button is clicked', () => {
     render()
-    const updateProtocolButton = screen.getByText('Update an existing protocol')
+    const updateProtocolButton = screen.getByText(
+      'Get help with an existing protocol'
+    )
     updateProtocolButton.click()
     expect(mockNavigate).toHaveBeenCalledWith('/update-protocol')
+  })
+
+  it('should redirect to the chat page when the go directly to chat link is clicked', () => {
+    render()
+    const chatLink = screen.getByText('Go directly to chat')
+    chatLink.click()
+    expect(mockNavigate).toHaveBeenCalledWith('/chat')
   })
 
   it('should track new protocol event when new protocol button is clicked', () => {
@@ -95,13 +111,26 @@ describe('Landing', () => {
     })
   })
 
-  it('should track logout event when log out button is clicked', () => {
+  it('should track update protocol event when get help with existing protocol button is clicked', () => {
     render()
-    const updateProtocolButton = screen.getByText('Update an existing protocol')
+    const updateProtocolButton = screen.getByText(
+      'Get help with an existing protocol'
+    )
     updateProtocolButton.click()
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
       name: 'update-protocol',
+      properties: {},
+    })
+  })
+
+  it('should track go-to-chat event when go directly to chat link is clicked', () => {
+    render()
+    const chatLink = screen.getByText('Go directly to chat')
+    chatLink.click()
+
+    expect(mockUseTrackEvent).toHaveBeenCalledWith({
+      name: 'go-to-chat',
       properties: {},
     })
   })

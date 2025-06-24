@@ -422,7 +422,6 @@ async def update_protocol(
     """
     logger.info("POST /api/chat/updateProtocol", extra={"body": body.model_dump(), "user": user})
     try:
-        # Validate protocol_text for all update types (required field)
         _validate_request(body, "protocol_text")
 
         fake_response = _handle_fake_response(bool(body.fake))

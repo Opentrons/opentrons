@@ -7,7 +7,6 @@ from typing import Any, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
-import weave  # type: ignore
 from anthropic import Anthropic
 from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
@@ -19,7 +18,6 @@ from api.settings import Settings
 MessageType = Literal["create", "update"]
 
 # weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
-weave.init("pentronsai-junk-may-28-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -159,15 +157,10 @@ class AnthropicPredict:
             v2_doc_content = f.read()
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
+    @tracer.wrap()
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
-
-        Args:
-            api_info_output: The output from get_api_info containing <relevant_files> tags
-
-        Returns:
-            String containing XML formatted file contents
         """
         match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
         if not match:
@@ -189,11 +182,9 @@ class AnthropicPredict:
                 xml_content += "\n</content>\n"
                 xml_content += "</file>\n"
             except FileNotFoundError:
-                # Skip files that don't exist
-                continue
+                continue  # Skip files that don't exist
             except Exception:
-                # Skip files that can't be read
-                continue
+                continue  # Skip files that can't be read
 
         xml_content += "</relevant_file_content>"
         return xml_content
@@ -213,7 +204,7 @@ class AnthropicPredict:
                     {
                         "type": "document",
                         "source": {"type": "text", "media_type": "text/plain", "data": api_docs_structure},
-                        "title": "API Documentation Structure",
+                        "title": "Python API V2 Documentation Structure",
                         "context": "This is the structure of Opentrons Python API V2 Documentation with descriptions of each file.",
                         "cache_control": {"type": "ephemeral"},
                     },
@@ -226,7 +217,7 @@ class AnthropicPredict:
             model=self.model_helper,
             messages=msg,
             max_tokens=1024,
-            temperature=0.0,
+            temperature=0.1,
             system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
         )
