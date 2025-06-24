@@ -122,7 +122,7 @@ def run(protocol: ProtocolContext) -> None:
         "opentrons_tough_1_reservoir_300ml", "C2", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0]
-
+    waste_reservoir.load_empty(waste_reservoir.wells())
     protocol.load_trash_bin("A3")
     sample_plate = protocol.load_labware(deepwell_type, "B3", "Sample Plate")
 
@@ -208,7 +208,13 @@ def run(protocol: ProtocolContext) -> None:
             for _ in range(num_trans):
                 m1000.move_to(m.center())
                 m1000.transfer_with_liquid_class(
-                    water, vol_per_trans, loc, waste, return_tip=True
+                    water,
+                    vol_per_trans,
+                    loc,
+                    waste,
+                    new_tip="never",
+                    return_tip=True,
+                    group_wells=False,
                 )
                 m1000.blow_out(waste)
                 m1000.air_gap(20)
@@ -379,7 +385,13 @@ def run(protocol: ProtocolContext) -> None:
                     # void air gap if necessary
                     m1000.dispense(m1000.current_volume, source.top())
                 m1000.transfer_with_liquid_class(
-                    water, vol_per_trans, source, well, return_tip=True
+                    water,
+                    vol_per_trans,
+                    source,
+                    well,
+                    new_tip="never",
+                    return_tip=True,
+                    group_wells=False,
                 )
                 if t < num_trans - 1:
                     m1000.air_gap(20)
@@ -435,7 +447,13 @@ def run(protocol: ProtocolContext) -> None:
                 if m1000.current_volume > 0:
                     m1000.dispense(m1000.current_volume, src.top())
                 m1000.transfer_with_liquid_class(
-                    water, vol_per_trans, src, m, return_tip=True
+                    water,
+                    vol_per_trans,
+                    src,
+                    m,
+                    return_tip=True,
+                    group_wells=False,
+                    new_tip="never",
                 )
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
@@ -491,7 +509,9 @@ def run(protocol: ProtocolContext) -> None:
             tiptrack(tips)
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 150
-            m1000.transfer_with_liquid_class(water, vol, m, e, return_tip=True)
+            m1000.transfer_with_liquid_class(
+                water, vol, m, e, return_tip=True, group_wells=False, new_tip="never"
+            )
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
