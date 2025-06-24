@@ -150,7 +150,6 @@
         {
           "shape": "squaredcone",
           "bottomCrossSection": "rectangular",
-            
           "topXDimension": 107.1,
           "topYDimension": 8,
           "bottomXDimension": 101.1,
