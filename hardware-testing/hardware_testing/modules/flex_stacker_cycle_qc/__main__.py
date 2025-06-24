@@ -18,6 +18,9 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 STACKER_VID = 0x483
 STACKER_PID = 0xEF24
 
+DEFAULT_NUM_CYCLES = 100
+DEFAULT_LABWARE_HEIGHT = 16  # mm
+
 # NOTE: this is required to get WIFI test to work
 if "OT_SYSTEM_VERSION" not in environ:
     environ["OT_SYSTEM_VERSION"] = "0.0.0"
@@ -42,7 +45,7 @@ async def build_stacker_report(
     return report, stacker
 
 
-async def _main(cfg: TestConfig) -> None:
+async def _main(cfg: TestConfig, cycles: int, labware_height: int) -> None:
     # BUILD REPORT
     ports = []
     for i in comports():
@@ -75,7 +78,9 @@ async def _main(cfg: TestConfig) -> None:
             ui.print_title(section.value)
             tasks = []
             for sn, (report, stacker) in stackers.items():
-                tasks.append(test_run(stacker, report, section.value))
+                tasks.append(
+                    test_run(stacker, report, section.value, cycles, labware_height)
+                )
             await asyncio.gather(*tasks)  # Run all tasks concurrently
     except Exception as e:
         ui.print_error(f"An error occurred: {e}")
@@ -97,6 +102,8 @@ async def _main(cfg: TestConfig) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--cycles", type=int, default=DEFAULT_NUM_CYCLES)
+    parser.add_argument("--labware-height", type=int, default=DEFAULT_LABWARE_HEIGHT)
     # add each test-section as a skippable argument (eg: --skip-connectivity)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -112,4 +119,4 @@ if __name__ == "__main__":
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
     _config = TestConfig(simulate=args.simulate, tests=_t_sections)
-    asyncio.run(_main(_config))
+    asyncio.run(_main(_config, args.cycles, args.labware_height))
