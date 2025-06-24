@@ -151,26 +151,13 @@
     }
   },
   "dropTipConfigurations": {
-    "plungerEject": {
-      "current": 1.25,
-      "speed": 7.5
-    }
+    "plungerEject": { "current": 1.25, "speed": 7.5 }
   },
-  "plungerMotorConfigurations": {
-    "idle": 0.3,
-    "run": 1.0
-  },
+  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
   "plungerPositionsConfigurations": {
-    "default": {
-      "top": 19.5,
-      "bottom": -14.5,
-      "blowout": -19.0,
-      "drop": -33.4
-    }
+    "default": { "top": 19.5, "bottom": -14.5, "blowout": -19.0, "drop": -33.4 }
   },
-  "availableSensors": {
-    "sensors": []
-  },
+  "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {
     "partialTipSupported": true,
     "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
@@ -181,8 +168,6 @@
   "backCompatNames": ["p300_multi"],
   "backlashDistance": 0.0,
   "quirks": ["needsUnstick"],
-  "plungerHomingConfigurations": {
-    "current": 1.0,
-    "speed": 30
-  }
+  "plungerHomingConfigurations": { "current": 1.0, "speed": 30 },
+  "familyName": "p300_multi_gen2"
 }

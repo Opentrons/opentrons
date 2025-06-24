@@ -1,0 +1,10 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
+  "displayName": "P50 Single-Channel GEN1",
+  "channels": 1,
+  "apiLoadName": "p50_single",
+  "pipetteName": "p50_single",
+  "familyName": "p50_single_gen1",
+  "displayCategory": "GEN1",
+  "compatibleMachine": "OT-2"
+}

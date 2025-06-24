@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "channels": {
+      "enum": [1, 8, 96, 384]
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": ["GEN1", "GEN2", "FLEX"]
+    },
+    "compatibleMachine": {
+      "type": "string",
+      "enum": ["Flex", "OT-2"]
+    }
+  },
+  "type": "object",
+  "required": [
+    "$otSharedSchema",
+    "channels",
+    "compatibleMachines",
+    "apiLoadName",
+    "familyName",
+    "displayName",
+    "displayCategory"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteGeometrySchema.json is a reference to this schema."
+    },
+    "channels": { "$ref": "#/definitions/channels" },
+    "displayCategory": { "$ref": "#/definitions/displayCategory" },
+    "compatibleMachine": { "$ref": "#/definitions/compatibleMachine" },
+    "apiLoadName": { "type": "string" },
+    "familyName": { "type": "string" },
+    "displayName": { "type": "string" }
+  }
+}

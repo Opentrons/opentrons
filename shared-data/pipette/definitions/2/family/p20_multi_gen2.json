@@ -1,0 +1,10 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
+  "displayName": "P20 8-Channel GEN2",
+  "channels": 8,
+  "apiLoadName": "p20_single_gen2",
+  "pipetteName": "p20_multi_gen2",
+  "familyName": "p20_multi_gen2",
+  "displayCategory": "GEN2",
+  "compatibleMachine": "OT-2"
+}

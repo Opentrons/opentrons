@@ -159,35 +159,16 @@
       }
     }
   },
-  "dropTipConfigurations": {
-    "plungerEject": {
-      "current": 1.0,
-      "speed": 10
-    }
-  },
-  "plungerMotorConfigurations": {
-    "idle": 0.3,
-    "run": 1.0
-  },
+  "dropTipConfigurations": { "plungerEject": { "current": 1.0, "speed": 10 } },
+  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
   "plungerPositionsConfigurations": {
-    "default": {
-      "top": 0.5,
-      "bottom": 71.5,
-      "blowout": 76.5,
-      "drop": 92.5
-    }
+    "default": { "top": 0.5, "bottom": 71.5, "blowout": 76.5, "drop": 92.5 }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": {
-      "count": 2
-    },
-    "capacitive": {
-      "count": 2
-    },
-    "environment": {
-      "count": 1
-    }
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
+    "environment": { "count": 1 }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -199,8 +180,6 @@
   "shaftULperMM": 63.617,
   "backlashDistance": 0.0,
   "quirks": [],
-  "plungerHomingConfigurations": {
-    "current": 1.0,
-    "speed": 30
-  }
+  "plungerHomingConfigurations": { "current": 1.0, "speed": 30 },
+  "familyName": "p1000_multi_flex"
 }

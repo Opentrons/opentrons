@@ -3,11 +3,7 @@
   "displayName": "P300 Single-Channel GEN2",
   "model": "p300",
   "displayCategory": "GEN2",
-  "validNozzleMaps": {
-    "maps": {
-      "SingleA1": ["A1"]
-    }
-  },
+  "validNozzleMaps": { "maps": { "SingleA1": ["A1"] } },
   "pickUpTipConfigurations": {
     "pressFit": {
       "presses": 1,
@@ -31,26 +27,13 @@
     }
   },
   "dropTipConfigurations": {
-    "plungerEject": {
-      "current": 1.25,
-      "speed": 7.0
-    }
+    "plungerEject": { "current": 1.25, "speed": 7.0 }
   },
-  "plungerMotorConfigurations": {
-    "idle": 0.05,
-    "run": 1.0
-  },
+  "plungerMotorConfigurations": { "idle": 0.05, "run": 1.0 },
   "plungerPositionsConfigurations": {
-    "default": {
-      "top": 19.5,
-      "bottom": -14.5,
-      "blowout": -19.0,
-      "drop": -37.0
-    }
+    "default": { "top": 19.5, "bottom": -14.5, "blowout": -19.0, "drop": -37.0 }
   },
-  "availableSensors": {
-    "sensors": []
-  },
+  "availableSensors": { "sensors": [] },
   "partialTipConfigurations": {
     "partialTipSupported": false,
     "availableConfigurations": null
@@ -61,8 +44,6 @@
   "backCompatNames": ["p300_single"],
   "backlashDistance": 0.0,
   "quirks": [],
-  "plungerHomingConfigurations": {
-    "current": 1.0,
-    "speed": 30
-  }
+  "plungerHomingConfigurations": { "current": 1.0, "speed": 30 },
+  "familyName": "p300_single_gen2"
 }

@@ -91,13 +91,18 @@
     "channels",
     "model",
     "displayName",
-    "backCompatNames"
+    "backCompatNames",
+    "familyName"
   ],
   "properties": {
     "additionalProperties": false,
     "$otSharedSchema": {
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipettePropertiesSchema.json is a reference to this schema."
+    },
+    "familyName": {
+      "type": "string",
+      "description": "The name of a pipette family whose definition can be found in the family configurations."
     },
     "backCompatNames": {
       "type": "array",

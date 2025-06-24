@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 96-Channel 1000 µL",
+  "displayName": "Flex 96-Channel 1000 \u00b5L",
   "model": "p1000",
   "displayCategory": "FLEX",
   "validNozzleMaps": {
@@ -513,29 +513,15 @@
       "prep_move_speed": 10.5
     }
   },
-  "plungerMotorConfigurations": {
-    "idle": 0.3,
-    "run": 2.0
-  },
+  "plungerMotorConfigurations": { "idle": 0.3, "run": 2.0 },
   "plungerPositionsConfigurations": {
-    "default": {
-      "top": 0,
-      "bottom": 66,
-      "blowout": 71,
-      "drop": 80
-    }
+    "default": { "top": 0, "bottom": 66, "blowout": 71, "drop": 80 }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": {
-      "count": 2
-    },
-    "capacitive": {
-      "count": 2
-    },
-    "environment": {
-      "count": 1
-    }
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
+    "environment": { "count": 1 }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -547,10 +533,8 @@
   "shaftULperMM": 63.617,
   "backlashDistance": 0.3,
   "quirks": [],
-  "plungerHomingConfigurations": {
-    "current": 2.0,
-    "speed": 5
-  },
+  "plungerHomingConfigurations": { "current": 2.0, "speed": 5 },
   "tipPresenceCheckDistanceMM": 8.0,
-  "endTipActionRetractDistanceMM": 2.0
+  "endTipActionRetractDistanceMM": 2.0,
+  "familyName": "p1000_96_flex"
 }

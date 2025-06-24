@@ -1,0 +1,10 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
+  "displayName": "P300 8-Channel GEN1",
+  "channels": 8,
+  "apiLoadName": "p300_multi",
+  "pipetteName": "p300_multi",
+  "familyName": "p300_multi_gen1",
+  "displayCategory": "GEN1",
+  "compatibleMachine": "OT-2"
+}
