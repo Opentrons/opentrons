@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual'
-import { TFunction } from 'i18next';
 
 import {
   WASTE_CHUTE_FIXTURES,
@@ -687,7 +686,7 @@ export function getAAComboFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  t: TFunction,
+  t: any,
   translationFileName: string,
   usbPortNumber?: number | string
 ): string | null {
@@ -708,18 +707,18 @@ export function getAAComboFixtureDisplayName(
           ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
-        return t('magnetic_block')
+        return t(`${translationFileName}:magnetic_block`)
       }
     case FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT:
       if (aaItem.areaType === 'wasteChute') {
-        return t('waste_chute')
+        return t(`${translationFileName}:waste_chute`)
       }
       return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'wasteChute') {
-        return 'waste_chute'
+        return t(`${translationFileName}:waste_chute`)
       } else {
-        return 'staging_area_slot'
+        return t(`${translationFileName}:staging_area_slot`)
       }
     default:
       return null
@@ -975,7 +974,7 @@ export const getAASlotIdForAA = (
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
-export const getAASlotDisplayName = (addressableAreaId: AddressableAreaNamesWithFakes) => {
+export const getAASlotDisplayName = (addressableAreaId: AddressableAreaNamesWithFakes): string => {
   return addressableAreaId.replace('fake', '')
 }
 

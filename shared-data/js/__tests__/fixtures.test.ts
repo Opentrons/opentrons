@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { Mock } from 'vitest'
 
 import {
@@ -472,9 +472,9 @@ describe('getAAFixtureDisplayName', () => {
       'magneticBlockV1D3',
       getDeckDefFromRobotType('OT-3 Standard'),
       t,
-      ''
+      'deck_configuration'
     )
-    expect(name).toEqual('Magnetic block')
+    expect(name).toEqual('deck_configuration:magnetic_block')
   })
 
   it('Should return mag block name when using combo fixtures with mag block', () => {
@@ -483,9 +483,9 @@ describe('getAAFixtureDisplayName', () => {
       'magneticBlockV1D3',
       getDeckDefFromRobotType('OT-3 Standard'),
       t,
-      ''
+      'deck_configuration'
     )
-    expect(name).toEqual('Magnetic block')
+    expect(name).toEqual('deck_configuration:magnetic_block')
   })
 
   it('Should return waste chute name when using waste chute fixture', () => {
@@ -494,8 +494,19 @@ describe('getAAFixtureDisplayName', () => {
       '96ChannelWasteChute',
       getDeckDefFromRobotType('OT-3 Standard'),
       t,
-      ''
+      'deck_configuration'
     )
-    expect(name).toEqual('Waste chute')
+    expect(name).toEqual('deck_configuration:waste_chute')
+  })
+
+  it('Should return null when not a combo fixture', () => {
+    const name = getAAComboFixtureDisplayName(
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      'deck_configuration'
+    )
+    expect(name).toBe(null)
   })
 })
