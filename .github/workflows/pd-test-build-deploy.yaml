@@ -98,7 +98,8 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           sourcemaps: protocol-designer/dist
-          set_commits: 'auto --ignore-missing'
+          set_commits: auto
+          ignore_missing: true
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v4
         with:
