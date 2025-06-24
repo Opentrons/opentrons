@@ -148,8 +148,7 @@
           "bottomHeight": 3
         },
         {
-          "shape": "squaredcone",
-          "bottomCrossSection": "rectangular",
+          "shape": "cuboidal",
           "topXDimension": 107.1,
           "topYDimension": 8,
           "bottomXDimension": 101.1,
