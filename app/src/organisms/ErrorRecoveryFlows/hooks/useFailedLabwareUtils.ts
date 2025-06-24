@@ -16,7 +16,12 @@ import {
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 
-import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
+import type {
+  CommandsData,
+  PipetteData,
+  Run,
+  RunCurrentState,
+} from '@opentrons/api-client'
 import type {
   DisplayLocationSlotOnlyParams,
   WellGroup,
@@ -26,7 +31,6 @@ import type {
   DispenseRunTimeCommand,
   Failed,
   FlexStackerRetrieveRunTimeCommand,
-  FlexStackerStoreRunTimeCommand,
   LabwareDefinition,
   LabwareLocation,
   LiquidProbeRunTimeCommand,
@@ -47,6 +51,7 @@ interface UseFailedLabwareUtilsProps {
   failedPipetteInfo: PipetteData | null
   runCommands?: CommandsData
   runRecord?: Run
+  runCurrentState?: RunCurrentState
 }
 
 interface RelevantFailedLabwareLocations {
@@ -98,6 +103,7 @@ export function useFailedLabwareUtils({
   failedPipetteInfo,
   runCommands,
   runRecord,
+  runCurrentState,
 }: UseFailedLabwareUtilsProps): UseFailedLabwareUtilsResult {
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
   const errorKind = getErrorKind(failedCommand)
@@ -163,9 +169,8 @@ export function useFailedLabwareUtils({
   })
 
   const labwareQuantity = getFailedLabwareQuantity(
-    runCommands,
-    recentRelevantFailedLabwareCmd,
-    errorKind
+    failedCommand,
+    runCurrentState
   )
 
   return {
@@ -340,70 +345,21 @@ function useTipSelectionUtils(
 }
 
 export function getFailedLabwareQuantity(
-  runCommands: CommandsData | undefined,
-  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
-  errorKind: ErrorKind
+  failedCommand: FailedCommandBySource | null,
+  runCurrentState: RunCurrentState | undefined
 ): number | null {
-  if (STACKER_ERROR_KINDS.includes(errorKind) && runCommands != null) {
-    const failedCommandIndex = runCommands?.data.findIndex(
-      x => x.id === recentRelevantFailedLabwareCmd?.id
-    )
-
-    const commandsBeforefailedCmd = runCommands?.data.slice(
-      0,
-      failedCommandIndex ?? 0
-    )
-
-    const storeOrRetrieveLabwareLast = commandsBeforefailedCmd?.findLast(
-      (
-        cmd
-      ): cmd is
-        | FlexStackerRetrieveRunTimeCommand
-        | FlexStackerStoreRunTimeCommand =>
-        cmd.commandType === 'flexStacker/retrieve' ||
-        cmd.commandType === 'flexStacker/store'
-    )
-    if (
-      storeOrRetrieveLabwareLast != null &&
-      'result' in storeOrRetrieveLabwareLast
-    ) {
-      return storeOrRetrieveLabwareLast.commandType === 'flexStacker/retrieve'
-        ? storeOrRetrieveLabwareLast?.result?.primaryLocationSequence.length ??
-            0
-        : storeOrRetrieveLabwareLast?.result
-            ?.eventualDestinationLocationSequence?.length ?? 0
-    }
-    // in case there is no result calculate based on setStoredLabware count
-    else {
-      const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
-        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-      )
-      const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
-        cmd => cmd.commandType === 'flexStacker/setStoredLabware'
-      )
-      const itemsToCheck = commandsBeforefailedCmd?.slice(
-        setStoredLabwareLastIndex ?? 0,
-        failedCommandIndex ?? 0
-      )
-
-      if (
-        setStoredLabwareLast != null &&
-        'initialCount' in setStoredLabwareLast.params
-      ) {
-        const total = setStoredLabwareLast?.params.initialCount ?? 0
-        const retreiveCmds =
-          itemsToCheck?.filter(
-            cmd => cmd.commandType === 'flexStacker/retrieve'
-          ).length ?? 0
-        const storeCmds =
-          itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
-            .length ?? 0
-        return total - retreiveCmds + storeCmds
-      } else {
-        return 0
+  if (runCurrentState !== undefined && failedCommand !== null) {
+    if ('moduleId' in failedCommand.byRunRecord.params) {
+      const flexStacker =
+        runCurrentState?.data.flexStackerStates?.[
+          failedCommand.byRunRecord.params.moduleId
+        ]
+      if (flexStacker) {
+        return flexStacker.count
       }
     }
   }
+
   return null
 }
 

@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
 )
 from hardware_testing.modules.flex_stacker_dvt_qc.utils import labware_detected
 
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from .utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -94,7 +94,7 @@ async def test_tof_sensors_labware_detection(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Make sure both TOF sensors are installed.")
 
     print("Homing stacker X and Z axis.")

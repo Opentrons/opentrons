@@ -93,3 +93,16 @@ def verify_and_normalize_transfer_args(
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
     )
+
+
+def resolve_keep_last_tip(
+    keep_last_tip: Optional[bool], tip_strategy: TransferTipPolicyV2
+) -> bool:
+    """Resolve the liquid class transfer argument `keep_last_tip`
+
+    If set to a boolean value, maintains that setting. Otherwise, default to
+    `True` if tip policy is `NEVER`, otherwise default to `False`
+    """
+    if keep_last_tip is not None:
+        return keep_last_tip
+    return tip_strategy == TransferTipPolicyV2.NEVER

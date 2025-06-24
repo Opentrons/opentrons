@@ -73,6 +73,16 @@ class GripperCalibrationOffset:
     last_modified: typing.Optional[datetime] = None
 
 
+@dataclass
+class GripperJawWidthData:
+    """Store gripper jaw width information on the robot fs."""
+
+    source: SourceType
+    status: CalibrationStatus
+    encoder_position_at_jaw_closed: typing.Optional[float] = None
+    last_modified: typing.Optional[datetime] = None
+
+
 def load_pipette_offset(
     pip_id: typing.Optional[str], mount: OT3Mount
 ) -> PipetteOffsetByPipetteMount:
@@ -140,6 +150,39 @@ def load_gripper_calibration_offset(
                 ),
             )
     return grip_cal_obj
+
+
+def load_gripper_jaw_width(
+    gripper_id: typing.Optional[str],
+) -> GripperJawWidthData:
+    grip_jaw_width_obj = GripperJawWidthData(
+        encoder_position_at_jaw_closed=None,
+        source=SourceType.default,
+        status=CalibrationStatus(),
+    )
+    if gripper_id and ff.enable_ot3_hardware_controller():
+        gripper_jaw_width_data = gripper_offset.get_gripper_jaw_width_data(gripper_id)
+        if gripper_jaw_width_data:
+            return GripperJawWidthData(
+                encoder_position_at_jaw_closed=gripper_jaw_width_data.encoderPositionAtJawClosed,
+                source=gripper_jaw_width_data.source,
+                status=cal_top_types.CalibrationStatus(
+                    markedAt=gripper_jaw_width_data.status.markedAt,
+                    markedBad=gripper_jaw_width_data.status.markedBad,
+                    source=gripper_jaw_width_data.status.source,
+                ),
+            )
+    return grip_jaw_width_obj
+
+
+def save_gripper_jaw_width_data(
+    gripper_id: typing.Optional[str], encoder_position_at_closed: float
+) -> None:
+    if gripper_id and ff.enable_ot3_hardware_controller():
+        gripper_offset.save_gripper_jaw_width_data(
+            encoder_position_at_jaw_closed=encoder_position_at_closed,
+            gripper_id=gripper_id,
+        )
 
 
 def save_gripper_calibration_offset(

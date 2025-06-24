@@ -206,6 +206,7 @@ pipette.transfer_with_liquid_class(
     dest=[mock_labware_2["B1"]],
     new_tip="always",
     trash_location=mock_trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -266,7 +267,8 @@ pipette.transfer_with_liquid_class(
             },
         }}},
     ),
-)`.trimStart()
+)
+pipette.drop_tip()`.trimStart()
     )
   })
   it('should generate a consolidate step in py', () => {
@@ -357,6 +359,7 @@ pipette.consolidate_with_liquid_class(
     dest=[mock_labware_2["B1"]],
     new_tip="always",
     trash_location=mock_trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -417,7 +420,8 @@ pipette.consolidate_with_liquid_class(
             },
         }}},
     ),
-)`.trimStart()
+)
+pipette.drop_tip()`.trimStart()
     )
   })
   it('should generate a distribute step in py', () => {
@@ -509,6 +513,7 @@ pipette.distribute_with_liquid_class(
     dest=[mock_labware_2["A1"], mock_labware_2["B1"]],
     new_tip="always",
     trash_location=mock_trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -571,7 +576,8 @@ pipette.distribute_with_liquid_class(
             },
         }}},
     ),
-)`.trimStart()
+)
+pipette.drop_tip()`.trimStart()
     )
   })
 })

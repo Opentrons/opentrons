@@ -23,7 +23,7 @@
           "zDimension": 0
         },
         "displayName": "Slot D1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "D2",
@@ -36,7 +36,7 @@
           "zDimension": 0
         },
         "displayName": "Slot D2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "D3",
@@ -49,7 +49,7 @@
           "zDimension": 0
         },
         "displayName": "Slot D3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "C1",
@@ -62,7 +62,7 @@
           "zDimension": 0
         },
         "displayName": "Slot C1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "C2",
@@ -75,7 +75,7 @@
           "zDimension": 0
         },
         "displayName": "Slot C2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "C3",
@@ -88,7 +88,7 @@
           "zDimension": 0
         },
         "displayName": "Slot C3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "B1",
@@ -101,7 +101,7 @@
           "zDimension": 0
         },
         "displayName": "Slot B1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "B2",
@@ -114,7 +114,7 @@
           "zDimension": 0
         },
         "displayName": "Slot B2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "B3",
@@ -127,7 +127,7 @@
           "zDimension": 0
         },
         "displayName": "Slot B3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "A1",
@@ -140,7 +140,7 @@
           "zDimension": 0
         },
         "displayName": "Slot A1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "A2",
@@ -153,7 +153,7 @@
           "zDimension": 0
         },
         "displayName": "Slot A2",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -167,7 +167,7 @@
           "zDimension": 0
         },
         "displayName": "Slot A3",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -181,7 +181,7 @@
           "zDimension": 0
         },
         "displayName": "Slot A4",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -195,7 +195,7 @@
           "zDimension": 0
         },
         "displayName": "Slot B4",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -209,7 +209,7 @@
           "zDimension": 0
         },
         "displayName": "Slot C4",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -223,7 +223,7 @@
           "zDimension": 0
         },
         "displayName": "Slot D4",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "compatibleModuleTypes": []
       },
       {
@@ -236,7 +236,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in D1",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -249,7 +249,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in C1",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -262,7 +262,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in B1",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -275,7 +275,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in A1",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -288,7 +288,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in D3",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -301,7 +301,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in C3",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -314,7 +314,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in B3",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -327,7 +327,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin in A3",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -340,7 +340,7 @@
           "zDimension": 0
         },
         "displayName": "Waste Chute",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -353,7 +353,7 @@
           "zDimension": 0
         },
         "displayName": "Waste Chute",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -366,7 +366,7 @@
           "zDimension": 0
         },
         "displayName": "Waste Chute",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropTips": true
       },
       {
@@ -379,7 +379,7 @@
           "zDimension": 0
         },
         "displayName": "Waste Chute",
-        "locatingFeaturesAsParent": {},
+        "features": {},
         "ableToDropLabware": true
       },
       {
@@ -393,7 +393,7 @@
           "zDimension": 0
         },
         "displayName": "Thermocycler Module Slot",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1D1",
@@ -405,7 +405,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in D1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1C1",
@@ -417,7 +417,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in C1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1B1",
@@ -429,7 +429,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in B1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1A1",
@@ -441,7 +441,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in A1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1D3",
@@ -453,7 +453,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in D3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1C3",
@@ -465,7 +465,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in C3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1B3",
@@ -477,7 +477,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in B3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "heaterShakerV1A3",
@@ -489,7 +489,7 @@
           "zDimension": 0
         },
         "displayName": "Heater Shaker in A3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2D1",
@@ -501,7 +501,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in D1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2C1",
@@ -513,7 +513,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in C1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2B1",
@@ -525,7 +525,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in B1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2A1",
@@ -537,7 +537,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in A1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2D3",
@@ -549,7 +549,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in D3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2C3",
@@ -561,7 +561,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in C3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2B3",
@@ -573,7 +573,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in B3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "temperatureModuleV2A3",
@@ -585,7 +585,7 @@
           "zDimension": 0
         },
         "displayName": "Temperature Module in A3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1D1",
@@ -597,7 +597,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in D1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1C1",
@@ -609,7 +609,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in C1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1B1",
@@ -621,7 +621,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in B1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1A1",
@@ -633,7 +633,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in A1",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1D2",
@@ -645,7 +645,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in D2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1C2",
@@ -657,7 +657,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in C2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1B2",
@@ -669,7 +669,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in B2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1A2",
@@ -681,7 +681,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in A2",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1D3",
@@ -693,7 +693,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in D3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1C3",
@@ -705,7 +705,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in C3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1B3",
@@ -717,7 +717,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in B3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "magneticBlockV1A3",
@@ -729,7 +729,7 @@
           "zDimension": 0
         },
         "displayName": "Magnetic Block in A3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1D3",
@@ -741,7 +741,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in D3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1C3",
@@ -753,7 +753,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in C3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1B3",
@@ -765,7 +765,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in B3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1A3",
@@ -777,7 +777,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader in A3",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1LidDockD4",
@@ -789,7 +789,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in D4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1LidDockC4",
@@ -801,7 +801,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in C4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1LidDockB4",
@@ -813,7 +813,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in B4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "absorbanceReaderV1LidDockA4",
@@ -825,7 +825,7 @@
           "zDimension": 0
         },
         "displayName": "Absorbance Reader Lid Dock in A4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "flexStackerModuleV1D4",
@@ -837,7 +837,7 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in D4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "flexStackerModuleV1C4",
@@ -849,7 +849,7 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in C4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "flexStackerModuleV1B4",
@@ -861,7 +861,7 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in B4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       },
       {
         "id": "flexStackerModuleV1A4",
@@ -873,7 +873,7 @@
           "zDimension": 0
         },
         "displayName": "Flex Stacker in A4",
-        "locatingFeaturesAsParent": {}
+        "features": {}
       }
     ],
     "cutouts": [

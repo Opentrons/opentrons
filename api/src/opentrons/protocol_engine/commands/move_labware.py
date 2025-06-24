@@ -35,7 +35,6 @@ from ..types import (
     AddressableAreaLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    LabwareMovementOffsetData,
     LabwareLocationSequence,
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
@@ -186,7 +185,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         )
         definition_uri = current_labware.definitionUri
         post_drop_slide_offset: Optional[Point] = None
-        trash_lid_drop_offset: Optional[LabwareOffsetVector] = None
+        trash_lid_drop_offset: Optional[Point] = None
 
         if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
@@ -243,16 +242,14 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 if labware_validation.validate_definition_is_lid(
                     self._state_view.labware.get_definition(params.labwareId)
                 ):
-                    lid_disposable_offfets = (
+                    lid_disposable_offsets = (
                         current_labware_definition.gripperOffsets.get(
                             "lidDisposalOffsets"
                         )
                     )
-                    if lid_disposable_offfets is not None:
-                        trash_lid_drop_offset = LabwareOffsetVector(
-                            x=lid_disposable_offfets.dropOffset.x,
-                            y=lid_disposable_offfets.dropOffset.y,
-                            z=lid_disposable_offfets.dropOffset.z,
+                    if lid_disposable_offsets is not None:
+                        trash_lid_drop_offset = Point.from_xyz_attrs(
+                            lid_disposable_offsets.dropOffset
                         )
                     else:
                         raise LabwareOffsetDoesNotExistError(
@@ -354,13 +351,20 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
-            user_offset_data = LabwareMovementOffsetData(
-                pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
+
+            user_pick_up_offset = (
+                Point.from_xyz_attrs(params.pickUpOffset)
+                if params.pickUpOffset is not None
+                else Point()
+            )
+            user_drop_offset = (
+                Point.from_xyz_attrs(params.dropOffset)
+                if params.dropOffset is not None
+                else Point()
             )
 
             if trash_lid_drop_offset:
-                user_offset_data.dropOffset += trash_lid_drop_offset
+                user_drop_offset += trash_lid_drop_offset
 
             immediate_destination_location_sequence = (
                 self._state_view.geometry.get_predicted_location_sequence(
@@ -378,7 +382,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     labware_id=params.labwareId,
                     current_location=validated_current_loc,
                     new_location=validated_new_loc,
-                    user_offset_data=user_offset_data,
+                    user_pick_up_offset=user_pick_up_offset,
+                    user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
                 )
             except (

@@ -79,7 +79,7 @@ HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
-PLATFORM_OFFSET = 2.5
+PLATFORM_OFFSET = 4
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -92,8 +92,8 @@ class FlexStacker(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -159,12 +159,12 @@ class FlexStacker(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractFlexStackerDriver,
         reader: FlexStackerReader,
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ):
         super().__init__(
@@ -430,7 +430,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Transfer
         await self.open_latch()
         # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
-        # sure the bottom of the next labware is sitting 2.5mm above the latch.
+        # sure the bottom of the next labware is sitting N mm above the latch.
         # So when moving the labware_height we dont need to add an additional
         # offset to make sure we arent cutting it too close since the labware
         # will always be above the latch.
@@ -521,7 +521,7 @@ class FlexStacker(mod_abc.AbstractModule):
                 if self.latch_state == LatchState.OPENED:
                     # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
                     await self.home_axis(StackerAxis.Z, Direction.EXTEND)
-                    await self.close_latch()
+            await self.close_latch()
 
         if (
             # if the platform is on the z or if x has not been homed
@@ -678,6 +678,10 @@ class FlexStacker(mod_abc.AbstractModule):
 
     def set_stacker_identify(self, state: bool) -> None:
         self._should_identify = state
+
+    def cleanup_persistent(self) -> None:
+        """Reset persistent data on the module that should not exist outside of a run."""
+        self.set_stacker_identify(False)
 
 
 class FlexStackerReader(Reader):

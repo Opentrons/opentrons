@@ -11,3 +11,4 @@ tests/helpers/staging_cached_token.txt
 tests/helpers/*_cached_token.txt
 tests/helpers/test.env
 tests/helpers/*.env
+evaluation/

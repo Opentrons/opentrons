@@ -40,7 +40,8 @@ interface DeckConfiguratorProps {
   ) => void
   handleClickRemove: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   lightFill?: string
   darkFill?: string
@@ -149,7 +150,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
-            addressableArea={addressableAreaId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -191,6 +192,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          addressableAreaId={addressableAreaId}
           selected={cutoutId === selectedCutoutId}
         />
       ))}
@@ -207,6 +209,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -224,6 +227,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -241,6 +245,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
             hasStagingArea={
               cutoutFixtureId ===
@@ -263,6 +268,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
               }
               fixtureLocation={cutoutId}
               cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
               selected={
                 selectedCutoutId != null &&
                 THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
@@ -285,6 +291,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -307,7 +314,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
               'wasteChuteRightAdapterNoCover',
             ].includes(cutoutFixtureId)}
             selected={cutoutId === selectedCutoutId}
-            addressableArea={addressableAreaId}
+            addressableAreaId={addressableAreaId}
           />
         )
       )}

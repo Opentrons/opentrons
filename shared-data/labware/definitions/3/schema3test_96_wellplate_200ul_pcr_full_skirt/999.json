@@ -21,8 +21,6 @@
       "https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"
     ]
   },
-  "locatingFeaturesAsParent": {},
-  "locatingFeaturesAsChild": {},
   "extents": {
     "total": {
       "backLeftBottom": {
@@ -35,8 +33,11 @@
         "y": -85.48,
         "z": 16.0
       }
-    },
-    "footprint": {
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
       "backLeft": {
         "x": 0,
         "y": 0
@@ -66,6 +67,11 @@
       "z": 11.91
     },
     "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+      "x": 0,
+      "y": 0,
+      "z": 3.0
+    },
+    "schema3test_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
       "z": 3.0

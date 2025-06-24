@@ -127,7 +127,7 @@
               "offsetFromCutoutFixture",
               "boundingBox",
               "displayName",
-              "locatingFeaturesAsParent"
+              "features"
             ],
             "properties": {
               "id": {
@@ -168,9 +168,9 @@
                 "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
               },
-              "locatingFeaturesAsParent": {
+              "features": {
                 "type": "object",
-                "description": "Explict locating features when this addressable area acts as the parent in a stackup.",
+                "description": "Locating features when this addressable area is a part of a stackup.",
                 "required": [],
                 "properties": {}
               },

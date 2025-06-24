@@ -46,8 +46,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -60,8 +60,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             loop: Loop
@@ -104,12 +104,12 @@ class HeaterShaker(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractHeaterShakerDriver,
         reader: HeaterShakerReader,
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ):
         super().__init__(

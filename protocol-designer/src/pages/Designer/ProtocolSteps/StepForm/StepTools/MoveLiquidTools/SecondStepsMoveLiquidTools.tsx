@@ -20,7 +20,6 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
@@ -81,7 +80,6 @@ export const SecondStepsMoveLiquidTools = ({
     getInvariantContext
   )
   const robotType = useSelector(getRobotType)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
 
@@ -336,7 +334,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {enableLiquidClasses && !isDestinationTrash ? (
+        {!isDestinationTrash ? (
           <>
             <Divider marginY="0" />
             <MultiInputField
@@ -569,14 +567,12 @@ export const SecondStepsMoveLiquidTools = ({
             ) : null}
           </CheckboxExpandStepFormField>
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )
