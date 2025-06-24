@@ -6,6 +6,7 @@ import { i18n } from '/app/i18n'
 
 import { AspirateSettingDetail } from '../../Aspirate/AspirateSettingDetail'
 import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
+import { Condition } from '../../QuickTransferAdvancedSettings/Condition'
 import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
@@ -20,6 +21,7 @@ vi.mock('../../QuickTransferAdvancedSettings/Mix')
 vi.mock('../../QuickTransferAdvancedSettings/Delay')
 vi.mock('../../QuickTransferAdvancedSettings/TouchTip')
 vi.mock('../../QuickTransferAdvancedSettings/AirGap')
+vi.mock('../../QuickTransferAdvancedSettings/Condition')
 
 const render = (props: ComponentProps<typeof AspirateSettingDetail>) => {
   return renderWithProviders(<AspirateSettingDetail {...props} />, {
@@ -35,6 +37,7 @@ describe('AspirateSettingDetail', () => {
       state: {} as any,
       dispatch: vi.fn(),
       onBack: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(FlowRateEntry).mockReturnValue(<div>mock FlowRateEntry</div>)
     vi.mocked(TipPositionEntry).mockReturnValue(
@@ -44,6 +47,7 @@ describe('AspirateSettingDetail', () => {
     vi.mocked(Delay).mockReturnValue(<div>mock Delay</div>)
     vi.mocked(TouchTip).mockReturnValue(<div>mock TouchTip</div>)
     vi.mocked(AirGap).mockReturnValue(<div>mock AirGap</div>)
+    vi.mocked(Condition).mockReturnValue(<div>mock Condition</div>)
   })
   it('renders the correct setting option flow rate entry', () => {
     render(props)
@@ -73,5 +77,12 @@ describe('AspirateSettingDetail', () => {
     props.selectedSetting = 'aspirate_air_gap'
     render(props)
     screen.getByText('mock AirGap')
+  })
+
+  it('renders the correct setting option condition entry', () => {
+    props.isMultiTransfer = true
+    props.selectedSetting = 'aspirate_condition'
+    render(props)
+    screen.getByText('mock Condition')
   })
 })

@@ -9,7 +9,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import (
     Direction,
     StackerAxis,
@@ -83,7 +83,7 @@ async def test_get_tof_sensor_histogram(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Make sure both TOF sensors are installed.")
         ui.get_user_ready("Make sure there is no labware in the stacker.")
 

@@ -35,7 +35,7 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderMeasureMode,
 )
-from opentrons.types import DeckSlotName, MountType, StagingSlotName
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 from .update_types import (
     AbsorbanceReaderStateUpdate,
     FlexStackerStateUpdate,
@@ -53,7 +53,6 @@ from ..types import (
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
-    LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
@@ -932,7 +931,7 @@ class ModuleView:
         # addressable area info, can we do that computation in GeometryView instead of
         # here?
         addressable_areas: AddressableAreaView,
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the nominal offset from a module's location to its child labware's location.
 
         Includes the slot-specific transform. Does not include the child's
@@ -946,17 +945,13 @@ class ModuleView:
                     module_addressable_area
                 )
             )
-            return base + LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
-            )
+            return base + module_addressable_area_position
         else:
             return base
 
     def get_nominal_offset_to_child_from_addressable_area(
         self, module_id: str
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the position offset for a child of this module from the nearest AA.
 
         On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
@@ -965,11 +960,7 @@ class ModuleView:
         slotTransform if appropriate.
         """
         if self.get_deck_supports_module_fixtures():
-            return LabwareOffsetVector(
-                x=0,
-                y=0,
-                z=0,
-            )
+            return Point(0, 0, 0)
         else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
@@ -1000,7 +991,7 @@ class ModuleView:
             # Apply the slot transform, if any
             xform: NDArray[npdouble] = array(xforms_ser_offset)
             xformed = dot(xform, pre_transform)
-            return LabwareOffsetVector(
+            return Point(
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],

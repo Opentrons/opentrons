@@ -2,6 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getWellTotalVolume,
+  OT2_PIPETTES,
 } from '@opentrons/shared-data'
 
 import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../constants'
@@ -251,8 +252,12 @@ export const incompatibleLiquidClass: (
   fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ) => FormWarning | null = formData => {
   const { pipette, tipRack, volume: rawVolume } = formData
+  // don't show warnings for OT-2
+  const isOT2 = Object.values(OT2_PIPETTES).includes(pipette.name)
+  if (isOT2) {
+    return null
+  }
   const liquidClasses = getAllLiquidClassDefs()
-
   const pipetteName = getFlexNameConversion(pipette.spec)
   const volume = Number(rawVolume)
   const path = 'path' in formData ? (formData.path as PathOption) : null

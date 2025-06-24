@@ -552,7 +552,6 @@ class InnerWellGeometry(BaseModel):
 
 class Extents(BaseModel):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
 
 
 class LabwareDefinition2(BaseModel):
@@ -589,8 +588,7 @@ class LabwareDefinition3(BaseModel):
     brand: BrandData
     parameters: Parameters3
     ordering: list[list[str]]
-    locatingFeaturesAsParent: LocatingFeatures
-    locatingFeaturesAsChild: LocatingFeatures
+    features: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]

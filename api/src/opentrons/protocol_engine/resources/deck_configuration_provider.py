@@ -123,7 +123,7 @@ def get_addressable_area_from_name(
                 y=addressable_area["boundingBox"]["yDimension"],
                 z=addressable_area["boundingBox"]["zDimension"],
             )
-            locating_features_as_parent = addressable_area["locatingFeaturesAsParent"]
+            features = addressable_area["features"]
 
             return AddressableArea(
                 area_name=addressable_area["id"],
@@ -135,7 +135,7 @@ def get_addressable_area_from_name(
                 compatible_module_types=addressable_area.get(
                     "compatibleModuleTypes", []
                 ),
-                locating_features_as_parent=locating_features_as_parent,
+                features=features,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"
