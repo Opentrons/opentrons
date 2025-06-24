@@ -463,7 +463,7 @@ describe('getAAFixtureDisplayName', () => {
       t,
       ''
     )
-    expect(name).toEqual('Flex Stacker Module GEN1')
+    expect(name).toEqual('deck_configuration:module_in_port')
   })
 
   it('Should return mag block name when using combo fixtures with mag block', () => {

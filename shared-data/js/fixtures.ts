@@ -64,6 +64,7 @@ import {
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
 
+import type { TFunction } from 'i18next'
 import type { ModuleLocation } from '../command'
 import type {
   AddressableAreaName,
@@ -683,11 +684,11 @@ export function getAAComboFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  t: any,
-  translationFileName: string,
+  t: TFunction,
   usbPortNumber?: number | string
 ): string | null {
   const aaItem = getAAByAAId(addressableAreaId, deckDef)
+  const translationFileName = 'deck_configuration'
   switch (cutoutFixtureId) {
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {

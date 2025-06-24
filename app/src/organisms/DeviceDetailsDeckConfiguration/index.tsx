@@ -46,6 +46,7 @@ import { useRunStatuses } from '/app/resources/runs'
 
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
+import type { TFunction } from 'i18next'
 import type { CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -130,8 +131,7 @@ export function DeviceDetailsDeckConfiguration({
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
-          t[1],
-          'deck_configuration',
+          t as TFunction,
           portDisplay
         ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
       const fixtureGroup =
