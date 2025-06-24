@@ -679,6 +679,10 @@ class FlexStacker(mod_abc.AbstractModule):
     def set_stacker_identify(self, state: bool) -> None:
         self._should_identify = state
 
+    def cleanup_persistent(self) -> None:
+        """Reset persistent data on the module that should not exist outside of a run."""
+        self.set_stacker_identify(False)
+
 
 class FlexStackerReader(Reader):
     error: Optional[str]
