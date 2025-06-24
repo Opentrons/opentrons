@@ -24,7 +24,7 @@ All :ref:`building block <v2-atomic-commands>` and :ref:`complex commands <v2-co
 To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the ``start`` parameter of the :py:meth:`.InstrumentContext.configure_nozzle_layout` method can change the pipette's primary channel. See :ref:`partial-tip-pickup` for more information.
 
 .. note::
-    Complex commands with liquid classes, like :py:meth:`.transfer_with_liquid`, handle multi-channel movement differently. By default, they expect a list of *all wells* that the pipette will access. If you want to only provide the wells that the primary channel will access, set ``group_wells=False`` when using those commands.
+    Complex commands with liquid classes, like :py:meth:`.transfer_with_liquid_class`, handle multi-channel movement differently. By default, they expect a list of *all wells* that the pipette will access. If you want to only provide the wells that the primary channel will access, set ``group_wells=False`` when using those commands.
 
 With a pipette's default settings, you can generally access the wells indicated in the table below. Moving to any other well may cause the pipette to crash.
 
