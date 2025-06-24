@@ -10600,11 +10600,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10616,7 +10622,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10628,7 +10636,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10640,7 +10650,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10661,11 +10673,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10677,7 +10695,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10689,7 +10709,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10701,7 +10723,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10715,11 +10739,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10731,7 +10761,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10743,7 +10775,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10755,7 +10789,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10769,11 +10805,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10785,7 +10827,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10797,7 +10841,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10809,7 +10855,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10823,11 +10871,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10839,7 +10893,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10851,7 +10907,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10863,7 +10921,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10877,11 +10937,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10893,7 +10959,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10905,7 +10973,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10917,7 +10987,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10931,11 +11003,17 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },
@@ -10947,7 +11025,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                     },
                   },
@@ -10959,7 +11039,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                     },
                   },
@@ -10971,7 +11053,9 @@ exports[`snapshot tests > makeContext 1`] = `
                   "tipOverlaps": {
                     "v0": {
                       "default": 10.5,
+                      "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.5,
+                      "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
                       "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
                     },
                   },

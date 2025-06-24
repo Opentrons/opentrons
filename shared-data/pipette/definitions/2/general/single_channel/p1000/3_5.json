@@ -1,5 +1,5 @@
 {
-  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "$otSharedSchema": "#/pipette/schemas/1/pipettePropertiesSchema.json",
   "displayName": "Flex 1-Channel 1000 µL",
   "model": "p1000",
   "displayCategory": "FLEX",
@@ -21,6 +21,12 @@
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.5,
                 "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.5,
                 "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.5,
                 "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.5,
@@ -30,6 +36,12 @@
               },
               "v1": {
                 "default": 10.5,
+                "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.65,
+                "opentrons/opentrons_flex_96_tiprack_200ul/1": 9.76,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.09,
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.65,
+                "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.76,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.09,
                 "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.65,
                 "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.76,
                 "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.09,
