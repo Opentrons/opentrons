@@ -9,7 +9,10 @@ from pydantic import (
 )
 from dataclasses import dataclass
 
+from opentrons_shared_data.robot import types as robot_types
+
 from . import types as pip_types, types
+
 
 # The highest and lowest existing overlap version values.
 TIP_OVERLAP_VERSION_MINIMUM = 0
@@ -393,6 +396,11 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance to move the head up after a tip drop or pickup.",
         alias="endTipActionRetractDistanceMM",
     )
+    family_name: str = Field(
+        ...,
+        description="The identifier of the family to which this pipette belongs.",
+        alias="familyName",
+    )
 
     @field_validator("pipette_type", mode="before")
     @classmethod
@@ -515,6 +523,51 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         return {pip_types.PipetteTipType[key]: value for key, value in v.items()}
 
 
+class PipetteFamilyDefinition(BaseModel):
+    displayName: str
+    channels: EnumSerializer[pip_types.PipetteChannelType] = Field(
+        ..., description="The maximum number of channels on the pipette."
+    )
+    api_load_name: str = Field(
+        ...,
+        description="The name you can use to load this from python.",
+        alias="apiLoadName",
+    )
+    pipetteName: str = Field(
+        ...,
+        description="The name used to report this by the robot in its API.",
+        alias="pipetteName",
+    )
+    familyName: str = Field(
+        ..., description="The name identifying this family of pipette."
+    )
+    display_category: EnumSerializer[pip_types.PipetteGenerationType] = Field(
+        ..., description="The product model of the pipette.", alias="displayCategory"
+    )
+    compatible_machine: EnumSerializer[robot_types.RobotTypeEnum] = Field(
+        ...,
+        description="The kind of machine this pipette works on.",
+        alias="compatibleMachine",
+    )
+
+    @field_validator("channels", mode="before")
+    @classmethod
+    def convert_channels(cls, v: int) -> pip_types.PipetteChannelType:
+        return pip_types.PipetteChannelType(v)
+
+    @field_validator("display_category", mode="before")
+    @classmethod
+    def convert_display_category(cls, v: str) -> pip_types.PipetteGenerationType:
+        if not v:
+            return pip_types.PipetteGenerationType.GEN1
+        return pip_types.PipetteGenerationType(v)
+
+    @field_validator("compatible_machine", mode="before")
+    @classmethod
+    def convert_compatible_machine(cls, v: str) -> robot_types.RobotTypeEnum:
+        return robot_types.RobotTypeEnum(v)
+
+
 class PipetteConfigurations(
     PipetteGeometryDefinition,
     PipettePhysicalPropertiesDefinition,
@@ -531,6 +584,9 @@ class PipetteConfigurations(
         pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition
     ] = Field(
         ..., description="A dictionary of liquid properties keyed by liquid classes."
+    )
+    family: PipetteFamilyDefinition = Field(
+        ..., description="The description of the containing pipette family"
     )
 
     @field_validator("liquid_properties", mode="before")

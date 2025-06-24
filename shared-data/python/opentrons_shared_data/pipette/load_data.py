@@ -12,6 +12,7 @@ from .pipette_definition import (
     PipetteConfigurations,
     PipetteLiquidPropertiesDefinition,
     ValidNozzleMaps,
+    PipetteFamilyDefinition,
 )
 from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
 from .types import (
@@ -93,6 +94,19 @@ def _liquid(
             continue
 
     return liquid_dict
+
+
+@lru_cache(maxsize=None)
+def _family(family_name: str) -> LoadedConfiguration:
+    config_path = (
+        get_shared_data_root()
+        / "pipette"
+        / "definitions"
+        / "2"
+        / "family"
+        / f"{family_name}.json"
+    )
+    return json.loads(load_shared_data(config_path))
 
 
 @lru_cache(maxsize=None)
@@ -270,8 +284,8 @@ def load_definition(
     geometry_dict = _geometry(channels, model, version, oem)
     physical_dict = _physical(channels, model, version, oem)
     liquid_dict = _liquid(channels, model, version, oem)
-
-    generation = PipetteGenerationType(physical_dict["displayCategory"])
+    family_dict = _family(physical_dict["familyName"])
+    generation = PipetteGenerationType(family_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
     return PipetteConfigurations.model_validate(
@@ -281,8 +295,14 @@ def load_definition(
             "liquid_properties": liquid_dict,
             "version": version,
             "mount_configurations": mount_configs,
+            "family": family_dict,
         }
     )
+
+
+def load_family_definition(family_name: str) -> PipetteFamilyDefinition:
+    """Load the definition for a pipette family."""
+    return PipetteFamilyDefinition.model_validate(_family(family_name))
 
 
 def load_valid_nozzle_maps(
