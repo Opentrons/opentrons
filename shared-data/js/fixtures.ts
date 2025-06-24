@@ -648,6 +648,7 @@ export function getCutoutIdsFromModuleSlotName(
   return Object.keys(fixtureIdByCutoutId) as CutoutId[]
 }
 
+// provides an array of all addressable areas provided by a load module command
 export function getAddressableAreaNamesFromLoadedModule(
   moduleModel: ModuleModel,
   slotName: ModuleLocation['slotName'],
@@ -808,6 +809,12 @@ export function getFixtureDisplayName(
             FLEX_STACKER_MODULE_V1
           )} in USB-${usbPortNumber} and magnetic block`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
+    case SINGLE_CENTER_SLOT_FIXTURE:
+      return 'Center slot'
+    case SINGLE_RIGHT_SLOT_FIXTURE:
+      return 'Right slot'
+    case SINGLE_LEFT_SLOT_FIXTURE:
+      return 'Left slot'
     default:
       console.error('was not able to find display name for: ', cutoutFixtureId)
       return 'Slot'
