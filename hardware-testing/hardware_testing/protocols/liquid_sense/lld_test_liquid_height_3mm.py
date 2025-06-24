@@ -39,9 +39,7 @@ def create_dict_of_heights_for_labware(
         # breakpoint()
         volumes_dict[labware] = [
             well.volume_from_height(height=3),
-            well.volume_from_height(height=well.depth / 2),
             well.volume_from_height(height=well.depth - 3),
-            0.0,
         ]
     return volumes_dict
 
@@ -83,7 +81,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 8", "value": "nest_8_reservoir_22ml"},
             {"display_name": "nest 12", "value": "nest_12_reservoir_22ml"},
-             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
+            {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
             {
                 "display_name": "nest 195 ml",
                 "value": "usascientific_96_wellplate_2.4ml_deep",
@@ -214,22 +212,23 @@ def _setup(
     volume_3mm_from_top = ctx.params.volume_3mm_from_top  # type: ignore[attr-defined]
     volume_of_middle = ctx.params.volume_of_middle  # type: ignore[attr-defined]
     pause_to_check_well = ctx.params.pause_to_check_well  # type: ignore[attr-defined]
-    VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
-
-    volumes = [volume_3mm_from_bottom, volume_3mm_from_top, volume_of_middle]
-    volumes_testing = []
-    for volume in volumes:
-        if volume > 0 and LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
-            volumes_testing.append(volume)
-    VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
-
+    VOLUMES_3MM_TOP_BOTTOM: Dict[str, List[float | SimulatedProbeResult]] = {}
+    if ctx.params.calculate_height_from_api:  # type: ignore[attr-defined]
+        VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
+    else:
+        volumes = [volume_3mm_from_bottom, volume_3mm_from_top, volume_of_middle]
+        volumes_testing = []
+        for volume in volumes:
+            if volume > 0 and LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
+                volumes_testing.append(volume)
+        VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
     labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
     labware.load_empty(labware.wells())
     labware_max_volume = labware["A1"].max_volume
-    print(f"Labware max volume: {labware_max_volume}")
     liquid_pipette_probe_every_time: bool = (
         ctx.params.liquid_pipette_probe_every_time  # type: ignore[attr-defined]
     )
+    input(VOLUMES_3MM_TOP_BOTTOM[LABWARE])
     if labware_max_volume < 50:
         LIQUID_TIP_SIZE = 50
     else:
@@ -237,8 +236,6 @@ def _setup(
     if left_mount != "None":
         probing_pipette = ctx.load_instrument(left_mount, "left")
     liquid_rack_name = f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL"
-    probing_pipette.pick_up_tip()
-    probing_pipette.aspirate(10, LABWARE["A1"].meniscus(z=1, target="end"))
     liq_tip_racks = []
     for slot in SLOT_LIQUID_TIPRACK:
         tiprack = ctx.load_labware(liquid_rack_name, slot)
@@ -256,38 +253,7 @@ def _setup(
 
     liquid_pip_channels = liquid_pipette.channels
 
-    if tube_volume == 15:
-        # Replace volumes with 15 ml volumes
-        VOLUMES_3MM_TOP_BOTTOM["opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"] = [
-            17.3,
-            7090.6,
-            16077.5,
-            0.0,
-        ]
-        VOLUMES_3MM_TOP_BOTTOM["opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"] = [
-            42.2,
-            15956.6,
-            0.0,
-        ]
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
-    calculate_height_from_api = ctx.params.calculate_height_from_api  # type: ignore[attr-defined]
-    if calculate_height_from_api:
-        labware_depth = labware["A1"].depth
-        volumes_raw = [
-            labware["A1"].volume_from_height(height=3),
-            labware["A1"].volume_from_height(height=labware_depth / 2),
-            labware["A1"].volume_from_height(height=labware_depth - 3),
-        ]
-        for vol in volumes_raw:
-            if isinstance(vol, float):
-                volumes.append(round(vol, 1))
-        volumes.append(0.0)
-        print(
-            f"Using volumes found by API:\n"
-            f"  - 3 mm from bottom: {volumes[0]:.1f} µL\n"
-            f"  - Middle:           {volumes[1]:.1f} µL\n"
-            f"  - 3 mm from top:    {volumes[2]:.1f} µL"
-        )
     total_volume_to_aspirate = 0.0
     for one_vols in volumes:
         total_volume_to_aspirate += one_vols * num_trials  # type: ignore[assignment]
@@ -478,6 +444,9 @@ def _test_for_finding_liquid_height(  # noqa: C901
             commented_height = 0.0
             # transfer over and over until all volume is moved
             if volume < 15650:
+                volume = (
+                    volume * 1.033
+                )  # ADJUST FOR USE OF ETHANOL # TODO: USE LIQUID CLASSES
                 need_to_transfer_per_ch = volume / liquid_pipette.channels
                 # set flow-rates
                 liquid_pipette.flow_rate.aspirate = min(
