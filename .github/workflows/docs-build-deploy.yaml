@@ -36,6 +36,8 @@ jobs:
           aws-region: us-east-2
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:

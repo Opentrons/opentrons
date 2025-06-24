@@ -44,6 +44,8 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
       - uses: 'actions/setup-node@v4'
         with:
           node-version: '22.11.0'
@@ -80,6 +82,8 @@ jobs:
     needs: ['js-unit-test']
     steps:
       - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
       - uses: 'actions/setup-node@v4'
         with:
           node-version: '22.11.0'
@@ -148,6 +152,8 @@ jobs:
     if: needs.determine-build-type.outputs.type != 'none'
     steps:
       - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -190,6 +196,8 @@ jobs:
     if: needs.determine-build-type.outputs.type == 'publish'
     steps:
       - uses: 'actions/checkout@v4'
+        with:
+          persist-credentials: false
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')

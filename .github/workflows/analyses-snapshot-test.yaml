@@ -58,6 +58,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ env.SNAPSHOT_REF }}
+          persist-credentials: false
 
       - name: Are the analyses snapshots in my PR branch in sync with the target branch?
         if: github.event_name == 'pull_request'

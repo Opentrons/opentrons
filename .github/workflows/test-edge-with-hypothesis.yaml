@@ -25,6 +25,7 @@ jobs:
         with:
           ref: 'edge'
           fetch-depth: 0
+          persist-credentials: false
 
       - name: 'Setup Python'
         uses: 'actions/setup-python@v5'

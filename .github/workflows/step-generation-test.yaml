@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/js/setup
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
