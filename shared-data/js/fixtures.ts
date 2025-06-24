@@ -64,6 +64,7 @@ import {
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
 
+import type { TFunction } from 'i18next'
 import type { ModuleLocation } from '../command'
 import type {
   AddressableAreaName,
@@ -671,44 +672,56 @@ export function getAddressableAreaNamesFromLoadedModule(
   }, [])
 }
 
-export function getAAFixtureDisplayName(
+export const getModuleDisplayNameWithPort = (
+  usbPortNumber: number | string
+): string => {
+  return `${getModuleDisplayName(
+    FLEX_STACKER_MODULE_V1
+  )} in USB-${usbPortNumber}`
+}
+
+export function getAAComboFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDef: DeckDefinition,
+  t: TFunction,
   usbPortNumber?: number | string
 ): string | null {
+  const aaItem = getAAByAAId(addressableAreaId, deckDef)
+  const translationFileName = 'deck_configuration'
   switch (cutoutFixtureId) {
-    case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-      return 'Staging area slot'
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
-      if (addressableAreaId.includes('flexStackerModuleV1')) {
+      if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayName(
-              FLEX_STACKER_MODULE_V1
-            )} in USB-${usbPortNumber}`
+          ? t(`${translationFileName}:module_in_port`, {
+              moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+              usbPortNumber,
+            })
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
-        return 'Waste chute'
+        return t(`${translationFileName}:waste_chute`)
       }
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
-      if (addressableAreaId.includes('flexStackerModuleV1')) {
+      if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
-          ? `${getModuleDisplayName(
-              FLEX_STACKER_MODULE_V1
-            )} in USB-${usbPortNumber}`
+          ? t(`${translationFileName}:module_in_port`, {
+              moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+              usbPortNumber,
+            })
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
-        return 'Magnetic block'
+        return t(`${translationFileName}:magnetic_block`)
       }
     case FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT:
-      if (addressableAreaId.includes('WasteChute')) {
-        return 'Waste chute'
+      if (aaItem.areaType === 'wasteChute') {
+        return t(`${translationFileName}:waste_chute`)
       }
       return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      if (addressableAreaId.includes('WasteChute')) {
-        return 'Waste chute'
+      if (aaItem.areaType === 'wasteChute') {
+        return t(`${translationFileName}:waste_chute`)
       } else {
-        return 'Staging area slot'
+        return t(`${translationFileName}:staging_area_slot`)
       }
     default:
       return null
@@ -724,7 +737,6 @@ export function getFixtureDisplayName(
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
       return 'Staging area slot'
     case FAKE_STAGING_AREA_RIGHT_SLOT:
-      // for debugging perpuses change to display name
       return 'Fake Staging area slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
       return 'Trash bin'
@@ -950,7 +962,7 @@ export const replaceAAWithFakeAA = (
   }
 }
 
-export const getAASlotNameForAA = (
+export const getAASlotIdForAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   addressableAreaId: AddressableAreaNamesWithFakes
@@ -963,6 +975,12 @@ export const getAASlotNameForAA = (
   return aaMatchInDef
     ? AA_TO_AA_SLOT[aaMatchInDef]
     : (addressableAreaId as AddressableAreaNamesWithFakes)
+}
+
+export const getAASlotDisplayName = (
+  addressableAreaId: AddressableAreaNamesWithFakes
+): string => {
+  return addressableAreaId.replace('fake', '')
 }
 
 /**
@@ -1061,7 +1079,7 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa =>
       aa === addressableAreaId
-        ? getAASlotNameForAA(cutoutId, cutoutFixtureRemoved, aa)
+        ? getAASlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
         : aa
     )
     const match = Object.entries(addressableAreasById).find(([, value]) =>
