@@ -38,16 +38,6 @@ interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
 }
 
-const updateOptions: UpdateOptionsDropdown[] = [
-  {
-    name: 'Adapt Python protocol from OT-2 to Flex',
-    value: 'adapt_python_protocol',
-  },
-  { name: 'Change labware', value: 'change_labware' },
-  { name: 'Change pipettes', value: 'change_pipettes' },
-  { name: 'Other', value: 'other' },
-]
-
 const FadeWrapper = styled.div`
   &.fade-enter {
     opacity: 0;
@@ -118,6 +108,20 @@ export function UpdateProtocol(): JSX.Element {
   const [pythonText, setPythonTextValue] = useState<string>('')
   const [errorText, setErrorText] = useState<string | null>(null)
   const progressIncrement = 1 / 3
+
+  const updateOptions: UpdateOptionsDropdown[] = [
+    {
+      name: t('update_option_adapt_python_protocol'),
+      value: 'adapt_python_protocol',
+    },
+    {
+      name: t('update_option_add_runtime_parameters'),
+      value: 'add_runtime_parameters',
+    },
+    { name: t('update_option_change_labware'), value: 'change_labware' },
+    { name: t('update_option_change_pipettes'), value: 'change_pipettes' },
+    { name: t('update_option_other'), value: 'other' },
+  ]
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
   useEffect(() => {
     setCreateProtocolChatAtom({
@@ -312,7 +316,7 @@ export function UpdateProtocol(): JSX.Element {
             currentOption={
               updateType ?? {
                 value: '',
-                name: 'Select an option',
+                name: t('update_option_select'),
               }
             }
             onClick={value => {

@@ -4,6 +4,7 @@ import { reduce } from 'lodash'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
   getIsTiprack,
   getPositionFromSlotId,
   TC_MODULE_LOCATION_OT2,
@@ -49,7 +50,6 @@ import type { Fixture } from './DeckSetup/constants'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
 export const TC_LID_LOADNAME = 'opentrons_tough_pcr_auto_sealing_lid'
-export const LID_LOADNAMES = [TIPRACK_LID_LOADNAME, TC_LID_LOADNAME]
 
 export interface AdditionalEquipment {
   name: AdditionalEquipmentName
@@ -86,6 +86,10 @@ export const getSlotInformation = (
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
+  const latestDefs = getAllLabwareDefs()
+  const lidLoadNames = Object.values(latestDefs)
+    .filter(def => def.allowedRoles?.includes('lid'))
+    ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
   const slotPosition =
     deckDef != null && offDeckLabware == null
@@ -111,18 +115,16 @@ export const getSlotInformation = (
     fullStackFromLabwares?.filter(
       id =>
         deckSetupLabware[id] != null &&
-        deckSetupLabware[id].def.parameters.loadName === TC_LID_LOADNAME
+        lidLoadNames.includes(deckSetupLabware[id].def.parameters.loadName) &&
+        deckSetupLabware[id].def.parameters.loadName !== TIPRACK_LID_LOADNAME
     )?.length ?? 0
-
   const labwareIdsFromFullStack =
     fullStackFromLabwares?.filter(
       id =>
         deckSetupLabware[id] != null &&
         //  remove lid from stack if its a labware + lid
         (numOfTcLidsOnStack === 1 && labwareStackOnSlot.length > 1
-          ? !LID_LOADNAMES.includes(
-              deckSetupLabware[id].def.parameters.loadName
-            )
+          ? !lidLoadNames.includes(deckSetupLabware[id].def.parameters.loadName)
           : //  otherwise, count lid in stack if its a stack of lids
             deckSetupLabware[id].def.parameters.loadName !==
             TIPRACK_LID_LOADNAME)
@@ -130,7 +132,7 @@ export const getSlotInformation = (
 
   const lidIdFromStack = fullStackFromLabwares?.find(id =>
     numOfTcLidsOnStack === 1
-      ? LID_LOADNAMES.includes(deckSetupLabware[id].def.parameters.loadName)
+      ? lidLoadNames.includes(deckSetupLabware[id].def.parameters.loadName)
       : deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   )
 

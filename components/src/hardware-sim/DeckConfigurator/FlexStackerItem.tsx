@@ -74,6 +74,11 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
   const x = xSlotPosition + offsetVector[0] + STACKER_X_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -86,17 +91,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(
-                  fixtureLocation,
-                  cutoutFixtureId,
-                  addressableAreaId
-                )
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

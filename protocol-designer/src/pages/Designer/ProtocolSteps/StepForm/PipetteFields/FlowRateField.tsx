@@ -116,12 +116,12 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const [referenceVolumeFlowRate, referenceVolumeCorrection] =
     flowRateType === 'aspirate'
       ? [
-          referenceVolumesForByVolumeInterpolation?.flowRateAspirate,
-          referenceVolumesForByVolumeInterpolation?.correctionAspirate,
+          referenceVolumesForByVolumeInterpolation?.flowRate.aspirate,
+          referenceVolumesForByVolumeInterpolation?.correction.aspirate,
         ]
       : [
-          referenceVolumesForByVolumeInterpolation?.flowRateDispense,
-          referenceVolumesForByVolumeInterpolation?.correctionDispense,
+          referenceVolumesForByVolumeInterpolation?.flowRate.dispense,
+          referenceVolumesForByVolumeInterpolation?.correction.dispense,
         ]
   const correctionVolume =
     referenceVolumeCorrection != null && liquidClassValuesForTip != null
@@ -164,6 +164,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           tipLiquidSpecs: matchingTipLiquidSpecs,
           flowRateType,
           correctionVolume: correctionVolume ?? 0,
+          shaftULperMM: pipette.spec.shaftULperMM,
         })
       : null
 

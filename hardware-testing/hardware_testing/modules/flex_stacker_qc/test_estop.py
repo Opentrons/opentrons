@@ -10,9 +10,10 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
+from .utils import get_estop
 from opentrons.drivers.flex_stacker.types import Direction, StackerAxis
 from opentrons.drivers.flex_stacker.errors import EStopTriggered
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -28,7 +29,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def axis_at_limit(stacker: FlexStacker, axis: StackerAxis) -> Direction:
     """Check which direction an axis is at the limit switch."""
-    if stacker._simulating:
+    if stacker.is_simulated:
         return Direction.RETRACT
 
     if axis is StackerAxis.L:
@@ -52,10 +53,10 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     l_limit = await axis_at_limit(stacker, StackerAxis.L)
 
     ui.print_header("Trigger E-Stop")
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Trigger the E-Stop")
 
-        if not await stacker.get_estop():
+        if not await get_estop(stacker):
             print("E-Stop is not triggered")
             report(section, "trigger-estop", [CSVResult.FAIL])
             return
@@ -123,7 +124,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             [CSVResult.from_bool(not triggered)],
         )
 
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Untrigger the E-Stop")
-    estop_released = not await stacker.get_estop()
+    estop_released = not await get_estop(stacker)
     report(section, "untrigger-estop", [CSVResult.from_bool(estop_released)])

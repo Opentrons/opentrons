@@ -66,6 +66,15 @@ export function WasteChuteConfigFixture(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(
+        fixtureLocation,
+        cutoutFixtureId,
+        DEFAULT_AA_FOR_WASTE_CHUTE
+      )
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -78,17 +87,7 @@ export function WasteChuteConfigFixture(
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(
-                  fixtureLocation,
-                  cutoutFixtureId,
-                  DEFAULT_AA_FOR_WASTE_CHUTE
-                )
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

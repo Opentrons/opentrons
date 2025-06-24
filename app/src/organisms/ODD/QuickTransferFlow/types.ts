@@ -109,6 +109,12 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass
+  conditionAspirate?: number
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 
 export type TransferType =
@@ -152,6 +158,8 @@ export type QuickTransferSummaryAction =
   | SetChangeTip
   | SetDropTipLocation
   | SetPushOut
+  | SetConditionAspirate
+  | SetDisposalVolumeDispense
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -298,4 +306,18 @@ interface SetVolumeAction {
 interface SetPushOut {
   type: typeof ACTIONS.SET_PUSH_OUT
   pushOut: boolean
+}
+
+interface SetConditionAspirate {
+  type: typeof ACTIONS.SET_CONDITION_ASPIRATE
+  conditionAspirate: number
+}
+
+interface SetDisposalVolumeDispense {
+  type: typeof ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }

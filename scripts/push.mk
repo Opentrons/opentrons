@@ -34,17 +34,10 @@ here=$(dir $(lastword "$(MAKEFILE_LIST)"))
 # argument 4 is the path to the sdist locally
 # argument 5 is the path to go to on the remote side
 define push-python
-<<<<<<< Updated upstream
-scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
-scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(dir $(realpath $(lastword $(MAKEFILE_LIST))))/install-dist-remote.sh root@$(1):/var/
-ssh $(call id-file-arg,$(2)) $(3) root@$(1) chmod a+x /var/install-dist-remote.sh
-ssh $(call id-file-arg,$(2)) $(3) root@$(1) /var/install-dist-remote.sh /var/$(notdir $(4)) $(5)
-=======
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/var/$(notdir $(4))
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(here)/install-dist-remote.sh" root@$(1):/var/
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) "chmod a+x /var/install-dist-remote.sh"
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) "/var/install-dist-remote.sh \"/var/$(notdir $(4))\" \"$(5)\""
->>>>>>> Stashed changes
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units

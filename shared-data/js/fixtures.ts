@@ -697,6 +697,7 @@ export function getAAFixtureDisplayName(
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
           ? `${getModuleDisplayNameWithPort(usbPortNumber)}`
+
           : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)}`
       } else {
         return 'Waste chute'
@@ -713,9 +714,12 @@ export function getAAFixtureDisplayName(
       if (aaItem.areaType === 'wasteChute') {
         return 'Waste chute'
       }
-      break
+      return null
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       if (aaItem.areaType === 'wasteChute') {
+      return null
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      if (addressableAreaId.includes('WasteChute')) {
         return 'Waste chute'
       } else {
         return 'Staging area slot'
@@ -1060,14 +1064,10 @@ export const replaceCutoutFixtureRemove = (
   )
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      if (
-        cutoutFixtureRemoved ===
+      return cutoutFixtureRemoved ===
         FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
-      ) {
-        return FLEX_STACKER_V1_FIXTURE
-      } else {
-        return SINGLE_RIGHT_SLOT_FIXTURE
-      }
+        ? FLEX_STACKER_V1_FIXTURE
+        : SINGLE_RIGHT_SLOT_FIXTURE
     } else {
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }

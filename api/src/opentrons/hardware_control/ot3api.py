@@ -937,14 +937,17 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+    async def _do_home_and_maybe_calibrate_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         gripper = self._gripper_handler.get_gripper()
         self._log.info("Homing gripper jaw.")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             gripper.default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        if not gripper.has_jaw_width_calibration:
+        if recalibrate_jaw_width or not gripper.has_jaw_width_calibration:
             self._log.info("Calibrating gripper jaw.")
             await self._grip(
                 duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
@@ -953,10 +956,13 @@ class OT3API(
             gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         """Home the jaw of the gripper."""
         try:
-            await self._do_home_and_maybe_calibrate_gripper_jaw()
+            await self._do_home_and_maybe_calibrate_gripper_jaw(recalibrate_jaw_width)
         except GripperNotPresentError:
             pass
 

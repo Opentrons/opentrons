@@ -10,7 +10,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -24,7 +24,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     ui.print_header("Manual measurement of UV Lockout Switch")
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Open the hopper door")
         door_open = not await stacker._driver.get_hopper_door_closed()
         if door_open:
