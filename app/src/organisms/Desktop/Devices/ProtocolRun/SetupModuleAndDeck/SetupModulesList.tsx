@@ -43,7 +43,6 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
-  ModulePrepCommandsType,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -65,6 +64,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
+import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type {
   ModuleRenderInfoForProtocol,
@@ -284,9 +284,7 @@ export function ModulesListItem({
     attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
 
-  console.log(attachedModuleMatch?.data)
-  console.log(needsCalibration, stackerShuttleMissing, stackerNeedsHome)
-  if (needsCalibration || stackerShuttleMissing) {
+  if (needsCalibration) {
     renderModuleStatus = (
       <>
         <TertiaryButton
@@ -316,6 +314,15 @@ export function ModulesListItem({
           {t('home_stacker')}
         </TertiaryButton>
       </>
+    )
+  } else if (stackerShuttleMissing) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={t('missing_shuttle')}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
+      />
     )
   } else if (attachedModuleMatch == null) {
     renderModuleStatus = (
