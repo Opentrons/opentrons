@@ -60,7 +60,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Aspirating 100 µL from well A1 of NEST 1 Well Reservoir 195 mL in Slot 5 at 150 µL/sec'
+        'Aspirating 100.00 µL from well A1 of NEST 1 Well Reservoir 195 mL in Slot 5 at 150.00 µL/sec'
       )
     }
   })
@@ -80,7 +80,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
+        'Dispensing 100.00 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300.00 µL/sec'
       )
     }
   })
@@ -107,7 +107,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec and pushing out 10 µL'
+        'Dispensing 100.00 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300.00 µL/sec and pushing out 10.00 µL'
       )
     }
   })
@@ -130,7 +130,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Dispensing 50 µL in place at 300 µL/sec')
+    screen.getByText('Dispensing 50.00 µL in place at 300.00 µL/sec')
   })
   it('renders correct text for blowout', () => {
     const dispenseCommand = mockCommandTextData.commands.find(
@@ -152,7 +152,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Blowing out at well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
+        'Blowing out at well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300.00 µL/sec'
       )
     }
   })
@@ -174,7 +174,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Blowing out in place at 300 µL/sec')
+    screen.getByText('Blowing out in place at 300.00 µL/sec')
   })
   it('renders correct text for aspirateInPlace', () => {
     renderWithProviders(
@@ -187,15 +187,15 @@ describe('CommandText', () => {
             commandType: 'aspirateInPlace',
             params: {
               pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
-              flowRate: 300,
-              volume: 10,
+              flowRate: 300.7653423,
+              volume: 10.12526,
             },
           } as AspirateInPlaceRunTimeCommand
         }
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Aspirating 10 µL in place at 300 µL/sec')
+    screen.getByText('Aspirating 10.13 µL in place at 300.77 µL/sec')
   })
   it('renders correct text for moveToWell', () => {
     const dispenseCommand = mockCommandTextData.commands.find(

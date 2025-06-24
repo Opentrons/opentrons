@@ -28,8 +28,7 @@ export function Configurations({
     <>
       <Flex
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing12}
-        paddingTop={SPACING.spacing12}
+        padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
       >
         <StyledText

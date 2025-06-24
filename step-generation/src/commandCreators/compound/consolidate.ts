@@ -377,6 +377,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `new_tip=${formatPyStr(changeTip)}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
+    `keep_last_tip=True`,
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({

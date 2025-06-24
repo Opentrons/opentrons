@@ -82,6 +82,10 @@ export const migrateFile = (
         liquidClass,
         aspirate_touchTip_checkbox,
         dispense_touchTip_checkbox,
+        // intentionally destructure but do not pass these deprecated fields
+        aspirate_delay_mmFromBottom,
+        dispense_delay_mmFromBottom,
+        blowout_z_offset,
         ...rest
       } = form
       const aspirateLabwareUri =
