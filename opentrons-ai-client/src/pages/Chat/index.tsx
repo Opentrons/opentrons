@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
@@ -22,6 +23,7 @@ export interface InputType {
 }
 
 export function Chat(): JSX.Element | null {
+  const { t } = useTranslation('protocol_generator')
   const methods = useForm<InputType>({
     defaultValues: {
       userPrompt: '',
@@ -77,7 +79,7 @@ export function Chat(): JSX.Element | null {
               <ChatDisplay
                 chat={{
                   role: 'assistant',
-                  reply: 'How can I help you today?',
+                  reply: t('chat_welcome_message'),
                   requestId: 'welcome-message',
                 }}
                 chatId="welcome-message"

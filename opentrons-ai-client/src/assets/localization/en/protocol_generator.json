@@ -3,6 +3,7 @@
   "api": "API: An API level is 2.15",
   "application": "Application: Your protocol's name, describing what it does.",
   "cancel": "Cancel",
+  "chat_welcome_message": "How can I help you today? I can help with:\n- Generating a protocol\n- Simulating a protocol\n- Answering questions about the Python API V2",
   "choose_file": "Choose file",
   "commands": "Commands: List the protocol's steps, specifying quantities in microliters (uL) and giving exact source and destination locations.",
   "copy_code": "Copy code",
