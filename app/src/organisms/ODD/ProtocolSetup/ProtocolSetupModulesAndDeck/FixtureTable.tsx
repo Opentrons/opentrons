@@ -168,9 +168,9 @@ function FixtureTableItem({
   const isCurrentFixtureCompatible =
     cutoutFixtureId != null &&
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-  const isRequiredSingleSlotMissing =
-    compatibleCutoutFixtureIds.length === 1 &&
-    SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+  const isRequiredSingleSlotMissing = compatibleCutoutFixtureIds.some(
+    fixtureId => SINGLE_SLOT_FIXTURES.includes(fixtureId)
+  )
 
   const isThermocyclerCurrentFixture =
     cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||

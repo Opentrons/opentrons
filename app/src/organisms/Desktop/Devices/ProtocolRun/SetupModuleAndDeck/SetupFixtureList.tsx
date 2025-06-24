@@ -60,14 +60,16 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
     deckConfigCompatibility.some(
       ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
         cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
-        compatibleCutoutFixtureIds.length === 1 &&
-        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+        compatibleCutoutFixtureIds.some(fixtureId =>
+          SINGLE_SLOT_FIXTURES.includes(fixtureId)
+        )
     ) &&
     deckConfigCompatibility.some(
       ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
         cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
-        compatibleCutoutFixtureIds.length === 1 &&
-        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+        compatibleCutoutFixtureIds.some(fixtureId =>
+          SINGLE_SLOT_FIXTURES.includes(fixtureId)
+        )
     )
 
   // if there are two labware conflicts with the thermocycler, don't show the conflict with the thermocycler rear fixture
