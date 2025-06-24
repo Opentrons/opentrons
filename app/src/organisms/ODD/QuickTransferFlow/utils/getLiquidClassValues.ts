@@ -49,7 +49,7 @@ const getNoLiquidClassValues = (
   liquidHandlingAction: 'aspirate' | 'dispense'
 ): QuickTransferSummaryState => {
   const { tipRack, path, volume } = state
-  const tiprackDefinition = getLabwareDefURI(state.tipRack)
+  const tiprackDefinition = getLabwareDefURI(tipRack)
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
