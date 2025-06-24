@@ -18,3 +18,41 @@ rules:
         docker/*: ref-pin
         octokit/*: ref-pin
         slackapi/*: ref-pin
+
+  excessive-permissions:
+    # todo(mm, 2025-06-24): These workflows leave their permissions at the default, which is usually way broader than what we need.
+    # https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+    # Narrow the permissions down and remove workflows from this ignore-list as they're fixed.
+    ignore:
+      - abr-testing-lint-test.yaml
+      - analyses-snapshot-lint.yaml
+      - analyses-snapshot-test.yaml
+      - api-test-lint-deploy.yaml
+      - app-test-build-deploy.yaml
+      - components-test-build-deploy.yaml
+      - docs-build.yaml
+      - g-code-confirm-tests.yaml
+      - g-code-testing-lint-test.yaml
+      - hardware-lint-test.yaml
+      - hardware-testing-protocols.yaml
+      - hardware-testing.yaml
+      - http-docs-build.yaml
+      - js-check.yaml
+      - ll-test-build-deploy.yaml
+      - odd-memory-usage-test.yaml
+      - opentrons-ai-client-test.yaml
+      - opentrons-ai-server-lint-test.yaml
+      - pd-test-build-deploy.yaml
+      - performance-metrics-test-lint.yaml
+      - react-api-client-test.yaml
+      - robot-server-lint-test.yaml
+      - server-utils-lint-test.yaml
+      - shared-data-test-lint-deploy.yaml
+      - start-flex-build.yaml
+      - start-ot2-build.yaml
+      - step-generation-test.yaml
+      - system-server-lint-test.yaml
+      - tag-releases.yaml
+      - test-edge-with-hypothesis.yaml
+      - update-server-lint-test.yaml
+      - usb-bridge-lint-test.yaml
