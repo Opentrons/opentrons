@@ -218,7 +218,7 @@
           "bottomHeight": 3
         },
         {
-          "shape": "squaredcone",
+          "shape": "cuboidal",
           "topXDimension": 8,
           "topYDimension": 71.5,
           "bottomXDimension": 2,
