@@ -510,6 +510,7 @@ def run(ctx: ProtocolContext) -> None:
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
+    diluent_probed = False  # NOTE: diluent is a 1-well reservoir, so only needs to be probed once
 
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
@@ -559,10 +560,6 @@ def run(ctx: ProtocolContext) -> None:
         # TRANSFER DILUENT TO PLATE
         dil_ul = DYE_READER_IDEAL_UL - ul
         if dil_ul > 0:
-            pip_for_dil.pick_up_tip(diluent_tips)
-            # FIXME: probing just 1x time means we cannot use >=2 source wells for diluent,
-            #        however probing >=2x times requires LLD support in liquid-classes.
-            pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
             if pip_for_dil.channels == 96:
                 assert dest_wells[0].well_name == "A1"
                 diluent_dest = dest_wells[0].parent.wells()
@@ -574,6 +571,12 @@ def run(ctx: ProtocolContext) -> None:
                     if "A" in w.well_name  # new column
                 ]
                 diluent_src = [reservoir_diluent["A1"]] * len(diluent_dest)
+            pip_for_dil.pick_up_tip(diluent_tips)
+            if not diluent_probed:
+                # FIXME: probing just 1x time means we cannot use >=2 source wells for diluent,
+                #        however probing >=2x times requires LLD support in liquid-classes.
+                pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
+                diluent_probed = True
             pip_for_dil.transfer_with_liquid_class(
                 diluent_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
