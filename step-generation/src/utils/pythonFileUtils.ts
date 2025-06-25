@@ -13,7 +13,10 @@ import { getPythonLiquidClassName } from './liquidClassUtils'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
+  formatPyList,
   formatPyStr,
+  getChunkForIndentingLists,
+  INDENT,
   indentPyLines,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
@@ -293,19 +296,67 @@ export function getLoadLiquids(
   liquidEntities: LiquidEntities,
   labwareEntities: LabwareEntities
 ): string {
-  const pythonLoadLiquids = Object.entries(liquidsByLabwareId)
-    .flatMap(([labwareId, liquidState]) => {
+  const groupedLiquids = Object.entries(liquidsByLabwareId).reduce(
+    (
+      acc: Record<
+        string,
+        {
+          labwarePythonName: string
+          liquidPythonName: string
+          volume: number
+          wells: string[]
+        }
+      >,
+      [labwareId, liquidState]
+    ) => {
       const labwarePythonName = labwareEntities[labwareId].pythonName
 
-      return Object.entries(liquidState).flatMap(([well, locationState]) =>
-        Object.entries(locationState)
-          .map(([liquidGroupId, volume]) => {
-            const liquidPythonName = liquidEntities[liquidGroupId].pythonName
-            return `${labwarePythonName}[${formatPyStr(
-              well
-            )}].load_liquid(${liquidPythonName}, ${volume.volume})`
-          })
-          .join('\n')
+      Object.entries(liquidState).forEach(([well, locationState]) => {
+        Object.entries(locationState).forEach(([liquidGroupId, volumeInfo]) => {
+          const liquidPythonName = liquidEntities[liquidGroupId].pythonName
+
+          const key = `${labwarePythonName}__${liquidPythonName}__${volumeInfo.volume}`
+          if (!acc[key]) {
+            acc[key] = {
+              labwarePythonName,
+              liquidPythonName,
+              volume: volumeInfo.volume,
+              wells: [],
+            }
+          }
+          acc[key].wells.push(well)
+        })
+      })
+
+      return acc
+    },
+    {}
+  )
+
+  const pythonLoadLiquids = Object.values(groupedLiquids)
+    .map(({ labwarePythonName, liquidPythonName, volume, wells }) => {
+      const formattedWells = wells.map(w => formatPyStr(w))
+      const wellChunks = getChunkForIndentingLists(formattedWells, 8)
+
+      const indentedWells = wellChunks
+        .map(chunk => INDENT + chunk.join(', '))
+        .join(',\n')
+
+      const pythonWells =
+        formattedWells.length < 8
+          ? formattedWells.join(', ')
+          : `\n${indentedWells}\n${INDENT}`
+
+      const loadLiquidArgs = [
+        `wells=[${pythonWells}],\n` +
+          `liquid=${liquidPythonName},\n` +
+          `volume=${volume},\n`,
+      ].join()
+
+      return (
+        `${labwarePythonName}.load_liquid(\n` +
+        `${indentPyLines(loadLiquidArgs)}` +
+        `)`
       )
     })
     .join('\n')
