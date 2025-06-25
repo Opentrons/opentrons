@@ -67,7 +67,6 @@ export const SetupModuleAndDeck = ({
     robotType,
     protocolAnalysis
   )
-
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(

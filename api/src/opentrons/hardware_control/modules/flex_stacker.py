@@ -79,7 +79,7 @@ HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
-PLATFORM_OFFSET = 2.5
+PLATFORM_OFFSET = 4
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -253,19 +253,11 @@ class FlexStacker(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
-    def _get_platform_live_data(self) -> PlatformState:
-        """Get the platform state for live data."""
-        if self.initialized and self.platform_state == PlatformState.UNKNOWN:
-            # If the platform state is unknown, we need to poll it
-            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
-                return PlatformState.MISSING
-        return self.platform_state
-
     @property
     def live_data(self) -> LiveData:
         data: FlexStackerData = {
             "latchState": self.latch_state.value,
-            "platformState": self._get_platform_live_data().value,
+            "platformState": self.platform_state.value,
             "hopperDoorState": self.hopper_door_state.value,
             "installDetected": self.install_detected,
             "errorDetails": self._reader.error,
@@ -418,10 +410,9 @@ class FlexStacker(mod_abc.AbstractModule):
     ) -> None:
         """Dispenses the next labware in the stacker."""
         self.verify_labware_height(labware_height)
+        await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
             await self.verify_hopper_labware_presence(True)
-
-        await self._prepare_for_action()
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
@@ -430,7 +421,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Transfer
         await self.open_latch()
         # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
-        # sure the bottom of the next labware is sitting 2.5mm above the latch.
+        # sure the bottom of the next labware is sitting N mm above the latch.
         # So when moving the labware_height we dont need to add an additional
         # offset to make sure we arent cutting it too close since the labware
         # will always be above the latch.
@@ -679,6 +670,10 @@ class FlexStacker(mod_abc.AbstractModule):
     def set_stacker_identify(self, state: bool) -> None:
         self._should_identify = state
 
+    def cleanup_persistent(self) -> None:
+        """Reset persistent data on the module that should not exist outside of a run."""
+        self.set_stacker_identify(False)
+
 
 class FlexStackerReader(Reader):
     error: Optional[str]
@@ -702,6 +697,7 @@ class FlexStackerReader(Reader):
         self.hopper_door_closed = False
         self.initialized = False
         self.installation_detected = False
+        self._refresh_state = False
         self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
 
     def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
@@ -711,7 +707,7 @@ class FlexStackerReader(Reader):
     async def read(self) -> None:
         await self.get_door_closed()
         await self.get_platform_sensor_state()
-        if not self.initialized:
+        if not self.initialized or self._refresh_state:
             initialized = True
             await self.get_installation_detected()
             await self.get_limit_switch_status()
@@ -722,8 +718,9 @@ class FlexStackerReader(Reader):
                     self.tof_sensor_status[sensor] = status
                     initialized &= status.ok
 
+            self._refresh_state = False
             # We are done initializing, sync the led state
-            if initialized:
+            if not self.initialized and initialized:
                 self.initialized = True
                 if self._initialized_callback:
                     await self._initialized_callback()
@@ -747,7 +744,14 @@ class FlexStackerReader(Reader):
     async def get_platform_sensor_state(self) -> None:
         """Get the platform state."""
         status = await self._driver.get_platform_status()
-        self.platform_state = PlatformState.from_status(status)
+        platform_state = PlatformState.from_status(status)
+        if self.initialized and platform_state == PlatformState.UNKNOWN:
+            # If the platform state is unknown but the X axis is known,
+            # the platform is missing.
+            await self.get_limit_switch_status()
+            if self.limit_switch_status[StackerAxis.X] != StackerAxisState.UNKNOWN:
+                platform_state = PlatformState.MISSING
+        self.platform_state = platform_state
 
     async def get_door_closed(self) -> None:
         """Check if the hopper door is closed."""
@@ -760,6 +764,10 @@ class FlexStackerReader(Reader):
         """Check if the stacker install detect is set."""
         detected = await self._driver.get_installation_detected()
         self.installation_detected = detected
+
+    def set_refresh_state(self) -> None:
+        """Tell the reader to refresh all states, even ones that arent polled."""
+        self._refresh_state = True
 
     def on_error(self, exception: Exception) -> None:
         self._driver.reset_serial_buffers()
