@@ -18,7 +18,9 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  ListItem
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
@@ -247,6 +249,7 @@ export function DeviceDetailsDeckConfiguration({
                 marginLeft={`-${SPACING.spacing32}`}
                 marginTop={`-${SPACING.spacing6}`}
                 flexDirection={DIRECTION_COLUMN}
+                css={'width: 370.14px; height: 256.2px;'}
               >
                 <DeckConfigurator
                   editableCutoutIds={
@@ -264,38 +267,30 @@ export function DeviceDetailsDeckConfiguration({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
-                width="32rem"
+                width="196px"
               >
                 <Flex
                   paddingLeft={SPACING.spacing8}
-                  gridGap={SPACING.spacing8}
+                  gridGap={SPACING.spacing24}
                   css={TYPOGRAPHY.labelSemiBold}
                 >
-                  <LegacyStyledText flex="1 0 30px">
+                  <StyledText desktopStyle='bodyDefaultSemiBold'>
                     {t('location')}
-                  </LegacyStyledText>
-                  <LegacyStyledText flex="9 1 0">
+                  </StyledText>
+                  <StyledText desktopStyle='bodyDefaultSemiBold'>
                     {i18n.format(t('deck_hardware'), 'capitalize')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (
-                    <Flex
-                      key={displayLocation}
-                      backgroundColor={COLORS.grey20}
-                      borderRadius={BORDERS.borderRadius4}
-                      gridGap={SPACING.spacing8}
-                      padding={SPACING.spacing8}
-                      width="100%"
-                      css={TYPOGRAPHY.labelRegular}
-                    >
-                      <LegacyStyledText flex="1 0 30px">
+                    <ListItem type='default' gridGap={SPACING.spacing24} css={DESKTOP_LIST_ITEM}>
+                      <StyledText desktopStyle='bodyDefaultRegular'>
                         {displayLocation}
-                      </LegacyStyledText>
-                      <LegacyStyledText flex="9 1 0">
+                      </StyledText>
+                      <StyledText desktopStyle='bodyDefaultRegular'>
                         {displayName}
-                      </LegacyStyledText>
-                    </Flex>
+                      </StyledText>
+                      </ListItem>
                   ))
                 ) : (
                   <Flex
@@ -332,12 +327,18 @@ export function DeviceDetailsDeckConfiguration({
   )
 }
 
+const DESKTOP_LIST_ITEM = css`
+  width: 196px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  grid-gap: 24px;
+`
+
 const DECK_CONFIG_SECTION_STYLE = css`
   flex-direction: ${DIRECTION_ROW};
   grid-gap: ${SPACING.spacing40};
   @media screen and (max-width: 1024px) {
-    flex-direction: ${DIRECTION_COLUMN};
-    align-items: ${ALIGN_CENTER};
     grid-gap: ${SPACING.spacing32};
   }
 `
