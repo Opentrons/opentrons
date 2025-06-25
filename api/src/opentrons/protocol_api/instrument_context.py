@@ -1851,7 +1851,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1910,7 +1910,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_used=transfer_args.last_tip_used,
+                last_tip_location=transfer_args.last_tip_location,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
@@ -1991,7 +1991,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2058,7 +2058,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_used=transfer_args.last_tip_used,
+                last_tip_location=transfer_args.last_tip_location,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
@@ -2140,7 +2140,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2206,7 +2206,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_used=transfer_args.last_tip_used,
+                last_tip_location=transfer_args.last_tip_location,
             )
 
         # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and

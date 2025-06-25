@@ -372,7 +372,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_used: Optional[Tuple[types.Location, WellCoreType]],
+        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
     ) -> Optional[Tuple[types.Location, WellCoreType]]:
         """Transfer a liquid from source to dest according to liquid class properties."""
         ...
@@ -390,7 +390,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_used: Optional[Tuple[types.Location, WellCoreType]],
+        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
     ) -> Optional[Tuple[types.Location, WellCoreType]]:
         """
         Distribute a liquid from single source to multiple destinations
@@ -411,7 +411,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_used: Optional[Tuple[types.Location, WellCoreType]],
+        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
     ) -> Optional[Tuple[types.Location, WellCoreType]]:
         """
         Consolidate liquid from multiple sources to a single destination
