@@ -1,3 +1,7 @@
+---
+title: "Introduction to Flex"
+---
+
 # Introduction
 
 This chapter introduces you to the Opentrons Flex ecosystem, including the overall system design and available workstation configurations. It also includes important compliance and safety information, which you should review before setting up your Opentrons Flex robot. For more details on the features of Opentrons Flex, see the [System Description chapter](system-description.md).
