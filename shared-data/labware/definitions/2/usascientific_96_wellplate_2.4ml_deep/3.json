@@ -1204,7 +1204,7 @@
   "namespace": "opentrons",
   "version": 3,
   "schemaVersion": 2,
-    "stackingOffsetWithLabware": {
+  "stackingOffsetWithLabware": {
     "usascientific_96_wellplate_2.4ml_deep": {
       "x": 0,
       "y": 0,
