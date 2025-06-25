@@ -2439,6 +2439,7 @@ def test_transfer_with_keep_last_tip(
             ),
         ]
         assert pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is not None
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2501,6 +2502,7 @@ def test_transfer_with_keep_last_tip_false(
             )
         ]
         assert not pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is None
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2554,6 +2556,7 @@ def test_transfer_with_keep_last_tip_chained(
             keep_last_tip=True,
         )
         assert pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is not None
         pipette_1k.consolidate_with_liquid_class(
             liquid_class=water,
             volume=400,
@@ -2572,6 +2575,7 @@ def test_transfer_with_keep_last_tip_chained(
             )
         ]
         assert pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is not None
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2636,6 +2640,7 @@ def test_return_tip_after_transfer_with_never(
             ),
         ]
         assert not pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is None
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2689,6 +2694,7 @@ def test_return_tip_after_chained_transfers(
             keep_last_tip=True,
         )
         assert pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is not None
         pipette_1k.distribute_with_liquid_class(
             liquid_class=water,
             volume=400,
@@ -2716,6 +2722,7 @@ def test_return_tip_after_chained_transfers(
             ),
         ]
         assert not pipette_1k.has_tip
+        assert pipette_1k._last_tip_picked_up_from is None
         assert mock_manager.mock_calls == expected_calls
 
 
