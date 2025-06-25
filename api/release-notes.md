@@ -10,7 +10,20 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 8.5.0
 
-### TODO
+Welcome to the v8.5.0 release of the Opentrons robot software! This release features the ability to pipette more accurately by using liquid classes in your protocols.
+
+### New Features
+
+- Use Opentrons-verified liquid classes (aqueous, viscous, and volatile) in the Python Protocol API to automatically adjust submerge speed, flow rate, touch tip, air gap, and more.
+- Customize and create your own liquid classes for even more control.
+
+### Improvements
+
+- Several Python API methods have new parameters that add capabilities available in Protocol Designer.
+
+### Bug Fixes
+
+- The Absorbance Plate Reader no longer reports measurements below 0.
 
 ---
 
