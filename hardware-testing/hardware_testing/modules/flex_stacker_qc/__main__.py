@@ -87,11 +87,6 @@ async def _main(cfg: TestConfig) -> None:
     report.save_to_disk()
     report.print_results()
 
-    # Restart the robot server
-    if not cfg.simulate:
-        print("Starting the robot server")
-        subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
