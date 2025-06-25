@@ -26,6 +26,7 @@ import {
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  isFixtureInUsbModules,
   replaceAAWithFakeAA,
   replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
@@ -508,5 +509,27 @@ describe('getAAFixtureDisplayName', () => {
       'deck_configuration'
     )
     expect(name).toBe(null)
+  })
+})
+
+describe('isFixtureInModules', () => {
+  it('should return true for flex stacker fixture', () => {
+    const result = isFixtureInUsbModules(FLEX_STACKER_V1_FIXTURE)
+    expect(result).toEqual(true)
+
+    const resultWithMag = isFixtureInUsbModules(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+    )
+    expect(resultWithMag).toEqual(true)
+  })
+
+  it('should return true for temp fixture', () => {
+    const result = isFixtureInUsbModules(TEMPERATURE_MODULE_V2_FIXTURE)
+    expect(result).toEqual(true)
+  })
+
+  it('should return false for mag block fixture', () => {
+    const result = isFixtureInUsbModules(MAGNETIC_BLOCK_V1_FIXTURE)
+    expect(result).toEqual(false)
   })
 })
