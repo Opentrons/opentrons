@@ -1,0 +1,48 @@
+.label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.label input[type='file'] {
+  display: none;
+}
+
+.buttonText {
+  line-height: 1.5rem; /* 24px */
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 600; /* semibold */
+}
+
+.navLink {
+  color: white;
+  text-decoration: none;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.landingPage {
+  display: flex;
+  background-color: #f7f8fa; /* COLORS.grey10 */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 9rem);
+  width: 100%;
+  gap: 2rem; /* SPACING.spacing32 */
+}
+
+.contentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* SPACING.spacing16 */
+}
+
+.textSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* SPACING.spacing8 */
+  align-items: center;
+}

@@ -30,7 +30,6 @@
     "@opentrons/step-generation": "link:../step-generation",
     "@thi.ng/paths": "1.6.5",
     "@types/uuid": "^3.4.7",
-    "classnames": "2.2.5",
     "connected-react-router": "6.9.3",
     "core-js": "3.2.1",
     "date-fns": "2.25.0",
@@ -69,7 +68,6 @@
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "5.59.16",
-    "@types/classnames": "2.2.5",
     "@types/file-saver": "2.0.1",
     "@types/jszip": "3.1.7",
     "@types/mixpanel-browser": "^2.35.6",

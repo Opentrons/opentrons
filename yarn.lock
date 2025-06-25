@@ -3786,7 +3786,6 @@
     "@opentrons/step-generation" "link:step-generation"
     "@thi.ng/paths" "1.6.5"
     "@types/uuid" "^3.4.7"
-    classnames "2.2.5"
     connected-react-router "6.9.3"
     core-js "3.2.1"
     date-fns "2.25.0"
@@ -8954,6 +8953,11 @@ classnames@2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
   integrity sha512-DTt3GhOUDKhh4ONwIJW4lmhyotQmV2LjNlGK/J2hkwUcqcbKkCLAdJPtxQnxnlc7SR3f1CEXCyMmc7WLUsWbNA==
+
+classnames@2.5.2:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.5.1.tgz#ba774c614be0f016da105c858e7159eae8e7687b"
+  integrity sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==
 
 clean-css@4.2.1:
   version "4.2.1"
