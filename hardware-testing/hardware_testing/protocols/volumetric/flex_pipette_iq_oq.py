@@ -89,8 +89,8 @@ VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_tiprack_50ul": [1, 10, 50],
     "opentrons_flex_96_filtertiprack_200ul": [5, 50, 200],
     "opentrons_flex_96_tiprack_200ul": [5, 50, 200],
-    "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 250],
-    "opentrons_flex_96_tiprack_1000ul": [10, 100, 250],
+    "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
+    "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
 }
 # TODO: increase 96ch trials by loading off-deck labware somehow
 TRIALS_BY_PIPETTE_BY_TIP = {
@@ -99,6 +99,10 @@ TRIALS_BY_PIPETTE_BY_TIP = {
     "flex_1channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 3]},
     "flex_8channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 3]},
     "flex_96channel_1000": {50: [1, 1, 1], 200: [1, 1, 1], 1000: [1, 1, 1]},
+}
+
+ENABLE_MULTI_DISPENSE_BY_CHANNELS = {
+    1: True, 8: True, 96: False
 }
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {
@@ -176,9 +180,10 @@ def add_parameters(params: ParameterContext) -> None:
 def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
-    # NOTE: limiting 96ch to only test <=200uL, b/c 1000uL requires too many plates
+    # NOTE: limiting pipettes (eg: 96ch) to only test <=250uL
+    #       if there aren't enough on-deck wells to dispense into for 1000ul multi-dispenses
     max_possible_ul = (
-        DYE_SHAKER_MAX_UL if pipette.channels == 96 else pipette.max_volume
+        pipette.max_volume if ENABLE_MULTI_DISPENSE_BY_CHANNELS[pipette.channels] else DYE_SHAKER_MAX_UL
     )
     # NOTE: configuring for MINIMUM tip uL before calculate test volumes
     pipette.configure_for_volume(1)
@@ -596,34 +601,40 @@ def run(ctx: ProtocolContext) -> None:
             ]
         else:
             dst_wells_organized = [dest_wells[0].parent.wells()]
-        src_wells_organized: List[Well] = [src_well] * len(dst_wells_organized)
 
         # TRANSFER DYE TO PLATE
-        args = [ul, src_wells_organized, dst_wells_organized]
-        if ul <= DYE_SHAKER_MAX_UL:
-            try:
-                test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
-            except RuntimeError as e:
-                # NOTE: 96ch can run out of tips, so ask operator to switch them
-                if test_pip.channels == 96:
-                    adapters = []
-                    # first throwout the empty racks
-                    for rack in test_pip.tip_racks:
-                        adapters.append(rack.parent)
-                        ctx.move_labware(rack, trash, use_gripper=True)
-                    # ask operator to load new tip-racks
-                    tips_ln = ctx.params.tips  # type: ignore[attr-defined]
-                    ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
-                    # load new tip-racks for pipette
-                    test_pip.tip_racks = [
-                        adapter.load_labware(tips_ln)
-                        for adapter in adapters
-                    ]
-                    test_pip.transfer_with_liquid_class(test_class, *args, new_tip="always")
-                else:
-                    raise e
-        else:
-            raise NotImplementedError("distribute not implemented yet")
+        def _transfer() -> None:
+            if ul <= DYE_SHAKER_MAX_UL:
+                list_of_the_same_src_well = [src_well] * len(dst_wells_organized)
+                test_pip.transfer_with_liquid_class(
+                    test_class, ul, list_of_the_same_src_well, dst_wells_organized, new_tip="always"
+                )
+            else:
+                test_pip.distribute_with_liquid_class(
+                    test_class, ul, src_well, dst_wells_organized, new_tip="always"
+                )
+                raise NotImplementedError("here")
+
+        try:
+            _transfer()
+        except RuntimeError as e:
+            if test_pip.channels != 96:
+                raise e
+            # NOTE: 96ch can run out of tips, so ask operator to switch them
+            adapters = []
+            # first throwout the empty racks
+            for rack in test_pip.tip_racks:
+                adapters.append(rack.parent)
+                ctx.move_labware(rack, trash, use_gripper=True)
+            # ask operator to load new tip-racks
+            tips_ln = ctx.params.tips  # type: ignore[attr-defined]
+            ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
+            # load new tip-racks for pipette
+            test_pip.tip_racks = [
+                adapter.load_labware(tips_ln)
+                for adapter in adapters
+            ]
+            _transfer()
 
         # SHAKE/READ the FINAL PLATE
         if ul == volumes[-1]:
