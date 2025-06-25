@@ -437,9 +437,6 @@ def _test_for_finding_liquid_height(  # noqa: C901
             commented_height = 0.0
             # transfer over and over until all volume is moved
             if volume < 15650:
-                volume = (
-                    volume * 1.033
-                )  # ADJUST FOR USE OF ETHANOL # TODO: USE LIQUID CLASSES
                 need_to_transfer_per_ch = volume / liquid_pipette.channels
                 # set flow-rates
                 liquid_pipette.flow_rate.aspirate = min(
@@ -557,6 +554,10 @@ def run(
     channels_probe = probe_pipette.channels
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
+    for i, volume in enumerate(volumes):
+        if volume < 15650:
+            volumes[i] = volume * 1.033
+
     total_test_wells = len(volumes) * num_trials
     test_wells = _get_test_wells(
         labware, channels=1, tube_volume=tube_volume, total_test_wells=total_test_wells
