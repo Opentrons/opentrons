@@ -1,5 +1,5 @@
 ---
-title: "Introduction to Flex"
+title: "Opentrons Flex: Introduction"
 ---
 
 # Introduction

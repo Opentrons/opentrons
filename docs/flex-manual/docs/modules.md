@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+---
+title: "Opentrons Flex: Modules"
+---
+>>>>>>> 67fe3c9443 (fix titles)
 # Modules
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
