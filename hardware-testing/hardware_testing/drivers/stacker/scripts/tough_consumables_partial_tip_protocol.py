@@ -2,9 +2,17 @@ from opentrons.protocol_api import (
     ProtocolContext, 
     ParameterContext
 )
-# metadata
-metadata = {"protocolName": "Tough Consumables Protocol 96 Channel Pipette"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+
+from opentrons.protocol_api import COLUMN, ALL, PARTIAL_COLUMN
+from opentrons import types
+
+# Metadata
+metadata = {
+    'protocolName': 'Partial Tough Consumables Protocol 96 Channel Pipette',
+    'author': 'Anurag Kanase',
+    'description': 'Partial Tough Consumables Protocol for 96-channel Pipette.'
+}
+requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Runtime parameters."""
@@ -72,57 +80,43 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         maximum=10,
     )
+    parameters.add_int(
+    display_name="How many columns?",
+    variable_name="columns",
+    default=2,minimum=1,maximum=6,
+    description="Select total columns to pickup from tiprack. \nNote: columns x 16 tips will be trashed")
+
+
 
 def run(protocol: ProtocolContext):
     labware_name = protocol.params.labware_name
     tiprack_name = protocol.params.tiprack_name
-    test_cycles = protocol.params.test_cycles
     pipette_name = protocol.params.pipette_name
-    trash = protocol.load_trash_bin("A3")   # or "B3"-"D3" if those slots are free
-    # Load adapter 
-    adapter = protocol.load_adapter(
-        load_name='opentrons_flex_96_tiprack_adapter',
-        location='B2'
-    )
 
-    # Load tiprack on the adapter
-    tiprack = adapter.load_labware(tiprack_name)
-
+    tips = protocol.load_labware(tiprack_name, "B2")
+    p96 = protocol.load_instrument(pipette_name, 'left')
+    trash = protocol.load_trash_bin("A3")
     # Load the labware
     reservoir = protocol.load_labware(
         load_name=labware_name,  # or your custom labware name
-        location='C2'
+        location='D2'
     )
+    pickup_cols = ["H1"]
+    protocol.comment("----> Picking up tips from Column 12 to left")
+    for start_loc in pickup_cols:
+        
+        p96.configure_nozzle_layout(
+            style=COLUMN,
+            start=start_loc,
+            tip_racks=[tips]) 
+        
+        for i in range(protocol.params.columns):
+            p96.pick_up_tip()
+            p96.move_to(reservoir.wells()[0].top())
+            protocol.pause("Please check the tip position before continuing.")
+            p96.move_to(reservoir.wells()[0].bottom(5))
+            protocol.pause("Please check the clearance before continuing.")
+            protocol.delay(5)
+            p96.drop_tip()
 
-    # Load the 96-channel pipette
-    pipette_96 = protocol.load_instrument(
-        instrument_name=pipette_name,
-        mount='left'
-    )
-
-    # Load gripper (automatically handled in Flex API)
-
-    # Use the gripper to move the reservoir from C2 to B2
-    protocol.move_labware(
-        labware=reservoir,
-        new_location='D2',
-        use_gripper=True,
-        pick_up_offset={"x": 0, "y": 0, "z": 0},
-        drop_offset = {"x": 0, "y": 0, "z": 0}
-        )
-
-    protocol.comment("Reservoir moved from C2 to B2 using the gripper.")
-    for x in range(1, test_cycles+1):
-        # Pick up tips (assumes tips are loaded in A1)
-        # tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', location='A1')
-        pipette_96.pick_up_tip(tiprack['A1'])
-
-        # Move to the reservoir and aspirate
-        pipette_96.move_to(reservoir.wells()[0].top())
-        protocol.pause("Please check the tip position before continuing.")
-        pipette_96.move_to(reservoir.wells()[0].bottom(5))
-        protocol.pause("Please check the clearance before continuing.")
-
-        pipette_96.return_tip()
-
-        protocol.comment("Protocol complete.")
+        protocol.comment("---- > Picking up tips from Column 1 to right")

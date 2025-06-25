@@ -137,9 +137,9 @@ class Mark10(AbstractForceGaugeDriver):
             start_time = time()
             while time() < start_time + timeout:
                 # Read the line asynchronously
-                line = await self._readline()
-                line = line.decode("utf-8").strip()
                 try:
+                    line = await self._readline()
+                    line = line.decode("utf-8").strip()
                     force_val, units = line.split(" ")
                     if units != "N":
                         await self._write("N\r\n")  # Set force gauge units to Newtons

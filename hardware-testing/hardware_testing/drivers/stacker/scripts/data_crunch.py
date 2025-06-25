@@ -69,27 +69,36 @@ def graph_curves(data, heading):
 if __name__ == '__main__':
     working_dir = os.getcwd()
     detail_rows = 0
-    trials = [1,2,3,4,5]  # Define trials only once
-
+    trials = [x for x in range(1,100+1)]  # Define trials only once
+    dir = '/Users/cfern/OneDrive/Desktop/stallguard/stallguard/'
+    name = r'Homing Repeatability Unit 3/'
+    print(name)
+    name = dir + name + 'X_SG_val_2.csv'
+    print(name)
     files = {  # Store file names and headings in a dictionary
-        'X stallguard one tiprack.csv': 'X stallguard one tiprack.csv',
+        name: name,
         # 'X stallguard no load.csv': 'X stallguard no load.csv',
         # 'Z stallguard one tiprack.csv': 'Z stallguard one tiprack.csv',
         # 'Z stallguard no load just platform.csv': 'Z stallguard no load just platform.csv',
         # 'Homing Z Stallguard no load.csv': 'Homing Z Stallguard no load.csv',
         # 'Repeatablity_Z_SG_val_2_Speed_150.0_1.5_Amps.csv': 'Repeatablity_Z_SG_val_2_Speed_150.0_1.5_Amps.csv',
     }
+    data = pd.read_csv(name, skiprows=detail_rows)
+    peak_forces = data.groupby('Trials')['Force(N)'].max().reset_index()
+    for x in peak_forces['Trials']:
+        print(f'{peak_forces[peak_forces["Trials"] == x]["Force(N)"].values[0]}')
+    # figures = []
 
-    figures = []
-    for file_name, heading in files.items():
-        data = pd.read_csv(file_name, skiprows=detail_rows)
-        fig = graph_curves(data, heading)
-        figures.append(fig)
+    # for file_name, heading in files.items():
+    #     data = pd.read_csv(file_name, skiprows=detail_rows)
+    #     fig = graph_curves(data, heading)
+    #     figures.append(fig)
 
-    # Batch HTML writing
-    for i, fig in enumerate(figures):
-        html_name = list(files.values())[i].replace('.csv', '')
-        fig.write_html(f'{html_name}.html')
+    # # Batch HTML writing
+    # for i, fig in enumerate(figures):
+    #     print(i)
+    #     html_name = list(files.values())[i].replace('.csv', '')
+    #     fig.write_html(f'{html_name}.html')
 
     # Optional: Open the browser (only once if needed)
     # open_browser()
