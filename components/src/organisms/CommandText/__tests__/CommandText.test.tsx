@@ -708,7 +708,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Loading Volatile Liquid Class')
+    screen.getByText('Loading Volatile (80% ethanol) Liquid Class')
   })
   it('renders correct text for temperatureModule/setTargetTemperature', () => {
     const mockTemp = 20
