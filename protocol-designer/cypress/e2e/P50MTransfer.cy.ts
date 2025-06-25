@@ -27,7 +27,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     sourceLabware2: string,
     destinationLabware1: string,
     destinationLabware2: string
-  ) => {
+  ): void => {
     const tip: string = '50' // Fixed tip for P50
     const volumes: string[] = ['4', '19', '49'] // Fixed volumes for P50
     const liquidClasses: string[] = [
@@ -79,23 +79,9 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     // After these loops, transferCounter will be 12, indicating 12 steps were added.
   }
 
-  const getAllWells = (): string[] => {
-    const allWells: string[] = []
-    const rows = 'ABCDEFGH'
-    const cols = Array.from({ length: 12 }, (_, i) => i + 1)
-    for (const row of rows) {
-      for (const col of cols) {
-        allWells.push(`${row}${col}`)
-      }
-    }
-    return allWells
-  }
-
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
     const protocol = getTestFile(TestFilePath.P50MTransferMulti)
     cy.importProtocol(protocol.path)
-    cy.contains('Confirm').click()
-    cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     const steps = new StepBuilder()
     /* Commenting out for now for E2E

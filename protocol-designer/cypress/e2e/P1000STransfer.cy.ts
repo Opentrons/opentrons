@@ -1,4 +1,4 @@
-import { CompositeSetupSteps, SetupSteps } from '../support/SetupSteps'
+import { CompositeSetupSteps } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 
@@ -29,7 +29,7 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
     destinationLabware1: string,
     sourceLabware2: string,
     destinationLabware2: string
-  ) => {
+  ):void => {
     const liquidClasses: string[] = [
       "Don't use a liquid class",
       'Aqueous',
@@ -115,7 +115,6 @@ describe('Transfer stepform testing Single Channel P1000uL', () => {
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
     const protocol = getTestFile(TestFilePath.P1000STransferSingle)
     cy.importProtocol(protocol.path)
-    cy.contains('Confirm').click()
     cy.contains('Edit protocol').click()
     const steps = new StepBuilder()
     GenerateMultipleTransferStepsForSingleChannel(

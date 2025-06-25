@@ -16,8 +16,6 @@ describe('Transfer stepform testing P1000M', () => {
     // before each 'it' block, directly within this beforeEach.
     const protocol = getTestFile(TestFilePath.P1000MTransferMulti)
     cy.importProtocol(protocol.path)
-    cy.contains('Confirm').click()
-    cy.openSettingsPage()
     cy.contains('Edit protocol').click()
     // Add an assertion to confirm we are in the expected state, e.g.,
     cy.contains('Add Step').should('be.visible')
@@ -33,7 +31,7 @@ describe('Transfer stepform testing P1000M', () => {
     sourceLabware2: string,
     destinationLabware1: string,
     destinationLabware2: string
-  ) => {
+  ):void => {
     const tips = ['50', '200', '1000']
     const liquidClasses: string[] = [
       "Don't use a liquid class",
@@ -88,18 +86,6 @@ describe('Transfer stepform testing P1000M', () => {
         }
       }
     }
-  }
-
-  const getAllWells = (): string[] => {
-    const allWells: string[] = []
-    const rows = 'ABCDEFGH'
-    const cols = Array.from({ length: 12 }, (_, i) => i + 1)
-    for (const row of rows) {
-      for (const col of cols) {
-        allWells.push(`${row}${col}`)
-      }
-    }
-    return allWells
   }
 
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {

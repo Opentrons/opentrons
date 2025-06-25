@@ -1,11 +1,8 @@
 import {
-  CompositeSetupSteps,
-  SetupSteps,
-  SetupVerifications,
+  CompositeSetupSteps
 } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
-import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', () => {
   beforeEach(() => {
@@ -27,8 +24,7 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
     return allWells
   }
 
-  const GenerateMultipleTransferSteps = (steps: StepBuilder) => {
-    const tip = '50'
+  const GenerateMultipleTransferSteps = (steps: StepBuilder):void => {
     const volumes = ['1', '20', '50']
     const liquidClasses = [
       "Don't use a liquid class",
@@ -63,21 +59,8 @@ describe('Transfer stepform testing Single Channel - Spicy Sequential Wells', ()
   it('Goes through onboarding flow and then runs multiple transfer steps with sequential well changes', () => {
     const protocol = getTestFile(TestFilePath.P50_Single_Import_T_Liquid)
     cy.importProtocol(protocol.path)
-    cy.contains('Confirm').click()
-    cy.openSettingsPage()
     cy.contains('Edit protocol').click()
-    /*
-    cy.contains('Add Step').click()
-    cy.contains('Transfer').click()
-    cy.contains('Always').click()
-    cy.contains('Once')
-    */
-
-    // cy.clickCreateNew()
-    // cy.verifyCreateNewHeader()
     const steps = new StepBuilder()
-
-    // steps.add(SetupSteps.EditProtocolA())
     GenerateMultipleTransferSteps(steps)
     steps.execute()
   })
