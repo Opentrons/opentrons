@@ -13,7 +13,6 @@ import { getPythonLiquidClassName } from './liquidClassUtils'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
-  formatPyList,
   formatPyStr,
   getChunkForIndentingLists,
   INDENT,
