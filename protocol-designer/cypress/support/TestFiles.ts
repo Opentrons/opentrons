@@ -55,6 +55,29 @@ export enum TestFilePath {
   InvalidJson = 'cypress/fixtures/invalid_json.txt', // a file with invalid JSON may not have .json extension because cy.readfile will not read it.
 }
 
+export enum ExportTestFilePath {
+  // python export protocols
+  ThreePlateWater = 'fixtures/protocol/9/3 Plate Water (1) (1).json',
+  ProteaseAssay = 'fixtures/protocol/9/3Cl Protease Assay _fill reaction tubes, add substrate and timepoints_50ul react tube (4) (1).json',
+  Well_96_Plating = 'fixtures/protocol/9/96 well (24 targets) plating with multichannel - 1 plate.json',
+  PCR_Step2_Alex = 'fixtures/protocol/9/220113_PCR_step2_Alex.json',
+  Rounds_1_to_4 = 'fixtures/protocol/9/20231031 Rounds 1 to 4 (N45 libraries) (Three streams) (uncleaved first)(large volumes).json',
+  AddWaterToDeepWellPlates = 'fixtures/protocol/9/Add water to 8X96 deep well plates (125ul) Minimal reproduceable_mod.json',
+  AlbuminElisa = 'fixtures/protocol/9/Albumin Elisa P1 V2.3 step 3.json',
+  AlmodLab = 'fixtures/protocol/9/AlmodLab - LbL 24 wells Plate_V2.json',
+  BeadCleanFixed = 'fixtures/protocol/9/Bead clean fixed_.json',
+  EasyPepDigestion = 'fixtures/protocol/9/Easy Pep Digestion (2sx) - tested (1).json',
+  Example_Protocol_6_0_1 = 'fixtures/protocol/9/Example_Protocol_6_0_1.json',
+  IlluminaDNAPrep48 = 'fixtures/protocol/9/Illumina DNA Prep 48x v8 Works!.json',
+  Luis_Test = 'fixtures/protocol/9/Luis - test (1).json',
+  MS_Prep_112Samples = 'fixtures/protocol/9/MS_Prep_112samples_270622.json',
+  Nanite_Test = 'fixtures/protocol/9/Nanite_Test.json',
+  qPCR_Cas9 = 'fixtures/protocol/9/qPCR Cas9 Activity Check v3.json',
+  Setup_For_Test = 'fixtures/protocol/9/setup for test 1.json',
+  Susceptibility = 'fixtures/protocol/9/Susceptibility (4).json',
+  Test_5 = 'fixtures/protocol/9/Test  (5).json',
+}
+
 export interface TestFile {
   path: string
   downloadsFolder: string
@@ -63,6 +86,18 @@ export interface TestFile {
 
 export const getTestFile = (id: TestFilePath): TestFile => {
   if (!isEnumValue([TestFilePath], [id])) {
+    throw new Error(`Invalid file path: ${id as string}`)
+  }
+
+  return {
+    path: id.valueOf(),
+    basename: path.basename(id.valueOf()),
+    downloadsFolder: Cypress.config('downloadsFolder'),
+  }
+}
+
+export const getExportTestFile = (id: ExportTestFilePath): TestFile => {
+  if (!isEnumValue([ExportTestFilePath], [id])) {
     throw new Error(`Invalid file path: ${id as string}`)
   }
 
