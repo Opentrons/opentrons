@@ -241,8 +241,9 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     decoy.verify(
         logger.info(
             "Could not verify height of liquid in well Well A1 of test_labware, either"
-            " because the liquid in this well has not been probed or because"
-            " liquid was not loaded in this well using `load_liquid`."
+            " because the liquid in this well has not been probed or"
+            " liquid was not loaded in this well using `load_liquid` or"
+            " inner geometry is not available for the target well."
             " Proceeding without verifying if retract end location is outside the liquid."
         )
     )

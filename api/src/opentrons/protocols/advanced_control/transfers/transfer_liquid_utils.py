@@ -61,8 +61,9 @@ def raise_if_location_inside_liquid(
         # so we will not raise but just log the details.
         logger.info(
             f"Could not verify height of liquid in well {well_core.get_display_name()}, either"
-            f" because the liquid in this well has not been probed or because"
-            f" liquid was not loaded in this well using `load_liquid`."
+            f" because the liquid in this well has not been probed or"
+            f" liquid was not loaded in this well using `load_liquid` or"
+            f" inner geometry is not available for the target well."
             f" Proceeding without verifying if {location_check_descriptors.location_type}"
             f" location is outside the liquid."
         )
