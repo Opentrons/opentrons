@@ -405,6 +405,7 @@ export const SecondStepsMoveLiquidTools = ({
                 >
                   {formData.conditioning_checkbox === true ? (
                     <InputStepFormField
+                      {...propsForFields.conditioning_volume}
                       title={t(
                         'form:step_edit_form.field.conditioning.conditioning_volume.label'
                       )}
@@ -413,7 +414,6 @@ export const SecondStepsMoveLiquidTools = ({
                         { min: 0, max: maxConditioningVolume }
                       )}
                       padding="0"
-                      {...propsForFields.conditioning_volume}
                       showTooltip={false}
                     />
                   ) : null}
