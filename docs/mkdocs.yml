@@ -1,0 +1,48 @@
+site_name: Opentrons Documentation
+
+docs_dir: ./shared
+
+nav:
+  - Index: index.md
+  - Hardware Manuals:
+    - Opentrons Flex: '!include flex-manual/mkdocs.yml'
+    - Flex Stacker: '!include stacker-manual/mkdocs.yml'
+
+plugins:
+  - monorepo
+  - search
+  - autorefs
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  features:
+    - navigation.indexes
+    - navigation.tabs
+  logo: flex-manual/docs/images/opentrons-droplet-white.svg
+  favicon: flex-manual/docs/images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - opentrons-theme.css
