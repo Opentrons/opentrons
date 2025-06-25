@@ -10,7 +10,7 @@
     ["A8", "B8", "C8", "D8", "E8", "F8"]
   ],
   "schemaVersion": 2,
-  "version": 4,
+  "version": 5,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 48 Well Plate 1.6 mL Flat",
@@ -592,6 +592,7 @@
       "x": 0,
       "y": 0,
       "z": 0
+    },
   },
   "innerLabwareGeometry": {
     "conicalWell": {

@@ -1142,7 +1142,7 @@
     "loadName": "corning_96_wellplate_360ul_flat"
   },
   "namespace": "opentrons",
-  "version": 3,
+  "version": 4,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {

@@ -13,7 +13,7 @@
     ]
   },
   "schemaVersion": 2,
-  "version": 3,
+  "version": 4,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 12 Well Plate 6.9 mL Flat",

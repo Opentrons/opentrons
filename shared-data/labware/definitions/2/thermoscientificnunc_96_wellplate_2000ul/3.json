@@ -1105,7 +1105,7 @@
     "loadName": "thermoscientificnunc_96_wellplate_2000ul"
   },
   "namespace": "opentrons",
-  "version": 2,
+  "version": 3,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,

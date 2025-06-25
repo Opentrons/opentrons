@@ -95,7 +95,6 @@ _APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
         "nest_96_wellplate_100ul_pcr_full_skirt": 4,
         "nest_96_wellplate_200ul_flat": 4,
         "nest_96_wellplate_2ml_deep": 4,
-        "opentrons_96_wellplate_200ul_pcr_full_skirt": 4,
         "thermoscientificnunc_96_wellplate_1300ul": 3,
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
