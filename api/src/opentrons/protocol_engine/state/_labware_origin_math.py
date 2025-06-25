@@ -105,6 +105,10 @@ def get_parent_placement_origin_to_lw_origin(
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
         assert_type(child_labware, LabwareDefinition3)
+
+        if isinstance(parent_deck_item, LabwareDefinition2):
+            raise NotImplementedError()
+
         parent_deck_item_origin_to_child_labware_origin = (
             _get_back_left_bottom_position(child_labware) * -1
         )
