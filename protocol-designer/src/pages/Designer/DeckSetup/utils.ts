@@ -185,16 +185,16 @@ export const getLabwareCompatibleWithAdapter = (
   }
 }
 
-const getStackerDefinition = (
+const getStackerDefinitionsFromDef = (
   defs: LabwareDefByDefURI,
   loadName: string
-): string | null => {
+): string[] | null => {
   const labwareDefURI = Object.entries(defs)
     .filter(([, { compatibleParentLabware }]) =>
       compatibleParentLabware?.includes(loadName)
     )
     .reverse()
-    .map(([labwareDefUri]) => labwareDefUri)[0]
+    .map(([labwareDefUri]) => labwareDefUri)
 
   return labwareDefURI
 }
@@ -219,9 +219,9 @@ export const getStackerDefinitions = (
     category != null && !CATEGORIES_WITH_NO_LID.includes(category)
       ? universalLidURI
       : null
-  const supportedDef = getStackerDefinition(defs, loadName)
+  const supportedDef = getStackerDefinitionsFromDef(defs, loadName)
   return [
-    ...(supportedDef != null ? [supportedDef] : []),
+    ...(supportedDef != null ? supportedDef : []),
     ...(universalLid != null ? [universalLid] : []),
   ]
 }
