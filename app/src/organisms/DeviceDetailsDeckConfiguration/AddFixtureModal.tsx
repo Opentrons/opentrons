@@ -305,9 +305,6 @@ export function AddFixtureModal({
           </Flex>
         </OddModal>
       ) : (
-        // This is the modal with the module fixtures
-        // Something that checks if this is a stacker module with a TODO to remove/update if other identifiable modules are added
-        // Call to the use identify thing that transitions back to regular after a second?
         <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText desktopStyle="bodyDefaultRegular">
