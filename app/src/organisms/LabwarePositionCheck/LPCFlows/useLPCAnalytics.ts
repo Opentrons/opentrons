@@ -16,8 +16,21 @@ import type {
   LegacyLabwareOffsetLocation,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
-import type { RobotType, Coordinates } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  LocationSequenceComponent,
+  ModuleModel,
+  RobotType,
+  Coordinates,
+} from '@opentrons/shared-data'
 import type { ResolvedOffsetSource } from '/app/redux/protocol-runs'
+
+// A formatted location sequence digestible for LPC Mixpanel analysis
+interface LPCLocationSequenceAnalytic {
+  kind: LocationSequenceComponent['kind'] | 'anyLocation'
+  info?: string | ModuleModel | AddressableAreaName
+  child?: LPCLocationSequenceAnalytic
+}
 
 interface ReportSaveOffsetToRunRecordParams {
   uri: string
@@ -115,6 +128,39 @@ export function useLPCAnalytics({
           }
         })()
 
+        // Transform the locationSequence into a data structure digestible by Mixpanel.
+        const locationDetails = ((): LPCLocationSequenceAnalytic | null => {
+          if (offset.locationSequence === 'anyLocation') {
+            return { kind: offset.locationSequence }
+          } else {
+            return offset.locationSequence.reduceRight((acc, lsComponent) => {
+              const currentLevel: any = {
+                kind: lsComponent.kind,
+                info: null,
+                child: null,
+              }
+
+              switch (lsComponent.kind) {
+                case 'onLabware':
+                  currentLevel.info = lsComponent.labwareUri
+                  break
+                case 'onModule':
+                  currentLevel.info = lsComponent.moduleModel
+                  break
+                case 'onAddressableArea':
+                  currentLevel.info = lsComponent.addressableAreaName
+                  break
+              }
+
+              if (acc != null) {
+                currentLevel.child = acc
+              }
+
+              return currentLevel
+            }, null)
+          }
+        })()
+
         doTrackEvent({
           name: ANALYTICS_LPC_SAVE_OFFSET,
           properties: {
@@ -122,7 +168,7 @@ export function useLPCAnalytics({
             runSession: runId,
             wizardSession: lpcWizardSessionId,
             uri: offset.definitionUri,
-            locationDetails: offset.locationSequence,
+            locationDetails,
             slot: slotName,
             vector: offset.vector,
             offsetKind,

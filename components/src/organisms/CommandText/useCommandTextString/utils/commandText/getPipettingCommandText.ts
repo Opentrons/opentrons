@@ -57,9 +57,12 @@ export const getPipettingCommandText = ({
         })
       : null
 
+  const volume = formatCmdParamDecimal(command, 'volume')
+  const flowRate = formatCmdParamDecimal(command, 'flowRate')
+  const pushOutVolume = formatCmdParamDecimal(command, 'pushOut')
+
   switch (command?.commandType) {
     case 'aspirate': {
-      const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
         labware: labwareName,
@@ -69,15 +72,14 @@ export const getPipettingCommandText = ({
       })
     }
     case 'dispense': {
-      const { volume, flowRate, pushOut } = command.params
-      return pushOut != null
+      return pushOutVolume != null
         ? t('dispense_push_out', {
             well_name: wellName,
             labware: labwareName,
             labware_location: displayLocation,
             volume,
             flow_rate: flowRate,
-            push_out_volume: pushOut,
+            push_out_volume: pushOutVolume,
           })
         : t('dispense', {
             well_name: wellName,
@@ -88,7 +90,6 @@ export const getPipettingCommandText = ({
           })
     }
     case 'blowout': {
-      const { flowRate } = command.params
       return t('blowout', {
         well_name: wellName,
         labware: labwareName,
@@ -154,19 +155,15 @@ export const getPipettingCommandText = ({
       }
     }
     case 'dispenseInPlace': {
-      const { volume, flowRate } = command.params
       return t('dispense_in_place', { volume, flow_rate: flowRate })
     }
     case 'blowOutInPlace': {
-      const { flowRate } = command.params
       return t('blowout_in_place', { flow_rate: flowRate })
     }
     case 'aspirateInPlace': {
-      const { flowRate, volume } = command.params
       return t('aspirate_in_place', { volume, flow_rate: flowRate })
     }
     case 'airGapInPlace': {
-      const { volume } = command.params
       return t('air_gap_in_place', { volume })
     }
     case 'sealPipetteToTip': {
@@ -182,7 +179,6 @@ export const getPipettingCommandText = ({
       })
     }
     case 'pressureDispense': {
-      const { flowRate, volume } = command.params
       return t('pressurizing_to_dispense', { volume, flow_rate: flowRate })
     }
     default: {
@@ -194,3 +190,16 @@ export const getPipettingCommandText = ({
     }
   }
 }
+
+// Format the given command param to two decimals if it exists and can be cast as a number.
+const formatCmdParamDecimal = (
+  command: RunTimeCommand | null | undefined,
+  paramName: string
+): string | null =>
+  command?.params &&
+  paramName in command.params &&
+  command.params[paramName as keyof typeof command.params] != null
+    ? Number(command.params[paramName as keyof typeof command.params]).toFixed(
+        2
+      )
+    : null
