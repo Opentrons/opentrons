@@ -479,7 +479,12 @@ def get_run_error_info_from_robot(
     if len(errored_labware_id) > 0:
         for labware in labware_dict:
             if labware["id"] == errored_labware_id:
-                errored_labware_dict["Slot"] = labware["location"].get("slotName", "")
+                try:
+                    errored_labware_dict["Slot"] = labware["location"].get(
+                        "slotName", ""
+                    )
+                except AttributeError:
+                    errored_labware_dict["Slot"] = labware.get("location", "")
                 errored_labware_dict["Labware Type"] = labware.get("definitionUri", "")
                 offset_id = labware.get("offsetId", "")
                 labware_slot = errored_labware_dict["Slot"]
@@ -607,10 +612,16 @@ if __name__ == "__main__":
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         # Path to protocol folder
-        list_of_files = os.listdir(protocol_folder_path)
-        for file in list_of_files:
-            if str(file).endswith(".py"):
-                protocol_file_path = os.path.join(protocol_folder_path, file)
+        protocol_file_path = ""
+        try:
+            protocol_file_path = next(
+                os.path.join(protocol_folder_path, f)
+                for f in os.listdir(protocol_folder_path)
+                if f.endswith(".py")
+            )
+        except (FileNotFoundError, StopIteration):
+            print(f"No .py file found or folder not found: {protocol_folder_path}")
+
         # Set protocol_found to true if python protocol was successfully copied over
         if protocol_file_path:
             protocol_found = True
