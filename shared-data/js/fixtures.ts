@@ -766,6 +766,7 @@ export function getFixtureDisplayName(
           )} in USB-${usbPortNumber}`
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
+    case FAKE_STAGING_SLOT_WITH_MAG_BLOCK:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
