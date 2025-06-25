@@ -19,7 +19,6 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getAADisplayName,
   getFixtureDisplayName,
   replaceCutoutFixtureWithComboFixture,
