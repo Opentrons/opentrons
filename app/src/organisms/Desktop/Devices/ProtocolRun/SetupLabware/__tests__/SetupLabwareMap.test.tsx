@@ -12,10 +12,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  getAttachedProtocolModuleMatches,
-  getLabwareRenderInfo,
-} from '/app/transformations/analysis'
+import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { SetupLabwareMap } from '../SetupLabwareMap'
@@ -55,10 +52,8 @@ vi.mock('../../../hooks')
 // Instead of testing SetupLabwareMap, make a test for Module using the tests below as a guide.
 
 const RUN_ID = '1'
-const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
-const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
 const mockMagneticModule = {
   moduleId: 'someMagneticModule',
@@ -101,7 +96,6 @@ const render = (props: ComponentProps<typeof SetupLabwareMap>) => {
 describe('SetupLabwareMap', () => {
   beforeEach(() => {
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
     vi.mocked(BaseDeck).mockReturnValue(<div>mock baseDeck</div>)
 
     vi.mocked(LabwareInfoOverlay).mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
@@ -135,16 +129,6 @@ describe('SetupLabwareMap', () => {
     )
   })
   it.skip('should render a deck WITH labware and WITHOUT modules', () => {
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({
-      '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition,
-        displayName: 'fresh tips',
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-        slotName: '1',
-      },
-    })
     render({
       runId: RUN_ID,
       protocolAnalysis: ({
@@ -172,17 +156,6 @@ describe('SetupLabwareMap', () => {
   })
 
   it.skip('should render a deck WITH labware and WITH modules', () => {
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({
-      [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition,
-        displayName: 'fresh tips',
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-        slotName: '1',
-      },
-    })
-
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         moduleId: mockMagneticModule.moduleId,
