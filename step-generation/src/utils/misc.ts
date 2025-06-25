@@ -9,11 +9,13 @@ import {
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMmFromBottom,
   getWellNamePerMultiTip,
   linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
 
 import {
@@ -44,6 +46,7 @@ import type {
   LabwareDefinition2,
   PipetteChannels,
   PipetteV2Specs,
+  PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -1150,4 +1153,37 @@ export const getTransferPlanAndReferenceVolumes = (args: {
       numWellsToFitInTip: maxSourcesPerAspiration,
     },
   }
+}
+
+export const getIsRetractSafeForAirGap = (args: {
+  retractZOffset: number
+  retractPositionReference: PositionReference
+  labwareEntities: LabwareEntities
+  labwareId: string
+  well: string | null
+}): boolean => {
+  const {
+    retractZOffset,
+    retractPositionReference,
+    labwareId,
+    labwareEntities,
+    well,
+  } = args
+  if (well == null) {
+    return false
+  }
+  const wellDepth = labwareEntities[labwareId]?.def.wells[well]?.depth
+  if (wellDepth == null) {
+    return false
+  }
+  const retractMmFromBottom = getMmFromBottom(
+    retractZOffset,
+    retractPositionReference,
+    wellDepth
+  )
+  if (retractMmFromBottom == null) {
+    return false
+  }
+  const retractZOffsetFromTop = retractMmFromBottom - wellDepth
+  return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
 }
