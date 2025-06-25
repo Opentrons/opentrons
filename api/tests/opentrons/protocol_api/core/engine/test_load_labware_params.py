@@ -95,7 +95,7 @@ def test_resolve_load_labware_params(
                 high_inclusive_bound=APIVersion(2, 22),
             )
         ],
-        *[(api_version, 3) for api_version in versions_at_or_above(APIVersion(2, 23))],
+        *[(api_version, 4) for api_version in versions_at_or_above(APIVersion(2, 23))],
     ],
 )
 def test_default_labware_version_dependent_on_api_version(
