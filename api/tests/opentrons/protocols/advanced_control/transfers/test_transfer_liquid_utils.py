@@ -194,7 +194,6 @@ def test_raise_only_if_pip_location_inside_liquid(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise an error if we have access to liquid height and pipette is in liquid."""
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
@@ -223,7 +222,6 @@ def test_log_warning_if_pip_location_cannot_be_validated(
 ) -> None:
     """It should log a warning if we don't have access to liquid height."""
     pip_location = Location(point=Point(1, 2, 3), labware=None)
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
