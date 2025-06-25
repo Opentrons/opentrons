@@ -2438,6 +2438,7 @@ def test_transfer_with_keep_last_tip(
                 increment=mock.ANY,
             ),
         ]
+        assert pipette_1k.has_tip
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2489,9 +2490,18 @@ def test_transfer_with_keep_last_tip_false(
             dest=arma_plate.wells()[:2],
             new_tip="never",
             trash_location=trash,
-            keep_last_tip=True,
+            keep_last_tip=False,
         )
-        assert mock_manager.mock_calls == []
+        expected_calls = [
+            mock.call.drop_tip_in_disposal_location(
+                mock.ANY,
+                disposal_location=trash,
+                home_after=False,
+                alternate_tip_drop=True,
+            )
+        ]
+        assert not pipette_1k.has_tip
+        assert mock_manager.mock_calls == expected_calls
 
 
 @pytest.mark.ot3_only
@@ -2543,6 +2553,7 @@ def test_transfer_with_keep_last_tip_chained(
             trash_location=trash,
             keep_last_tip=True,
         )
+        assert pipette_1k.has_tip
         pipette_1k.consolidate_with_liquid_class(
             liquid_class=water,
             volume=400,
@@ -2560,6 +2571,7 @@ def test_transfer_with_keep_last_tip_chained(
                 increment=mock.ANY,
             )
         ]
+        assert pipette_1k.has_tip
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2623,6 +2635,7 @@ def test_return_tip_after_transfer_with_never(
                 alternate_drop_location=False,
             ),
         ]
+        assert not pipette_1k.has_tip
         assert mock_manager.mock_calls == expected_calls
 
 
@@ -2675,6 +2688,7 @@ def test_return_tip_after_chained_transfers(
             trash_location=trash,
             keep_last_tip=True,
         )
+        assert pipette_1k.has_tip
         pipette_1k.distribute_with_liquid_class(
             liquid_class=water,
             volume=400,
@@ -2701,4 +2715,43 @@ def test_return_tip_after_chained_transfers(
                 alternate_drop_location=False,
             ),
         ]
+        assert not pipette_1k.has_tip
         assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+)
+def test_return_tip_fails_after_new_tip_never_keep_last_tip_false(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should fail in returning a tip with new tip of never and keep last tip False."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    pipette_1k = simulated_protocol_context.load_instrument(
+        "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.get_liquid_class("water")
+
+    pipette_1k.pick_up_tip()
+    pipette_1k.transfer_with_liquid_class(
+        liquid_class=water,
+        volume=400,
+        source=nest_plate.wells()[0],
+        dest=arma_plate.wells()[0],
+        new_tip="never",
+        trash_location=trash,
+        keep_last_tip=False,
+    )
+
+    with pytest.raises(TypeError, match="Last tip location"):
+        pipette_1k.return_tip()
