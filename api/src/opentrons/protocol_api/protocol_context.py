@@ -1379,8 +1379,7 @@ class ProtocolContext(CommandPublisher):
         """
         Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
 
-        Args:
-            name: Name of an Opentrons-verified liquid class.
+        :param name: Name of an Opentrons-verified liquid class. Must be one of:
 
             - ``"water"``: an Opentrons-verified liquid class based on deionized water. 
             - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol. 
