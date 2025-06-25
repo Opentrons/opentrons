@@ -349,7 +349,9 @@ def _get_tips_for_test_96(
     if len(need_to_swap) != 0:
         fixture_settings.ctx.pause(f"Replace slots {need_to_swap} with {tip}ul tips")
         for slot in need_to_swap:
-            old_adapter = loaded_labwares[DeckSlotName.from_primitive(slot).as_int()].parent
+            old_adapter = loaded_labwares[
+                DeckSlotName.from_primitive(slot).as_int()
+            ].parent
             fixture_settings.ctx._core.move_labware(
                 loaded_labwares[DeckSlotName.from_primitive(slot).as_int()]._core,
                 new_location=OFF_DECK,
@@ -359,7 +361,7 @@ def _get_tips_for_test_96(
                 drop_offset=None,
             )
             fixture_settings.ctx._core.move_labware(
-                old_adapter._core,
+                old_adapter._core,  # type: ignore [union-attr, arg-type]
                 new_location=OFF_DECK,
                 use_gripper=False,
                 pause_for_manual_move=False,
@@ -367,9 +369,13 @@ def _get_tips_for_test_96(
                 drop_offset=None,
             )
     if blank:
-        tipracks_lw = [fixture_settings.ctx.load_labware(
-            f"opentrons_flex_96_tiprack_{tip}uL", fixture_settings.tips[tip][0], adapter=adapter
-        )]
+        tipracks_lw = [
+            fixture_settings.ctx.load_labware(
+                f"opentrons_flex_96_tiprack_{tip}uL",
+                fixture_settings.tips[tip][0],
+                adapter=adapter,
+            )
+        ]
 
     else:
         tipracks_lw = [
@@ -657,7 +663,7 @@ def run_one_test(
     channel: int,
     last_measurement: MeasurementData,
 ) -> List[MeasurementData]:
-    """Pick up, aspirate, and dispense one trial and write it to the report."""
+    """Run one trial of one test."""
     tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
@@ -893,7 +899,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
 
+
 def run(ctx: ProtocolContext) -> None:
+    """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
     try:
         _run(ctx, fixture_settings)

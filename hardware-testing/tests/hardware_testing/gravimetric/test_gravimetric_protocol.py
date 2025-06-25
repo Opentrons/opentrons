@@ -11,14 +11,14 @@ from pathlib import Path
 import pytest
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from os.path import join
 import pytest
 
 GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH = (
     Path(__file__).parent / "../../../hardware_testing/gravimetric/protocol_replacement"
 )
 VIAL_LABWARE_DEF = (
-    Path(__file__).parent / "../../../hardware_testing/labware/radwag_pipette_calibration_vial/1.json"
+    Path(__file__).parent
+    / "../../../hardware_testing/labware/radwag_pipette_calibration_vial/1.json"
 )
 GRAVIMETRIC_PROTOCOL_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "gravimetric.py"
 CSV_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "96ch200.csv"
@@ -115,6 +115,7 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
         MAX_SUPPORTED_VERSION.minor,
     ]
 
+
 @pytest.mark.parametrize(
     argnames=["csv"],
     argvalues=[
@@ -126,11 +127,18 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
         # ["96ch200.csv"], Needs LC
     ],
 )
-def test_analsis(csv:str) -> None:
+def test_analsis(csv: str) -> None:
+    """Make sure each CSV can analyze successfully."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH, VIAL_LABWARE_DEF],
         "--json-output",
         check=True,
-        rtp_files=json.dumps({"qc_test_profile": str((GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / csv).resolve())}),
+        rtp_files=json.dumps(
+            {
+                "qc_test_profile": str(
+                    (GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / csv).resolve()
+                )
+            }
+        ),
     )
     assert result.exit_code == 0
