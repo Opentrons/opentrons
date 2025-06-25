@@ -1777,7 +1777,7 @@ class InstrumentContext(publisher.CommandPublisher):
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -1851,7 +1851,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1891,7 +1891,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.transfer_with_liquid_class(
+            last_tip_location = self._core.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -1910,10 +1910,22 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -1979,7 +1991,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2024,7 +2036,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.distribute_with_liquid_class(
+            last_tip_location = self._core.distribute_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=(
@@ -2046,10 +2058,22 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -2116,7 +2140,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2163,7 +2187,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.consolidate_with_liquid_class(
+            last_tip_location = self._core.consolidate_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -2182,7 +2206,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
     @requires_version(2, 0)
@@ -2607,10 +2643,9 @@ class InstrumentContext(publisher.CommandPublisher):
         From API version 2.15 to 2.22, this property returned an internal name for Flex
         pipettes. (e.g., ``"p1000_single_flex"``).
 
-        .. TODO uncomment when 2.23 is ready
-          In API version 2.23 and later, this property returns the Python Protocol API
-          :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
-          ``"flex_1channel_1000"``).
+        In API version 2.23 and later, this property returns the Python Protocol API
+        :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
+        ``"flex_1channel_1000"``).
         """
         return self._core.get_pipette_name()
 
