@@ -2,6 +2,7 @@
 from datetime import datetime
 from math import ceil, inf
 from typing import List, Optional, Tuple, Dict, cast
+import numpy as np
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -398,6 +399,7 @@ def shake_and_read_plate(
         shaker: HeaterShakerContext,
         reader: AbsorbanceReaderContext,
         filename: str,
+        dest_wells_by_volume: Dict[float, List[Well]]
 ) -> None:
 
     # SHAKE FOR 60 SECONDS
@@ -411,10 +413,26 @@ def shake_and_read_plate(
     reader.open_lid()
     ctx.move_labware(plate, new_location=reader, use_gripper=True)
     reader.close_lid()
-    reader.read(
+    result = reader.read(
         export_filename=f"{filename}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
     )
     reader.open_lid()
+    # CALCULATE CV
+    cv_results = {}
+    for vol in dest_wells_by_volume:
+        dest_wells_by_volume[vol] = [entry.well_name for entry in dest_wells_by_volume[vol]]
+    for vol, wells in dest_wells_by_volume.items():
+        values = [result.get(well, 0.0) for well in wells]
+        mean = np.mean(values)
+        std = np.std(values)
+        cv = (std / mean * 100) if mean != 0 else None
+        cv_results[int(vol)] = cv
+    for volume, cv in cv_results.items():
+        if cv is not None:
+            comment_str = f"Volume: {volume} ul -- CV: {cv:.2f}%"
+        else:
+            comment_str = f"Volume: {volume} ul -- CV: N/A"
+        ctx.comment(comment_str)
 
     # ADD TO STACK
     plate_in_stack: Optional[Labware] = ctx.deck[SLOTS["stack_end"]]
@@ -505,7 +523,7 @@ def run(ctx: ProtocolContext) -> None:
             ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
         else:
             shake_and_read_plate(
-                ctx, plate, heater_shaker, plate_reader, filename()
+                ctx, plate, heater_shaker, plate_reader, filename(), dest_wells_by_volume
             )
         plate = None
         ul_in_this_plate = []
