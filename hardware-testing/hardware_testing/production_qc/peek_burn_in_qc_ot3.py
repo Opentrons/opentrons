@@ -24,7 +24,7 @@ DEFAULT_TRIALS = 10 # The number of trials each current speed check does
 DEFAULT_CYCLES = 4 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 500 # number of plunger cycles in one burn in cycle
 
-STALL_THRESHOLD_MM = 0.1
+STALL_THRESHOLD_MM = 0.2
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
 CYCLING_CURRENT = 1
