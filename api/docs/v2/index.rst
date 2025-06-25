@@ -10,12 +10,12 @@ Welcome
     tutorial
     versioning
     new_labware
-    liquid_classes
-    liquid_class_definitions
     moving_labware
     new_modules
     deck_slots
     new_pipette
+    liquid_classes
+    liquid_class_definitions
     new_atomic_commands
     new_complex_commands
     robot_position

@@ -139,25 +139,27 @@ Start by definining the tips, trash, pipette, and labware used in your transfers
 
     # define tips, trash, and pipette
     def run(protocol: protocol_api.ProtocolContext):
-            tiprack = protocol.load_labware(
-              load_name="opentrons_flex_96_tiprack_50ul", 
-              location="D3")
-            trash = protocol.load_trash_bin(location="A3")
-            pipette = protocol.load_instrument(
-              instrument_name="flex_1channel_50", 
-              mount="left", 
-              tip_racks=[tiprack])
-    
+        tiprack = protocol.load_labware(
+            load_name="opentrons_flex_96_tiprack_50ul", location="D3"
+        )
+        trash = protocol.load_trash_bin(location="A3")
+        pipette = protocol.load_instrument(
+            instrument_name="flex_1channel_50",
+            mount="left",
+            tip_racks=[tiprack],
+        )
+
     # load source and destination labware
-            reservoir = protocol.load_labware(
-              load_name="nest_12_reservoir_15ml", 
-              location="C3")
-            plate = protocol.load_labware(
-              load_name="nest_96_wellplate_200ul_flat",
-              location="C2")
+       reservoir = protocol.load_labware(
+           load_name="nest_12_reservoir_15ml", location="C3"
+        )
+        plate = protocol.load_labware(
+            load_name="nest_96_wellplate_200ul_flat", location="C2"
+        )
 
     # select liquid class to use in your protocol
-            viscous_liquid = protocol.get_liquid_class(name="glycerol_50")
+        viscous_liquid = protocol.get_liquid_class(name="glycerol_50")
+
 
 .. versionadded:: 2.24
 
@@ -172,14 +174,14 @@ In the example below, a Flex P50 1-channel pipette will transfer 50 µL of your 
 .. code-block:: python
 
     # transfer with the viscous liquid class
-            pipette.transfer_with_liquid_class(
-              liquid_class=viscous_liquid,
-              volume=50,
-              source=reservoir["A1"],
-              dest=plate["A1"],
-              new_tip="always",
-              trash_location=trash
-            )
+    pipette.transfer_with_liquid_class(
+       liquid_class=viscous_liquid,
+       volume=50,
+       source=reservoir["A1"],
+       dest=plate["A1"],
+       new_tip="always",
+       trash_location=trash,
+    )
   
 .. versionadded:: 2.24
 
@@ -219,8 +221,9 @@ You can create your own liquid class to customize transfer behavior for any liqu
 To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use :py:meth:`~.ProtocolContext.get_liquid_class` to specify the liquid class you'll make changes to::
 
   # get base liquid class and custom properties for the Flex pipette and tips 
-            custom_water = protocol.get_liquid_class(name="water")
-            custom_water_properties=custom_water.get_for(pipette, tiprack)
+
+    custom_water = protocol.get_liquid_class(name="water")
+    custom_water_properties=custom_water.get_for(pipette, tiprack)
 
 .. versionadded:: 2.24
 
@@ -229,15 +232,15 @@ Next, edit indivual liquid class properties based on your Flex pipette and tip c
 .. code-block:: python
     
   # edit aspirate submerge speed to 80 μL/sec
-            custom_water_properties.aspirate.submerge.speed = 80
+    custom_water_properties.aspirate.submerge.speed = 80
 
   # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
-            custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)
-            custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
 
   # edit to delay for 1 sec before retracting after an aspirate
-            custom_water_properties.aspirate.retract.delay.enabled = True
-            custom_water_properties.aspirate.retract.delay.duration = 1.0
+    custom_water_properties.aspirate.retract.delay.enabled = True
+    custom_water_properties.aspirate.retract.delay.duration = 1.0
 
 .. versionadded:: 2.24
 
@@ -245,29 +248,35 @@ Then, complete your transfers with the modified ``custom_water`` liquid class.
 
 All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use :ref:`meniscus-relative <well-meniscus>` locations, set the ``positionReference`` to ``"liquid-meniscus"`` for actions like an aspirate or dispense.   
 
+
+.. _new-liquid-classes:
+
+Defining New Liquid Classes
+============================
+
 You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified liquid class, you'll start from scratch, providing a value for `every required property <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ in your liquid class. 
 
 .. code-block:: python
 
  # examples of required properties in a dictionary for your pipette and tip racks
-            custom_liquid_class_properties = {
-            "flex_1channel_50": {
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": {
-                    "aspirate": {
-                        "aspirate_position": {
-                            "offset": {"x": 1, "y": 2, "z": 3},
-                            "position_reference": "well-bottom",
-                        },
-                    },
-                },
-            }
+    custom_liquid_class_properties = {
+      "flex_1channel_50": {
+        "opentrons/opentrons_flex_96_tiprack_50ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                     "offset": {"x": 1, "y": 2, "z": 3},
+                     "position_reference": "well-bottom",
+                  },
+              },
+          },
+      }
     
  # create a new liquid class
-              custom_viscous = protocol.define_liquid_class(
-                name="custom_viscous",
-                properties=custom_liquid_class_properties,
-                display_name="Custom Viscous"
-              )
+    custom_viscous = protocol.define_liquid_class(
+      name="custom_viscous",
+      properties=custom_liquid_class_properties,
+      display_name="Custom Viscous"
+    )
 
 .. versionadded:: 2.24
 

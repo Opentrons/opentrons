@@ -1950,7 +1950,6 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``"once"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip before each aspirate.
               - ``"never"``: Do not pick up or drop tips at all.
-              - ``"always"``: Pick up a new tip before every aspirate.
 
             See :ref:`param-tip-handling` for details.
 
@@ -2087,7 +2086,6 @@ class InstrumentContext(publisher.CommandPublisher):
               - ``"once"``: Use one tip for the entire command.
               - ``"always"``: Use a new tip after each aspirate and dispense, even when visiting the same source again.
               - ``"never"``: Do not pick up or drop tips at all.
-              - ``"always"``: Pick up a new tip before going back to source for refilling after a dispense.
 
             See :ref:`param-tip-handling` for details.
 
