@@ -13325,11 +13325,40 @@
       "status": "succeeded"
     },
     {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8fe2294a5558cabc803db15d740fff2b",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": true,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 2.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 42.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e44ba3911df3b413db465d29132e873f",
+      "key": "6e527a6393fcf30b7adf1e3a50d5c876",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -13343,7 +13372,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "452316dede893232f2d23ebaa8b735f7",
+      "key": "c2ce5a1574cbe2c229610dfc5159215f",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -13372,7 +13401,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "194cc0dfb09b76f7d176fa44a6eeda20",
+      "key": "93dd00f3a6fc0bb9bf5572fdd467ace2",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -13387,7 +13416,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "94507397dea540de4ec5c2347c8ffa1b",
+      "key": "7441adb0644c88f2e3858bf5dba17f11",
       "notes": [],
       "params": {
         "liquidClassRecord": {
@@ -13467,7 +13496,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13484,7 +13513,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -13599,7 +13628,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13616,7 +13645,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -13708,7 +13737,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13725,7 +13754,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -13750,7 +13779,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a1405e568c1ed3f4e5d68507bd26dd1d",
+      "key": "75539a7f57ef76b9bc1ed93921c4069e",
       "notes": [],
       "params": {
         "labwareIds": [
@@ -13777,7 +13806,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b0cc42729d551c3ac59abc0d5234b83e",
+      "key": "93fd5fd767cf2a70b4d937032e3ac168",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -13810,7 +13839,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c8ec2a92603a72b71e99e7d8a5cb6d73",
+      "key": "e509bdf9c5ad700ecd5a4dd3d699d3b1",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -13842,7 +13871,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "28d85fc61743320d954c6327e3bc37ef",
+      "key": "43d35245ae2fd4fcfc286f8fac58d751",
       "notes": [],
       "params": {
         "pipetteId": "UUID",
@@ -13858,7 +13887,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "731cb52f8b6fdcb0a590c42ca10e1c87",
+      "key": "2c955dbcd8390e4516c6dc5bacf22547",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -13872,7 +13901,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "dd5afa9607647a17d639726e6e766909",
+      "key": "fe2d1ed0fdfc7b19af47ed064786de73",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -13904,13 +13933,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5d198eb22a7c7b241b9459d827e95d7f",
+      "key": "13159e4e3bc2653ff2866cfb66f8d741",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -13937,7 +13966,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0ca80fcc73235ddc2947027c0dc02f4d",
+      "key": "4da134258179cb1c71da25b1239bc72a",
       "notes": [],
       "params": {
         "correctionVolume": -0.796,
@@ -13956,7 +13985,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1bb60095e745579a92c6aa23f2c8ee1f",
+      "key": "5618612f59f77413734a6bab807000ee",
       "notes": [],
       "params": {
         "seconds": 1.0
@@ -13970,13 +13999,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "664230d5c5e877ccf0738233a2aa8372",
+      "key": "d0d82b6228d88f692044fa72f7d2a9a5",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14003,7 +14032,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f3ec0b82efd9ea683d04586cad7f1b45",
+      "key": "b0f39ef86c320be8aa6e2866ca1555fd",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14035,13 +14064,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "67368960d5f3c2821dbd8ddb35fe5baa",
+      "key": "d786b77dcde5d16befa36f765b3550c8",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14068,7 +14097,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "fa0ff09088b27b9637740364f6d1362d",
+      "key": "97ec39a78f16a1faa30a28ae59693405",
       "notes": [],
       "params": {
         "correctionVolume": -0.4646666666666667,
@@ -14088,7 +14117,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "986b70a19abca1b2f48d025a3fb1f0c3",
+      "key": "bc69a626a6b11486f28226ff7fdd7b42",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -14102,13 +14131,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5a1ee429c4897a11c00eb97a59b2fe4c",
+      "key": "34ac44f8658260c640abff6001bf9249",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14135,7 +14164,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "de2a3e3d90096e08392f68529222e165",
+      "key": "5aaf45fca4f88480b3b08922f26081b5",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14167,13 +14196,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "47bc416a878ec85b35bb2541426f5068",
+      "key": "3db8c7b6c346e0eb89c02689dbba9553",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14200,7 +14229,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4c3b41a628ed82a10d2556077b7a98a2",
+      "key": "a81dc1e2a3f6ef942bf035c2e47cad19",
       "notes": [],
       "params": {
         "correctionVolume": -0.4646666666666667,
@@ -14220,7 +14249,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b26f27e708983bc9d8b2eaa0dcbb17bf",
+      "key": "edd0d8281d7cd3813118abfb91074b66",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -14234,13 +14263,13 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5f01ecf7f1ada8c3ac5fcda229512e08",
+      "key": "8832131b147817fb84294dc5fe7da600",
       "notes": [],
       "params": {
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14267,7 +14296,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "58fed539e956e92409d03b8428dda9eb",
+      "key": "dc79fd891e0df4634185a7e873dc12b1",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -14281,7 +14310,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "abfb9dee84543fda06b6c3b39b3412e1",
+      "key": "e97ab8c4a4ea726048fbb135506c1e6e",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -14310,7 +14339,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "80d9dda997be770388161d395dbf8d9e",
+      "key": "767672408387e995458654afce4a4971",
       "notes": [],
       "params": {
         "flowRate": 50.0,
@@ -14321,11 +14350,40 @@
       "status": "succeeded"
     },
     {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dea5d842862ff3bf2fc2bb904c95e97f",
+      "notes": [],
+      "params": {
+        "addressableAreaName": "movableTrashA3",
+        "alternateDropLocation": false,
+        "forceDirect": true,
+        "ignoreTipConfiguration": true,
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 2.0
+        },
+        "pipetteId": "UUID"
+      },
+      "result": {
+        "position": {
+          "x": 434.25,
+          "y": 364.0,
+          "z": 42.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0a3dd11123964d77a6c01beb59645717",
+      "key": "fc4f1020d39adce110ec2e3ca4f21df0",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -14339,7 +14397,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c15572d060ceb6a3d4d28444483fb0f8",
+      "key": "0baafb40ddf09554b84eecda8e7650d6",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -14368,7 +14426,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cbf194a0de7f00772206ee847b1620c6",
+      "key": "2807ce819f5bc7fe8ce2eee09fe2c08a",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -14383,7 +14441,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9586a2b56820199dfdc190bbbee5c479",
+      "key": "b7a375ae0e803cf3bfd45fbe00733851",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -14397,7 +14455,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "01f47572856f2b22514ff2a0f6a451a7",
+      "key": "883edd2c562c680e40effdd1fbd21a9b",
       "notes": [],
       "params": {
         "message": "A: A1 ❌  A2 ❌  A3 ❌  A4 ❌  A5 ❌  A6 ❌  A7 ❌  A8 ❌  A9 ❌  A10 ❌  A11 ❌  A12 ❌  "
@@ -14411,7 +14469,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "87fa243116c2569ab538ba0f3e1f6f06",
+      "key": "0edb2cc9c4f01eceee3eacc1426af654",
       "notes": [],
       "params": {
         "message": "B: B1 ❌  B2 ❌  B3 ❌  B4 ❌  B5 ❌  B6 ❌  B7 ❌  B8 ❌  B9 ❌  B10 ❌  B11 ❌  B12 ❌  "
@@ -14425,7 +14483,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0b0e5ee7f32f503110ce612b84ebb0e4",
+      "key": "b1ae918a41cba8efbd85dca9d988bff5",
       "notes": [],
       "params": {
         "message": "C: C1 ❌  C2 ❌  C3 ❌  C4 ❌  C5 ❌  C6 ❌  C7 ❌  C8 ❌  C9 ❌  C10 ❌  C11 ❌  C12 ❌  "
@@ -14439,7 +14497,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e91c2af00f9be7592c42a24251f70df7",
+      "key": "f7f1b37d3c52972cb0cba240031ffbf6",
       "notes": [],
       "params": {
         "message": "D: D1 ❌  D2 ❌  D3 ❌  D4 ❌  D5 ❌  D6 ❌  D7 ❌  D8 ❌  D9 ❌  D10 ❌  D11 ❌  D12 ❌  "
@@ -14453,7 +14511,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "49bb62f68654d2045b15d843e20d11a7",
+      "key": "4369f6a87b80d97cd3bc5a57131d59fe",
       "notes": [],
       "params": {
         "message": "E: E1 ❌  E2 ❌  E3 ❌  E4 ❌  E5 ❌  E6 ❌  E7 ❌  E8 ❌  E9 ❌  E10 ❌  E11 ❌  E12 ❌  "
@@ -14467,7 +14525,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "454f3abcd1a60ecef4ae1f29ceeea6cd",
+      "key": "ca32ab5be40bfac84e8ce0b6d6856b9e",
       "notes": [],
       "params": {
         "message": "F: F1 ❌  F2 ❌  F3 ❌  F4 ❌  F5 ❌  F6 ❌  F7 ❌  F8 ❌  F9 ❌  F10 ❌  F11 ❌  F12 ❌  "
@@ -14481,7 +14539,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e9bc91bddcb3aceb0bd34572352cfd9b",
+      "key": "48772b28b31dc512f290e7394f2c552b",
       "notes": [],
       "params": {
         "message": "G: G1 ❌  G2 ❌  G3 ❌  G4 ❌  G5 ❌  G6 ❌  G7 ❌  G8 ❌  G9 ❌  G10 ❌  G11 ❌  G12 ❌  "
@@ -14495,7 +14553,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "61dc6e1d8de15da253f2bc30aec9cd04",
+      "key": "8f9d2492cd6781f2459d5ebb0f504880",
       "notes": [],
       "params": {
         "message": "H: H1 ❌  H2 ❌  H3 ❌  H4 ❌  H5 ❌  H6 ❌  H7 ❌  H8 ❌  H9 ❌  H10 ❌  H11 ❌  H12 ❌  "
@@ -14509,7 +14567,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "bb9580bf92641ae220d9bb864e047a1a",
+      "key": "a354c8bc2620a14aea1bf4a9f73d1fda",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -14523,7 +14581,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cb59ae8cc691b37951aea6c2edbc3e34",
+      "key": "586bb6d230f68741d258bd5554bff85e",
       "notes": [],
       "params": {
         "message": "A: A1 ❌  A2 ❌  A3 ❌  A4 ❌  A5 ❌  A6 ❌  A7 ❌  A8 ❌  A9 ❌  A10 ❌  A11 ❌  A12 ❌  "
@@ -14537,7 +14595,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d44311f859b69e8688986b9c3afae82a",
+      "key": "4950f05f999c71c89a92c45e056c4e8c",
       "notes": [],
       "params": {
         "message": "B: B1 ❌  B2 ❌  B3 ❌  B4 ❌  B5 ❌  B6 ❌  B7 ❌  B8 ❌  B9 ❌  B10 ❌  B11 ❌  B12 ❌  "
@@ -14551,7 +14609,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "160fe7c8a1e38442d12b94b11280e32c",
+      "key": "664315419d4a89bb2230f4e735295fbc",
       "notes": [],
       "params": {
         "message": "C: C1 ❌  C2 ❌  C3 ❌  C4 ❌  C5 ❌  C6 ❌  C7 ❌  C8 ❌  C9 ❌  C10 ❌  C11 ❌  C12 ❌  "
@@ -14565,7 +14623,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a8e9126f6f4ff23f51c7e86e830cc24d",
+      "key": "57ee13653e99db68e00009e32ddab637",
       "notes": [],
       "params": {
         "message": "D: D1 ❌  D2 ❌  D3 ❌  D4 ❌  D5 ❌  D6 ❌  D7 ❌  D8 ❌  D9 ❌  D10 ❌  D11 ❌  D12 ❌  "
@@ -14579,7 +14637,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d583cbea53c5edff8fd6ea788ec9958d",
+      "key": "4d3e0831ad4f7a88ddb23f25693374ed",
       "notes": [],
       "params": {
         "message": "E: E1 ❌  E2 ❌  E3 ❌  E4 ❌  E5 ❌  E6 ❌  E7 ❌  E8 ❌  E9 ❌  E10 ❌  E11 ❌  E12 ❌  "
@@ -14593,7 +14651,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b69416b9785990fb19ecaea442e806de",
+      "key": "1599f75a1b87785fb3b9380ad75e8f9f",
       "notes": [],
       "params": {
         "message": "F: F1 ❌  F2 ❌  F3 ❌  F4 ❌  F5 ❌  F6 ❌  F7 ❌  F8 ❌  F9 ❌  F10 ❌  F11 ❌  F12 ❌  "
@@ -14607,7 +14665,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "22b46699b1a6becf3c0364ba6e75a0a1",
+      "key": "6234d5a3216cfa9719ef8b1da7517b76",
       "notes": [],
       "params": {
         "message": "G: G1 ❌  G2 ❌  G3 ❌  G4 ❌  G5 ❌  G6 ❌  G7 ❌  G8 ❌  G9 ❌  G10 ❌  G11 ❌  G12 ❌  "
@@ -14621,7 +14679,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "dec4d99de013d5518ebc907f2c4a9f30",
+      "key": "aeb62e6e2d8c2920a753481cb927ea99",
       "notes": [],
       "params": {
         "message": "H: H1 ❌  H2 ❌  H3 ❌  H4 ❌  H5 ❌  H6 ❌  H7 ❌  H8 ❌  H9 ❌  H10 ❌  H11 ❌  H12 ❌  "
@@ -14635,7 +14693,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "560592996c3b8de806952380661d24b9",
+      "key": "116c6d5af069283585cf5739b15589f7",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -14649,7 +14707,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "12ffcb979690ee9a7b0921607764d0cc",
+      "key": "1a2d4480632491581208b34bcf119f89",
       "notes": [],
       "params": {
         "message": "A: A1 ❌  A2 ❌  A3 ❌  A4 ❌  A5 ❌  A6 ❌  A7 ❌  A8 ❌  A9 ❌  A10 ❌  A11 ❌  A12 ❌  "
@@ -14663,7 +14721,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "07b645b35e9f58f028db10f89777e37f",
+      "key": "f0966a6df782bac83438442cf918d235",
       "notes": [],
       "params": {
         "message": "B: B1 ❌  B2 ❌  B3 ❌  B4 ❌  B5 ❌  B6 ❌  B7 ❌  B8 ❌  B9 ❌  B10 ❌  B11 ❌  B12 ❌  "
@@ -14677,7 +14735,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "879c78f00a6569f2ba26d2419d2fcca3",
+      "key": "ae187dfc875eb655454edb2e78f55370",
       "notes": [],
       "params": {
         "message": "C: C1 ❌  C2 ❌  C3 ❌  C4 ❌  C5 ❌  C6 ❌  C7 ❌  C8 ❌  C9 ❌  C10 ❌  C11 ❌  C12 ❌  "
@@ -14691,7 +14749,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e8661c3bebdb69f96c22ec387cfb7fd6",
+      "key": "4a1c857c42744856d83d9f061b2df076",
       "notes": [],
       "params": {
         "message": "D: D1 ❌  D2 ❌  D3 ❌  D4 ❌  D5 ❌  D6 ❌  D7 ❌  D8 ❌  D9 ❌  D10 ❌  D11 ❌  D12 ❌  "
@@ -14705,7 +14763,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f3d6a105b44f600d200517d3ec9b48d8",
+      "key": "d39ba4d4bf4228bfc31ee396e67a7ac1",
       "notes": [],
       "params": {
         "message": "E: E1 ❌  E2 ❌  E3 ❌  E4 ❌  E5 ❌  E6 ❌  E7 ❌  E8 ❌  E9 ❌  E10 ❌  E11 ❌  E12 ❌  "
@@ -14719,7 +14777,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0b30194f47b9506bbf2b95aef7eb9c7d",
+      "key": "b28fe4e8262624cd48c2c30c4f3f1c1e",
       "notes": [],
       "params": {
         "message": "F: F1 ❌  F2 ❌  F3 ❌  F4 ❌  F5 ❌  F6 ❌  F7 ❌  F8 ❌  F9 ❌  F10 ❌  F11 ❌  F12 ❌  "
@@ -14733,7 +14791,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "37a82f9e576d6c93125caf6490e68fde",
+      "key": "f997b521951f6c0c1ebbebe07355b71b",
       "notes": [],
       "params": {
         "message": "G: G1 ❌  G2 ❌  G3 ❌  G4 ❌  G5 ❌  G6 ❌  G7 ❌  G8 ❌  G9 ❌  G10 ❌  G11 ❌  G12 ❌  "
@@ -14747,7 +14805,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "309db8807cf195fdfb7f3a1c0bbafe95",
+      "key": "c15c2688937e9b6bbc17412c5c0d3b0f",
       "notes": [],
       "params": {
         "message": "H: H1 ❌  H2 ❌  H3 ❌  H4 ❌  H5 ❌  H6 ❌  H7 ❌  H8 ❌  H9 ❌  H10 ❌  H11 ❌  H12 ❌  "
@@ -14761,7 +14819,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "019460b12ada93f179fef57926e13080",
+      "key": "56f7b24d1318d5effc40cdd29f3d9b58",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -14775,7 +14833,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "69c85057d0fba2077b4c1aab16ec9fdf",
+      "key": "57aaa45ffab51b520110a4c63e20a50c",
       "notes": [],
       "params": {
         "message": "A: A1 🟢  A2 🟢  A3 🟢  A4 🟢  A5 🟢  A6 🟢  A7 🟢  A8 🟢  A9 🟢  A10 🟢  A11 🟢  A12 🟢  "
@@ -14789,7 +14847,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "05398540b4d3ce4da60a5bcff0be4775",
+      "key": "eb9e13b180b9b5837b83627e40ce8952",
       "notes": [],
       "params": {
         "message": "B: B1 🟢  B2 🟢  B3 🟢  B4 🟢  B5 🟢  B6 🟢  B7 🟢  B8 🟢  B9 🟢  B10 🟢  B11 🟢  B12 🟢  "
@@ -14803,7 +14861,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a89bad4f8b6b91ed640932ee3bc3a2e6",
+      "key": "d60a30a66ed6cbf1880d2d20be8eea3d",
       "notes": [],
       "params": {
         "message": "C: C1 🟢  C2 🟢  C3 🟢  C4 🟢  C5 🟢  C6 🟢  C7 🟢  C8 🟢  C9 🟢  C10 🟢  C11 🟢  C12 🟢  "
@@ -14817,7 +14875,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b0c5b564483f207b018414cc6a3f6ab2",
+      "key": "3db827f1dccdaf17228fffb004ab5335",
       "notes": [],
       "params": {
         "message": "D: D1 🟢  D2 🟢  D3 🟢  D4 🟢  D5 🟢  D6 🟢  D7 🟢  D8 🟢  D9 🟢  D10 🟢  D11 🟢  D12 🟢  "
@@ -14831,7 +14889,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ed7ad0ed51885ed9780fdebab690b032",
+      "key": "3a1ec38f747acf4fd55db3f30ebc1761",
       "notes": [],
       "params": {
         "message": "E: E1 🟢  E2 🟢  E3 🟢  E4 🟢  E5 🟢  E6 🟢  E7 🟢  E8 🟢  E9 🟢  E10 🟢  E11 🟢  E12 🟢  "
@@ -14845,7 +14903,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c12a47ae49d7ba95f2ec63d947d16e79",
+      "key": "7b0269e6d15ae9c73824049f950c77d0",
       "notes": [],
       "params": {
         "message": "F: F1 🟢  F2 🟢  F3 🟢  F4 🟢  F5 🟢  F6 🟢  F7 🟢  F8 🟢  F9 🟢  F10 🟢  F11 🟢  F12 🟢  "
@@ -14859,7 +14917,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8b631e8ad0b34aaeff779724cf095da8",
+      "key": "9db8c3efc4e492d65a0032dbae38d1e4",
       "notes": [],
       "params": {
         "message": "G: G1 🟢  G2 🟢  G3 🟢  G4 🟢  G5 🟢  G6 🟢  G7 🟢  G8 🟢  G9 🟢  G10 🟢  G11 🟢  G12 🟢  "
@@ -14873,7 +14931,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "19367527d3dcba7559ca3d8a2615aa9d",
+      "key": "76eda2aa53bdf6fd7716d6887d860799",
       "notes": [],
       "params": {
         "message": "H: H1 🟢  H2 🟢  H3 🟢  H4 🟢  H5 🟢  H6 🟢  H7 🟢  H8 🟢  H9 🟢  H10 🟢  H11 🟢  H12 🟢  "
@@ -14887,7 +14945,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "85121e3b384ec0219ce38ede8257a5c6",
+      "key": "c222b40a83b7b4c3994e94703e3e4b95",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -14901,7 +14959,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2ec96fad055784609966c240d676892e",
+      "key": "4a211afc3f2314256e262c766dae1296",
       "notes": [],
       "params": {
         "message": "A: A1 🟢  A2 🟢  A3 🟢  A4 🟢  A5 🟢  A6 🟢  A7 🟢  A8 🟢  A9 🟢  A10 🟢  A11 🟢  A12 🟢  "
@@ -14915,7 +14973,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7a5bc5c2147b251343ab75eba49b3926",
+      "key": "0138b8a2a9290527e94dd57e99025f43",
       "notes": [],
       "params": {
         "message": "B: B1 🟢  B2 🟢  B3 🟢  B4 🟢  B5 🟢  B6 🟢  B7 🟢  B8 🟢  B9 🟢  B10 🟢  B11 🟢  B12 🟢  "
@@ -14929,7 +14987,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b83dfb440f6a1ba30cc71a31dbfc80a7",
+      "key": "a0e97512d0ca4f3d6d11dd5ef608dc86",
       "notes": [],
       "params": {
         "message": "C: C1 🟢  C2 🟢  C3 🟢  C4 🟢  C5 🟢  C6 🟢  C7 🟢  C8 🟢  C9 🟢  C10 🟢  C11 🟢  C12 🟢  "
@@ -14943,7 +15001,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "83e0c7c5bb94f259fa5b7cec7fd46f3b",
+      "key": "5aff4f98608712c60044c935f1f7e5df",
       "notes": [],
       "params": {
         "message": "D: D1 🟢  D2 🟢  D3 🟢  D4 🟢  D5 🟢  D6 🟢  D7 🟢  D8 🟢  D9 🟢  D10 🟢  D11 🟢  D12 🟢  "
@@ -14957,7 +15015,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "dcc09cdff018d881f0737dcd403c0dae",
+      "key": "e61b8435dbaa37f3e41cd70d87f3771b",
       "notes": [],
       "params": {
         "message": "E: E1 🟢  E2 🟢  E3 🟢  E4 🟢  E5 🟢  E6 🟢  E7 🟢  E8 🟢  E9 🟢  E10 🟢  E11 🟢  E12 🟢  "
@@ -14971,7 +15029,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e169362640babbd1454894d397e9a18e",
+      "key": "ff719324ec8f1536a7fb8149ee120ead",
       "notes": [],
       "params": {
         "message": "F: F1 🟢  F2 🟢  F3 🟢  F4 🟢  F5 🟢  F6 🟢  F7 🟢  F8 🟢  F9 🟢  F10 🟢  F11 🟢  F12 🟢  "
@@ -14985,7 +15043,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f429fb0553ac1047052e220023aec017",
+      "key": "cd2681bc0c4bf562da0c073dff38f910",
       "notes": [],
       "params": {
         "message": "G: G1 🟢  G2 🟢  G3 🟢  G4 🟢  G5 🟢  G6 🟢  G7 🟢  G8 🟢  G9 🟢  G10 🟢  G11 🟢  G12 🟢  "
@@ -14999,7 +15057,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0238aecc49d7cfefcd1827c38835615a",
+      "key": "db123a50605d7f75bdf5c0a71d1017e8",
       "notes": [],
       "params": {
         "message": "H: H1 🟢  H2 🟢  H3 🟢  H4 🟢  H5 🟢  H6 🟢  H7 🟢  H8 🟢  H9 🟢  H10 🟢  H11 🟢  H12 🟢  "
@@ -15013,7 +15071,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2dc4eb5a462a752d60fc8971395f2444",
+      "key": "a7d43d23f477e3db6a1474558aa9ed41",
       "notes": [],
       "params": {
         "message": "Tip rack in Opentrons Flex 96 Tip Rack Adapter"
@@ -15027,7 +15085,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a0c55618b80699a22078bdca72b223c3",
+      "key": "d0e1513559f2d3b3053b70c8a83c21fd",
       "notes": [],
       "params": {
         "message": "A: A1 🟢  A2 🟢  A3 🟢  A4 🟢  A5 🟢  A6 🟢  A7 🟢  A8 🟢  A9 🟢  A10 🟢  A11 🟢  A12 🟢  "
@@ -15041,7 +15099,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1abac2b5a57f4a2b106a40f45f5e77b1",
+      "key": "ea555afa5f7bb6a034c7617561ca5870",
       "notes": [],
       "params": {
         "message": "B: B1 🟢  B2 🟢  B3 🟢  B4 🟢  B5 🟢  B6 🟢  B7 🟢  B8 🟢  B9 🟢  B10 🟢  B11 🟢  B12 🟢  "
@@ -15055,7 +15113,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "73f7b603699181f25d9222c47185b459",
+      "key": "5b1b4fd67b63513ae21cf798bc1c10e3",
       "notes": [],
       "params": {
         "message": "C: C1 🟢  C2 🟢  C3 🟢  C4 🟢  C5 🟢  C6 🟢  C7 🟢  C8 🟢  C9 🟢  C10 🟢  C11 🟢  C12 🟢  "
@@ -15069,7 +15127,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e14849346478eb67cffeebf20177cdb0",
+      "key": "37895d5bef1cf81767ca9771fd5c3c39",
       "notes": [],
       "params": {
         "message": "D: D1 🟢  D2 🟢  D3 🟢  D4 🟢  D5 🟢  D6 🟢  D7 🟢  D8 🟢  D9 🟢  D10 🟢  D11 🟢  D12 🟢  "
@@ -15083,7 +15141,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7ece6aa4893a41452f937ff04b88c174",
+      "key": "764d547fd8f1663b788c960f00363720",
       "notes": [],
       "params": {
         "message": "E: E1 🟢  E2 🟢  E3 🟢  E4 🟢  E5 🟢  E6 🟢  E7 🟢  E8 🟢  E9 🟢  E10 🟢  E11 🟢  E12 🟢  "
@@ -15097,7 +15155,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4801f83e38caf9cabc5dceccecd76f38",
+      "key": "a07bdbd28a565f42ba8f9fb40ddd65e3",
       "notes": [],
       "params": {
         "message": "F: F1 🟢  F2 🟢  F3 🟢  F4 🟢  F5 🟢  F6 🟢  F7 🟢  F8 🟢  F9 🟢  F10 🟢  F11 🟢  F12 🟢  "
@@ -15111,7 +15169,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a7593b94ae40026a7425f246083a21f3",
+      "key": "093a4ad7c336694093eba73d3983f292",
       "notes": [],
       "params": {
         "message": "G: G1 🟢  G2 🟢  G3 🟢  G4 🟢  G5 🟢  G6 🟢  G7 🟢  G8 🟢  G9 🟢  G10 🟢  G11 🟢  G12 🟢  "
@@ -15125,7 +15183,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "91765839c7768cb17e5e2347b2901c95",
+      "key": "3de998415fdff7b2f82118464a2410c5",
       "notes": [],
       "params": {
         "message": "H: H1 🟢  H2 🟢  H3 🟢  H4 🟢  H5 🟢  H6 🟢  H7 🟢  H8 🟢  H9 🟢  H10 🟢  H11 🟢  H12 🟢  "
@@ -16066,7 +16124,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16083,7 +16141,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,
@@ -16199,7 +16257,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16216,7 +16274,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,
@@ -16308,7 +16366,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16325,7 +16383,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,

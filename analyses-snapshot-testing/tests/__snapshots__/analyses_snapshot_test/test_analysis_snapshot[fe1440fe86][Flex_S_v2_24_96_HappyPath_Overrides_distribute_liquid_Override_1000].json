@@ -13687,7 +13687,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13704,7 +13704,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -13819,7 +13819,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13836,7 +13836,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -13928,7 +13928,7 @@
                 },
                 "positionReference": "well-top"
               },
-              "speed": 4,
+              "speed": 10,
               "touchTip": {
                 "enable": false,
                 "params": {
@@ -13945,7 +13945,7 @@
                   "duration": 0.0
                 }
               },
-              "speed": 4,
+              "speed": 10,
               "startPosition": {
                 "offset": {
                   "x": 0,
@@ -14130,7 +14130,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14196,7 +14196,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14261,7 +14261,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14328,7 +14328,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14469,7 +14469,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14535,7 +14535,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14600,7 +14600,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -14667,7 +14667,7 @@
         "forceDirect": true,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
+        "speed": 10.0,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -16439,7 +16439,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16456,7 +16456,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,
@@ -16572,7 +16572,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16589,7 +16589,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,
@@ -16681,7 +16681,7 @@
             },
             "positionReference": "well-top"
           },
-          "speed": 4,
+          "speed": 10,
           "touchTip": {
             "enable": false,
             "params": {
@@ -16698,7 +16698,7 @@
               "duration": 0.0
             }
           },
-          "speed": 4,
+          "speed": 10,
           "startPosition": {
             "offset": {
               "x": 0,
