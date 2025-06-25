@@ -1409,10 +1409,9 @@ class ProtocolContext(CommandPublisher):
                     {
                     <pipette_name>: {
                         <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
-
-                        # TransferPropertiesDict is a dictionary representation of the
-                        # transfer properties returned by the `LiquidClass.get_for(..)` function.
                     }}
+                
+                ``TransferPropertiesDict`` is a dictionary representation of the transfer properties retutrned by the `LiquidClass.get_for(..)` function. Each dictionary must include values for all properties that make up a liquid class. For more, see :ref:`new-liquid-classes`.
 
             base_liquid_class: An Opentrons-verified liquid class to base the newly defined liquid class on. The
                 specified ``transfer_properties`` will override any existing properties for the Flex pipette and tips. 
