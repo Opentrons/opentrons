@@ -1920,6 +1920,8 @@ class InstrumentContext(publisher.CommandPublisher):
             self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
                 tip_well_core.get_name()
             ]
+        else:
+            self._last_tip_picked_up_from = None
 
         return self
 
@@ -2066,6 +2068,8 @@ class InstrumentContext(publisher.CommandPublisher):
             self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
                 tip_well_core.get_name()
             ]
+        else:
+            self._last_tip_picked_up_from = None
 
         return self
 
@@ -2212,6 +2216,8 @@ class InstrumentContext(publisher.CommandPublisher):
             self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
                 tip_well_core.get_name()
             ]
+        else:
+            self._last_tip_picked_up_from = None
 
         return self
 

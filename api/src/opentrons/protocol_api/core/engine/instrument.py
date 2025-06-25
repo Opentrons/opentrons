@@ -1426,6 +1426,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             _drop_tip()
+            last_tip = None
 
         return last_tip
 
@@ -1766,6 +1767,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             _drop_tip()
+            last_tip = None
 
         return last_tip
 
@@ -2034,6 +2036,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             _drop_tip()
+            last_tip = None
 
         return last_tip
 
