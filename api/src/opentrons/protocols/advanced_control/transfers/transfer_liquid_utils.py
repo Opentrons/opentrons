@@ -4,7 +4,10 @@ from __future__ import annotations
 from typing import Literal, Sequence, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass
 
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
+from opentrons.protocol_engine.errors import (
+    LiquidHeightUnknownError,
+    IncompleteLabwareDefinitionError,
+)
 from opentrons.protocol_engine.state._well_math import (
     wells_covered_by_pipette_configuration,
 )
@@ -25,7 +28,6 @@ class LocationCheckDescriptors:
 
 def raise_if_location_inside_liquid(
     location: Location,
-    well_location: Location,
     well_core: WellCore,
     location_check_descriptors: LocationCheckDescriptors,
     logger: Logger,
@@ -39,7 +41,11 @@ def raise_if_location_inside_liquid(
     """
     try:
         liquid_height_from_bottom = well_core.current_liquid_height()
-    except LiquidHeightUnknownError:
+    except (IncompleteLabwareDefinitionError, LiquidHeightUnknownError):
+        # IncompleteLabwareDefinitionError is raised when there's no inner geometry
+        # defined for the well. So, we can't find the liquid height even if liquid volume is known.
+        # LiquidHeightUnknownError is raised when we don't have liquid volume info
+        # and no probing has been done either.
         liquid_height_from_bottom = None
     if isinstance(liquid_height_from_bottom, (int, float)):
         if liquid_height_from_bottom + well_core.get_bottom(0).z > location.point.z:

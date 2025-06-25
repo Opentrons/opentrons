@@ -7,10 +7,14 @@ from contextlib import nullcontext as does_not_raise
 
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import ProtocolEngineError
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
 )
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
+from opentrons.protocol_engine.errors import (
+    LiquidHeightUnknownError,
+    IncompleteLabwareDefinitionError,
+)
 from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.labware import Well, Labware
@@ -204,15 +208,18 @@ def test_raise_only_if_pip_location_inside_liquid(
     with expected_raise:
         raise_if_location_inside_liquid(
             location=pip_location,
-            well_location=well_location,
             well_core=well_core,
             location_check_descriptors=location_descriptors,
             logger=logger,
         )
 
 
+@pytest.mark.parametrize(
+    "error_raised", [LiquidHeightUnknownError(), IncompleteLabwareDefinitionError()]
+)
 def test_log_warning_if_pip_location_cannot_be_validated(
     decoy: Decoy,
+    error_raised: ProtocolEngineError,
 ) -> None:
     """It should log a warning if we don't have access to liquid height."""
     pip_location = Location(point=Point(1, 2, 3), labware=None)
@@ -224,12 +231,11 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     )
     logger = decoy.mock(cls=Logger)
 
-    decoy.when(well_core.current_liquid_height()).then_raise(LiquidHeightUnknownError())
+    decoy.when(well_core.current_liquid_height()).then_raise(error_raised)
     decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
     decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
     raise_if_location_inside_liquid(
         location=pip_location,
-        well_location=well_location,
         well_core=well_core,
         location_check_descriptors=location_descriptors,
         logger=logger,
