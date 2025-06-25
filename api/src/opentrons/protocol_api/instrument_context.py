@@ -1828,6 +1828,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
@@ -1955,6 +1956,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
@@ -2091,6 +2093,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
