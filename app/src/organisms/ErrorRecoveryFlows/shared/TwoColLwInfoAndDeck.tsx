@@ -243,10 +243,16 @@ export function TwoColLwInfoAndDeck(
                 )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
                       {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
+                        <LabwareRender
+                          definition={labwareDef}
+                          positioningMode="passThrough"
+                        />
                       ) : null}
                     </g>
                   ))}
