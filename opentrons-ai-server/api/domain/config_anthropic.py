@@ -370,10 +370,8 @@ Format your response exactly like this:
 <relevant_files>
 docs/v2/new_modules.rst,
 docs/v2/new_pipette.rst,
-docs/v2/index.rst
-src/opentrons/protocol_api/_parameter_context.py
-
-
+docs/v2/index.rst,
+docs/v2/example_protocols/dilution_tutorial_flex.py
 </relevant_files>
 
 Important: Use the exact file paths as shown in the documentation structure, separated by commas.
