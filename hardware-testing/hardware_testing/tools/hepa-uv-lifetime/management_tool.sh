@@ -3,14 +3,14 @@
 # This script gathers logs from Flex units running the hepa_uv_lifetime_test.py script
 
 DEFAULT_IPS=(
-    "10.14.19.49
-     10.14.19.50
-     10.14.19.51
-     10.14.19.52
+    "10.14.19.200
+     10.14.19.201
+     10.14.19.249
+     10.14.19.250
      10.14.19.230
      10.14.19.232
-     10.14.19.48
-     10.14.19.47"
+     10.14.19.253
+     10.14.19.254"
 )
 
 instructions() {
