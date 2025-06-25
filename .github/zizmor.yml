@@ -19,6 +19,32 @@ rules:
         octokit/*: ref-pin
         slackapi/*: ref-pin
 
+  ref-confusion:
+    # todo(mm, 2025-06-24):
+    # codecov/codecov-action@v3 the branch overlaps with codecov/codecov-action@v3 the
+    # tag. For some reason, I can only ignore that violation globally here, not locally
+    # with `# zizmor: ignore` comments. We should upgrade to one of the newer
+    # codecov-action refs, which do not have the overlapping problem, and then remove
+    # these overrides.
+    ignore:
+      - hardware-testing.yaml
+      - opentrons-ai-client-test.yaml
+      - app-test-build-deploy.yaml
+      - shared-data-test-lint-deploy.yaml
+      - server-utils-lint-test.yaml
+      - g-code-testing-lint-test.yaml
+      - hardware-lint-test.yaml
+      - robot-server-lint-test.yaml
+      - system-server-lint-test.yaml
+      - step-generation-test.yaml
+      - ll-test-build-deploy.yaml
+      - usb-bridge-lint-test.yaml
+      - components-test-build-deploy.yaml
+      - pd-test-build-deploy.yaml
+      - react-api-client-test.yaml
+      - update-server-lint-test.yaml
+      - api-test-lint-deploy.yaml
+
   excessive-permissions:
     # todo(mm, 2025-06-24): These workflows leave their permissions at the default, which is usually way broader than what we need.
     # https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
