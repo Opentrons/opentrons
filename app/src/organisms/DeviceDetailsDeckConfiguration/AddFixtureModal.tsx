@@ -33,6 +33,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 import { getOptions } from './utils'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
   AddressableAreaNamesWithFakes,
@@ -42,7 +43,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { AttachedModule } from '@opentrons/api-client'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000
@@ -193,7 +193,7 @@ export function AddFixtureModal({
         null
       if (module !== null) {
         sendIdentifyStacker(module, false)
-        if (identifyTimeout !== null){
+        if (identifyTimeout !== null) {
           clearTimeout(identifyTimeout)
         }
       }
@@ -201,29 +201,33 @@ export function AddFixtureModal({
     updateDeckConfiguration(newDeckConfig)
     closeModal()
   }
-  
+
   const stackerIdentifyHandler = (module: AttachedModule): void => {
-      // Identify the stacker module
-      sendIdentifyStacker(module, true, 'blue')
-      // Ensure that the module reverts after a set time
-      setIdentifyInUse(module.serialNumber)
-      const timeoutID = setTimeout(() => {
-        sendIdentifyStacker(module, false)
-        setIdentifyInUse(null)
-      }, MODULE_IDENTIFY_TIME_MS)
-      setTimeoutID(timeoutID)
+    // Identify the stacker module
+    sendIdentifyStacker(module, true, 'blue')
+    // Ensure that the module reverts after a set time
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
   }
-  
+
   const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
-    const module = unconfiguredMods.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+    const module =
+      unconfiguredMods.find(m => m.serialNumber === fixtureSerialNumber) ?? null
     if (identifyInUse === null && module !== null) {
-     stackerIdentifyHandler(module)
-    }
-    else if (identifyInUse !== fixtureSerialNumber && identifyInUse !== null){
-      const previousModule = unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
-      if (previousModule !== null && module !== null){
+      stackerIdentifyHandler(module)
+    } else if (
+      identifyInUse !== fixtureSerialNumber &&
+      identifyInUse !== null
+    ) {
+      const previousModule =
+        unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
+      if (previousModule !== null && module !== null) {
         sendIdentifyStacker(previousModule, false)
-        if (identifyTimeout !== null){
+        if (identifyTimeout !== null) {
           clearTimeout(identifyTimeout)
         }
         stackerIdentifyHandler(module)
