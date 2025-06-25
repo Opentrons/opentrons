@@ -423,16 +423,11 @@ def shake_and_read_plate(
         dest_wells_by_volume[vol] = [entry.well_name for entry in dest_wells_by_volume[vol]]
     for vol, wells in dest_wells_by_volume.items():
         values = [result.get(well, 0.0) for well in wells]
+        ctx.comment(str(wells))
         mean = np.mean(values)
         std = np.std(values)
         cv = (std / mean * 100) if mean != 0 else None
-        cv_results[int(vol)] = cv
-    for volume, cv in cv_results.items():
-        if cv is not None:
-            comment_str = f"Volume: {volume} ul -- CV: {cv:.2f}%"
-        else:
-            comment_str = f"Volume: {volume} ul -- CV: N/A"
-        ctx.comment(comment_str)
+        ctx.comment(f"Volume {vol} ul | Mean {mean} | std {std} | CV {cv}")
 
     # ADD TO STACK
     plate_in_stack: Optional[Labware] = ctx.deck[SLOTS["stack_end"]]
