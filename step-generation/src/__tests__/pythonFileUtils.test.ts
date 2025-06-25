@@ -127,6 +127,7 @@ const labwareId2 = 'labwareId2'
 const labwareId3 = 'labwareId3'
 const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
+const labwareId6 = 'labwareId6'
 
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
@@ -159,6 +160,16 @@ const mockLabwareEntities: LabwareEntities = {
     def: fixture96Plate as LabwareDefinition2,
     pythonName: 'well_plate_3',
   },
+  [labwareId6]: {
+    id: labwareId6,
+    labwareDefURI: 'opentrons/mock_lid/1',
+    def: {
+      ...opentrons96Plate,
+      allowedRoles: ['lid'],
+      parameters: { loadName: 'mock_lid' } as any,
+    },
+    pythonName: 'lid_1',
+  },
 }
 
 const labwareRobotState: TimelineFrame['labware'] = {
@@ -172,6 +183,8 @@ const labwareRobotState: TimelineFrame['labware'] = {
   [labwareId4]: { stack: [labwareId4, moduleId3, 'A2'] },
   //  labware on a slot
   [labwareId5]: { stack: [labwareId5, 'C2'] },
+  // lid on labware
+  [labwareId6]: { stack: [labwareId6, labwareId3, labwareId2, 'B2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -223,7 +236,7 @@ adapter_2 = protocol.load_adapter_from_definition(
 })
 
 describe('getLoadLabware', () => {
-  it('should generate loadLabware for 3 labware', () => {
+  it('should generate loadLabware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
         mockModuleEntities,
@@ -238,6 +251,7 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
+    lid="mock_lid",
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",

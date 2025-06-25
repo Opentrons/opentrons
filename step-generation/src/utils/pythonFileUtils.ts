@@ -167,12 +167,20 @@ export function getLoadLabware(
   labwareNicknamesById: Record<string, string>
 ): string {
   const labwareEntities = Object.values(allLabwareEntities).filter(
-    lw => !lw.def.allowedRoles?.includes('adapter')
+    lw =>
+      !lw.def.allowedRoles?.includes('adapter') &&
+      !lw.def.allowedRoles?.includes('lid')
+  )
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
   )
   const pythonLabware = Object.values(labwareEntities)
     .map(labware => {
       const { id, def, pythonName } = labware
       const { metadata, parameters, namespace } = def
+      const lidEntity = Object.values(lidEntities).find(
+        lid => labwareRobotState[lid.id].stack[1] === id
+      )
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -204,6 +212,9 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
+          ...(lidEntity != null
+            ? [`lid=${formatPyStr(lidEntity.def.parameters.loadName)}`]
+            : []),
           //  NOTE: temporarily removing version number
           //  until PD migrated labware defs to the latest version
           //  upon re-import
