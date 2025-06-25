@@ -167,6 +167,7 @@ export function AddFixtureModal({
       deckConfigWithAA,
       cutoutId
     )
+
     const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
       return (
         addedCutoutConfigsWithCombo.find(

@@ -1,6 +1,10 @@
 import isEqual from 'lodash/isEqual'
 
-import { WASTE_CHUTE_FIXTURES, WASTE_CHUTE_WITH_FAKE_FIXTURES } from '.'
+import {
+  FLEX_STACKER_FIXTURES,
+  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_WITH_FAKE_FIXTURES,
+} from '.'
 import {
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -1040,7 +1044,9 @@ export const replaceCutoutFixtureWithComboFixture = (
           const sn = matchedModule?.opentronsModuleSerialNumber
           return {
             ...aaCutoutItem,
-            cutoutFixtureId: fixtureId as CutoutFixtureId,
+            cutoutFixtureId: getReplacementFixtureForFakeFixture(
+              fixtureId as CutoutFixtureIdsWithFakes
+            ) as CutoutFixtureId,
             opentronsModuleSerialNumber:
               sn ?? aaCutoutItem.opentronsModuleSerialNumber,
           }
@@ -1104,4 +1110,16 @@ export const replaceCutoutFixtureRemove = (
     // Fallback if no match found
     return cutoutFixtureRemoved
   }
+}
+
+export const isFixtureInUsbModules = (fixtureId: CutoutFixtureId): boolean => {
+  const moduleFixturesWithoutMagBlock = Object.entries(
+    MODULE_FIXTURES_BY_MODEL
+  ).filter(([key, value]) => key !== MAGNETIC_BLOCK_V1)
+  return (
+    FLEX_STACKER_FIXTURES.includes(fixtureId) ||
+    Object.values(moduleFixturesWithoutMagBlock).some(fixtures =>
+      fixtures?.includes(fixtureId)
+    )
+  )
 }
