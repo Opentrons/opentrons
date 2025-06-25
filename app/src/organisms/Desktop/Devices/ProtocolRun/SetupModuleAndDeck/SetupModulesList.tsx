@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 
-import { CommandData } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -59,6 +58,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   DeckDefinition,
