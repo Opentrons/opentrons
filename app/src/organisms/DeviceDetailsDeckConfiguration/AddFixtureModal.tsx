@@ -42,7 +42,7 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { AttachedModule } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000
