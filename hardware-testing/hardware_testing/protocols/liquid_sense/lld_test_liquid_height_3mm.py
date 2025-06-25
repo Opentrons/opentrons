@@ -416,6 +416,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
     wells: List[Well],
     liquid_pipette_probe_every_time: bool,
     pause_to_check_well: bool,
+    vol_by_hand: float
 ) -> None:
     global _src_meniscus_height
     trial_counter = 0
@@ -436,7 +437,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
         if volume:
             commented_height = 0.0
             # transfer over and over until all volume is moved
-            if volume < 15650:
+            if volume < vol_by_hand:
                 need_to_transfer_per_ch = volume / liquid_pipette.channels
                 # set flow-rates
                 liquid_pipette.flow_rate.aspirate = min(
@@ -554,8 +555,9 @@ def run(
     channels_probe = probe_pipette.channels
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
+    vol_by_hand = 15650
     for i, volume in enumerate(volumes):
-        if volume < 15650:
+        if volume < vol_by_hand:
             volumes[i] = volume * 1.033
 
     total_test_wells = len(volumes) * num_trials
@@ -578,6 +580,7 @@ def run(
             wells=test_wells[:num_trials],
             liquid_pipette_probe_every_time=liquid_pipette_probe_every_time,
             pause_to_check_well=pause_to_check_well,
+            vol_by_hand=vol_by_hand
         )
         test_wells = test_wells[num_trials:]
         # test_tips_liquid = test_tips_liquid[num_trials:]
