@@ -347,13 +347,15 @@
     "cuboidalWell": {
       "sections": [
         {
-          "shape": "cuboidal",
-          "topXDimension": 17.2,
-          "topYDimension": 17.2,
-          "bottomXDimension": 16.5,
-          "bottomYDimension": 16.5,
+          "shape": "squaredcone",
+          "bottomCrossSection": "circular",
+          "circleDiameter": 16.4,
+          "rectangleXDimension": 17.2,
+          "rectangleYDimension": 17.2,
           "topHeight": 41,
-          "bottomHeight": 26.4
+          "bottomHeight": 26.4,
+          "xCount": 1,
+          "yCount": 1
         },
         {
           "shape": "conical",
