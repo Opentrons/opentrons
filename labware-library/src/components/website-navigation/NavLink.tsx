@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import cx from 'classnames'
 
 import styles from './styles.module.css'
 
@@ -13,10 +13,10 @@ export function NavLink(props: Props): JSX.Element {
     gtm: { category, label, action },
   } = props
   return (
-    <div className={clsx(styles.link_group, props.className)}>
+    <div className={cx(styles.link_group, props.className)}>
       <a
         href={props.url}
-        className={clsx(styles.link_title, { [styles.link_cta]: props.cta })}
+        className={cx(styles.link_title, { [styles.link_cta]: props.cta })}
         target="_blank"
         rel="noopener noreferrer"
         data-gtm-category={category}
