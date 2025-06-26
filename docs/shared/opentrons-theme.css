@@ -11,6 +11,25 @@ code, pre {
   font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
+/* Headers */
+
+.md-typeset h1 {
+  font-weight: 700;
+  color: black;
+}
+
+.md-typeset h2 {
+  font-weight: 700;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+}
+
+.md-typeset h4 {
+  font-weight: 600;
+}
+
 /* Colors */
 
 :root {
