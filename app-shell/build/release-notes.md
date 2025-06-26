@@ -12,7 +12,6 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 Welcome to the v8.5.0 release of the Opentrons App! This release features the ability to run protocols that use liquid classes to improve pipetting accuracy.
 
-
 ### New Features
 
 - The app now supports running protocols that use liquid class features in the Python API, including Opentrons-verified and custom liquid class definitions.
