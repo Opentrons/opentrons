@@ -106,8 +106,6 @@ _APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
     }
 )
 
-DEFAULT_LABWARE_VERSIONS = _APILEVEL_2_24_OT_DEFAULT_VERSIONS
-
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
@@ -181,10 +179,13 @@ def _get_default_version_for_standard_labware(
 ) -> int:
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
-    if api_version >= APIVersion(2, 24) and load_name in DEFAULT_LABWARE_VERSIONS:
-        return DEFAULT_LABWARE_VERSIONS[load_name]
+    if (
+        api_version >= APIVersion(2, 24)
+        and load_name in _APILEVEL_2_24_OT_DEFAULT_VERSIONS
+    ):
+        return _APILEVEL_2_24_OT_DEFAULT_VERSIONS[load_name]
     elif (
-        api_version == APIVersion(2, 23)
+        api_version >= APIVersion(2, 23)
         and load_name in _APILEVEL_2_23_OT_DEFAULT_VERSIONS
     ):
         return _APILEVEL_2_23_OT_DEFAULT_VERSIONS[load_name]
