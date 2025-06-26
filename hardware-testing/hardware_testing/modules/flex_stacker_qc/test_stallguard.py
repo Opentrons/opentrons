@@ -68,22 +68,7 @@ async def test_stallguard(
         except FlexStackerStallError:
             ui.print_info("Stall Detected")
             stall_detected = True
-
-        axis_reset = False
-        while not axis_reset:
-            try:
-                # Move the axis off the crash block before re-homing
-                await stacker.move_axis(
-                    test_axis,
-                    Direction.EXTEND,
-                    20,
-                    STACKER_MOTION_CONFIG[test_axis]["home"].move_params.max_speed,
-                    STACKER_MOTION_CONFIG[test_axis]["home"].move_params.acceleration,
-                    STACKER_MOTION_CONFIG[test_axis]["home"].run_current,
-                )
-                axis_reset = True
-            except FlexStackerStallError:
-                axis_reset = False
+            await stacker._driver.set_stallguard_threshold(test_axis, False, 0)
 
         await stacker.home_axis(test_axis, Direction.EXTEND)
 
@@ -134,7 +119,13 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             test_reset = True
         except FlexStackerStallError:
             # Double check if crash block was actually removed
-            await stacker.home_axis(StackerAxis.Z, Direction.EXTEND)
-            await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
+            await stacker._driver.set_stallguard_threshold(StackerAxis.Z, False, 0)
+            await stacker._driver.set_stallguard_threshold(StackerAxis.X, False, 0)
+            await stacker._driver.set_stallguard_threshold(
+                StackerAxis.Z, True, STALLGUARD_CONFIG[StackerAxis.Z].threshold
+            )
+            await stacker._driver.set_stallguard_threshold(
+                StackerAxis.X, True, STALLGUARD_CONFIG[StackerAxis.X].threshold
+            )
             if not stacker.is_simulated:
                 ui.get_user_ready("Remove the crash block from the stacker")
