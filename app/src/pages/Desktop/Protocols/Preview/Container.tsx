@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ViewportListRef } from 'react-viewport-list'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, RunTimeCommand } from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
   getResultingTimelineFrameFromRunCommands,
@@ -15,7 +15,7 @@ import { DeckView } from './DeckView'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-const SEC_PER_FRAME = 3000
+const SEC_PER_FRAME = 1000
 
 interface ContainerProps {
   analysis: ProtocolAnalysisOutput
@@ -29,7 +29,7 @@ export function Container(props: ContainerProps): JSX.Element {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
   const commandListRef = useRef<ViewportListRef>(null)
-
+  const [selectedCommand, setSelectedCommand] = useState<string | null>(null)
   const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
   const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
     commands
@@ -39,7 +39,7 @@ export function Container(props: ContainerProps): JSX.Element {
     invariantContextFromRunCommands
   )
   const handlePlayPause = (): void => {
-    setIsPlaying(!isPlaying)
+    setIsPlaying(prev => !prev)
   }
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export function Container(props: ContainerProps): JSX.Element {
         setCurrentCommandIndex={setCurrentCommandIndex}
         commandListRef={commandListRef}
         handlePlayPause={handlePlayPause}
+        isPlaying={isPlaying}
       />
       <div style={{ display: 'flex' }}>
         <DeckView
@@ -83,6 +84,7 @@ export function Container(props: ContainerProps): JSX.Element {
           analysis={analysis}
           currentCommandIndex={currentCommandIndex}
           groupedCommands={groupedCommands}
+          setSelectedCommand={setSelectedCommand}
         />
       </div>
     </>

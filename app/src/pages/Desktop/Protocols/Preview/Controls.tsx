@@ -13,6 +13,7 @@ interface ControlsProps {
   setCurrentCommandIndex: (value: SetStateAction<number>) => void
   commandListRef: RefObject<ViewportListRef>
   handlePlayPause: () => void
+  isPlaying: boolean
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -23,6 +24,7 @@ export function Controls(props: ControlsProps): JSX.Element {
     commandListRef,
     setCurrentCommandIndex,
     handlePlayPause,
+    isPlaying,
   } = props
 
   return (
@@ -56,7 +58,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               </button>
               <button className={styles.playButton} onClick={handlePlayPause}>
                 <Icon
-                  name="play-icon"
+                  name={isPlaying ? 'play-icon' : 'pause'}
                   width="21px"
                   height="24px"
                   color="white"

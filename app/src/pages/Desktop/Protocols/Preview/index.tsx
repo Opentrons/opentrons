@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
-import { Icon } from '@opentrons/components'
+import { COLORS, Icon } from '@opentrons/components'
 
 import {
   fetchProtocols,
@@ -36,9 +36,16 @@ export function Preview(): JSX.Element {
       groupedCommands={groupedCommands}
     />
   ) : (
-    <Icon size="8rem" name="ot-spinner" spin />
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+      }}
+    >
+      <Icon size="8rem" name="ot-spinner" spin color={COLORS.blue50} />
+    </div>
   )
-}
-{
-  /* <ProtocolTimelineScrubber analysis={storedProtocol.mostRecentAnalysis} /> */
 }

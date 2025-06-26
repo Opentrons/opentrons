@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -35,10 +35,16 @@ interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
   currentCommandIndex?: number
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
-  const { analysis, currentCommandIndex, groupedCommands } = props
+  const {
+    analysis,
+    currentCommandIndex,
+    groupedCommands,
+    setSelectedCommand,
+  } = props
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -81,15 +87,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      // maxHeight="82vh"
-      // flex="1 1 0"
       overflowY={OVERFLOW_AUTO}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        // marginY={SPACING.spacing16}
-        gridGap={SPACING.spacing4}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {groupedCommandsHighlightedInfo != null &&
         groupedCommandsHighlightedInfo.length > 0
           ? groupedCommandsHighlightedInfo.map((c, i) =>
@@ -102,6 +102,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   }
                   subCommands={c.subCommands}
                   allRunDefs={allRunDefs}
+                  setSelectedCommand={setSelectedCommand}
                 />
               ) : (
                 <IndividualCommand
@@ -110,6 +111,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   isHighlighted={c.isHighlighted}
                   analysis={analysis}
                   allRunDefs={allRunDefs}
+                  setSelectedCommand={setSelectedCommand}
                 />
               )
             )
@@ -120,6 +122,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 isHighlighted={i === currentCommandIndex}
                 analysis={analysis}
                 allRunDefs={allRunDefs}
+                setSelectedCommand={setSelectedCommand}
               />
             ))}
       </Flex>
@@ -132,9 +135,16 @@ interface AnnotatedGroupProps {
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
-  const { subCommands, annotationType, analysis, allRunDefs } = props
+  const {
+    subCommands,
+    annotationType,
+    analysis,
+    allRunDefs,
+    setSelectedCommand,
+  } = props
   const [isExpanded, setIsExpanded] = useState(false)
   return (
     <Flex
@@ -147,10 +157,10 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
       <Flex alignItems={ALIGN_CENTER} width="100%" flexDirection="column">
         <Flex
           alignItems={ALIGN_CENTER}
-          borderRadius={BORDERS.borderRadius4}
           paddingX="16px"
           width="100%"
           justifyContent="space-between"
+          borderBottom={`1px solid ${COLORS.grey30}`}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
             {annotationType}
@@ -161,7 +171,7 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             color={COLORS.black90}
           />
         </Flex>
-        <Divider />
+
         <Flex flexDirection="column" gridGap={SPACING.spacing4}>
           {isExpanded
             ? subCommands.map((c, i) => (
@@ -171,6 +181,7 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
                   analysis={analysis}
                   isHighlighted={c.isHighlighted}
                   allRunDefs={allRunDefs}
+                  setSelectedCommand={setSelectedCommand}
                 />
               ))
             : null}
@@ -185,17 +196,23 @@ interface IndividualCommandProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   isHighlighted: boolean
   allRunDefs: LabwareDefinition[]
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 function IndividualCommand({
   command,
   analysis,
   isHighlighted,
   allRunDefs,
+  setSelectedCommand,
 }: IndividualCommandProps): JSX.Element {
-  const backgroundColor = isHighlighted ? COLORS.blue30 : COLORS.grey20
-  const iconColor = isHighlighted ? COLORS.blue60 : COLORS.grey50
+  const backgroundColor = isHighlighted ? COLORS.purple30 : COLORS.grey20
+  const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
   return (
-    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8} paddingX="16px">
+    <Flex
+      alignItems={ALIGN_CENTER}
+      gridGap={SPACING.spacing8}
+      padding="0px 16px"
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
@@ -208,6 +225,9 @@ function IndividualCommand({
           transition: background-color 500ms ease-out,
             border-color 500ms ease-out;
         `}
+        onClick={() => {
+          setSelectedCommand?.(command.id)
+        }}
       >
         <Flex
           key={command.id}

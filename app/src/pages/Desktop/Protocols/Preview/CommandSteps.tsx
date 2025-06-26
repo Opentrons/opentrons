@@ -1,4 +1,4 @@
-import { RefObject } from 'react'
+import { Dispatch, RefObject, SetStateAction } from 'react'
 import ViewportList, { ViewportListRef } from 'react-viewport-list'
 
 import {
@@ -19,10 +19,16 @@ interface CommandStepsProps {
   //   commands: RunTimeCommand[]
   groupedCommands: GroupedCommands | null
   analysis: ProtocolAnalysisOutput
+  setSelectedCommand: Dispatch<SetStateAction<string | null>>
   currentCommandIndex: number | undefined
 }
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
-  const { currentCommandIndex, groupedCommands, analysis } = props
+  const {
+    currentCommandIndex,
+    groupedCommands,
+    analysis,
+    setSelectedCommand,
+  } = props
   const commandLength = analysis.commands.length
   console.log(commandLength, currentCommandIndex)
   const percentComplete =
@@ -84,6 +90,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
           currentCommandIndex={currentCommandIndex}
           analysis={analysis}
           groupedCommands={groupedCommands}
+          setSelectedCommand={setSelectedCommand}
         />
       </div>
     </div>
