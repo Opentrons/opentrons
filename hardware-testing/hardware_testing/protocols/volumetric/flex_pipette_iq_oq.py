@@ -24,6 +24,8 @@ requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
     f"api level: {requirements['apiLevel']}"
 
+READER_ABSORBANCE = 450
+
 # TODO: (sigler) test using Buonoy at low volumes
 DYE_READER_IDEAL_UL = 200.0
 DYE_SHAKER_MAX_UL = 250.0
@@ -87,8 +89,8 @@ CRITICAL_UL_BY_LABWARE = {
 VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_filtertiprack_50ul": [1, 10, 50],
     "opentrons_flex_96_tiprack_50ul": [1, 10, 50],
-    "opentrons_flex_96_filtertiprack_200ul": [5, 50, 200],
-    "opentrons_flex_96_tiprack_200ul": [5, 50, 200],
+    "opentrons_flex_96_filtertiprack_200ul": [200, 200, 200],
+    "opentrons_flex_96_tiprack_200ul": [200, 200, 200],
     "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
     "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
 }
@@ -149,7 +151,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_str(
         display_name="tips",
         variable_name="tips",
-        default=_racks[0],
+        default=_racks[1],
         choices=[
             {"display_name": r.replace("opentrons_flex_96_", ""), "value": r}
             for r in _racks
@@ -418,16 +420,14 @@ def shake_and_read_plate(
     reader.open_lid()
     ctx.move_labware(plate, new_location=reader, use_gripper=True)
     reader.close_lid()
-    result = reader.read(
+    result: Dict[str, float] = reader.read(
         export_filename=f"{filename}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
-    )
+    )[READER_ABSORBANCE]
     reader.open_lid()
+
     # CALCULATE CV
-    cv_results = {}
-    for vol in dest_wells_by_volume:
-        dest_wells_by_volume[vol] = [entry.well_name for entry in dest_wells_by_volume[vol]]
     for vol, wells in dest_wells_by_volume.items():
-        values = [result.get(well, 0.0) for well in wells]
+        values = [result.get(well.well_name, 0.0) for well in wells]
         ctx.comment(str(wells))
         mean = np.mean(values)
         std = np.std(values)
@@ -460,7 +460,7 @@ def run(ctx: ProtocolContext) -> None:
     if not ctx.params.use_artel:
         plate_reader = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
         plate_reader.close_lid()
-        plate_reader.initialize(mode="single", wavelengths=[450])
+        plate_reader.initialize(mode="single", wavelengths=[READER_ABSORBANCE])
 
     # LOAD PIPETTES
     test_pip = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
@@ -494,18 +494,16 @@ def run(ctx: ProtocolContext) -> None:
         ctx, test_pip, reservoirs_dye, volumes, tip_ul
     )
     load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
-    diluent_class = ctx.get_liquid_class("water")
     test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # ENABLE LIQUID-MENISCUS PIPETTING
     if ctx.params.pipette_at_liquid_meniscus:
-        for base_class in [diluent_class, test_class]:
-            _cls = base_class.get_for(test_pip, test_pip.tip_racks[0])
-            _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
-            _cls.aspirate.aspirate_position.offset.z = -1.5
-            _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
-            is_eth = bool("ethanol" in base_class.name.lower() or "volatile" in base_class.name.lower())
-            _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
+        _cls = test_class.get_for(test_pip, test_pip.tip_racks[0])
+        _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+        _cls.aspirate.aspirate_position.offset.z = -1.5
+        _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
+        is_eth = bool("ethanol" in test_class.name.lower() or "volatile" in test_class.name.lower())
+        _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
@@ -529,7 +527,7 @@ def run(ctx: ProtocolContext) -> None:
         plate = None
         ul_in_this_plate = []
 
-    for ul in volumes:
+    for ul_idx, ul in enumerate(volumes):
 
         dest_wells: List[Well] = dest_wells_by_volume[float(ul)]
 
@@ -578,7 +576,7 @@ def run(ctx: ProtocolContext) -> None:
                 pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
                 diluent_probed = True
             pip_for_dil.transfer_with_liquid_class(
-                diluent_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
+                test_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
             if pip_for_dil.channels == 96:
                 pip_for_dil.return_tip()
@@ -640,5 +638,5 @@ def run(ctx: ProtocolContext) -> None:
             _transfer()
 
         # SHAKE/READ the FINAL PLATE
-        if ul == volumes[-1]:
+        if ul_idx == len(volumes) - 1:
             _on_plate_done()
