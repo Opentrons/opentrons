@@ -26,6 +26,7 @@ import {
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  getVisualSlotIdFromAAId,
   isFixtureInUsbModules,
   replaceAAWithFakeAA,
   replaceCutoutFixtureRemove,
@@ -531,5 +532,17 @@ describe('isFixtureInModules', () => {
   it('should return false for mag block fixture', () => {
     const result = isFixtureInUsbModules(MAGNETIC_BLOCK_V1_FIXTURE)
     expect(result).toEqual(false)
+  })
+})
+
+describe('getVisualSlotIdFromAAId', () => {
+  it('should get VSD4 for flexStackerModuleV1D4', () => {
+    const vs = getVisualSlotIdFromAAId('flexStackerModuleV1D4')
+    expect(vs).toEqual('VSD4')
+  })
+
+  it('should get VSD3 for D3', () => {
+    const vs = getVisualSlotIdFromAAId('D3')
+    expect(vs).toEqual('VSD3')
   })
 })
