@@ -30,6 +30,8 @@ export const ACTIONS = {
   SET_FLOW_RATE: 'SET_FLOW_RATE',
   SET_LIQUID_CLASS: 'SET_LIQUID_CLASS',
   SET_PUSH_OUT: 'SET_PUSH_OUT',
+  SET_CONDITION_ASPIRATE: 'SET_CONDITION_ASPIRATE',
+  SET_DISPOSAL_VOLUME_DISPENSE: 'SET_DISPOSAL_VOLUME_DISPENSE',
 } as const
 
 export const DISTRIBUTE = 'distribute'
@@ -220,6 +222,7 @@ export const ASPIRATE_SETTING_OPTIONS = {
   ASPIRATE_AIR_GAP: 'aspirate_air_gap',
   ASPIRATE_SUBMERGE: 'aspirate_submerge',
   ASPIRATE_RETRACT: 'aspirate_retract',
+  ASPIRATE_CONDITION: 'aspirate_condition',
 } as const
 
 export const DISPENSE_SETTING_OPTIONS = {
@@ -233,4 +236,5 @@ export const DISPENSE_SETTING_OPTIONS = {
   DISPENSE_SUBMERGE: 'dispense_submerge',
   DISPENSE_RETRACT: 'dispense_retract',
   DISPENSE_PUSH_OUT: 'dispense_push_out',
+  DISPENSE_DISPOSAL_VOLUME: 'dispense_disposal_volume',
 } as const

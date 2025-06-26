@@ -651,8 +651,7 @@ class LegacyCommandMapper:
         )
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
-
-        succeeded_command = pe_commands.LoadLabware.model_construct(
+        succeeded_command = pe_commands.LoadLabware(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,

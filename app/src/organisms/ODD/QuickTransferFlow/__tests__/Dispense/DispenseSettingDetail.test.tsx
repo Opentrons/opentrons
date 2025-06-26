@@ -7,6 +7,7 @@ import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
 import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
 import { BlowOut } from '../../QuickTransferAdvancedSettings/BlowOut'
 import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
+import { DisposalVolume } from '../../QuickTransferAdvancedSettings/DisposalVolume'
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
 import { TipPositionEntry } from '../../QuickTransferAdvancedSettings/TipPosition'
@@ -21,6 +22,7 @@ vi.mock('../../QuickTransferAdvancedSettings/Delay')
 vi.mock('../../QuickTransferAdvancedSettings/TouchTip')
 vi.mock('../../QuickTransferAdvancedSettings/AirGap')
 vi.mock('../../QuickTransferAdvancedSettings/BlowOut')
+vi.mock('../../QuickTransferAdvancedSettings/DisposalVolume')
 
 const render = (props: ComponentProps<typeof DispenseSettingDetail>) => {
   return renderWithProviders(<DispenseSettingDetail {...props} />)
@@ -34,6 +36,7 @@ describe('DispenseSettingDetail', () => {
       state: {} as any,
       dispatch: vi.fn(),
       onBack: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(FlowRateEntry).mockReturnValue(<div>mock FlowRateEntry</div>)
     vi.mocked(TipPositionEntry).mockReturnValue(
@@ -44,6 +47,7 @@ describe('DispenseSettingDetail', () => {
     vi.mocked(TouchTip).mockReturnValue(<div>mock TouchTip</div>)
     vi.mocked(AirGap).mockReturnValue(<div>mock AirGap</div>)
     vi.mocked(BlowOut).mockReturnValue(<div>mock BlowOut</div>)
+    vi.mocked(DisposalVolume).mockReturnValue(<div>mock DisposalVolume</div>)
   })
 
   it('renders the correct setting option flow rate entry', () => {
@@ -85,5 +89,12 @@ describe('DispenseSettingDetail', () => {
     props.selectedSetting = 'dispense_blow_out'
     render(props)
     screen.getByText('mock BlowOut')
+  })
+
+  it('renders the correct setting option blow out entry', () => {
+    props.isMultiTransfer = true
+    props.selectedSetting = 'dispense_disposal_volume'
+    render(props)
+    screen.getByText('mock DisposalVolume')
   })
 })

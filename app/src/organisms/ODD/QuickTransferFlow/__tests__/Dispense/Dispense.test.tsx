@@ -84,6 +84,7 @@ describe('Dispense', () => {
         },
       } as any,
       dispatch: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(DispenseSettingItem).mockReturnValue(
       <div>mock DispenseSettingItem</div>
@@ -98,7 +99,7 @@ describe('Dispense', () => {
 
   it('renders mock components and reset button', () => {
     render(props)
-    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(10)
+    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(11)
     screen.getByText('mock DispenseSettingDetail')
     screen.getByRole('button', { name: 'Reset dispense settings' })
   })

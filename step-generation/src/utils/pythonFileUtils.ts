@@ -37,11 +37,7 @@ const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/a
 export const PD_APPLICATION_VERSION = '8.5.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
-  return [
-    'import json',
-    'from contextlib import nullcontext as pd_step',
-    'from opentrons import protocol_api, types',
-  ].join('\n')
+  return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
