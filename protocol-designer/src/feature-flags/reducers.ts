@@ -31,8 +31,6 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:
     process.env.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,
   OT_PD_ENABLE_REACT_SCAN: process.env.OT_PD_ENABLE_REACT_SCAN === '1' || false,
-  OT_PD_ENABLE_LIQUID_CLASSES:
-    process.env.OT_PD_ENABLE_LIQUID_CLASSES === '1' || false,
   OT_PD_ENABLE_MULTIPLE_TEMPS_OT2:
     process.env.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 === '1' || false,
   OT_PD_ENABLE_TIMELINE_SCRUBBER:

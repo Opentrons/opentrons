@@ -2494,6 +2494,8 @@ def test_transfer_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -2551,6 +2553,8 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -2601,6 +2605,8 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -2751,7 +2757,7 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -2761,7 +2767,7 @@ def test_distribute_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -2825,6 +2831,8 @@ def test_distribute_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -2890,6 +2898,8 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -3033,7 +3043,7 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -3043,7 +3053,7 @@ def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source" or "always"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -3108,6 +3118,8 @@ def test_consolidate_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -3174,6 +3186,8 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )
 
@@ -3225,5 +3239,7 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+            last_tip_location=None,
         )
     )

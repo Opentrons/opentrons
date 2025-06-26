@@ -7,10 +7,14 @@ from contextlib import nullcontext as does_not_raise
 
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import ProtocolEngineError
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
 )
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
+from opentrons.protocol_engine.errors import (
+    LiquidHeightUnknownError,
+    IncompleteLabwareDefinitionError,
+)
 from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.labware import Well, Labware
@@ -144,75 +148,6 @@ def mock_384_well_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.mark.parametrize(
-    argnames=[
-        "pip_location",
-        "well_location",
-        "location_descriptors",
-        "expected_raise",
-    ],
-    argvalues=[
-        (
-            Location(point=Point(4, 5, 6), labware=None),
-            Location(point=Point(1, 1, 1), labware=None),
-            LocationCheckDescriptors(
-                location_type="submerge start",
-                pipetting_action="aspirate",
-            ),
-            does_not_raise(),
-        ),
-        (
-            Location(point=Point(4, 5, 6), labware=None),
-            Location(point=Point(5, 6, 7), labware=None),
-            LocationCheckDescriptors(
-                location_type="submerge start",
-                pipetting_action="aspirate",
-            ),
-            pytest.raises(
-                RuntimeError,
-                match="Received submerge start location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, meniscus_tracking=None\\)"
-                " and aspirate location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, meniscus_tracking=None\\)."
-                " Submerge start location z should not be lower than the aspirate location z.",
-            ),
-        ),
-        (
-            Location(point=Point(4, 5, 6), labware=None),
-            Location(point=Point(5, 6, 7), labware=None),
-            LocationCheckDescriptors(
-                location_type="retract end",
-                pipetting_action="dispense",
-            ),
-            pytest.raises(
-                RuntimeError,
-                match="Received retract end location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, meniscus_tracking=None\\)"
-                " and dispense location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, meniscus_tracking=None\\)."
-                " Retract end location z should not be lower than the dispense location z.",
-            ),
-        ),
-    ],
-)
-def test_raise_only_if_pip_location_below_target(
-    decoy: Decoy,
-    pip_location: Location,
-    well_location: Location,
-    location_descriptors: LocationCheckDescriptors,
-    expected_raise: ContextManager[Any],
-) -> None:
-    """It should raise appropriately based on heights of given location and target location."""
-    well_core = decoy.mock(cls=WellCore)
-    logger = decoy.mock(cls=Logger)
-    decoy.when(well_core.current_liquid_height()).then_return(0)
-    decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
-    with expected_raise:
-        raise_if_location_inside_liquid(
-            location=pip_location,
-            well_location=well_location,
-            well_core=well_core,
-            location_check_descriptors=location_descriptors,
-            logger=logger,
-        )
-
-
-@pytest.mark.parametrize(
     argnames=["liquid_height", "pip_location", "well_bottom", "expected_raise"],
     argvalues=[
         (
@@ -259,7 +194,6 @@ def test_raise_only_if_pip_location_inside_liquid(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise an error if we have access to liquid height and pipette is in liquid."""
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
@@ -273,19 +207,21 @@ def test_raise_only_if_pip_location_inside_liquid(
     with expected_raise:
         raise_if_location_inside_liquid(
             location=pip_location,
-            well_location=well_location,
             well_core=well_core,
             location_check_descriptors=location_descriptors,
             logger=logger,
         )
 
 
+@pytest.mark.parametrize(
+    "error_raised", [LiquidHeightUnknownError(), IncompleteLabwareDefinitionError()]
+)
 def test_log_warning_if_pip_location_cannot_be_validated(
     decoy: Decoy,
+    error_raised: ProtocolEngineError,
 ) -> None:
     """It should log a warning if we don't have access to liquid height."""
     pip_location = Location(point=Point(1, 2, 3), labware=None)
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
@@ -293,21 +229,21 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     )
     logger = decoy.mock(cls=Logger)
 
-    decoy.when(well_core.current_liquid_height()).then_raise(LiquidHeightUnknownError())
+    decoy.when(well_core.current_liquid_height()).then_raise(error_raised)
     decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
     decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
     raise_if_location_inside_liquid(
         location=pip_location,
-        well_location=well_location,
         well_core=well_core,
         location_check_descriptors=location_descriptors,
         logger=logger,
     )
     decoy.verify(
-        logger.warning(
+        logger.info(
             "Could not verify height of liquid in well Well A1 of test_labware, either"
-            " because the liquid in this well has not been probed or because"
-            " liquid was not loaded in this well using `load_liquid`."
+            " because the liquid in this well has not been probed or"
+            " liquid was not loaded in this well using `load_liquid` or"
+            " inner geometry is not available for the target well."
             " Proceeding without verifying if retract end location is outside the liquid."
         )
     )

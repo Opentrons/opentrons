@@ -310,6 +310,7 @@ export type FlexFakeAddressableAreaName =
 export type FakeCutoutFixtureId =
   | 'fakeStagingAreaRightSlot'
   | 'fakeWasteChuteWithEmptySlot'
+  | 'fakeStagingSlotWithMagBlockV1'
 
 export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
@@ -589,6 +590,9 @@ export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
 export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' =
   'fakeWasteChuteWithEmptySlot'
 
+export const FAKE_STAGING_SLOT_WITH_MAG_BLOCK: 'fakeStagingSlotWithMagBlockV1' =
+  'fakeStagingSlotWithMagBlockV1'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -652,7 +656,7 @@ export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
 ]
 
-export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -664,6 +668,17 @@ export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_WITH_FAKE_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  // TODO (tz, 6-14-25): we need to remove this from our code base?
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
 ]
 
 export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [

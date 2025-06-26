@@ -3,6 +3,7 @@ import application from './application.json'
 import button from './button.json'
 import card from './card.json'
 import context_menu from './context_menu.json'
+import deck_configuration from './deck_configuration.json'
 import deck from './deck.json'
 import feature_flags from './feature_flags.json'
 import form from './form.json'
@@ -25,6 +26,7 @@ export const en = {
   card,
   context_menu,
   deck,
+  deck_configuration,
   feature_flags,
   form,
   liquids,

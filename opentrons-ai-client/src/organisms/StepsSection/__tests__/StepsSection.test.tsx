@@ -9,7 +9,7 @@ import { StepsSection } from '../../StepsSection'
 const TestFormProviderComponent = () => {
   const methods = useForm({
     defaultValues: {
-      steps: [''],
+      steps: '',
     },
   })
 
@@ -19,11 +19,7 @@ const TestFormProviderComponent = () => {
     <FormProvider {...methods}>
       <StepsSection />
 
-      {Array.isArray(steps) ? (
-        steps.map((step, index) => <p key={index}>{step}</p>)
-      ) : (
-        <p>{steps}</p>
-      )}
+      <p>{steps}</p>
 
       <p>{`form is ${methods.formState.isValid ? 'valid' : 'invalid'}`}</p>
     </FormProvider>
@@ -45,75 +41,36 @@ describe('StepsSection', () => {
         'Give step-by-step instructions on how to handle liquids, with quantities in microliters (uL) and exact source and destination locations within labware. Always err on the side of providing extra information!'
       )
     ).toBeInTheDocument()
-    expect(screen.getByText('Add individual steps')).toBeInTheDocument()
-    expect(screen.getByText('Paste from document')).toBeInTheDocument()
-  })
-
-  it('should render the Add individual steps part', () => {
-    render()
-
-    expect(screen.getByText('Add individual steps')).toBeInTheDocument()
-    expect(screen.getByText('Add step')).toBeInTheDocument()
-    expect(screen.getByText('Step 1')).toBeInTheDocument()
     expect(screen.getByRole('textbox')).toBeInTheDocument()
+    expect(screen.getByText('Example:')).toBeInTheDocument()
   })
 
-  it('should render the Paste from document part', () => {
+  it('should render example text', () => {
     render()
 
-    fireEvent.click(screen.getByText('Paste from document'))
-
+    expect(screen.getByText('Example:')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Paste the steps from your document. Make sure your steps are clearly numbered.'
+        'Use right pipette to transfer 15 uL of mastermix from source well to destination well. Use the same pipette tip for all transfers.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Use left pipette to transfer 10 ul of sample from the source to destination well. Mix the sample and mastermix of 25 ul total volume 9 times. Blow out to `destination well`. Use a new tip for each transfer.'
+      )
+    ).toBeInTheDocument()
   })
 
-  it('should add a step when the Add step button is clicked', () => {
+  it('should add step description when the text area is filled', () => {
     render()
 
-    fireEvent.click(screen.getByText('Add step'))
+    const textbox = screen.getByRole('textbox')
 
-    expect(screen.getByText('Step 2')).toBeInTheDocument()
-  })
-
-  it('should add step descriptions when the text area is filled', () => {
-    render()
-
-    fireEvent.change(screen.getByRole('textbox'), {
+    fireEvent.change(textbox, {
       target: { value: 'description test' },
     })
 
-    expect(screen.getByText('Step 1: description test')).toBeInTheDocument()
-  })
-
-  it('should add multiple step descriptions when the text area is filled multiple times', () => {
-    render()
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'description test' },
-    })
-    fireEvent.click(screen.getByText('Add step'))
-    fireEvent.change(screen.getAllByRole('textbox')[1], {
-      target: { value: 'description test 2' },
-    })
-
-    expect(screen.getByText('Step 1: description test')).toBeInTheDocument()
-    expect(screen.getByText('Step 2: description test 2')).toBeInTheDocument()
-  })
-
-  it('should add a step description when pasting from a document', () => {
-    render()
-
-    fireEvent.click(screen.getByText('Paste from document'))
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'description test' },
-    })
-
-    expect(screen.getAllByText('description test')[1]).toBeInTheDocument()
+    expect(textbox).toHaveValue('description test')
   })
 
   it('should update form state to valid when steps have been added', async () => {

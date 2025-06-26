@@ -448,7 +448,7 @@ const getSubmergeRetractFields = (args: {
     'airGapByVolume' in submergeRetractLookup &&
     !(liquidHandlingAction === 'aspirate' && isConditioningVolumeEnabled)
       ? getByVolumeField({
-          volume: volumes.airGap,
+          volume: volumes.airGap[liquidHandlingAction],
           byVolume: submergeRetractLookup.airGapByVolume,
           field: 'airGap',
           prefix: liquidHandlingAction,
@@ -772,7 +772,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   )
   const aspirateOffsetFields = getOffsetFields(aspirateOffset, 'aspirate')
   const aspirateFlowRateFields = getFlowRateFields(
-    byVolumeLookup.flowRateAspirate,
+    byVolumeLookup.flowRate.aspirate,
     aspirateFlowRateByVolume,
     'aspirate'
   )
@@ -787,7 +787,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   )
   const dispenseOffsetFields = getOffsetFields(dispenseOffset, 'dispense')
   const dispenseFlowRateFields = getFlowRateFields(
-    byVolumeLookup.flowRateDispense,
+    byVolumeLookup.flowRate.dispense,
     dispenseFlowRateByVolume,
     'dispense'
   )

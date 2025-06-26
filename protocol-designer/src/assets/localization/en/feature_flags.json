@@ -27,10 +27,6 @@
     "title": "Enable React Scan",
     "description": "Enable React Scan support for components rendering check"
   },
-  "OT_PD_ENABLE_LIQUID_CLASSES": {
-    "title": "Enable liquid classes",
-    "description": "Enable liquid classes support"
-  },
   "OT_PD_ENABLE_TIMELINE_SCRUBBER": {
     "title": "Enable timeline scrubber",
     "description": "See the protocol timeline visualization in overview"

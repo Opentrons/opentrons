@@ -9,7 +9,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from .utils import test_limit_switches_per_direction
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 
@@ -64,7 +64,7 @@ async def platform_is_removed(stacker: FlexStacker) -> bool:
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker._simulating and not await platform_is_removed(stacker):
+    if not stacker.is_simulated and not await platform_is_removed(stacker):
         print("FAILURE - Cannot start tests with platform on the carrier")
         return
 
@@ -72,7 +72,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )
 
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         ui.get_user_ready("Place the platform on the X carrier")
 
     await test_platform_sensors_for_direction(

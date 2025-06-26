@@ -110,7 +110,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace, version } = def
+      const { parameters, namespace } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -132,7 +132,10 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -164,12 +167,20 @@ export function getLoadLabware(
   labwareNicknamesById: Record<string, string>
 ): string {
   const labwareEntities = Object.values(allLabwareEntities).filter(
-    lw => !lw.def.allowedRoles?.includes('adapter')
+    lw =>
+      !lw.def.allowedRoles?.includes('adapter') &&
+      !lw.def.allowedRoles?.includes('lid')
+  )
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
   )
   const pythonLabware = Object.values(labwareEntities)
     .map(labware => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace, version } = def
+      const { metadata, parameters, namespace } = def
+      const lidEntity = Object.values(lidEntities).find(
+        lid => labwareRobotState[lid.id].stack[1] === id
+      )
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -201,7 +212,13 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          `version=${version}`,
+          ...(lidEntity != null
+            ? [`lid=${formatPyStr(lidEntity.def.parameters.loadName)}`]
+            : []),
+          //  NOTE: temporarily removing version number
+          //  until PD migrated labware defs to the latest version
+          //  upon re-import
+          // `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_labware(\n` +

@@ -236,6 +236,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
   touchTipMmFromTop?: number
   touchTipMmFromEdge?: number
   touchTipSpeed?: number
+  isRetractSafeForAirGap?: boolean
 }) => {
   const {
     volume,
@@ -263,6 +264,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
     touchTipMmFromTop,
     touchTipMmFromEdge,
     touchTipSpeed,
+    isRetractSafeForAirGap = false,
   } = submergeParams
   const mixCommands = []
   for (let i = 0; i < mixTimes; i++) {
@@ -492,24 +494,22 @@ export const aspirateHelperLiquidClass = (submergeParams: {
               speed: touchTipSpeed,
             },
           },
-          ...(aspirateAirGap > 0
-            ? [
-                {
-                  commandType: 'moveToWell',
-                  key: expect.any(String),
-                  params: {
-                    pipetteId: 'p300SingleId',
-                    labwareId: SOURCE_LABWARE,
-                    wellName,
-                    wellLocation: retractLocation,
-                  },
-                },
-              ]
-            : []),
         ]
       : []),
     ...(aspirateAirGap > 0
       ? [
+          {
+            commandType: 'moveToWell',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              labwareId: SOURCE_LABWARE,
+              wellName,
+              wellLocation: isRetractSafeForAirGap
+                ? retractLocation
+                : SAFE_MOVE_TO_WELL_LOCATION,
+            },
+          },
           {
             commandType: 'airGapInPlace',
             key: expect.any(String),
@@ -625,6 +625,7 @@ export const dispenseHelperLiquidClass = (params: {
   pushOut?: number
   shouldBlowoutInDestination?: boolean
   blowoutFlowRate?: number
+  isRetractSafeForAirGap?: boolean
 }) => {
   const {
     volume,
@@ -653,6 +654,7 @@ export const dispenseHelperLiquidClass = (params: {
     pushOut,
     shouldBlowoutInDestination = false,
     blowoutFlowRate,
+    isRetractSafeForAirGap = false,
   } = params
   const mixCommands = []
   for (let i = 0; i < mixTimes; i++) {
@@ -824,24 +826,22 @@ export const dispenseHelperLiquidClass = (params: {
               speed: touchTipSpeed,
             },
           },
-          ...(dispenseAirGap > 0
-            ? [
-                {
-                  commandType: 'moveToWell',
-                  key: expect.any(String),
-                  params: {
-                    pipetteId: 'p300SingleId',
-                    labwareId,
-                    wellName,
-                    wellLocation: retractLocation,
-                  },
-                },
-              ]
-            : []),
         ]
       : []),
     ...(dispenseAirGap > 0
       ? [
+          {
+            commandType: 'moveToWell',
+            key: expect.any(String),
+            params: {
+              pipetteId: 'p300SingleId',
+              labwareId,
+              wellName,
+              wellLocation: isRetractSafeForAirGap
+                ? retractLocation
+                : SAFE_MOVE_TO_WELL_LOCATION,
+            },
+          },
           {
             commandType: 'airGapInPlace',
             key: expect.any(String),

@@ -4,7 +4,10 @@ from __future__ import annotations
 from typing import Literal, Sequence, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass
 
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
+from opentrons.protocol_engine.errors import (
+    LiquidHeightUnknownError,
+    IncompleteLabwareDefinitionError,
+)
 from opentrons.protocol_engine.state._well_math import (
     wells_covered_by_pipette_configuration,
 )
@@ -25,28 +28,24 @@ class LocationCheckDescriptors:
 
 def raise_if_location_inside_liquid(
     location: Location,
-    well_location: Location,
     well_core: WellCore,
     location_check_descriptors: LocationCheckDescriptors,
     logger: Logger,
 ) -> None:
     """Raise an error if the location in question would be inside the liquid.
 
-    This checker will raise an error if:
-    - the location in question is below the target well location during aspirate/dispense or,
-    - if we can find the liquid height AND the location in question is below this height.
-      If we can't find the liquid height, then we simply log a warning and no error is raised.
+    This checker will raise an error if we can find the liquid height
+    AND the location in question is below this height.
+
+    If we can't find the liquid height, then we simply log the details and no error is raised.
     """
-    if location.point.z < well_location.point.z:
-        raise RuntimeError(
-            f"Received {location_check_descriptors.location_type} location of {location}"
-            f" and {location_check_descriptors.pipetting_action} location of {well_location}."
-            f" {location_check_descriptors.location_type.capitalize()} location z should not be lower"
-            f" than the {location_check_descriptors.pipetting_action} location z."
-        )
     try:
         liquid_height_from_bottom = well_core.current_liquid_height()
-    except LiquidHeightUnknownError:
+    except (IncompleteLabwareDefinitionError, LiquidHeightUnknownError):
+        # IncompleteLabwareDefinitionError is raised when there's no inner geometry
+        # defined for the well. So, we can't find the liquid height even if liquid volume is known.
+        # LiquidHeightUnknownError is raised when we don't have liquid volume info
+        # and no probing has been done either.
         liquid_height_from_bottom = None
     if isinstance(liquid_height_from_bottom, (int, float)):
         if liquid_height_from_bottom + well_core.get_bottom(0).z > location.point.z:
@@ -59,11 +58,12 @@ def raise_if_location_inside_liquid(
         # We could raise an error here but that would restrict the use of
         # liquid classes-based transfer to only when LPD is enabled or when liquids are
         # loaded in protocols using `load_liquid`. This can be quite restrictive
-        # so we will not raise but just log a warning.
-        logger.warning(
+        # so we will not raise but just log the details.
+        logger.info(
             f"Could not verify height of liquid in well {well_core.get_display_name()}, either"
-            f" because the liquid in this well has not been probed or because"
-            f" liquid was not loaded in this well using `load_liquid`."
+            f" because the liquid in this well has not been probed or"
+            f" liquid was not loaded in this well using `load_liquid` or"
+            f" inner geometry is not available for the target well."
             f" Proceeding without verifying if {location_check_descriptors.location_type}"
             f" location is outside the liquid."
         )

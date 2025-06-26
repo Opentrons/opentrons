@@ -30,8 +30,10 @@ import {
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 import { getOptions } from './utils'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
   AddressableAreaNamesWithFakes,
@@ -41,6 +43,9 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+
+const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
+const MODULE_IDENTIFY_TIME_MS = 10000
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -161,7 +166,14 @@ export function AddFixtureModal({
     )
   }
 
-  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
+  const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
+
+  const handleAddFixture = (
+    addedCutoutConfigs: CutoutConfigMap[],
+    fixtureSerialNumber?: string
+  ): void => {
     const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
       addedCutoutConfigs,
       deckConfigWithAA,
@@ -175,8 +187,52 @@ export function AddFixtureModal({
       )
     }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
 
+    if (fixtureSerialNumber) {
+      const module =
+        unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
+        null
+      if (module !== null) {
+        sendIdentifyStacker(module, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+      }
+    }
     updateDeckConfiguration(newDeckConfig)
     closeModal()
+  }
+
+  const stackerIdentifyHandler = (module: AttachedModule): void => {
+    // Identify the stacker module
+    sendIdentifyStacker(module, true, 'blue')
+    // Ensure that the module reverts after a set time
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
+  }
+
+  const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
+    const module =
+      unconfiguredMods.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+    if (identifyInUse === null && module !== null) {
+      stackerIdentifyHandler(module)
+    } else if (
+      identifyInUse !== fixtureSerialNumber &&
+      identifyInUse !== null
+    ) {
+      const previousModule =
+        unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
+      if (previousModule !== null && module !== null) {
+        sendIdentifyStacker(previousModule, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+        stackerIdentifyHandler(module)
+      }
+    }
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
@@ -188,20 +244,45 @@ export function AddFixtureModal({
         ? `${usbPort.port}.${usbPort.hubPort}`
         : usbPort?.port
 
-    return (
-      <FixtureOption
-        key={cutoutConfigs[0].cutoutFixtureId}
-        optionName={getFixtureDisplayName(
-          cutoutConfigs[0].cutoutFixtureId,
-          portDisplay
-        )}
-        buttonText={t('add')}
-        onClickHandler={() => {
-          handleAddFixture(cutoutConfigs)
-        }}
-        isOnDevice={isOnDevice}
-      />
-    )
+    const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
+    if (
+      fixtureSerialNumber !== undefined &&
+      cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)
+    ) {
+      return (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs, fixtureSerialNumber)
+          }}
+          secondaryButtonText={t('identify')}
+          secondaryOnClickHandler={() => {
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
+          isOnDevice={isOnDevice}
+        />
+      )
+    } else {
+      return (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs)
+          }}
+          isOnDevice={isOnDevice}
+        />
+      )
+    }
   })
 
   return (

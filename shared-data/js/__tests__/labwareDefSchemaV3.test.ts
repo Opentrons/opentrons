@@ -61,19 +61,30 @@ const checkExtents = (labwareDef: LabwareDefinition3): void => {
     expect(backLeftBottom.y).toBeGreaterThanOrEqual(frontRightTop.y)
     expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
   })
-  test('extents.footprint should be oriented correctly', () => {
-    const {
-      footprint: { backLeft, frontRight },
-    } = labwareDef.extents
-    expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
-    expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+  test('slotFootprintAsChild feature should be oriented correctly', () => {
+    if (labwareDef.features.slotFootprintAsChild) {
+      const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
+      expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+      expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+    }
   })
   test('extents.footprint should be contained inside extents.total', () => {
-    const { footprint, total } = labwareDef.extents
-    expect(footprint.backLeft.x).toBeGreaterThanOrEqual(total.backLeftBottom.x)
-    expect(footprint.backLeft.y).toBeLessThanOrEqual(total.backLeftBottom.y)
-    expect(footprint.frontRight.x).toBeLessThanOrEqual(total.frontRightTop.x)
-    expect(footprint.frontRight.y).toBeGreaterThanOrEqual(total.frontRightTop.y)
+    if (labwareDef.features.slotFootprintAsChild) {
+      const {
+        backLeft,
+        frontRight,
+        z,
+      } = labwareDef.features.slotFootprintAsChild
+      const {
+        total: { backLeftBottom, frontRightTop },
+      } = labwareDef.extents
+      expect(backLeft.x).toBeGreaterThanOrEqual(backLeftBottom.x)
+      expect(backLeft.y).toBeLessThanOrEqual(backLeftBottom.y)
+      expect(frontRight.x).toBeLessThanOrEqual(frontRightTop.x)
+      expect(frontRight.y).toBeGreaterThanOrEqual(frontRightTop.y)
+      expect(z).toBeGreaterThanOrEqual(backLeftBottom.z)
+      expect(z).toBeLessThanOrEqual(frontRightTop.z)
+    }
   })
 }
 
@@ -112,11 +123,18 @@ describe(`test labware definitions with schema v3`, () => {
   describe.each(allPaths)('%s', labwarePath => {
     const labwareDef = require(labwarePath) as LabwareDefinition3
 
-    test('extents properly use back-left bottom origin with quadrant IV coordinates', () => {
-      expect(labwareDef.extents.footprint.backLeft.x).toBe(0)
-      expect(labwareDef.extents.footprint.backLeft.y).toBe(0)
-      expect(labwareDef.extents.footprint.frontRight.x).toBeGreaterThan(0)
-      expect(labwareDef.extents.footprint.frontRight.y).toBeLessThan(0)
+    test('slotFootprintAsChild properly uses back-left bottom origin with quadrant IV coordinates', () => {
+      if (labwareDef.features.slotFootprintAsChild) {
+        const {
+          backLeft,
+          frontRight,
+        } = labwareDef.features.slotFootprintAsChild
+
+        expect(backLeft.x).toBe(0)
+        expect(backLeft.y).toBe(0)
+        expect(frontRight.x).toBeGreaterThan(0)
+        expect(frontRight.y).toBeLessThan(0)
+      }
     })
 
     test('all wells have quadrant IV coordinates', () => {

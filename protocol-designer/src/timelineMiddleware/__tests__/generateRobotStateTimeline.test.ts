@@ -292,10 +292,12 @@ describe('generateRobotStateTimeline', () => {
       // Step a:
       `
 mock_pipette.transfer_with_liquid_class(...)
+mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
 mock_pipette_p300_multi.transfer_with_liquid_class(...)
+mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `
