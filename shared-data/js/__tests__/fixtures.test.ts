@@ -20,12 +20,12 @@ import {
 } from '..'
 import {
   getAAComboFixtureDisplayName,
-  getAASlotIdForAA,
+  getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
-  getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
   isFixtureInUsbModules,
   replaceAAWithFakeAA,
@@ -40,12 +40,14 @@ vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
 }))
 
+const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+
 describe('getAAFromCutoutFixtureId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
     const result = getAAWithFakesFromCutoutFixtureId(
       'cutoutD3',
       'flexStackerModuleV1',
-      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+      deckDef
     )
 
     const expectedOrder = ['flexStackerModuleV1D4', 'D3']
@@ -56,7 +58,7 @@ describe('getAAFromCutoutFixtureId', () => {
     const result = getAAWithFakesFromCutoutFixtureId(
       'cutoutA1',
       'flexStackerModuleV1',
-      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+      deckDef
     )
 
     expect(result).toBeUndefined()
@@ -194,7 +196,7 @@ describe('getCutoutFixtureReplacementIfNeeded', () => {
     const result = getCutoutFixtureReplacementIfNeeded(
       SINGLE_RIGHT_SLOT_FIXTURE,
       'cutoutA3',
-      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+      deckDef
     )
 
     expect(result).toEqual(FAKE_STAGING_AREA_RIGHT_SLOT)
@@ -204,7 +206,7 @@ describe('getCutoutFixtureReplacementIfNeeded', () => {
     const result = getCutoutFixtureReplacementIfNeeded(
       STAGING_AREA_RIGHT_SLOT_FIXTURE,
       'cutoutB3',
-      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+      deckDef
     )
 
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
@@ -275,7 +277,10 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
 
 describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
   it('Should return a dic of fixtures and aa for cutoutA3', () => {
-    const cutoutA3Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutA3')
+    const cutoutA3Result = getAAsToFixtureIdFromDeckDefWithFakes(
+      'cutoutA3',
+      deckDef
+    )
 
     expect(cutoutA3Result).toEqual({
       singleRightSlot: ['A3'],
@@ -300,14 +305,18 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
   })
 
   it('Should return a dic of fixtures and aa for cutoutD3', () => {
-    const cutoutD3Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutD3')
+    const cutoutD3Result = getAAsToFixtureIdFromDeckDefWithFakes(
+      'cutoutD3',
+      deckDef
+    )
+    console.log('cutoutD3Result: ', cutoutD3Result)
     expect(cutoutD3Result).toEqual({
       absorbanceReaderV1: [
         'absorbanceReaderV1D3',
         'absorbanceReaderV1LidDockD4',
       ],
       fakeStagingAreaRightSlot: ['D3', 'fakeD4'],
-      fakeStagingSlotWithMagBlockV1: ['fakeD4', 'magneticBlockV1D3'],
+      fakeStagingSlotWithMagBlockV1: ['magneticBlockV1D3', 'fakeD4'],
       fakeWasteChuteWithEmptySlot: ['96ChannelWasteChute', 'fakeD4'],
       flexStackerModuleV1: ['D3', 'flexStackerModuleV1D4'],
       flexStackerModuleV1WithMagneticBlockV1: [
@@ -358,7 +367,10 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
     })
   })
   it('Should return a dic of fixtures and aa for cutoutA1', () => {
-    const cutoutA1Result = getFlexDeckDefAAByFixtureIdForCutoutId('cutoutA1')
+    const cutoutA1Result = getAAsToFixtureIdFromDeckDefWithFakes(
+      'cutoutA1',
+      deckDef
+    )
     expect(cutoutA1Result).toEqual({
       singleLeftSlot: ['A1'],
       trashBinAdapter: ['movableTrashA1'],
@@ -393,32 +405,32 @@ describe('getReplacementFixtureForFakeFixture', () => {
   })
 })
 
-describe('getAASlotNameForAA', () => {
-  it('should get aa name for single right slot', () => {
-    const result = getAASlotIdForAA(
+describe('getVisualSlotIdForAA', () => {
+  it('should get vs name for single right slot', () => {
+    const result = getVisualSlotIdForAA(
       'cutoutA3',
       FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
       'magneticBlockV1A3'
     )
-    expect(result).toEqual('A3')
+    expect(result).toEqual('VSA3')
   })
 
-  it('should return aa name for single center slot', () => {
-    const result = getAASlotIdForAA(
+  it('should return vs name for single center slot', () => {
+    const result = getVisualSlotIdForAA(
       'cutoutD1',
       TEMPERATURE_MODULE_V2_FIXTURE,
       'temperatureModuleV2D1'
     )
-    expect(result).toEqual('D1')
+    expect(result).toEqual('VSD1')
   })
 
-  it('should get input aa name for single center slot', () => {
-    const result = getAASlotIdForAA(
+  it('should get vs id for mag block in D2', () => {
+    const result = getVisualSlotIdForAA(
       'cutoutD2',
       MAGNETIC_BLOCK_V1_FIXTURE,
       'magneticBlockV1D2'
     )
-    expect(result).toEqual('D2')
+    expect(result).toEqual('VSD2')
   })
 })
 
@@ -461,7 +473,7 @@ describe('getAAFixtureDisplayName', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'flexStackerModuleV1D4',
-      getDeckDefFromRobotType('OT-3 Standard'),
+      deckDef,
       t,
       ''
     )
@@ -472,7 +484,7 @@ describe('getAAFixtureDisplayName', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'magneticBlockV1D3',
-      getDeckDefFromRobotType('OT-3 Standard'),
+      deckDef,
       t,
       'deck_configuration'
     )
@@ -483,7 +495,7 @@ describe('getAAFixtureDisplayName', () => {
     const name = getAAComboFixtureDisplayName(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'magneticBlockV1D3',
-      getDeckDefFromRobotType('OT-3 Standard'),
+      deckDef,
       t,
       'deck_configuration'
     )
@@ -494,7 +506,7 @@ describe('getAAFixtureDisplayName', () => {
     const name = getAAComboFixtureDisplayName(
       FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
       '96ChannelWasteChute',
-      getDeckDefFromRobotType('OT-3 Standard'),
+      deckDef,
       t,
       'deck_configuration'
     )
@@ -505,7 +517,7 @@ describe('getAAFixtureDisplayName', () => {
     const name = getAAComboFixtureDisplayName(
       MAGNETIC_BLOCK_V1_FIXTURE,
       'magneticBlockV1D3',
-      getDeckDefFromRobotType('OT-3 Standard'),
+      deckDef,
       t,
       'deck_configuration'
     )

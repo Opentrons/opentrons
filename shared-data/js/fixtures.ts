@@ -425,6 +425,7 @@ export const getReplacementFixtureForFixtureRemoval = (
       cutoutId,
       addressableAreaId
     )
+    console.log('cutoutFixtureReplacment; ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -855,101 +856,198 @@ export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   D3_ADDRESSABLE_AREA,
 ]
 
-export type VISUAL_SLOTS = 
-  'VSA1'
-| 'VSB1'
-| 'VSC1'
-| 'VSD1'
-| 'VSA2'
-| 'VSB2'
-| 'VSC2'
-| 'VSD2'
-| 'VSA3'
-| 'VSB3'
-| 'VSC3'
-| 'VSD3'
-| 'VSA4'
-| 'VSB4'
-| 'VSC4'
-| 'VSD4'
+export type VISUAL_SLOTS =
+  | 'VSA1'
+  | 'VSB1'
+  | 'VSC1'
+  | 'VSD1'
+  | 'VSA2'
+  | 'VSB2'
+  | 'VSC2'
+  | 'VSD2'
+  | 'VSA3'
+  | 'VSB3'
+  | 'VSC3'
+  | 'VSD3'
+  | 'VSA4'
+  | 'VSB4'
+  | 'VSC4'
+  | 'VSD4'
 
 export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
-  VSA1: ['A1', 'magneticBlockV1A1', 'temperatureModuleV2A1', 'heaterShakerV1A1', 'movableTrashA1'],
-  VSB1: ['B1', 'magneticBlockV1B1', 'temperatureModuleV2B1', 'heaterShakerV1B1', 'movableTrashB1'],
-  VSC1: ['C1', 'magneticBlockV1C1', 'temperatureModuleV2C1', 'heaterShakerV1C1', 'movableTrashC1'],
-  VSD1: ['D1', 'magneticBlockV1D1', 'temperatureModuleV2D1', 'heaterShakerV1D1', 'movableTrashD1'],
+  VSA1: [
+    'A1',
+    'magneticBlockV1A1',
+    'temperatureModuleV2A1',
+    'heaterShakerV1A1',
+    'movableTrashA1',
+  ],
+  VSB1: [
+    'B1',
+    'magneticBlockV1B1',
+    'temperatureModuleV2B1',
+    'heaterShakerV1B1',
+    'movableTrashB1',
+  ],
+  VSC1: [
+    'C1',
+    'magneticBlockV1C1',
+    'temperatureModuleV2C1',
+    'heaterShakerV1C1',
+    'movableTrashC1',
+  ],
+  VSD1: [
+    'D1',
+    'magneticBlockV1D1',
+    'temperatureModuleV2D1',
+    'heaterShakerV1D1',
+    'movableTrashD1',
+  ],
   VSA2: ['A2', 'magneticBlockV1A2'],
   VSB2: ['B2', 'magneticBlockV1B2'],
   VSC2: ['C2', 'magneticBlockV1C2'],
   VSD2: ['D2', 'magneticBlockV1D2'],
-  VSA3: ['A3', 'magneticBlockV1A3', 'temperatureModuleV2A3', 'heaterShakerV1A3', 'movableTrashA3'],
-  VSB3: ['B3', 'magneticBlockV1B3', 'temperatureModuleV2B3', 'heaterShakerV1B3', 'movableTrashB3'],
-  VSC3: ['C3', 'magneticBlockV1C3', 'temperatureModuleV2C3', 'heaterShakerV1C3', 'movableTrashC3'],
-  VSD3: ['D3', 'magneticBlockV1D3', 'temperatureModuleV2D3', 'heaterShakerV1D3', 'movableTrashD3', '96ChannelWasteChute', '1ChannelWasteChute', '8ChannelWasteChute', 'gripperWasteChute'],
+  VSA3: [
+    'A3',
+    'magneticBlockV1A3',
+    'temperatureModuleV2A3',
+    'heaterShakerV1A3',
+    'movableTrashA3',
+  ],
+  VSB3: [
+    'B3',
+    'magneticBlockV1B3',
+    'temperatureModuleV2B3',
+    'heaterShakerV1B3',
+    'movableTrashB3',
+  ],
+  VSC3: [
+    'C3',
+    'magneticBlockV1C3',
+    'temperatureModuleV2C3',
+    'heaterShakerV1C3',
+    'movableTrashC3',
+  ],
+  VSD3: [
+    'D3',
+    'magneticBlockV1D3',
+    'temperatureModuleV2D3',
+    'heaterShakerV1D3',
+    'movableTrashD3',
+    '96ChannelWasteChute',
+    '1ChannelWasteChute',
+    '8ChannelWasteChute',
+    'gripperWasteChute',
+  ],
   VSA4: ['fakeA4', 'flexStackerModuleV1A4'],
   VSB4: ['fakeB4', 'flexStackerModuleV1B4'],
   VSC4: ['fakeC4', 'flexStackerModuleV1C4'],
-  VSD4: ['fakeD4', 'flexStackerModuleV1D4']
+  VSD4: ['fakeD4', 'flexStackerModuleV1D4'],
 }
 
-export const getVisualSlotIdFromAAId = (aaId:AddressableAreaNamesWithFakes): string => {
-    const vsId = Object.entries(VS_TO_AA).find(([key, value]) => value.includes(aaId))?.[0]
-    return vsId as string // should always find a match
-} 
+export const getVisualSlotIdFromAAId = (
+  aaId: AddressableAreaNamesWithFakes
+): string => {
+  const vsId = Object.entries(VS_TO_AA).find(([key, value]) =>
+    value.includes(aaId)
+  )?.[0]
+  return vsId as string // should always find a match
+}
+
+export const getSingleSlotIdWithFakesFromVSId = (
+  vsId: string
+): AddressableAreaNamesWithFakes => {
+  switch (vsId) {
+    case 'VSA1':
+      return 'A1'
+    case 'VSB1':
+      return 'B1'
+    case 'VSC1':
+      return 'C1'
+    case 'VSD1':
+      return 'D1'
+    case 'VSA2':
+      return 'A2'
+    case 'VSB2':
+      return 'B2'
+    case 'VSC2':
+      return 'C2'
+    case 'VSD2':
+      return 'D2'
+    case 'VSA3':
+      return 'A3'
+    case 'VSB3':
+      return 'B3'
+    case 'VSC3':
+      return 'C3'
+    case 'VSD3':
+      return 'D3'
+    case 'VSA4':
+      return 'fakeA4'
+    case 'VSB4':
+      return 'fakeB4'
+    case 'VSC4':
+      return 'fakeC4'
+    case 'VSD4':
+      return 'fakeD4'
+    default:
+      console.error(`could not find a match for VS${vsId}`)
+  }
+}
 
 export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
-  // D4: 'fakeD4',
-  // C4: 'fakeC4',
-  // B4: 'fakeB4',
-  // A4: 'fakeA4',
-  // flexStackerModuleV1D4: 'fakeD4',
-  // flexStackerModuleV1C4: 'fakeC4',
-  // flexStackerModuleV1B4: 'fakeB4',
-  // flexStackerModuleV1A4: 'fakeA4',
-  // magneticBlockV1A3: 'A3',
-  // magneticBlockV1B3: 'B3',
-  // magneticBlockV1C3: 'C3',
-  // magneticBlockV1D3: 'D3',
-  // magneticBlockV1D2: 'D2',
-  // magneticBlockV1C2: 'C2',
-  // magneticBlockV1B2: 'B2',
-  // magneticBlockV1A2: 'A2',
-  // magneticBlockV1D1: 'D1',
-  // magneticBlockV1C1: 'C1',
-  // magneticBlockV1B1: 'B1',
-  // magneticBlockV1A1: 'A1',
-  // '1ChannelWasteChute': 'D3',
-  // '8ChannelWasteChute': 'D3',
-  // '96ChannelWasteChute': 'D3',
-  // gripperWasteChute: 'D3',
-  // temperatureModuleV2D3: 'D3',
-  // temperatureModuleV2C3: 'C3',
-  // temperatureModuleV2B3: 'B3',
-  // temperatureModuleV2A3: 'A3',
-  // temperatureModuleV2D2: 'D2',
-  // temperatureModuleV2C2: 'C2',
-  // temperatureModuleV2B2: 'B2',
-  // temperatureModuleV2A2: 'A2',
-  // temperatureModuleV2D1: 'D1',
-  // temperatureModuleV2C1: 'C1',
-  // temperatureModuleV2B1: 'B1',
-  // temperatureModuleV2A1: 'A1',
+  D4: 'fakeD4',
+  C4: 'fakeC4',
+  B4: 'fakeB4',
+  A4: 'fakeA4',
+  flexStackerModuleV1D4: 'fakeD4',
+  flexStackerModuleV1C4: 'fakeC4',
+  flexStackerModuleV1B4: 'fakeB4',
+  flexStackerModuleV1A4: 'fakeA4',
+  magneticBlockV1A3: 'A3',
+  magneticBlockV1B3: 'B3',
+  magneticBlockV1C3: 'C3',
+  magneticBlockV1D3: 'D3',
+  magneticBlockV1D2: 'D2',
+  magneticBlockV1C2: 'C2',
+  magneticBlockV1B2: 'B2',
+  magneticBlockV1A2: 'A2',
+  magneticBlockV1D1: 'D1',
+  magneticBlockV1C1: 'C1',
+  magneticBlockV1B1: 'B1',
+  magneticBlockV1A1: 'A1',
+  '1ChannelWasteChute': 'D3',
+  '8ChannelWasteChute': 'D3',
+  '96ChannelWasteChute': 'D3',
+  gripperWasteChute: 'D3',
+  temperatureModuleV2D3: 'D3',
+  temperatureModuleV2C3: 'C3',
+  temperatureModuleV2B3: 'B3',
+  temperatureModuleV2A3: 'A3',
+  temperatureModuleV2D2: 'D2',
+  temperatureModuleV2C2: 'C2',
+  temperatureModuleV2B2: 'B2',
+  temperatureModuleV2A2: 'A2',
+  temperatureModuleV2D1: 'D1',
+  temperatureModuleV2C1: 'C1',
+  temperatureModuleV2B1: 'B1',
+  temperatureModuleV2A1: 'A1',
   heaterShakerV1D3: 'D3',
   heaterShakerV1C3: 'C3',
   heaterShakerV1B3: 'B3',
-  // heaterShakerV1A3: 'A3',
-  // heaterShakerV1D1: 'D1',
-  // heaterShakerV1C1: 'C1',
-  // heaterShakerV1B1: 'B1',
-  // heaterShakerV1A1: 'A1',
+  heaterShakerV1A3: 'A3',
+  heaterShakerV1D1: 'D1',
+  heaterShakerV1C1: 'C1',
+  heaterShakerV1B1: 'B1',
+  heaterShakerV1A1: 'A1',
   movableTrashD3: 'D3',
   movableTrashC3: 'C3',
   movableTrashB3: 'B3',
   movableTrashA3: 'A3',
-  // movableTrashD1: 'D1',
-  // movableTrashC1: 'C1',
-  // movableTrashB1: 'B1',
-  // movableTrashA1: 'A1',
+  movableTrashD1: 'D1',
+  movableTrashC1: 'C1',
+  movableTrashB1: 'B1',
+  movableTrashA1: 'A1',
 }
 
 export const isAddressableAreaStandardSlot = (
@@ -967,10 +1065,10 @@ export const isAddressableAreaStandardSlot = (
  * @param cutoutId: cutout if we are adding a fixture to.
  * @returns key value pair of of all possibilities for fixture id and related AA
  */
-export const getFlexDeckDefAAByFixtureIdForCutoutId = (
-  cutoutId: CutoutId
+export const getAAsToFixtureIdFromDeckDefWithFakes = (
+  cutoutId: CutoutId,
+  deckDef: DeckDefinition
 ): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
   const deckDefWithFakes = getDeckDefWithFakes(deckDef)
   // replace staging area aaId to fake ones
   const availableCutoutFixtuers = deckDefWithFakes.cutoutFixtures.filter(cf =>
@@ -1000,15 +1098,20 @@ export const replaceAAWithFakeAA = (
   fixtureId: CutoutFixtureId,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): AddressableAreaNamesWithFakes | null => {
-  const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
-    cutoutId
+  const addressableAreasByFIxtureId = getAAsToFixtureIdFromDeckDefWithFakes(
+    cutoutId,
+    getDeckDefFromRobotType('OT-3 Standard')
   )
+  console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
+
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
     return aaListForFixtureId[0]
   } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
     return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
+    console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
+    console.log('aaListForFixtureId: ', aaListForFixtureId)
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       return aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
     })
@@ -1016,18 +1119,19 @@ export const replaceAAWithFakeAA = (
   }
 }
 
-export const getAASlotIdForAA = (
+export const getVisualSlotIdForAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): AddressableAreaNamesWithFakes => {
-  const addressableAreasByFIxtureId = getFlexDeckDefAAByFixtureIdForCutoutId(
-    cutoutId
+  const addressableAreasByFIxtureId = getAAsToFixtureIdFromDeckDefWithFakes(
+    cutoutId,
+    getDeckDefFromRobotType('OT-3 Standard')
   )
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   const aaMatchInDef = aaListForFixtureId.find(aa => aa === addressableAreaId)
   return aaMatchInDef
-    ? AA_TO_AA_SLOT[aaMatchInDef]
+    ? getVisualSlotIdFromAAId(aaMatchInDef)
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
@@ -1049,7 +1153,10 @@ export const replaceCutoutFixtureWithComboFixture = (
   deckConfigWithAA: CutoutConfigMap[],
   cutoutId: CutoutId
 ): CutoutConfigMap[] => {
-  const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
+  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
+    cutoutId,
+    getDeckDefFromRobotType('OT-3 Standard')
+  )
 
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
@@ -1116,13 +1223,17 @@ export const replaceCutoutFixtureRemove = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutFixtureIdsWithFakes => {
-  const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
+    cutoutId,
+    deckDef
+  )
   const aaForCutoutAndFixture = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
     cutoutFixtureRemoved,
     deckDef
   )
+  console.log('aaForCutoutAndFixture; ', aaForCutoutAndFixture)
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
       return cutoutFixtureRemoved ===
@@ -1135,9 +1246,12 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa =>
       aa === addressableAreaId
-        ? getAASlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
+        ? getSingleSlotIdWithFakesFromVSId(
+            getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
+          )
         : aa
     )
+    console.log('updated: ', updated)
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(
         value.sort(),
@@ -1146,7 +1260,7 @@ export const replaceCutoutFixtureRemove = (
           : updated?.sort()
       )
     )
-
+    console.log('match: ', match)
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes
     }

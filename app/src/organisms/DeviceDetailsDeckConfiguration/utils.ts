@@ -1,7 +1,7 @@
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
+  getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
-  getFlexDeckDefAAByFixtureIdForCutoutId,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   replaceAAWithFakeAA,
@@ -66,7 +66,7 @@ export const getModuleUnconfiguredFixtures = (
   moduleModel: ModuleModel,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutConfigMap[][] => {
-  const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(cutoutId)
+  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(cutoutId)
   const filteredMods = getFilteredModules(unconfiguredMods, moduleModel)
 
   return filteredMods
@@ -247,7 +247,7 @@ export const getOptions = (
 ): CutoutConfigMap[][] => {
   if (providedFixtureOptions != null) {
     return providedFixtureOptions?.map((o: CutoutFixtureId) => {
-      const addressableAreasById = getFlexDeckDefAAByFixtureIdForCutoutId(
+      const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
         cutoutId
       )
       const aaProvidedFixtureOptions = addressableAreasById[o]

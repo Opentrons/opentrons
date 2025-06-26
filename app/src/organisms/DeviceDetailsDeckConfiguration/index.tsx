@@ -27,10 +27,10 @@ import {
   getAAByAAId,
   getAAComboFixtureDisplayName,
   getAASlotDisplayName,
-  getAASlotIdForAA,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
@@ -158,7 +158,7 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
-      const name = getAASlotIdForAA(
+      const name = getVisualSlotIdForAA(
         cutoutId,
         cutoutFixtureId,
         addressableAreaId
