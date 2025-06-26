@@ -11,6 +11,7 @@ from hardware_testing.data.csv_report import (
 from .utils import test_limit_switches_per_direction
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
+from opentrons.hardware_control.modules.types import PlatformState
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -55,25 +56,18 @@ async def test_platform_sensors_for_direction(
     )
 
 
-async def platform_is_removed(stacker: FlexStacker) -> bool:
-    """Check if the platform is removed from the carrier."""
-    plus_side = await stacker._driver.get_platform_sensor(Direction.EXTEND)
-    minus_side = await stacker._driver.get_platform_sensor(Direction.RETRACT)
-    return not plus_side and not minus_side
-
-
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker.is_simulated and not await platform_is_removed(stacker):
-        print("FAILURE - Cannot start tests with platform on the carrier")
-        return
-
     await test_limit_switches_per_direction(
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )
 
-    if not stacker.is_simulated:
-        ui.get_user_ready("Place the platform on the X carrier")
+    await stacker._reader.read()
+    if not stacker.is_simulated and (
+        stacker.platform_state is PlatformState.UNKNOWN
+        or stacker.platform_state is PlatformState.MISSING
+    ):
+        ui.get_user_ready("Place Platform on X axis carrier")
 
     await test_platform_sensors_for_direction(
         stacker, Direction.EXTEND, report, section

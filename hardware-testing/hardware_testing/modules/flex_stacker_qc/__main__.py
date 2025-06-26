@@ -18,7 +18,6 @@ from .config import TestSection, TestConfig, build_report, TESTS
 from .utils import find_stacker_port, get_estop
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
-from opentrons.hardware_control.modules.types import PlatformState
 
 
 async def build_stacker_report(
@@ -60,16 +59,8 @@ async def _main(cfg: TestConfig) -> None:
                 ui.print_error("ESTOP is still pressed, cannot start tests")
                 return
 
-        # TODO: This check should be in the basic axes tests
         await stacker.home_all()
         await stacker._reader.read()
-        if stacker.platform_state is not PlatformState.UNKNOWN:
-            ui.print_error("Platform must be removed from the carrier before starting")
-            ui.get_user_ready(f"Remove platform from {stacker.platform_state.value}")
-            await stacker._reader.get_platform_sensor_state()
-            if stacker.platform_state is not PlatformState.UNKNOWN:
-                ui.print_error("Platform is still detected, cannot start tests")
-                return
 
     device_info = await stacker._driver.get_device_info()
     report.set_tag(device_info.sn if device_info.sn else "UNKNOWN")
