@@ -214,7 +214,6 @@ function getRelevantPickUpTipCommand(
   if (
     failedCommandByRunRecord == null ||
     runCommands == null ||
-    !('wellName' in failedCommandByRunRecord.params) ||
     !('pipetteId' in failedCommandByRunRecord.params)
   ) {
     return null
