@@ -20,7 +20,6 @@ import { SetupLabwareMap } from '../SetupLabwareMap'
 import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
