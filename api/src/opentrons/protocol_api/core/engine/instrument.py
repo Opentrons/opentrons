@@ -1,7 +1,6 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 
 from __future__ import annotations
-from contextlib import contextmanager
 from itertools import dropwhile
 from copy import deepcopy
 from typing import (
@@ -13,7 +12,6 @@ from typing import (
     Sequence,
     Tuple,
     NamedTuple,
-    Generator,
     Literal,
 )
 from opentrons.types import (
@@ -1933,7 +1931,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         next_step_volume, next_source = next(source_per_volume_step)
         is_first_step = True
         is_last_step = False
-        prev_src: Optional[tuple[Location, WellCore]] = None
         while not is_last_step:
             total_dispense_volume = 0.0
             vol_aspirate_combo = []
@@ -1974,7 +1971,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     ),
                     current_volume=total_aspirated_volume,
                 )
-                prev_src = step_source
                 total_aspirated_volume += step_volume
                 is_first_step = False
             tip_contents = self.dispense_liquid_class(
