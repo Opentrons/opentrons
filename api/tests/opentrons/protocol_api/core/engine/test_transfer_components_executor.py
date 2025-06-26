@@ -126,7 +126,6 @@ def test_submerge(
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_location=Location(Point(x=1, y=2, z=3), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
@@ -197,7 +196,6 @@ def test_submerge_without_starting_air_gap(
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_location=Location(Point(x=1, y=2, z=3), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
@@ -308,7 +306,6 @@ def test_submerge_raises_when_submerge_point_is_invalid(
     decoy.when(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_location=Location(Point(x=1, y=2, z=3), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
@@ -755,7 +752,6 @@ def test_retract_after_aspiration(
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=4, y=4, z=4), labware=None),
-            well_location=Location(Point(x=1, y=1, z=1), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -837,7 +833,6 @@ def test_retract_after_aspiration_when_retract_loc_below_safe_airgap_point(
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=4, y=4, z=4), labware=None),
-            well_location=Location(Point(x=1, y=1, z=1), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -906,7 +901,6 @@ def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
     decoy.when(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(x=4, y=4, z=4), labware=None),
-            well_location=Location(Point(x=1, y=1, z=1), labware=None),
             well_core=source_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -1830,7 +1824,6 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
     decoy.when(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(12, 24, 36), labware=None),
-            well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -2040,7 +2033,6 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(3, 5, 4), labware=None),
-            well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -2159,7 +2151,6 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
     decoy.verify(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(3, 5, 4), labware=None),
-            well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -2248,7 +2239,6 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
     decoy.when(
         tx_utils.raise_if_location_inside_liquid(
             location=Location(Point(3, 5, 4), labware=None),
-            well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",

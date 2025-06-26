@@ -334,7 +334,9 @@ describe('replaceTip', () => {
       }
       initialRobotState = {
         ...initialRobotState,
-        pipettes: { p100096Id: { mount: 'left', nozzles: COLUMN } },
+        pipettes: {
+          p100096Id: { mount: 'left', nozzles: COLUMN, tiprackId: tiprack5Id },
+        },
         tipState: {
           tipracks: {
             [tiprack4Id]: getTiprackTipstate(false),

@@ -4,6 +4,7 @@ import { when } from 'vitest-when'
 
 import { BaseDeck } from '@opentrons/components'
 import {
+  useCreateLiveCommandMutation,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -58,6 +59,7 @@ const render = (
 
 describe('ProtocolSetupDeckConfiguration', () => {
   let props: ComponentProps<typeof ProtocolSetupDeckConfiguration>
+  const mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -80,6 +82,10 @@ describe('ProtocolSetupDeckConfiguration', () => {
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
+    mockCreateLiveCommand.mockResolvedValue(null)
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
 
   afterEach(() => {
