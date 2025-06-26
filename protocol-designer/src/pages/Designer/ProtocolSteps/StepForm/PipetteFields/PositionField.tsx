@@ -28,6 +28,7 @@ import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type { PositionSpecs } from '../../../../../components/organisms'
 import type {
+  FormData,
   ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
@@ -47,10 +48,12 @@ interface PositionFieldProps {
   showButton?: boolean
   isNested?: boolean
   referenceField?: ReferenceFields
+  formData?: FormData
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
   const {
+    formData,
     labwareId,
     propsForFields,
     zField,
@@ -168,6 +171,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
     modal = (
       <TipPositionModal
+        formData={formData}
         closeModal={handleClose}
         wellDepthMm={wellDepthMm}
         wellXWidthMm={wellXWidthMm}
