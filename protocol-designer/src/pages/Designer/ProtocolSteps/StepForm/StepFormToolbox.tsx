@@ -140,6 +140,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     'application',
     'shared',
     'protocol_steps',
+    'tooltip',
   ])
   const dispatch = useDispatch()
   const { makeSnackbar } = useKitchen()
