@@ -96,7 +96,10 @@ def group_wells_for_multi_channel_transfer(
     ):
         return _group_wells_for_nozzle_configuration(list(targets), nozzle_map)
     else:
-        raise ValueError("Unsupported tip configuration for well grouping")
+        raise ValueError(
+            "Unsupported nozzle configuration for well grouping. Set group_wells to False"
+            " to only target wells with the primary nozzle for this configuration."
+        )
 
 
 def _group_wells_for_nozzle_configuration(  # noqa: C901
@@ -132,8 +135,9 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
         if active_wells_covered:
             if well.parent != active_labware:
                 raise ValueError(
-                    "Could not resolve wells provided to pipette's nozzle configuration. "
-                    "Please ensure wells are ordered to match pipette's nozzle layout."
+                    "Could not group wells to match pipette's nozzle configuration. Ensure that the wells are ordered"
+                    " correctly (e.g. rows() for a row layout or columns() for a column layout), or set group_wells to"
+                    " False to only target wells with the primary nozzle."
                 )
 
             if well.well_name in active_wells_covered:
@@ -165,8 +169,9 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
                 alternate_384_well_coverage_count += 1
             else:
                 raise ValueError(
-                    "Could not resolve wells provided to pipette's nozzle configuration. "
-                    "Please ensure wells are ordered to match pipette's nozzle layout."
+                    "Could not group wells to match pipette's nozzle configuration. Ensure that the wells are ordered"
+                    " correctly (e.g. rows() for a row layout or columns() for a column layout), or set group_wells to"
+                    " False to only target wells with the primary nozzle."
                 )
         # If we have no active wells covered to account for, add a new target well and list of covered wells to check
         else:
@@ -193,8 +198,8 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
 
     if active_wells_covered:
         raise ValueError(
-            "Could not target all wells provided without aspirating or dispensing from other wells. "
-            f"Other wells that would be targeted: {active_wells_covered}"
+            "Pipette will access wells not provided in the liquid handling command. Set group_wells to False or include"
+            f" these wells: {active_wells_covered}"
         )
 
     # If we reversed the lookup of wells, reverse the grouped wells we will return
