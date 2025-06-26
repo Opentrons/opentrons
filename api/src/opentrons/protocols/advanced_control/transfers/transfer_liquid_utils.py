@@ -72,6 +72,7 @@ def raise_if_location_inside_liquid(
 def group_wells_for_multi_channel_transfer(
     targets: Sequence[Well],
     nozzle_map: NozzleMapInterface,
+    target_name: Literal["source", "destination"],
 ) -> List[Well]:
     """Takes a list of wells and a nozzle map and returns a list of target wells to address every well given
 
@@ -94,7 +95,9 @@ def group_wells_for_multi_channel_transfer(
         or (configuration == NozzleConfigurationType.ROW and active_nozzles == 12)
         or active_nozzles == 96
     ):
-        return _group_wells_for_nozzle_configuration(list(targets), nozzle_map)
+        return _group_wells_for_nozzle_configuration(
+            list(targets), nozzle_map, target_name
+        )
     else:
         raise ValueError(
             "Unsupported nozzle configuration for well grouping. Set group_wells to False"
@@ -103,7 +106,9 @@ def group_wells_for_multi_channel_transfer(
 
 
 def _group_wells_for_nozzle_configuration(  # noqa: C901
-    targets: List[Well], nozzle_map: NozzleMapInterface
+    targets: List[Well],
+    nozzle_map: NozzleMapInterface,
+    target_name: Literal["source", "destination"],
 ) -> List[Well]:
     """Groups wells together for a column, row, or full 96 configuration and returns a reduced list of target wells."""
     grouped_wells = []
@@ -135,9 +140,9 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
         if active_wells_covered:
             if well.parent != active_labware:
                 raise ValueError(
-                    "Could not group wells to match pipette's nozzle configuration. Ensure that the wells are ordered"
-                    " correctly (e.g. rows() for a row layout or columns() for a column layout), or set group_wells to"
-                    " False to only target wells with the primary nozzle."
+                    f"Could not group wells for {target_name} to match pipette's nozzle configuration. Ensure that the"
+                    " wells are ordered correctly (e.g. rows() for a row layout or columns() for a column layout), or"
+                    " set group_wells to False to only target wells with the primary nozzle."
                 )
 
             if well.well_name in active_wells_covered:
@@ -169,9 +174,9 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
                 alternate_384_well_coverage_count += 1
             else:
                 raise ValueError(
-                    "Could not group wells to match pipette's nozzle configuration. Ensure that the wells are ordered"
-                    " correctly (e.g. rows() for a row layout or columns() for a column layout), or set group_wells to"
-                    " False to only target wells with the primary nozzle."
+                    f"Could not group wells for {target_name} to match pipette's nozzle configuration. Ensure that the"
+                    " wells are ordered correctly (e.g. rows() for a row layout or columns() for a column layout), or"
+                    " set group_wells to False to only target wells with the primary nozzle."
                 )
         # If we have no active wells covered to account for, add a new target well and list of covered wells to check
         else:
@@ -198,8 +203,8 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
 
     if active_wells_covered:
         raise ValueError(
-            "Pipette will access wells not provided in the liquid handling command. Set group_wells to False or include"
-            f" these wells: {active_wells_covered}"
+            f"Pipette will access wells for {target_name} not provided in the liquid handling command."
+            f" Set group_wells to False or include these wells: {active_wells_covered}"
         )
 
     # If we reversed the lookup of wells, reverse the grouped wells we will return
