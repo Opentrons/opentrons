@@ -384,6 +384,8 @@ def get_robot_state(
     components = match_error_to_component("RABR", reported_string, components)
     if "alpha" in affects_version:
         components.append("flex internal releases")
+    if "flexStacker" in str(description):
+        components.append("Flex Stacker")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
@@ -605,6 +607,7 @@ if __name__ == "__main__":
         sys.exit()
     version_file_dir = retrieve_version_file(robot_ip=ip, storage=storage_directory)
     version_file_path = os.path.join(storage_directory, version_file_dir)
+    protocol_file_path = ""
     if len(run_or_other) < 1:
         # Retrieve the most recently run protocol file
         protocol_folder = retrieve_protocol_file(
@@ -612,7 +615,6 @@ if __name__ == "__main__":
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         # Path to protocol folder
-        protocol_file_path = ""
         try:
             protocol_file_path = next(
                 os.path.join(protocol_folder_path, f)
@@ -669,7 +671,6 @@ if __name__ == "__main__":
         components,
         affects_version,
         labels,
-        parent,
     )
     # Link Tickets
     to_link = ticket.match_issues(all_issues, summary)
@@ -677,8 +678,6 @@ if __name__ == "__main__":
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-    print(version_file_path)
-    print(run_log_file_path)
     error_files = [
         saved_file_path_calibration,
         run_log_file_path,
