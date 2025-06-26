@@ -318,6 +318,7 @@ export const SecondStepsMoveLiquidTools = ({
           <>
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix={tab}
               propsForFields={propsForFields}
               zField={`${tab}_mmFromBottom`}
@@ -338,6 +339,7 @@ export const SecondStepsMoveLiquidTools = ({
           <>
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('submerge')}
               prefix={`${tab}_submerge`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
@@ -355,6 +357,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('retract')}
               prefix={`${tab}_retract`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
@@ -532,6 +535,7 @@ export const SecondStepsMoveLiquidTools = ({
                   units={t('application:units.millimeter')}
                 />
                 <PositionField
+                  formData={formData}
                   prefix={tab}
                   propsForFields={propsForFields}
                   zField={`${tab}_touchTip_mmFromTop`}
