@@ -89,8 +89,8 @@ CRITICAL_UL_BY_LABWARE = {
 VOLUMES_BY_TIP_RACK = {
     "opentrons_flex_96_filtertiprack_50ul": [1, 10, 50],
     "opentrons_flex_96_tiprack_50ul": [1, 10, 50],
-    "opentrons_flex_96_filtertiprack_200ul": [200, 200, 200],
-    "opentrons_flex_96_tiprack_200ul": [200, 200, 200],
+    "opentrons_flex_96_filtertiprack_200ul": [10, 50, 200],
+    "opentrons_flex_96_tiprack_200ul": [10, 50, 200],
     "opentrons_flex_96_filtertiprack_1000ul": [10, 100, 1000],
     "opentrons_flex_96_tiprack_1000ul": [10, 100, 1000],
 }
