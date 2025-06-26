@@ -62,13 +62,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )
 
-    await stacker._reader.read()
-    if not stacker.is_simulated and (
-        stacker.platform_state is PlatformState.UNKNOWN
-        or stacker.platform_state is PlatformState.MISSING
-    ):
-        ui.get_user_ready("Place Platform on X axis carrier")
-
     await test_platform_sensors_for_direction(
         stacker, Direction.EXTEND, report, section
     )
