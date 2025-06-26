@@ -6,7 +6,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
