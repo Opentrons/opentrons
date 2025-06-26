@@ -1,6 +1,6 @@
 # Installing the Stacker
 
-Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](stacker-preinstall.md).
+Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](preinstall.md).
 
 ## Part 1: Unboxing the Stacker
 
@@ -38,7 +38,7 @@ The Stacker attaches to the right side of your robot and requires a replacement 
 
 With the new window panel in place, it's time to install a deck plate adapter and attach the Stacker to the robot.
 
-!!!Warning "Heavy Object"
+!!!Warning "Warning: Heavy Object"
     The Stacker is heavy. Ask a lab partner to assist with lifting and attaching this module.
 
 To install the deck adapter and attach the Stacker:
@@ -64,7 +64,7 @@ To install the deck adapter and attach the Stacker:
 
 ## Part 4: Connecting the Hub and Cables
 
-After attaching the Stacker to the robot, you can connect all the cables and turn on the power. See [Physical Connections](stacker-preinstall.md#physical-connections) for more information about the type and purpose of each cable. To connect the power and data cables to the hub:
+After attaching the Stacker to the robot, you can connect all the cables and turn on the power. See [Physical Connections](preinstall.md#physical-connections) for more information about the type and purpose of each cable. To connect the power and data cables to the hub:
 
 13. Remove the power/data hub from the User Kit. Place it with its back flush against the robot.
 
@@ -120,4 +120,4 @@ After attaching the Stacker to the robot, you can connect all the cables and tur
 
 ## Next Steps
 
-See [Post-Installation Procedures](stacker-postinstall.md). The information in that section will help you finish setting up your Stacker.
+See [Post-Installation Procedures](postinstall.md). The information in that section will help you finish setting up your Stacker.

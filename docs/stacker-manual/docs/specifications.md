@@ -60,7 +60,7 @@ Status lights on the Stacker provide at-a-glance information about its operation
         <th>Stacker status</th>
     </tr>
     <tr>
-        <td><span class="my-dot white"></span> White</td>
+        <td><span class="status-dot white"></span> White</td>
         <td>A white light indicates a neutral operation state. For example:
             <ul>
                 <li>Solid white: idle.</li>
@@ -69,15 +69,15 @@ Status lights on the Stacker provide at-a-glance information about its operation
         </td>
     </tr>
     <tr>
-        <td><span class="my-dot green"></span> Green</td>
+        <td><span class="status-dot green"></span> Green</td>
         <td>A solid green light indicates a protocol is running.</td>
     </tr>
     <tr>
-        <td><span class="my-dot blue"></span> Blue</td>
+        <td><span class="status-dot blue"></span> Blue</td>
         <td>A pulsing blue light indicates a Stacker requires attention (e.g., for empty/fill commands, door open, identification).</td>
     </tr>
     <tr>
-        <td><span class="my-dot red"></span> Red</td>
+        <td><span class="status-dot red"></span> Red</td>
         <td>A pulsing red light indicates a stall or other type of error condition.</td>
     </tr>
 </table>

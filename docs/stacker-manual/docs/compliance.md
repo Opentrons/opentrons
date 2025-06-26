@@ -91,14 +91,14 @@ Always observe the following electrical safety warnings.
 
 The Flex Stacker has been tested and found to be in compliance with all applicable requirements of the following standards.
 
-#### Safety
+### Safety
 
 | Rule ID | Title |
 |----|----|
 | IEC/UL/CSA 61010-1 | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use–Part 1: General Requirements |
 | IEC/UL/CSA 61010-2-051 | Safety Requirements for Electrical Equipment for Measurement, Control and Laboratory Use - Part 2-051: Particular Requirements for Laboratory Equipment for Mixing and Stirring |
 
-#### Electromagnetic Compatibility
+### Electromagnetic Compatibility
 
 | Rule ID | Title |
 |----|----|
@@ -106,39 +106,39 @@ The Flex Stacker has been tested and found to be in compliance with all applicab
 | FCC 47 CFR Part 15 Subpart B Class A | Equipment Authorization of Unintentional Radiators |
 | IC ICES-003 | Spectrum Management and Telecommunications–Interference-Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus) |
 
-#### Hazardous Substances
+### Hazardous Substances
 
 RoHS3 compliant.
 
-#### FCC Warnings and Notes
+### FCC Warnings and Notes
 
-!!!warning
-    Changes or modifications to this module not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules.
+#### Warning
 
-!!!note
-    This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to part 15 of the FCC rules. These limits are designed to provide a reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
+Changes or modifications to this module not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules.
 
-#### Canada ISED ICES–003(A)/NMB–003(A)
+#### Note
+
+This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to part 15 of the FCC rules. These limits are designed to provide a reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
+
+### Canada ISED ICES–003(A)/NMB–003(A)
 
 This product meets the applicable Innovation, Science and Economic Development Canada technical specifications.
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
 
-CISPR 11 Class A
+#### CISPR 11 Class A
 
-!!!caution
-    This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
+**Caution**: This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
 
-#### WEEE Policy
+### WEEE Policy
 
 Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life. 
 
-Opentrons products that fall under the WEEE directive are labeled with the <img src="/images/iso-warnings/WEEE.png" style="vertical-align: middle; width: 30px; height: 30px;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+Opentrons products that fall under the WEEE directive are labeled with the <img src="/images/iso-warnings/WEEE.png" style="vertical-align: middle; height: 1.2em;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
 
-#### Environmental Warning
+### Environmental Warning
 
-!!!warning
-    Cancer and reproductive harm – [www.P65Warnings.ca.gov](https://www.p65warnings.ca.gov/).
+Cancer and reproductive harm – [www.P65Warnings.ca.gov](https://www.p65warnings.ca.gov/).
 
 ## UV Safety Features
 
@@ -155,7 +155,7 @@ Flex robots manufactured before September 2025 require an upgrade kit. This kit 
 
 Refer to your robot's serial number to determine if an upgrade kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require the upgrade kit.
 
-<img src="/images/serial-number-cropped2.png" alt="serial number" class="center-image" style="width:60%;">
+<img src="/images/serial-number-cropped2.png" alt="serial number" class="center-image" style="width:40%;">
 
 The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
 

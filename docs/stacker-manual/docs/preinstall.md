@@ -10,9 +10,9 @@ Once attached, the Stacker becomes part of column 4, like a [staging area slot](
 
 After your Stacker is attached to the deck and powered on, instructions and animated images on the touchscreen take you through a guided setup.
 
-<img src="/images/touchscreen-map.png" alt="deck map" class="center-image" style="width:80%;">
+<img src="/images/touchscreen-map.png" alt="deck map" class="center-image">
 
-Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](stacker-postinstall.md#).
+Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](postinstall.md).
 
 ## Deck Adapters
 
@@ -34,11 +34,11 @@ All the module's power and data cables route through the hub, which can support 
 
 ### Physical Connections
 
-The following illustration shows the physical cable connections on the hub. [Part 4 of the installation instructions](stacker-install.md#part-4-connecting-the-hub-and-cables) will provide more information about how to connect these cables.
+The following illustration shows the physical cable connections on the hub. [Part 4 of the installation instructions](installation.md#part-4-connecting-the-hub-and-cables) will provide more information about how to connect these cables.
 
 ![power-data-cables](images/power-and-data.png)
 
-The The following table lists and describes the function of each cable.
+The following table lists and describes the function of each cable.
 
 <table>
     <tr>
@@ -74,7 +74,7 @@ The The following table lists and describes the function of each cable.
 
 ## Installing Multiple Stackers
 
-The [installation instructions](stacker-install.md) in this guide assume you're installing one Stacker only. If you're installing multiple Stackers on the same Flex:
+The [installation instructions](installation.md) in this guide assume you're installing one Stacker only. If you're installing multiple Stackers on the same Flex:
 
 * Attach only one Stacker at a time. Complete all of the installation and post-installation procedures before installing the next module.
 * Attach Stackers from the rear (A4) to the front (D4). This prevents the need to work around previously installed modules.

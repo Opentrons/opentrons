@@ -27,15 +27,15 @@ markdown_extensions:
   - sane_lists
 
 copyright:
-  Copyright &copy; OPENTRONS, 2025. ALL RIGHTS RESERVED
+  Copyright © OPENTRONS, 2025. ALL RIGHTS RESERVED
 
 nav:
   - Product and Manufacturer Description: index.md
-  - Safety and Compliance: stacker-compliance.md
-  - Product Specifications: stacker-product-specifications.md
-  - Pre-installation Information: stacker-preinstall.md
-  - Installing the Stacker: stacker-install.md
-  - Post-installation Procedures: stacker-postinstall.md
-  - Loading and Unloading Labware: stacker-load-labware.md
-  - Maintenance and Cleaning: stacker-maintenance.md
-  - Additional Product Information: stacker-warranty.md
+  - Safety and Compliance: compliance.md
+  - Product Specifications: specifications.md
+  - Pre-installation Information: preinstall.md
+  - Installing the Stacker: installation.md
+  - Post-installation Procedures: postinstall.md
+  - Loading and Unloading Labware: loading-labware.md
+  - Maintenance and Cleaning: maintenance.md
+  - Additional Product Information: warranty.md

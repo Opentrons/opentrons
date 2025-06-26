@@ -19,7 +19,7 @@
   background-color: transparent;
 }
 /* stacker status light colors */
-.my-dot {
+.status-dot {
   height: var(--my-dot-size);
   width: var(--my-dot-size);
   border-radius: 50%;
@@ -29,25 +29,25 @@
   margin-right: 5px;
  }
 
- .my-dot.white {
+ .status-dot.white {
   background-color: #F8F6F0;
   animation: pulse-white 3s;
   animation-iteration-count: 3;
  }
 
- .my-dot.green {
+ .status-dot.green {
   background-color: green;
  }
 
- .my-dot.blue {
+ .status-dot.blue {
   background-color: #006CFA;
  }
 
- .my-dot.red {
+ .status-dot.red {
   background-color: red;
  }
 
- .my-dot.yellow {
+ .status-dot.yellow {
   background-color: #F09D20;
  }
 
@@ -55,6 +55,25 @@
     display: block; /* Make the image a block-level element */
     margin-left: auto; /* Push it to the center horizontally */
     margin-right: auto; /* Push it to the center horizontally */
+}
+
+figure.general > figcaption {
+    font-style: normal; /* override italics */
+}
+
+/* A class for controlling text length, mainly for back-matter */
+.caption-text-block {
+  max-width: 35em; /* Adjust this value to get the length you want */
+}
+
+/* A specific class for the final figure on a page */
+/* Using padding-top to avoid margin collapse issues */
+.md-content__inner > .figure-end-of-doc {
+  padding-top: 150px;
+}
+
+.figure-end-of-doc img {
+  width: 60%;
 }
 
 /* New class for end-of-doc trademark text */
