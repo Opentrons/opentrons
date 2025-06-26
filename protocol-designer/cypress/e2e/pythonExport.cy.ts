@@ -18,8 +18,8 @@ describe('Import a json and export as a python', () => {
           const file = getExportTestFile(exportProtocol)
           cy.importProtocol(file.path)
           cy.contains('Import').click({force:true})
-          // verifyImportProtocolPage(file)
-          // cy.contains('Export protocol').click()
+          verifyImportProtocolPage(file)
+          cy.contains('Export protocol').click()
         //   cy.visit('/')
       };
     // const steps = new StepBuilder()
