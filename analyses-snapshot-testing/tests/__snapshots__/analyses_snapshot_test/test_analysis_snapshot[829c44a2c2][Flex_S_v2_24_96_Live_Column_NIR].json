@@ -9003,7 +9003,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -9035,7 +9035,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                125.0
+                100.0
               ]
             ],
             "retract": {
@@ -9056,7 +9056,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "trash"
                 }
               },
@@ -9125,7 +9125,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -9139,7 +9139,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                40.0
+                100.0
               ]
             ],
             "mix": {
@@ -9181,7 +9181,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "destination"
                 }
               },
@@ -9572,7 +9572,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -9591,7 +9591,7 @@
       "key": "a89b32182345431d325a6b7b3bd10fae",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -9639,7 +9639,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -9658,7 +9658,7 @@
       "key": "f36d3a03b52a8b5f3ca4ca1054e9bb4f",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -9949,7 +9949,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -9981,7 +9981,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                125.0
+                100.0
               ]
             ],
             "retract": {
@@ -10002,7 +10002,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "trash"
                 }
               },
@@ -10071,7 +10071,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -10085,7 +10085,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                40.0
+                100.0
               ]
             ],
             "mix": {
@@ -10127,7 +10127,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "destination"
                 }
               },
@@ -10518,7 +10518,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -10537,7 +10537,7 @@
       "key": "6559b8c3c79540497893a0a6f91d9340",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -10585,7 +10585,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -10604,7 +10604,7 @@
       "key": "13c832494dcd1e31335157ec4c6b40fe",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -10731,7 +10731,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -10750,7 +10750,7 @@
       "key": "6f4c16afb539a3361e29b7bfb8304528",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11005,7 +11005,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -11024,7 +11024,7 @@
       "key": "9d03076b4b7711cff3cc0a1630f1b045",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11072,7 +11072,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -11091,7 +11091,7 @@
       "key": "dd34f8bd2c943674884da6cddcdf930a",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11218,7 +11218,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -11237,7 +11237,7 @@
       "key": "fb2cd78d2472e86de1102cb1d40f736a",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11492,7 +11492,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -11511,7 +11511,7 @@
       "key": "dde9c2bb6e366575e7b9c77851c4485c",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11559,7 +11559,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -11578,7 +11578,7 @@
       "key": "6f36170364349dd3dee27371e71ff761",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11705,7 +11705,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -11724,7 +11724,7 @@
       "key": "3b3c84755e7057200ec1ca93e4c0f8a8",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11979,7 +11979,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -11998,7 +11998,7 @@
       "key": "fdeff983c6e358b34519b9b6f75fbb94",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -12046,7 +12046,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -12065,7 +12065,7 @@
       "key": "4a01060897eb4f1bef3d438976c6ae2c",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -12356,7 +12356,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -12388,7 +12388,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                125.0
+                100.0
               ]
             ],
             "retract": {
@@ -12409,7 +12409,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "trash"
                 }
               },
@@ -12478,7 +12478,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -12492,7 +12492,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                40.0
+                100.0
               ]
             ],
             "mix": {
@@ -12534,7 +12534,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 100.0,
                   "location": "destination"
                 }
               },
@@ -12925,7 +12925,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -12944,7 +12944,7 @@
       "key": "647007c8daf81948ea528633bf34f805",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -12992,7 +12992,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -13011,7 +13011,7 @@
       "key": "c23227f1553e575bc3b7b9b3415a7544",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13138,7 +13138,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -13157,7 +13157,7 @@
       "key": "b6cb6469bcfb8946dff6dc6d71199315",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13412,7 +13412,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -13431,7 +13431,7 @@
       "key": "53a67bea9711c8f9b243484b1898718a",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13479,7 +13479,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -13498,7 +13498,7 @@
       "key": "0a7acea267224b719de7db9102477383",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13625,7 +13625,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -13644,7 +13644,7 @@
       "key": "203a24ec3e01cb9ace9867fd278dca6e",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13899,7 +13899,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4666666666666667,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 10.0
@@ -13918,7 +13918,7 @@
       "key": "9f03d0c122fa2f8c5e6baf6870e4b677",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -13966,7 +13966,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -4.656666666666666,
-        "flowRate": 40.0,
+        "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 105.0
@@ -13985,7 +13985,7 @@
       "key": "7808a425daeecf272179eb5436607040",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -18738,7 +18738,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -18770,7 +18770,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            125.0
+            100.0
           ]
         ],
         "retract": {
@@ -18791,7 +18791,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 100.0,
               "location": "trash"
             }
           },
@@ -18860,7 +18860,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -18874,7 +18874,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            40.0
+            100.0
           ]
         ],
         "mix": {
@@ -18916,7 +18916,7 @@
           "blowout": {
             "enable": false,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 100.0,
               "location": "destination"
             }
           },

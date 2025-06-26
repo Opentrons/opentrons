@@ -10479,7 +10479,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -10532,7 +10532,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 200.0,
                   "location": "trash"
                 }
               },
@@ -10601,7 +10601,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -10615,7 +10615,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                40.0
+                200.0
               ]
             ],
             "mix": {
@@ -10657,7 +10657,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 200.0,
                   "location": "destination"
                 }
               },
@@ -11053,7 +11053,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.21694581280788178,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 5.4236453201970445
@@ -11072,7 +11072,7 @@
       "key": "0deebc82d862a67ba524b8169056b673",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11120,7 +11120,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -20.12977777777778,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 633.0
@@ -11139,7 +11139,7 @@
       "key": "0d9d323e3598580f491c387cd78ca733",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -11459,7 +11459,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                200.0
+                250.0
               ]
             ],
             "retract": {
@@ -11472,7 +11472,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 200.0,
+                  "flowRate": 250.0,
                   "location": "trash"
                 }
               },
@@ -12700,7 +12700,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -12753,7 +12753,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 200.0,
               "location": "trash"
             }
           },
@@ -12822,7 +12822,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -12836,7 +12836,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            40.0
+            200.0
           ]
         ],
         "mix": {
@@ -12878,7 +12878,7 @@
           "blowout": {
             "enable": false,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 200.0,
               "location": "destination"
             }
           },
@@ -13109,7 +13109,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            200.0
+            250.0
           ]
         ],
         "retract": {
@@ -13122,7 +13122,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 200.0,
+              "flowRate": 250.0,
               "location": "trash"
             }
           },

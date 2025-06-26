@@ -72076,7 +72076,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -72129,7 +72129,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 200.0,
                   "location": "trash"
                 }
               },
@@ -72198,7 +72198,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             },
             "dispensePosition": {
@@ -72212,7 +72212,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                40.0
+                200.0
               ]
             ],
             "mix": {
@@ -72254,7 +72254,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 125.0,
+                  "flowRate": 200.0,
                   "location": "destination"
                 }
               },
@@ -72650,7 +72650,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.2627586206896552,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 6.56896551724138
@@ -72669,7 +72669,7 @@
       "key": "521e03ca2e2083b1f8a7969e5fa174f7",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -72717,7 +72717,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -17.58088888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 555.5
@@ -72736,7 +72736,7 @@
       "key": "96c012b249bc514af273d64366419baa",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -72863,7 +72863,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4488888888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 12.0
@@ -72882,7 +72882,7 @@
       "key": "8cf4f3ebe5a0136d284c289f41e0b14b",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73137,7 +73137,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.2627586206896552,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 6.56896551724138
@@ -73156,7 +73156,7 @@
       "key": "a6eb257a443b2514b6615ed2df51657c",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73204,7 +73204,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -17.58088888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 555.5
@@ -73223,7 +73223,7 @@
       "key": "ab96a5e24f1c92f3ec688d0e1b984c03",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73350,7 +73350,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4488888888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 12.0
@@ -73369,7 +73369,7 @@
       "key": "e89d900f5561f0a8e750baf6e31429c2",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73624,7 +73624,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.2627586206896552,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 6.56896551724138
@@ -73643,7 +73643,7 @@
       "key": "c4368928103122198d7b9ed628bd92c8",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73691,7 +73691,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -17.58088888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 555.5
@@ -73710,7 +73710,7 @@
       "key": "e6018ba209e6dce267dd40905e91a9ac",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -73837,7 +73837,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.4488888888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 12.0
@@ -73856,7 +73856,7 @@
       "key": "c50fb3e3586fe48e65f6c778ba8673e8",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -74111,7 +74111,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -0.2627586206896552,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 6.56896551724138
@@ -74130,7 +74130,7 @@
       "key": "3596423b909677e591283b38cb4da57c",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -74178,7 +74178,7 @@
       "notes": [],
       "params": {
         "correctionVolume": -17.58088888888889,
-        "flowRate": 40.0,
+        "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
         "volume": 555.5
@@ -74197,7 +74197,7 @@
       "key": "de1637948b8d7445ef82229f1f72b8e6",
       "notes": [],
       "params": {
-        "seconds": 2.0
+        "seconds": 1.0
       },
       "result": {},
       "startedAt": "TIMESTAMP",
@@ -76715,7 +76715,7 @@
             "flowRateByVolume": [
               [
                 0.0,
-                200.0
+                250.0
               ]
             ],
             "retract": {
@@ -76728,7 +76728,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 200.0,
+                  "flowRate": 250.0,
                   "location": "trash"
                 }
               },
@@ -79332,7 +79332,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -79385,7 +79385,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 200.0,
               "location": "trash"
             }
           },
@@ -79454,7 +79454,7 @@
         "delay": {
           "enable": true,
           "params": {
-            "duration": 2.0
+            "duration": 1.0
           }
         },
         "dispensePosition": {
@@ -79468,7 +79468,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            40.0
+            200.0
           ]
         ],
         "mix": {
@@ -79510,7 +79510,7 @@
           "blowout": {
             "enable": false,
             "params": {
-              "flowRate": 125.0,
+              "flowRate": 200.0,
               "location": "destination"
             }
           },
@@ -79741,7 +79741,7 @@
         "flowRateByVolume": [
           [
             0.0,
-            200.0
+            250.0
           ]
         ],
         "retract": {
@@ -79754,7 +79754,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 200.0,
+              "flowRate": 250.0,
               "location": "trash"
             }
           },
