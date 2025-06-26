@@ -2,7 +2,6 @@ from copy import deepcopy
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -100,6 +99,7 @@ _APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
         "nest_96_wellplate_100ul_pcr_full_skirt": 4,
         "nest_96_wellplate_200ul_flat": 4,
         "nest_96_wellplate_2ml_deep": 4,
+        "opentrons_96_wellplate_200ul_pcr_full_skirt": 4,
         "thermoscientificnunc_96_wellplate_1300ul": 3,
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
@@ -181,7 +181,7 @@ def _get_default_version_for_standard_labware(
 ) -> int:
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
-    if api_version >= MAX_SUPPORTED_VERSION and load_name in DEFAULT_LABWARE_VERSIONS:
+    if api_version >= APIVersion(2, 24) and load_name in DEFAULT_LABWARE_VERSIONS:
         return DEFAULT_LABWARE_VERSIONS[load_name]
     elif (
         api_version == APIVersion(2, 23)
