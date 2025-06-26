@@ -95,7 +95,7 @@ describe('BlowOut', () => {
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_BLOW_OUT',
       blowOutSettings: {
-        blowOutLocation: 'source_well',
+        location: 'source_well',
         speed: 2,
       },
     })
