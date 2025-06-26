@@ -226,9 +226,10 @@ export function UpdateProtocol(): JSX.Element {
           pythonText +
           `\n\`\`\`\n\n`
         : ''
-    const updateTypeText =
-      t('modify_type_of_update') + updateType?.name + `\n\n`
-    const detailsText = t('modify_details_of_change') + detailsValue + '\n'
+    const updateTypeText = `${t('modify_type_of_update')}${
+      updateType?.name
+    }\n\n`
+    const detailsText = `${t('modify_details_of_change')}${detailsValue}\n`
     const chatPrompt = `${originalCodeText}${updateTypeText}${detailsText}`
 
     setUpdateProtocolChatAtom({
