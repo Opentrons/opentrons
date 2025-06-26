@@ -2,19 +2,16 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
-import {
-  Box,
-  Icon,
-  ProtocolTimelineScrubber,
-  SPACING,
-} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 
 import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
+
+import { Container } from './Container'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ProtocolTimeline(): JSX.Element {
+export function Preview(): JSX.Element {
   const { protocolKey } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
@@ -28,10 +25,11 @@ export function ProtocolTimeline(): JSX.Element {
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <Box padding={SPACING.spacing16}>
-      <ProtocolTimelineScrubber analysis={storedProtocol.mostRecentAnalysis} />
-    </Box>
+    <Container analysis={storedProtocol.mostRecentAnalysis} />
   ) : (
     <Icon size="8rem" name="ot-spinner" spin />
   )
+}
+{
+  /* <ProtocolTimelineScrubber analysis={storedProtocol.mostRecentAnalysis} /> */
 }

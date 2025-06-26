@@ -1,0 +1,98 @@
+.container {
+  padding: 16px;
+}
+
+.headingText {
+  font-family: Public Sans;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 32px;
+  letter-spacing: 0px;
+}
+
+.playButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 200px;
+  background-color: #006cfa;
+  cursor: pointer;
+}
+
+.fastButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 200px;
+  background-color: #d0e6fe;
+  cursor: pointer;
+}
+
+.buttons {
+  display: flex;
+  grid-gap: 8px;
+  align-items: center;
+}
+
+.controlsInfo {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 16px;
+}
+
+.allControlsInfo {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.controlsContainer {
+  padding: 16px;
+  background-color: white;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.maxContent {
+  width: max-content;
+}
+
+.rangeInput {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.rangeInput::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    #006cfa 0%,
+    #006cfa var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
+}
+
+/* Hide thumb initially */
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #006cfa;
+  margin-top: -4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Show thumb on hover/focus */
+.rangeInput:hover::-webkit-slider-thumb,
+.rangeInput:focus::-webkit-slider-thumb,
+.rangeInput:active::-webkit-slider-thumb {
+  opacity: 1;
+}

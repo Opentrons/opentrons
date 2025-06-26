@@ -20,7 +20,7 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 // prettier-ignore
 import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
 
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolTimeline } from '../../pages/Desktop/Protocols/Preview'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 

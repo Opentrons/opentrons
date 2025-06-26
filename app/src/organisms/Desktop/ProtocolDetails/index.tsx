@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import isEmpty from 'lodash/isEmpty'
 import map from 'lodash/map'
@@ -21,6 +22,7 @@ import {
   DISPLAY_FLEX,
   DISPLAY_GRID,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -30,6 +32,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
+  SecondaryButton,
   SIZE_1,
   SIZE_5,
   SPACING,
@@ -37,6 +40,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
@@ -220,6 +224,7 @@ export function ProtocolDetails(
     groupedCommands,
   } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
+  const navigate = useNavigate()
   const enableProtocolStats = useFeatureFlag('protocolStats')
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
@@ -382,6 +387,10 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
+  const handleClickTimeline = (): void => {
+    navigate(`/protocols/${protocolKey}/preview`)
+  }
+
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
@@ -503,11 +512,18 @@ export function ProtocolDetails(
                 </Flex>
                 <Flex
                   css={css`
-                    display: ${DISPLAY_GRID};
+                    display: flex;
                     justify-self: end;
+                    grid-gap: 4px;
                   `}
                 >
+                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
+                    <SecondaryButton onClick={handleClickTimeline}>
+                      Preview
+                    </SecondaryButton>
+                  ) : null}
                   <PrimaryButton
+                    width={FLEX_MAX_CONTENT}
                     onClick={() => {
                       handleRunProtocolButtonClick()
                     }}
