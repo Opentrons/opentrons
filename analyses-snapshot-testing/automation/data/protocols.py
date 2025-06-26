@@ -715,6 +715,9 @@ class Protocols:
     Flex_S_v2_24_96_Live_SingleTip_SLAM_FRONT_NIR: Protocol = Protocol(
         file_stem="Flex_S_v2_24_96_Live_SingleTip_SLAM_FRONT_NIR", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_v2_24_P1000M_Alex_tip_strategy_with_lc: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P1000M_Alex_tip_strategy_with_lc", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
     Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
