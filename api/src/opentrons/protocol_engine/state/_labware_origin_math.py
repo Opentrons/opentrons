@@ -1,4 +1,5 @@
 """Utilities for calculating the labware origin offset position."""
+import dataclasses
 from typing import Union, overload
 
 from typing_extensions import assert_type
@@ -11,6 +12,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import (
     SlotFootprintAsChildFeature,
+    LocatingFeatures,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from ..types import (
@@ -24,6 +26,11 @@ from ..types import (
     AddressableAreaLocation,
     OnLabwareLocation,
 )
+
+
+@dataclasses.dataclass
+class _Labware3SupportedParentDefinition:
+    features: LocatingFeatures
 
 
 @overload
@@ -78,17 +85,17 @@ def get_parent_placement_origin_to_lw_origin(
     Only parent-child specific offsets are calculated. Offsets that apply to a single entity
     (ex., module cal) or the entire stackup (ex., LPC) are handled elsewhere.
     """
-    parent_deck_item_origin_to_child_labware_placement_origin = (
-        _get_parent_deck_item_origin_to_child_labware_placement_origin(
-            child_labware=child_labware,
-            parent_deck_item=parent_deck_item,
-            module_parent_to_child_offset=module_parent_to_child_offset,
-            deck_definition=deck_definition,
-            labware_location=labware_location,
-        )
-    )
-
     if isinstance(child_labware, LabwareDefinition2):
+        parent_deck_item_origin_to_child_labware_placement_origin = (
+            _get_parent_deck_item_origin_to_child_labware_placement_origin(
+                child_labware=child_labware,
+                parent_deck_item=parent_deck_item,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                labware_location=labware_location,
+            )
+        )
+
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
         # For compatibility with historical (buggy?) behavior,
         # we only consider it when the child labware is the topmost labware in a stackup.
@@ -109,13 +116,32 @@ def get_parent_placement_origin_to_lw_origin(
         if isinstance(parent_deck_item, LabwareDefinition2):
             raise NotImplementedError()
 
-        parent_deck_item_origin_to_child_labware_origin = (
-            _get_back_left_bottom_position(child_labware) * -1
+        # TODO(jh, 06-25-25): This code is entirely temporary and only exists for the purposes of more useful
+        #  snapshot testing. This code should exist in NO capacity after features are implemented.
+        if _shim_does_locating_feature_pair_exist(
+            child_labware=child_labware,
+            parent_deck_item=_parent_deck_item_with_features(parent_deck_item),
+        ):
+            parent_deck_item_origin_to_child_labware_placement_origin = Point(0, 0, 0)
+        else:
+            parent_deck_item_origin_to_child_labware_placement_origin = (
+                _get_parent_deck_item_origin_to_child_labware_placement_origin(
+                    child_labware=child_labware,
+                    parent_deck_item=parent_deck_item,
+                    module_parent_to_child_offset=module_parent_to_child_offset,
+                    deck_definition=deck_definition,
+                    labware_location=labware_location,
+                )
+            )
+
+        parent_origin_to_lw_origin = _get_parent_origin_to_lw_origin(
+            child_labware=child_labware,
+            parent_deck_item=_parent_deck_item_with_features(parent_deck_item),
         )
 
         return (
             parent_deck_item_origin_to_child_labware_placement_origin
-            + parent_deck_item_origin_to_child_labware_origin
+            + parent_origin_to_lw_origin
         )
 
 
@@ -175,6 +201,90 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
         raise TypeError(f"Unsupported labware location type: {labware_location}")
 
 
+def _shim_does_locating_feature_pair_exist(
+    child_labware: LabwareDefinition3,
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> bool:
+    """Temporary util."""
+    return (
+        parent_deck_item.features.get("slotFootprintAsParent") is not None
+        and child_labware.features.get("slotFootprintAsChild") is not None
+    )
+
+
+def _parent_deck_item_with_features(
+    parent_deck_item: Union[
+        LabwareDefinition3, DeckLocationDefinition, ModuleDefinition
+    ],
+) -> _Labware3SupportedParentDefinition:
+    """Returns a standardized parent deck item interface."""
+    if hasattr(parent_deck_item, "features"):
+        return _Labware3SupportedParentDefinition(parent_deck_item.features)  # type: ignore[union-attr]
+    elif (
+        hasattr(parent_deck_item, "get")
+        and parent_deck_item.get("features") is not None
+    ):
+        return _Labware3SupportedParentDefinition(parent_deck_item.get("features"))  # type: ignore[arg-type]
+    else:
+        raise ValueError("Expected parent deck item to have features.")
+
+
+def _get_parent_origin_to_lw_origin(
+    child_labware: LabwareDefinition3,
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> Point:
+    """Get the offset vector from the parent entity origin to the child labware origin."""
+    if (
+        parent_deck_item.features.get("slotFootprintAsParent") is not None
+        and child_labware.features.get("slotFootprintAsChild") is not None
+    ):
+        return _get_parent_origin_to_bottom_center_mate(
+            parent_deck_item
+        ) + _get_bottom_center_mate_to_lw_origin(child_labware)
+    else:
+        # TODO(jh, 06-25-25): This is a temporary shim to unblock FE usage with LW Def3 and more accurately diff
+        #  ongoing positioning snapshot changes, but we should throw an error  after adding all locating features
+        #  if no appropriate LF pair is found.
+        return _get_back_left_bottom_position(child_labware) * -1
+
+
+def _get_parent_origin_to_bottom_center_mate(
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> Point:
+    """Returns offset from the parent deck item's origin to the bottom-center point of the mating plane."""
+    slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
+    assert slot_footprint_as_parent is not None
+
+    x = slot_footprint_as_parent["frontRight"]["x"] / 2
+    y = slot_footprint_as_parent["frontRight"]["y"] / 2
+    z = slot_footprint_as_parent["z"]
+
+    return Point(x, y, z)
+
+
+def _get_bottom_center_mate_to_lw_origin(child_labware: LabwareDefinition3) -> Point:
+    """Returns offset from the labware's bottom-center point of the mating plane to the labware origin."""
+    slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
+    assert slot_footprint_as_child is not None
+
+    x = slot_footprint_as_child["frontRight"]["x"] / 2
+    y = slot_footprint_as_child["frontRight"]["y"] / 2
+    z = slot_footprint_as_child["z"]
+
+    return -1 * Point(x, y, z)
+
+
+def _get_back_left_bottom_position(child_labware: LabwareDefinition3) -> Point:
+    """Get the back left bottom position from a v3 labware definition."""
+    footprint_as_child = _get_labware_footprint_as_child(child_labware)
+
+    return Point(
+        x=footprint_as_child["backLeft"]["x"],
+        y=footprint_as_child["frontRight"]["y"],
+        z=footprint_as_child["z"],
+    )
+
+
 def _get_child_labware_overlap_with_parent_labware(
     child_labware: LabwareDefinition, parent_labware_name: str
 ) -> Point:
@@ -220,17 +330,6 @@ def _is_thermocycler_on_ot2(
         parent_module_model
         in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
         and robot_model == "OT-2 Standard"
-    )
-
-
-def _get_back_left_bottom_position(labware: LabwareDefinition3) -> Point:
-    """Get the back left bottom position from a v3 labware definition."""
-    footprint_as_child = _get_labware_footprint_as_child(labware)
-
-    return Point(
-        x=footprint_as_child["backLeft"]["x"],
-        y=footprint_as_child["frontRight"]["y"],
-        z=footprint_as_child["z"],
     )
 
 
