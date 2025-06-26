@@ -85,6 +85,14 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
     trackEvent({ name: 'user-logout', properties: {} })
   }
 
+  function handleSettingsClick(): void {
+    if (featureFlags.enablePrereleaseMode) {
+      setDisplayFeatureFlagsModalAtom(true)
+    } else {
+      window.location.hash = '/settings'
+    }
+  }
+
   return (
     <HeaderBar>
       <HeaderBarContent>
@@ -92,20 +100,13 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
           <HeaderTitle>{t('opentrons')}</HeaderTitle>
           <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           <LogoutOrExitButton onClick={handleLoginOrExitClick}>
             {isExitButton ? t('exit') : t('logout')}
           </LogoutOrExitButton>
-
-          {featureFlags.enablePrereleaseMode && (
-            <Box marginLeft={SPACING.spacing32} marginTop="-.5rem">
-              <SettingsButton
-                onClick={() => {
-                  setDisplayFeatureFlagsModalAtom(true)
-                }}
-              />
-            </Box>
-          )}
+          <Box marginLeft={SPACING.spacing16}>
+            <SettingsButton onClick={handleSettingsClick} />
+          </Box>
         </Flex>
       </HeaderBarContent>
     </HeaderBar>

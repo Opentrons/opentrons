@@ -128,4 +128,5 @@ export interface PromptData {
 export interface FeatureFlags {
   enablePrereleaseMode: boolean
   enablePDProtocolGeneration: boolean
+  enableAnalytics?: boolean
 }

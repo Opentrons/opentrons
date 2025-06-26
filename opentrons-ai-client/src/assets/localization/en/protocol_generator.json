@@ -16,6 +16,7 @@
   "exit_confirmation_exit": "Exit without saving",
   "exit_confirmation_title": "Are you sure you want to exit?",
   "exit": "Exit",
+  "feature_flags": "Feature Flags",
   "file_length_error": "The length of the file contents is 0. Please upload a file with content.",
   "go_directly_to_chat": "Go directly to chat",
   "got_feedback": "Got feedback? We love to hear it.",
@@ -32,6 +33,8 @@
   "login": "Login",
   "logout": "Logout",
   "make_sure_your_prompt": "Write a prompt in a natural language for OpentronsAI to generate a protocol using the Opentrons Python Protocol API v2. The better the prompt, the better the quality of the protocol produced by OpentronsAI.",
+  "manage_feature_flags": "Manage feature flags",
+  "manage_feature_flags_description": "Configure experimental features and prerelease functionality",
   "modify_details_of_change": "Detail of changes:\n- ",
   "modify_python_code": "Original protocol:\n",
   "modify_type_of_update": "Type of update:\n- ",
@@ -80,5 +83,9 @@
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
   "what_if_you": "<span>What if you don’t provide all of those pieces of information? <bold>OpentronsAI asks you to provide it!</bold></span>",
   "what_typeof_protocol": "What type of protocol do you need?",
-  "you": "You"
+  "you": "You",
+  "settings": "Settings",
+  "privacy": "Privacy",
+  "share_analytics_with_opentrons": "Share analytics with Opentrons",
+  "share_analytics_description": "Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data"
 }
