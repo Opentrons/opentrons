@@ -718,6 +718,9 @@ class Protocols:
     Flex_S_v2_24_P1000M_PD_happy: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P1000M_PD_happy", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
     Flex_S_v2_24_P1000S_PD_happy: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P1000S_PD_happy", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
