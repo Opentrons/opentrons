@@ -96,3 +96,12 @@
 .rangeInput:active::-webkit-slider-thumb {
   opacity: 1;
 }
+
+.deckViewContainer {
+  width: 500px;
+  height: 535px;
+  padding: 28px 32px;
+  gap: 20px;
+  border-radius: 8px;
+  background-color: white;
+}

@@ -12,6 +12,7 @@ interface ControlsProps {
   currentCommandIndex: number
   setCurrentCommandIndex: (value: SetStateAction<number>) => void
   commandListRef: RefObject<ViewportListRef>
+  handlePlayPause: () => void
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -21,6 +22,7 @@ export function Controls(props: ControlsProps): JSX.Element {
     currentCommandIndex,
     commandListRef,
     setCurrentCommandIndex,
+    handlePlayPause,
   } = props
 
   return (
@@ -39,7 +41,12 @@ export function Controls(props: ControlsProps): JSX.Element {
               </div>
             </div>
             <div className={styles.buttons}>
-              <button className={styles.fastButton}>
+              <button
+                className={styles.fastButton}
+                onClick={() => {
+                  setCurrentCommandIndex(0)
+                }}
+              >
                 <Icon
                   name="play-icon"
                   width="15px"
@@ -47,7 +54,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                   color="#006cfa"
                 />
               </button>
-              <button className={styles.playButton}>
+              <button className={styles.playButton} onClick={handlePlayPause}>
                 <Icon
                   name="play-icon"
                   width="21px"
@@ -55,7 +62,12 @@ export function Controls(props: ControlsProps): JSX.Element {
                   color="white"
                 />
               </button>
-              <button className={styles.fastButton}>
+              <button
+                className={styles.fastButton}
+                onClick={() => {
+                  setCurrentCommandIndex(numCommandLength)
+                }}
+              >
                 <Icon
                   name="play-icon"
                   width="15px"

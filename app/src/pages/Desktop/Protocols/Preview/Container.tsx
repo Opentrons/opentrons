@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { ViewportListRef } from 'react-viewport-list'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { GroupedCommands } from '/app/redux/protocol-storage'
+
+import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
+import { DeckView } from './DeckView'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -14,12 +19,14 @@ const SEC_PER_FRAME = 3000
 
 interface ContainerProps {
   analysis: ProtocolAnalysisOutput
+  groupedCommands: GroupedCommands | null
 }
 export function Container(props: ContainerProps): JSX.Element {
-  const { analysis } = props
+  const { analysis, groupedCommands } = props
   const { commands, robotType, liquids } = analysis
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
   const commandListRef = useRef<ViewportListRef>(null)
 
@@ -54,13 +61,30 @@ export function Container(props: ContainerProps): JSX.Element {
   const { robotState } = frame
 
   return (
-    <Controls
-      protocolName={analysis.metadata.protocolName}
-      numErrors={analysis.errors.length}
-      numCommandLength={commands.length}
-      currentCommandIndex={currentCommandIndex}
-      setCurrentCommandIndex={setCurrentCommandIndex}
-      commandListRef={commandListRef}
-    />
+    <>
+      <Controls
+        protocolName={analysis.metadata.protocolName}
+        numErrors={analysis.errors.length}
+        numCommandLength={commands.length}
+        currentCommandIndex={currentCommandIndex}
+        setCurrentCommandIndex={setCurrentCommandIndex}
+        commandListRef={commandListRef}
+        handlePlayPause={handlePlayPause}
+      />
+      <div style={{ display: 'flex' }}>
+        <DeckView
+          invariantContext={invariantContext}
+          robotState={robotState}
+          robotType={robotType ?? FLEX_ROBOT_TYPE}
+          selectedSlot={selectedSlot}
+          setSelectedSlot={setSelectedSlot}
+        />
+        <CommandSteps
+          analysis={analysis}
+          currentCommandIndex={currentCommandIndex}
+          groupedCommands={groupedCommands}
+        />
+      </div>
+    </>
   )
 }

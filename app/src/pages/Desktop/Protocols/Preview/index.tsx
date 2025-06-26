@@ -4,7 +4,11 @@ import { useParams } from 'react-router-dom'
 
 import { Icon } from '@opentrons/components'
 
-import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
+import {
+  fetchProtocols,
+  getStoredProtocol,
+  getStoredProtocolGroupedCommands,
+} from '/app/redux/protocol-storage'
 
 import { Container } from './Container'
 
@@ -19,13 +23,18 @@ export function Preview(): JSX.Element {
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
   )
-
+  const groupedCommands = useSelector((state: State) =>
+    getStoredProtocolGroupedCommands(state, protocolKey)
+  )
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <Container analysis={storedProtocol.mostRecentAnalysis} />
+    <Container
+      analysis={storedProtocol.mostRecentAnalysis}
+      groupedCommands={groupedCommands}
+    />
   ) : (
     <Icon size="8rem" name="ot-spinner" spin />
   )

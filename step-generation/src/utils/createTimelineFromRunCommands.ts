@@ -72,8 +72,9 @@ export function getResultingTimelineFrameFromRunCommands(
           )
         } else if ('labwareId' in command.params.location) {
           const labwareId = command.params.location.labwareId
-          const labwareIdStack = labwareLocations[labwareId].stack
-          stack.push(labwareId, ...labwareIdStack)
+          // const labwareIdStack = labwareLocations[labwareId].stack
+          //  TODO: fix this bug
+          stack.push(labwareId)
         } else {
           stack.push(command.params.location.addressableAreaName)
         }
