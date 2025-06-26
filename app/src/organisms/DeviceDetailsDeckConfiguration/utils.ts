@@ -1,10 +1,10 @@
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
-  getAddressableAreaMatchForAreaId,
   getDeckDefFromRobotType,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  replaceAAWithFakeAA,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
@@ -42,7 +42,7 @@ const mapModuleToCutoutConfig = (
 
   if (!cutoutFixtureId) return null
 
-  const aaforModule = getAddressableAreaMatchForAreaId(
+  const aaforModule = replaceAAWithFakeAA(
     cutoutId,
     cutoutFixtureId,
     addressableAreaId
@@ -154,7 +154,7 @@ export const getModuleOptions = (
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
-  const aaMagBlockId = getAddressableAreaMatchForAreaId(
+  const aaMagBlockId = replaceAAWithFakeAA(
     cutoutId,
     MAGNETIC_BLOCK_V1_FIXTURE,
     addressableAreaId
@@ -200,7 +200,7 @@ export const getFixtureOptions = (
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
-  const TrashBinAA = getAddressableAreaMatchForAreaId(
+  const TrashBinAA = replaceAAWithFakeAA(
     cutoutId,
     TRASH_BIN_ADAPTER_FIXTURE,
     addressableAreaId
@@ -218,7 +218,7 @@ export const getFixtureOptions = (
     ]
   }
 
-  const stagingAreaAA = getAddressableAreaMatchForAreaId(
+  const stagingAreaAA = replaceAAWithFakeAA(
     cutoutId,
     STAGING_AREA_RIGHT_SLOT_FIXTURE,
     addressableAreaId
@@ -252,11 +252,7 @@ export const getOptions = (
       )
       const aaProvidedFixtureOptions = addressableAreasById[o]
       if (aaProvidedFixtureOptions != null) {
-        const aaForFixture = getAddressableAreaMatchForAreaId(
-          cutoutId,
-          o,
-          addressableAreaId
-        )
+        const aaForFixture = replaceAAWithFakeAA(cutoutId, o, addressableAreaId)
         if (aaForFixture != null) {
           return [
             {

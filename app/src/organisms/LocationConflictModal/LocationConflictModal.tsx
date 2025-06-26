@@ -53,7 +53,6 @@ interface LocationConflictModalProps {
   cutoutId: CutoutId
   deckDef: DeckDefinition
   robotName: string
-  missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
@@ -66,7 +65,6 @@ export const LocationConflictModal = (
     onCloseClick,
     cutoutId,
     robotName,
-    missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
     deckDef,
@@ -185,9 +183,7 @@ export const LocationConflictModal = (
   }
 
   let protocolSpecifiesDisplayName = ''
-  if (missingLabwareDisplayName != null) {
-    protocolSpecifiesDisplayName = missingLabwareDisplayName
-  } else if (requiredFixtureId != null) {
+  if (requiredFixtureId != null) {
     protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
   } else if (requiredModule != null) {
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)

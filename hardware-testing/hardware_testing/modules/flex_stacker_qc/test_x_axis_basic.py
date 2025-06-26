@@ -55,25 +55,11 @@ async def test_platform_sensors_for_direction(
     )
 
 
-async def platform_is_removed(stacker: FlexStacker) -> bool:
-    """Check if the platform is removed from the carrier."""
-    plus_side = await stacker._driver.get_platform_sensor(Direction.EXTEND)
-    minus_side = await stacker._driver.get_platform_sensor(Direction.RETRACT)
-    return not plus_side and not minus_side
-
-
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker.is_simulated and not await platform_is_removed(stacker):
-        print("FAILURE - Cannot start tests with platform on the carrier")
-        return
-
     await test_limit_switches_per_direction(
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )
-
-    if not stacker.is_simulated:
-        ui.get_user_ready("Place the platform on the X carrier")
 
     await test_platform_sensors_for_direction(
         stacker, Direction.EXTEND, report, section

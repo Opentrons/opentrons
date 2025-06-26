@@ -30,13 +30,14 @@ interface FlexStackerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   hasWasteChute: boolean
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
-  addressableArea: AddressableAreaNamesWithFakes
 }
 
 export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
@@ -46,7 +47,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
     fixtureLocation,
     cutoutFixtureId,
     hasWasteChute,
-    addressableArea,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -66,13 +67,18 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
   const offsetVector = getAALocationForCutoutAndFixtureId(
-    addressableArea,
+    addressableAreaId,
     deckDefinition
   )
   const y = ySlotPosition + Y_ADJUSTMENT
   const x = xSlotPosition + offsetVector[0] + STACKER_X_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -85,13 +91,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

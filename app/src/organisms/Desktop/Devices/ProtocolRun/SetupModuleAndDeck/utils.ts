@@ -1,6 +1,7 @@
 import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
@@ -24,7 +25,10 @@ import wasteChute from '/app/assets/images/waste_chute.png'
 import type { CutoutFixtureId } from '@opentrons/shared-data'
 
 export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+  if (SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)) {
+    // TODO: replace with image for single slot fixtures once we get final renders
+    return stagingArea
+  } else if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return stagingArea
   } else if (WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)) {
     return wasteChute

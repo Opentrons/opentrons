@@ -64,7 +64,7 @@ import {
   getLabwareIsRecommended,
   getStackerDefinition,
 } from '../../../pages/Designer/DeckSetup/utils'
-import { TC_LID_LOADNAME } from '../../../pages/Designer/utils'
+import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
@@ -84,11 +84,6 @@ import type { ThunkDispatch } from '../../../types'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
-const STACKING_LOADNAMES = [
-  'opentrons_flex_deck_riser',
-  'opentrons_flex_tiprack_lid',
-  'opentrons_tough_pcr_auto_sealing_lid',
-]
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 interface SelectLabwareModalProps {
@@ -118,6 +113,14 @@ export function SelectLabwareModal(
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
+  const lidLoadNames = Object.values(defs)
+    .filter(
+      def =>
+        def.allowedRoles?.includes('lid') &&
+        def.parameters.loadName !== TIPRACK_LID_LOADNAME
+    )
+    ?.map(def => def.parameters.loadName)
+
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -219,7 +222,7 @@ export function SelectLabwareModal(
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
-        (!enableStacking && STACKING_LOADNAMES.includes(parameters.loadName))
+        (!enableStacking && parameters.loadName === 'opentrons_flex_deck_riser')
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
@@ -235,8 +238,9 @@ export function SelectLabwareModal(
         const category: string = def.metadata.displayCategory
         //  filter out non-permitted tipracks
         if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
+          (category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))) ||
+          (category === 'lid' && !enableStacking)
         ) {
           return acc
         }
@@ -542,7 +546,7 @@ export function SelectLabwareModal(
                                     loadName={loadName}
                                     allowInputField={
                                       onFlexStacker ||
-                                      loadName === TC_LID_LOADNAME
+                                      lidLoadNames.includes(loadName)
                                     }
                                     stackingProps={stackingProps ?? undefined}
                                     id={`${index}_${category}_${loadName}`}
@@ -736,11 +740,10 @@ export function SelectLabwareModal(
                                                       nestedDef.parameters
                                                         .loadName
                                                     }
-                                                    allowInputField={
+                                                    allowInputField={lidLoadNames.includes(
                                                       nestedDef.parameters
-                                                        .loadName ===
-                                                      TC_LID_LOADNAME
-                                                    }
+                                                        .loadName
+                                                    )}
                                                     stackingProps={
                                                       stackingProps ?? undefined
                                                     }
