@@ -1,5 +1,8 @@
+from copy import deepcopy
+
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 
 
@@ -81,7 +84,9 @@ _APILEVEL_2_23_OT_DEFAULT_VERSIONS: dict[str, int] = {
     "usascientific_96_wellplate_2.4ml_deep": 2,
 }
 
-_APILEVEL_2_24_OT_DEFAULT_VERSIONS: dict[str, int] = _APILEVEL_2_23_OT_DEFAULT_VERSIONS
+_APILEVEL_2_24_OT_DEFAULT_VERSIONS: dict[str, int] = deepcopy(
+    _APILEVEL_2_23_OT_DEFAULT_VERSIONS
+)
 _APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
     {
         "appliedbiosystemsmicroamp_384_wellplate_40ul": 3,
@@ -100,6 +105,8 @@ _APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
         "usascientific_96_wellplate_2.4ml_deep": 3,
     }
 )
+
+DEFAULT_LABWARE_VERSIONS = _APILEVEL_2_24_OT_DEFAULT_VERSIONS
 
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
@@ -174,11 +181,8 @@ def _get_default_version_for_standard_labware(
 ) -> int:
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
-    if (
-        api_version >= APIVersion(2, 24)
-        and load_name in _APILEVEL_2_24_OT_DEFAULT_VERSIONS
-    ):
-        return _APILEVEL_2_24_OT_DEFAULT_VERSIONS[load_name]
+    if api_version >= MAX_SUPPORTED_VERSION and load_name in DEFAULT_LABWARE_VERSIONS:
+        return DEFAULT_LABWARE_VERSIONS[load_name]
     elif (
         api_version == APIVersion(2, 23)
         and load_name in _APILEVEL_2_23_OT_DEFAULT_VERSIONS
