@@ -433,7 +433,7 @@ liquid_2 = protocol.define_liquid(
 })
 
 describe('getLoadLiquids', () => {
-  it('should generate 2 liquids in 2 labware in 4 wells', () => {
+  it('should generate 2 liquids in 2 labware in multiple wells', () => {
     const mockLiquidsBylabwareId: LabwareLiquidState = {
       [labwareId3]: {
         A1: { [liquid1]: { volume: 10 } },
@@ -442,6 +442,14 @@ describe('getLoadLiquids', () => {
       },
       [labwareId4]: {
         D1: { [liquid2]: { volume: 180 } },
+        D2: { [liquid2]: { volume: 180 } },
+        D3: { [liquid2]: { volume: 180 } },
+        D4: { [liquid2]: { volume: 180 } },
+        D5: { [liquid2]: { volume: 180 } },
+        D6: { [liquid2]: { volume: 180 } },
+        D7: { [liquid2]: { volume: 180 } },
+        D8: { [liquid2]: { volume: 180 } },
+        E3: { [liquid2]: { volume: 180 } },
       },
     }
     expect(
@@ -453,10 +461,24 @@ describe('getLoadLiquids', () => {
     ).toBe(
       `
 # Load Liquids:
-well_plate_1["A1"].load_liquid(liquid_1, 10)
-well_plate_1["A2"].load_liquid(liquid_1, 10)
-well_plate_1["A3"].load_liquid(liquid_2, 50)
-well_plate_2["D1"].load_liquid(liquid_2, 180)`.trimStart()
+well_plate_1.load_liquid(
+    wells=["A1", "A2"],
+    liquid=liquid_1,
+    volume=10,
+)
+well_plate_1.load_liquid(
+    wells=["A3"],
+    liquid=liquid_2,
+    volume=50,
+)
+well_plate_2.load_liquid(
+    wells=[
+        "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8",
+        "E3"
+        ],
+    liquid=liquid_2,
+    volume=180,
+)`.trimStart()
     )
   })
 })
