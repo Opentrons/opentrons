@@ -83,10 +83,10 @@ _APILEVEL_2_23_OT_DEFAULT_VERSIONS: dict[str, int] = {
     "usascientific_96_wellplate_2.4ml_deep": 2,
 }
 
-_APILEVEL_2_24_OT_DEFAULT_VERSIONS: dict[str, int] = deepcopy(
+_APILEVEL_2_25_OT_DEFAULT_VERSIONS: dict[str, int] = deepcopy(
     _APILEVEL_2_23_OT_DEFAULT_VERSIONS
 )
-_APILEVEL_2_24_OT_DEFAULT_VERSIONS.update(
+_APILEVEL_2_25_OT_DEFAULT_VERSIONS.update(
     {
         "appliedbiosystemsmicroamp_384_wellplate_40ul": 3,
         "biorad_384_wellplate_50ul": 4,
@@ -180,10 +180,10 @@ def _get_default_version_for_standard_labware(
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
     if (
-        api_version >= APIVersion(2, 24)
-        and load_name in _APILEVEL_2_24_OT_DEFAULT_VERSIONS
+        api_version >= APIVersion(2, 25)
+        and load_name in _APILEVEL_2_25_OT_DEFAULT_VERSIONS
     ):
-        return _APILEVEL_2_24_OT_DEFAULT_VERSIONS[load_name]
+        return _APILEVEL_2_25_OT_DEFAULT_VERSIONS[load_name]
     elif (
         api_version >= APIVersion(2, 23)
         and load_name in _APILEVEL_2_23_OT_DEFAULT_VERSIONS
