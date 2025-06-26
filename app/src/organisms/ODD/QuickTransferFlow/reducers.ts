@@ -239,7 +239,7 @@ export function quickTransferSummaryReducer(
     case 'SET_BLOW_OUT': {
       return {
         ...state,
-        blowOut: action.location,
+        blowOutDispense: action.blowOutSettings,
       }
     }
     case 'SET_AIR_GAP_DISPENSE': {

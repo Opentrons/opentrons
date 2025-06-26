@@ -30,6 +30,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from '../constants'
+import { getPipetteName } from '../utils'
 
 import type { Dispatch } from 'react'
 import type { SupportedTip } from '@opentrons/shared-data'
@@ -106,15 +107,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     },
   ]
 
-  let pipetteName = state.pipette.model
-  if (state.pipette.channels === 1) {
-    pipetteName = pipetteName + `_single_flex`
-  } else if (state.pipette.channels === 8) {
-    pipetteName = pipetteName + `_multi_flex`
-  } else {
-    pipetteName = pipetteName + `_96`
-  }
-
+  const pipetteName = getPipetteName(state.pipette)
   const liquidSpecs = state.pipette.liquids
   const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
   const flowRatesForSupportedTip: SupportedTip | undefined =

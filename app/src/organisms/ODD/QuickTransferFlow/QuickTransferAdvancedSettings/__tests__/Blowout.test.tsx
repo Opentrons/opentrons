@@ -11,6 +11,7 @@ import { BlowOut } from '../BlowOut'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux-resources/analytics')
+// vi.mock('/app/resources/deck_configuration')
 
 const render = (props: ComponentProps<typeof BlowOut>) => {
   return renderWithProviders(<BlowOut {...props} />, {
@@ -60,7 +61,23 @@ describe('BlowOut', () => {
     screen.getByText('Destination well')
     screen.getByText('Source well')
     screen.getByText('Trash bin in A3')
-    fireEvent.click(screen.getByText('Save'))
+  })
+
+  it('renders text, buttons for blowout third screen', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Enabled'))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Select blowout location')
+    screen.getByText('Destination well')
+    screen.getByText('Source well')
+    screen.getByText('Trash bin in A3')
+    fireEvent.click(screen.getByText('Source well'))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Blowout speed (µL/second)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
   })
 
   it('should call dispatch when clicking save button', () => {
@@ -72,10 +89,15 @@ describe('BlowOut', () => {
     screen.getByText('Source well')
     screen.getByText('Trash bin in A3')
     fireEvent.click(screen.getByText('Source well'))
+    fireEvent.click(screen.getByText('Continue'))
+    fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_BLOW_OUT',
-      location: 'source_well',
+      blowOutSettings: {
+        blowOutLocation: 'source_well',
+        speed: 2,
+      },
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: 'quickTransferSettingSaved',

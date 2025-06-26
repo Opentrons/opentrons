@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
 
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
@@ -14,11 +16,14 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getTipTypeFromTipRackDefinition,
+  LOW_VOLUME_PIPETTES,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -26,9 +31,10 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from '../constants'
+import { getPipetteName } from '../utils'
 
 import type { Dispatch } from 'react'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration, SupportedTip } from '@opentrons/shared-data'
 import type {
   BlowOutLocation,
   FlowRateKind,
@@ -101,27 +107,31 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const [isBlowOutEnabled, setisBlowOutEnabled] = useState<boolean>(
-    state.blowOut != null
+  const keyboardRef = useRef(null)
+  const [isBlowOutEnabled, setIsBlowOutEnabled] = useState<boolean>(
+    state.blowOutDispense != null
   )
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOut)
+  >(state.blowOutDispense?.location)
+  const [speed, setSpeed] = useState<number | null>(
+    state.blowOutDispense?.speed ?? null
+  )
 
   const enableBlowOutDisplayItems = [
     {
       option: true,
       description: t('option_enabled'),
       onClick: () => {
-        setisBlowOutEnabled(true)
+        setIsBlowOutEnabled(true)
       },
     },
     {
       option: false,
       description: t('option_disabled'),
       onClick: () => {
-        setisBlowOutEnabled(false)
+        setIsBlowOutEnabled(false)
       },
     },
   ]
@@ -140,7 +150,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       if (!isBlowOutEnabled) {
         dispatch({
           type: ACTIONS.SET_BLOW_OUT,
-          location: undefined,
+          blowOutSettings: {
+            location: undefined,
+            speed: 0,
+          },
         })
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -152,10 +165,17 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       } else {
         setCurrentStep(currentStep + 1)
       }
+    } else if (currentStep === 2) {
+      if (blowOutLocation != null) {
+        setCurrentStep(currentStep + 1)
+      }
     } else {
       dispatch({
         type: ACTIONS.SET_BLOW_OUT,
-        location: blowOutLocation,
+        blowOutSettings: {
+          location: blowOutLocation,
+          speed: speed ?? 1,
+        },
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -168,13 +188,41 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   }
 
   const saveOrContinueButtonText =
-    isBlowOutEnabled && currentStep < 2
+    isBlowOutEnabled && currentStep < 3
       ? t('shared:continue')
       : t('shared:save')
 
   let buttonIsDisabled = false
-  if (currentStep === 2) {
+  if (currentStep === 3) {
     buttonIsDisabled = blowOutLocation == null
+  }
+
+  const pipetteName = getPipetteName(state.pipette)
+  const liquidSpecs = state.pipette.liquids
+  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+  const flowRatesForSupportedTip: SupportedTip | undefined =
+    state.volume < 5 &&
+    `lowVolumeDefault` in liquidSpecs &&
+    LOW_VOLUME_PIPETTES.includes(pipetteName)
+      ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
+      : liquidSpecs.default.supportedTips[tipType]
+  const minFlowRate = 1
+  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
+
+  const speedError =
+    speed != null && (speed < minFlowRate || speed > maxFlowRate)
+      ? t(`value_out_of_range`, {
+          min: minFlowRate,
+          max: maxFlowRate,
+        })
+      : null
+
+  const handleFlowRateChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    }
+    const parsedFlowRate = parseInt(userInput)
+    setSpeed(!isNaN(parsedFlowRate) ? parsedFlowRate : null)
   }
 
   return createPortal(
@@ -241,6 +289,47 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
                 radioButtonType="large"
               />
             ))}
+          </Flex>
+        </Flex>
+      ) : null}
+      {currentStep === 3 ? (
+        <Flex
+          alignSelf={ALIGN_CENTER}
+          gridGap={SPACING.spacing48}
+          paddingX={SPACING.spacing40}
+          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          alignItems={ALIGN_CENTER}
+          height="22rem"
+        >
+          <Flex
+            width="30.5rem"
+            height="100%"
+            gridGap={SPACING.spacing24}
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing68}
+          >
+            <InputField
+              type="text"
+              value={String(speed ?? '')}
+              title={t('blow_out_speed')}
+              error={speedError}
+              readOnly
+            />
+          </Flex>
+          <Flex
+            paddingX={SPACING.spacing24}
+            height="21.25rem"
+            marginTop="7.75rem"
+            borderRadius="0"
+          >
+            <NumericalKeyboard
+              keyboardRef={keyboardRef}
+              initialValue={String(speed ?? '')}
+              onChange={e => {
+                handleFlowRateChange(e)
+              }}
+            />
           </Flex>
         </Flex>
       ) : null}
