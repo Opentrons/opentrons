@@ -1,0 +1,53 @@
+site_name: hepa-uv
+
+nav:
+  - Home: index.md
+  - Product and Manufacturer Description: product-and-manufacturer-description.md
+  - Safety Information and Regulatory Compliance: safety-information-and-regulatory-compliance.md
+  - Product Specifications: product-specifications.md
+  - HEPA Specifications: hepa-specifications.md
+  - UV Specifications: uv-specifications.md
+  - Unboxing and Installation: unboxing-and-installation.md
+  - Hardware Controls: hardware-controls.md
+  - Maintenance: maintenance.md
+  - Cleaning: cleaning.md
+  - Additional Product Information: additional-product-information.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - manual.css
+  - ../opentrons-theme.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

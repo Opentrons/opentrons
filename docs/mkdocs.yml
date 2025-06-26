@@ -7,6 +7,7 @@ nav:
   - Opentrons Flex: '!include flex-manual/mkdocs.yml'
   - Modules:
     - Flex Stacker: '!include stacker-manual/mkdocs.yml'
+    - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
   - Python API: papi.md
   - Protocol Designer: pd.md
 
@@ -23,8 +24,8 @@ theme:
   features:
     - navigation.indexes
     - navigation.tabs
-  logo: flex-manual/docs/images/opentrons-droplet-white.svg
-  favicon: flex-manual/docs/images/opentrons-droplet-color.svg
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
   icon:
     admonition:
       tip: material/lightbulb-on-outline
