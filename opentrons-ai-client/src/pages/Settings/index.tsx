@@ -4,9 +4,13 @@ import { useAtom } from 'jotai'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
@@ -38,6 +42,10 @@ export function Settings(): JSX.Element {
     })
   }
 
+  const handleBackClick = (): void => {
+    window.location.hash = '/'
+  }
+
   return (
     <Flex
       width="100%"
@@ -53,12 +61,35 @@ export function Settings(): JSX.Element {
           gridGap={SPACING.spacing40}
           borderRadius={BORDERS.borderRadius8}
           width="100%"
-          height={featureFlags.enablePrereleaseMode ? 'auto' : '17.25rem'}
-          minHeight="17.25rem"
+          height={featureFlags.enablePrereleaseMode ? 'auto' : '20rem'}
+          minHeight="20rem"
         >
-          <StyledText desktopStyle="headingLargeBold">
-            {t('settings')}
-          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+            <Btn
+              onClick={handleBackClick}
+              css="padding: 0; margin-left: -0.5rem; display: flex; align-items: center; justify-content: flex-start; background: transparent; border: none; cursor: pointer; width: fit-content;"
+              data-testid="back-button"
+              aria-label="Back"
+            >
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing4}
+              >
+                <Icon name="arrow-left" size="1.5rem" color={COLORS.grey60} />
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                  css="font-size: 1rem;"
+                >
+                  {t('back')}
+                </StyledText>
+              </Flex>
+            </Btn>
+            <StyledText desktopStyle="headingLargeBold">
+              {t('settings')}
+            </StyledText>
+          </Flex>
 
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <StyledText desktopStyle="bodyLargeSemiBold">
