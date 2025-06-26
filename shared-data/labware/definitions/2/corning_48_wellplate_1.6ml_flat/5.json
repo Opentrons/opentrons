@@ -10,7 +10,7 @@
     ["A8", "B8", "C8", "D8", "E8", "F8"]
   ],
   "schemaVersion": 2,
-  "version": 2,
+  "version": 5,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 48 Well Plate 1.6 mL Flat",
@@ -34,435 +34,483 @@
   "wells": {
     "F1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A1": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 18.16,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A2": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 31.24,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A3": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 44.32,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A4": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 57.4,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A5": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 70.48,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A6": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 83.56,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A7": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 96.64,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "F8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 10.08,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "E8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 23.16,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "D8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 36.24,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "C8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 49.32,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "B8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 62.4,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     },
     "A8": {
       "shape": "circular",
-      "depth": 17.4,
-      "diameter": 11.56,
+      "depth": 17.399,
+      "diameter": 11.1,
       "totalLiquidVolume": 1600,
       "x": 109.72,
       "y": 75.48,
-      "z": 2.62
+      "z": 2.621,
+      "geometryDefinitionId": "conicalWell"
     }
   },
   "brand": {
@@ -539,6 +587,24 @@
       "x": 0,
       "y": 0,
       "z": 4.4
+    },
+    "corning_48_wellplate_1.6ml_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "innerLabwareGeometry": {
+    "conicalWell": {
+      "sections": [
+        {
+          "shape": "conical",
+          "bottomDiameter": 10.643,
+          "topDiameter": 11.1,
+          "topHeight": 17.399,
+          "bottomHeight": 0.0
+        }
+      ]
     }
   }
 }

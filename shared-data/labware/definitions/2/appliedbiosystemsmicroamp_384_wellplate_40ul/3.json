@@ -4694,8 +4694,15 @@
     "loadName": "appliedbiosystemsmicroamp_384_wellplate_40ul"
   },
   "namespace": "opentrons",
-  "version": 2,
+  "version": 3,
   "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "appliedbiosystemsmicroamp_384_wellplate_40ul": {
+      "x": 0,
+      "y": 0,
+      "z": 1.2
+    }
+  },
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,

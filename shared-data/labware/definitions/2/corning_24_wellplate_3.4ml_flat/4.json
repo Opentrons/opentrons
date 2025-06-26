@@ -15,7 +15,7 @@
     ]
   },
   "schemaVersion": 2,
-  "version": 3,
+  "version": 4,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 24 Well Plate 3.4 mL Flat",
@@ -319,6 +319,11 @@
       "x": 0,
       "y": 0,
       "z": 4.15
+    },
+    "corning_24_wellplate_3.4ml_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 1.34
     }
   },
   "innerLabwareGeometry": {
