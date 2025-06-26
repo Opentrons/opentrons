@@ -219,7 +219,6 @@ export function UpdateProtocol(): JSX.Element {
 
   function processDataAndNavigateToChat(): void {
     // Format the prompt for all update types
-    const introText = t('modify_intro')
     const originalCodeText =
       pythonText !== ''
         ? t('modify_python_code') +
@@ -228,9 +227,9 @@ export function UpdateProtocol(): JSX.Element {
           `\n\`\`\`\n\n`
         : ''
     const updateTypeText =
-      t('modify_type_of_update') + updateType?.value + `\n\n`
+      t('modify_type_of_update') + updateType?.name + `\n\n`
     const detailsText = t('modify_details_of_change') + detailsValue + '\n'
-    const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
+    const chatPrompt = `${originalCodeText}${updateTypeText}${detailsText}`
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,
