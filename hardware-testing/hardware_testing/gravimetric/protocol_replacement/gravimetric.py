@@ -682,6 +682,7 @@ def run_one_test(
         tiprack_uri=tiprack_uri,
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
+    fixture_settings.pipette.configure_for_volume(volume)
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
