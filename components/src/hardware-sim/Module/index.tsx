@@ -3,6 +3,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
+  IDENTITY_AFFINE_TRANSFORM,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   multiplyMatrices,
@@ -35,9 +36,8 @@ import type {
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 
+export * from './alignToModule'
 export * from './Thermocycler'
-
-const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
 interface Props {
   /**
@@ -58,8 +58,13 @@ interface Props {
     | ComponentProps<typeof HeaterShaker>
     | ComponentProps<typeof Temperature>
     | {}
-  statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
-  children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
+  statusInfo?: ReactNode /** contents of small status rectangle, not displayed if absent */
+
+  /**
+   * Contents to be rendered above and as part of the module, typically labware.
+   * Use a helper component like `<AlignLabwareToModule>` to position them properly.
+   */
+  children?: ReactNode
 
   /**
    * Used for applying slot-specific positioning adjustments.
@@ -102,12 +107,6 @@ export const Module = (props: Props): JSX.Element => {
 
   const moduleType = getModuleType(def.model)
 
-  const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
-  const {
-    x: translateX,
-    y: translateY,
-    z: translateZ,
-  } = def.cornerOffsetFromSlot
   const {
     xDimension,
     yDimension,
@@ -118,46 +117,28 @@ export const Module = (props: Props): JSX.Element => {
   } = def.dimensions
 
   // apply translation to position module in viewport
-  const positionTransform = `translate(${x}, ${y})`
+  const parentSlotPositionTransform = `translate(${x}, ${y})`
+
+  const transformsForLocation =
+    targetSlotId != null && targetDeckId != null
+      ? def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {}
+      : {}
 
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
-  let offsetTransform = `translate(${translateX}, ${translateY})`
-
-  let nestedLabwareOffsetX = labwareOffsetX
-  let nestedLabwareOffsetY = labwareOffsetY
-
-  // additional transforms to apply to vectors in certain deck/slot combinations
-  const transformsForDeckBySlot =
-    (targetDeckId != null ? def?.slotTransforms?.[targetDeckId] : null) ?? {}
-  const slotTransformsForDeckSlot =
-    (targetSlotId != null ? transformsForDeckBySlot[targetSlotId] : null) ?? {}
-
-  if (slotTransformsForDeckSlot.cornerOffsetFromSlot != null) {
-    const [
-      [slotTranslateX],
-      [slotTranslateY],
-    ] = multiplyMatrices(slotTransformsForDeckSlot.cornerOffsetFromSlot, [
-      [translateX],
-      [translateY],
-      [translateZ],
+  const [
+    [slotTranslateX],
+    [slotTranslateY],
+  ] = multiplyMatrices(
+    transformsForLocation.cornerOffsetFromSlot ?? IDENTITY_AFFINE_TRANSFORM,
+    [
+      [def.cornerOffsetFromSlot.x],
+      [def.cornerOffsetFromSlot.y],
+      [def.cornerOffsetFromSlot.z],
       [1],
-    ])
-    offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
-  }
-  if (slotTransformsForDeckSlot.labwareOffset != null) {
-    const [
-      [slotLabwareOffsetX],
-      [slotLabwareOffsetY],
-    ] = multiplyMatrices(slotTransformsForDeckSlot.labwareOffset, [
-      [labwareOffsetX],
-      [labwareOffsetY],
-      [1],
-      [1],
-    ])
-    nestedLabwareOffsetX = slotLabwareOffsetX
-    nestedLabwareOffsetY = slotLabwareOffsetY
-  }
+    ]
+  )
+  const offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
 
   // find coordinates of center of footprint, fallback to overall center if not defined
   const rotationCenterX = (footprintXDimension ?? xDimension) / 2
@@ -170,18 +151,6 @@ export const Module = (props: Props): JSX.Element => {
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
-  // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
-  const clampedLabwareOffsetX =
-    Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? nestedLabwareOffsetX
-      : 0
-  const clampedLabwareOffsetY =
-    Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? nestedLabwareOffsetY
-      : 0
-  // transform to be applied to children which render within the labware interfacing surface of the module
-  const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
-
   const renderStatusInfo = (): JSX.Element | null => {
     if (statusInfo == null) return null
     const statusWidth = (labwareInterfaceXDimension ?? xDimension) / 2
@@ -189,10 +158,10 @@ export const Module = (props: Props): JSX.Element => {
       <RobotCoordsForeignObject
         x={
           orientation === 'left'
-            ? labwareOffsetX - statusWidth
-            : labwareOffsetX + (labwareInterfaceXDimension ?? xDimension)
+            ? def.labwareOffset.x - statusWidth
+            : def.labwareOffset.x + (labwareInterfaceXDimension ?? xDimension)
         }
-        y={labwareOffsetY}
+        y={def.labwareOffset.y}
         height={labwareInterfaceYDimension ?? yDimension}
         width={statusWidth}
         foreignObjectProps={statusInfoWrapperProps}
@@ -230,16 +199,17 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <FlexStacker />
   }
   return (
-    <g transform={positionTransform} data-test={`Module_${moduleType}`}>
+    <g
+      transform={parentSlotPositionTransform}
+      data-test={`Module_${moduleType}`}
+    >
       <g transform={orientationTransform}>
         <g transform={offsetTransform} style={{ fill: C_DARK_GRAY }}>
           {moduleViz}
         </g>
       </g>
       {renderStatusInfo()}
-      {children != null ? (
-        <g transform={childrenTransform}>{children}</g>
-      ) : null}
+      {children}
     </g>
   )
 }
