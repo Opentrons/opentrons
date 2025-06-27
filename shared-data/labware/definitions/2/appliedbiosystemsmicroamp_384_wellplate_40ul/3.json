@@ -4700,7 +4700,7 @@
     "appliedbiosystemsmicroamp_384_wellplate_40ul": {
       "x": 0,
       "y": 0,
-      "z": 1.2
+      "z": 0.78
     }
   },
   "cornerOffsetFromSlot": {
