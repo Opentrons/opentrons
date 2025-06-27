@@ -72,6 +72,42 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
     )
     ?.map(def => def.parameters.loadName)
 
+  const handleSelectLabware = (
+    isAdapter: boolean,
+    uri: string,
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    e.stopPropagation()
+    if (isAdapter) {
+      dispatch(
+        selectAdapter({
+          adapterDefURI: uri === selectedAdapterDefURI ? null : uri,
+        })
+      )
+      dispatch(
+        selectTopLabware({
+          labwareDefURI: null,
+        })
+      )
+      dispatch(
+        selectLid({
+          labwareDefURI: null,
+        })
+      )
+    } else {
+      dispatch(
+        selectTopLabware({
+          labwareDefURI: uri === selectedTopLabware.labwareDefURI ? null : uri,
+        })
+      )
+      dispatch(
+        selectLid({
+          labwareDefURI: null,
+        })
+      )
+    }
+  }
+
   return (
     <>
       {ORDERED_CATEGORIES.map(category => {
@@ -153,41 +189,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           id={`${category}_${loadName}`}
                           buttonText={def.metadata.displayName}
                           buttonValue={uri}
-                          onChange={e => {
-                            e.stopPropagation()
-                            if (isAdapter) {
-                              dispatch(
-                                selectAdapter({
-                                  adapterDefURI:
-                                    uri === selectedAdapterDefURI ? null : uri,
-                                })
-                              )
-                              dispatch(
-                                selectTopLabware({
-                                  labwareDefURI: null,
-                                })
-                              )
-                              dispatch(
-                                selectLid({
-                                  labwareDefURI: null,
-                                })
-                              )
-                            } else {
-                              dispatch(
-                                selectTopLabware({
-                                  labwareDefURI:
-                                    uri === selectedTopLabware.labwareDefURI
-                                      ? null
-                                      : uri,
-                                })
-                              )
-                              dispatch(
-                                selectLid({
-                                  labwareDefURI: null,
-                                })
-                              )
-                            }
-                          }}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleSelectLabware(isAdapter ?? false, uri, e)
+                          }
                           isSelected={
                             (isAdapter && uri === selectedAdapterDefURI) ||
                             (!isAdapter &&

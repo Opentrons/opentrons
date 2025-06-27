@@ -14,6 +14,7 @@ import { selectLid, selectTopLabware } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { CUSTOM_CATEGORY } from '../../../pages/Designer/DeckSetup/constants'
 
+import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -45,6 +46,14 @@ export function SelectCustomLabware(
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedTopLabware, selectedLidLabware } = zoomedInSlotInfo
+
+  const handleChangeLabware = (
+    uri: string,
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    e.stopPropagation()
+    dispatch(selectTopLabware({ labwareDefURI: uri }))
+  }
 
   return filteredLabwareByCategory[CUSTOM_CATEGORY].length > 0 ? (
     <ListButton
@@ -96,10 +105,7 @@ export function SelectCustomLabware(
                 id={`${index}_${uri}`}
                 buttonText={customLabwareDefs[uri].metadata.displayName}
                 buttonValue={uri}
-                onChange={e => {
-                  e.stopPropagation()
-                  dispatch(selectTopLabware({ labwareDefURI: uri }))
-                }}
+                onChange={e => handleChangeLabware(uri, e)}
                 isSelected={uri === selectedTopLabware.labwareDefURI}
                 stackingProps={lidProps ?? undefined}
               />

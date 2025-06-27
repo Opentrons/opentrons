@@ -68,6 +68,28 @@ export function SelectLabwareOnAdapter(
     selectedLidLabware,
   } = zoomedInSlotInfo
 
+  const handleSelectLabware = (
+    nestedDefUri: string,
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    e.stopPropagation()
+    dispatch(
+      selectTopLabware({
+        labwareDefURI: nestedDefUri,
+      })
+    )
+    dispatch(
+      selectLid({
+        labwareDefURI: null,
+      })
+    )
+    dispatch(
+      selectTopLabwareAmount({
+        amount: 1,
+      })
+    )
+  }
+
   return isAdapter &&
     parentLabwareURI === selectedAdapterDefURI &&
     getLabwareCompatibleWithAdapter(defs, enableStacking, loadName)?.length >
@@ -173,24 +195,7 @@ export function SelectLabwareOnAdapter(
                     id={`${category}_${loadName}_${nestedDefUri}`}
                     buttonText={nestedDef?.metadata.displayName ?? ''}
                     buttonValue={nestedDefUri}
-                    onChange={e => {
-                      e.stopPropagation()
-                      dispatch(
-                        selectTopLabware({
-                          labwareDefURI: nestedDefUri,
-                        })
-                      )
-                      dispatch(
-                        selectLid({
-                          labwareDefURI: null,
-                        })
-                      )
-                      dispatch(
-                        selectTopLabwareAmount({
-                          amount: 1,
-                        })
-                      )
-                    }}
+                    onChange={e => handleSelectLabware(nestedDefUri, e)}
                     isSelected={
                       nestedDefUri === selectedTopLabware.labwareDefURI
                     }

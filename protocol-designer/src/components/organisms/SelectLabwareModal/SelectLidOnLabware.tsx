@@ -13,6 +13,7 @@ import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 
+import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 interface SelectLidOnLabwareProps {
@@ -41,6 +42,18 @@ export function SelectLidOnLabware(
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedTopLabware, selectedLidLabware } = zoomedInSlotInfo
+  const handleSelectLabware = (
+    defUri: string,
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    e.stopPropagation()
+    dispatch(
+      selectLid({
+        labwareDefURI: defUri,
+      })
+    )
+  }
+
   return !isAdapter &&
     parentLabwareURI === selectedTopLabware.labwareDefURI &&
     lidURIs.length > 1 ? (
@@ -63,14 +76,7 @@ export function SelectLidOnLabware(
               id={`${category}_${loadName}_${defUri}`}
               buttonText={def?.metadata.displayName ?? ''}
               buttonValue={defUri}
-              onChange={e => {
-                e.stopPropagation()
-                dispatch(
-                  selectLid({
-                    labwareDefURI: defUri,
-                  })
-                )
-              }}
+              onChange={e => handleSelectLabware(defUri, e)}
               isSelected={defUri === selectedLidLabware}
             />
           )
