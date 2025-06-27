@@ -243,6 +243,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
             <RobotCoordsForeignDiv
               x={slotPosition[0]}
               y={slotPosition[1]}
+              width={`${STANDARD_X_WIDTH}px`}
+              height={`${STANDARD_Y_HEIGHT}px`}
+              dataTestId={id}
               innerDivProps={{
                 style: {
                   cursor: 'pointer',
@@ -329,6 +332,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
             <RobotCoordsForeignDiv
               x={slotPosition[0]}
               y={slotPosition[1]}
+              width={`${STANDARD_X_WIDTH}px`}
+              height={`${STANDARD_Y_HEIGHT}px`}
               innerDivProps={{
                 style: {
                   cursor: 'pointer',

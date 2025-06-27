@@ -5,13 +5,15 @@ import {
   RobotWorkSpace,
   StyledText,
 } from '@opentrons/components'
-import { Liquid, RunTimeCommand } from '@opentrons/shared-data'
-import { LabwareEntities } from '@opentrons/step-generation'
+import { LabwareEntities, RobotState } from '@opentrons/step-generation'
 
 import { getWellFillFromLabwareId } from '/app/transformations/analysis'
 import { getLabwareInfoByLiquidId } from '/app/transformations/commands'
 
 import styles from './preview.module.css'
+
+import type { WellGroup } from '@opentrons/components'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface LabwareSlotDetailsProps {
   topLabwareOnSlotId: string
@@ -19,6 +21,7 @@ interface LabwareSlotDetailsProps {
   commands: RunTimeCommand[]
   liquids: Liquid[]
   currentCommand: RunTimeCommand
+  robotState: RobotState
 }
 export function LabwareSlotDetails(
   props: LabwareSlotDetailsProps
@@ -29,14 +32,26 @@ export function LabwareSlotDetails(
     topLabwareOnSlotId,
     labwareEntities,
     currentCommand,
+    robotState,
   } = props
-  const labwareNickname = Object.values(commands).find(
+  const labwareLoadCommand = Object.values(commands).find(
     command =>
-      command.commandType === 'loadLabware' &&
-      'labwareId' in command.params &&
-      command.params.labwareId === topLabwareOnSlotId
-  )?.params.displayName
+      'labwareId' in command.result &&
+      command.result.labwareId === topLabwareOnSlotId
+  )
+  // TODO: this only works for single channel, need to update for multi-channels
+  // by getting all the wells the multi-channel is using
+  const activeWellName = Object.values(robotState.pipettes).find(
+    pipette => pipette.entityId === topLabwareOnSlotId
+  )?.wellName
 
+  const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
+  const labwareNickname =
+    labwareLoadCommandParams != null &&
+    'displayName' in labwareLoadCommandParams
+      ? labwareLoadCommandParams.displayName
+      : null
+  const { params } = currentCommand
   const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
 
   const wellFill = getWellFillFromLabwareId(
@@ -47,6 +62,12 @@ export function LabwareSlotDetails(
 
   const labwareDisplayName =
     labwareEntities[topLabwareOnSlotId].def.metadata.displayName
+  const wellGroup: WellGroup | null =
+    activeWellName != null
+      ? {
+          [activeWellName]: null,
+        }
+      : null
 
   return (
     <>
@@ -74,14 +95,14 @@ export function LabwareSlotDetails(
             <RobotWorkSpace
               key={topLabwareOnSlotId}
               width="14rem"
-              viewBox={`0 0 ${labwareEntities[topLabwareOnSlotId].def.dimensions.xDimension} ${labwareEntities[topMostLabwareOnSlot].def.dimensions.yDimension}`}
+              viewBox={`0 0 ${labwareEntities[topLabwareOnSlotId].def.dimensions.xDimension} ${labwareEntities[topLabwareOnSlotId].def.dimensions.yDimension}`}
             >
               {() => (
                 <g>
                   <LabwareRender
                     definition={labwareEntities[topLabwareOnSlotId].def}
                     wellFill={wellFill}
-                    // highlightedWells={}
+                    highlightedWells={wellGroup}
                   />
                 </g>
               )}
@@ -90,6 +111,43 @@ export function LabwareSlotDetails(
         </div>
       </div>
       <Divider />
+      {activeWellName != null ? (
+        <>
+          <div className={styles.slotDetailsActiveStep}>
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {`Well ${activeWellName}`}
+            </StyledText>
+          </div>
+          <div style={{ padding: '0 16px 16px 16px' }}>
+            <div
+              style={{
+                justifyContent: 'center',
+                display: 'flex',
+                backgroundColor: COLORS.grey20,
+                padding: '16px',
+                borderRadius: '4px',
+                flexDirection: 'column',
+              }}
+            >
+              <div> {currentCommand.commandType}</div>
+              <div> {'speed' in params ? `speed: ${params.speed}` : null}</div>
+              <div>
+                {'flowRate' in params ? `flow rate: ${params.flowRate}` : null}
+              </div>
+              <div>
+                {'wellLocation' in params
+                  ? `well location: ${params.wellLocation.origin}, x: ${params.wellLocation.x}, y: ${params.wellLocation.x}, z: ${params.wellLocation.x}`
+                  : null}
+              </div>
+              <div>
+                {'volume' in params ? `volume: ${params.volume}` : null}
+              </div>
+            </div>
+          </div>
+
+          <Divider />
+        </>
+      ) : null}
     </>
   )
 }

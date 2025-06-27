@@ -27,7 +27,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
       ? (currentCommandIndex / commandLength) * 100
       : 0
   return (
-    <div className={styles.commandStepContainer}>
+    <div className={styles.detailContainer}>
       <div className={styles.commandStep}>
         <div className={styles.commandStepHeader}>
           <StyledText desktopStyle="bodyDefaultRegular">Timeline</StyledText>

@@ -99,14 +99,14 @@
 
 .deckViewContainer {
   width: 500px;
-  height: 535px;
+  height: 100%;
   padding: 28px 32px;
   gap: 20px;
   border-radius: 8px;
   background-color: white;
 }
 
-.commandStepContainer {
+.detailContainer {
   padding-right: 16px;
   padding-bottom: 16px;
 }
@@ -114,8 +114,7 @@
 .commandStep {
   background-color: white;
   border-radius: 8px;
-  height: 535px;
-  max-height: 535px;
+  height: 75.5vh;
 }
 
 .commandStepHeader {
@@ -126,8 +125,7 @@
 
 .commandStepGroups {
   overflow-y: scroll;
-  height: 470px;
-  max-height: 470px;
+  height: 67vh;
 }
 
 .slotDetailsActiveStep {

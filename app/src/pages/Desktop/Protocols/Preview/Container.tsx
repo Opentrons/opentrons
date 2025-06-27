@@ -91,7 +91,7 @@ export function Container(props: ContainerProps): JSX.Element {
         isPlaying={isPlaying}
         commands={commands}
       />
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', height: '75.5vh' }}>
         <DeckView
           invariantContext={invariantContext}
           robotState={robotState}

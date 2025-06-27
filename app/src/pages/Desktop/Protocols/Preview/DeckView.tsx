@@ -65,7 +65,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
       cutoutId: `cutout${
         Object.values(trashBinEntities)[0]?.location
       }` as CutoutId,
-      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      slot: Object.values(trashBinEntities)[0]?.location,
     },
   ]
 
@@ -114,7 +114,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               {Object.values(trashBinEntities).length > 0
-                ? trashBinFixtures.map(({ cutoutId }) => (
+                ? trashBinFixtures.map(({ cutoutId, slot }) => (
                     <Fragment key={cutoutId}>
                       <SingleSlotFixture
                         cutoutId={cutoutId}
@@ -126,7 +126,12 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         robotType={robotType}
                         trashIconColor={lightFill}
                         trashCutoutId={cutoutId as TrashCutoutId}
-                        backgroundColor={COLORS.grey50}
+                        backgroundColor={
+                          selectedSlot === slot ? COLORS.grey60 : COLORS.grey50
+                        }
+                        onClick={() => {
+                          setSelectedSlot(slot)
+                        }}
                       />
                     </Fragment>
                   ))

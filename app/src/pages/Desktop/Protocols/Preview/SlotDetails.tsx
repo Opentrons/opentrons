@@ -1,14 +1,9 @@
-import { Dispatch, SetStateAction } from 'react'
-
 import {
   COLORS,
   CommandText,
   DeckInfoLabel,
-  DeckLabel,
   Divider,
   Icon,
-  LabwareRender,
-  RobotWorkSpace,
   StyledText,
 } from '@opentrons/components'
 import {
@@ -20,18 +15,15 @@ import {
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
-  getSlotInLocationStack,
+  getModuleIdFromRobotStateStack,
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
 
-import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/AnnotatedSteps'
-import { GroupedCommands } from '/app/redux/protocol-storage'
-import { getWellFillFromLabwareId } from '/app/transformations/analysis'
-import { getLabwareInfoByLiquidId } from '/app/transformations/commands'
-
 import { LabwareSlotDetails } from './LabwareSlotDetails'
+import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
+import { TrashSlotDetails } from './trashSlotDetails'
 
 interface SlotDetailsProps {
   slotId: string
@@ -56,15 +48,26 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     analysis,
     liquids,
   } = props
-  const { labware } = robotState
-  const { labwareEntities } = invariantContext
+  const { labware, modules } = robotState
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+    moduleEntities,
+  } = invariantContext
   const { commands } = analysis
   const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
+  const moduleOnSlot = Object.entries(modules).find(
+    ([id, module]) => module.slot === slotId
+  )
   const topMostLabwareOnSlot =
-    stackOfLabwareOnSlot.length > 1 ? stackOfLabwareOnSlot[0] : null
+    stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
+  const isTrashOnSlot =
+    Object.values(trashBinEntities).some(trash => trash.location === slotId) ||
+    Object.values(wasteChuteEntities).some(trash => trash.location === slotId)
 
   return (
-    <div className={styles.commandStepContainer} style={{ width: '100%' }}>
+    <div className={styles.detailContainer} style={{ width: '100%' }}>
       <div className={styles.commandStep}>
         <div className={styles.commandStepHeader}>
           <div
@@ -78,7 +81,10 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           </div>
         </div>
         <Divider />
-        <div className={styles.slotDetailsActiveStep}>
+        <div
+          className={styles.slotDetailsActiveStep}
+          style={{ height: '100px' }}
+        >
           <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
           <div className={styles.commandText}>
             <CommandText
@@ -91,6 +97,13 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           </div>
         </div>
         <Divider />
+        {moduleOnSlot != null ? (
+          <ModuleSlotDetails
+            moduleId={moduleOnSlot[0]}
+            moduleEntities={moduleEntities}
+            moduleRobotState={modules}
+          />
+        ) : null}
         {topMostLabwareOnSlot != null ? (
           <LabwareSlotDetails
             topLabwareOnSlotId={topMostLabwareOnSlot}
@@ -98,12 +111,18 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             commands={commands}
             currentCommand={command}
             liquids={liquids}
+            robotState={robotState}
           />
+        ) : null}
+        {isTrashOnSlot ? (
+          <TrashSlotDetails trashBinEntities={trashBinEntities} />
         ) : null}
       </div>
     </div>
   )
 }
 
-// module info with module state
-// labware with display name, nickname, then liquid then svg render of labware with liquids
+// volume of liquids
+// update tip state
+// follow active step in viewport
+// allow for clicking on all slots, including empty ones
