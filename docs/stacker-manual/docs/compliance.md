@@ -45,7 +45,7 @@ The Flex Stacker has the following power input and output requirements, which ar
 
 - 100–240 VAC, 50/60 Hz
 - 6.4 A/115 VAC, 3.2 A/230 VAC
-- Mains fluctuation: &plusmn; 10%
+- Mains fluctuation: ± 10%
 - Overvoltage: Category III
 
 #### Output

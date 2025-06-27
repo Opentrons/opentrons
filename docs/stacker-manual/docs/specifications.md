@@ -42,8 +42,8 @@ The following table lists the environmental conditions for recommended use, acce
 
 |    | Recommended | Acceptable | Storage and transportation |
 |----|----|----|----|
-| Ambient temperature | +20 to +25 &deg;C | +2 to +40 &deg;C | -10 to +60 &deg;C |
-| Relative humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 &deg;C) | 10-85%, non-condensing (below 30 &deg;C) |
+| Ambient temperature | +20 to +25 °C | +2 to +40 °C | -10 to +60 °C |
+| Relative humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10-85%, non-condensing (below 30 °C) |
 | Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
 | Pollution degree | 2 or lower | 2 or lower | 2 or lower |
 
