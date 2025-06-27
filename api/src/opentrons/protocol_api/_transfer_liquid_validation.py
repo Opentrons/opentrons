@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union, Sequence, Optional
+from typing import List, Union, Sequence, Optional, Tuple
 
 from opentrons.types import Location, NozzleMapInterface
 from opentrons.protocols.api_support import instrument
@@ -13,6 +13,7 @@ from opentrons.protocols.advanced_control.transfers.common import (
 
 from .disposal_locations import TrashBin, WasteChute
 from .labware import Labware, Well
+from .core.common import WellCore
 from . import validation
 
 
@@ -24,13 +25,14 @@ class TransferInfo:
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
+    last_tip_location: Optional[Tuple[Location, WellCore]]
 
 
 def verify_and_normalize_transfer_args(
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute],
     tip_policy: TransferTipPolicyV2Type,
-    last_tip_picked_up_from: Optional[Well],
+    last_tip_well: Optional[Well],
     tip_racks: List[Labware],
     nozzle_map: NozzleMapInterface,
     group_wells_for_multi_channel: bool,
@@ -59,14 +61,14 @@ def verify_and_normalize_transfer_args(
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
     if valid_new_tip == TransferTipPolicyV2.NEVER:
-        if last_tip_picked_up_from is None:
+        if last_tip_well is None:
             raise RuntimeError(
                 "Pipette has no tip attached to perform transfer."
                 " Either do a pick_up_tip beforehand or specify a new_tip parameter"
                 " of 'once' or 'always'."
             )
         else:
-            valid_tip_racks = [last_tip_picked_up_from.parent]
+            valid_tip_racks = [last_tip_well.parent]
     else:
         valid_tip_racks = tip_racks
     if current_volume != 0:
@@ -86,12 +88,22 @@ def verify_and_normalize_transfer_args(
         trash_location=_trash_location
     )
 
+    if last_tip_well is not None:
+        parent_tip_rack = last_tip_well.parent
+        last_tip_location = (
+            Location(last_tip_well.top().point, parent_tip_rack),
+            last_tip_well._core,
+        )
+    else:
+        last_tip_location = None
+
     return TransferInfo(
         source=flat_sources_list,
         dest=flat_dests_list if not isinstance(dest, (TrashBin, WasteChute)) else dest,
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
+        last_tip_location=last_tip_location,
     )
 
 
