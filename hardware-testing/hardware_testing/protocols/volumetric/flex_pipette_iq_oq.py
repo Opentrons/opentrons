@@ -54,7 +54,7 @@ DYE_WELL_BY_LABWARE = {
         "dye_a": "A1",
         "dye_hv": "H1",
     },
-    "usascientific_12_reservoir_22ml": {
+    "opentrons_tough_12_reservoir_22ml": {
         "dye_e": "A5",
         "dye_d": "A4",
         "dye_c": "A3",
@@ -68,19 +68,19 @@ DYE_WELL_BY_LABWARE = {
     },
 }
 DYE_RESERVOIRS_BY_CHANNELS_AND_TIP = {
-    (1, 50): (1, "usascientific_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
-    (1, 200): (1, "usascientific_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
-    (1, 1000): (1, "usascientific_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
-    (8, 50): (1, "usascientific_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
-    (8, 200): (1, "usascientific_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
-    (8, 1000): (2, "usascientific_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
+    (1, 50): (1, "opentrons_tough_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
+    (1, 200): (1, "opentrons_tough_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
+    (1, 1000): (1, "opentrons_tough_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
+    (8, 50): (1, "opentrons_tough_12_reservoir_22ml", ["dye_d", "dye_b", "dye_a"]),
+    (8, 200): (1, "opentrons_tough_12_reservoir_22ml", ["dye_c", "dye_b", "dye_a"]),
+    (8, 1000): (2, "opentrons_tough_12_reservoir_22ml", ["dye_b", "dye_a", "dye_hv"]),
     (96, 50): (3, "nest_1_reservoir_290ml", ["dye_c", "dye_b", "dye_a"]),
     (96, 200): (3, "nest_1_reservoir_290ml", ["dye_c", "dye_b", "dye_a"]),
     (96, 1000): (3, "nest_1_reservoir_290ml", ["dye_b", "dye_a", "dye_hv"]),
 }
 CRITICAL_UL_BY_LABWARE = {
     "nest_1_reservoir_290ml": {"dead": 10000, "setup_min": 30000, "setup_max": 200000},
-    "usascientific_12_reservoir_22ml": {"dead": 1000, "setup_min": 3000, "setup_max": 21000},
+    "opentrons_tough_12_reservoir_22ml": {"dead": 1000, "setup_min": 3000, "setup_max": 21000},
     "nest_96_wellplate_2ml_deep": {"dead": 300, "setup_min": 300, "setup_max": 1700},
 }
 
@@ -426,9 +426,9 @@ def shake_and_read_plate(
     reader.open_lid()
 
     # CALCULATE CV
+    ctx.comment(f"result: {str(result)}")
     for vol, wells in dest_wells_by_volume.items():
         values = [result.get(well.well_name, 0.0) for well in wells]
-        ctx.comment(str(wells))
         mean = np.mean(values)
         std = np.std(values)
         cv = (std / mean * 100) if mean != 0 else None
