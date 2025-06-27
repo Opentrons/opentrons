@@ -61,6 +61,8 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
+    FlexStackerId,
+    FlexStackerSubState,
     ModuleSubStateType,
 )
 from opentrons_shared_data.deck import load as load_deck
@@ -1749,6 +1751,39 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_module_in_location(location=location)
+
+
+def test_raise_if_module_in_col_4_location(
+    flex_stacker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if there is already a module in column 4 when loading a module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id-1": DeckSlotName.SLOT_D3},
+        hardware_by_module_id={
+            "module-id-1": HardwareModule(
+                serial_number="serial-number",
+                definition=flex_stacker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id-1": FlexStackerSubState(
+                module_id=FlexStackerId("module-id-1"),
+                pool_primary_definition=None,
+                pool_adapter_definition=None,
+                pool_lid_definition=None,
+                pool_height=0,
+                pool_overlap=0,
+                max_pool_count=0,
+                contained_labware_bottom_first=[],
+            )
+        },
+    )
+    with pytest.raises(
+        errors.LocationIsOccupiedError, match="is already present at D4"
+    ):
+        subject.raise_if_module_in_location(
+            location=DeckSlotLocation(slotName=DeckSlotName("D3"))
+        )
 
 
 def test_get_by_slot() -> None:

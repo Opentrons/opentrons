@@ -1303,7 +1303,12 @@ class ModuleView:
         location: DeckSlotLocation,
     ) -> None:
         """Raise if the given location has a module in it."""
+        column_4_modules = [ModuleModel.FLEX_STACKER_MODULE_V1]
         for module in self.get_all():
+            if module.model in column_4_modules and module.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Module {module.model} is already present at {location.slotName.value[:1]}4."
+                )
             if module.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
