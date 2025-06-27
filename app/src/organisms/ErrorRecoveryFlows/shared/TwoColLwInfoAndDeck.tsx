@@ -63,9 +63,9 @@ export function TwoColLwInfoAndDeck(
   const primaryOnClick = (): void => {
     if (
       (route === STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
-        step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE) ||
+        step === STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE) ||
       (route === STACKER_STALLED_SKIP.ROUTE &&
-        step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE)
+        step === STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE)
     ) {
       void manualRetrieve().then(() => proceedNextStep())
     } else {
@@ -107,9 +107,9 @@ export function TwoColLwInfoAndDeck(
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         if (
-          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE ||
-          step === STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+          step === STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE ||
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE ||
+          step === STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
         ) {
           return t('load_labware_into_labware_shuttle')
         } else {
@@ -146,8 +146,8 @@ export function TwoColLwInfoAndDeck(
       case STACKER_STALLED_SKIP.ROUTE:
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         if (
-          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+          step === STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE ||
+          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
         ) {
           return null
         } else {
@@ -235,7 +235,7 @@ export function TwoColLwInfoAndDeck(
                       orientation={inferModuleOrientationFromXCoordinate(x)}
                     >
                       {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
+                        nestedLabwareId !== failedLwId ? (
                         <LabwareRender definition={nestedLabwareDef} />
                       ) : null}
                     </Module>

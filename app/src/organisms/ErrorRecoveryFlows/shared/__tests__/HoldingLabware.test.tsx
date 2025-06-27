@@ -67,13 +67,13 @@ describe('HoldingLabware', () => {
       expect(screen.getAllByText(capitalize(option))[0])
     })
   })
-  ;[true, false].forEach(isOnDevice => {
-    it(`renders options when isOnDevice is ${isOnDevice}`, () => {
-      render(props)
+    ;[true, false].forEach(isOnDevice => {
+      it(`renders options when isOnDevice is ${isOnDevice}`, () => {
+        render(props)
 
-      expect(screen.getAllByText(capitalize(HOLDING_LABWARE_OPTIONS[0]))[0])
+        expect(screen.getAllByText(capitalize(HOLDING_LABWARE_OPTIONS[0]))[0])
+      })
     })
-  })
 
   it('proceeds to next step when the yes option is clicked', async () => {
     render(props)
@@ -162,7 +162,7 @@ describe('HoldingLabware', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER
       )
     })
   })
@@ -193,7 +193,7 @@ describe('HoldingLabware', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
       )
     })
   })

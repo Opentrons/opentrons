@@ -96,7 +96,7 @@ describe('TwoColLwInfoAndDeck', () => {
   it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
     props.recoveryMap.route = RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
     render(props)
     clickButtonLabeled('Continue')
     await waitFor(() => {
@@ -184,7 +184,7 @@ describe('TwoColLwInfoAndDeck', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -200,7 +200,7 @@ describe('TwoColLwInfoAndDeck', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -217,7 +217,7 @@ describe('TwoColLwInfoAndDeck', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
       expect.objectContaining({

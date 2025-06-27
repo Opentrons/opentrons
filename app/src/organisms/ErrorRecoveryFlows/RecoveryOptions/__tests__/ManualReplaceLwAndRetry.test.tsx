@@ -89,24 +89,24 @@ describe('ManualReplaceLwAndRetry', () => {
     screen.getByText('MOCK_RETRY_STEP_INFO')
   })
 
-  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY} step`, () => {
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER} step`, () => {
     props.recoveryMap.route = RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY
+      RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
   })
 
-  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE} step`, () => {
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE} step`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
     render(props)
     screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
   })
 
-  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE} step`, () => {
+  it(`renders TwoColTextAndImage for ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.LOAD_SHUTTLE} step`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE
+      RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.LOAD_SHUTTLE
     props.recoveryMap.route = RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE
     render(props)
     const button = screen.getAllByRole('button')[0]

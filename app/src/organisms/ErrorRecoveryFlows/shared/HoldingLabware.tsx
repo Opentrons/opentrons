@@ -85,12 +85,12 @@ export function HoldingLabware({
           case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER
             )
           case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
             )
           default: {
             console.error('Unexpected recovery option for gripper routing.')
@@ -192,18 +192,18 @@ function DesktopGripperHoldingLwOptions({
       value={selectedOption}
       options={HOLDING_LABWARE_OPTIONS.map(
         option =>
-          ({
-            value: option,
-            children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getCopyFromOption(option, t)}
-              </StyledText>
-            ),
-          } as const)
+        ({
+          value: option,
+          children: (
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              role="label"
+              htmlFor={option}
+            >
+              {getCopyFromOption(option, t)}
+            </StyledText>
+          ),
+        } as const)
       )}
     />
   )
