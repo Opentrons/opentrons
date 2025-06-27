@@ -145,7 +145,7 @@ _LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE = LabwareDefinition3.model_construct(  # t
     ),
     features=LocatingFeatures(
         slotFootprintAsParent=SlotFootprintAsParentFeature(
-            frontRight=Vector2D(x=120, y=90), z=10
+            backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=120, y=90), z=10
         )
     ),
     parameters=type("MockParams", (), {"loadName": "parent-labware-v3"})(),
@@ -166,7 +166,7 @@ _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct( 
             backLeft=Vector2D(x=10, y=15), frontRight=Vector2D(x=70, y=45), z=8
         ),
         slotFootprintAsParent=SlotFootprintAsParentFeature(
-            frontRight=Vector2D(x=100, y=80), z=12
+            backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=100, y=80), z=12
         ),
     ),
     parameters=type("MockParams", (), {"loadName": "dual-feature-labware"})(),
@@ -222,14 +222,14 @@ _ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
     compatible_module_types=[],
     features=LocatingFeatures(
         slotFootprintAsParent=SlotFootprintAsParentFeature(
-            frontRight=Vector2D(x=150, y=120), z=15
+            backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=150, y=120), z=15
         )
     ),
 )
 
 
 class ModuleOverlapSpec(NamedTuple):
-    """Spec data to test module overlap behavior through get_parent_placement_origin_to_lw_origin."""
+    """Spec data to test module overlap behavior."""
 
     spec_deck_definition: DeckDefinitionV5
     module_definition: ModuleDefinition
@@ -241,7 +241,7 @@ class ModuleOverlapSpec(NamedTuple):
 
 
 class LabwareOverlapSpec(NamedTuple):
-    """Spec data to test labware stacking behavior through get_parent_placement_origin_to_lw_origin."""
+    """Spec data to test labware stacking behavior."""
 
     child_definition: LabwareDefinition2
     parent_definition: LabwareDefinition2
@@ -251,7 +251,7 @@ class LabwareOverlapSpec(NamedTuple):
 
 
 class AddressableAreaSpec(NamedTuple):
-    """Spec data to test addressable area behavior through get_parent_placement_origin_to_lw_origin."""
+    """Spec data to test addressable area behavior."""
 
     child_definition: LabwareDefinition2
     addressable_area: AddressableArea
@@ -261,7 +261,7 @@ class AddressableAreaSpec(NamedTuple):
 
 
 class LabwareV3Spec(NamedTuple):
-    """Spec data to test LabwareDefinition3 behavior through get_parent_placement_origin_to_lw_origin."""
+    """Spec data to test LabwareDefinition3 behavior."""
 
     child_definition: LabwareDefinition3
     parent_definition: object
@@ -426,14 +426,14 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         labware_location=AddressableAreaLocation(
             addressableAreaName="test_area_with_parent"
         ),
-        expected_total_offset=Point(x=35.0, y=30.0, z=10),
+        expected_total_offset=Point(x=35.0, y=-30.0, z=5),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE,
         is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="parent-labware-v3"),
-        expected_total_offset=Point(x=20.0, y=15.0, z=5),
+        expected_total_offset=Point(x=20.0, y=-45.0, z=0),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
@@ -531,7 +531,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
     expected_total_offset: Point,
 ) -> None:
     """It should handle LabwareDefinition3 correctly with various parent configurations."""
-    result = get_parent_placement_origin_to_lw_origin(
+    result = get_parent_placement_origin_to_lw_origin(  # type: ignore[call-overload]
         child_labware=child_definition,
         parent_deck_item=parent_definition,
         module_parent_to_child_offset=None,
