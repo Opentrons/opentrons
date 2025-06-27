@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import { Btn, COLORS, Flex, Icon, JUSTIFY_CENTER } from '@opentrons/components'
@@ -7,21 +7,8 @@ const BUTTON_NAME = 'SettingsIconButton'
 
 export const SettingsButton = (props: { onClick: () => void }): JSX.Element => {
   const { onClick } = props
-  const [isOnSettingsPage, setIsOnSettingsPage] = useState(
-    window.location.hash === '#/settings'
-  )
-
-  useEffect(() => {
-    const handleHashChange = (): void => {
-      setIsOnSettingsPage(window.location.hash === '#/settings')
-    }
-
-    window.addEventListener('hashchange', handleHashChange)
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange)
-    }
-  }, [])
+  const location = useLocation()
+  const isOnSettingsPage = location.pathname === '/settings'
 
   return (
     <Btn

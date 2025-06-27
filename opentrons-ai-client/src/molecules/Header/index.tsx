@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
@@ -21,10 +22,7 @@ import {
 import { CLIENT_MAX_WIDTH } from '/ai-client/resources/constants'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
-import {
-  displayExitConfirmModalAtom,
-  featureFlagsAtom,
-} from '../../resources/atoms'
+import { displayExitConfirmModalAtom } from '../../resources/atoms'
 import { SettingsButton } from '../SettingsButton'
 
 const HeaderBar = styled(Flex)`
@@ -67,9 +65,10 @@ interface HeaderProps {
 export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { logout } = useAuth0()
+  const navigate = useNavigate()
+  const location = useLocation()
   const trackEvent = useTrackEvent()
   const [, setDisplayExitConfirmModal] = useAtom(displayExitConfirmModalAtom)
-  const [featureFlags] = useAtom(featureFlagsAtom)
 
   async function handleLoginOrExitClick(): Promise<void> {
     if (isExitButton) {
@@ -82,7 +81,11 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   }
 
   function handleSettingsClick(): void {
-    window.location.hash = '/settings'
+    if (location.pathname === '/settings') {
+      navigate(-1)
+    } else {
+      navigate('/settings')
+    }
   }
 
   return (

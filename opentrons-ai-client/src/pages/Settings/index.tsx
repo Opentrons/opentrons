@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 
 import {
@@ -22,6 +23,7 @@ const SETTINGS_MAX_WIDTH = '56rem'
 
 export function Settings(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
+  const navigate = useNavigate()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
 
   const prereleaseModeEnabled = featureFlags.enablePrereleaseMode === true
@@ -43,7 +45,7 @@ export function Settings(): JSX.Element {
   }
 
   const handleBackClick = (): void => {
-    window.location.hash = '/'
+    navigate('/')
   }
 
   return (
