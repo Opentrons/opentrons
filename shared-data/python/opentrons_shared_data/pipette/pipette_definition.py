@@ -1,6 +1,6 @@
 from __future__ import annotations
 import re
-from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar
+from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar, cast
 from pydantic import (
     field_validator,
     BaseModel,
@@ -46,7 +46,6 @@ class PipetteNameType:
     pipette_channels: pip_types.PipetteChannelType
     pipette_generation: pip_types.PipetteGenerationType
     oem_type: pip_types.PipetteOEMType
-    family_name: str
 
     @classmethod
     def from_family(cls, family: PipetteFamilyDefinition) -> PipetteNameType:
@@ -55,7 +54,6 @@ class PipetteNameType:
             pipette_channels=family.channels,
             pipette_generation=family.display_category,
             oem_type=family.oem_type,
-            family_name=family.family_name,
         )
 
     def __repr__(self) -> str:
@@ -549,6 +547,11 @@ class PipetteFamilyDefinition(BaseModel):
         description="The name you can use to load this from python.",
         alias="apiLoadName",
     )
+    pipette_model_prefix: str = Field(
+        ...,
+        description="The name used internally to load pipettes from instrument data.",
+        alias="pipetteModelPrefix",
+    )
     pipette_name: str = Field(
         ...,
         description="The name used to report this by the robot in its API.",
@@ -572,6 +575,14 @@ class PipetteFamilyDefinition(BaseModel):
     )
     oem_type: EnumSerializer[pip_types.PipetteOEMType] = Field(
         ..., description="The OEM type of the pipette.", alias="oemType"
+    )
+
+    exemplar_version: Annotated[
+        pip_types.PipetteVersionType, PlainSerializer(lambda v: v.as_tuple)
+    ] = Field(
+        ...,
+        description="The version of the pipette configuration that is the exemplar, the default version, of this family.",
+        alias="exemplarVersion",
     )
 
     @field_validator("channels", mode="before")
@@ -600,6 +611,16 @@ class PipetteFamilyDefinition(BaseModel):
     @classmethod
     def convert_oem_type(cls, v: str) -> pip_types.PipetteOEMType:
         return pip_types.PipetteOEMType(v)
+
+    @field_validator("exemplar_version", mode="before")
+    @classmethod
+    def convert_exemplar_version(
+        cls, v: tuple[int, int]
+    ) -> pip_types.PipetteVersionType:
+        return pip_types.PipetteVersionType(
+            major=cast(pip_types.PipetteModelMajorVersionType, v[0]),
+            minor=cast(pip_types.PipetteModelMinorVersionType, v[1]),
+        )
 
 
 class PipetteConfigurations(

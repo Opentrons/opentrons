@@ -19,29 +19,29 @@ from opentrons_shared_data.pipette import (
     argnames=["model", "output"],
     argvalues=[
         [
-            "p50_single_v2.0",
+            "p20_single_v2.0",
             pc.PipetteModelVersionType(
-                PipetteModelType.p50,
+                PipetteModelType.p20,
                 PipetteChannelType.SINGLE_CHANNEL,
                 PipetteVersionType(2, 0),
                 PipetteOEMType.OT,
             ),
         ],
         [
-            "p1000_multi_v1.0",
+            "p300_multi_v2.0",
             pc.PipetteModelVersionType(
-                PipetteModelType.p1000,
+                PipetteModelType.p300,
                 PipetteChannelType.EIGHT_CHANNEL,
-                PipetteVersionType(1, 0),
+                PipetteVersionType(2, 0),
                 PipetteOEMType.OT,
             ),
         ],
         [
-            "p1000_96_v1.0",
+            "p1000_96_v3.0",
             pc.PipetteModelVersionType(
                 PipetteModelType.p1000,
                 PipetteChannelType.NINETY_SIX_CHANNEL,
-                PipetteVersionType(1, 0),
+                PipetteVersionType(3, 0),
                 PipetteOEMType.OT,
             ),
         ],
@@ -57,10 +57,10 @@ def test_convert_pipette_model(
     argnames=["model", "version", "output"],
     argvalues=[
         [
-            "p50_single",
+            "p20_single",
             "2.0",
             pc.PipetteModelVersionType(
-                PipetteModelType.p50,
+                PipetteModelType.p20,
                 PipetteChannelType.SINGLE_CHANNEL,
                 PipetteVersionType(2, 0),
                 PipetteOEMType.OT,
@@ -98,11 +98,11 @@ def test_convert_pipette_model_provided_version(
     argnames=["name", "output"],
     argvalues=[
         [
-            "p50_single_gen2",
+            "p20_single_gen2",
             pc.PipetteModelVersionType(
-                PipetteModelType.p50,
+                PipetteModelType.p20,
                 PipetteChannelType.SINGLE_CHANNEL,
-                PipetteVersionType(2, 0),
+                PipetteVersionType(2, 2),
                 PipetteOEMType.OT,
             ),
         ],
@@ -136,21 +136,20 @@ def test_convert_pipette_name(
     argnames=["model_type", "channels", "generation", "output", "oem"],
     argvalues=[
         [
-            PipetteModelType.p50,
+            PipetteModelType.p20,
             PipetteChannelType.SINGLE_CHANNEL,
             PipetteGenerationType.GEN2,
-            "p50_single_gen2",
+            "p20_single_gen2",
             PipetteOEMType.OT,
         ],
         [
-            PipetteModelType.p1000,
+            PipetteModelType.p300,
             PipetteChannelType.EIGHT_CHANNEL,
             PipetteGenerationType.GEN2,
-            "p1000_multi_gen2",
+            "p300_multi_gen2",
             PipetteOEMType.OT,
         ],
         [
-            # 96 channel has a unique "name" right now
             PipetteModelType.p1000,
             PipetteChannelType.NINETY_SIX_CHANNEL,
             PipetteGenerationType.FLEX,

@@ -1,10 +1,13 @@
 import enum
 from dataclasses import dataclass
+from functools import total_ordering
 
 from pydantic import BaseModel
 from typing_extensions import Literal, TypedDict
 from typing import Dict, List, Mapping, NewType, Union, Tuple, cast
 
+
+from ..errors.exceptions import InvalidInstrumentData
 
 # TODO(mc, 2022-06-16): remove type alias when able
 # and when certain removal will not break any pickling
@@ -87,6 +90,7 @@ class PipetteGenerationType(enum.Enum):
     FLEX = "FLEX"
 
 
+@total_ordering
 @dataclass(frozen=True)
 class PipetteVersionType:
     major: PipetteModelMajorVersionType
@@ -98,6 +102,25 @@ class PipetteVersionType:
         minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
         return cls(major=major, minor=minor)
 
+    @classmethod
+    def convert_from_string(cls, version: str) -> "PipetteVersionType":
+        # this seems silly but it's just that much easier to support both dotted version
+        # like normal and underscore version like filenames
+        if "." in version:
+            parts = version.split(".")
+        else:
+            parts = version.split("_")
+
+        if len(parts) != 2:
+            raise InvalidInstrumentData(f"Invalid pipette version: {version}")
+        try:
+            return cls(
+                major=cast(PipetteModelMajorVersionType, int(parts[0])),
+                minor=cast(PipetteModelMinorVersionType, int(parts[1])),
+            )
+        except ValueError:
+            raise InvalidInstrumentData(f"Invalid pipette version: {version}")
+
     def __str__(self) -> str:
         if self.major == 1 and self.minor == 0:
             # Maintain the format of V1 pipettes that
@@ -105,6 +128,9 @@ class PipetteVersionType:
             return f"{self.major}"
         else:
             return f"{self.major}.{self.minor}"
+
+    def __ge__(self, other: "PipetteVersionType") -> bool:
+        return self.as_tuple > other.as_tuple
 
     @property
     def as_tuple(

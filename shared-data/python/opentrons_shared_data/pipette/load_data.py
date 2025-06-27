@@ -3,13 +3,13 @@ from pathlib import Path
 from logging import getLogger
 
 import re
-from typing import Dict, Any, Union, Optional, List, Iterator
+from typing import Dict, Any, Union, Optional, List, Iterator, cast
 from typing_extensions import Literal
 from functools import lru_cache
 
 from pydantic import ValidationError
 
-from ..errors.exceptions import InvalidLoadPipetteSpecsError
+from ..errors.exceptions import InvalidProtocolData, InvalidInstrumentData
 
 from .. import load_shared_data, get_shared_data_root
 
@@ -37,17 +37,16 @@ LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 LOG = getLogger(__name__)
 
 
-def _get_configuration_dictionary(
+def _get_configuration_directory(
     config_type: Literal["general", "geometry", "liquid"],
     channels: PipetteChannelType,
     model: PipetteModelType,
-    version: PipetteVersionType,
     oem: PipetteOEMType,
     liquid_class: Optional[LiquidClasses] = None,
-) -> LoadedConfiguration:
+) -> Path:
     oem_extension = f"_{oem.value}" if oem != PipetteOEMType.OT else ""
     if liquid_class:
-        config_path = (
+        return (
             get_shared_data_root()
             / "pipette"
             / "definitions"
@@ -56,10 +55,9 @@ def _get_configuration_dictionary(
             / f"{channels.name.lower()}{oem_extension}"
             / model.value
             / liquid_class.name
-            / f"{version.major}_{version.minor}.json"
         )
     else:
-        config_path = (
+        return (
             get_shared_data_root()
             / "pipette"
             / "definitions"
@@ -67,8 +65,21 @@ def _get_configuration_dictionary(
             / config_type
             / f"{channels.name.lower()}{oem_extension}"
             / model.value
-            / f"{version.major}_{version.minor}.json"
         )
+
+
+def _get_configuration_dictionary(
+    config_type: Literal["general", "geometry", "liquid"],
+    channels: PipetteChannelType,
+    model: PipetteModelType,
+    version: PipetteVersionType,
+    oem: PipetteOEMType,
+    liquid_class: LiquidClasses | None = None,
+) -> LoadedConfiguration:
+    directory = _get_configuration_directory(
+        config_type, channels, model, oem, liquid_class
+    )
+    config_path = directory / f"{version.major}_{version.minor}.json"
     return json.loads(load_shared_data(config_path))
 
 
@@ -128,13 +139,13 @@ def _all_families_iter() -> Iterator[PipetteFamilyDefinition]:
     for possible_config in (
         get_shared_data_root() / "pipette" / "definitions" / "2" / "family"
     ).iterdir():
-        if child.is_file() and child.suffix == "json":
+        if possible_config.is_file() and possible_config.suffix == ".json":
             try:
                 yield PipetteFamilyDefinition.model_validate_json(
-                    child.read_text(encoding="utf-8")
+                    possible_config.read_text(encoding="utf-8")
                 )
-            except pydantic.ValidationError as ve:
-                LOG.warning(f"Unparsable family definition at {child}: {ve}")
+            except ValidationError as ve:
+                LOG.warning(f"Unparsable family definition at {possible_config}: {ve}")
 
 
 @lru_cache(maxsize=1)
@@ -307,7 +318,7 @@ def load_definition(
     geometry_dict = _geometry(channels, model, version, oem)
     physical_dict = _physical(channels, model, version, oem)
     liquid_dict = _liquid(channels, model, version, oem)
-    family_dict = _family(physical_dict["familyName"])
+    family_dict = _family(cast(str, physical_dict["familyName"]))
     generation = PipetteGenerationType(family_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
@@ -328,34 +339,112 @@ def load_family_definition(family_name: str) -> PipetteFamilyDefinition:
     return PipetteFamilyDefinition.model_validate(_family(family_name))
 
 
-def load_family_definition_from_api_name_or_model(
-    api_name_or_model: str,
+def load_family_definition_from_internal_model(
+    api_model: str,
 ) -> PipetteFamilyDefinition:
     """Load the definition for a pipette family from its API reporting name.
 
-    If no pipette family matches the provided API name or model, raises InvalidLoadPipetteSpecsError.
+    If no pipette family matches the provided API name or model, raises InvalidProtocolData.
     """
-    for family in _all_families():
-        if re.match(f"^{family.pipetteName}(_v.*)?", api_name_or_model):
-            LOG.debug(
-                f"Matched pipette family {family.familyName} for {api_name_or_model}"
-            )
-            return api_name_or_model
-    raise InvalidLoadPipetteSpecsError(
-        message=f"The pipette name {api_name_or_model} is not valid."
+    matches = re.match(r"^(.*?)(_v(.*))?$", api_model)
+    if not matches:
+        raise InvalidInstrumentData(
+            message=f"Pipette name or model invalid: {api_model}"
+        )
+    pipette_name = matches.group(1)
+    maybe_version = matches.group(3)
+    matching_families = [
+        family
+        for family in _all_families()
+        if pipette_name == family.pipette_model_prefix
+    ]
+    min_exemplar = None
+    for family in matching_families:
+        if min_exemplar is None or family.exemplar_version < min_exemplar:
+            min_exemplar = family.exemplar_version
+    if min_exemplar is None:
+        raise InvalidInstrumentData(
+            message=f"Pipette name or model invalid: {api_model}"
+        )
+    version = (
+        min_exemplar
+        if maybe_version is None
+        else PipetteVersionType.convert_from_string(maybe_version)
     )
+    exemplar_version = PipetteVersionType(major=version.major, minor=0)
+    for family in matching_families:
+        if family.exemplar_version == exemplar_version:
+            return family
+    raise InvalidInstrumentData(message=f"Pipette name or model invalid: {api_model}")
+
+
+def load_family_definition_from_api_name(
+    api_name: str,
+) -> PipetteFamilyDefinition:
+    """Load the definition for a pipette family from its API reporting name.
+
+    If no pipette family matches the provided API name or model, raises InvalidProtocolData.
+    """
+    matches = re.match(r"^(.*?)(_v(.*))?$", api_name)
+    if not matches:
+        raise InvalidInstrumentData(
+            message=f"Pipette name or model invalid: {api_name}"
+        )
+    pipette_name = matches.group(1)
+    for family in _all_families():
+        if pipette_name == family.pipette_name:
+            return family
+    raise InvalidInstrumentData(message=f"Pipette name or model invalid: {api_name}")
 
 
 def load_family_definition_from_load_name(load_name: str) -> PipetteFamilyDefinition:
     """Load the definition for a pipette family from its load name.
 
-    If no pipette family matches the provided API name or model, raises InvalidLoadPipetteSpecsError.
+    If no pipette family matches the provided API name or model, raises InvalidProtocolData.
     """
     for family in _all_families():
         if family.api_load_name == load_name:
             return family
-    raise InvalidLoadPipetteSpecsError(
+    raise InvalidProtocolData(
         message=f"The pipette load name {load_name} is not valid."
+    )
+
+
+def max_version_for_family(
+    family: PipetteFamilyDefinition,
+) -> PipetteVersionType:
+    """Load a full configuration from a family alone, at the highest associated version."""
+    highest_version: PipetteVersionType | None = None
+    directory = _get_configuration_directory(
+        "general", family.channels, family.model, family.oem_type
+    )
+    for config_file in directory.iterdir():
+        if config_file.is_file() and config_file.suffix == ".json":
+            this_version = PipetteVersionType.convert_from_string(config_file.stem)
+            if this_version.major == family.exemplar_version.major:
+                if highest_version is None or this_version > highest_version:
+                    highest_version = this_version
+    if highest_version is None:
+        raise InvalidProtocolData(
+            message=f"Pipette family {family.family_name} has no configurations"
+        )
+    return highest_version
+
+
+def load_configuration_from_family_plus_version(
+    family: PipetteFamilyDefinition, version: str | None
+) -> PipetteConfigurations:
+    """Load a full configuration from a family plus version.
+
+    If the version is not provided, the highest subversion for the family exemplar will be used.
+    """
+    return load_definition(
+        family.model,
+        family.channels,
+        PipetteVersionType.convert_from_string(version)
+        if version is not None
+        else max_version_for_family(family),
+        family.oem_type,
     )
 
 
