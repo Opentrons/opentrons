@@ -66,6 +66,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     robotType
   )
 
+  console.log('selectedSlot', selectedSlot)
   return (
     <>
       {/* all modules */}
@@ -93,7 +94,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               key={slot}
               slotId={slot}
               slotPosition={slotPosition}
-              slotFillColor={selectedSlot ? COLORS.grey60 : COLORS.grey55}
+              slotFillColor={
+                selectedSlot === slot ? COLORS.grey60 : COLORS.grey55
+              }
               robotType={robotType}
               invariantContext={invariantContext}
               robotState={robotState}
@@ -149,7 +152,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 key={slot}
                 slotId={slot}
                 slotPosition={slotPosition}
-                slotFillColor={selectedSlot ? COLORS.purple40 : COLORS.purple50}
+                slotFillColor={
+                  selectedSlot === slot ? COLORS.purple40 : COLORS.purple50
+                }
                 robotType={robotType}
                 invariantContext={invariantContext}
                 robotState={robotState}
@@ -210,9 +215,29 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
         }
-        const isStepAssosciatedWithLabware = Object.values(pipettes).find(
-          pipette => pipette.entityId === id
+        const isStepAssosciatedWithLabwareState = Object.values(pipettes).find(
+          pipette => pipette.entityId === id || pipette.tiprackId === id
         )
+        const isStepAssosciatedWithLabwareId =
+          selectedRunTimeCommand != null &&
+          (('labwareId' in selectedRunTimeCommand.params &&
+            selectedRunTimeCommand.params.labwareId === id) ||
+            ('newLocation' in selectedRunTimeCommand.params &&
+              selectedRunTimeCommand.params.newLocation?.labwareId === id))
+
+        const isStepAssosciatedWithLabware =
+          isStepAssosciatedWithLabwareState || isStepAssosciatedWithLabwareId
+
+        let backgroundColor = COLORS.grey50
+
+        if (selectedSlot === slot && isStepAssosciatedWithLabware) {
+          backgroundColor = COLORS.purple60
+        } else if (selectedSlot === slot && !isStepAssosciatedWithLabware) {
+          backgroundColor = COLORS.grey60
+        } else if (isStepAssosciatedWithLabware) {
+          backgroundColor = COLORS.purple40
+        }
+
         return (
           <Fragment key={id}>
             <RobotCoordsForeignDiv
@@ -229,9 +254,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               }}
             >
               <Box
-                backgroundColor={
-                  isStepAssosciatedWithLabware ? COLORS.purple40 : COLORS.grey50
-                }
+                backgroundColor={backgroundColor}
                 border="3px solid black"
                 borderRadius={BORDERS.borderRadius8}
                 width={`${STANDARD_X_WIDTH}px`}
@@ -275,6 +298,31 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           console.warn(`no slot ${slotForOnTheDeck} for labware ${labware.id}!`)
           return null
         }
+        const isStepAssosciatedWithLabwareState = Object.values(pipettes).find(
+          pipette => pipette.entityId === id || pipette.tiprackId === id
+        )
+        const isStepAssosciatedWithLabwareId =
+          selectedRunTimeCommand != null &&
+          (('labwareId' in selectedRunTimeCommand.params &&
+            selectedRunTimeCommand.params.labwareId === id) ||
+            ('newLocation' in selectedRunTimeCommand.params &&
+              selectedRunTimeCommand.params.newLocation?.labwareId === id))
+
+        const isStepAssosciatedWithLabware =
+          isStepAssosciatedWithLabwareState || isStepAssosciatedWithLabwareId
+
+        let backgroundColor = COLORS.grey50
+
+        if (selectedSlot === slotForOnTheDeck && isStepAssosciatedWithLabware) {
+          backgroundColor = COLORS.purple60
+        } else if (
+          selectedSlot === slotForOnTheDeck &&
+          !isStepAssosciatedWithLabware
+        ) {
+          backgroundColor = COLORS.grey60
+        } else if (isStepAssosciatedWithLabware) {
+          backgroundColor = COLORS.purple40
+        }
 
         return (
           <Fragment key={id}>
@@ -292,7 +340,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               }}
             >
               <Box
-                backgroundColor={COLORS.grey50}
+                backgroundColor={backgroundColor}
                 border="3px solid black"
                 borderRadius={BORDERS.borderRadius8}
                 width={`${STANDARD_X_WIDTH}px`}

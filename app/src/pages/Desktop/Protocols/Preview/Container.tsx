@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ViewportListRef } from 'react-viewport-list'
 
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, RunTimeCommand } from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
@@ -12,6 +13,7 @@ import { GroupedCommands } from '/app/redux/protocol-storage'
 import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
 import { DeckView } from './DeckView'
+import { SlotDetails } from './SlotDetails'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -73,6 +75,9 @@ export function Container(props: ContainerProps): JSX.Element {
   const selectedRunTimeCommand = commands.find(
     command => command.id === selectedCommandId
   )
+
+  const allRunDefs = getLabwareDefinitionsFromCommands(commands)
+
   return (
     <>
       <Controls
@@ -95,12 +100,28 @@ export function Container(props: ContainerProps): JSX.Element {
           setSelectedSlot={setSelectedSlot}
           selectedRunTimeCommand={selectedRunTimeCommand}
         />
-        <CommandSteps
-          analysis={analysis}
-          currentCommandIndex={selectedCommandIndex}
-          groupedCommands={groupedCommands}
-          setSelectedCommand={setSelectedCommand}
-        />
+        {selectedSlot != null && selectedRunTimeCommand != null ? (
+          <SlotDetails
+            slotId={selectedSlot}
+            command={selectedRunTimeCommand}
+            robotState={robotState}
+            onClose={() => {
+              setSelectedSlot(null)
+            }}
+            analysis={analysis}
+            robotType={robotType ?? FLEX_ROBOT_TYPE}
+            allRunDefs={allRunDefs}
+            invariantContext={invariantContext}
+            liquids={liquids}
+          />
+        ) : (
+          <CommandSteps
+            analysis={analysis}
+            currentCommandIndex={selectedCommandIndex}
+            groupedCommands={groupedCommands}
+            setSelectedCommand={setSelectedCommand}
+          />
+        )}
       </div>
     </>
   )

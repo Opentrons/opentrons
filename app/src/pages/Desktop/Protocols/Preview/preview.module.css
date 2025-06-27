@@ -129,3 +129,16 @@
   height: 470px;
   max-height: 470px;
 }
+
+.slotDetailsActiveStep {
+  padding: 0px 16px 16px 16px;
+  grid-gap: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.commandText {
+  border-radius: 4px;
+  background-color: #f4def7;
+  padding: 8px;
+}
