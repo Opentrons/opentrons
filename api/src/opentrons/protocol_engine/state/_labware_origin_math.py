@@ -28,6 +28,8 @@ from ..types import (
     OnLabwareLocation,
 )
 
+_OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
+
 
 @dataclasses.dataclass
 class _Labware3SupportedParentDefinition:
@@ -136,11 +138,14 @@ def get_parent_placement_origin_to_lw_origin(
             )
 
         parent_deck_item_to_child_labware_feature_offset = (
-            _get_parent_deck_item_to_child_labware_feature_offset(
+            _parent_deck_item_to_child_labware_feature_offset(
                 child_labware=child_labware,
                 parent_deck_item=_parent_deck_item_with_features(parent_deck_item),
             )
+        ) + _feature_exception_offsets(
+            deck_definition=deck_definition, parent_deck_item=parent_deck_item
         )
+
         parent_deck_item_origin_to_child_labware_origin = (
             _child_back_left_bottom_position(child_labware) * -1
         )
@@ -236,7 +241,7 @@ def _parent_deck_item_with_features(
         raise ValueError("Expected parent deck item to have features.")
 
 
-def _get_parent_deck_item_to_child_labware_feature_offset(
+def _parent_deck_item_to_child_labware_feature_offset(
     child_labware: LabwareDefinition3,
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
@@ -384,11 +389,27 @@ def _get_child_labware_overlap_with_parent_module(
     )
     if not child_labware_overlap:
         if _is_thermocycler_on_ot2(parent_module_model, deck_definition):
-            return Point(x=0, y=0, z=10.7)
+            return _OFFSET_ON_TC_OT2
         else:
             return Point(x=0, y=0, z=0)
 
     return Point.from_xyz_attrs(child_labware_overlap)
+
+
+def _feature_exception_offsets(
+    parent_deck_item: LabwareParentDefinition,
+    deck_definition: DeckDefinitionV5,
+) -> Point:
+    """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
+
+    If you need to make exceptions for a parent-child stackup, use the `custom` locating feature.
+    """
+    if isinstance(parent_deck_item, ModuleDefinition) and _is_thermocycler_on_ot2(
+        parent_deck_item.model, deck_definition
+    ):
+        return _OFFSET_ON_TC_OT2
+    else:
+        return Point(x=0, y=0, z=0)
 
 
 def _is_thermocycler_on_ot2(
