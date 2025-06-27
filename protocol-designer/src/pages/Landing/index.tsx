@@ -107,15 +107,15 @@ export function Landing(): JSX.Element {
           }}
         />
       ) : null}
-      <div data-cy="landing-page" className={styles.landingPage}>
-        <div className={styles.contentSection}>
+      <div data-cy="landing-page" className={styles.landing_page}>
+        <div className={styles.content_section}>
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <div className={styles.textSection}>
+          <div className={styles.text_section}>
             <StyledText desktopStyle="headingLargeBold">
               {t('welcome')}
             </StyledText>
@@ -129,13 +129,13 @@ export function Landing(): JSX.Element {
             </StyledText>
           </div>
         </div>
-        <NavLink to="/createNew" className={styles.navLink}>
+        <NavLink to="/createNew" className={styles.nav_link}>
           <LargeButton
             onClick={() => {
               dispatch(toggleNewProtocolModal(true))
             }}
             buttonText={
-              <span className={styles.buttonText}>
+              <span className={styles.button_text}>
                 {t('create_a_protocol')}
               </span>
             }
