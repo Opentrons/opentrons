@@ -150,7 +150,11 @@ def get_tips_for_individual_channel_on_multi(
     all_racks = _get_racks(ctx)
     specific_racks: List[Labware] = []
     for slot in slots:
-        specific_racks.append(all_racks[slot])
+        try:
+            specific_racks.append(all_racks[slot])
+        except KeyError as e:
+            # we may not be loading all the tips and thats OK
+            pass
     unused_tips = _unused_tips_for_racks(ctx, specific_racks)
     tips = [
         tip
