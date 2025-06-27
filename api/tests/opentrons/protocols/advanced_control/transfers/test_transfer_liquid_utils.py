@@ -306,11 +306,11 @@ def test_grouping_wells_for_column_96_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Pipette will access wells for source"):
+    with pytest.raises(ValueError, match="Pipette will access source wells"):
         group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
 
     # non-contiguous wells from the same labware
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:7] + [mock_wells[-1], mock_wells[7]], nozzle_map, "source"
         )
@@ -322,7 +322,7 @@ def test_grouping_wells_for_column_96_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:7] + [other_well], nozzle_map, "source"
         )
@@ -343,13 +343,13 @@ def test_grouping_wells_for_column_384_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Pipette will access wells for destination"):
+    with pytest.raises(ValueError, match="Pipette will access destination wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:-1], nozzle_map, "destination"
         )
 
     # non-contiguous or every other wells from the same labware
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:2] + [mock_wells[-1]], nozzle_map, "source"
         )
@@ -364,7 +364,7 @@ def test_grouping_wells_for_column_384_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:15] + [other_well], nozzle_map, "source"
         )
@@ -432,11 +432,11 @@ def test_grouping_wells_for_row_96_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Pipette will access wells for source"):
+    with pytest.raises(ValueError, match="Pipette will access source wells"):
         group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map, "source")
 
     # non-contiguous wells from the same labware
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:11] + [mock_wells[-1], mock_wells[11]], nozzle_map, "source"
         )
@@ -448,7 +448,7 @@ def test_grouping_wells_for_row_96_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group destination wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:11] + [other_well], nozzle_map, "destination"
         )
@@ -470,13 +470,13 @@ def test_grouping_wells_for_row_384_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Pipette will access wells for destination"):
+    with pytest.raises(ValueError, match="Pipette will access destination wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:-1], nozzle_map, "destination"
         )
 
     # non-contiguous or every other wells from the same labware
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:2] + [mock_wells[-1]], nozzle_map, "destination"
         )
@@ -491,7 +491,7 @@ def test_grouping_wells_for_row_384_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not group wells"):
+    with pytest.raises(ValueError, match="Could not group destination wells"):
         group_wells_for_multi_channel_transfer(
             mock_wells[:23] + [other_well], nozzle_map, "destination"
         )

@@ -140,7 +140,7 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
         if active_wells_covered:
             if well.parent != active_labware:
                 raise ValueError(
-                    f"Could not group wells for {target_name} to match pipette's nozzle configuration. Ensure that the"
+                    f"Could not group {target_name} wells to match pipette's nozzle configuration. Ensure that the"
                     " wells are ordered correctly (e.g. rows() for a row layout or columns() for a column layout), or"
                     " set group_wells to False to only target wells with the primary nozzle."
                 )
@@ -174,7 +174,7 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
                 alternate_384_well_coverage_count += 1
             else:
                 raise ValueError(
-                    f"Could not group wells for {target_name} to match pipette's nozzle configuration. Ensure that the"
+                    f"Could not group {target_name} wells to match pipette's nozzle configuration. Ensure that the"
                     " wells are ordered correctly (e.g. rows() for a row layout or columns() for a column layout), or"
                     " set group_wells to False to only target wells with the primary nozzle."
                 )
@@ -203,7 +203,7 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
 
     if active_wells_covered:
         raise ValueError(
-            f"Pipette will access wells for {target_name} not provided in the liquid handling command."
+            f"Pipette will access {target_name} wells not provided in the liquid handling command."
             f" Set group_wells to False or include these wells: {active_wells_covered}"
         )
 
