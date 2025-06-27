@@ -120,12 +120,17 @@ def get_parent_placement_origin_to_lw_origin(
             raise NotImplementedError()
 
         # TODO(jh, 06-25-25): This code is entirely temporary and only exists for the purposes of more useful
-        #  snapshot testing. This code should exist in NO capacity after features are implemented.
+        #  snapshot testing. This code should exist in NO capacity after features are implemented outside of the
+        #  module_parent_to_child_offset.
         if _shim_does_locating_feature_pair_exist(
             child_labware=child_labware,
             parent_deck_item=_parent_deck_item_with_features(parent_deck_item),
         ):
-            parent_deck_item_origin_to_child_labware_placement_origin = Point(0, 0, 0)
+            parent_deck_item_origin_to_child_labware_placement_origin = (
+                _module_parent_to_child_offset(
+                    module_parent_to_child_offset, labware_location
+                )
+            )
         else:
             parent_deck_item_origin_to_child_labware_placement_origin = (
                 _get_parent_deck_item_origin_to_child_labware_placement_origin(
@@ -149,7 +154,7 @@ def get_parent_placement_origin_to_lw_origin(
         # TODO(jh 06-27-25): This is temporary until we support well locating features. This helps keep the snapshot
         #  testing more useful.
         if _shim_is_tc_or_mag_block(parent_deck_item):
-            parent_deck_item_to_child_labware_feature_offset = 0
+            parent_deck_item_to_child_labware_feature_offset = Point(0, 0, 0)
 
         parent_deck_item_origin_to_child_labware_origin = (
             _child_back_left_bottom_position(child_labware) * -1
@@ -175,7 +180,6 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
 
     elif isinstance(labware_location, ModuleLocation):
         assert isinstance(parent_deck_item, ModuleDefinition)
-        assert module_parent_to_child_offset is not None
 
         child_labware_overlap_with_parent_deck_item = (
             _get_child_labware_overlap_with_parent_module(
@@ -184,9 +188,13 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
                 deck_definition=deck_definition,
             )
         )
+        module_parent_to_child_offset = _module_parent_to_child_offset(
+            module_parent_to_child_offset, labware_location
+        )
 
-        module_offset_point = Point.from_xyz_attrs(module_parent_to_child_offset)
-        return module_offset_point - child_labware_overlap_with_parent_deck_item
+        return (
+            module_parent_to_child_offset - child_labware_overlap_with_parent_deck_item
+        )
 
     elif isinstance(labware_location, OnLabwareLocation):
         assert isinstance(parent_deck_item, (LabwareDefinition2, LabwareDefinition3))
@@ -216,6 +224,20 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
 
     else:
         raise TypeError(f"Unsupported labware location type: {labware_location}")
+
+
+def _module_parent_to_child_offset(
+    module_parent_to_child_offset: Union[Point, None],
+    labware_location: LabwareLocation,
+) -> Point:
+    """Returns the module offset if applicable."""
+    if (
+        isinstance(labware_location, ModuleLocation)
+        and module_parent_to_child_offset is not None
+    ):
+        return Point.from_xyz_attrs(module_parent_to_child_offset)
+    else:
+        return Point(0, 0, 0)
 
 
 def _shim_does_locating_feature_pair_exist(
