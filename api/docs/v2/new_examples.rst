@@ -193,7 +193,7 @@ This protocol uses some :ref:`building block commands <v2-atomic-commands>` to t
 Advanced Method
 ---------------
 
-These protocols accomplishes the same thing as the previous example, but does it a little more efficiently. Notice how it uses the :py:meth:`.InstrumentContext.transfer` or :py:meth:`.InstrumentContext.transfer_with_liquid_class` method to move liquid between well plates. Because each is a complex command, you don't need separate calls to ``aspirate`` or ``dispense`` here.
+These protocols accomplish the same thing as the previous example, but a little more efficiently. Notice how they use the :py:meth:`.InstrumentContext.transfer` or :py:meth:`.InstrumentContext.transfer_with_liquid_class` methods to move liquid between well plates. Because each is a complex command, you don't need separate calls to ``aspirate`` or ``dispense`` here.
 
 Let's start with a basic complex command, using ``transfer()``. The source and destination well  arguments (e.g., ``plate["A1"], plate["B1"]``) are part of ``transfer()`` method parameters. 
 
@@ -249,7 +249,7 @@ Let's start with a basic complex command, using ``transfer()``. The source and d
 
 When you use the liquid class command ``transfer_with_liquid_class()``, you'll need to specify a ``liquid_class`` along with volume, source and destination, and trash parameters. 
 
-Opentrons-verified liquid class definitions are based on Flex pipette and tip combinations. The API will raise an error if you try to perform a liquid class transfer with an OT-2 pipette and tips. 
+Opentrons-verified liquid class definitions are based on Flex pipette and tip combinations. The API will raise an error if you try to perform a liquid class transfer with one of these definitions in an OT-2 protocol. 
 
 .. tabs::
 
@@ -260,7 +260,7 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
 
             from opentrons import protocol_api
 
-            metadata = {"apiLevel": "|apiLevel|"}
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -271,20 +271,20 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
                     load_name="opentrons_flex_96_tiprack_200ul",
                     location="C1"
                 )
-                p50 = protocol.load_instrument(
-                    instrument_name="flex_1channel_50",
+                p1000 = protocol.load_instrument(
+                    instrument_name="flex_1channel_1000",
                     mount="left",
                     tip_racks=[tiprack_1]
                 )
                 liquid_1 = protocol.get_liquid_class("glycerol_50")
                 trash = protocol.load_trash_bin("A3")
                 # transfer 100 µL from well A1 to well B1
-                p50.transfer_with_liquid_class(
+                p1000.transfer_with_liquid_class(
                     liquid_class=liquid_1,
                     volume=100,
                     source=plate["A1"],
-                    dest=plate["B1"],
-                    trash_location=trash)
+                    dest=plate["B1"]
+                    )
 
 
 Loops

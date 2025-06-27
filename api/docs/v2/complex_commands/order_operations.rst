@@ -13,12 +13,10 @@ This page describes what steps you should expect the robot to perform when using
 Step Sequence
 =============
 
-The order of steps is fixed within complex commands, but basic and liquid class complex commands handle transfer steps and changes to actions differently.
+The order of steps is fixed within complex commands, but legacy and liquid class complex commands handle transfer steps and changes to actions differently.
 
-Basic Step Sequence
---------------------
 
-In a basic ``transfer()``, aspiration and dispensing are the only required actions. You can enable or disable all of the other actions with :ref:`complex liquid handling parameters <complex_params>`. A basic ``transfer()`` command designed to perform every possible action will proceed in this order:
+In a ``transfer()``, aspiration and dispensing are the only required actions. You can enable or disable all of the other actions with :ref:`complex liquid handling parameters <complex_params>`. A ``transfer()`` command designed to perform every possible action will proceed in this order:
 
     1. Pick up tip
     2. Mix at source
@@ -31,10 +29,10 @@ In a basic ``transfer()``, aspiration and dispensing are the only required actio
     9. Blow out
     10. Drop tip
     
-Liquid Class Step Sequence
----------------------------
 
-In a ``transfer_with_liquid_class()``, the liquid class definition specifies nearly all transfer behavior your Flex pipette will perform. A liquid class definition with every action enabled would proceed in this order: 
+In a ``transfer_with_liquid_class()``, your chosen liquid class definition specifies nearly all transfer behavior your Flex pipette will perform, like position information. For more information, see :ref:`liquid-class-definitions`. 
+
+A liquid class definition with every action enabled would proceed in this order: 
 
 To **aspirate:**
 1. Pick up tip
@@ -61,9 +59,7 @@ To **dispense:**
 20. Touch tip at the blow out location
 21. Drop tip
 
-The ``transfer_with_liquid_class()`` method includes more steps, like position information. Your chosen liquid class definition provides this additional transfer behavior. For more information, see :ref:`liquid-class-definitions`. 
-
-Each command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` arguments. Both basic and liquid class distribute and consolidate methods try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat. 
+Each command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat. 
 
 Example Orders
 ==============
@@ -123,7 +119,7 @@ Tip Refilling
 
 One factor that affects the exact order of steps for a complex command is whether the amount of liquid being moved can fit in the tip at once. If it won't fit, you don't have to adjust your command. The API will handle it for you by including additional steps to refill the tip when needed.
 
-For example, say you need to move 100 µL of liquid from one well to another, but you only have a 50 µL pipette attached to your robot. To accomplish this with building block commands, you'd need multiple aspirates and dispenses. ``aspirate(volume=100)`` would raise an error, since it exceeds the tip's volume. But you can accomplish this with a single basic or liquid class transfer command::
+For example, say you need to move 100 µL of liquid from one well to another, but you only have a 50 µL pipette attached to your robot. To accomplish this with building block commands, you'd need multiple aspirates and dispenses. ``aspirate(volume=100)`` would raise an error, since it exceeds the tip's volume. But you can accomplish this with a single command::
 
     pipette50.transfer(
         volume=100,
@@ -144,7 +140,7 @@ To effect the transfer, the API will aspirate and dispense the maximum volume of
 
 You can change ``volume`` to any value (above the minimum volume of the pipette) and the API will automatically calculate how many times the pipette needs to aspirate and dispense. ``volume=50`` would require just one repetition. ``volume=75`` would require two, split into 50 µL and 25 µL. ``volume=1000`` would repeat 20 times — not very efficient, but perhaps more useful than having to swap to a different pipette!
 
-Remember that ``distribute()`` and ``distribute_with_liquid_class()`` include a disposal volume by default, and this can affect the number of times the pipette refills its tip. Say you want to ``distribute()`` 80 µL to each of the 12 wells in row A of a plate. That's 960 µL total — less than the capacity of the pipette — but the 100 µL disposal volume will cause the pipette to refill.
+Remember that ``distribute()`` includes a disposal volume by default, and this can affect the number of times the pipette refills its tip. Say you want to ``distribute()`` 80 µL to each of the 12 wells in row A of a plate. That's 960 µL total — less than the capacity of the pipette — but the 100 µL disposal volume will cause the pipette to refill.
 
 .. code-block:: text
 
@@ -168,9 +164,9 @@ This command will blow out 200 total µL of liquid in the trash. If you need to 
 List of Volumes
 ===============
 
-Basic complex commands like ``transfer()`` can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. Liquid class complex commands, like ``transfer_with_liquid_class()`` only accept a single volume argument, and aspirate or dispense the same amount across wells. 
+Legacy complex commands like ``transfer()`` can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. Liquid class complex commands, like ``transfer_with_liquid_class()`` only accept a single volume argument, and aspirate or dispense the same amount across wells. 
 
-In a basic complex command, set the ``volume`` parameter to a list of volumes instead of a single number. The list must be the same length as the number of ``source`` or ``dest`` (or the longer of the two for a basic ``transfer()``), or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
+To do this in a ``transfer()``, set the ``volume`` parameter to a list of volumes instead of a single number. The list must be the same length as the number of ``source`` or ``dest`` (or the longer of the two for a ``transfer()``), or the API will raise an error. For example, this command transfers a different amount of liquid into each of wells B1, B2, and B3::
 
     pipette.transfer(
         volume=[20, 40, 60],

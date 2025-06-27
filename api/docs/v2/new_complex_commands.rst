@@ -16,9 +16,8 @@ Complex liquid handling commands combine multiple :ref:`building block commands 
 There are six complex liquid handling commands, each optimized for a different liquid handling scenario: 
 
 .. list-table::
-    :header-rows: 1
    
-    * - Basic
+    * - Legacy
       - 
         * :py:meth:`.InstrumentContext.transfer`
         * :py:meth:`.InstrumentContext.distribute`
@@ -29,7 +28,7 @@ There are six complex liquid handling commands, each optimized for a different l
         * :py:meth:`.InstrumentContext.distribute_with_liquid_class`
         * :py:meth:`.InstrumentContext.consolidate_with_liquid_class`
   
-The basic complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the *liquid class definition* to account for liquid properties like viscosity. For more information, see :ref:`liquid-classes`. 
+The legacy complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the *liquid class definition* to account for liquid properties like viscosity. For more information, see :ref:`liquid-classes`. 
 
 Pages in this section of the documentation cover:
 
