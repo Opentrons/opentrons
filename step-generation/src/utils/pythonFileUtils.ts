@@ -264,15 +264,17 @@ export function getLoadPipettes(
         },
         []
       )
-      //  list off-deck labware last to match getNextTip logic
-      const tiprackPythonNames = allTipracks
-        .sort((a, b) => {
-          const aOffDeck =
-            getSlotInLocationStack(labwareRobotState[a.id].stack) === 'offDeck'
-          const bOffDeck =
-            getSlotInLocationStack(labwareRobotState[b.id].stack) === 'offDeck'
-          return Number(aOffDeck) - Number(bOffDeck)
-        })
+      const onDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
+          'offDeck'
+      )
+      const offDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
+          'offDeck'
+      )
+      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
         .map(tiprack => tiprack.pythonName)
         .join(', ')
 
