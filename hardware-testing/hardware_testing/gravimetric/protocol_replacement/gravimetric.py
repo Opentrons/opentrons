@@ -336,7 +336,6 @@ def _get_tips_for_test_single_multi(
 
     wells += tips.get_unused_tips(fixture_settings.ctx, tip)
     for rack in tipracks_lw:
-        # TODO remove 8 channel pattern with channel
         wells += rack.wells()
     return wells
 
