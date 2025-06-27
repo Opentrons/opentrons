@@ -12,7 +12,12 @@ export function getMoveToWellCommandText({
   commandTextData,
   robotType,
 }: HandlesCommands<MoveToWellRunTimeCommand>): string {
-  const { wellName, labwareId } = command.params
+  const { wellName, labwareId, wellLocation } = command.params
+  const {
+    x: xOffsetUnformatted,
+    y: yOffsetUnformatted,
+    z: zOffsetUnformatted,
+  } = wellLocation.offset
   const allPreviousCommands = commandTextData?.commands.slice(
     0,
     commandTextData.commands.findIndex(c => c.id === command.id)
@@ -32,7 +37,7 @@ export function getMoveToWellCommandText({
   })
 
   return t('move_to_well', {
-    well_name: wellName,
+    wellName,
     labware:
       commandTextData != null
         ? getLabwareName({
@@ -41,6 +46,10 @@ export function getMoveToWellCommandText({
             allRunDefs,
           })
         : null,
-    labware_location: displayLocation,
+    xOffset: xOffsetUnformatted.toFixed(2),
+    yOffset: yOffsetUnformatted.toFixed(2),
+    zOffset: zOffsetUnformatted.toFixed(2),
+    positionRelative: wellLocation.origin,
+    displayLocation,
   })
 }

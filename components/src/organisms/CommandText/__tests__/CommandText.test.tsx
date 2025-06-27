@@ -216,7 +216,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
+        'Moving to well A1 of NEST 1 Well Reservoir 195 mL with x,y,z offset 0.00, 0.00, -24.00 relative to top in Slot 5'
       )
     }
   })
