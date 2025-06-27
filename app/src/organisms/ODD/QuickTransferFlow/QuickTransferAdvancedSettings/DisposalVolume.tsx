@@ -56,20 +56,22 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [volume, setVolume] = useState<number | null>(null)
 
-  const getInitialBlowoutLocation = (blowOut: typeof state.blowOut): string => {
-    if (blowOut == null) {
+  const getInitialBlowoutLocation = (
+    blowOut: typeof state.blowOutDispense
+  ): string => {
+    if (blowOut?.location == null) {
       return ''
     }
-    if (typeof blowOut === 'string') {
-      return blowOut
+    if (typeof blowOut.location === 'string') {
+      return blowOut.location
     }
-    return `trashBin:${blowOut.cutoutId}`
+    return `trashBin:${blowOut.location.cutoutId}`
   }
 
   const [
     selectedBlowoutLocation,
     setSelectedBlowoutLocation,
-  ] = useState<string>(getInitialBlowoutLocation(state.blowOut))
+  ] = useState<string>(getInitialBlowoutLocation(state.blowOutDispense))
   const [flowRate, setFlowRate] = useState<number | null>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const fixtureLocationOptions = deckConfig.filter(

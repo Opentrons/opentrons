@@ -140,7 +140,10 @@ export function quickTransferSummaryReducer(
           ...state,
           path: action.path,
           disposalVolume: action.disposalVolume,
-          blowOut: action.blowOutLocation,
+          blowOutDispense: {
+            location: action.blowOutLocation,
+            speed: state.dispenseFlowRate,
+          },
         }
       } else {
         return {

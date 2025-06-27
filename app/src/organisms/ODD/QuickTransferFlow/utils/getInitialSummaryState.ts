@@ -97,7 +97,13 @@ export function getInitialSummaryState(
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
     disposalVolume: path === 'multiDispense' ? state.volume : undefined,
-    blowOut: path === 'multiDispense' ? trashConfigCutout : undefined,
+    blowOutDispense:
+      path === 'multiDispense'
+        ? {
+            location: trashConfigCutout,
+            speed: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+          }
+        : undefined,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,

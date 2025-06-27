@@ -157,7 +157,10 @@ describe('PipettePath', () => {
         ...props.state,
         transferType: 'distribute',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          speed: 10,
+        },
       },
     }
     render(props)
@@ -186,7 +189,10 @@ describe('PipettePath', () => {
         transferType: 'distribute',
         path: 'multiDispense',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          speed: 10,
+        },
       },
     }
     render(props)
@@ -216,7 +222,10 @@ describe('PipettePath', () => {
         transferType: 'distribute',
         path: 'multiDispense',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          speed: 10,
+        },
       },
     }
     render(props)
