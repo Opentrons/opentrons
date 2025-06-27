@@ -33,7 +33,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -58,7 +59,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -83,7 +85,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -108,7 +111,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -133,7 +137,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -158,7 +163,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -183,7 +189,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -208,7 +215,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -233,7 +241,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -258,7 +267,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         }
       },
@@ -283,7 +293,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []
@@ -309,7 +320,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []
@@ -335,7 +347,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []
@@ -361,7 +374,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []
@@ -387,7 +401,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []
@@ -413,7 +428,8 @@
             "frontRight": {
               "x": 128.0,
               "y": -86.0
-            }
+            },
+            "springDirectionalForce": "backLeftBottom"
           }
         },
         "compatibleModuleTypes": []

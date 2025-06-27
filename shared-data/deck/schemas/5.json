@@ -190,7 +190,6 @@
                     "description": "The 2D plane on which a child deck item resides.",
                     "type": "object",
                     "required": ["backLeft", "frontRight", "z"],
-                    "additionalProperties": false,
                     "properties": {
                       "backLeft": {
                         "description": "(-x, +y), the back left corner of an addressable area.",
@@ -203,6 +202,10 @@
                       "z": {
                         "description": "Always zero by convention. The z-offset from the bottom of the addressable area's plane to the plane on which a child deck item resides.",
                         "type": "number"
+                      },
+                      "springDirectionalForce": {
+                        "description": "Applicable when the addressable area contains a spring that influences a child deck item.",
+                        "type": "string"
                       }
                     }
                   }

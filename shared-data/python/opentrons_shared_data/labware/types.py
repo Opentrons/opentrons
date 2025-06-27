@@ -43,7 +43,7 @@ LabwareRoles = Literal[
 ]
 
 SpringDirectionalForce = Literal["backLeftBottom"]
-"""Describes the resultant net force a parent entity induces on a child entity."""
+"""Describes the resultant net force exerted on the child deck item."""
 
 
 class Vector2D(TypedDict):

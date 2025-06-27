@@ -159,7 +159,6 @@
           "description": "The 3D plane of the module that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
           "type": "object",
           "required": ["backLeft", "frontRight", "z"],
-          "additionalProperties": false,
           "properties": {
             "backLeft": {
               "description": "(-x, +y) relative to the labware origin.",
@@ -172,6 +171,10 @@
             "z": {
               "description": "Always zero by convention. Z-coordinate of the footprint plane.",
               "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the module contains a spring that influences its position when placed on a parent deck item.",
+              "type": "string"
             }
           }
         },
@@ -179,7 +182,6 @@
           "description": "The 2D plane on which a child deck item resides.",
           "type": "object",
           "required": ["backLeft", "frontRight", "z"],
-          "additionalProperties": false,
           "properties": {
             "backLeft": {
               "description": "(-x, +y), the back left corner of a module's mating plane.",
@@ -192,6 +194,10 @@
             "z": {
               "description": "Always zero by convention. The z-offset from the bottom of the module's mating plane to the plane on which a child deck item resides.",
               "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the module contains a spring that influences a child deck item.",
+              "type": "string"
             }
           }
         }
