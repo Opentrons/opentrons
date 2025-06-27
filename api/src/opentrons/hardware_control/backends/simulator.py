@@ -11,6 +11,7 @@ from opentrons_shared_data.pipette import (
     mutable_configurations,
     pipette_definition,
 )
+from opentrons_shared_data.errors.exceptions import InvalidInstrumentData
 
 from opentrons import types
 from opentrons.config.types import RobotConfig
@@ -26,7 +27,7 @@ from ..module_control import AttachedModulesControl
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
+    from opentrons_shared_data.pipette.types import PipetteName
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -128,19 +129,13 @@ class Simulator:
         ) -> PipetteSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
-            if pipette_load_name.supported_pipette(
-                cast("PipetteName", passed_ai["model"])
-            ):
-                if pipette_load_name.is_model(passed_ai["model"]):
-                    return passed_ai
-                else:
-                    get_pip_model = pipette_load_name.convert_pipette_name(
-                        cast("PipetteName", passed_ai["model"])
-                    )
-                    return {
-                        "model": PipetteModel(str(get_pip_model)),
-                        "id": passed_ai.get("id"),
-                    }
+            try:
+                name = pipette_load_name.convert_to_pipette_name_type(
+                    passed_ai["model"]
+                )
+                return {"model": name.model, "id": passed_ai.get("id")}
+            except InvalidInstrumentData:
+                pass
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
