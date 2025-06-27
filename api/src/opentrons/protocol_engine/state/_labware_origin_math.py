@@ -146,6 +146,11 @@ def get_parent_placement_origin_to_lw_origin(
             deck_definition=deck_definition, parent_deck_item=parent_deck_item
         )
 
+        # TODO(jh 06-27-25): This is temporary until we support well locating features. This helps keep the snapshot
+        #  testing more useful.
+        if _shim_is_tc_or_mag_block(parent_deck_item):
+            parent_deck_item_to_child_labware_feature_offset = 0
+
         parent_deck_item_origin_to_child_labware_origin = (
             _child_back_left_bottom_position(child_labware) * -1
         )
@@ -222,6 +227,20 @@ def _shim_does_locating_feature_pair_exist(
         parent_deck_item.features.get("slotFootprintAsParent") is not None
         and child_labware.features.get("slotFootprintAsChild") is not None
     )
+
+
+def _shim_is_tc_or_mag_block(parent_deck_item: LabwareParentDefinition) -> bool:
+    """Temporary util."""
+    model = None
+    if hasattr(parent_deck_item, "model"):
+        model = parent_deck_item.model  # type: ignore[union-attr]
+    elif isinstance(parent_deck_item, dict):
+        model = parent_deck_item.get("model")
+    return model in [
+        ModuleModel.THERMOCYCLER_MODULE_V2,
+        ModuleModel.THERMOCYCLER_MODULE_V1,
+        ModuleModel.MAGNETIC_BLOCK_V1,
+    ]
 
 
 def _parent_deck_item_with_features(
