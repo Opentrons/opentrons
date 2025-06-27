@@ -21,7 +21,10 @@ describe('Import a json and export as a python', () => {
           cy.get( 'div[aria-label="ModalShell_ModalArea"]')
             .contains('Import').click({force:true})
           verifyImportProtocolPage(file)
+          cy.wait(3000)
           cy.contains('Export protocol').click()
+
+          //verification the import page to account for a race condition
           // const steps = new StepBuilder()
           // steps.execute()
         })
