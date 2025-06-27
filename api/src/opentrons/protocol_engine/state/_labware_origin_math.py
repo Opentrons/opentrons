@@ -13,6 +13,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.labware.types import (
     SlotFootprintAsChildFeature,
     LocatingFeatures,
+    SpringDirectionalForce,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from ..types import (
@@ -238,17 +239,51 @@ def _get_parent_origin_to_lw_origin(
         parent_deck_item.features.get("slotFootprintAsParent") is not None
         and child_labware.features.get("slotFootprintAsChild") is not None
     ):
-        return _get_parent_origin_to_bottom_center_mate(
-            parent_deck_item
-        ) + _get_bottom_center_mate_to_lw_origin(child_labware)
+        spring_force = _get_spring_force(child_labware, parent_deck_item)
+
+        if spring_force is not None:
+            if spring_force == "backLeftBottom":
+                return _parent_origin_to_mate_spring_back_left_bottom(
+                    parent_deck_item
+                ) + _mate_spring_back_left_bottom_to_lw_origin(child_labware)
+            else:
+                raise NotImplementedError(f"Spring force: {spring_force}")
+        else:
+            return _parent_origin_to_bottom_center_mate(
+                parent_deck_item
+            ) + _bottom_center_mate_to_lw_origin(child_labware)
     else:
         # TODO(jh, 06-25-25): This is a temporary shim to unblock FE usage with LW Def3 and more accurately diff
         #  ongoing positioning snapshot changes, but we should throw an error  after adding all locating features
         #  if no appropriate LF pair is found.
-        return _get_back_left_bottom_position(child_labware) * -1
+        return _back_left_bottom_position(child_labware) * -1
 
 
-def _get_parent_origin_to_bottom_center_mate(
+def _get_spring_force(
+    child_labware: LabwareDefinition3,
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> SpringDirectionalForce | None:
+    """Returns whether the parent-child stackup has a spring that affects positioning."""
+    assert parent_deck_item.features.get("slotFootprintAsParent") is not None
+    assert child_labware.features.get("slotFootprintAsChild") is not None
+
+    parent_spring_force = parent_deck_item.features["slotFootprintAsParent"].get(
+        "springDirectionalForce"
+    )
+    child_spring_force = child_labware.features["slotFootprintAsChild"].get(
+        "springDirectionalForce"
+    )
+
+    if parent_spring_force is not None and child_spring_force is not None:
+        if parent_spring_force != child_spring_force:
+            raise ValueError(
+                f"Parent spring force: {parent_spring_force} does not match child spring force: {child_spring_force}"
+            )
+
+    return parent_spring_force or child_spring_force
+
+
+def _parent_origin_to_bottom_center_mate(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
     """Returns offset from the parent deck item's origin to the bottom-center point of the mating plane."""
@@ -262,7 +297,21 @@ def _get_parent_origin_to_bottom_center_mate(
     return Point(x, y, z)
 
 
-def _get_bottom_center_mate_to_lw_origin(child_labware: LabwareDefinition3) -> Point:
+def _parent_origin_to_mate_spring_back_left_bottom(
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> Point:
+    """Returns offset from the parent origin to the stackup plane, accounting for back left bottom spring force."""
+    slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
+    assert slot_footprint_as_parent is not None
+
+    x = slot_footprint_as_parent["backLeft"]["x"]
+    y = slot_footprint_as_parent["backLeft"]["y"]
+    z = slot_footprint_as_parent["z"]
+
+    return Point(x, y, z)
+
+
+def _bottom_center_mate_to_lw_origin(child_labware: LabwareDefinition3) -> Point:
     """Returns offset from the labware's bottom-center point of the mating plane to the labware origin."""
     slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
     assert slot_footprint_as_child is not None
@@ -271,10 +320,24 @@ def _get_bottom_center_mate_to_lw_origin(child_labware: LabwareDefinition3) -> P
     y = slot_footprint_as_child["frontRight"]["y"] / 2
     z = slot_footprint_as_child["z"]
 
-    return -1 * Point(x, y, z)
+    return Point(x, y, z) * -1
 
 
-def _get_back_left_bottom_position(child_labware: LabwareDefinition3) -> Point:
+def _mate_spring_back_left_bottom_to_lw_origin(
+    child_labware: LabwareDefinition3,
+) -> Point:
+    """Returns offset from the stackup plane to the child's origin, accounting for back left bottom spring force."""
+    slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
+    assert slot_footprint_as_child is not None
+
+    x = slot_footprint_as_child["backLeft"]["x"]
+    y = slot_footprint_as_child["backLeft"]["y"]
+    z = slot_footprint_as_child["z"]
+
+    return Point(x, y, z) * -1
+
+
+def _back_left_bottom_position(child_labware: LabwareDefinition3) -> Point:
     """Get the back left bottom position from a v3 labware definition."""
     footprint_as_child = _get_labware_footprint_as_child(child_labware)
 

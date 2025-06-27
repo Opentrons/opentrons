@@ -42,6 +42,9 @@ LabwareRoles = Literal[
     "system",
 ]
 
+SpringDirectionalForce = Literal["backLeftBottom"]
+"""Describes the resultant net force a parent entity induces on a child entity."""
+
 
 class Vector2D(TypedDict):
     x: float
@@ -160,12 +163,14 @@ class SlotFootprintAsChildFeature(TypedDict):
     z: float
     backLeft: Vector2D
     frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
 
 
 class SlotFootprintAsParentFeature(TypedDict):
     z: float
     backLeft: Vector2D
     frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
 
 
 class LocatingFeatures(TypedDict):
