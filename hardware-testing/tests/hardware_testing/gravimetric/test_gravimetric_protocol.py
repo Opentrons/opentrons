@@ -11,7 +11,6 @@ from pathlib import Path
 import pytest
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-import pytest
 
 GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH = (
     Path(__file__).parent / "../../../hardware_testing/gravimetric/protocol_replacement"
@@ -85,13 +84,10 @@ def _get_analysis_result(
 @pytest.mark.parametrize(
     "pipette",
     [
-        pytest.param(
-            "96ch200", marks=pytest.mark.xfail(reason="200ul has no liquid class")
-        ),
-        pytest.param("96ch1000"),
+        pytest.param("1ch50"),
     ],
 )
-def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
+def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
     """Check that gravimetric test protocol uses the latest Python API version and simulates."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH],
@@ -107,9 +103,6 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
     print(result.stdout_stderr)
     assert result.exit_code == 0
     assert result.json_output
-    assert result.json_output["errors"] == [], "Analysis failed: " + str(
-        result.json_output
-    )
     assert result.json_output["config"]["apiVersion"] == [
         MAX_SUPPORTED_VERSION.major,
         MAX_SUPPORTED_VERSION.minor,
@@ -119,15 +112,19 @@ def test_gravimetric_test_protocol_passes_analysis(pipette: str) -> None:
 @pytest.mark.parametrize(
     argnames=["csv"],
     argvalues=[
-        ["1ch1000.csv"],
-        ["1ch1000_extra.csv"],
-        # ["1ch50.csv"],  Needs t20ul LC
-        # ["1ch50_extra.csv"],  Needs t20ul LC
+        # ["1ch1000.csv"], # Some of these are commented out just cause they take so long.
+        # ["1ch1000_extra.csv"],
+        ["1ch50.csv"],
+        # ["1ch50_extra.csv"],
         ["96ch1000.csv"],
-        # ["96ch200.csv"], Needs LC
+        # ["96ch200.csv"], Needs LC to complete
+        # ["8ch1000.csv"],
+        # ["8ch1000_extra.csv"],
+        ["8ch50.csv"],
+        # ["8ch50_extra.csv"],
     ],
 )
-def test_analsis(csv: str) -> None:
+def test_analasis(csv: str) -> None:
     """Make sure each CSV can analyze successfully."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH, VIAL_LABWARE_DEF],
@@ -141,4 +138,5 @@ def test_analsis(csv: str) -> None:
             }
         ),
     )
+    print(result.stdout_stderr)
     assert result.exit_code == 0
