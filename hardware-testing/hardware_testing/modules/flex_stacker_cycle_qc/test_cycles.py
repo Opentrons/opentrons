@@ -26,7 +26,7 @@ def print_cycle(stacker: FlexStacker, cycle: int, total_cycles: int) -> None:
 
 
 async def test_cycles(
-    stacker: FlexStacker, cycles: int, labware_height: int
+    stacker: FlexStacker, cycles: int, labware_height: int, labware_sense: bool
 ) -> Tuple[bool, int]:
     """Test Cycling Labware on Stacker."""
     cycles_completed = 0
@@ -35,11 +35,11 @@ async def test_cycles(
         try:
             await stacker.dispense_labware(
                 labware_height,
-                enforce_hopper_lw_sensing=False,
-                enforce_shuttle_lw_sensing=False,
+                enforce_hopper_lw_sensing=labware_sense,
+                enforce_shuttle_lw_sensing=labware_sense,
             )
             await stacker.store_labware(
-                labware_height, enforce_shuttle_lw_sensing=False
+                labware_height, enforce_shuttle_lw_sensing=labware_sense
             )
         except Exception as e:
             ui.print_error(f"{stacker.device_info['serial']}: An error occurred: {e}")
@@ -59,11 +59,14 @@ async def run(
     section: str,
     cycles: int,
     labware_height: int,
+    labware_sense: bool,
 ) -> None:
     """Run."""
     ui.print_header(f"Cycle Test - {stacker.device_info['serial']}")
 
     await stacker.home_all()
-    cycle_result, cycles_completed = await test_cycles(stacker, cycles, labware_height)
+    cycle_result, cycles_completed = await test_cycles(
+        stacker, cycles, labware_height, labware_sense
+    )
 
     report(section, "cycle", [cycles_completed, CSVResult.from_bool(cycle_result)])

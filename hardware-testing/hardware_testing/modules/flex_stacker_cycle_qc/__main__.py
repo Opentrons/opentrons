@@ -45,7 +45,9 @@ async def build_stacker_report(
     return report, stacker
 
 
-async def _main(cfg: TestConfig, cycles: int, labware_height: int) -> None:
+async def _main(
+    cfg: TestConfig, cycles: int, labware_height: int, labware_sense: bool
+) -> None:
     # BUILD REPORT
     ports = []
     for i in comports():
@@ -79,7 +81,14 @@ async def _main(cfg: TestConfig, cycles: int, labware_height: int) -> None:
             tasks = []
             for sn, (report, stacker) in stackers.items():
                 tasks.append(
-                    test_run(stacker, report, section.value, cycles, labware_height)
+                    test_run(
+                        stacker,
+                        report,
+                        section.value,
+                        cycles,
+                        labware_height,
+                        labware_sense,
+                    )
                 )
             await asyncio.gather(*tasks)  # Run all tasks concurrently
     except Exception as e:
@@ -107,6 +116,11 @@ if __name__ == "__main__":
         default=DEFAULT_LABWARE_HEIGHT,
         help="LabwareHeight - stackingOffsetWithLabware, in mm",
     )
+    parser.add_argument(
+        "--labware-sense",
+        action="store_true",
+        help="Enable labware sensing",
+    )
     # add each test-section as a skippable argument (eg: --skip-connectivity)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -122,4 +136,4 @@ if __name__ == "__main__":
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
     _config = TestConfig(simulate=args.simulate, tests=_t_sections)
-    asyncio.run(_main(_config, args.cycles, args.labware_height))
+    asyncio.run(_main(_config, args.cycles, args.labware_height, args.labware_sense))
