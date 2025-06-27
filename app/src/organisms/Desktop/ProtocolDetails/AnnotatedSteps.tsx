@@ -1,23 +1,19 @@
-import { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   CommandText,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
-  Divider,
   Flex,
   getLabwareDefinitionsFromCommands,
   Icon,
-  LegacyStyledText,
   OVERFLOW_AUTO,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -82,7 +78,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       }
     }
   })
-
   return (
     <Flex
       css={HIDE_SCROLLBAR}
@@ -145,7 +140,19 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     allRunDefs,
     setSelectedCommand,
   } = props
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(() =>
+    subCommands.some(command => command.isHighlighted)
+  )
+
+  useEffect(() => {
+    const hasHighlighted = subCommands.some(command => command.isHighlighted)
+    if (hasHighlighted) {
+      setIsExpanded(true)
+    } else {
+      setIsExpanded(false)
+    }
+  }, [subCommands])
+
   return (
     <Flex
       onClick={() => {
@@ -225,6 +232,7 @@ function IndividualCommand({
           transition: background-color 500ms ease-out,
             border-color 500ms ease-out;
         `}
+        cursor="pointer"
         onClick={() => {
           setSelectedCommand?.(command.id)
         }}

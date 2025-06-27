@@ -19,6 +19,7 @@ import {
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
   RobotType,
+  RunTimeCommand,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
@@ -37,6 +38,7 @@ interface DeckViewProps {
   robotType: RobotType
   selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
+  selectedRunTimeCommand?: RunTimeCommand
 }
 
 const lightFill = COLORS.grey35
@@ -49,6 +51,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedSlot,
     setSelectedSlot,
     robotState,
+    selectedRunTimeCommand,
   } = props
   const [isSlotActive, setSlotActive] = useState<boolean>(false)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -57,10 +60,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     wasteChuteEntities,
     stagingAreaEntities,
   } = invariantContext
-
   const trashBinFixtures = [
     {
-      cutoutId: trashBinEntities[0]?.location as CutoutId,
+      cutoutId: `cutout${
+        Object.values(trashBinEntities)[0]?.location
+      }` as CutoutId,
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
@@ -72,7 +76,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
   return (
     <div style={{ padding: '0px 16px' }}>
       <div className={styles.deckViewContainer}>
@@ -111,24 +114,22 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               {Object.values(trashBinEntities).length > 0
-                ? trashBinFixtures.map(({ cutoutId }) =>
-                    cutoutId != null ? (
-                      <Fragment key={cutoutId}>
-                        <SingleSlotFixture
-                          cutoutId={cutoutId}
-                          deckDefinition={deckDef}
-                          slotClipColor={COLORS.transparent}
-                          fixtureBaseColor={lightFill}
-                        />
-                        <FlexTrash
-                          robotType={robotType}
-                          trashIconColor={lightFill}
-                          trashCutoutId={cutoutId as TrashCutoutId}
-                          backgroundColor={COLORS.grey50}
-                        />
-                      </Fragment>
-                    ) : null
-                  )
+                ? trashBinFixtures.map(({ cutoutId }) => (
+                    <Fragment key={cutoutId}>
+                      <SingleSlotFixture
+                        cutoutId={cutoutId}
+                        deckDefinition={deckDef}
+                        slotClipColor={COLORS.transparent}
+                        fixtureBaseColor={lightFill}
+                      />
+                      <FlexTrash
+                        robotType={robotType}
+                        trashIconColor={lightFill}
+                        trashCutoutId={cutoutId as TrashCutoutId}
+                        backgroundColor={COLORS.grey50}
+                      />
+                    </Fragment>
+                  ))
                 : null}
               {Object.values(wasteChuteEntities).map(entity => (
                 <WasteChuteFixture
@@ -160,6 +161,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 {...{
                   deckDef,
                 }}
+                selectedRunTimeCommand={selectedRunTimeCommand}
               />
               <SlotLabels
                 robotType={robotType}

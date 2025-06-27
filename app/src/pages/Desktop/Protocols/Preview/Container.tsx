@@ -27,10 +27,17 @@ export function Container(props: ContainerProps): JSX.Element {
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
-  const [currentCommandIndex, setCurrentCommandIndex] = useState<number>(0)
   const commandListRef = useRef<ViewportListRef>(null)
-  const [selectedCommand, setSelectedCommand] = useState<string | null>(null)
-  const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
+
+  const [selectedCommandId, setSelectedCommand] = useState<string | null>(
+    commands[0]?.id ?? null
+  )
+
+  const selectedCommandIndex = commands.findIndex(
+    command => command.id === selectedCommandId
+  )
+
+  const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
   const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
     commands
   )
@@ -38,39 +45,46 @@ export function Container(props: ContainerProps): JSX.Element {
     currentCommandsSlice,
     invariantContextFromRunCommands
   )
+
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }
 
   useEffect(() => {
-    if (isPlaying) {
-      const intervalId = setInterval(() => {
-        setCurrentCommandIndex(prev => {
-          const nextIndex = prev < commands.length - 1 ? prev + 1 : 0
-          commandListRef.current?.scrollToIndex(nextIndex)
-          return nextIndex
-        })
-      }, SEC_PER_FRAME)
+    if (!isPlaying) return
 
-      return () => {
-        clearInterval(intervalId)
-      }
-    }
+    const intervalId = setInterval(() => {
+      setSelectedCommand(prevId => {
+        const currentIndex = commands.findIndex(cmd => cmd.id === prevId)
+        const nextIndex =
+          currentIndex < commands.length - 1 ? currentIndex + 1 : 0
+        const nextId = commands[nextIndex]?.id ?? null
+
+        commandListRef.current?.scrollToIndex(nextIndex)
+
+        return nextId
+      })
+    }, SEC_PER_FRAME)
+
+    return () => clearInterval(intervalId)
   }, [isPlaying, commands])
 
   const { robotState } = frame
-
+  const selectedRunTimeCommand = commands.find(
+    command => command.id === selectedCommandId
+  )
   return (
     <>
       <Controls
         protocolName={analysis.metadata.protocolName}
         numErrors={analysis.errors.length}
         numCommandLength={commands.length}
-        currentCommandIndex={currentCommandIndex}
-        setCurrentCommandIndex={setCurrentCommandIndex}
+        currentCommandIndex={selectedCommandIndex}
+        setSelectedCommand={setSelectedCommand}
         commandListRef={commandListRef}
         handlePlayPause={handlePlayPause}
         isPlaying={isPlaying}
+        commands={commands}
       />
       <div style={{ display: 'flex' }}>
         <DeckView
@@ -79,10 +93,11 @@ export function Container(props: ContainerProps): JSX.Element {
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
+          selectedRunTimeCommand={selectedRunTimeCommand}
         />
         <CommandSteps
           analysis={analysis}
-          currentCommandIndex={currentCommandIndex}
+          currentCommandIndex={selectedCommandIndex}
           groupedCommands={groupedCommands}
           setSelectedCommand={setSelectedCommand}
         />

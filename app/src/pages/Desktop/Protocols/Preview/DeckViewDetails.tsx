@@ -15,6 +15,7 @@ import {
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   RobotType,
+  RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -43,6 +44,7 @@ interface DeckViewDetailsProps {
   invariantContext: InvariantContext
   deckDef: DeckDefinition
   isSlotActive: boolean
+  selectedRunTimeCommand?: RunTimeCommand
 }
 export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
   const {
@@ -54,8 +56,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     stagingAreaCutoutIds,
     invariantContext,
     isSlotActive,
+    selectedRunTimeCommand,
   } = props
-  const { labware, modules } = robotState
+  const { labware, modules, pipettes } = robotState
   const { labwareEntities, moduleEntities } = invariantContext
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
@@ -76,6 +79,14 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           id,
           Object.values(labware)
         )
+        const isStepAssosciatedWithModule =
+          selectedRunTimeCommand != null &&
+          'moduleId' in selectedRunTimeCommand.params &&
+          selectedRunTimeCommand.params.moduleId === id
+        const isStepAssosciatedWithLabware = Object.values(pipettes).find(
+          pipette => pipette.entityId === labwareLoadedOnModuleId
+        )
+        console.log(pipettes)
         return (
           <Fragment key={id}>
             <DeckViewOverlay
@@ -106,7 +117,11 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   <>
                     <RobotCoordsForeignDiv>
                       <Box
-                        backgroundColor={COLORS.grey50}
+                        backgroundColor={
+                          isStepAssosciatedWithLabware
+                            ? COLORS.purple40
+                            : COLORS.grey50
+                        }
                         border="3px solid black"
                         borderRadius={BORDERS.borderRadius8}
                         width={`${STANDARD_X_WIDTH}px`}
@@ -129,6 +144,22 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 ) : null}
               </div>
             </DeckViewOverlay>
+            {isStepAssosciatedWithModule ? (
+              <DeckViewOverlay
+                key={slot}
+                slotId={slot}
+                slotPosition={slotPosition}
+                slotFillColor={selectedSlot ? COLORS.purple40 : COLORS.purple50}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+              >
+                <StyledText desktopStyle="bodyLargeRegular">
+                  Thermocycler changing state
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
           </Fragment>
         )
       })}
@@ -179,7 +210,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
         }
-
+        const isStepAssosciatedWithLabware = Object.values(pipettes).find(
+          pipette => pipette.entityId === id
+        )
         return (
           <Fragment key={id}>
             <RobotCoordsForeignDiv
@@ -196,7 +229,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               }}
             >
               <Box
-                backgroundColor={COLORS.grey50}
+                backgroundColor={
+                  isStepAssosciatedWithLabware ? COLORS.purple40 : COLORS.grey50
+                }
                 border="3px solid black"
                 borderRadius={BORDERS.borderRadius8}
                 width={`${STANDARD_X_WIDTH}px`}

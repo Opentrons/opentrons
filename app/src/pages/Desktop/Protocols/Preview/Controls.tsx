@@ -1,7 +1,8 @@
-import { RefObject, SetStateAction } from 'react'
+import { Dispatch, RefObject, SetStateAction } from 'react'
 import { ViewportListRef } from 'react-viewport-list'
 
 import { Chip, Icon } from '@opentrons/components'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 import styles from './preview.module.css'
 
@@ -10,10 +11,11 @@ interface ControlsProps {
   protocolName: string
   numCommandLength: number
   currentCommandIndex: number
-  setCurrentCommandIndex: (value: SetStateAction<number>) => void
+  setSelectedCommand: Dispatch<SetStateAction<string | null>>
   commandListRef: RefObject<ViewportListRef>
   handlePlayPause: () => void
   isPlaying: boolean
+  commands: RunTimeCommand[]
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -22,9 +24,10 @@ export function Controls(props: ControlsProps): JSX.Element {
     numCommandLength,
     currentCommandIndex,
     commandListRef,
-    setCurrentCommandIndex,
+    setSelectedCommand,
     handlePlayPause,
     isPlaying,
+    commands,
   } = props
 
   return (
@@ -46,7 +49,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               <button
                 className={styles.fastButton}
                 onClick={() => {
-                  setCurrentCommandIndex(0)
+                  setSelectedCommand(commands[0].id)
                 }}
               >
                 <Icon
@@ -58,7 +61,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               </button>
               <button className={styles.playButton} onClick={handlePlayPause}>
                 <Icon
-                  name={isPlaying ? 'play-icon' : 'pause'}
+                  name={isPlaying ? 'pause' : 'play-icon'}
                   width="21px"
                   height="24px"
                   color="white"
@@ -67,7 +70,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               <button
                 className={styles.fastButton}
                 onClick={() => {
-                  setCurrentCommandIndex(numCommandLength)
+                  setSelectedCommand(commands[commands.length - 1].id)
                 }}
               >
                 <Icon
@@ -93,7 +96,7 @@ export function Controls(props: ControlsProps): JSX.Element {
           }}
           onChange={e => {
             const nextIndex = Number(e.target.value) - 1
-            setCurrentCommandIndex(nextIndex)
+            setSelectedCommand(commands[nextIndex].id)
             commandListRef.current?.scrollToIndex(nextIndex)
           }}
         />

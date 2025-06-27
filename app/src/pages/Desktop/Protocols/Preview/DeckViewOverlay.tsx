@@ -94,9 +94,10 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
       foreignObjectProps={{
         opacity: 1,
         flex: '1',
-        zIndex: 10,
         cursor: CURSOR_POINTER,
-        onClick: setSelectedSlot(slotId),
+        onClick: () => {
+          setSelectedSlot(slotId)
+        },
       }}
     >
       <Flex
