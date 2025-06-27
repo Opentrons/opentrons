@@ -11,7 +11,6 @@ import { BlowOut } from '../BlowOut'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux-resources/analytics')
-// vi.mock('/app/resources/deck_configuration')
 
 const render = (props: ComponentProps<typeof BlowOut>) => {
   return renderWithProviders(<BlowOut {...props} />, {
