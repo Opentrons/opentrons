@@ -5,9 +5,11 @@
   "channels": 8,
   "apiLoadName": "flex_8channel_50",
   "pipetteName": "p50_multi_flex",
+  "pipetteModelPrefix": "p50_multi",
   "familyName": "p50_multi_flex",
   "displayCategory": "FLEX",
   "generation": "FLEX",
   "model": "p50",
+  "exemplarVersion": [3, 0],
   "compatibleMachine": "Flex"
 }

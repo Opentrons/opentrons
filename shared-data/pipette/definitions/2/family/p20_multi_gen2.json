@@ -5,9 +5,11 @@
   "channels": 8,
   "apiLoadName": "p20_single_gen2",
   "pipetteName": "p20_multi_gen2",
+  "pipetteModelPrefix": "p20_multi",
   "familyName": "p20_multi_gen2",
   "displayCategory": "GEN2",
   "generation": "GEN2",
   "model": "p20",
+  "exemplarVersion": [2, 0],
   "compatibleMachine": "OT-2"
 }

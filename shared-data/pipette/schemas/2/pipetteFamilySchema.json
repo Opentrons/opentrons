@@ -15,6 +15,13 @@
     "oemType": {
       "type": "string",
       "enum": ["ot", "em"]
+    },
+    "version": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "A pipette version"
     }
   },
   "type": "object",
@@ -24,12 +31,13 @@
     "compatibleMachines",
     "apiLoadName",
     "pipetteName",
-    "familyName",
+    "pipetteModelPrefix",
     "displayName",
     "displayCategory",
     "generation",
     "oemType",
-    "model"
+    "model",
+    "exemplarVersion"
   ],
   "additionalProperties": false,
   "properties": {
@@ -43,15 +51,19 @@
     "compatibleMachine": { "$ref": "#/definitions/compatibleMachine" },
     "apiLoadName": {
       "type": "string",
-      "description": "The name that can be used to load a pipette in a protocol. May not correlate with any other name. May not correlate with a pipette model name."
+      "description": "The name that can be used to load a pipette in a protocol, like flex_8channel_1000."
     },
     "familyName": {
       "type": "string",
       "description": "The name of this family, which should be treated as opaque and may not correlate with any other name"
     },
+    "pipetteModelPrefix": {
+      "type": "string",
+      "description": "The name of the pipette used inside the Python, like p300_single (the version is appended - generation is not in this string)."
+    },
     "pipetteName": {
       "type": "string",
-      "description": "The name of the pipette as reported out of the robot software. Reliably will be everything before the final underscore of a pipette model name; may not correlate with family name or with api load name."
+      "description": "The name of the pipette as reported out of the robot software, like p1000_single_flex (generation is in this string)"
     },
     "displayName": {
       "type": "string",
@@ -63,6 +75,9 @@
     },
     "oemType": {
       "$ref": "#/definitions/oemType"
+    },
+    "exemplarVersion": {
+      "$ref": "#/definitions/version"
     }
   }
 }

@@ -5,9 +5,11 @@
   "channels": 8,
   "apiLoadName": "flex_8channel_1000_em",
   "pipetteName": "p1000_multi_em_flex",
+  "pipetteModelPrefix": "p1000_multi_em",
   "familyName": "p1000_multi_em_flex",
   "displayCategory": "FLEX",
   "generation": "FLEX",
   "model": "p1000",
+  "exemplarVersion": [3, 0],
   "compatibleMachine": "Flex"
 }

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import subprocess
-import dataclasses
 import argparse
 import json
 import pathlib
@@ -9,7 +8,6 @@ import sys
 import traceback
 from typing import Iterator, Any
 
-from ..types import PIPETTE_API_NAMES_MAP
 
 DEFAULT_DATA_PATH = (
     pathlib.Path(__file__).parent.parent.parent.parent.parent
@@ -76,6 +74,28 @@ FAMILY_NAMES_TO_PIPETTE_NAMES = {
     "p200_96_flex": "p200_96",
 }
 
+FAMILY_NAMES_TO_INTERNAL_NAMES = {
+    "p10_single_gen1": "p10_single",
+    "p10_multi_gen1": "p10_multi",
+    "p20_single_gen2": "p20_single",
+    "p20_multi_gen2": "p20_multi",
+    "p50_single_gen1": "p50_single",
+    "p50_multi_gen1": "p50_multi",
+    "p300_single_gen1": "p300_single",
+    "p300_multi_gen1": "p300_multi",
+    "p300_single_gen2": "p300_single",
+    "p300_multi_gen2": "p300_multi",
+    "p1000_single_gen1": "p1000_single",
+    "p1000_single_gen2": "p1000_single",
+    "p50_single_flex": "p50_single",
+    "p50_multi_flex": "p50_multi",
+    "p1000_single_flex": "p1000_single",
+    "p1000_multi_flex": "p1000_multi",
+    "p1000_multi_em_flex": "p1000_multi_em",
+    "p1000_96_flex": "p1000_96",
+    "p200_96_flex": "p200_96",
+}
+
 EXEMPLAR_PATHS_TO_FAMILY_NAMES = {
     "single_channel/p1000/1_0.json": "p1000_single_gen1",
     "single_channel/p1000/2_0.json": "p1000_single_gen2",
@@ -129,7 +149,7 @@ def get_generals(data_path: pathlib.Path) -> Iterator[pathlib.Path]:
 
 
 def family_from_exemplar(
-    exemplar_data: dict[str, Any], family_name: str
+    exemplar_data: dict[str, Any], family_name: str, exemplar_version: str
 ) -> dict[str, Any]:
     """Get a family definition from an exemplar."""
     return {
@@ -139,10 +159,12 @@ def family_from_exemplar(
         "channels": exemplar_data["channels"],
         "apiLoadName": FAMILY_NAMES_TO_API_NAMES[family_name],
         "pipetteName": FAMILY_NAMES_TO_PIPETTE_NAMES[family_name],
+        "pipetteModelPrefix": FAMILY_NAMES_TO_INTERNAL_NAMES[family_name],
         "familyName": family_name,
         "displayCategory": exemplar_data["displayCategory"],
         "generation": exemplar_data["displayCategory"],
         "model": exemplar_data["model"],
+        "exemplarVersion": [int(v) for v in exemplar_version.split(".")],
         "compatibleMachine": (
             "Flex" if exemplar_data["displayCategory"] == "FLEX" else "OT-2"
         ),
@@ -161,7 +183,9 @@ def run(data_path: pathlib.Path) -> None:
             )
             continue
         exemplar_data = json.load(open(exemplar))
-        family_data = family_from_exemplar(exemplar_data, family_name)
+        family_data = family_from_exemplar(
+            exemplar_data, family_name, exemplar.stem.replace("_", ".")
+        )
         print(f"Creating {family_name}")
         json.dump(family_data, open(data_path / "family" / f"{family_name}.json", "w"))
 
@@ -184,9 +208,9 @@ def run(data_path: pathlib.Path) -> None:
     )
 
 
-def _do_run(args: list[str]) -> int:
+def _do_run(argv: list[str]) -> int:
     parser = get_argparse(argparse.ArgumentParser())
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     try:
         run(args.data_path)
         return 0

@@ -5,9 +5,11 @@
   "channels": 8,
   "apiLoadName": "p10_multi",
   "pipetteName": "p10_multi",
+  "pipetteModelPrefix": "p10_multi",
   "familyName": "p10_multi_gen1",
   "displayCategory": "GEN1",
   "generation": "GEN1",
   "model": "p10",
+  "exemplarVersion": [1, 0],
   "compatibleMachine": "OT-2"
 }

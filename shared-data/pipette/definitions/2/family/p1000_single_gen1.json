@@ -5,9 +5,11 @@
   "channels": 1,
   "apiLoadName": "p1000_single",
   "pipetteName": "p1000_single",
+  "pipetteModelPrefix": "p1000_single",
   "familyName": "p1000_single_gen1",
   "displayCategory": "GEN1",
   "generation": "GEN1",
   "model": "p1000",
+  "exemplarVersion": [1, 0],
   "compatibleMachine": "OT-2"
 }

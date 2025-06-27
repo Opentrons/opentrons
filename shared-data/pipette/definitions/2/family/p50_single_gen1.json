@@ -5,9 +5,11 @@
   "channels": 1,
   "apiLoadName": "p50_single",
   "pipetteName": "p50_single",
+  "pipetteModelPrefix": "p50_single",
   "familyName": "p50_single_gen1",
   "displayCategory": "GEN1",
   "generation": "GEN1",
   "model": "p50",
+  "exemplarVersion": [1, 0],
   "compatibleMachine": "OT-2"
 }

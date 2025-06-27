@@ -5,9 +5,11 @@
   "channels": 1,
   "apiLoadName": "p300_single_gen2",
   "pipetteName": "p300_single_gen2",
+  "pipetteModelPrefix": "p300_single",
   "familyName": "p300_single_gen2",
   "displayCategory": "GEN2",
   "generation": "GEN2",
   "model": "p300",
+  "exemplarVersion": [2, 0],
   "compatibleMachine": "OT-2"
 }

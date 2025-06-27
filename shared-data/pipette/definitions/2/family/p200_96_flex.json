@@ -5,9 +5,11 @@
   "channels": 96,
   "apiLoadName": "flex_96channel_200",
   "pipetteName": "p200_96",
+  "pipetteModelPrefix": "p200_96",
   "familyName": "p200_96_flex",
   "displayCategory": "FLEX",
   "generation": "FLEX",
   "model": "p200",
+  "exemplarVersion": [3, 0],
   "compatibleMachine": "Flex"
 }

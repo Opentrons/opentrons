@@ -1,13 +1,15 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
-  "displayName": "Flex 8-Channel 1000 uL",
+  "displayName": "Flex 8-Channel 1000 \u00b5L",
   "oemType": "ot",
   "channels": 8,
   "apiLoadName": "flex_8channel_1000",
   "pipetteName": "p1000_multi_flex",
+  "pipetteModelPrefix": "p1000_multi",
   "familyName": "p1000_multi_flex",
   "displayCategory": "FLEX",
   "generation": "FLEX",
   "model": "p1000",
+  "exemplarVersion": [3, 0],
   "compatibleMachine": "Flex"
 }
