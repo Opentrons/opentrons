@@ -100,6 +100,12 @@ export const migrateFile = (
       ),
     ]) ?? null
 
+  if (firstTrashBinOrWasteChuteId == null) {
+    console.error(
+      'No trash bin or waste chute found in the initial deck setup step. Protocol file may have been corrupted.'
+    )
+  }
+
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
   ).reduce((acc, form) => {
