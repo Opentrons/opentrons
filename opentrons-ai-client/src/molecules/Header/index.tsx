@@ -23,7 +23,6 @@ import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import {
   displayExitConfirmModalAtom,
-  displayFeatureFlagsModalAtom,
   featureFlagsAtom,
 } from '../../resources/atoms'
 import { SettingsButton } from '../SettingsButton'
@@ -71,9 +70,6 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   const trackEvent = useTrackEvent()
   const [, setDisplayExitConfirmModal] = useAtom(displayExitConfirmModalAtom)
   const [featureFlags] = useAtom(featureFlagsAtom)
-  const [, setDisplayFeatureFlagsModalAtom] = useAtom(
-    displayFeatureFlagsModalAtom
-  )
 
   async function handleLoginOrExitClick(): Promise<void> {
     if (isExitButton) {
@@ -86,11 +82,7 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   }
 
   function handleSettingsClick(): void {
-    if (featureFlags.enablePrereleaseMode) {
-      setDisplayFeatureFlagsModalAtom(true)
-    } else {
-      window.location.hash = '/settings'
-    }
+    window.location.hash = '/settings'
   }
 
   return (

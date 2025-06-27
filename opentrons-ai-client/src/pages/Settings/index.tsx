@@ -11,23 +11,24 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  ListItem,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../molecules/ToggleButton'
+import { FeatureFlag, Privacy } from '../../components/organisms/Settings'
 import { featureFlagsAtom } from '../../resources/atoms'
+
+const SETTINGS_MAX_WIDTH = '56rem'
 
 export function Settings(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
 
+  const prereleaseModeEnabled = featureFlags.enablePrereleaseMode === true
+
   const handleToggleAnalytics = (): void => {
     const currentValue = featureFlags.enableAnalytics ?? true
     const newValue = !currentValue
-    console.log('Toggle clicked - current:', currentValue, 'new:', newValue)
     setFeatureFlags({
       enableAnalytics: newValue,
     })
@@ -52,7 +53,7 @@ export function Settings(): JSX.Element {
       backgroundColor={COLORS.grey10}
       padding={`${SPACING.spacing60} ${SPACING.spacing80} ${SPACING.spacing80}`}
     >
-      <Flex width="100%" maxWidth="56rem" height="100%">
+      <Flex width="100%" maxWidth={SETTINGS_MAX_WIDTH} height="100%">
         <Flex
           backgroundColor={COLORS.white}
           padding={SPACING.spacing40}
@@ -60,8 +61,7 @@ export function Settings(): JSX.Element {
           gridGap={SPACING.spacing40}
           borderRadius={BORDERS.borderRadius8}
           width="100%"
-          height={featureFlags.enablePrereleaseMode ? 'auto' : '20rem'}
-          minHeight="20rem"
+          height="100%"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <Btn
@@ -90,67 +90,24 @@ export function Settings(): JSX.Element {
             </StyledText>
           </Flex>
 
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-            <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('privacy')}
-            </StyledText>
-            <ListItem
-              padding={SPACING.spacing16}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              type="default"
-              gridGap={SPACING.spacing40}
-              alignItems={ALIGN_CENTER}
-            >
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText desktopStyle="bodyDefaultSemiBold">
-                  {t('share_analytics_with_opentrons')}
-                </StyledText>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  color={COLORS.grey60}
-                >
-                  {t('share_analytics_description')}
-                </StyledText>
-              </Flex>
-              <ToggleButton
-                label="analytics-toggle"
-                toggledOn={featureFlags.enableAnalytics ?? true}
-                onClick={handleToggleAnalytics}
+          <Flex
+            height="100%"
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing24}
+          >
+            <Privacy
+              enableAnalytics={featureFlags.enableAnalytics ?? true}
+              onToggleAnalytics={handleToggleAnalytics}
+            />
+            {prereleaseModeEnabled ? (
+              <FeatureFlag
+                enablePDProtocolGeneration={
+                  featureFlags.enablePDProtocolGeneration ?? true
+                }
+                onTogglePDProtocolGeneration={handleTogglePDProtocolGeneration}
               />
-            </ListItem>
+            ) : null}
           </Flex>
-
-          {featureFlags.enablePrereleaseMode && (
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('feature_flags')}
-              </StyledText>
-              <ListItem
-                padding={SPACING.spacing16}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="default"
-                gridGap={SPACING.spacing40}
-                alignItems={ALIGN_CENTER}
-              >
-                <Flex flexDirection={DIRECTION_COLUMN}>
-                  <StyledText desktopStyle="bodyDefaultSemiBold">
-                    Protocol Designer Protocol Generation
-                  </StyledText>
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    Enable Protocol Designer protocol generation features
-                  </StyledText>
-                </Flex>
-                <ToggleButton
-                  label="pd-protocol-generation-toggle"
-                  toggledOn={featureFlags.enablePDProtocolGeneration ?? true}
-                  onClick={handleTogglePDProtocolGeneration}
-                />
-              </ListItem>
-            </Flex>
-          )}
         </Flex>
       </Flex>
     </Flex>

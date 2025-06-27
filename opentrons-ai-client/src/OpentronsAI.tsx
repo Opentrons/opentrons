@@ -19,9 +19,7 @@ import { Header } from './molecules/Header'
 import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { Loading } from './molecules/Loading'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
-import { FeatureFlagsModal } from './organisms/FeatureFlagsModal'
 import {
-  displayFeatureFlagsModalAtom,
   featureFlagsAtom,
   headerWithMeterAtom,
   mixpanelAtom,
@@ -37,8 +35,7 @@ export function OpentronsAI(): JSX.Element | null {
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
-  const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
-  const [displayFeatureFlagsModal] = useAtom(displayFeatureFlagsModalAtom)
+  const [, setFeatureFlags] = useAtom(featureFlagsAtom)
 
   const trackEvent = useTrackEvent()
 
@@ -90,9 +87,6 @@ export function OpentronsAI(): JSX.Element | null {
       height={'100vh'}
       flexDirection={DIRECTION_COLUMN}
     >
-      {displayFeatureFlagsModal && featureFlags.enablePrereleaseMode && (
-        <FeatureFlagsModal />
-      )}
       <StickyHeader>
         {displayHeaderWithMeter ? (
           <HeaderWithMeter progressPercentage={progress} />
