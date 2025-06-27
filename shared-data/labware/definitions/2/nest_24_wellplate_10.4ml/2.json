@@ -348,36 +348,36 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 17.2,
-          "topYDimension": 17.2,
-          "bottomXDimension": 16.5,
-          "bottomYDimension": 16.5,
-          "topHeight": 40.5,
-          "bottomHeight": 20
+          "topXDimension": 17,
+          "topYDimension": 17,
+          "bottomXDimension": 16.8,
+          "bottomYDimension": 16.8,
+          "topHeight": 40.85,
+          "bottomHeight": 19.85
         },
         {
           "shape": "squaredcone",
           "bottomCrossSection": "circular",
-          "circleDiameter": 16.4,
-          "rectangleXDimension": 16.5,
-          "rectangleYDimension": 16.5,
-          "topHeight": 20,
-          "bottomHeight": 14,
+          "circleDiameter": 16.8,
+          "rectangleXDimension": 16.8,
+          "rectangleYDimension": 16.8,
+          "topHeight": 19.85,
+          "bottomHeight": 14.4,
           "xCount": 1,
           "yCount": 1
         },
         {
           "shape": "conical",
-          "bottomDiameter": 15.5,
-          "topDiameter": 16.4,
-          "topHeight": 14,
-          "bottomHeight": 3.5
+          "bottomDiameter": 13.9,
+          "topDiameter": 16.8,
+          "topHeight": 14.4,
+          "bottomHeight": 3.77
         },
         {
           "shape": "conical",
           "bottomDiameter": 0,
-          "topDiameter": 15.5,
-          "topHeight": 3.5,
+          "topDiameter": 13.9,
+          "topHeight": 3.77,
           "bottomHeight": 0
         }
       ]
