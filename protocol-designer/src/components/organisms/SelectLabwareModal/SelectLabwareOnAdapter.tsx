@@ -195,7 +195,9 @@ export function SelectLabwareOnAdapter(
                     id={`${category}_${loadName}_${nestedDefUri}`}
                     buttonText={nestedDef?.metadata.displayName ?? ''}
                     buttonValue={nestedDefUri}
-                    onChange={e => handleSelectLabware(nestedDefUri, e)}
+                    onChange={e => {
+                      handleSelectLabware(nestedDefUri, e)
+                    }}
                     isSelected={
                       nestedDefUri === selectedTopLabware.labwareDefURI
                     }

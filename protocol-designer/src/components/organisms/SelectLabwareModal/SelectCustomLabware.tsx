@@ -105,7 +105,9 @@ export function SelectCustomLabware(
                 id={`${index}_${uri}`}
                 buttonText={customLabwareDefs[uri].metadata.displayName}
                 buttonValue={uri}
-                onChange={e => handleChangeLabware(uri, e)}
+                onChange={e => {
+                  handleChangeLabware(uri, e)
+                }}
                 isSelected={uri === selectedTopLabware.labwareDefURI}
                 stackingProps={lidProps ?? undefined}
               />

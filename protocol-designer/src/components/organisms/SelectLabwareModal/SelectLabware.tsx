@@ -189,9 +189,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           id={`${category}_${loadName}`}
                           buttonText={def.metadata.displayName}
                           buttonValue={uri}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             handleSelectLabware(isAdapter ?? false, uri, e)
-                          }
+                          }}
                           isSelected={
                             (isAdapter && uri === selectedAdapterDefURI) ||
                             (!isAdapter &&

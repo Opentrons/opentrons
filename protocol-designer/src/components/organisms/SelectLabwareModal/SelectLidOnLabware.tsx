@@ -76,7 +76,9 @@ export function SelectLidOnLabware(
               id={`${category}_${loadName}_${defUri}`}
               buttonText={def?.metadata.displayName ?? ''}
               buttonValue={defUri}
-              onChange={e => handleSelectLabware(defUri, e)}
+              onChange={e => {
+                handleSelectLabware(defUri, e)
+              }}
               isSelected={defUri === selectedLidLabware}
             />
           )
