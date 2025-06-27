@@ -17,7 +17,7 @@ export function getMoveToWellCommandText({
     x: xOffsetUnformatted,
     y: yOffsetUnformatted,
     z: zOffsetUnformatted,
-  } = wellLocation.offset
+  } = wellLocation?.offset ?? { x: '', y: '', z: '' }
   const allPreviousCommands = commandTextData?.commands.slice(
     0,
     commandTextData.commands.findIndex(c => c.id === command.id)
@@ -36,6 +36,13 @@ export function getMoveToWellCommandText({
     t,
   })
 
+  const xOffset =
+    typeof xOffsetUnformatted === 'number' ? xOffsetUnformatted?.toFixed(2) : ''
+  const yOffset =
+    typeof yOffsetUnformatted === 'number' ? yOffsetUnformatted?.toFixed(2) : ''
+  const zOffset =
+    typeof zOffsetUnformatted === 'number' ? zOffsetUnformatted?.toFixed(2) : ''
+
   return t('move_to_well', {
     wellName,
     labware:
@@ -46,10 +53,10 @@ export function getMoveToWellCommandText({
             allRunDefs,
           })
         : null,
-    xOffset: xOffsetUnformatted.toFixed(2),
-    yOffset: yOffsetUnformatted.toFixed(2),
-    zOffset: zOffsetUnformatted.toFixed(2),
-    positionRelative: wellLocation.origin,
+    xOffset,
+    yOffset,
+    zOffset,
+    positionRelative: wellLocation?.origin,
     displayLocation,
   })
 }
