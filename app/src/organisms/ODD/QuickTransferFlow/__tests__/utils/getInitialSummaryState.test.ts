@@ -142,7 +142,10 @@ describe('getInitialSummaryState', () => {
         cutoutFixtureId: 'trashBinAdapter',
       },
       disposalVolume: 10,
-      blowOut: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+      blowOutDispense: {
+        location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+        speed: 75,
+      },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {
