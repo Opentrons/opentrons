@@ -1,12 +1,12 @@
-import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
+import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
+import type { WellLocation } from './support'
 import type {
   Coordinates,
-  GantryMount,
   MotorAxes,
   MotorAxis,
+  GantryMount,
 } from '../../js/types'
-import type { WellLocation } from './support'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -126,7 +126,7 @@ export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  wellLocation: WellLocation
+  wellLocation?: WellLocation
   minimumZHeight?: number
   forceDirect?: boolean
 }
