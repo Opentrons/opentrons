@@ -350,10 +350,10 @@
           "shape": "cuboidal",
           "topXDimension": 17.2,
           "topYDimension": 17.2,
-            "bottomXDimension": 16.5,
+          "bottomXDimension": 16.5,
           "bottomYDimension": 16.5,
-          "topHeight": 40.25,
-          "bottomHeight": 19.75
+          "topHeight": 40.8,
+          "bottomHeight": 20.3
         },
         {
           "shape": "squaredcone",
@@ -361,8 +361,8 @@
           "circleDiameter": 16.4,
           "rectangleXDimension": 16.5,
           "rectangleYDimension": 16.5,
-          "topHeight": 19.75,
-          "bottomHeight": 13.75,
+          "topHeight": 20.3,
+          "bottomHeight": 14,
           "xCount": 1,
           "yCount": 1
         },
@@ -370,14 +370,14 @@
           "shape": "conical",
           "bottomDiameter": 15.5,
           "topDiameter": 16.4,
-          "topHeight": 13.75,
-          "bottomHeight": 3.25
+          "topHeight": 14,
+          "bottomHeight": 3.5
         },
         {
           "shape": "conical",
           "bottomDiameter": 0,
           "topDiameter": 15.5,
-          "topHeight": 3.25,
+          "topHeight": 3.5,
           "bottomHeight": 0
         }
       ]
