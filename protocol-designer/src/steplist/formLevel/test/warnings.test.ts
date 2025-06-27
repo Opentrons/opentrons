@@ -158,6 +158,7 @@ describe('Max dispense well volume', () => {
     fieldsWithDispenseLabware = {
       dispense_labware: { def: fixture24Tuberack },
       dispense_wells: ['A1', 'A2'],
+      aspirate_wells: ['A1', 'A2'],
     }
   })
   it('should NOT return a warning when there is no dispense labware', () => {
