@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { useTranslation } from 'react-i18next'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
@@ -18,17 +19,25 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
-  getAASlotNameForAA,
+  getAAComboFixtureDisplayName,
+  getAASlotIdForAA,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
   getFlexDeckDefAAByFixtureIdForCutoutId,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  isFixtureInUsbModules,
   replaceAAWithFakeAA,
   replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
+
+import type { Mock } from 'vitest'
+
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
+}))
 
 describe('getAAFromCutoutFixtureId', () => {
   it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
@@ -385,7 +394,7 @@ describe('getReplacementFixtureForFakeFixture', () => {
 
 describe('getAASlotNameForAA', () => {
   it('should get aa name for single right slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutA3',
       FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
       'magneticBlockV1A3'
@@ -394,7 +403,7 @@ describe('getAASlotNameForAA', () => {
   })
 
   it('should return aa name for single center slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutD1',
       TEMPERATURE_MODULE_V2_FIXTURE,
       'temperatureModuleV2D1'
@@ -403,7 +412,7 @@ describe('getAASlotNameForAA', () => {
   })
 
   it('should get input aa name for single center slot', () => {
-    const result = getAASlotNameForAA(
+    const result = getAASlotIdForAA(
       'cutoutD2',
       MAGNETIC_BLOCK_V1_FIXTURE,
       'magneticBlockV1D2'
@@ -436,5 +445,91 @@ describe('replaceCutoutFixtureRemove', () => {
       'flexStackerModuleV1D4'
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+  })
+})
+
+describe('getAAFixtureDisplayName', () => {
+  let t: Mock
+
+  beforeEach(() => {
+    t = vi.fn(key => key)
+
+    vi.mocked(useTranslation).mockReturnValue({ t } as any)
+  })
+  it('Should return flex stacker name when using combo fixtures and aa for stacker', () => {
+    const name = getAAComboFixtureDisplayName(
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      'flexStackerModuleV1D4',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      ''
+    )
+    expect(name).toEqual('deck_configuration:module_in_port')
+  })
+
+  it('Should return mag block name when using combo fixtures with mag block', () => {
+    const name = getAAComboFixtureDisplayName(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      'deck_configuration'
+    )
+    expect(name).toEqual('deck_configuration:magnetic_block')
+  })
+
+  it('Should return mag block name when using combo fixtures with mag block', () => {
+    const name = getAAComboFixtureDisplayName(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      'deck_configuration'
+    )
+    expect(name).toEqual('deck_configuration:magnetic_block')
+  })
+
+  it('Should return waste chute name when using waste chute fixture', () => {
+    const name = getAAComboFixtureDisplayName(
+      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
+      '96ChannelWasteChute',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      'deck_configuration'
+    )
+    expect(name).toEqual('deck_configuration:waste_chute')
+  })
+
+  it('Should return null when not a combo fixture', () => {
+    const name = getAAComboFixtureDisplayName(
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      'magneticBlockV1D3',
+      getDeckDefFromRobotType('OT-3 Standard'),
+      t,
+      'deck_configuration'
+    )
+    expect(name).toBe(null)
+  })
+})
+
+describe('isFixtureInModules', () => {
+  it('should return true for flex stacker fixture', () => {
+    const result = isFixtureInUsbModules(FLEX_STACKER_V1_FIXTURE)
+    expect(result).toEqual(true)
+
+    const resultWithMag = isFixtureInUsbModules(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+    )
+    expect(resultWithMag).toEqual(true)
+  })
+
+  it('should return true for temp fixture', () => {
+    const result = isFixtureInUsbModules(TEMPERATURE_MODULE_V2_FIXTURE)
+    expect(result).toEqual(true)
+  })
+
+  it('should return false for mag block fixture', () => {
+    const result = isFixtureInUsbModules(MAGNETIC_BLOCK_V1_FIXTURE)
+    expect(result).toEqual(false)
   })
 })

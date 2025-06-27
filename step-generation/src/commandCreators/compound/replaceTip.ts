@@ -56,6 +56,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     isFromMixCommand = false,
   } = args
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles
+  const stateTiprack = prevRobotState.pipettes[pipette].tiprackId
   if (tipRack == null) {
     return {
       errors: [errorCreators.noTipSelected()],
@@ -189,7 +190,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     //  only emit the command if previous nozzle state is different
     (channels === 96 || channels === 8) &&
     args.nozzles != null &&
-    args.nozzles !== stateNozzles
+    (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
       ? [
           curryCommandCreator(configureNozzleLayout, {
             configurationParams: {
