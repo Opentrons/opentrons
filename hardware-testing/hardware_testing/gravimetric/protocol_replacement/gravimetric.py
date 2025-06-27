@@ -329,6 +329,11 @@ def _get_tips_for_test_single_multi(
         for slot in fixture_settings.tips[tip]
         if slot not in partially_used
     ]
+    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
+        return tips.get_tips_for_individual_channel_on_multi(
+            fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
+        )
+
     wells += tips.get_unused_tips(fixture_settings.ctx, tip)
     for rack in tipracks_lw:
         # TODO remove 8 channel pattern with channel
