@@ -195,7 +195,9 @@ def run(protocol: ProtocolContext) -> None:
                 top_labware = labware
             for i, labware in enumerate(original_order):
                 if i == 0:
-                    protocol.move_labware(labware, deck_locations[n - 1], use_gripper=True)
+                    protocol.move_labware(
+                        labware, deck_locations[n - 1], use_gripper=True
+                    )
                 else:
                     protocol.move_labware(labware, top_labware, use_gripper=True)
                 top_labware = labware
