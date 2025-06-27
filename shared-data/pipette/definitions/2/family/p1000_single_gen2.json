@@ -1,10 +1,13 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
   "displayName": "P1000 Single-Channel GEN2",
+  "oemType": "ot",
   "channels": 1,
   "apiLoadName": "p1000_single_gen2",
   "pipetteName": "p1000_single_gen2",
   "familyName": "p1000_single_gen2",
   "displayCategory": "GEN2",
+  "generation": "GEN2",
+  "model": "p1000",
   "compatibleMachine": "OT-2"
 }

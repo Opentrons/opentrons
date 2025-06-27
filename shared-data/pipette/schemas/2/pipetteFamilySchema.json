@@ -4,13 +4,17 @@
     "channels": {
       "enum": [1, 8, 96, 384]
     },
-    "displayCategory": {
+    "generation": {
       "type": "string",
       "enum": ["GEN1", "GEN2", "FLEX"]
     },
     "compatibleMachine": {
       "type": "string",
       "enum": ["Flex", "OT-2"]
+    },
+    "oemType": {
+      "type": "string",
+      "enum": ["ot", "em"]
     }
   },
   "type": "object",
@@ -19,9 +23,13 @@
     "channels",
     "compatibleMachines",
     "apiLoadName",
+    "pipetteName",
     "familyName",
     "displayName",
-    "displayCategory"
+    "displayCategory",
+    "generation",
+    "oemType",
+    "model"
   ],
   "additionalProperties": false,
   "properties": {
@@ -30,10 +38,31 @@
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteGeometrySchema.json is a reference to this schema."
     },
     "channels": { "$ref": "#/definitions/channels" },
-    "displayCategory": { "$ref": "#/definitions/displayCategory" },
+    "displayCategory": { "$ref": "#/definitions/generation" },
+    "generation": { "$ref": "#/definitions/generation" },
     "compatibleMachine": { "$ref": "#/definitions/compatibleMachine" },
-    "apiLoadName": { "type": "string" },
-    "familyName": { "type": "string" },
-    "displayName": { "type": "string" }
+    "apiLoadName": {
+      "type": "string",
+      "description": "The name that can be used to load a pipette in a protocol. May not correlate with any other name. May not correlate with a pipette model name."
+    },
+    "familyName": {
+      "type": "string",
+      "description": "The name of this family, which should be treated as opaque and may not correlate with any other name"
+    },
+    "pipetteName": {
+      "type": "string",
+      "description": "The name of the pipette as reported out of the robot software. Reliably will be everything before the final underscore of a pipette model name; may not correlate with family name or with api load name."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "A human-oriented name for the pipette."
+    },
+    "model": {
+      "type": "string",
+      "description": "the model of the pipette, for example p1000. Try not to use this."
+    },
+    "oemType": {
+      "$ref": "#/definitions/oemType"
+    }
   }
 }

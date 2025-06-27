@@ -1,10 +1,13 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteFamilySchema.json",
   "displayName": "Flex 96-Channel 200 \u00b5L",
+  "oemType": "ot",
   "channels": 96,
   "apiLoadName": "flex_96channel_200",
   "pipetteName": "p200_96",
   "familyName": "p200_96_flex",
   "displayCategory": "FLEX",
+  "generation": "FLEX",
+  "model": "p200",
   "compatibleMachine": "Flex"
 }

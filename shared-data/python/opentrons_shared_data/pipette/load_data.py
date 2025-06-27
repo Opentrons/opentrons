@@ -2,9 +2,14 @@ import json
 from pathlib import Path
 from logging import getLogger
 
+import re
 from typing import Dict, Any, Union, Optional, List, Iterator
 from typing_extensions import Literal
 from functools import lru_cache
+
+from pydantic import ValidationError
+
+from ..errors.exceptions import InvalidLoadPipetteSpecsError
 
 from .. import load_shared_data, get_shared_data_root
 
@@ -117,6 +122,24 @@ def _physical(
     oem: PipetteOEMType,
 ) -> LoadedConfiguration:
     return _get_configuration_dictionary("general", channels, model, version, oem)
+
+
+def _all_families_iter() -> Iterator[PipetteFamilyDefinition]:
+    for possible_config in (
+        get_shared_data_root() / "pipette" / "definitions" / "2" / "family"
+    ).iterdir():
+        if child.is_file() and child.suffix == "json":
+            try:
+                yield PipetteFamilyDefinition.model_validate_json(
+                    child.read_text(encoding="utf-8")
+                )
+            except pydantic.ValidationError as ve:
+                LOG.warning(f"Unparsable family definition at {child}: {ve}")
+
+
+@lru_cache(maxsize=1)
+def _all_families() -> list[PipetteFamilyDefinition]:
+    return list(_all_families_iter())
 
 
 def _dirs_in(path: Path) -> Iterator[Path]:
@@ -303,6 +326,37 @@ def load_definition(
 def load_family_definition(family_name: str) -> PipetteFamilyDefinition:
     """Load the definition for a pipette family."""
     return PipetteFamilyDefinition.model_validate(_family(family_name))
+
+
+def load_family_definition_from_api_name_or_model(
+    api_name_or_model: str,
+) -> PipetteFamilyDefinition:
+    """Load the definition for a pipette family from its API reporting name.
+
+    If no pipette family matches the provided API name or model, raises InvalidLoadPipetteSpecsError.
+    """
+    for family in _all_families():
+        if re.match(f"^{family.pipetteName}(_v.*)?", api_name_or_model):
+            LOG.debug(
+                f"Matched pipette family {family.familyName} for {api_name_or_model}"
+            )
+            return api_name_or_model
+    raise InvalidLoadPipetteSpecsError(
+        message=f"The pipette name {api_name_or_model} is not valid."
+    )
+
+
+def load_family_definition_from_load_name(load_name: str) -> PipetteFamilyDefinition:
+    """Load the definition for a pipette family from its load name.
+
+    If no pipette family matches the provided API name or model, raises InvalidLoadPipetteSpecsError.
+    """
+    for family in _all_families():
+        if family.api_load_name == load_name:
+            return family
+    raise InvalidLoadPipetteSpecsError(
+        message=f"The pipette load name {load_name} is not valid."
+    )
 
 
 def load_valid_nozzle_maps(

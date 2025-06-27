@@ -5,6 +5,10 @@
     "channels": {
       "enum": [1, 8, 96, 384]
     },
+    "oemType": {
+      "type": "string",
+      "enum": ["ot", "em"]
+    },
     "displayCategory": {
       "type": "string",
       "enum": ["GEN1", "GEN2", "FLEX"]
@@ -100,6 +104,7 @@
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipettePropertiesSchema.json is a reference to this schema."
     },
+    "oemType": { "$ref": "#/definitions/oemType" },
     "familyName": {
       "type": "string",
       "description": "The name of a pipette family whose definition can be found in the family configurations."

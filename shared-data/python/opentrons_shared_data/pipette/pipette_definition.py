@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar
 from pydantic import (
@@ -45,6 +46,17 @@ class PipetteNameType:
     pipette_channels: pip_types.PipetteChannelType
     pipette_generation: pip_types.PipetteGenerationType
     oem_type: pip_types.PipetteOEMType
+    family_name: str
+
+    @classmethod
+    def from_family(cls, family: PipetteFamilyDefinition) -> PipetteNameType:
+        return cls(
+            pipette_type=family.model,
+            pipette_channels=family.channels,
+            pipette_generation=family.display_category,
+            oem_type=family.oem_type,
+            family_name=family.family_name,
+        )
 
     def __repr__(self) -> str:
         oem_name = (
@@ -524,7 +536,11 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
 
 
 class PipetteFamilyDefinition(BaseModel):
-    displayName: str
+    display_name: str = Field(
+        ...,
+        description="A human-oriented display name for the pipette",
+        alias="displayName",
+    )
     channels: EnumSerializer[pip_types.PipetteChannelType] = Field(
         ..., description="The maximum number of channels on the pipette."
     )
@@ -533,13 +549,15 @@ class PipetteFamilyDefinition(BaseModel):
         description="The name you can use to load this from python.",
         alias="apiLoadName",
     )
-    pipetteName: str = Field(
+    pipette_name: str = Field(
         ...,
         description="The name used to report this by the robot in its API.",
         alias="pipetteName",
     )
-    familyName: str = Field(
-        ..., description="The name identifying this family of pipette."
+    family_name: str = Field(
+        ...,
+        description="The name identifying this family of pipette.",
+        alias="familyName",
     )
     display_category: EnumSerializer[pip_types.PipetteGenerationType] = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
@@ -548,6 +566,12 @@ class PipetteFamilyDefinition(BaseModel):
         ...,
         description="The kind of machine this pipette works on.",
         alias="compatibleMachine",
+    )
+    model: EnumSerializer[pip_types.PipetteModelType] = Field(
+        ..., description="The model type of the pipette."
+    )
+    oem_type: EnumSerializer[pip_types.PipetteOEMType] = Field(
+        ..., description="The OEM type of the pipette.", alias="oemType"
     )
 
     @field_validator("channels", mode="before")
@@ -566,6 +590,16 @@ class PipetteFamilyDefinition(BaseModel):
     @classmethod
     def convert_compatible_machine(cls, v: str) -> robot_types.RobotTypeEnum:
         return robot_types.RobotTypeEnum(v)
+
+    @field_validator("model", mode="before")
+    @classmethod
+    def convert_model(cls, v: str) -> pip_types.PipetteModelType:
+        return pip_types.PipetteModelType(v)
+
+    @field_validator("oem_type", mode="before")
+    @classmethod
+    def convert_oem_type(cls, v: str) -> pip_types.PipetteOEMType:
+        return pip_types.PipetteOEMType(v)
 
 
 class PipetteConfigurations(
