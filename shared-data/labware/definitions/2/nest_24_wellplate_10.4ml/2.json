@@ -353,7 +353,7 @@
             "bottomXDimension": 16.5,
           "bottomYDimension": 16.5,
           "topHeight": 40.25,
-          "bottomHeight": 20.25
+          "bottomHeight": 19.75
         },
         {
           "shape": "squaredcone",
@@ -361,7 +361,7 @@
           "circleDiameter": 16.4,
           "rectangleXDimension": 16.5,
           "rectangleYDimension": 16.5,
-          "topHeight": 20.25,
+          "topHeight": 19.75,
           "bottomHeight": 13.75,
           "xCount": 1,
           "yCount": 1
