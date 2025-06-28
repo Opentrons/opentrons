@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -68,7 +69,7 @@ export function Settings(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <Btn
               onClick={handleBackClick}
-              css="padding: 0; margin-left: -0.5rem; display: flex; align-items: center; justify-content: flex-start; background: transparent; border: none; cursor: pointer; width: fit-content;"
+              css={BACK_BUTTON_STYLE}
               data-testid="back-button"
               aria-label="Back"
             >
@@ -79,9 +80,8 @@ export function Settings(): JSX.Element {
               >
                 <Icon name="arrow-left" size="1.5rem" color={COLORS.grey60} />
                 <StyledText
-                  desktopStyle="bodyDefaultRegular"
+                  desktopStyle="bodyDefaultSemiBold"
                   color={COLORS.grey60}
-                  css="font-size: 1rem;"
                 >
                   {t('back')}
                 </StyledText>
@@ -115,3 +115,23 @@ export function Settings(): JSX.Element {
     </Flex>
   )
 }
+
+const BACK_BUTTON_STYLE = css`
+  padding: 0;
+  margin-left: -0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+
+  &:hover {
+    background: transparent;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
+  }
+`

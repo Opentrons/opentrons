@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -24,22 +25,16 @@ export function FeatureFlag({
   const { t } = useTranslation('protocol_generator')
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      height="100%"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('feature_flags')}
       </StyledText>
       <ListItem
         type="default"
         padding={SPACING.spacing16}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               Protocol Designer Protocol Generation

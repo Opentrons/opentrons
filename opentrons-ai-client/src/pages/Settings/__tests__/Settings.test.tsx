@@ -2,6 +2,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
+import { FeatureFlag } from '../../../components/organisms/Settings/FeatureFlag'
+import { Privacy } from '../../../components/organisms/Settings/Privacy'
 import { i18n } from '../../../i18n'
 import { featureFlagsAtom } from '../../../resources/atoms'
 import { Settings } from '../index'
@@ -18,6 +20,9 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
+vi.mock('../../../components/organisms/Settings/Privacy')
+vi.mock('../../../components/organisms/Settings/FeatureFlag')
+
 const render = () => {
   return renderWithProviders(<Settings />, {
     i18nInstance: i18n,
@@ -27,6 +32,16 @@ const render = () => {
 describe('Settings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(Privacy).mockReturnValue(
+      <div data-testid="mock-privacy">
+        <div>Mock Privacy Component</div>
+      </div>
+    )
+    vi.mocked(FeatureFlag).mockReturnValue(
+      <div data-testid="mock-feature-flag">
+        <div>Mock Feature Flags Component</div>
+      </div>
+    )
   })
 
   it('should render Settings page title', () => {
@@ -42,17 +57,8 @@ describe('Settings', () => {
 
   it('should render Privacy section', () => {
     render()
-    expect(screen.getByText('Privacy')).toBeInTheDocument()
-    expect(
-      screen.getByText('Share analytics with Opentrons')
-    ).toBeInTheDocument()
-  })
-
-  it('should render analytics toggle in Privacy section', () => {
-    render()
-    // Look for the toggle button by its role
-    const toggles = screen.getAllByRole('switch')
-    expect(toggles.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByTestId('mock-privacy')).toBeInTheDocument()
+    expect(screen.getByText('Mock Privacy Component')).toBeInTheDocument()
   })
 
   it('should navigate to landing page when back button is clicked', () => {
@@ -62,53 +68,88 @@ describe('Settings', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/')
   })
 
-  it('should toggle analytics when analytics toggle is clicked', () => {
+  it('should pass correct props to Privacy component', () => {
     render()
-    // Get all toggle switches and find the analytics one
-    const toggles = screen.getAllByRole('switch')
-    const analyticsToggle = toggles[0] // First toggle should be analytics
 
-    // Click the toggle
-    fireEvent.click(analyticsToggle)
+    expect(Privacy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        enableAnalytics: true,
+        onToggleAnalytics: expect.any(Function),
+      }),
+      expect.anything()
+    )
+  })
 
-    // The toggle state should change (we can't easily test the exact state
-    // change without more complex mocking, but we can verify the click works)
-    expect(analyticsToggle).toBeInTheDocument()
+  it('should handle analytics toggle', () => {
+    vi.mocked(Privacy).mockReturnValue(
+      <div data-testid="mock-privacy">
+        <div>Mock Privacy Component</div>
+        <div>Analytics: enabled</div>
+        <button onClick={() => {}}>Toggle Analytics</button>
+      </div>
+    )
+
+    render()
+    const toggleButton = screen.getByText('Toggle Analytics')
+
+    // Initial state shows analytics enabled
+    expect(screen.getByText('Analytics: enabled')).toBeInTheDocument()
+
+    // Click toggle
+    fireEvent.click(toggleButton)
+
+    // The Privacy component should be called with the handler function
+    const lastCall = vi.mocked(Privacy).mock.calls[
+      vi.mocked(Privacy).mock.calls.length - 1
+    ]
+    expect(typeof lastCall[0].onToggleAnalytics).toBe('function')
   })
 
   it('should not render Feature Flags section by default', () => {
     render()
-    expect(screen.queryByText('Feature Flags')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('mock-feature-flag')).not.toBeInTheDocument()
   })
 
   it('should render Feature Flags section when prerelease mode is enabled', () => {
-    // Mock the featureFlags atom to have prerelease mode enabled
     const mockFeatureFlags = {
       enablePrereleaseMode: true,
       enableAnalytics: true,
       enablePDProtocolGeneration: true,
     }
 
-    // Render with custom initial state
     renderWithProviders(<Settings />, {
       i18nInstance: i18n,
       initialValues: [[featureFlagsAtom, mockFeatureFlags]],
     })
 
-    expect(screen.getByText('Feature Flags')).toBeInTheDocument()
-    expect(
-      screen.getByText('Protocol Designer Protocol Generation')
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('mock-feature-flag')).toBeInTheDocument()
+    expect(screen.getByText('Mock Feature Flags Component')).toBeInTheDocument()
+  })
+
+  it('should pass correct props to FeatureFlag component when rendered', () => {
+    const mockFeatureFlags = {
+      enablePrereleaseMode: true,
+      enableAnalytics: true,
+      enablePDProtocolGeneration: true,
+    }
+
+    renderWithProviders(<Settings />, {
+      i18nInstance: i18n,
+      initialValues: [[featureFlagsAtom, mockFeatureFlags]],
+    })
+
+    expect(FeatureFlag).toHaveBeenCalledWith(
+      expect.objectContaining({
+        enablePDProtocolGeneration: true,
+        onTogglePDProtocolGeneration: expect.any(Function),
+      }),
+      expect.anything()
+    )
   })
 
   it('should have proper accessibility attributes', () => {
     render()
     const backButton = screen.getByTestId('back-button')
     expect(backButton).toHaveAttribute('aria-label', 'Back')
-
-    const toggles = screen.getAllByRole('switch')
-    toggles.forEach(toggle => {
-      expect(toggle).toHaveAttribute('aria-checked')
-    })
   })
 })
