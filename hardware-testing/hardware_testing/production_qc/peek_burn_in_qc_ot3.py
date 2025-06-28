@@ -24,7 +24,7 @@ DEFAULT_TRIALS = 10 # The number of trials each current speed check does
 DEFAULT_CYCLES = 4 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 500 # number of plunger cycles in one burn in cycle
 
-STALL_THRESHOLD_MM = 0.5
+STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
 CYCLING_CURRENT = 1
@@ -445,6 +445,9 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     cycle=cycle, trials=trials,
                     continue_after_stall=continue_after_stall
                 )
+
+                await _home_plunger(api, mount)
+                await sleep(0.5) 
 
                 failed_cycles = await _cycle_plunger(
                     api, mount,
