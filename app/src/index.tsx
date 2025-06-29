@@ -15,6 +15,7 @@ import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
 import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
 import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
 import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
+import './global.css'
 
 // export public types so they can be accessed by external deps
 export * from './redux/types'

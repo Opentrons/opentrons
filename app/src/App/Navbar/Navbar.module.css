@@ -1,0 +1,128 @@
+.navbar {
+  background-color: var(--black-90); /* COLORS.black90 */
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25rem; /* TYPOGRAPHY.h3Regular */
+  flex-direction: column;
+  flex: none;
+  width: 5.625rem;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  height: 100vh;
+}
+
+.nav_container {
+  flex-direction: column;
+  flex: none;
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+}
+
+.logo_img {
+  align-self: center;
+  padding: 1.5rem 0; /* SPACING.spacing24 */
+}
+
+.navbar_link {
+  color: var(--white);
+  align-self: stretch;
+  background-color: var(--black-90); /* COLORS.black90 */
+  text-decoration: none;
+  display: block;
+  height: 2.25rem;
+  /* padding-left: 0.75rem; */
+  /* padding-bottom: 0.125rem; */
+}
+
+.navbar_link:hover {
+  background-color: var(--black-80); /* COLORS.black80 */
+}
+
+.navbar_link:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--blue-50); /* COLORS.blue50 */
+  outline: none;
+  background-color: var(--grey-60); /* COLORS.grey60 */
+}
+
+.navbar_link:active {
+  background-color: var(--black-90); /* COLORS.black90 */
+}
+
+/* Use global selector for React Router's active class */
+.navbar_link:global(.active) {
+  background-color: var(--black-70); /* COLORS.black70 */
+}
+
+.navbar_link:global(.active):focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+.navbar_link.active:has(svg) {
+  background-color: var(--black-90); /* COLORS.black90 */
+}
+
+.nav_link_text {
+  padding: 0.5rem 0 0.5rem 0.75rem; /* SPACING.spacing2 SPACING.spacing12 */
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+}
+
+.bottom_container {
+  margin-bottom: 0.5rem; /* SPACING.spacing8 */
+  align-self: stretch;
+  justify-content: space-evenly;
+  display: flex;
+}
+
+.nav_icon_link {
+  display: inline-block;
+}
+
+.nav_icon_link.active > .navbar_icon {
+  color: var(--grey-30); /* COLORS.grey30 */
+  background-color: var(--black-70); /* COLORS.black70 */
+}
+
+.icon_link {
+  display: inline-block;
+}
+
+.icon_link.active > .navbar_icon {
+  color: var(--grey-30); /* COLORS.grey30 */
+  background-color: var(--black-70); /* COLORS.black70 */
+}
+
+.navbar_icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0.375rem; /* SPACING.spacing6 */
+  border-radius: 50%;
+  color: var(--grey-30); /* COLORS.grey30 */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar_icon:hover {
+  background-color: var(--black-80); /* COLORS.black80 */
+}
+
+.navbar_icon:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--blue-50); /* COLORS.blue50 */
+  outline: none;
+  background-color: var(--grey-60); /* COLORS.grey60 */
+}
+
+.navbar_icon:active {
+  color: var(--grey-30); /* COLORS.grey30 */
+  background-color: var(--black-90); /* COLORS.black90 */
+}
+
+.navbar_icon.active {
+  color: var(--grey-30); /* COLORS.grey30 */
+  background-color: var(--black-70); /* COLORS.black70 */
+}
