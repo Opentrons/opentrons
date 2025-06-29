@@ -6,7 +6,6 @@ import {
   Icon,
   InlineNotification,
   LegacyStyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
