@@ -3,21 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  BORDERS,
-  Btn,
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  DISPLAY_FLEX,
-  Flex,
   Icon,
   InlineNotification,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
-  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,6 +30,8 @@ import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import { useLEDLights } from '/app/resources/robot-settings'
+
+import styles from './RobotSettingsList.module.css'
 
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
@@ -88,9 +78,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <div className={styles.main_content}>
       <Navigation />
-      <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
+      <div className={styles.settings_content}>
         <RobotSettingButton
           settingName={t('network_settings')}
           dataTestId="RobotSettingButton_network_settings"
@@ -123,7 +113,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="update"
           rightElement={
-            <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+            <div className={styles.right_element_with_icon}>
               {isUpdateAvailable ? (
                 <InlineNotification
                   type="alert"
@@ -134,8 +124,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
                   hug={true}
                 />
               ) : null}
-              <Icon name="more" size="3rem" color={COLORS.black90} />
-            </Flex>
+              <Icon name="more" className={styles.icon_large} color="#171717" />
+            </div>
           }
         />
         <RobotSettingButton
@@ -228,8 +218,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => dispatch(toggleDevtools())}
         />
         {devToolsOn ? <FeatureFlags /> : null}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 }
 
@@ -240,45 +230,27 @@ function FeatureFlags(): JSX.Element {
   return (
     <>
       {DEV_INTERNAL_FLAGS.map(flag => (
-        <Btn
+        <button
           key={flag}
-          width="100%"
-          marginBottom={SPACING.spacing8}
-          backgroundColor={COLORS.grey35}
-          padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.borderRadius16}
-          display={DISPLAY_FLEX}
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing24}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
+          className={styles.feature_flag_button}
           onClick={() => {
             dispatch(toggleDevInternalFlag(flag))
           }}
         >
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing24}
-            alignItems={ALIGN_CENTER}
-          >
-            <Icon name="alert-circle" size="3rem" color={COLORS.black90} />
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing2}
-              alignItems={ALIGN_FLEX_START}
-              justifyContent={JUSTIFY_CENTER}
-              width="46.25rem"
-            >
-              <LegacyStyledText
-                as="h4"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+          <div className={styles.feature_flag_content}>
+            <Icon
+              name="alert-circle"
+              className={styles.icon_large}
+              color="#171717"
+            />
+            <div className={styles.feature_flag_text_content}>
+              <LegacyStyledText as="h4" className={styles.feature_flag_title}>
                 {t(`__dev_internal__${flag}`)}
               </LegacyStyledText>
-            </Flex>
-          </Flex>
+            </div>
+          </div>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />
-        </Btn>
+        </button>
       ))}
     </>
   )
