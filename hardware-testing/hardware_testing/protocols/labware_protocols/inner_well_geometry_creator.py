@@ -153,8 +153,10 @@ def run(ctx: ProtocolContext) -> None:
     # Load tip racks
     liquid_rack_name = f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL"
     liquid_rack = ctx.load_labware(liquid_rack_name, SLOT_LIQUID_TIPRACK)
+
     probing_rack_name = f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL"
     probing_rack = ctx.load_labware(probing_rack_name, SLOT_PROBING_TIPRACK)
+
 
     #load pipettes
     # TODO: depending on the max volume will determine the tip size we will use for filling the plate
@@ -203,7 +205,7 @@ def run(ctx: ProtocolContext) -> None:
 
     if not quick_mode:
         for _ in range(int(STEPS)):
-            probe_pipette.pickup_tip()
+            probe_pipette.pick_up_tip()
             _get_tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
             probe_pipette.move_to(labware["A1"].bottom()) #probe bottom of well
             probe_pipette.drop_tip()
