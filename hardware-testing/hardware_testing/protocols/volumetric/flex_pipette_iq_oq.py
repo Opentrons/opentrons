@@ -270,10 +270,7 @@ def load_most_labware(
         res.load_empty(res.wells())
 
     # empty plates
-    num_plates_needed = ceil(num_wells_needed / 96)
-    # FIXME: support a stack of plates
-    if num_plates_needed > 5:
-        raise NotImplementedError(f"plate count of {num_plates_needed} not implemented yet")
+    num_plates_needed = ceil(num_wells_needed / 96) + 1  # NOTE: 1x extra for baseline
     plates: List[Labware] = []
     for i in range(num_plates_needed):
         if i == 0:
@@ -509,7 +506,6 @@ def run(ctx: ProtocolContext) -> None:
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
     diluent_probed = False  # NOTE: diluent is a 1-well reservoir, so only needs to be probed once
-    trash_dil_tips_at_end = False  # NOTE: flag set to True if 96ch returns diluent tips
 
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
@@ -582,7 +578,6 @@ def run(ctx: ProtocolContext) -> None:
             if pip_for_dil.channels == 96:
                 pip_for_dil.return_tip()
                 diluent_tips.reset()
-                trash_dil_tips_at_end = True
             else:
                 pip_for_dil.drop_tip()
 
@@ -643,6 +638,20 @@ def run(ctx: ProtocolContext) -> None:
         if ul_idx == len(volumes) - 1:
             _on_plate_done()
 
-    # TRASH ANY USED TIPS
-    if trash_dil_tips_at_end:
-        ctx.move_labware(diluent_tips, trash, use_gripper=True)
+    # BASELINE
+    if plate_reader:
+        plate = plates[0]
+        ul_in_this_plate.append(0.0)  # NOTE: marking baseline as being 0.0uL
+        heater_shaker.open_labware_latch()
+        ctx.move_labware(plate, adapter, use_gripper=True)
+        heater_shaker.close_labware_latch()
+        pip_for_dil.pick_up_tip(diluent_tips)
+        pip_for_dil.transfer_with_liquid_class(
+            test_class,
+            DYE_READER_IDEAL_UL,
+            [reservoir_diluent["A1"]] * 96,
+            plate.wells(),
+            new_tip="never",
+        )
+        pip_for_dil.drop_tip()
+        _on_plate_done()
