@@ -39,7 +39,6 @@ export const getLoadLiquidClassCommands = (
               )
               ?.byTipType.find(({ tiprack }) => tiprack === tipRack)
           : null
-
       if (byTipTypeSettings != null && !loadedLiquidClasses.has(uniqueString)) {
         loadedLiquidClasses.add(uniqueString)
         return [
