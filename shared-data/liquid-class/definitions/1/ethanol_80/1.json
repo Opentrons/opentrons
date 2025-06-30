@@ -1,6 +1,6 @@
 {
   "liquidClassName": "ethanol_80",
-  "displayName": "Volatile (80% ethanol)",
+  "displayName": "Volatile",
   "description": "80% ethanol",
   "schemaVersion": 1,
   "version": 1,
@@ -130,7 +130,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -174,7 +174,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
@@ -215,7 +215,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -241,7 +241,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -1.6],
@@ -263,7 +263,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           }
@@ -389,7 +389,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -433,7 +433,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
@@ -474,7 +474,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -500,7 +500,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -1.6],
@@ -522,7 +522,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           }
@@ -653,7 +653,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -679,7 +679,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.5],
@@ -697,7 +697,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
@@ -738,7 +738,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -764,7 +764,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -1.6],
@@ -786,7 +786,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           }
@@ -912,7 +912,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -938,7 +938,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 7.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -0.5],
@@ -956,7 +956,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
@@ -997,7 +997,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -1023,7 +1023,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [1.0, -1.6],
@@ -1045,7 +1045,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           }
@@ -1176,7 +1176,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1202,7 +1202,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.75],
@@ -1266,7 +1266,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1292,7 +1292,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -1440,7 +1440,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1466,7 +1466,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.75],
@@ -1530,7 +1530,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1556,7 +1556,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -1704,7 +1704,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1730,7 +1730,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.5],
@@ -1752,7 +1752,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -1793,7 +1793,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1819,7 +1819,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -1841,7 +1841,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -1967,7 +1967,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1993,7 +1993,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.5],
@@ -2015,7 +2015,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -2056,7 +2056,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -2082,7 +2082,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -2104,7 +2104,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -2230,7 +2230,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2256,7 +2256,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.9],
@@ -2278,7 +2278,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -2319,7 +2319,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2345,7 +2345,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -1.9],
@@ -2367,7 +2367,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -2493,7 +2493,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2519,7 +2519,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.9],
@@ -2541,7 +2541,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -2582,7 +2582,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2608,7 +2608,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -1.9],
@@ -2630,7 +2630,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -2761,7 +2761,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -2787,7 +2787,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.75],
@@ -2851,7 +2851,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -2877,7 +2877,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -3025,7 +3025,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3051,7 +3051,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.75],
@@ -3115,7 +3115,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3141,7 +3141,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -3289,7 +3289,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3315,7 +3315,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.5],
@@ -3337,7 +3337,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -3378,7 +3378,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3404,7 +3404,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -3426,7 +3426,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -3552,7 +3552,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3578,7 +3578,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.5],
@@ -3600,7 +3600,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -3641,7 +3641,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3667,7 +3667,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -3689,7 +3689,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -3815,7 +3815,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -3841,7 +3841,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.9],
@@ -3863,7 +3863,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -3904,7 +3904,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -3930,7 +3930,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -1.9],
@@ -3952,7 +3952,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -4078,7 +4078,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -4104,7 +4104,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.9],
@@ -4126,7 +4126,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -4167,7 +4167,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -4193,7 +4193,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -1.9],
@@ -4215,7 +4215,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -4346,7 +4346,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4372,7 +4372,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.35],
@@ -4436,7 +4436,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4462,7 +4462,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -4610,7 +4610,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4636,7 +4636,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.35],
@@ -4700,7 +4700,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4726,7 +4726,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -2.1],
@@ -4874,7 +4874,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4900,7 +4900,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.25],
@@ -4922,7 +4922,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -4963,7 +4963,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4989,7 +4989,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -5011,7 +5011,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -5137,7 +5137,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -5163,7 +5163,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.25],
@@ -5185,7 +5185,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -5226,7 +5226,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -5252,7 +5252,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -1.5],
@@ -5274,7 +5274,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -5400,7 +5400,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 200.0
                 }
               },
               "touchTip": {
@@ -5426,7 +5426,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.4],
@@ -5448,7 +5448,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -5489,7 +5489,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 200.0
                 }
               },
               "touchTip": {
@@ -5537,7 +5537,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }
@@ -5663,7 +5663,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 125.0
+                  "flowRate": 200.0
                 }
               },
               "touchTip": {
@@ -5689,7 +5689,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 40.0]],
+            "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.4],
@@ -5711,7 +5711,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           },
@@ -5752,7 +5752,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 200.0
                 }
               },
               "touchTip": {
@@ -5800,7 +5800,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 1.0
               }
             }
           }

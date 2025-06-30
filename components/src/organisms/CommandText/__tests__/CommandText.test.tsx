@@ -1,15 +1,8 @@
-import { it, expect, describe } from 'vitest'
-import { screen } from '@testing-library/react'
-
 import {
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../testing/utils'
-import { CommandText } from '../index'
-
 import type {
   AspirateInPlaceRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
@@ -22,17 +15,22 @@ import type {
   DropTipRunTimeCommand,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
+  LoadLiquidClassRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  MoveToAddressableAreaForDropTipRunTimeCommand,
   MoveToAddressableAreaRunTimeCommand,
   MoveToWellRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
-  MoveToAddressableAreaForDropTipRunTimeCommand,
-  LoadLiquidClassRunTimeCommand,
 } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../testing/utils'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber'
 import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
 import { mockRobotSideAnalysis } from '../fixtures'
+import { CommandText } from '../index'
 
 const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,
@@ -216,7 +214,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
+        'Moving to X 0.00 Y 0.00 Z -24.00 relative to top of well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
       )
     }
   })

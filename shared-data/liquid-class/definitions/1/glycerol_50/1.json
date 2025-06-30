@@ -1,6 +1,6 @@
 {
   "liquidClassName": "glycerol_50",
-  "displayName": "Viscous (50% glycerol)",
+  "displayName": "Viscous",
   "description": "50% glycerol",
   "schemaVersion": 1,
   "version": 1,
@@ -5224,7 +5224,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 250.0
                 }
               },
               "touchTip": {
@@ -5250,7 +5250,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 200.0]],
+            "flowRateByVolume": [[0.0, 250.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.2],
@@ -5472,7 +5472,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 250.0
                 }
               },
               "touchTip": {
@@ -5498,7 +5498,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 200.0]],
+            "flowRateByVolume": [[0.0, 250.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [10.0, -0.2],
