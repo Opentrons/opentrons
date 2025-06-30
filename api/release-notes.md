@@ -10,7 +10,20 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 8.5.0
 
-### TODO
+Welcome to the v8.5.0 release of the Opentrons robot software! This release features the ability to pipette more accurately by using liquid classes in your protocols.
+
+### New Features
+
+- Use Opentrons-verified liquid classes (aqueous, viscous, and volatile) in the Python Protocol API to automatically adjust submerge speed, flow rate, touch tip, air gap, and more.
+- Customize and create your own liquid classes for even more control.
+
+### Improvements
+
+- Several Python API methods have new parameters that add capabilities available in Protocol Designer.
+
+### Bug Fixes
+
+- The Absorbance Plate Reader no longer reports measurements below 0.
 
 ---
 
@@ -51,13 +64,12 @@ The 8.3.2 hotfix release fixes a bug where protocol commands could time out, esp
 
 The 8.3.1 hotfix release contains two bug fixes:
 
-- Exported data from the Absorbance Plate Reader no longer contains invalid values. 
-- A small fix allows all robots to properly reboot after an upgrade to v8.3.0. 
+- Exported data from the Absorbance Plate Reader no longer contains invalid values.
+- A small fix allows all robots to properly reboot after an upgrade to v8.3.0.
 
 ## Opentrons Robot Software Changes in 8.3.0
 
-Welcome to the v8.3.0 release of the Opentrons robot software! This release includes improvements to error recovery on the Flex, as well as beta features for our commercial partners. 
-
+Welcome to the v8.3.0 release of the Opentrons robot software! This release includes improvements to error recovery on the Flex, as well as beta features for our commercial partners.
 
 ### Improved Features
 
@@ -172,7 +184,7 @@ Welcome to the v7.3.0 release of the Opentrons robot software!
 ### Bug Fixes
 
 - Fixed an edge case where capitalizing part of a labware load name could cause unexpected behavior or collisions.
-- Fixed Python packages installed  on the OT-2 with `pip` not being found by `import` statements.
+- Fixed Python packages installed on the OT-2 with `pip` not being found by `import` statements.
 
 ---
 
@@ -208,7 +220,7 @@ Welcome to the v7.2.1 release of the Opentrons robot software!
 
 Welcome to the v7.2.0 release of the Opentrons robot software!
 
-This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow *approximately 20 minutes* for your robot to restart. This delay will only happen once.
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow _approximately 20 minutes_ for your robot to restart. This delay will only happen once.
 
 If you don't care about preserving your labware offsets and run history, you can avoid the delay by clearing your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
 
@@ -343,12 +355,12 @@ Some protocols can't be simulated with the `opentrons_simulate` command-line too
 Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
 
 ### Improved Features
+
 - Changed the Thermocycler GEN2 plate ejection behavior to prevent plates from getting stuck after PCR cycles or being ejected too forcefully.
 
 ### Bug Fixes
 
-- Specifying Python API version 2.14 no longer prevents ``set_block_temperature`` from executing a hold time.
-
+- Specifying Python API version 2.14 no longer prevents `set_block_temperature` from executing a hold time.
 
 ---
 
@@ -374,6 +386,7 @@ Some protocols can't be simulated with the `opentrons_simulate` command-line too
 - Python protocols specifying an `apiLevel` of 2.14
 
 ---
+
 ## OT-2 Software Changes in 6.2.1
 
 Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.
