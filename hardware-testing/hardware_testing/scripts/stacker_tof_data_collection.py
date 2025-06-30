@@ -1,30 +1,28 @@
-"""Flex Stacker TOF Validation Test."""
+"""Flex Stacker TOF Data Collection Script."""
+
+# TODO: Make the output of this match tools/tof-analysis/data/raw_data_frame.csv
 import argparse
 import asyncio
-import csv
-import os
-import sys
 import subprocess
 import re
 import time
-import threading
 from datetime import datetime
 
 from hardware_testing import data
 from opentrons.hardware_control.ot3api import OT3API
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
-from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor, MeasurementKind
+from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor
 
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='Flex Stacker TOF Validation Test')
+    arg_parser = argparse.ArgumentParser(description=__doc__)
     arg_parser.add_argument('-p', '--samples', type=int, required=False, help='Sets the number of histogram samples', default=5)
     arg_parser.add_argument('-i', '--interval', type=int, required=False, help='Sets the sample interval', default=1)
     arg_parser.add_argument('-n', '--labware_amount', type=int, required=False, help='Sets the labware amount', default=0)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
-class Stacker_TOF_Validation_Test:
+class Stacker_TOF_Data_Collection:
     def __init__(
         self, simulate: bool, samples: int, interval: int, labware_amount: int
     ) -> None:
@@ -166,8 +164,8 @@ class Stacker_TOF_Validation_Test:
             print("\nTest Completed!")
 
 if __name__ == '__main__':
-    print("\nFlex Stacker TOF Validation Test\n")
+    print("\nFlex Stacker TOF Data Collection\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Stacker_TOF_Validation_Test(args.simulate, args.samples, args.interval, args.labware_amount)
+    test = Stacker_TOF_Data_Collection(args.simulate, args.samples, args.interval, args.labware_amount)
     asyncio.run(test.run())
