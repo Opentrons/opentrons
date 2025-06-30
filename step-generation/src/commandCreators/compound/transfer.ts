@@ -536,7 +536,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
           const isDispenseRetractSafeForAirGap = getIsRetractSafeForAirGap({
             retractZOffset: dispenseRetractZOffset,
-            retractPositionReference: dispensePositionReference,
+            retractPositionReference: dispenseRetractPositionReference,
             labwareId: destLabware,
             labwareEntities,
             well: destinationWell,
