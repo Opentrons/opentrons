@@ -4,12 +4,21 @@ import argparse
 import pandas as pd
 import plotly.express as px
 
+
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='Opentrons TOF Sensor Data Plot')
-    arg_parser.add_argument('-f', '--folder_name', type=str, required=False, help='Folder name with raw data', default='tof_log')
+    arg_parser = argparse.ArgumentParser(description="Opentrons TOF Sensor Data Plot")
+    arg_parser.add_argument(
+        "-f",
+        "--folder_name",
+        type=str,
+        required=False,
+        help="Folder name with raw data",
+        default="tof_log",
+    )
     return arg_parser
 
-class TOF_Plot():
+
+class TOF_Plot:
     def __init__(self, folder):
         self.df_list = []
         self.data_folder = folder
@@ -20,17 +29,17 @@ class TOF_Plot():
         self.PLOT_FONT = 16
         self.PLOT_FORMAT = ".png"
         self.plot_param = {
-            "figure":None,
-            "filename":None,
-            "title":None,
-            "x_title":None,
-            "y_title":None,
-            "y2_title":None,
-            "x_range":None,
-            "y_range":None,
-            "y2_range":None,
-            "legend":None,
-            "annotation":None
+            "figure": None,
+            "filename": None,
+            "title": None,
+            "x_title": None,
+            "y_title": None,
+            "y2_title": None,
+            "x_range": None,
+            "y_range": None,
+            "y2_range": None,
+            "legend": None,
+            "annotation": None,
         }
 
     def plot_samples(self):
@@ -43,7 +52,7 @@ class TOF_Plot():
                     filename = f"tof_histogram_zone{zone}_average_lab{lab}"
                     title = f"TOF Histogram - Zone {zone} (Average) [Labware = {lab}]"
                 else:
-                    file_suffix = col.lower().replace(" ","")
+                    file_suffix = col.lower().replace(" ", "")
                     filename = f"tof_histogram_zone{zone}_{file_suffix}_lab{lab}"
                     title = f"TOF Histogram - Zone {zone} ({col}) [Labware = {lab}]"
                 fig = px.line(df, y=col)
@@ -67,7 +76,9 @@ class TOF_Plot():
         for col in cols:
             if "Labware0" not in col:
                 lab = col[-1]
-                df_sub[f"Subtraction{lab}"] = self.df_average[col] - self.df_average["Labware0"]
+                df_sub[f"Subtraction{lab}"] = (
+                    self.df_average[col] - self.df_average["Labware0"]
+                )
                 filename = f"tof_histogram_zone{zone}_subtraction_lab{lab}"
                 title = f"TOF Histogram - Zone {zone} (Subtraction) [Labware = {lab}]"
                 fig = px.line(df_sub, y=f"Subtraction{lab}")
@@ -103,7 +114,9 @@ class TOF_Plot():
         ## Zoomed Plot
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = f"tof_histogram_zone{zone}_subtraction_all_zoomed"
-        self.plot_param["title"] = f"TOF Histogram - Zone {zone} (Subtraction All) [Zoomed]"
+        self.plot_param[
+            "title"
+        ] = f"TOF Histogram - Zone {zone} (Subtraction All) [Zoomed]"
         self.plot_param["x_title"] = "Bin Number"
         self.plot_param["y_title"] = "Number of Photons"
         self.plot_param["x_range"] = [0, 50]
@@ -155,19 +168,19 @@ class TOF_Plot():
 
     def set_annotation(self, x_pos, y_pos, text, ax_pos=0, ay_pos=0, y_ref="y1"):
         annotation = {
-            "x":x_pos,
-            "y":y_pos,
-            "ax":ax_pos,
-            "ay":ay_pos,
-            "xref":"x1",
-            "yref":y_ref,
-            "text":text,
-            "showarrow":True,
-            "arrowhead":3,
-            "arrowsize":2,
-            "font":{"size":20,"color":"black"},
-            "bordercolor":"black",
-            "bgcolor":"white"
+            "x": x_pos,
+            "y": y_pos,
+            "ax": ax_pos,
+            "ay": ay_pos,
+            "xref": "x1",
+            "yref": y_ref,
+            "text": text,
+            "showarrow": True,
+            "arrowhead": 3,
+            "arrowsize": 2,
+            "font": {"size": 20, "color": "black"},
+            "bordercolor": "black",
+            "bgcolor": "white",
         }
         return annotation
 
@@ -191,10 +204,12 @@ class TOF_Plot():
             xaxis_ticks="outside",
             yaxis_ticks="outside",
             legend_title=param["legend"],
-            annotations=param["annotation"]
+            annotations=param["annotation"],
         )
         if param["y2_title"] is not None:
-            fig.update_layout(yaxis2_title=param["y2_title"], yaxis2_range=param["y2_range"])
+            fig.update_layout(
+                yaxis2_title=param["y2_title"], yaxis2_range=param["y2_range"]
+            )
 
         fig.write_image(self.plot_folder + "/" + param["filename"] + self.PLOT_FORMAT)
 
@@ -216,7 +231,7 @@ class TOF_Plot():
                     df.columns = range(df.columns.size)
                     df = df.T
                     for col in df.columns:
-                        df.rename(columns={col:f"Sample {col+1}"}, inplace=True)
+                        df.rename(columns={col: f"Sample {col+1}"}, inplace=True)
                     df["Average"] = df.mean(axis=1)
                     df.name = file
                     self.df_list.append(df)
@@ -232,7 +247,8 @@ class TOF_Plot():
         self.plot_average_all()
         self.plot_subtract()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("TOF Sensor Data Plot")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()

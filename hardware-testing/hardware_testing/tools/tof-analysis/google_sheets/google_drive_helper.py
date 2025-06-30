@@ -18,6 +18,7 @@ from googleapiclient.http import MediaIoBaseDownload
 This module requires a credentials.json file before getting started.
 Retrieve from https://console.cloud.google.com/apis/credentials."""
 
+
 class google_drive:
     """Google Drive Tool."""
 
@@ -57,8 +58,8 @@ class google_drive:
                     else ""  # type: ignore
                     if self.parent_folder
                     else None,
-                    supportsAllDrives = True,
-                    includeItemsFromAllDrives = True,
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
                     pageSize=1000,
                     fields="nextPageToken, files(id, name, mimeType)",
                     pageToken=page_token,
@@ -70,7 +71,7 @@ class google_drive:
                 break
             for item in items:
                 item_name = item["name"]
-                item_id = item['id']
+                item_id = item["id"]
                 if delete:
                     self.delete_files(item["id"])
                 file_names.append(item_name)
@@ -97,9 +98,8 @@ class google_drive:
             file = (
                 self.drive_service.files()
                 .create(
-                    body=file_metadata,
-                    supportsAllDrives=True,
-                    fields="id")  # type: ignore
+                    body=file_metadata, supportsAllDrives=True, fields="id"
+                )  # type: ignore
                 .execute()
             )
             folder_id = file.get("id", "")
@@ -128,10 +128,12 @@ class google_drive:
 
         uploaded_file = (
             self.drive_service.files()
-            .create(body=file_metadata,
-                    media_body=media,
-                    supportsAllDrives=True,
-                    fields="id")  # type: ignore
+            .create(
+                body=file_metadata,
+                media_body=media,
+                supportsAllDrives=True,
+                fields="id",
+            )  # type: ignore
             .execute()
         )
         uploaded_file_id = uploaded_file["id"]
@@ -207,8 +209,8 @@ class google_drive:
         self.drive_service.permissions().create(
             fileId=file_id,
             body=new_permission,
-            supportsAllDrives = True,
-            transferOwnership=False  # type: ignore
+            supportsAllDrives=True,
+            transferOwnership=False,  # type: ignore
         ).execute()
 
     def download_single_file(
@@ -261,11 +263,13 @@ class google_drive:
             files_found.extend(response.get("files", []))
         return files_found
 
+
 def upload_files(drive, local_storage):
     sub_dirs, ids = drive.list_folder(folder=True)
-    if 'Files' not in sub_dirs:
+    if "Files" not in sub_dirs:
         child_id = drive.create_folder("Files")
-    else: child_id = ids[sub_dirs.index('Files')]
+    else:
+        child_id = ids[sub_dirs.index("Files")]
 
     for file in os.listdir(local_storage):
         try:
@@ -274,12 +278,14 @@ def upload_files(drive, local_storage):
         except:
             print("Can not upload file")
             traceback.print_exc()
+
 
 def upload_plots(drive, local_storage):
     sub_dirs, ids = drive.list_folder(folder=True)
-    if 'Plots' not in sub_dirs:
+    if "Plots" not in sub_dirs:
         child_id = drive.create_folder("Plots")
-    else: child_id = ids[sub_dirs.index('Plots')]
+    else:
+        child_id = ids[sub_dirs.index("Plots")]
     for file in os.listdir(local_storage):
         try:
             file_path = os.path.join(local_storage, file)
@@ -287,6 +293,7 @@ def upload_plots(drive, local_storage):
         except:
             print("Can not upload file")
             traceback.print_exc()
+
 
 def upload_tof_files(drive_details, axis, labware_num):
     curr_dir = os.curdir
@@ -298,13 +305,21 @@ def upload_tof_files(drive_details, axis, labware_num):
     drive = google_drive(credentials_path, drive_details[0], drive_details[1])
     tof_logs = os.path.join(curr_dir, "tof_log")
     tof_plots = os.path.join(curr_dir, "tof_plots")
-    if axis == 'x':
-        drive_details = drive_details[0:3] + ['X-Axis'] + drive_details[5:-1] + [labware_num]
-    elif axis == 'z':
-        drive_details = drive_details[0:3] + ['Z-Axis']  + drive_details[3:5] + drive_details[7:-1] + [labware_num]
+    if axis == "x":
+        drive_details = (
+            drive_details[0:3] + ["X-Axis"] + drive_details[5:-1] + [labware_num]
+        )
+    elif axis == "z":
+        drive_details = (
+            drive_details[0:3]
+            + ["Z-Axis"]
+            + drive_details[3:5]
+            + drive_details[7:-1]
+            + [labware_num]
+        )
 
     components, ids = drive.list_folder()
-    for path_comp in drive_details[2: ]:
+    for path_comp in drive_details[2:]:
         if path_comp not in components:
             child = drive.create_folder(path_comp)
             drive = google_drive(credentials_path, child, drive_details[1])
@@ -314,5 +329,3 @@ def upload_tof_files(drive_details, axis, labware_num):
         components, ids = drive.list_folder()
     print("Uploading files")
     upload_files(drive, tof_logs)
-
-        

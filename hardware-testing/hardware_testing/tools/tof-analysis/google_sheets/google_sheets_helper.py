@@ -288,4 +288,3 @@ class google_sheet:
             ]
         }
         self.spread_sheet.batch_update(body=request_body)
-
