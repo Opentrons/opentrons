@@ -1,11 +1,8 @@
 """Flex Stacker TOF Sensor Data Plot."""
 import os
-import sys
-import csv
 import argparse
 import pandas as pd
 import plotly.express as px
-from plotly.subplots import make_subplots
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='Opentrons TOF Sensor Data Plot')
