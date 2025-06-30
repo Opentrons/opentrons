@@ -541,7 +541,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             labwareEntities,
             well: destinationWell,
           })
-          console.log({ isDispenseRetractSafeForAirGap })
           const preDispenseAirGapMoveToCommand =
             !isDispenseRetractSafeForAirGap && destinationWell != null
               ? [
