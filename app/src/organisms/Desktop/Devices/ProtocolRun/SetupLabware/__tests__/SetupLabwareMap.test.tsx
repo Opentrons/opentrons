@@ -40,7 +40,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 })
 
 vi.mock('../../LabwareInfoOverlay')
-vi.mock('/app/transformations/analysis/getLabwareRenderInfo')
 vi.mock('/app/transformations/analysis/getAttachedProtocolModuleMatches')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/organisms/RunTimeControl')
