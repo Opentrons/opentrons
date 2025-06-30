@@ -34,6 +34,8 @@ export function Preview(): JSX.Element {
     <Container
       analysis={storedProtocol.mostRecentAnalysis}
       groupedCommands={groupedCommands}
+      protocolKey={protocolKey}
+      srcFileNames={storedProtocol.srcFileNames}
     />
   ) : (
     <div

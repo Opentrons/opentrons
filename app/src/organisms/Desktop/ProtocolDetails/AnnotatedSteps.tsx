@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -8,6 +15,7 @@ import {
   CommandText,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   getLabwareDefinitionsFromCommands,
   Icon,
@@ -56,9 +64,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   )
   const annotations = analysis?.commandAnnotations ?? []
 
-  //  NOTE: isHighlighted is meant to show when running on the protocol in the run log
-  //  but isn't in use during protocol details. Therefore, this info is not in use and is
-  //  merely a proof-of-concept for when we do add this to the run log.
   const groupedCommandsHighlightedInfo = groupedCommands?.map(node => {
     if ('annotationIndex' in node) {
       return {
@@ -90,7 +95,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           ? groupedCommandsHighlightedInfo.map((c, i) =>
               'annotationIndex' in c ? (
                 <AnnotatedGroup
-                  key={`group-${i}`}
+                  key={`group_${c.annotationIndex}`}
                   analysis={analysis}
                   annotationType={
                     annotations[c.annotationIndex]?.machineReadableName
@@ -112,7 +117,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             )
           : analysis.commands.map((c, i) => (
               <IndividualCommand
-                key={i}
+                key={`individual_${c.id}`}
                 command={c}
                 isHighlighted={i === currentCommandIndex}
                 analysis={analysis}
@@ -120,6 +125,35 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 setSelectedCommand={setSelectedCommand}
               />
             ))}
+        {analysis?.errors.length > 0 ? (
+          <Flex
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing8}
+            padding="0px 16px"
+          >
+            {analysis?.errors.map(error => (
+              <Flex
+                key={error.id}
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
+                width="100%"
+                backgroundColor={COLORS.red30}
+                color={COLORS.red60}
+                borderRadius={BORDERS.borderRadius4}
+                padding={SPACING.spacing8}
+                css={css`
+                  transition: background-color 500ms ease-out,
+                    border-color 500ms ease-out;
+                `}
+                cursor="pointer"
+              >
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {error.detail}
+                </StyledText>
+              </Flex>
+            ))}
+          </Flex>
+        ) : null}
       </Flex>
     </Flex>
   )
@@ -145,55 +179,66 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   )
 
   useEffect(() => {
-    const hasHighlighted = subCommands.some(command => command.isHighlighted)
-    if (hasHighlighted) {
-      setIsExpanded(true)
-    } else {
-      setIsExpanded(false)
-    }
+    setIsExpanded(subCommands.some(command => command.isHighlighted))
   }, [subCommands])
 
   return (
     <Flex
-      onClick={() => {
-        setIsExpanded(!isExpanded)
-      }}
-      cursor={CURSOR_POINTER}
+      alignItems={ALIGN_CENTER}
       width="100%"
+      flexDirection="column"
+      overflow="hidden"
     >
-      <Flex alignItems={ALIGN_CENTER} width="100%" flexDirection="column">
-        <Flex
-          alignItems={ALIGN_CENTER}
-          paddingX="16px"
-          width="100%"
-          justifyContent="space-between"
-          borderBottom={`1px solid ${COLORS.grey30}`}
-        >
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {annotationType}
-          </StyledText>
-          <Icon
-            name={isExpanded ? 'chevron-up' : 'chevron-down'}
-            size="2rem"
-            color={COLORS.black90}
-          />
-        </Flex>
-
-        <Flex flexDirection="column" gridGap={SPACING.spacing4}>
-          {isExpanded
-            ? subCommands.map((c, i) => (
-                <IndividualCommand
-                  key={c.command.id}
-                  command={c.command}
-                  analysis={analysis}
-                  isHighlighted={c.isHighlighted}
-                  allRunDefs={allRunDefs}
-                  setSelectedCommand={setSelectedCommand}
-                />
-              ))
-            : null}
-        </Flex>
+      <Flex
+        onClick={() => {
+          setIsExpanded(!isExpanded)
+        }}
+        cursor={CURSOR_POINTER}
+        alignItems={ALIGN_CENTER}
+        paddingX="16px"
+        width="100%"
+        justifyContent="space-between"
+        borderBottom={`1px solid ${COLORS.grey30}`}
+        flexShrink={0}
+      >
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {annotationType}
+        </StyledText>
+        <Icon
+          name={isExpanded ? 'chevron-up' : 'chevron-down'}
+          size="2rem"
+          color={COLORS.black90}
+        />
       </Flex>
+
+      {isExpanded ? (
+        <Flex
+          flexDirection="column"
+          padding="8px"
+          //  TODO: make max height dynamic based on
+          //  amount of space left
+          maxHeight="300px"
+          borderBottom={`1px solid ${COLORS.grey30}`}
+          overflowY={OVERFLOW_AUTO}
+          gridGap={SPACING.spacing4}
+          css={css`
+            ::-webkit-scrollbar {
+              display: none;
+            }
+          `}
+        >
+          {subCommands.map((c, i) => (
+            <IndividualCommand
+              key={c.command.id}
+              command={c.command}
+              analysis={analysis}
+              isHighlighted={c.isHighlighted}
+              allRunDefs={allRunDefs}
+              setSelectedCommand={setSelectedCommand}
+            />
+          ))}
+        </Flex>
+      ) : null}
     </Flex>
   )
 }
@@ -212,13 +257,28 @@ function IndividualCommand({
   allRunDefs,
   setSelectedCommand,
 }: IndividualCommandProps): JSX.Element {
+  const commandRef = useRef<HTMLDivElement | null>(null)
+
   const backgroundColor = isHighlighted ? COLORS.purple30 : COLORS.grey20
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
+
+  useEffect(() => {
+    if (isHighlighted && commandRef.current) {
+      commandRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      })
+    }
+  }, [isHighlighted])
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing8}
       padding="0px 16px"
+      width="100%"
+      ref={commandRef}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

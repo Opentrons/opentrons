@@ -1,5 +1,9 @@
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import sum from 'lodash/sum'
 import values from 'lodash/values'
 
+import { COLORS, WellGroup } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -9,18 +13,27 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  DeckSlot,
+  _wellContentsForLabware,
+  getLiquidIdsOnLabware,
   getSlotInLocationStack,
-  ModuleEntities,
-  RobotState,
+  getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
 import type {
   AddressableAreaName,
   CoordinateTuple,
   CutoutId,
+  LabwareDefinition2,
+  Liquid,
   RobotType,
 } from '@opentrons/shared-data'
+import type {
+  ContentsByWell,
+  DeckSlot,
+  ModuleEntities,
+  RobotState,
+  SingleLabwareLiquidState,
+} from '@opentrons/step-generation'
 
 interface HoverDimensions {
   width: number
@@ -28,6 +41,12 @@ interface HoverDimensions {
   x: number
   y: number
 }
+interface LiquidDetailInfo {
+  totalVolume: number
+  color: string
+  displayName: string
+}
+type WellContentsByLabware = Record<string, ContentsByWell>
 
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
@@ -128,4 +147,92 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   }
 
   return []
+}
+
+export const getAllWellContentsAtFrame = (
+  liquidState: RobotState['liquidState'],
+  labwareDef: LabwareDefinition2
+): WellContentsByLabware => {
+  const labwareLiquidState = liquidState.labware
+  const wellContentsByLabwareId = mapValues(
+    labwareLiquidState,
+    (labwareLiquids: SingleLabwareLiquidState, labwareId: string) => {
+      return _wellContentsForLabware(labwareLiquids, labwareDef)
+    }
+  )
+  return wellContentsByLabwareId
+}
+
+export const getLiquidDetailInfo = (
+  liquidState: RobotState['liquidState'],
+  labwareDef: LabwareDefinition2,
+  labwareId: string,
+  liquids: Liquid[]
+): LiquidDetailInfo[] => {
+  const allWellContentsForActiveItem = getAllWellContentsAtFrame(
+    liquidState,
+    labwareDef
+  )
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[labwareId]
+      : null
+
+  const individualIds = getLiquidIdsOnLabware(wellContents)
+  const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
+
+  const liquidInfo: LiquidDetailInfo[] = individualIds.map(liquidId => {
+    const totalVolume = sum(Object.values(volumesPerLiquid[parseInt(liquidId)]))
+    const matchingLiquid = liquids.find(liquid => liquid.id === liquidId)
+
+    return {
+      totalVolume,
+      //  TODO: add default liquid color
+      color: matchingLiquid?.displayColor ?? '000000',
+      displayName: matchingLiquid?.displayName ?? 'unknown display name',
+    }
+  })
+  return liquidInfo
+}
+
+export const getMissingTips = (
+  tipState: RobotState['tipState'],
+  labwareId: string
+): WellGroup | null => {
+  const missingTipsByLabwareId =
+    tipState &&
+    mapValues(tipState.tipracks, tipMap =>
+      reduce(
+        tipMap,
+        (acc, hasTip, wellName): WellGroup =>
+          hasTip ? acc : { ...acc, [wellName]: null },
+        {}
+      )
+    )
+  const missingTips = missingTipsByLabwareId
+    ? missingTipsByLabwareId[labwareId]
+    : null
+
+  return missingTips
+}
+
+export const getBackgroundColor = (
+  hoveredSlot: string | null,
+  selectedSlot: string | null,
+  slot: string,
+  isSlotSelected: boolean
+): string => {
+  let backgroundColor = COLORS.grey50
+  if (hoveredSlot === slot && isSlotSelected) {
+    backgroundColor = COLORS.purple60
+  } else if (hoveredSlot === slot && !isSlotSelected) {
+    backgroundColor = COLORS.grey60
+  } else if (selectedSlot === slot && isSlotSelected) {
+    backgroundColor = COLORS.purple60
+  } else if (selectedSlot === slot && !isSlotSelected) {
+    backgroundColor = COLORS.grey60
+  } else if (isSlotSelected) {
+    backgroundColor = COLORS.purple40
+  }
+  return backgroundColor
 }

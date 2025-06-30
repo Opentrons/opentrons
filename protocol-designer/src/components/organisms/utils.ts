@@ -26,7 +26,6 @@ import type {
 } from '../../step-forms'
 import type * as wellContentsSelectors from '../../top-selectors/well-contents'
 import type { CutoutConfigExtended } from './HardwareConfigurator/AddFixtureModal'
-import type { WellContentsByNumber } from './SlotDetailModal'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -151,18 +150,6 @@ export const getNextAvailableModuleSlot = (
   }
 }
 
-export const getLiquidIdsOnLabware = (
-  wellContents: ContentsByWell
-): string[] => {
-  const allLiquidIdsOnLabware =
-    wellContents != null
-      ? Object.values(wellContents)
-          .flatMap(contents => contents.groupIds)
-          ?.filter(group => group !== AIR)
-      : []
-  return Array.from(new Set(allLiquidIdsOnLabware))
-}
-
 export const getIsWellContentsEmpty = (
   allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null,
   labwareId: string
@@ -176,32 +163,4 @@ export const getIsWellContentsEmpty = (
         well => Object.keys(well.ingreds).length === 0
       )
     : true
-}
-
-export const getVolumesPerLiquid = (
-  wellContents: ContentsByWell,
-  individualIds: string[]
-): Record<string, WellContentsByNumber> => {
-  const volumesPerLiquid: Record<string, WellContentsByNumber> = {}
-  individualIds.forEach(id => {
-    const volumeByWell: WellContentsByNumber =
-      wellContents != null
-        ? Object.values(wellContents).reduce(
-            (acc: WellContentsByNumber, contents) => {
-              const groupIndex = contents.groupIds.indexOf(id)
-              if (groupIndex !== -1) {
-                const ingred = contents.ingreds[id]
-                if (ingred?.volume != null) {
-                  acc[contents.wellName ?? 'A1'] = ingred.volume
-                }
-              }
-              return acc
-            },
-            {}
-          )
-        : {}
-
-    volumesPerLiquid[id] = volumeByWell
-  })
-  return volumesPerLiquid
 }

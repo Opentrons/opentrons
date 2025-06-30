@@ -8,10 +8,8 @@ import {
 } from '../DefineLiquidsModal/swatchColors'
 
 import type { WellFill } from '@opentrons/components'
-import type {
-  ContentsByWell,
-  WellContents,
-} from '../../../labware-ingred/types'
+import type { WellContents } from '@opentrons/step-generation'
+import type { ContentsByWell } from '../../../labware-ingred/types'
 
 const ingredIdsToColor = (
   groupIds: string[],

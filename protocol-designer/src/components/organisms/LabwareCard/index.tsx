@@ -20,6 +20,7 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
 import { getEnableStacking } from '../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../labware-ingred/actions'
@@ -30,7 +31,6 @@ import { getAllLabwareIdsOfCertainURIOnStack } from '../../../utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../utils'
 
 import type { LabwareOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'

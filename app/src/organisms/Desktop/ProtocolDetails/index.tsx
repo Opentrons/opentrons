@@ -17,6 +17,7 @@ import {
   Box,
   Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -40,7 +41,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
@@ -517,8 +517,11 @@ export function ProtocolDetails(
                     grid-gap: 4px;
                   `}
                 >
-                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
-                    <SecondaryButton onClick={handleClickTimeline}>
+                  {enableProtocolTimeline ? (
+                    <SecondaryButton
+                      onClick={handleClickTimeline}
+                      cursor={CURSOR_POINTER}
+                    >
                       Preview
                     </SecondaryButton>
                   ) : null}

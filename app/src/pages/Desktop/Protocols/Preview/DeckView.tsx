@@ -1,4 +1,4 @@
-import { Dispatch, Fragment, SetStateAction, useMemo, useState } from 'react'
+import { Dispatch, Fragment, useMemo, useState } from 'react'
 
 import {
   COLORS,
@@ -20,13 +20,14 @@ import {
   isAddressableAreaStandardSlot,
   RobotType,
   RunTimeCommand,
-  TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import { DeckViewDetails } from './DeckViewDetails'
 import styles from './preview.module.css'
+import { getBackgroundColor } from './utils'
 
+import type { SetStateAction } from 'react'
 import type {
   InvariantContext,
   TimelineFrame,
@@ -53,22 +54,18 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     robotState,
     selectedRunTimeCommand,
   } = props
-  const [isSlotActive, setSlotActive] = useState<boolean>(false)
+  const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const {
     trashBinEntities,
     wasteChuteEntities,
     stagingAreaEntities,
   } = invariantContext
-  const trashBinFixtures = [
-    {
-      cutoutId: `cutout${
-        Object.values(trashBinEntities)[0]?.location
-      }` as CutoutId,
-      slot: Object.values(trashBinEntities)[0]?.location,
-    },
-  ]
-
+  const trashBinFixtures = Object.values(trashBinEntities).map(trash => ({
+    cutoutId: trash.location as CutoutId,
+    slot: trash.location.split('cutout')[1],
+    id: trash.id,
+  }))
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
   ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
@@ -114,27 +111,46 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               {Object.values(trashBinEntities).length > 0
-                ? trashBinFixtures.map(({ cutoutId, slot }) => (
-                    <Fragment key={cutoutId}>
-                      <SingleSlotFixture
-                        cutoutId={cutoutId}
-                        deckDefinition={deckDef}
-                        slotClipColor={COLORS.transparent}
-                        fixtureBaseColor={lightFill}
-                      />
-                      <FlexTrash
-                        robotType={robotType}
-                        trashIconColor={lightFill}
-                        trashCutoutId={cutoutId as TrashCutoutId}
-                        backgroundColor={
-                          selectedSlot === slot ? COLORS.grey60 : COLORS.grey50
-                        }
-                        onClick={() => {
-                          setSelectedSlot(slot)
-                        }}
-                      />
-                    </Fragment>
-                  ))
+                ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
+                    // TODO: the dropTipInPlace command doesn't have
+                    // any knowledge of where its dropping. would be
+                    // nice to expand the results key to include the addressable
+                    // area name
+                    const isPipetteOverTrash = Object.values(
+                      robotState.pipettes
+                    ).some(pipette => pipette.entityId === id)
+
+                    return (
+                      <Fragment key={cutoutId}>
+                        <SingleSlotFixture
+                          cutoutId={cutoutId}
+                          deckDefinition={deckDef}
+                          slotClipColor={COLORS.transparent}
+                          fixtureBaseColor={lightFill}
+                        />
+                        <FlexTrash
+                          robotType={robotType}
+                          trashIconColor={lightFill}
+                          trashCutoutId={cutoutId as TrashCutoutId}
+                          backgroundColor={getBackgroundColor(
+                            hoveredSlot,
+                            selectedSlot,
+                            slot,
+                            isPipetteOverTrash ?? false
+                          )}
+                          onClick={() => {
+                            setSelectedSlot(slot)
+                          }}
+                          onMouseEnter={() => {
+                            setHoveredSlot(slot)
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredSlot(null)
+                          }}
+                        />
+                      </Fragment>
+                    )
+                  })
                 : null}
               {Object.values(wasteChuteEntities).map(entity => (
                 <WasteChuteFixture
@@ -154,8 +170,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               <DeckViewDetails
+                hoveredSlot={hoveredSlot}
+                setHoveredSlot={setHoveredSlot}
                 robotType={robotType}
-                isSlotActive={isSlotActive}
                 selectedSlot={selectedSlot}
                 setSelectedSlot={setSelectedSlot}
                 robotState={robotState}

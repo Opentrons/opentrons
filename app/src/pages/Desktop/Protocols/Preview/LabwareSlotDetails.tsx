@@ -2,18 +2,20 @@ import {
   COLORS,
   Divider,
   LabwareRender,
+  LiquidIcon,
   RobotWorkSpace,
   StyledText,
 } from '@opentrons/components'
-import { LabwareEntities, RobotState } from '@opentrons/step-generation'
 
 import { getWellFillFromLabwareId } from '/app/transformations/analysis'
 import { getLabwareInfoByLiquidId } from '/app/transformations/commands'
 
 import styles from './preview.module.css'
+import { getLiquidDetailInfo, getMissingTips } from './utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import type { LabwareEntities, RobotState } from '@opentrons/step-generation'
 
 interface LabwareSlotDetailsProps {
   topLabwareOnSlotId: string
@@ -53,13 +55,15 @@ export function LabwareSlotDetails(
       : null
   const { params } = currentCommand
   const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
-
+  const labwareDef = labwareEntities[topLabwareOnSlotId].def
+  //  TODO: need to use wellFillFromWellContents in protocol-designer
+  //  so that it update with liquid state and not based off of starting
+  //  liquids
   const wellFill = getWellFillFromLabwareId(
     topLabwareOnSlotId,
     liquids,
     labwareByLiquidId
   )
-
   const labwareDisplayName =
     labwareEntities[topLabwareOnSlotId].def.metadata.displayName
   const wellGroup: WellGroup | null =
@@ -68,6 +72,14 @@ export function LabwareSlotDetails(
           [activeWellName]: null,
         }
       : null
+
+  const missingTips = getMissingTips(robotState.tipState, topLabwareOnSlotId)
+  const liquidInfo = getLiquidDetailInfo(
+    robotState.liquidState,
+    labwareDef,
+    topLabwareOnSlotId,
+    liquids
+  )
 
   return (
     <>
@@ -83,6 +95,23 @@ export function LabwareSlotDetails(
           ) : null}
         </div>
         <div style={{ padding: '0 16px 16px 16px' }}>
+          {liquidInfo.map(liquid => {
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'space-betweem',
+                }}
+              >
+                <LiquidIcon color={liquid.color} />
+                <StyledText desktopStyle="captionRegular">{`${liquid.totalVolume}uL`}</StyledText>
+                <StyledText desktopStyle="captionRegular">
+                  {liquid.displayName}
+                </StyledText>
+              </div>
+            )
+          })}
           <div
             style={{
               justifyContent: 'center',
@@ -95,13 +124,14 @@ export function LabwareSlotDetails(
             <RobotWorkSpace
               key={topLabwareOnSlotId}
               width="14rem"
-              viewBox={`0 0 ${labwareEntities[topLabwareOnSlotId].def.dimensions.xDimension} ${labwareEntities[topLabwareOnSlotId].def.dimensions.yDimension}`}
+              viewBox={`0 0 ${labwareDef.dimensions.xDimension} ${labwareDef.dimensions.yDimension}`}
             >
               {() => (
                 <g>
                   <LabwareRender
-                    definition={labwareEntities[topLabwareOnSlotId].def}
+                    definition={labwareDef}
                     wellFill={wellFill}
+                    missingTips={missingTips}
                     highlightedWells={wellGroup}
                   />
                 </g>

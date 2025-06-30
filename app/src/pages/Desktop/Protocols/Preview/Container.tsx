@@ -2,13 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ViewportListRef } from 'react-viewport-list'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, RunTimeCommand } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  RunTimeCommand,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   constructInvariantContextFromRunCommands,
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
 import { GroupedCommands } from '/app/redux/protocol-storage'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
@@ -22,9 +27,11 @@ const SEC_PER_FRAME = 1000
 interface ContainerProps {
   analysis: ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
+  protocolKey: string
+  srcFileNames: string[]
 }
 export function Container(props: ContainerProps): JSX.Element {
-  const { analysis, groupedCommands } = props
+  const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
@@ -75,13 +82,37 @@ export function Container(props: ContainerProps): JSX.Element {
   const selectedRunTimeCommand = commands.find(
     command => command.id === selectedCommandId
   )
-
+  const isThermocyclerAttached = Object.keys(robotState.modules).some(
+    id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
+  )
   const allRunDefs = getLabwareDefinitionsFromCommands(commands)
+
+  const protocolDisplayName = getProtocolDisplayName(
+    protocolKey,
+    srcFileNames,
+    analysis
+  )
+
+  const thermocyclerSlots = ['A1', '8', '10', '11']
+
+  useEffect(() => {
+    if (
+      isThermocyclerAttached &&
+      selectedSlot != null &&
+      thermocyclerSlots.includes(selectedSlot)
+    ) {
+      if (robotType === FLEX_ROBOT_TYPE) {
+        setSelectedSlot('B1')
+      } else {
+        setSelectedSlot('7')
+      }
+    }
+  }, [isThermocyclerAttached, selectedSlot])
 
   return (
     <>
       <Controls
-        protocolName={analysis.metadata.protocolName}
+        protocolName={protocolDisplayName}
         numErrors={analysis.errors.length}
         numCommandLength={commands.length}
         currentCommandIndex={selectedCommandIndex}

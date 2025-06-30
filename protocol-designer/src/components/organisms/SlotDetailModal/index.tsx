@@ -20,7 +20,9 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
+  getLiquidIdsOnLabware,
   getSlotInLocationStack,
+  getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
@@ -30,7 +32,6 @@ import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { getMainPagePortalEl } from '../Portal'
-import { getLiquidIdsOnLabware, getVolumesPerLiquid } from '../utils'
 import { LiquidCardList } from './LiquidCardList'
 
 import type { WellGroup } from '@opentrons/components'

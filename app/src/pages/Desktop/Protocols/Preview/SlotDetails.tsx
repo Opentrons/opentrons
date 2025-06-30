@@ -7,15 +7,16 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   LabwareDefinition,
   Liquid,
   ProtocolAnalysisOutput,
   RobotType,
   RunTimeCommand,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
-  getModuleIdFromRobotStateStack,
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
@@ -23,7 +24,7 @@ import {
 import { LabwareSlotDetails } from './LabwareSlotDetails'
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
-import { TrashSlotDetails } from './trashSlotDetails'
+import { TrashSlotDetails } from './TrashSlotDetails'
 
 interface SlotDetailsProps {
   slotId: string
@@ -65,7 +66,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const isTrashOnSlot =
     Object.values(trashBinEntities).some(trash => trash.location === slotId) ||
     Object.values(wasteChuteEntities).some(trash => trash.location === slotId)
-
+  const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
     <div className={styles.detailContainer} style={{ width: '100%' }}>
       <div className={styles.commandStep}>
@@ -74,9 +75,17 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             style={{ display: 'flex', gridGap: '4px', alignItems: 'center' }}
           >
             <StyledText desktopStyle="bodyLargeSemiBold">Slot</StyledText>
-            <DeckInfoLabel deckLabel={slotId} />
+            <DeckInfoLabel
+              deckLabel={
+                moduleOnSlot != null &&
+                moduleEntities[moduleOnSlot[0]].type ===
+                  THERMOCYCLER_MODULE_TYPE
+                  ? tcSlot
+                  : slotId
+              }
+            />
           </div>
-          <div onClick={onClose}>
+          <div onClick={onClose} style={{ cursor: 'pointer' }}>
             <Icon name="close" size="28px" />
           </div>
         </div>
@@ -122,7 +131,10 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   )
 }
 
-// volume of liquids
-// update tip state
-// follow active step in viewport
-// allow for clicking on all slots, including empty ones
+// follow active step in viewport when it is playing
+// update layout of labware + well details
+// update the back and end icons near the play.pause button
+// how does the layout look when there are steps not in a group?
+// update the copy on the labware when they are active for the step
+// add hover state to the deck slots
+// add the error state??? I think we only show the run log up to the error when the error is a syntax error in the code and not if there is a comand failure
