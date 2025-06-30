@@ -71,8 +71,20 @@ class PipetteChannelType(int, enum.Enum):
             return "96"
         elif self.value == 8:
             return "multi"
-        else:
+        elif self.value == 1:
             return "single"
+        else:
+            raise KeyError(self.value)
+
+    def to_config_name(self) -> str:
+        if self.value == 96:
+            return "ninety_six_channel"
+        elif self.value == 8:
+            return "eight_channel"
+        elif self.value == 1:
+            return "single_channel"
+        else:
+            raise KeyError(self.value)
 
 
 class PipetteModelType(enum.Enum):
@@ -163,6 +175,10 @@ class PipetteOEMType(enum.Enum):
     def get_oem_from_model_str(cls, model_str: str) -> "PipetteOEMType":
         """Return an oem type if true based on the model string."""
         return cls.EM if "multi_em" in model_str else cls.OT
+
+    def defpath_extension_str(self) -> str:
+        """Get the string to add to the channel dir to get a config path."""
+        return "_em" if self == type(self).EM else ""
 
 
 class AvailableUnits(enum.Enum):
