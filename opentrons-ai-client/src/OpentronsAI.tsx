@@ -82,12 +82,7 @@ export function OpentronsAI(): JSX.Element | null {
 
   return (
     <HashRouter>
-      <Flex
-        id="opentrons-ai"
-        width="100%"
-        height="100vh"
-        flexDirection={DIRECTION_COLUMN}
-      >
+      <Flex width="100%" height="100vh" flexDirection={DIRECTION_COLUMN}>
         <StickyHeader>
           {displayHeaderWithMeter ? (
             <HeaderWithMeter progressPercentage={progress} />
@@ -97,7 +92,7 @@ export function OpentronsAI(): JSX.Element | null {
         </StickyHeader>
 
         <Flex
-          flex={1}
+          flex="1"
           flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.grey10}
           overflow={OVERFLOW_AUTO}
@@ -106,7 +101,7 @@ export function OpentronsAI(): JSX.Element | null {
             width="100%"
             maxWidth={CLIENT_MAX_WIDTH}
             alignSelf={ALIGN_CENTER}
-            flex={1}
+            flex="1"
           >
             <ExitConfirmModal />
             <OpentronsAIRoutes />

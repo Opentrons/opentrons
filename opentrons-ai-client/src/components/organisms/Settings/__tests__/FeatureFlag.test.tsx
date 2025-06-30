@@ -3,97 +3,44 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { ToggleButton } from '../../../../molecules/ToggleButton'
 import { FeatureFlag } from '../FeatureFlag'
 
-vi.mock('../../../../molecules/ToggleButton')
+import type { ComponentProps } from 'react'
 
-const mockProps = {
-  enablePDProtocolGeneration: true,
-  onTogglePDProtocolGeneration: vi.fn(),
-}
-
-const render = (props = mockProps) => {
+const render = (props: ComponentProps<typeof FeatureFlag>) => {
   return renderWithProviders(<FeatureFlag {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('FeatureFlag', () => {
+  let props: ComponentProps<typeof FeatureFlag>
+
   beforeEach(() => {
-    vi.clearAllMocks()
-    vi.mocked(ToggleButton).mockReturnValue(
-      <div data-testid="mock-toggle-button">Mock Toggle Button</div>
-    )
-  })
-
-  it('should render feature flags section title', () => {
-    render()
-    expect(screen.getByText('Feature Flags')).toBeInTheDocument()
-  })
-
-  it('should render protocol designer protocol generation toggle', () => {
-    render()
-    expect(
-      screen.getByText('Protocol Designer Protocol Generation')
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Enable Protocol Designer protocol generation features')
-    ).toBeInTheDocument()
-  })
-
-  it('should render ToggleButton component', () => {
-    render()
-    expect(screen.getByTestId('mock-toggle-button')).toBeInTheDocument()
-  })
-
-  it('should pass correct props to ToggleButton', () => {
-    render()
-
-    expect(ToggleButton).toHaveBeenCalledWith(
-      expect.objectContaining({
-        label: 'pd-protocol-generation-toggle',
-        toggledOn: true,
-        onClick: expect.any(Function),
-      }),
-      expect.anything()
-    )
-  })
-
-  it('should pass toggledOn false when enablePDProtocolGeneration is false', () => {
-    render({
-      enablePDProtocolGeneration: false,
-      onTogglePDProtocolGeneration: vi.fn(),
-    })
-
-    expect(ToggleButton).toHaveBeenCalledWith(
-      expect.objectContaining({
-        toggledOn: false,
-      }),
-      expect.anything()
-    )
-  })
-
-  it('should call onTogglePDProtocolGeneration when toggle is clicked', () => {
-    const mockOnToggle = vi.fn()
-    vi.mocked(ToggleButton).mockReturnValue(
-      <button data-testid="mock-toggle-button" onClick={mockOnToggle}>
-        Mock Toggle Button
-      </button>
-    )
-
-    render({
+    props = {
       enablePDProtocolGeneration: true,
-      onTogglePDProtocolGeneration: mockOnToggle,
-    })
+      onTogglePDProtocolGeneration: vi.fn(),
+    }
+  })
 
-    const toggleButton = screen.getByTestId('mock-toggle-button')
-    fireEvent.click(toggleButton)
+  it('renders the feature flags section', () => {
+    render(props)
+    screen.getByText('Feature Flags')
+    screen.getByText('Protocol Designer Protocol Generation')
+    screen.getByText('Enable Protocol Designer protocol generation features')
+    screen.getByRole('switch')
+  })
 
-    // Verify the toggle function was passed correctly
-    const lastCall = vi.mocked(ToggleButton).mock.calls[
-      vi.mocked(ToggleButton).mock.calls.length - 1
-    ]
-    expect(typeof lastCall[0].onClick).toBe('function')
+  it('should call onTogglePDProtocolGeneration when clicking toggle switch when enabled', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('switch'))
+    expect(props.onTogglePDProtocolGeneration).toHaveBeenCalled()
+  })
+
+  it('should call onTogglePDProtocolGeneration when clicking toggle switch when disabled', () => {
+    props.enablePDProtocolGeneration = false
+    render(props)
+    fireEvent.click(screen.getByRole('switch'))
+    expect(props.onTogglePDProtocolGeneration).toHaveBeenCalled()
   })
 })
