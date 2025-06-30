@@ -47,10 +47,10 @@ def verify_and_normalize_transfer_args(
         flat_dests_list = []
     if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
         flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            flat_sources_list, nozzle_map
+            flat_sources_list, nozzle_map, "source"
         )
         flat_dests_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            flat_dests_list, nozzle_map
+            flat_dests_list, nozzle_map, "destination"
         )
     for well in flat_sources_list + flat_dests_list:
         instrument.validate_takes_liquid(
