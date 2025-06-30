@@ -2,6 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
 } from '@opentrons/shared-data'
+import { getLiquidClassName } from '@opentrons/step-generation'
 
 import { uuid } from '../../../utils'
 
@@ -49,7 +50,7 @@ export const getLoadLiquidClassCommands = (
             params: {
               liquidClassRecord: {
                 ...byTipTypeSettings,
-                liquidClassName: liquidClass,
+                liquidClassName: getLiquidClassName(liquidClass),
                 pipetteModel,
               },
             },
