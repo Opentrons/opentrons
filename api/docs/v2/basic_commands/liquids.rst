@@ -281,7 +281,7 @@ This example moves the pipette 75% of well's total radius and 2 mm below the top
 
 And this example uses ``mm_from edge`` to set the touch tip location 0 mm, or the edge of the current well::
 
-    pipette.touch_tip(plate["B1"],mm_from_edge=0)
+    pipette.touch_tip(plate["B1"], mm_from_edge=0)
 
 .. versionchanged:: 2.24
     Add the ``mm_from_edge`` parameter.
