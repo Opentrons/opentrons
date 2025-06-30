@@ -939,10 +939,10 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     '8ChannelWasteChute',
     'gripperWasteChute',
   ],
-  VSA4: ['fakeA4', 'flexStackerModuleV1A4'],
-  VSB4: ['fakeB4', 'flexStackerModuleV1B4'],
-  VSC4: ['fakeC4', 'flexStackerModuleV1C4'],
-  VSD4: ['fakeD4', 'flexStackerModuleV1D4'],
+  VSA4: ['fakeA4', 'A4', 'flexStackerModuleV1A4'],
+  VSB4: ['fakeB4', 'B4', 'flexStackerModuleV1B4'],
+  VSC4: ['fakeC4', 'C4', 'flexStackerModuleV1C4'],
+  VSD4: ['fakeD4', 'D4', 'flexStackerModuleV1D4'],
 }
 
 export const getVisualSlotIdFromAAId = (
@@ -956,7 +956,7 @@ export const getVisualSlotIdFromAAId = (
 
 export const getSingleSlotIdWithFakesFromVSId = (
   vsId: string
-): AddressableAreaNamesWithFakes => {
+): AddressableAreaNamesWithFakes | null => {
   switch (vsId) {
     case 'VSA1':
       return 'A1'
@@ -992,6 +992,7 @@ export const getSingleSlotIdWithFakesFromVSId = (
       return 'fakeD4'
     default:
       console.error(`could not find a match for VS${vsId}`)
+      return null
   }
 }
 
@@ -1093,7 +1094,7 @@ export const getAAsToFixtureIdFromDeckDefWithFakes = (
  * @param fixtureId - The fixtureId we are looking for.
  * @returns The aa name or null if not match found.
  */
-export const replaceAAWithFakeAA = (
+export const getMainAAForAFixture = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
   addressableAreaId: AddressableAreaNamesWithFakes
@@ -1102,8 +1103,6 @@ export const replaceAAWithFakeAA = (
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
   )
-  console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
-
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
     return aaListForFixtureId[0]
@@ -1113,7 +1112,13 @@ export const replaceAAWithFakeAA = (
     console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
     console.log('aaListForFixtureId: ', aaListForFixtureId)
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
-      return aa in AA_TO_AA_SLOT && AA_TO_AA_SLOT[aa] === addressableAreaId
+      console.log('addressableAreaId: ', addressableAreaId)
+      console.log('aa: ', aa)
+      const vsId = getVisualSlotIdFromAAId(aa)
+      console.log('vsId: ', vsId)
+      const singleSlotId = getSingleSlotIdWithFakesFromVSId(vsId)
+      console.log('singleSlotId: ', singleSlotId)
+      return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
@@ -1131,7 +1136,7 @@ export const getVisualSlotIdForAA = (
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   const aaMatchInDef = aaListForFixtureId.find(aa => aa === addressableAreaId)
   return aaMatchInDef
-    ? getVisualSlotIdFromAAId(aaMatchInDef)
+    ? getSingleSlotIdWithFakesFromVSId(getVisualSlotIdFromAAId(aaMatchInDef)) ?? (addressableAreaId as AddressableAreaNamesWithFakes)
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 

@@ -5,7 +5,6 @@ import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
-  FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
@@ -23,12 +22,12 @@ import {
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
+  getMainAAForAFixture,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
   isFixtureInUsbModules,
-  replaceAAWithFakeAA,
   replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
@@ -158,7 +157,7 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
 
 describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   it('Should find an aa for flex stacker', () => {
-    const result = replaceAAWithFakeAA(
+    const result = getMainAAForAFixture(
       'cutoutD3',
       'flexStackerModuleV1',
       'fakeD4'
@@ -168,7 +167,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   })
 
   it('Should find an aa for waste chute', () => {
-    const result = replaceAAWithFakeAA(
+    const result = getMainAAForAFixture(
       'cutoutD3',
       'wasteChuteRightAdapterNoCover',
       'D3'
@@ -177,7 +176,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   })
 
   it('Should find an aa for staging area', () => {
-    const result = replaceAAWithFakeAA(
+    const result = getMainAAForAFixture(
       'cutoutD3',
       'stagingAreaRightSlot',
       'fakeD4'
@@ -186,7 +185,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
   })
 
   it('Should find an aa for temp module', () => {
-    const result = replaceAAWithFakeAA('cutoutA1', 'temperatureModuleV2', 'A1')
+    const result = getMainAAForAFixture('cutoutA1', 'temperatureModuleV2', 'A1')
     expect(result).toEqual('temperatureModuleV2A1')
   })
 })
