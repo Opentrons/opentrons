@@ -19,7 +19,7 @@ from opentrons.protocol_api import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 
-metadata = {"protocolName": "NEW Opentrons Flex Pipette IQ/OQ"}
+metadata = {"protocolName": "Opentrons Flex Pipette IQ/OQ"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
@@ -152,7 +152,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_str(
         display_name="tips",
         variable_name="tips",
-        default=_racks[1],
+        default=_racks[0],
         choices=[
             {"display_name": r.replace("opentrons_flex_96_", ""), "value": r}
             for r in _racks
@@ -460,6 +460,7 @@ def run(ctx: ProtocolContext) -> None:
     pip_for_dil: InstrumentContext = (
         diluent_pipette if diluent_pipette else test_pip
     )
+    pip_sn = test_pip.hw_pipette['pipette_id'] if not ctx.is_simulating() else "simulation"
 
     # LOAD LABWARE & TIP-RACKS
     tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
@@ -511,7 +512,7 @@ def run(ctx: ProtocolContext) -> None:
         file.write("==================\n")
         file.write(f"simulation,{ctx.is_simulating()}\n")
         file.write(f"time,{time_str}\n")
-        file.write(f"pipette_sn,{test_pip.hw_pipette['pipette_id']}\n")
+        file.write(f"pipette_sn,{pip_sn}\n")
         file.write(f"model,{ctx.params.pipette}\n")
         file.write(f"tips,{ctx.params.tips}\n")
         file.write(f"liquid,{ctx.params.liquid}\n")
@@ -521,6 +522,32 @@ def run(ctx: ProtocolContext) -> None:
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
+
+    def _save_results_to_csv(test_volume: float, abs_values: Dict[str, float]) -> None:
+        results = {
+            w.well_name: abs_values[w.well_name]
+            for w in dest_wells_by_volume[test_volume]
+        }
+        abs_values_at_this_volume: List[float] = list(results.values())
+        avg = sum(abs_values_at_this_volume) / len(abs_values_at_this_volume)
+        if ctx.is_simulating():
+            avg = 2.5
+        cv = (stdev(abs_values_at_this_volume) / avg) * 100.0
+        with open(results_filepath, "a") as _f:
+            _f.write("==================\n")
+            _f.write(f"VOLUME: {test_volume} uL\n")
+            _f.write("==================\n")
+            _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
+            for col in "ABCDEFGH":
+                csv_row_abs_values = [
+                    str(results.get(f"{col}{row + 1}", ""))
+                    for row in range(12)
+                ]
+                csv_row = f"{col},{','.join(csv_row_abs_values)}\n"
+                _f.write(csv_row)
+            _f.write(f"CV,{round(cv, 2)}\n")
+            _f.write(f"AVG,{round(avg, 2)}\n")
+            ctx.comment(f"RESULT: {test_volume} uL %CV = {round(cv, 2)}%")
 
     def _on_plate_done() -> None:
         nonlocal plate, ul_in_this_plate
@@ -533,34 +560,13 @@ def run(ctx: ProtocolContext) -> None:
                 ctx, plate, heater_shaker, plate_reader, filename()
             )
             for vol in ul_in_this_plate:
-                results = {
-                    w.well_name: _absorbance_values[w.well_name]
-                    for w in dest_wells_by_volume[vol]
-                }
-                abs_values_at_this_volume: List[float] = list(results.values())
-                avg = sum(abs_values_at_this_volume) / len(abs_values_at_this_volume)
-                cv = (stdev(abs_values_at_this_volume) / avg) * 100.0
-                with open(results_filepath, "a") as _f:
-                    _f.write("==================\n")
-                    _f.write(f"VOLUME: {vol} uL\n")
-                    _f.write("==================\n")
-                    _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
-                    for col in "ABCDEFGH":
-                        csv_row_abs_values = [
-                            str(results.get(f"{col}{row + 1}", ""))
-                            for row in range(12)
-                        ]
-                        csv_row = f"{col},{','.join(csv_row_abs_values)}\n"
-                        _f.write(csv_row)
-                    _f.write(f"CV,{round(cv, 2)}\n")
-                    _f.write(f"AVG,{round(avg, 2)}\n")
-                    ctx.comment(f"RESULT: {vol} uL %CV = {round(cv, 2)}%")
-
+                if vol <= 0.0:
+                    continue
+                _save_results_to_csv(vol, _absorbance_values)
         plate = None
         ul_in_this_plate = []
 
     for ul_idx, ul in enumerate(volumes):
-
         dest_wells: List[Well] = dest_wells_by_volume[float(ul)]
 
         # SHAKE/READ the CURRENT PLATE
@@ -646,7 +652,6 @@ def run(ctx: ProtocolContext) -> None:
                 test_pip.distribute_with_liquid_class(
                     test_class, ul, src_well, dst_wells_organized, new_tip="always"
                 )
-                raise NotImplementedError("here")
 
         try:
             _transfer()
@@ -681,10 +686,11 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(plate, adapter, use_gripper=True)
         heater_shaker.close_labware_latch()
         pip_for_dil.pick_up_tip(diluent_tips)
+        num_transfers = 12 if pip_for_dil.channels == 8 else 1
         pip_for_dil.transfer_with_liquid_class(
             test_class,
             DYE_READER_IDEAL_UL,
-            [reservoir_diluent["A1"]] * 96,
+            [reservoir_diluent["A1"]] * num_transfers,
             plate.wells(),
             new_tip="never",
         )
