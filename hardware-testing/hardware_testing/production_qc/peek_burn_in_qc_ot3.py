@@ -447,7 +447,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 )
 
                 await _home_plunger(api, mount)
-                await sleep(0.5) 
+                await asyncio.sleep(0.5)
 
                 failed_cycles = await _cycle_plunger(
                     api, mount,
