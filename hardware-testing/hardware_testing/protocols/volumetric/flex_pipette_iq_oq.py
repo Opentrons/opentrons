@@ -1,9 +1,10 @@
 """Opentrons Flex Pipette IQ/OQ."""
 from datetime import datetime
 from math import ceil, inf
+from statistics import stdev
 from typing import List, Optional, Tuple, Dict, cast
-import numpy as np
 
+from opentrons.config import infer_config_base_dir
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -403,8 +404,7 @@ def shake_and_read_plate(
         shaker: HeaterShakerContext,
         reader: AbsorbanceReaderContext,
         filename: str,
-        dest_wells_by_volume: Dict[float, List[Well]]
-) -> None:
+) -> Dict[str, float]:
 
     # SHAKE FOR 60 SECONDS
     shaker.close_labware_latch()
@@ -422,15 +422,6 @@ def shake_and_read_plate(
     )[READER_ABSORBANCE]
     reader.open_lid()
 
-    # CALCULATE CV
-    ctx.comment(f"result: {str(result)}")
-    for vol, wells in dest_wells_by_volume.items():
-        values = [result.get(well.well_name, 0.0) for well in wells]
-        mean = np.mean(values)
-        std = np.std(values)
-        cv = (std / mean * 100) if mean != 0 else None
-        ctx.comment(f"Volume {vol} ul | Mean {mean} | std {std} | CV {cv}")
-
     # ADD TO STACK
     plate_in_stack: Optional[Labware] = ctx.deck[SLOTS["stack_end"]]
     if not plate_in_stack:
@@ -440,6 +431,8 @@ def shake_and_read_plate(
             plate_in_stack = plate_in_stack.child
         plate_dest = plate_in_stack
     ctx.move_labware(plate, plate_dest, use_gripper=True)
+
+    return result
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -507,20 +500,62 @@ def run(ctx: ProtocolContext) -> None:
     ul_in_this_plate: List[float] = []
     diluent_probed = False  # NOTE: diluent is a 1-well reservoir, so only needs to be probed once
 
+    time_str = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+    results_filename = f"flex_pipette_iq_oq_RESULTS_{time_str}.csv"
+    results_directory = infer_config_base_dir() / "flex_pipette_iq_oq"
+    results_filepath = results_directory / results_filename
+    results_directory.mkdir(parents=True, exist_ok=True)
+    with open(results_filepath, "w+") as file:
+        file.write("==================\n")
+        file.write("FLEX-PIPETTE-IQ-OQ\n")
+        file.write("==================\n")
+        file.write(f"simulation,{ctx.is_simulating()}\n")
+        file.write(f"time,{time_str}\n")
+        file.write(f"pipette_sn,{test_pip.hw_pipette['pipette_id']}\n")
+        file.write(f"model,{ctx.params.pipette}\n")
+        file.write(f"tips,{ctx.params.tips}\n")
+        file.write(f"liquid,{ctx.params.liquid}\n")
+        file.write(f"use_artel,{ctx.params.use_artel}\n")
+        file.write(f"meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
+
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
-    def _on_plate_done():
+    def _on_plate_done() -> None:
         nonlocal plate, ul_in_this_plate
         heater_shaker.open_labware_latch()
         if not plate_reader:
             # REMOVE AND TAKE TO ARTEL READER
             ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
         else:
-            shake_and_read_plate(
-                ctx, plate, heater_shaker, plate_reader, filename(), dest_wells_by_volume
+            _absorbance_values = shake_and_read_plate(
+                ctx, plate, heater_shaker, plate_reader, filename()
             )
+            for vol in ul_in_this_plate:
+                results = {
+                    w.well_name: _absorbance_values[w.well_name]
+                    for w in dest_wells_by_volume[vol]
+                }
+                abs_values_at_this_volume: List[float] = list(results.values())
+                avg = sum(abs_values_at_this_volume) / len(abs_values_at_this_volume)
+                cv = (stdev(abs_values_at_this_volume) / avg) * 100.0
+                with open(results_filepath, "a") as _f:
+                    _f.write("==================\n")
+                    _f.write(f"VOLUME: {vol} uL\n")
+                    _f.write("==================\n")
+                    _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
+                    for col in "ABCDEFGH":
+                        csv_row_abs_values = [
+                            str(results.get(f"{col}{row + 1}", ""))
+                            for row in range(12)
+                        ]
+                        csv_row = f"{col},{','.join(csv_row_abs_values)}\n"
+                        _f.write(csv_row)
+                    _f.write(f"CV,{round(cv, 2)}\n")
+                    _f.write(f"AVG,{round(avg, 2)}\n")
+                    ctx.comment(f"RESULT: {vol} uL %CV = {round(cv, 2)}%")
+
         plate = None
         ul_in_this_plate = []
 
