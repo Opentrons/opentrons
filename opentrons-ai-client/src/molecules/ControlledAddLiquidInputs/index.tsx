@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LIQUIDS_FIELD_NAME } from '../../organisms/LabwareLiquidsSection'
+import { LIQUIDS_FIELD_NAME } from '/ai-client/organisms/LabwareLiquidsSection'
 
 export function ControlledAddLiquidInputs(): JSX.Element {
   const { t } = useTranslation('create_protocol')

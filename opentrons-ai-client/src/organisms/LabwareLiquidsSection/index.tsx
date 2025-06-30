@@ -12,8 +12,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
-import { ControlledLabwareListItems } from '../../molecules/ControlledLabwareListItems'
+import { ControlledAddTextAreaFields } from '/ai-client/molecules/ControlledAddTextAreaFields'
+import { ControlledLabwareListItems } from '/ai-client/molecules/ControlledLabwareListItems'
+
 import { LabwareModal } from '../LabwareModal'
 
 export interface DisplayLabware {

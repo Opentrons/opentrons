@@ -1,8 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { Landing } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -10,7 +11,7 @@ import type { NavigateFunction } from 'react-router-dom'
 const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()
 
-vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
@@ -22,7 +23,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 

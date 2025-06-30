@@ -18,13 +18,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { CLIENT_MAX_WIDTH } from '/ai-client/resources/constants'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
 import {
   displayExitConfirmModalAtom,
   displayFeatureFlagsModalAtom,
   featureFlagsAtom,
 } from '../../resources/atoms'
-import { CLIENT_MAX_WIDTH } from '../../resources/constants'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { SettingsButton } from '../SettingsButton'
 
 const HeaderBar = styled(Flex)`

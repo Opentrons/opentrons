@@ -27,6 +27,9 @@ import {
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 
+import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
 import {
   chatDataAtom,
   createProtocolChatAtom,
@@ -35,11 +38,8 @@ import {
   scrollToBottomAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 
-import type { ChatData } from '../../resources/types'
-
-import smallLogo from '../../assets/images/opentrons_logo_small.svg'
+import type { ChatData } from '/ai-client/resources/types'
 
 interface ChatDisplayProps {
   chat: ChatData
