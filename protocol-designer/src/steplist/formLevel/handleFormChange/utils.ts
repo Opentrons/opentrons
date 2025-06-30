@@ -523,8 +523,27 @@ const getNoLiquidClassValuesMoveLiquid = (
     return {}
   }
   const { aspirate, singleDispense, multiDispense } = liquidClassValuesForTip
+  const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
+    pipetteSpecs,
+    tiprackDefinition: null,
+    conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
+      [number, number]
+    >,
+    disposalByVolume: (multiDispense?.disposalByVolume ?? []) as Array<
+      [number, number]
+    >,
+    volume,
+    path: rawForm.path as PathOption,
+    numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+      [number, number]
+    >,
+  })
+  const { isSupported: isMultiDispenseSupported } = multiWellHandling
   const dispense =
-    multiDispense != null && path === 'multiDispense'
+    multiDispense != null &&
+    path === 'multiDispense' &&
+    isMultiDispenseSupported
       ? multiDispense
       : singleDispense
   const aspirateFlowRateFields = getFlowRateFields(
@@ -753,7 +772,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tipRack
     )?.def ?? null
-  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
+  const {
+    referenceVolumes: byVolumeLookup,
+    multiWellHandling,
+  } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     conditioningByVolume,
@@ -764,7 +786,8 @@ const getLiquidClassValuesMoveLiquid = (args: {
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
     >,
-  }).referenceVolumes
+  })
+  const { isSupported: isMultiDispenseSupported } = multiWellHandling
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
     aspiratePositionReference,
@@ -833,7 +856,9 @@ const getLiquidClassValuesMoveLiquid = (args: {
   })
   const dispenseSubmergeFields = getSubmergeRetractFields({
     submergeRetractLookup:
-      path === 'multiDispense' && multiDispense != null
+      path === 'multiDispense' &&
+      multiDispense != null &&
+      isMultiDispenseSupported
         ? multiDispense.submerge
         : singleDispense.submerge,
     volumes: byVolumeLookup,
@@ -851,7 +876,9 @@ const getLiquidClassValuesMoveLiquid = (args: {
   })
   const dispenseRetractFields = getSubmergeRetractFields({
     submergeRetractLookup:
-      path === 'multiDispense' && multiDispense != null
+      path === 'multiDispense' &&
+      multiDispense != null &&
+      isMultiDispenseSupported
         ? multiDispense.retract
         : singleDispense.retract,
     volumes: byVolumeLookup,

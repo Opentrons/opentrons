@@ -104,7 +104,7 @@ export function pythonDef(
   const sections: string[] = [
     getLoadAdapters(moduleEntities, labwareEntities, labware),
     getLoadLabware(moduleEntities, labwareEntities, labware, {}),
-    getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
+    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
     ...[
       getLoadTrashBins(trashBinEntities),
       getLoadWasteChute(wasteChuteEntities),

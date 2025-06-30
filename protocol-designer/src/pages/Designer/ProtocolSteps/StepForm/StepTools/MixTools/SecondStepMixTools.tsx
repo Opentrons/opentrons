@@ -158,6 +158,7 @@ export function SecondStepMixTools({
             />
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix="mix"
               propsForFields={propsForFields}
               zField="mix_mmFromBottom"
@@ -270,6 +271,7 @@ export function SecondStepMixTools({
               >
                 {formData.mix_touchTip_checkbox === true ? (
                   <PositionField
+                    formData={formData}
                     prefix={tab}
                     propsForFields={propsForFields}
                     zField="mix_touchTip_mmFromTop"

@@ -35,7 +35,9 @@ export function CheckboxExpandStepFormField(
     disabled = false,
   } = fieldProps
 
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top-start',
+  })
   return (
     <>
       <ListButton
@@ -53,15 +55,14 @@ export function CheckboxExpandStepFormField(
           width="100%"
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
+          {...targetProps}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
             <>
-              <StyledText desktopStyle="bodyDefaultRegular" {...targetProps}>
-                {title}
-              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
               <Btn
                 data-testid={testId}
                 onClick={() => {

@@ -20,6 +20,7 @@ import {
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
+  getIsRetractSafeForAirGap,
   getSlotInLocationStack,
   getTrashOrLabware,
   indentPyLines,
@@ -29,7 +30,7 @@ import {
 } from '../../utils'
 import {
   getCustomLiquidClassProperties,
-  getPythonLiquidClassName,
+  getLiquidClassName,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -353,7 +354,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
     ...(liquidClass != null
-      ? [`base_liquid_class=${getPythonLiquidClassName(liquidClass)}`]
+      ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
@@ -489,22 +490,22 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
-          const wellDepth =
+          const aspirateWellDepth =
             labwareEntities[sourceLabware]?.def.wells[sourceWell]?.depth ?? null
           const aspirateMmFromBottom = getMmFromBottom(
             aspirateZOffset,
             aspiratePositionReference,
-            wellDepth
+            aspirateWellDepth
           )
           const aspirateSubmergeMmFromBottom = getMmFromBottom(
             aspirateSubmergeZOffset,
             aspirateSubmergePositionReference,
-            wellDepth
+            aspirateWellDepth
           )
           const aspirateRetractMmFromBottom = getMmFromBottom(
             aspirateRetractZOffset,
             aspirateRetractPositionReference,
-            wellDepth
+            aspirateWellDepth
           )
           if (
             aspirateMmFromBottom != null &&
@@ -513,6 +514,44 @@ export const transfer: CommandCreator<TransferArgs> = (
           ) {
             errors.push(errorCreators.submergeBelowAspirate())
           }
+
+          const isAspirateRetractSafeForAirGap = getIsRetractSafeForAirGap({
+            retractZOffset: aspirateRetractZOffset,
+            retractPositionReference: aspirateRetractPositionReference,
+            labwareId: sourceLabware,
+            labwareEntities,
+            well: sourceWell,
+          })
+          const preAspirateAirGapMoveToCommand =
+            !isAspirateRetractSafeForAirGap && sourceWell != null
+              ? [
+                  curryWithoutPython(moveToWell, {
+                    pipetteId: pipette,
+                    labwareId: sourceLabware,
+                    wellName: sourceWell,
+                    wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+                  }),
+                ]
+              : []
+
+          const isDispenseRetractSafeForAirGap = getIsRetractSafeForAirGap({
+            retractZOffset: dispenseRetractZOffset,
+            retractPositionReference: dispenseRetractPositionReference,
+            labwareId: destLabware,
+            labwareEntities,
+            well: destinationWell,
+          })
+          const preDispenseAirGapMoveToCommand =
+            !isDispenseRetractSafeForAirGap && destinationWell != null
+              ? [
+                  curryWithoutPython(moveToWell, {
+                    pipetteId: pipette,
+                    labwareId: destLabware,
+                    wellName: destinationWell,
+                    wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+                  }),
+                ]
+              : []
           if (
             aspirateMmFromBottom != null &&
             aspirateRetractMmFromBottom != null &&
@@ -674,7 +713,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     : {}),
                 }),
                 // move back to retract position after touch tip if air gap needed
-                ...(aspirateAirGapVol > 0
+                // if retract isn't safe for air gap, air gap commands will include a move to well safe position
+                ...(aspirateAirGapVol > 0 && isAspirateRetractSafeForAirGap
                   ? [
                       curryWithoutPython(moveToWell, {
                         pipetteId: pipette,
@@ -699,6 +739,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterAspirateRetractCommands =
             aspirateAirGapVol > 0
               ? [
+                  ...preAspirateAirGapMoveToCommand,
                   curryWithoutPython(airGapInPlace, {
                     pipetteId: pipette,
                     volume: aspirateAirGapVol,
@@ -906,7 +947,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             }) ?? 0
 
           const getAirGapAfterDispenseCommands = (
-            considerUltimateSubtransfer: boolean
+            considerUltimateSubtransfer: boolean,
+            considerRetractSafety: boolean = true
           ): CurriedCommandCreator[] =>
             dispenseAirGapVol > 0 &&
             !(
@@ -915,6 +957,9 @@ export const transfer: CommandCreator<TransferArgs> = (
               considerUltimateSubtransfer
             ) // don't air gap if end of full transfer and not changing tip
               ? [
+                  ...(considerRetractSafety
+                    ? preDispenseAirGapMoveToCommand
+                    : []),
                   curryWithoutPython(airGapInPlace, {
                     pipetteId: pipette,
                     volume: dispenseAirGapVol,
@@ -947,9 +992,10 @@ export const transfer: CommandCreator<TransferArgs> = (
                       : {}),
                   }),
                   // move back to retract position after touch tip if air gap needed
+                  // if retract isn't safe for air gap, air gap commands will include a move to well safe position
                   ...(getAirGapAfterDispenseCommands(
                     considerUltimateSubtransfer
-                  ).length > 0
+                  ).length > 0 && isDispenseRetractSafeForAirGap
                     ? [
                         curryWithoutPython(moveToWell, {
                           pipetteId: pipette,
@@ -1017,7 +1063,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                       }),
                     ]
                   : []),
-                ...getAirGapAfterDispenseCommands(true),
+                ...getAirGapAfterDispenseCommands(true, false),
               ]
               break
             default:
@@ -1031,7 +1077,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: blowoutFlowRateUlSec,
                     trashId: blowoutLocation,
                   }),
-                  ...getAirGapAfterDispenseCommands(true),
+                  ...getAirGapAfterDispenseCommands(true, false),
                 ]
               } else if (blowoutLocation in wasteChuteEntities) {
                 advancedDispenseArgsCommands = [
@@ -1040,7 +1086,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: blowoutFlowRateUlSec,
                     wasteChuteId: blowoutLocation,
                   }),
-                  ...getAirGapAfterDispenseCommands(true),
+                  ...getAirGapAfterDispenseCommands(true, false),
                 ]
               }
               break
