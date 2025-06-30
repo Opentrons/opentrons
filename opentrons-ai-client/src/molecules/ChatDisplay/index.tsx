@@ -28,8 +28,6 @@ import {
 } from '@opentrons/components'
 
 import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
-import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
-
 import {
   chatDataAtom,
   createProtocolChatAtom,
@@ -37,7 +35,8 @@ import {
   regenerateProtocolAtom,
   scrollToBottomAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { ChatData } from '/ai-client/resources/types'
 
@@ -64,7 +63,7 @@ const StyledIcon = styled(Icon)`
 `
 
 const OuterContainer = styled.div`
-  background-color: ${COLORS.white}
+  background-color: ${COLORS.white};
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -230,6 +229,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       }, 2000)
   }, [isCopied])
 
+  // ToDo this nested component definition should be resolved
+  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
   function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
     return <CodeWrapper {...props} id={chatId} />
   }
@@ -238,6 +239,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
       ?.metadata.protocolName ?? 'protocol.json'
 
+  // ToDo this nested component definition should be resolved
+  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
   const ProtocolContentBadge = (props: {
     onClick: () => void
   }): JSX.Element => {
