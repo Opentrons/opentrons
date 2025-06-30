@@ -56,6 +56,26 @@ describe('Update Protocol', () => {
     ).toBeInTheDocument()
   })
 
+  it('should display all update options in dropdown including Add Flex Stacker(s)', () => {
+    render()
+
+    // Click the dropdown to open it
+    const dropdown = screen.getByText('Select an option')
+    fireEvent.click(dropdown)
+
+    // Check that all options are present
+    expect(
+      screen.getByText('Adapt Python protocol from OT-2 to Flex')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Add Flex Stacker(s) to protocol')
+    ).toBeInTheDocument()
+    expect(screen.getByText('Add Runtime Parameters')).toBeInTheDocument()
+    expect(screen.getByText('Change labware')).toBeInTheDocument()
+    expect(screen.getByText('Change pipettes')).toBeInTheDocument()
+    expect(screen.getByText('Other')).toBeInTheDocument()
+  })
+
   it('should update the file value when the file is uploaded', async () => {
     render()
 

@@ -72,6 +72,7 @@
   "type_your_prompt": "Type your prompt...",
   "update_existing_protocol": "Update an existing protocol",
   "update_option_adapt_python_protocol": "Adapt Python protocol from OT-2 to Flex",
+  "update_option_add_flex_stackers": "Add Flex Stacker(s) to protocol",
   "update_option_add_runtime_parameters": "Add Runtime Parameters",
   "update_option_change_labware": "Change labware",
   "update_option_change_pipettes": "Change pipettes",

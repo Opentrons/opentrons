@@ -44,6 +44,7 @@ export interface CreatePrompt {
 
 export type UpdateOptions =
   | 'adapt_python_protocol'
+  | 'add_flex_stackers'
   | 'add_runtime_parameters'
   | 'change_labware'
   | 'change_pipettes'
