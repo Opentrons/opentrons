@@ -130,28 +130,43 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             gridGap={SPACING.spacing8}
             padding="0px 16px"
+            flexDirection="column"
           >
             {analysis?.errors.map(error => (
               <Flex
                 key={error.id}
-                flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 width="100%"
-                backgroundColor={COLORS.red30}
-                color={COLORS.red60}
+                backgroundColor={COLORS.red20}
                 borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
+                alignItems="center"
                 css={css`
                   transition: background-color 500ms ease-out,
                     border-color 500ms ease-out;
                 `}
-                cursor="pointer"
               >
+                <Icon name="ot-alert" size="16px" color={COLORS.red60} />
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {error.detail}
                 </StyledText>
               </Flex>
             ))}
+            <Flex
+              key="final_command"
+              width="100%"
+              backgroundColor={COLORS.grey20}
+              borderRadius={BORDERS.borderRadius4}
+              padding={SPACING.spacing8}
+              css={css`
+                transition: background-color 500ms ease-out,
+                  border-color 500ms ease-out;
+              `}
+            >
+              <StyledText desktopStyle="bodyDefaultRegular">
+                Unable to show steps past errors
+              </StyledText>
+            </Flex>
           </Flex>
         ) : null}
       </Flex>

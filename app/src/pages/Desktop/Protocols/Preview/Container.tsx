@@ -108,7 +108,7 @@ export function Container(props: ContainerProps): JSX.Element {
       }
     }
   }, [isThermocyclerAttached, selectedSlot])
-
+console.log(selectedRunTimeCommand)
   return (
     <>
       <Controls

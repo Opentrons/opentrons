@@ -131,10 +131,11 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   )
 }
 
-// follow active step in viewport when it is playing
 // update layout of labware + well details
 // update the back and end icons near the play.pause button
 // how does the layout look when there are steps not in a group?
 // update the copy on the labware when they are active for the step
+// do we have assets of aspirating/dispensing into a well?
 // add hover state to the deck slots
 // add the error state??? I think we only show the run log up to the error when the error is a syntax error in the code and not if there is a comand failure
+// fix the color to show multiple liquids in the same well
