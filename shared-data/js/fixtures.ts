@@ -991,64 +991,9 @@ export const getSingleSlotIdWithFakesFromVSId = (
     case 'VSD4':
       return 'fakeD4'
     default:
-      console.error(`could not find a match for VS${vsId}`)
+      console.error(`could not find a match for VS:${vsId}`)
       return null
   }
-}
-
-export const AA_TO_AA_SLOT: Record<string, AddressableAreaNamesWithFakes> = {
-  D4: 'fakeD4',
-  C4: 'fakeC4',
-  B4: 'fakeB4',
-  A4: 'fakeA4',
-  flexStackerModuleV1D4: 'fakeD4',
-  flexStackerModuleV1C4: 'fakeC4',
-  flexStackerModuleV1B4: 'fakeB4',
-  flexStackerModuleV1A4: 'fakeA4',
-  magneticBlockV1A3: 'A3',
-  magneticBlockV1B3: 'B3',
-  magneticBlockV1C3: 'C3',
-  magneticBlockV1D3: 'D3',
-  magneticBlockV1D2: 'D2',
-  magneticBlockV1C2: 'C2',
-  magneticBlockV1B2: 'B2',
-  magneticBlockV1A2: 'A2',
-  magneticBlockV1D1: 'D1',
-  magneticBlockV1C1: 'C1',
-  magneticBlockV1B1: 'B1',
-  magneticBlockV1A1: 'A1',
-  '1ChannelWasteChute': 'D3',
-  '8ChannelWasteChute': 'D3',
-  '96ChannelWasteChute': 'D3',
-  gripperWasteChute: 'D3',
-  temperatureModuleV2D3: 'D3',
-  temperatureModuleV2C3: 'C3',
-  temperatureModuleV2B3: 'B3',
-  temperatureModuleV2A3: 'A3',
-  temperatureModuleV2D2: 'D2',
-  temperatureModuleV2C2: 'C2',
-  temperatureModuleV2B2: 'B2',
-  temperatureModuleV2A2: 'A2',
-  temperatureModuleV2D1: 'D1',
-  temperatureModuleV2C1: 'C1',
-  temperatureModuleV2B1: 'B1',
-  temperatureModuleV2A1: 'A1',
-  heaterShakerV1D3: 'D3',
-  heaterShakerV1C3: 'C3',
-  heaterShakerV1B3: 'B3',
-  heaterShakerV1A3: 'A3',
-  heaterShakerV1D1: 'D1',
-  heaterShakerV1C1: 'C1',
-  heaterShakerV1B1: 'B1',
-  heaterShakerV1A1: 'A1',
-  movableTrashD3: 'D3',
-  movableTrashC3: 'C3',
-  movableTrashB3: 'B3',
-  movableTrashA3: 'A3',
-  movableTrashD1: 'D1',
-  movableTrashC1: 'C1',
-  movableTrashB1: 'B1',
-  movableTrashA1: 'A1',
 }
 
 export const isAddressableAreaStandardSlot = (
@@ -1115,9 +1060,7 @@ export const getMainAAForAFixture = (
       console.log('addressableAreaId: ', addressableAreaId)
       console.log('aa: ', aa)
       const vsId = getVisualSlotIdFromAAId(aa)
-      console.log('vsId: ', vsId)
       const singleSlotId = getSingleSlotIdWithFakesFromVSId(vsId)
-      console.log('singleSlotId: ', singleSlotId)
       return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
@@ -1128,7 +1071,7 @@ export const getVisualSlotIdForAA = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   addressableAreaId: AddressableAreaNamesWithFakes
-): AddressableAreaNamesWithFakes => {
+): string => {
   const addressableAreasByFIxtureId = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
@@ -1136,7 +1079,7 @@ export const getVisualSlotIdForAA = (
   const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
   const aaMatchInDef = aaListForFixtureId.find(aa => aa === addressableAreaId)
   return aaMatchInDef
-    ? getSingleSlotIdWithFakesFromVSId(getVisualSlotIdFromAAId(aaMatchInDef)) ?? (addressableAreaId as AddressableAreaNamesWithFakes)
+    ? getVisualSlotIdFromAAId(aaMatchInDef)
     : (addressableAreaId as AddressableAreaNamesWithFakes)
 }
 
@@ -1249,13 +1192,13 @@ export const replaceCutoutFixtureRemove = (
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
   } else {
-    const updated = aaForCutoutAndFixture?.map(aa =>
-      aa === addressableAreaId
-        ? getSingleSlotIdWithFakesFromVSId(
-            getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-          )
+    const updated = aaForCutoutAndFixture?.map(aa => {
+      const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
+      console.log('vsId: ', vsId)
+      return aa === addressableAreaId
+        ? getSingleSlotIdWithFakesFromVSId(vsId)
         : aa
-    )
+    })
     console.log('updated: ', updated)
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(
