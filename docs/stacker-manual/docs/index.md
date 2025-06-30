@@ -1,16 +1,12 @@
-<a href="https://opentrons.com/">
-  <img src="../images/tm-opentrons-flex.png" alt="flex-tm" style="width:70%">
-</a>
+[![opentrons logo](images/tm-opentrons-flex.png)](https://opentrons.com/)
 
 # Stacker Module GEN1 Instruction Manual
 
-<figure class="general">
-  <img src="/images/stacker-hero-cover.png" alt="flex-stacker-hero">
-  <figcaption>
-    <strong><a href="https://opentrons.com/">Opentrons Labworks Inc</a></strong><br>
-    August 2025
-  </figcaption>
-</figure>
+![stacker hero image](images/stacker-hero.png)
+
+<div class="centered-text">
+    <strong><a href="https://opentrons.com/">Opentrons Labworks Inc</a></strong><br>August 2025
+</div>
 
 ## Product Description
 

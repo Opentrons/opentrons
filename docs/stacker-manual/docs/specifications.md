@@ -18,21 +18,21 @@ The User Kit is packaged separately from the Stacker and ships with its own set 
 
 <table>
     <tr>
-        <td><b>Tower and track dimensions</b></td>
+        <th><strong>Tower and track dimensions</strong></th>
         <td>385.5 mm L x 106 mm W x 955.5 mm H (~15” L x 4” W x 37” H)</td>
     </tr>
     <tr>
-        <td><b>Tower dimensions</b></td>
-        <td><p>194.5 mm L x 106 mm W x 955.5 mm H
-(~8” L x 4” W x 37” H)</p><p>Measurements are taken from the base of the tower and exclude the track.</p></td>
+        <th><strong>Tower dimensions</strong></th>
+        <td>194.5 mm L x 106 mm W x 955.5 mm H
+(~8” L x 4” W x 37” H). Measurements are taken from the base of the tower and exclude the track.</p></td>
     </tr>
     <tr>
-        <td><b>Side clearance</b></td>
+        <th><strong>Side clearance</strong></th>
         <td>When attached, this module extends approximately 20 cm (8”) from the side of the robot. You’ll also need additional clearance for the Stacker’s loading door, which requires slightly more space to open fully and to allow for easy labware loading.</td>
     </tr>
     <tr>
-        <td><b>Weight</b></td>
-        <td><p>13.6 kg (~30 lbs)</p><p>Installation may require the assistance of a lab partner.</p></td>
+        <th><strong>Weight</strong></th>
+        <td>13.6 kg (~30 lbs). Installation may require the assistance of a lab partner.</p></td>
     </tr>
 </table>
 
@@ -47,7 +47,7 @@ The following table lists the environmental conditions for recommended use, acce
 | Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
 | Pollution degree | 2 or lower | 2 or lower | 2 or lower |
 
-!!!info "Pollution Degree"
+!!!info "Info: Pollution Degree"
     Pollution degree is a measure of the contaminants that could occur in the environment around and within this module. The Stacker is designed for indoor use in dry locations with a pollution degree of 2 or lower where only dry, non-conductive pollution is present and only temporary condensation occurs.
 
 ## LED Status Lights

@@ -4,7 +4,7 @@
   --md-primary-fg-color: #006CFA; /* Header and footer color */
   --md-accent-fg-color: #F09D20; /* Accent color */
   /* Creates a dot for stacker color statuses */
-  --my-dot-size: 24px;
+  --status-dot-size: 24px;
 }
 
 .md-header {
@@ -20,8 +20,8 @@
 }
 /* stacker status light colors */
 .status-dot {
-  height: var(--my-dot-size);
-  width: var(--my-dot-size);
+  height: var(--status-dot-size);
+  width: var(--status-dot-size);
   border-radius: 50%;
   display: inline-block;
   vertical-align: middle;
@@ -51,19 +51,22 @@
   background-color: #F09D20;
  }
 
-.center-image {
-    display: block; /* Make the image a block-level element */
-    margin-left: auto; /* Push it to the center horizontally */
-    margin-right: auto; /* Push it to the center horizontally */
+.centered-text {
+  text-align: center;
 }
 
-figure.general > figcaption {
-    font-style: normal; /* override italics */
+.img-medium {
+    width: 70%;
+    height: auto; 
 }
 
-/* A class for controlling text length, mainly for back-matter */
+/* Controls text length for back-matter */
 .caption-text-block {
-  max-width: 35em; /* Adjust this value to get the length you want */
+  max-width: 35em; /* Adjust length */
+}
+
+figcaption {
+  font-style: normal; /* This will explicitly set the font style to normal for figcaption */
 }
 
 /* A specific class for the final figure on a page */

@@ -10,7 +10,7 @@ Once attached, the Stacker becomes part of column 4, like a [staging area slot](
 
 After your Stacker is attached to the deck and powered on, instructions and animated images on the touchscreen take you through a guided setup.
 
-<img src="/images/touchscreen-map.png" alt="deck map" class="center-image">
+![touchscreen deck map](images/touchscreen-map.png)
 
 Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](postinstall.md).
 
@@ -18,17 +18,17 @@ Because you can install a Stacker anywhere in column 4, and connect it to any po
 
 Each Stacker ships with its own deck plate adapter. The adapter secures the Stacker to the deck of your robot.
 
-<img src="/images/deck-plate-adapter.png" alt="serial number" class="center-image" style="width:60%;">
+![deck plate adapter](images/deck-plate-adapter.png){: .img-medium }
 
 A separate Waste Chute Adapter (shown below) allows you to install the Stacker and the [Waste Chute](https://opentrons.com/products/opentrons-flex-waste-chute-gen1) in adjacent slots (D3 and D4).
 
-<img src="/images/waste-chute-adapter.png" alt="serial number" class="center-image" style="width:60%;">
+![waste chute adapter](images/waste-chute-adapter.png){: .img-medium }
 
 ## Power and Data Hub
 
 This external component provides power to the Stacker and bidirectional data connectivity between each attached Stacker and your Flex.
 
-<img src="/images/power-hub.png" alt="power supply" class="center-image" style="width:60%;">
+![power data hub](images/power-hub.png){: .img-medium }
 
 All the module's power and data cables route through the hub, which can support up to four Stackers on the same robot. The on/off switch on the hub controls power to all connected Stackers. The four labeled ports (S-1 through S-4) help you identify each Stacker's deck location during setup.
 

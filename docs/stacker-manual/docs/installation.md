@@ -23,14 +23,14 @@ The Stacker attaches to the right side of your robot and requires a replacement 
     !!!tip
         Hand tighten the screws until the window panels are reasonably secure. This is not a trial of strength. Excessive torque may damage the screws.
 
-    <img src="/images/window-attach-detail.png" alt="panel attachment detail" class="center-image" style="width:60%;">
+    ![attaching window panel](images/window-attach-detail.png){: .img-medium }
 
     !!!Note
         A properly attached panel fits flush and square to the robot's frame, without gaps or misalignment. This helps ensure a good connection between the safety interlock pins on panel and Flex.
 
 1. <div id="identify-access-panels" markdown> After attaching the replacement window, identify the four, smaller access panels on the window. Select the panel that matches the deck slot where you will attach the Stacker.</div>
 
-    <img src="/images/access-panel.png" alt="access panel" class="center-image" style="width:65%;">
+    ![removing access panel](images/access-panel.png){: .img-medium }
 
 1. Remove the 2 screws from your selected access panel and detach it. Save the screws and panel for future use.
 
@@ -47,18 +47,18 @@ To install the deck adapter and attach the Stacker:
 
 1. Replace the deck plate with the Stacker's deck slot adapter and screw it in place. You can re-use the original deck plate screws or the screws that ship in the User Kit.
 
-    <img src="/images/deck-plate-attaching.png" alt="attaching deck plate" class="center-image" style="width:60%;">
+    ![attaching deck plate](images/deck-plate-attaching.png){: .img-medium }
 
     !!!note
         Use the Waste Chute adapter if you want to use the Waste Chute and Stacker in adjacent slots (D3 and D4).
 
 1. Insert the Stacker through the access panel opening and lower it onto the adapter plate alignment pins. The module should be flush against the adapter plate when properly installed.
 
-    <img src="/images/stacker-attach-detail.png" alt="stacker detail" class="center-image" style="width:60%;">
+    ![attaching stacker track](images/stacker-attach-detail.png){: .img-medium }
 
 1. Secure the Stacker in place by fastening the 4 captive screws on the track to the deck slot adapter.
 
-    <img src="/images/fasten-stacker.png" alt="fasten to deck" class="center-image" style="width:60%;">
+    ![tighten stacker screws](images/fasten-stacker.png){: .img-medium }
 
 1. Remove the packing tape from the Stacker door and peel the protective film from the door window.
 

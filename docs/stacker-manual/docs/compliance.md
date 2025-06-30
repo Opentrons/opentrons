@@ -17,7 +17,7 @@ Various labels on the Stacker or in this manual warn you about sources of potent
     </tr>
     <tr>
         <td><img src="/images/iso-warnings/caution.png"></td>
-        <td><b>Warning</b> or <b>Caution</b> alerts users about:
+        <td><strong>Warning</strong> or <strong>Caution</strong> alerts users about:
             <ul>
                 <li>Potentially hazardous conditions.</li>
                 <li>Equipment damage.</li>
@@ -29,11 +29,11 @@ Various labels on the Stacker or in this manual warn you about sources of potent
     </tr>
     <tr>
         <td><img src="/images/iso-warnings/electrical.png"></td>
-        <td><b>Electrical shock</b>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
+        <td><strong>Electrical shock</strong>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
     </tr>
     <tr>
         <td><img src="/images/iso-warnings/heavy-lift.png"></td>
-        <td><b>Heavy object</b>: alerts users about potentially heavy objects that may require 2 people to lift properly.</td>
+        <td><strong>Heavy object</strong>: alerts users about potentially heavy objects that may require 2 people to lift properly.</td>
     </tr>
 </table>
 
@@ -63,22 +63,20 @@ Always observe the following electrical safety warnings.
         <th>Description</th>
     </tr>
     <td><img src="/images/iso-warnings/caution.png"></td>
-    <td><p>Plug the Stacker into a grounded, Class 1 circuit. The module is grounded through the grounding conductor of the power cable.</p>
-    <p>Do not:
+    <td>Plug the Stacker into a grounded, Class 1 circuit. The module is grounded through the grounding conductor of the power cable. Do not:
         <ul>
             <li>Damage, disable, or remove the ground connection on the power cable.</li>
             <li>Replace the AC power cable unless at the direction of Opentrons Support.</li>
         </ul>
-    </p>
     </tr>
     <tr>
         <td><img src="/images/iso-warnings/electrical.png"></td>
-        <td><p>Do not connect (plug in), disconnect (unplug), or use AC power cables if:
+        <td>Do not connect (plug in), disconnect (unplug), or use AC power cables if:
             <ul>
                 <li>The cable is frayed or damaged.</li>
                 <li>Other attached cables, cords, or receptacles are frayed or damaged.</li>
-            </ul></p>
-            <p>Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.</p>
+            </ul>
+            Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.
         </td>
     </tr>
     <tr>
@@ -126,15 +124,21 @@ This product meets the applicable Innovation, Science and Economic Development C
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
 
-#### CISPR 11 Class A
+### CISPR 11 Class A
 
 **Caution**: This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
 
 ### WEEE Policy
 
+[//]: # (leveraging attr_list extension, maintain markdown purity)
+
+<figure markdown="span" style="float: right; width: 10%;">
+    ![WEEE symbol](images/iso-warnings/WEEE.svg)
+</figure>
+
 Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life. 
 
-Opentrons products that fall under the WEEE directive are labeled with the <img src="/images/iso-warnings/WEEE.png" style="vertical-align: middle; height: 1.2em;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+Opentrons products that fall under the WEEE directive are labeled with the ![WEEE symbol](images/iso-warnings/WEEE.svg){: style="vertical-align: middle; height: 1.25em;"} symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
 
 ### Environmental Warning
 
@@ -155,7 +159,7 @@ Flex robots manufactured before September 2025 require an upgrade kit. This kit 
 
 Refer to your robot's serial number to determine if an upgrade kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require the upgrade kit.
 
-<img src="/images/serial-number-cropped2.png" alt="serial number" class="center-image" style="width:40%;">
+![flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
 

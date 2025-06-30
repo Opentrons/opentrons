@@ -20,7 +20,6 @@ Control your liquid handling robot and module using the Opentrons App. Download 
 45-18 Court Square West<br>
 Long Island City, NY 11101
 
-
 <figure class="general figure-end-of-doc">
   <img src="/images/tm-opentrons-full-blackcolor.svg" alt="opentrons-logo">
   <figcaption>

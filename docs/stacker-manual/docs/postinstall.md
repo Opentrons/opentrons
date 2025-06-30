@@ -10,6 +10,6 @@ After attaching and powering on the robot and Stacker, instructions on the touch
 
 During the touchscreen configuration process, Flex will move the track from its storage position inside the Stacker to its home position in column 4. After homing, you can place the shuttle on the track.
 
-<img src="/images/attach-shuttle.png" alt="access panel" style="width:60%;">
+![attaching shuttle](images/attach-shuttle.png){: .img-medium }
 
 To ensure a proper fit, align the pins on the track to corresponding holes on the shuttle. Magnets on the shuttle help hold it in place.
