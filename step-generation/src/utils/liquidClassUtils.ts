@@ -220,10 +220,15 @@ export const getCustomLiquidClassProperties = (
   return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 
-export const getLiquidClassName = (liquidClass: string): string => {
+export const getLiquidClassName = (
+  liquidClass: string,
+  showVersion?: boolean
+): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef = allLiquidClassDefs[liquidClass]
-  return `${liquidClassDef.liquidClassName}_v${liquidClassDef.schemaVersion}`
+  return `${liquidClassDef.liquidClassName}${
+    showVersion ? `_v${liquidClassDef.schemaVersion}` : ''
+  }`
 }
 
 const getBlowoutPythonLocation = (

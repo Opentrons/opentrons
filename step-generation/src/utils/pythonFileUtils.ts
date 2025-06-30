@@ -392,7 +392,8 @@ export function getLoadLiquidClasses(
         return ''
       }
       return `${getLiquidClassName(
-        liquidClass
+        liquidClass,
+        true
       )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
         allLiquidClassDefs[liquidClass].liquidClassName
       )})`
