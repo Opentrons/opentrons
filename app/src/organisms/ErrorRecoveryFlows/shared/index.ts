@@ -24,5 +24,6 @@ export { RecoveryDoorOpenSpecial } from './RecoveryDoorOpenSpecial'
 export { FillWell } from './FillWell'
 export { RetryWithSameTips } from './RetryWithSameTips'
 export { RetryWithNewTips } from './RetryWithNewTips'
+export { RightColumnAnimation } from './RightColumnAnimation'
 
 export type { RecoveryInterventionModalProps } from './RecoveryInterventionModal'
