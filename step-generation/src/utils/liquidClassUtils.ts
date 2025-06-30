@@ -222,13 +222,11 @@ export const getCustomLiquidClassProperties = (
 
 export const getLiquidClassName = (
   liquidClass: string,
-  showVersion?: boolean
+  showBase?: boolean
 ): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef = allLiquidClassDefs[liquidClass]
-  return `${liquidClassDef.liquidClassName}${
-    showVersion ? `_v${liquidClassDef.schemaVersion}` : ''
-  }`
+  return `${liquidClassDef.liquidClassName}${showBase ? `_base_class` : ''}`
 }
 
 const getBlowoutPythonLocation = (
