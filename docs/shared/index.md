@@ -26,7 +26,7 @@ Check out all our cool docs.
 
     [:octicons-arrow-right-24: Flex Stacker](stacker-manual/index.md)
 
--   :material-language-python:{ .xl .middle } __Python Protocol API__
+-   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
 
     ---
 
