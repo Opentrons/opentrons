@@ -2525,7 +2525,12 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "source"
+        )
+    ).then_return([mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map, "destination"
         )
     ).then_return([mock_well])
 
@@ -2862,12 +2867,12 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well, mock_well], mock_nozzle_map, "source"
         )
     ).then_return([mock_well])
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "destination"
         )
     ).then_return([mock_well, mock_well])
 
@@ -3149,14 +3154,14 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well, mock_well], mock_nozzle_map
-        )
-    ).then_return([mock_well])
-    decoy.when(
-        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "source"
         )
     ).then_return([mock_well, mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well, mock_well], mock_nozzle_map, "destination"
+        )
+    ).then_return([mock_well])
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
