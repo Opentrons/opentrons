@@ -30,8 +30,6 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
-    recoveryMap,
-    recoveryCommands,
   } = props
   const {
     RETRY_NEW_TIPS,

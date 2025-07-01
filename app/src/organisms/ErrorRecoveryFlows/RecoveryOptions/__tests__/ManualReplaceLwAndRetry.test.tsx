@@ -1,11 +1,11 @@
-import { act, fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
 
 import { RECOVERY_MAP } from '../../constants'
-import { LeftColumnLabwareInfo } from '../../shared'
 import { ManualReplaceLwAndRetry } from '../ManualReplaceLwAndRetry'
 
 import type { ComponentProps } from 'react'
@@ -102,8 +102,12 @@ describe('ManualReplaceLwAndRetry', () => {
 
 describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   let props: ComponentProps<typeof ManualReplaceLwAndRetry>
+  let mockProceedNextStep: Mock
+  let mockManualRetrieve: Mock
 
   beforeEach(() => {
+    mockProceedNextStep = vi.fn()
+    mockManualRetrieve = vi.fn().mockResolvedValue(undefined)
     props = {
       doorStatusUtils: {
         isDoorOpen: false,
@@ -111,9 +115,11 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
       routeUpdateActions: {
         proceedToRouteAndStep: vi.fn(),
         handleMotionRouting: vi.fn(() => Promise.resolve()),
+        proceedNextStep: mockProceedNextStep,
       },
       recoveryCommands: {
         homeShuttle: vi.fn(() => Promise.resolve()),
+        manualRetrieve: mockManualRetrieve,
       },
       stepCounts: {
         hasRunDiverged: false,
@@ -230,10 +236,20 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
         RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE,
     },
   ])('renders ShuttleLabwareInfo', ({ route, step }) => {
-    it(`renders ShuttleLabwareInfo for ${route} route and ${step} step`, () => {
+    it(`renders ShuttleLabwareInfo for ${route} route and ${step} step`, async () => {
       props.recoveryMap = { route, step }
       const { getByText } = render(props)
       getByText('MOCK_LEFT_COL_LABWARE_INFO')
+
+      const continueBtn = screen.queryAllByText('Continue')[0]
+      fireEvent.click(continueBtn)
+      clickButtonLabeled('Continue')
+      await waitFor(() => {
+        expect(mockManualRetrieve).toHaveBeenCalled()
+      })
+      await waitFor(() => {
+        expect(mockProceedNextStep).toHaveBeenCalled()
+      })
     })
   })
   describe.each([

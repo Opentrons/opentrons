@@ -93,20 +93,6 @@ describe('TwoColLwInfoAndDeck', () => {
     expect(mockProceedNextStep).toHaveBeenCalled()
   })
 
-  it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
-    props.recoveryMap.route = RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
-    render(props)
-    clickButtonLabeled('Continue')
-    await waitFor(() => {
-      expect(mockManualRetrieve).toHaveBeenCalled()
-    })
-    await waitFor(() => {
-      expect(mockProceedNextStep).toHaveBeenCalled()
-    })
-  })
-
   it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
@@ -160,71 +146,6 @@ describe('TwoColLwInfoAndDeck', () => {
         type: 'location',
         bannerText:
           "It's best to replace tips and select the last location used for tip pickup.",
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE}`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Load labware onto labware shuttle',
-        type: 'location',
-        bannerText: null,
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with NOT manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE} with NOT manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
       }),
       expect.anything()
     )
