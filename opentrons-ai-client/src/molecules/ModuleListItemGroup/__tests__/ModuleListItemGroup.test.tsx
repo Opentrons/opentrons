@@ -2,8 +2,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { ModuleListItemGroup } from '../index'
 
 // Define a local type matching the usage in the mock

@@ -19,14 +19,13 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import welcomeImage from '/ai-client/assets/images/welcome_dashboard.png'
 import {
   headerWithMeterAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
-import { useIsMobile } from '../../resources/hooks/useIsMobile'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-
-import welcomeImage from '../../assets/images/welcome_dashboard.png'
+} from '/ai-client/resources/atoms'
+import { useIsMobile } from '/ai-client/resources/hooks/useIsMobile'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 export function Landing(): JSX.Element | null {
   const navigate = useNavigate()

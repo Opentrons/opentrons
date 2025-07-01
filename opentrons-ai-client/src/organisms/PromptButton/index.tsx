@@ -8,7 +8,7 @@ import {
   flexReagentTransfer,
   pcr,
   reagentTransfer,
-} from '../../assets/prompts'
+} from '/ai-client/assets/prompts'
 
 interface PromptButtonProps {
   buttonText: string
