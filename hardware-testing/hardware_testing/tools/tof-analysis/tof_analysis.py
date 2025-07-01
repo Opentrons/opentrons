@@ -516,6 +516,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
     axis_list = args.axes
     stacker_list = args.stackers
     labware_list = args.labwares
+    baseline_version = args.baseline_version
     zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
     zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
     bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
@@ -579,12 +580,15 @@ def generate_baseline(args: argparse.Namespace) -> None:
             definition = json.load(file)
             unique_module_data = definition.get("uniqueModuleData", {})
             tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
+            baseline_version = baseline_version or tof_sensor_baseline.get("version", 1)
             x_baseline = baseline_x or tof_sensor_baseline.get("X", "{}")
             z_baseline = baseline_z or tof_sensor_baseline.get("Z", "{}")
+
             definition.update(
                 {
                     "uniqueModuleData": {
                         "TOFSensorBaseline": {
+                            "version": baseline_version,
                             "X": str(x_baseline),
                             "Z": str(z_baseline),
                         }
@@ -595,7 +599,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             file.seek(0)
             json.dump(definition, file, indent=2)
 
-    print(f"\n--------------- GENERATED BASELINES FROM {samples} Samples ---------------\n")
+    print(f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {samples} Samples ---------------\n")
     print(
         "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
     )
@@ -678,6 +682,11 @@ if __name__ == "__main__":
         help="The path to the generated baseline JSON file for plotting and validating labware.",
     )
     parser.add_argument(
+        "--baseline-version",
+        help="The version of the baseline to generate",
+        type=int,
+    )
+    parser.add_argument(
         "--std",
         help="Standard devition to use when creating a baseline.",
         type=int,
@@ -733,5 +742,6 @@ if __name__ == "__main__":
         type=int,
         default=DEFAULT_MAX_SAMPLES,
     )
+
     args = parser.parse_args()
     main(args)
