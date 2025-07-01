@@ -1,6 +1,7 @@
 {
-  "96_channel_1000ul_pipette_label": "96-Channel 1000uL pipette",
-  "96_channel_1000ul_pipette": "96-Channel 1000uL pipette",
+  "96_channel_pipette_label": "96-Channel pipette",
+  "96_channel_1000ul": "96-Channel 1000uL",
+  "96_channel_low_volume": "96-Channel Low Volume",
   "absorbance_plate_reader_module_v1": "Absorbance Plate Reader Module GEN1",
   "adapter": "Adapter",
   "add_individual_step": "Add individual steps",
@@ -73,7 +74,7 @@
   "pcr": "PCR",
   "pd_prompt_warning": "Not all prompts will be possible to output to Protocol Designer. If OpentronsAI produces errors, you can correct them in OpentronsAI chat.",
   "pd_protocol": "Protocol Designer protocol",
-  "pipette_mounts": "Pipette mount(s)",
+  "pipette_mounts": "Pipette",
   "protocol_format_title": "Protocol Format",
   "protocol_format": "What file format should OpentronsAI use to generate the protocol?",
   "python_protocol": "Python protocol",
