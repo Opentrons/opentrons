@@ -15,6 +15,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
 import { DeckView } from './DeckView'
+import styles from './preview.module.css'
 import { SlotDetails } from './SlotDetails'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
@@ -117,7 +118,7 @@ export function Container(props: ContainerProps): JSX.Element {
         isPlaying={isPlaying}
         commands={commands}
       />
-      <div style={{ display: 'flex', height: '75.5vh' }}>
+      <div className={styles.preview_container}>
         <DeckView
           invariantContext={invariantContext}
           robotState={robotState}

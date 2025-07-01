@@ -23,21 +23,8 @@ export function ModuleSlotDetails(props: ModuleSlotDetailsProps): JSX.Element {
   switch (moduleState.type) {
     case THERMOCYCLER_MODULE_TYPE: {
       moduleDetails = (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            gridGap: '4px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingLeft: '16px',
-            }}
-          >
+        <div className={styles.module_details_status_container}>
+          <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               Block temp status
             </StyledText>
@@ -52,13 +39,7 @@ export function ModuleSlotDetails(props: ModuleSlotDetailsProps): JSX.Element {
               }
             />
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingLeft: '16px',
-            }}
-          >
+          <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               Lid temp status
             </StyledText>
@@ -73,13 +54,7 @@ export function ModuleSlotDetails(props: ModuleSlotDetailsProps): JSX.Element {
               }
             />
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingLeft: '16px',
-            }}
-          >
+          <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               Lid status
             </StyledText>
@@ -99,8 +74,8 @@ export function ModuleSlotDetails(props: ModuleSlotDetailsProps): JSX.Element {
 
   return (
     <>
-      <div className={styles.detailContainer}>
-        <div className={styles.slotDetailsActiveStep}>
+      <div className={styles.detail_container}>
+        <div className={styles.slot_details_active_step}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {moduleName}
           </StyledText>

@@ -1,10 +1,10 @@
 import {
-  COLORS,
   Divider,
   LabwareRender,
   LiquidIcon,
   RobotWorkSpace,
   StyledText,
+  Tag,
 } from '@opentrons/components'
 import { wellFillFromWellContents } from '@opentrons/step-generation'
 
@@ -85,7 +85,7 @@ export function LabwareSlotDetails(
   return (
     <>
       <div>
-        <div className={styles.slotDetailsActiveStep}>
+        <div className={styles.slot_details_active_step}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {labwareNickname != null ? labwareNickname : labwareDisplayName}
           </StyledText>
@@ -95,34 +95,26 @@ export function LabwareSlotDetails(
             </StyledText>
           ) : null}
         </div>
-        <div style={{ padding: '0 16px 16px 16px' }}>
-          {liquidInfo.map((liquid, index) => {
-            return (
-              <div
-                key={`${liquid.displayName}_liquid_${index}`}
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  justifyContent: 'space-betweem',
-                }}
-              >
-                <LiquidIcon color={liquid.color} />
-                <StyledText desktopStyle="captionRegular">{`${liquid.totalVolume}uL`}</StyledText>
-                <StyledText desktopStyle="captionRegular">
-                  {liquid.displayName}
-                </StyledText>
-              </div>
-            )
-          })}
-          <div
-            style={{
-              justifyContent: 'center',
-              display: 'flex',
-              backgroundColor: COLORS.grey20,
-              padding: '16px',
-              borderRadius: '4px',
-            }}
-          >
+        <div className={styles.labware_details_all_liquids_container}>
+          <div className={styles.labware_details_all_liquids}>
+            {liquidInfo.map((liquid, index) => {
+              return (
+                <div
+                  key={`${liquid.displayName}_liquid_${index}`}
+                  className={styles.labware_details_liquid_info_container}
+                >
+                  <div className={styles.labware_details_liquid_info}>
+                    <LiquidIcon color={liquid.color} />
+                    <StyledText desktopStyle="captionRegular">
+                      {liquid.displayName}
+                    </StyledText>
+                  </div>
+                  <Tag text={`${liquid.totalVolume} µL`} type="default" />
+                </div>
+              )
+            })}
+          </div>
+          <div className={styles.labware_details_labware_display}>
             <RobotWorkSpace
               key={topLabwareOnSlotId}
               width="14rem"
@@ -145,22 +137,13 @@ export function LabwareSlotDetails(
       <Divider />
       {activeWellName != null ? (
         <>
-          <div className={styles.slotDetailsActiveStep}>
+          <div className={styles.slot_details_active_step}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {`Well ${activeWellName}`}
             </StyledText>
           </div>
-          <div style={{ padding: '0 16px 16px 16px' }}>
-            <div
-              style={{
-                justifyContent: 'center',
-                display: 'flex',
-                backgroundColor: COLORS.grey20,
-                padding: '16px',
-                borderRadius: '4px',
-                flexDirection: 'column',
-              }}
-            >
+          <div className={styles.labware_details_padding}>
+            <div className={styles.labware_details_container}>
               <div> {currentCommand.commandType}</div>
               <div> {'speed' in params ? `speed: ${params.speed}` : null}</div>
               <div>
@@ -176,7 +159,6 @@ export function LabwareSlotDetails(
               </div>
             </div>
           </div>
-
           <Divider />
         </>
       ) : null}

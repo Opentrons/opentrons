@@ -2,7 +2,7 @@
   padding: 16px;
 }
 
-.headingText {
+.heading_text {
   font-family: Public Sans;
   font-weight: 700;
   font-size: 26px;
@@ -10,7 +10,7 @@
   letter-spacing: 0px;
 }
 
-.playButton {
+.play_button {
   width: 60px;
   height: 60px;
   border-radius: 200px;
@@ -18,12 +18,12 @@
   cursor: pointer;
 }
 
-.playButton:active,
-.playButton:hover {
+.play_button:active,
+.play_button:hover {
   background-color: #004196;
 }
 
-.fastButton {
+.fast_button {
   width: 48px;
   height: 48px;
   border-radius: 200px;
@@ -31,8 +31,8 @@
   cursor: pointer;
 }
 
-.fastButton:active,
-.fastButton:hover {
+.fast_button:active,
+.fast_button:hover {
   background-color: #a9cefd;
 }
 
@@ -42,30 +42,30 @@
   align-items: center;
 }
 
-.controlsInfo {
+.controls_info {
   display: flex;
   flex-direction: column;
   grid-gap: 16px;
 }
 
-.allControlsInfo {
+.all_controls_info {
   padding: 20px;
   display: flex;
   justify-content: space-between;
 }
 
-.controlsContainer {
+.controls_container {
   padding: 16px;
   background-color: white;
   width: 100%;
   border-radius: 8px;
 }
 
-.maxContent {
+.max_content {
   width: max-content;
 }
 
-.rangeInput {
+.range_input {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
@@ -75,7 +75,7 @@
   cursor: pointer;
 }
 
-.rangeInput::-webkit-slider-runnable-track {
+.range_input::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
   background: linear-gradient(
@@ -88,7 +88,7 @@
 }
 
 /* Hide thumb initially */
-.rangeInput::-webkit-slider-thumb {
+.range_input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 12px;
@@ -101,13 +101,13 @@
 }
 
 /* Show thumb on hover/focus */
-.rangeInput:hover::-webkit-slider-thumb,
-.rangeInput:focus::-webkit-slider-thumb,
-.rangeInput:active::-webkit-slider-thumb {
+.range_input:hover::-webkit-slider-thumb,
+.range_input:focus::-webkit-slider-thumb,
+.range_input:active::-webkit-slider-thumb {
   opacity: 1;
 }
 
-.deckViewContainer {
+.deck_view_container {
   width: 500px;
   height: 100%;
   padding: 28px 32px;
@@ -116,29 +116,48 @@
   background-color: white;
 }
 
-.detailContainer {
+.detail_container {
   padding-right: 16px;
   padding-bottom: 16px;
 }
 
-.commandStep {
+.command_step {
   background-color: white;
   border-radius: 8px;
-  height: 75.5vh;
+  height: 70vh;
 }
 
-.commandStepHeader {
+.command_step_header {
   display: flex;
   justify-content: space-between;
   padding: 16px;
 }
 
-.commandStepGroups {
+.command_step_groups {
   overflow-y: scroll;
-  height: 67vh;
+  height: 62vh;
 }
 
-.slotDetailsActiveStep {
+.preview_container {
+  display: flex;
+  height: 70vh;
+}
+
+.deck_view_padding {
+  padding: 0px 16px;
+}
+
+.align_deck_modules {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.module_copy {
+  margin-bottom: 6rem;
+}
+
+.slot_details_active_step {
   padding: 0px 16px 16px 16px;
   grid-gap: 8px;
   display: flex;
@@ -149,4 +168,81 @@
   border-radius: 4px;
   background-color: #f4def7;
   padding: 8px;
+}
+
+.loading_icon {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.slot_detail_header {
+  display: flex;
+  grid-gap: 4px;
+  align-items: center;
+}
+
+.cursor_pointer {
+  cursor: pointer;
+}
+
+.module_details_status {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 16px;
+}
+
+.module_details_status_container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  grid-gap: 4px;
+}
+
+.labware_details_labware_display {
+  justify-content: center;
+  display: flex;
+  background-color: #e9e9e9;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.labware_details_liquid_info {
+  display: flex;
+  grid-gap: 8px;
+  align-items: center;
+}
+
+.labware_details_liquid_info_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.labware_details_all_liquids {
+  grid-gap: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.labware_details_all_liquids_container {
+  grid-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 16px 16px;
+}
+
+.labware_details_padding {
+  padding: 0 16px 16px 16px;
+}
+
+.labware_details_container {
+  justify-content: center;
+  display: flex;
+  background-color: #e9e9e9;
+  padding: 16px;
+  border-radius: 4px;
+  flex-direction: column;
 }

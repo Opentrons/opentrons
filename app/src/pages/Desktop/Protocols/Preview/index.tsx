@@ -11,6 +11,7 @@ import {
 } from '/app/redux/protocol-storage'
 
 import { Container } from './Container'
+import styles from './preview.module.css'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
@@ -38,15 +39,7 @@ export function Preview(): JSX.Element {
       srcFileNames={storedProtocol.srcFileNames}
     />
   ) : (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        display: 'flex',
-      }}
-    >
+    <div className={styles.loading_icon}>
       <Icon size="8rem" name="ot-spinner" spin color={COLORS.blue50} />
     </div>
   )

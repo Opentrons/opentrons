@@ -30,11 +30,11 @@ export function Controls(props: ControlsProps): JSX.Element {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.controlsContainer}>
-          <div className={styles.allControlsInfo}>
-            <div className={styles.controlsInfo}>
-              <div className={styles.headingText}>{protocolName}</div>
-              <div className={styles.maxContent}>
+        <div className={styles.controls_container}>
+          <div className={styles.all_controls_info}>
+            <div className={styles.controls_info}>
+              <div className={styles.heading_text}>{protocolName}</div>
+              <div className={styles.max_content}>
                 {numErrors === 0 ? (
                   <Chip type="success" chipSize="small" text="No errors" />
                 ) : (
@@ -44,7 +44,7 @@ export function Controls(props: ControlsProps): JSX.Element {
             </div>
             <div className={styles.buttons}>
               <button
-                className={styles.fastButton}
+                className={styles.fast_button}
                 onClick={() => {
                   setSelectedCommand(commands[0].id)
                 }}
@@ -56,7 +56,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                   color="#006cfa"
                 />
               </button>
-              <button className={styles.playButton} onClick={handlePlayPause}>
+              <button className={styles.play_button} onClick={handlePlayPause}>
                 <Icon
                   name={isPlaying ? 'pause' : 'play-icon'}
                   width="21px"
@@ -65,7 +65,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                 />
               </button>
               <button
-                className={styles.fastButton}
+                className={styles.fast_button}
                 onClick={() => {
                   setSelectedCommand(commands[commands.length - 1].id)
                 }}
@@ -85,7 +85,7 @@ export function Controls(props: ControlsProps): JSX.Element {
           min={1}
           max={numCommandLength}
           value={currentCommandIndex + 1}
-          className={styles.rangeInput}
+          className={styles.range_input}
           style={{
             '--progress': `${
               ((currentCommandIndex + 1) / numCommandLength) * 100

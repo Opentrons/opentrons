@@ -75,8 +75,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
   return (
-    <div style={{ padding: '0px 16px' }}>
-      <div className={styles.deckViewContainer}>
+    <div className={styles.deck_view_padding}>
+      <div className={styles.deck_view_container}>
         <StyledText desktopStyle="bodyLargeSemiBold">Deck View</StyledText>
         <RobotCoordinateSpaceWithRef
           height="100%"

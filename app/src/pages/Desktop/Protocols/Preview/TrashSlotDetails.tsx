@@ -16,8 +16,8 @@ export function TrashSlotDetails(props: TrashSlotDetailsProps): JSX.Element {
 
   return (
     <>
-      <div className={styles.detailContainer}>
-        <div className={styles.slotDetailsActiveStep}>
+      <div className={styles.detail_container}>
+        <div className={styles.slot_details_active_step}>
           <StyledText desktopStyle="bodyDefaultSemiBold">{header}</StyledText>
         </div>
       </div>

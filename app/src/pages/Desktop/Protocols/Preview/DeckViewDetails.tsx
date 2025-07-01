@@ -18,6 +18,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DeckViewOverlay } from './DeckViewOverlay'
+import styles from './preview.module.css'
 import {
   getBackgroundColor,
   getSlotIdsBlockedBySpanningForThermocycler,
@@ -126,15 +127,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               setSelectedSlot={setSelectedSlot}
               setHoveredSlot={setHoveredSlot}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
+              <div className={styles.align_deck_modules}>
                 {moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE ? (
-                  <div style={{ marginBottom: '6rem' }}>
+                  <div className={styles.module_copy}>
                     <StyledText desktopStyle="bodyLargeRegular" color="white">
                       {isStepAssosciatedWithModule
                         ? 'Thermocycler changing state'

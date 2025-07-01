@@ -27,9 +27,9 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
       ? (currentCommandIndex / commandLength) * 100
       : 0
   return (
-    <div className={styles.detailContainer}>
-      <div className={styles.commandStep}>
-        <div className={styles.commandStepHeader}>
+    <div className={styles.detail_container}>
+      <div className={styles.command_step}>
+        <div className={styles.command_step_header}>
           <StyledText desktopStyle="bodyDefaultRegular">Timeline</StyledText>
           <StyledText
             desktopStyle="bodyDefaultRegular"
@@ -37,7 +37,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
           >{`${percentComplete.toFixed(0)}% complete`}</StyledText>
         </div>
         <Divider />
-        <div className={styles.commandStepGroups}>
+        <div className={styles.command_step_groups}>
           <AnnotatedSteps
             currentCommandIndex={currentCommandIndex}
             analysis={analysis}
