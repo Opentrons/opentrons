@@ -1,13 +1,12 @@
-import { useRef, useEffect } from 'react'
 import { createAuthorization, createRegistration } from '@opentrons/api-client'
-import { useHost } from '../api'
-
 import type {
-  HostConfig,
   AuthorizationToken,
   CreateRegistrationParams,
+  HostConfig,
   RegistrationToken,
 } from '@opentrons/api-client'
+import { useEffect, useRef } from 'react'
+import { useHost } from '../api'
 
 interface UseAuthorizationResult {
   authorizationToken: AuthorizationToken | null
@@ -23,7 +22,10 @@ export function useAuthorization(
   const authorizationToken = useRef<AuthorizationToken | null>(null)
 
   useEffect(() => {
-    createRegistration(host as HostConfig, createRegistrationParams)
+    if (host == null) {
+      return
+    }
+    createRegistration(host, createRegistrationParams)
       .then(response => {
         registrationToken.current = response.data
         return createAuthorization(host as HostConfig, response.data)
@@ -31,8 +33,7 @@ export function useAuthorization(
       .then(response => {
         authorizationToken.current = response.data
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [host])
 
   return {
     authorizationToken: authorizationToken.current,
