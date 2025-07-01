@@ -152,7 +152,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_str(
         display_name="tips",
         variable_name="tips",
-        default=_racks[0],
+        default=_racks[2],
         choices=[
             {"display_name": r.replace("opentrons_flex_96_", ""), "value": r}
             for r in _racks
@@ -654,9 +654,16 @@ def run(ctx: ProtocolContext) -> None:
                     test_class, ul, list_of_the_same_src_well, dst_wells_organized, new_tip="always"
                 )
             else:
+                dst_well_names = [w.well_name for w in dst_wells_organized]
+                print(f"distributing {ul / 4} uL to wells:")
+                print(" ".join(dst_well_names))
+                print("current volume (before):")
+                print(" ".join(str(w.current_liquid_volume()) for w in dst_wells_organized))
                 test_pip.distribute_with_liquid_class(
-                    test_class, ul, src_well, dst_wells_organized, new_tip="always"
+                    test_class, ul / 4, src_well, dst_wells_organized, new_tip="always"
                 )
+                print("new volume (after):")
+                input(" ".join(str(w.current_liquid_volume()) for w in dst_wells_organized))
 
         try:
             _transfer()
@@ -702,6 +709,7 @@ def run(ctx: ProtocolContext) -> None:
         pip_for_dil.drop_tip()
         _on_plate_done()
 
+    # DISPLAY RESULTS
     with open(results_filepath, "r") as _f:
         for line in _f.readlines():
             ctx.comment(line.strip())
