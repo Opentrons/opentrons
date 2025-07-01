@@ -2,7 +2,7 @@
 
 Usage:
 
-    python3 tof_tools.py <action> [options]
+    python3 tof_analysis.py <action> [options]
 
 """
 
@@ -11,7 +11,7 @@ from collections import defaultdict
 from enum import Enum
 import json
 import sys
-from typing import, Dict, List, Optional
+from typing import Dict, List, Optional
 import pandas as pd
 import statistics
 import os
@@ -27,7 +27,7 @@ baseline_stacker = "baseline_stack_{axis}.json"
 baseline_sensor = "baseline_sensor_{axis}.json"
 
 global options
-option = ["Make Baseline", "Validate Labware", "Validation Checks", "Plot"]
+options = ["Make Baseline", "Validate Labware", "Validation Checks", "Plot"]
 
 CHUNK_SIZE = 100
 NUMBER_OF_ZONES = 10
@@ -556,8 +556,8 @@ def generate_baseline(args: argparse.Namespace) -> None:
     baseline_z = create_baseline(dict(data["z"]), zone_count, bin_count, deviation)
 
     # print or save to json file
+    # given the
     print(baseline_x)
-    print(baseline_z)
 
 
 def main(args: argparse.Namespace):
