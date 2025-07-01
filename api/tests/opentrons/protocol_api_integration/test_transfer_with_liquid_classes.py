@@ -1488,7 +1488,10 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
                 volume=400,
-                dest=(Location(Point(), arma_plate.rows()[0][0]), arma_plate.rows()[0][0]._core),
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][0]),
+                    arma_plate.rows()[0][0]._core,
+                ),
                 source=mock.ANY,
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,
@@ -1505,7 +1508,10 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
                 volume=400,
-                dest=(Location(Point(), arma_plate.rows()[0][1]), arma_plate.rows()[0][1]._core),
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][1]),
+                    arma_plate.rows()[0][1]._core,
+                ),
                 source=mock.ANY,
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,
@@ -1532,12 +1538,17 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
                 volume=400,
-                dest=(Location(Point(), arma_plate.rows()[0][2]), arma_plate.rows()[0][2]._core),
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][2]),
+                    arma_plate.rows()[0][2]._core,
+                ),
                 source=mock.ANY,
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,
                 tip_contents=[
-                    LiquidAndAirGapPair(liquid=800 + expected_disposal_volume, air_gap=0)
+                    LiquidAndAirGapPair(
+                        liquid=800 + expected_disposal_volume, air_gap=0
+                    )
                 ],
                 add_final_air_gap=True,
                 trash_location=mock.ANY,
@@ -1547,12 +1558,17 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
                 volume=400,
-                dest=(Location(Point(), arma_plate.rows()[0][3]), arma_plate.rows()[0][3]._core),
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][3]),
+                    arma_plate.rows()[0][3]._core,
+                ),
                 source=mock.ANY,
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,
                 tip_contents=[
-                    LiquidAndAirGapPair(liquid=400 + expected_disposal_volume, air_gap=0)
+                    LiquidAndAirGapPair(
+                        liquid=400 + expected_disposal_volume, air_gap=0
+                    )
                 ],
                 add_final_air_gap=True,
                 trash_location=mock.ANY,
