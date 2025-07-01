@@ -63,7 +63,6 @@ export function useAssignLiquidClass(
       ? getAllWellsFromPrimaryWells(
           formData[wellsField] as string[],
           labwareEntities[formData[labwareField]]?.def,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           channels as 8 | 96
         )
       : (formData[wellsField] as string[])
