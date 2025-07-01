@@ -347,7 +347,9 @@ def load_liquid_dye(
     trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
     liquid_and_trials_by_volume = {
         v: (ctx.define_liquid(
-            f"{name}_{v}ul", f"{name}_{v}ul", cfg[2]
+            name=f"{name}_{min(v, DYE_SHAKER_MAX_UL)}ul",
+            description=f"{name}_{min(v, DYE_SHAKER_MAX_UL)}ul",
+            display_color=cfg[2],
         ), t)
         for v, t in zip(volumes, trials_list)
         for name, cfg in DYE_CONFIGS.items()
