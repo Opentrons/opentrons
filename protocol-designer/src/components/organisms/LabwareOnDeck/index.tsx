@@ -6,6 +6,7 @@ import * as wellContentsSelectors from '@opentrons/step-generation'
 import { selectors } from '../../../labware-ingred/selectors'
 import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
+import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
 import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 
@@ -21,7 +22,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     tipContentsSelectors.getMissingTipsByLabwareId
   )
   const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
+    getAllWellContentsForActiveItem
   )
   const allHighlightedWells = useSelector(
     highlightSelectors.wellHighlightsByLabwareId

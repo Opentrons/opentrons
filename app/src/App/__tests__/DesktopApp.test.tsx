@@ -20,10 +20,10 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 // prettier-ignore
 import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
 
-import { ProtocolTimeline } from '../../pages/Desktop/Protocols/Preview'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
+import { Preview } from '../../pages/Desktop/Protocols/Preview'
 import { DesktopApp } from '../DesktopApp'
 import { useSoftwareUpdatePoll } from '../hooks'
 
@@ -70,9 +70,7 @@ describe('DesktopApp', () => {
     vi.mocked(ProtocolRunDetails).mockReturnValue(
       <div>Mock ProtocolRunDetails</div>
     )
-    vi.mocked(ProtocolTimeline).mockReturnValue(
-      <div>Mock ProtocolTimeline</div>
-    )
+    vi.mocked(Preview).mockReturnValue(<div>Mock Preview</div>)
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
@@ -131,9 +129,9 @@ describe('DesktopApp', () => {
     screen.getByText('Mock ProtocolsLanding')
   })
 
-  it('renders a ProtocolsTimeline component from /protocolTimeline', () => {
+  it('renders a ProtocolsTimeline component from /preview', () => {
     render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/timeline`)
-    screen.getByText('Mock ProtocolTimeline')
+    screen.getByText('Mock Preview')
   })
 
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {

@@ -1,12 +1,10 @@
 import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 
-import { COLORS } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 import { AIR } from './misc'
 
-import type { WellFill } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LocationLiquidState,
@@ -99,7 +97,7 @@ export const getLiquidIdsOnLabware = (
   return Array.from(new Set(allLiquidIdsOnLabware))
 }
 
-export const MIXED_WELL_COLOR = COLORS.grey50
+export const MIXED_WELL_COLOR = '#737578'
 
 export const swatchColors = (ingredGroupId: string): string => {
   const num = Number(ingredGroupId)
@@ -133,6 +131,8 @@ const ingredIdsToColor = (
 
   return MIXED_WELL_COLOR
 }
+
+export type WellFill = Record<string, string>
 
 export const wellFillFromWellContents = (
   wellContents: ContentsByWell,
