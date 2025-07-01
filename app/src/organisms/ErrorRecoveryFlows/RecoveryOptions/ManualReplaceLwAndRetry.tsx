@@ -2,7 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import StackerReengageLatch from 'app/assets/images/flex_stacker_reengage_latch.png'
+import StackerReengageLatch from '/app/assets/images/flex_stacker_reengage_latch.png'
 import StackerClearObstructions from '/app/assets/videos/error-recovery/FlexStacker_ClearObstructions.webm'
 import StackerEmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
 import StackerFillHopper from '/app/assets/videos/error-recovery/FlexStacker_FillHopper.webm'
@@ -292,14 +292,14 @@ export function HopperLabwareInfo(props: RecoveryContentProps): JSX.Element {
 }
 
 export function ShuttleLabwareInfo(props: RecoveryContentProps): JSX.Element {
-  const { recoveryMap, recoveryCommands, routeUpdateActions } = props
+  const { recoveryCommands, routeUpdateActions } = props
   const { manualRetrieve } = recoveryCommands
   const { proceedNextStep } = routeUpdateActions
 
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
-    return void manualRetrieve().then(() => proceedNextStep())
+    void manualRetrieve().then(() => proceedNextStep())
   }
 
   return (

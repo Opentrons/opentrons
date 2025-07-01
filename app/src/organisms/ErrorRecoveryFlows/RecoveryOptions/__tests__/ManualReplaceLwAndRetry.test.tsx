@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,6 +8,7 @@ import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests_
 import { RECOVERY_MAP } from '../../constants'
 import { ManualReplaceLwAndRetry } from '../ManualReplaceLwAndRetry'
 
+import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
 vi.mock('../../shared', async importOriginal => {
@@ -160,8 +161,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders PrepareStackerHome', ({ route, step }) => {
     it(`for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('Prepare track for homing')
+      render(props)
+      screen.getByText('Prepare track for homing')
     })
   })
   describe.each([
@@ -177,8 +178,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders PrepareStackerHome', ({ route, step }) => {
     it(`renders PrepareStackerHome for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('Clear track of obstructions')
+      render(props)
+      screen.getByText('Clear track of obstructions')
     })
   })
   describe.each([
@@ -193,8 +194,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders EmptyStacker', ({ route, step }) => {
     it(`renders EmptyStacker for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('Empty stacker of labware above latch')
+      render(props)
+      screen.getByText('Empty stacker of labware above latch')
     })
   })
   describe.each([
@@ -209,8 +210,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders ReengageLatch', ({ route, step }) => {
     it(`renders ReengageLatch for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('Prepare for stacker latch to re-engage')
+      render(props)
+      screen.getByText('Prepare for stacker latch to re-engage')
     })
   })
   describe.each([
@@ -221,8 +222,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders LoadShuttle', ({ route, step }) => {
     it(`renders LoadShuttle for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('Load labware shuttle onto track')
+      render(props)
+      screen.getByText('Load labware shuttle onto track')
     })
   })
   describe.each([
@@ -238,8 +239,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders ShuttleLabwareInfo', ({ route, step }) => {
     it(`renders ShuttleLabwareInfo for ${route} route and ${step} step`, async () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('MOCK_LEFT_COL_LABWARE_INFO')
+      render(props)
+      screen.getByText('MOCK_LEFT_COL_LABWARE_INFO')
 
       const continueBtn = screen.queryAllByText('Continue')[0]
       fireEvent.click(continueBtn)
@@ -288,8 +289,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
         ...props.failedLabwareUtils,
         labwareQuantity: 2,
       } // Mock labware quantity for testing
-      const { getByText } = render(props)
-      getByText('MOCK_LEFT_COL_LABWARE_INFO')
+      render(props)
+      screen.getByText('MOCK_LEFT_COL_LABWARE_INFO')
     })
   })
   describe.each([
@@ -306,8 +307,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders HoldingLabware', ({ route, step }) => {
     it(`for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('MOCK_HOLDING_LABWARE')
+      render(props)
+      screen.getByText('MOCK_HOLDING_LABWARE')
     })
   })
   describe.each([
@@ -322,8 +323,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders ReleaseLabware', ({ route, step }) => {
     it(`for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('MOCK_RELEASE_LABWARE')
+      render(props)
+      screen.getByText('MOCK_RELEASE_LABWARE')
     })
   })
   describe.each([
@@ -346,8 +347,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders RetryStepInfo', ({ route, step }) => {
     it(`for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('MOCK_RETRY_STEP_INFO')
+      render(props)
+      screen.getByText('MOCK_RETRY_STEP_INFO')
     })
   })
   describe.each([
@@ -366,8 +367,8 @@ describe('ManualReplaceLwAndRetry for Stacker Recovery Routes', () => {
   ])('renders SkipStepInfo', ({ route, step }) => {
     it(`for ${route} route and ${step} step`, () => {
       props.recoveryMap = { route, step }
-      const { getByText } = render(props)
-      getByText('MOCK_SKIP_STEP_INFO')
+      render(props)
+      screen.getByText('MOCK_SKIP_STEP_INFO')
     })
   })
 })
