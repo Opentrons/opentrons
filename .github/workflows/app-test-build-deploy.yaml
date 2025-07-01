@@ -216,7 +216,7 @@ jobs:
         shell: bash
         run: |
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_V2 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-          echo "${{ secrets.WINDOWS_CSC_B64}}" | base64 --decode > /d/opentrons_labworks_inc.crt
+          echo "${{ secrets.WINDOWS_CSC_B64_V2 }}" | base64 --decode > /d/opentrons_labworks_inc.crt
           echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
           echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
           echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
