@@ -101,13 +101,13 @@ export function ModuleListItemGroup(): JSX.Element | null {
                 <ListItem type="default" key={module.id}>
                   <ListItemCustomize
                     label={
-                      adapters != null && adapters.length > 0
+                      adapters != null && adapters.length > 0 && module.type !== THERMOCYCLER_MODULE_TYPE
                         ? t('modules_adapter_label')
                         : undefined
                     }
                     linkText={t('modules_remove_label')}
                     dropdown={
-                      adapters != null && adapters.length > 0
+                      adapters != null && adapters.length > 0 && module.type !== THERMOCYCLER_MODULE_TYPE
                         ? {
                             title: (null as unknown) as string,
                             width: '13rem',
