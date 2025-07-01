@@ -577,15 +577,26 @@ def run(ctx: ProtocolContext) -> None:
         if plate and dest_wells[0] not in plate.wells():
             _on_plate_done()
 
-        # SWAP INACCESSIBLE TIP-RACKS
+        # REPLACE EMPTY TIP-RACKS
+        locations_to_replace_by_hand = []
         for i, old_rack in enumerate(test_pip.tip_racks):
+            rack_location = old_rack.parent
             has_tips = bool(old_rack.next_tip(test_pip.channels))
-            if not has_tips and inaccessible_racks:
-                new_rack = inaccessible_racks.pop(0)
-                rack_adapter = old_rack.parent
+            if not has_tips:
                 ctx.move_labware(old_rack, trash, use_gripper=True)
-                ctx.move_labware(new_rack, rack_adapter, use_gripper=True)
-                test_pip.tip_racks[i] = new_rack
+                if inaccessible_racks:
+                    new_rack = inaccessible_racks.pop(0)
+                    ctx.move_labware(new_rack, rack_location, use_gripper=True)
+                    test_pip.tip_racks[i] = new_rack
+                else:
+                    locations_to_replace_by_hand.append(rack_location)
+        if locations_to_replace_by_hand:
+            tips_ln = ctx.params.tips  # type: ignore[attr-defined]
+            ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
+            test_pip.tip_racks = [
+                location.load_labware(tips_ln)
+                for location in locations_to_replace_by_hand
+            ]
 
         # GET NEW (EMPTY) PLATE
         if not plate:
@@ -634,59 +645,29 @@ def run(ctx: ProtocolContext) -> None:
         test_pip.drop_tip()
 
         # ORGANIZE WELLS FOR PIPETTES
-        dst_wells_organized: List[List[Well]] = []
         if test_pip.channels == 1:
-            dst_wells_organized = dest_wells
+            dst_wells_organized_by_channel = dest_wells
         elif test_pip.channels == 8:
-            dst_wells_organized = [
+            dst_wells_organized_by_channel = [
                 w.parent.columns_by_name()[w.well_name[1:]]
                 for w in dest_wells
                 if "A" in w.well_name  # new column
             ]
         else:
-            dst_wells_organized = [dest_wells[0].parent.wells()]
+            dst_wells_organized_by_channel = [dest_wells]
 
         # TRANSFER DYE TO PLATE
-        def _transfer() -> None:
-            if ul <= DYE_SHAKER_MAX_UL:
-                list_of_the_same_src_well = [src_well] * len(dst_wells_organized)
-                test_pip.transfer_with_liquid_class(
-                    test_class, ul, list_of_the_same_src_well, dst_wells_organized, new_tip="always"
-                )
-            else:
-                dst_well_names = [w.well_name for w in dst_wells_organized]
-                print(f"distributing {ul / 4} uL to wells:")
-                print(" ".join(dst_well_names))
-                print("current volume (before):")
-                print(" ".join(str(w.current_liquid_volume()) for w in dst_wells_organized))
-                test_pip.distribute_with_liquid_class(
-                    test_class, ul / 4, src_well, dst_wells_organized, new_tip="always"
-                )
-                print("new volume (after):")
-                input(" ".join(str(w.current_liquid_volume()) for w in dst_wells_organized))
+        if ul <= DYE_SHAKER_MAX_UL:
+            list_of_the_same_src_well = [src_well] * len(dst_wells_organized_by_channel)
+            test_pip.transfer_with_liquid_class(
+                test_class, ul, list_of_the_same_src_well, dst_wells_organized_by_channel, new_tip="always"
+            )
+        else:
+            test_pip.distribute_with_liquid_class(
+                test_class, ul / 4, src_well, dst_wells_organized_by_channel, new_tip="always"
+            )
 
-        try:
-            _transfer()
-        except RuntimeError as e:
-            if test_pip.channels != 96:
-                raise e
-            # NOTE: 96ch can run out of tips, so ask operator to switch them
-            adapters = []
-            # first throwout the empty racks
-            for rack in test_pip.tip_racks:
-                adapters.append(rack.parent)
-                ctx.move_labware(rack, trash, use_gripper=True)
-            # ask operator to load new tip-racks
-            tips_ln = ctx.params.tips  # type: ignore[attr-defined]
-            ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
-            # load new tip-racks for pipette
-            test_pip.tip_racks = [
-                adapter.load_labware(tips_ln)
-                for adapter in adapters
-            ]
-            _transfer()
-
-        # SHAKE/READ the FINAL PLATE
+        # Transfer & SHAKE/READ the FINAL PLATE
         if ul_idx == len(volumes) - 1:
             _on_plate_done()
 
