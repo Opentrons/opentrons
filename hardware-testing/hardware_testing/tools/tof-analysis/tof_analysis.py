@@ -34,7 +34,7 @@ NUMBER_OF_ZONES = 10
 NUMBER_OF_BINS = 128
 
 DEFAULT_STD = 6
-DEFAULT_MAX_SAMPLES = 1000
+DEFAULT_MAX_SAMPLES = 100000
 
 ACTIONS = ["plot", "generate", "validate"]
 
@@ -546,9 +546,9 @@ def generate_baseline(args: argparse.Namespace) -> None:
                 continue
             if axis_list and axis not in axis_list:
                 continue
-            if zone_list_x and zone not in zone_list_x:
+            if axis == 'x' and zone_list_x and zone not in zone_list_x:
                 continue
-            if zone_list_z and zone not in zone_list_z:
+            if axis == 'z' and zone_list_z and zone not in zone_list_z:
                 continue
 
             # Get the bins
@@ -560,6 +560,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
         if samples > max_samples:
             break
 
+    # Create a baseline for each axis
     baseline_x = create_baseline(dict(data["x"]), zone_count_x, bin_count, deviation)
     baseline_z = create_baseline(dict(data["z"]), zone_count_z, bin_count, deviation)
     if not baseline_x and not baseline_z:
@@ -594,7 +595,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             file.seek(0)
             json.dump(definition, file, indent=2)
 
-    print("\n--------------- GENERATED BASELINES ---------------\n")
+    print(f"\n--------------- GENERATED BASELINES FROM {samples} Samples ---------------\n")
     print(
         "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
     )
@@ -684,7 +685,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-o",
-        "--output_file",
+        "--output-file",
         help="The output file of the generated baseline, prints to stdout if ommited.",
     )
     parser.add_argument(
@@ -696,13 +697,13 @@ if __name__ == "__main__":
         nargs="+",
     )
     parser.add_argument(
-        "--zones_x",
+        "--zones-x",
         help="The list of zones to use for the X axis, uses 1-9 if ommited.",
         type=int,
         nargs="+",
     )
     parser.add_argument(
-        "--zones_z",
+        "--zones-z",
         help="The list of zones to use for the Z axis, uses 1-9 if ommited.",
         type=int,
         nargs="+",
@@ -727,7 +728,7 @@ if __name__ == "__main__":
         nargs="+",
     )
     parser.add_argument(
-        "--max_samples",
+        "--max-samples",
         help="The maximum number of samples (rows) to pricess from the dataframe.",
         type=int,
         default=DEFAULT_MAX_SAMPLES,
