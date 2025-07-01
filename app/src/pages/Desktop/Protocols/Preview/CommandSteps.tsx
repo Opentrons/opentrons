@@ -1,12 +1,12 @@
-import { Dispatch, SetStateAction } from 'react'
-
 import { COLORS, Divider, StyledText } from '@opentrons/components'
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/AnnotatedSteps'
-import { GroupedCommands } from '/app/redux/protocol-storage'
 
 import styles from './preview.module.css'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface CommandStepsProps {
   groupedCommands: GroupedCommands | null

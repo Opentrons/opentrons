@@ -1,10 +1,9 @@
-import { Dispatch, RefObject, SetStateAction } from 'react'
-import { ViewportListRef } from 'react-viewport-list'
-
 import { Chip, Icon } from '@opentrons/components'
-import { RunTimeCommand } from '@opentrons/shared-data'
 
 import styles from './preview.module.css'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface ControlsProps {
   numErrors: number
@@ -12,7 +11,6 @@ interface ControlsProps {
   numCommandLength: number
   currentCommandIndex: number
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
-  commandListRef: RefObject<ViewportListRef>
   handlePlayPause: () => void
   isPlaying: boolean
   commands: RunTimeCommand[]
@@ -23,7 +21,6 @@ export function Controls(props: ControlsProps): JSX.Element {
     protocolName,
     numCommandLength,
     currentCommandIndex,
-    commandListRef,
     setSelectedCommand,
     handlePlayPause,
     isPlaying,
@@ -52,7 +49,12 @@ export function Controls(props: ControlsProps): JSX.Element {
                   setSelectedCommand(commands[0].id)
                 }}
               >
-                <Icon name="ot-end" width="25px" height="30px" color="#006cfa" />
+                <Icon
+                  name="ot-end"
+                  width="25px"
+                  height="30px"
+                  color="#006cfa"
+                />
               </button>
               <button className={styles.playButton} onClick={handlePlayPause}>
                 <Icon
@@ -68,7 +70,12 @@ export function Controls(props: ControlsProps): JSX.Element {
                   setSelectedCommand(commands[commands.length - 1].id)
                 }}
               >
-                <Icon name="ot-start" width="25px" height="30px" color="#006cfa" />
+                <Icon
+                  name="ot-start"
+                  width="25px"
+                  height="30px"
+                  color="#006cfa"
+                />
               </button>
             </div>
           </div>
@@ -87,7 +94,6 @@ export function Controls(props: ControlsProps): JSX.Element {
           onChange={e => {
             const nextIndex = Number(e.target.value) - 1
             setSelectedCommand(commands[nextIndex].id)
-            commandListRef.current?.scrollToIndex(nextIndex)
           }}
         />
       </div>

@@ -8,8 +8,6 @@ import {
 } from '@opentrons/components'
 import { wellFillFromWellContents } from '@opentrons/step-generation'
 
-import { getLabwareInfoByLiquidId } from '/app/transformations/commands'
-
 import styles from './preview.module.css'
 import {
   getAllWellContentsAtFrame,
@@ -98,9 +96,10 @@ export function LabwareSlotDetails(
           ) : null}
         </div>
         <div style={{ padding: '0 16px 16px 16px' }}>
-          {liquidInfo.map(liquid => {
+          {liquidInfo.map((liquid, index) => {
             return (
               <div
+                key={`${liquid.displayName}_liquid_${index}`}
                 style={{
                   display: 'flex',
                   width: '100%',

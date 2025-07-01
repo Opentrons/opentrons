@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import {
   ALIGN_CENTER,
   BORDERS,
-  CURSOR_GRABBING,
   CURSOR_POINTER,
   Flex,
   JUSTIFY_CENTER,

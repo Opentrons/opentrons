@@ -1,7 +1,6 @@
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
-import omitBy from 'lodash/omitBy'
 import pick from 'lodash/pick'
 import { createSelector } from 'reselect'
 

@@ -1,11 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import {
@@ -15,7 +8,6 @@ import {
   CommandText,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
-  Divider,
   Flex,
   getLabwareDefinitionsFromCommands,
   Icon,
@@ -27,6 +19,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,

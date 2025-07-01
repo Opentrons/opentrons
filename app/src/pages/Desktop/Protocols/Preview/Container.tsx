@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { ViewportListRef } from 'react-viewport-list'
+import { useEffect, useState } from 'react'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -12,7 +10,6 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
-import { GroupedCommands } from '/app/redux/protocol-storage'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -21,6 +18,7 @@ import { DeckView } from './DeckView'
 import { SlotDetails } from './SlotDetails'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const SEC_PER_FRAME = 1000
 
@@ -36,7 +34,6 @@ export function Container(props: ContainerProps): JSX.Element {
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
-  const commandListRef = useRef<ViewportListRef>(null)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
@@ -69,13 +66,13 @@ export function Container(props: ContainerProps): JSX.Element {
           currentIndex < commands.length - 1 ? currentIndex + 1 : 0
         const nextId = commands[nextIndex]?.id ?? null
 
-        commandListRef.current?.scrollToIndex(nextIndex)
-
         return nextId
       })
     }, SEC_PER_FRAME)
 
-    return () => clearInterval(intervalId)
+    return () => {
+      clearInterval(intervalId)
+    }
   }, [isPlaying, commands])
 
   const { robotState } = frame
@@ -108,7 +105,6 @@ export function Container(props: ContainerProps): JSX.Element {
       }
     }
   }, [isThermocyclerAttached, selectedSlot])
-console.log(selectedRunTimeCommand)
   return (
     <>
       <Controls
@@ -117,7 +113,6 @@ console.log(selectedRunTimeCommand)
         numCommandLength={commands.length}
         currentCommandIndex={selectedCommandIndex}
         setSelectedCommand={setSelectedCommand}
-        commandListRef={commandListRef}
         handlePlayPause={handlePlayPause}
         isPlaying={isPlaying}
         commands={commands}

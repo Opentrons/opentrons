@@ -8,23 +8,23 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  LabwareDefinition,
-  Liquid,
-  ProtocolAnalysisOutput,
-  RobotType,
-  RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  getFullStackFromLabwares,
-  InvariantContext,
-  RobotState,
-} from '@opentrons/step-generation'
+import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { LabwareSlotDetails } from './LabwareSlotDetails'
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
 import { TrashSlotDetails } from './TrashSlotDetails'
+
+import type {
+  LabwareDefinition,
+  Liquid,
+  ProtocolAnalysisOutput,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 interface SlotDetailsProps {
   slotId: string

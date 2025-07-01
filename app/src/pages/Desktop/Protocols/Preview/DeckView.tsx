@@ -1,4 +1,4 @@
-import { Dispatch, Fragment, useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 
 import {
   COLORS,
@@ -7,19 +7,14 @@ import {
   SingleSlotFixture,
   SlotLabels,
   StagingAreaFixture,
-  StagingAreaLocation,
   StyledText,
-  TrashCutoutId,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  CutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
-  RobotType,
-  RunTimeCommand,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
@@ -27,7 +22,13 @@ import { DeckViewDetails } from './DeckViewDetails'
 import styles from './preview.module.css'
 import { getBackgroundColor } from './utils'
 
-import type { SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
+import type {
+  CutoutId,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   TimelineFrame,

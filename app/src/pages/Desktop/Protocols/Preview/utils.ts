@@ -3,7 +3,7 @@ import reduce from 'lodash/reduce'
 import sum from 'lodash/sum'
 import values from 'lodash/values'
 
-import { COLORS, WellGroup } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -19,6 +19,7 @@ import {
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
+import type { WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CoordinateTuple,

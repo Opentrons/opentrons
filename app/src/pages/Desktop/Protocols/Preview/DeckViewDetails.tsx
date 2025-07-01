@@ -1,4 +1,4 @@
-import { Dispatch, Fragment, SetStateAction } from 'react'
+import { Fragment } from 'react'
 
 import {
   BORDERS,
@@ -9,22 +9,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  CutoutId,
-  DeckDefinition,
   getAddressableAreaFromSlotId,
   getModuleDef2,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
-  RobotType,
-  RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  getSlotInLocationStack,
-  InvariantContext,
-  LabwareTemporalProperties,
-  TimelineFrame,
-} from '@opentrons/step-generation'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DeckViewOverlay } from './DeckViewOverlay'
 import {
@@ -33,6 +24,19 @@ import {
   getSlotIsEmpty,
   getStagingAreaAddressableAreas,
 } from './utils'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type {
+  CutoutId,
+  DeckDefinition,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type {
+  InvariantContext,
+  LabwareTemporalProperties,
+  TimelineFrame,
+} from '@opentrons/step-generation'
 
 const STANDARD_X_WIDTH = 127.76
 const STANDARD_Y_HEIGHT = 85.48
@@ -235,7 +239,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
           ?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
-          console.warn(`no slot ${slot} for labware ${labware.id}!`)
+          console.warn(
+            `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
+          )
           return null
         }
         const isStepAssosciatedWithLabwareState = Object.values(pipettes).some(
@@ -322,7 +328,11 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           slotPosition = getPositionFromSlotId(slotForOnTheDeck, deckDef)
         }
         if (slotPosition == null) {
-          console.warn(`no slot ${slotForOnTheDeck} for labware ${labware.id}!`)
+          console.warn(
+            `no slot ${slotForOnTheDeck} for labware ${
+              Object.keys(labware)[0]
+            }!`
+          )
           return null
         }
         const isStepAssosciatedWithLabwareState = Object.values(pipettes).some(
