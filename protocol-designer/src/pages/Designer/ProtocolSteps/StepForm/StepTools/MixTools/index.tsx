@@ -3,11 +3,12 @@ import { useSelector } from 'react-redux'
 import {
   getEnablePartialTipSupport,
   getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'

@@ -14,20 +14,20 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import batchEdit from '/protocol-designer/assets/images/announcements/batch_edit.gif'
+import liquidEnhancements from '/protocol-designer/assets/images/announcements/liquid-enhancements.gif'
+import multiSelect from '/protocol-designer/assets/images/announcements/multi_select.gif'
+import deckConfiguration from '/protocol-designer/assets/images/deck_configuration.png'
+import heaterShaker from '/protocol-designer/assets/images/modules/heatershaker.png'
+import magTempCombined from '/protocol-designer/assets/images/modules/magdeck_tempdeck_combined.png'
+import thermocyclerGen2 from '/protocol-designer/assets/images/modules/thermocycler_gen2.png'
+import thermocycler from '/protocol-designer/assets/images/modules/thermocycler.png'
+import absorbancePlateReaderImage from '/protocol-designer/assets/images/opentrons_absorbance_plate_reader.png'
+import opentronsFlex from '/protocol-designer/assets/images/OpentronsFlex.png'
+
 import { DOC_URL, RELEASE_NOTES_URL } from '../KnowledgeLink'
 
 import type { ReactNode } from 'react'
-
-import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
-import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
-import multiSelect from '../../../assets/images/announcements/multi_select.gif'
-import deckConfiguration from '../../../assets/images/deck_configuration.png'
-import heaterShaker from '../../../assets/images/modules/heatershaker.png'
-import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
-import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
-import thermocycler from '../../../assets/images/modules/thermocycler.png'
-import absorbancePlateReaderImage from '../../../assets/images/opentrons_absorbance_plate_reader.png'
-import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
 
 export interface Announcement {
   announcementKey: string

@@ -11,17 +11,18 @@ import {
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getDisableModuleRestrictions } from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '/protocol-designer/ui/steps'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
-} from '../../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
+
 import { DeckSetupContainer } from '../DeckSetupContainer'
 import { DeckSetupDetails } from '../DeckSetupDetails'
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
@@ -30,14 +31,14 @@ import { getCutoutIdForAddressableArea } from '../utils'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsShared from '@opentrons/shared-data'
 
-vi.mock('../../../../ui/steps/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../feature-flags/selectors')
+vi.mock('/protocol-designer/ui/steps/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('../DeckSetupToolbox')
 vi.mock('../DeckSetupDetails')
-vi.mock('../../../../ui/steps')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('../utils')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

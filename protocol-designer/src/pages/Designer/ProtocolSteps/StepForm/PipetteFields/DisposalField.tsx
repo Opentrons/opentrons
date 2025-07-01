@@ -7,14 +7,19 @@ import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
-} from '../../../../../components/molecules'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { getMaxDisposalVolumeForMultidispense } from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
+} from '/protocol-designer/components/molecules'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getMaxDisposalVolumeForMultidispense } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
+
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
 
-import type { FormData, PathOption, StepType } from '../../../../../form-types'
+import type {
+  FormData,
+  PathOption,
+  StepType,
+} from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../types'
 
 interface DisposalFieldProps {

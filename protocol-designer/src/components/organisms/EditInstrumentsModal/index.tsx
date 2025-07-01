@@ -11,15 +11,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getRobotType } from '../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
   getPipetteEntities,
-} from '../../../step-forms/selectors'
-import { getHas96Channel } from '../../../utils'
-import { HandleEnter } from '../../atoms'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+
 import { getMainPagePortalEl } from '../Portal'
 import { editPipettes } from './editPipettes'
 import { PipetteConfiguration } from './PipetteConfiguration'
@@ -27,7 +28,7 @@ import { PipetteOverview } from './PipetteOverview'
 import { usePipetteConfig } from './usePipetteConfig'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface EditInstrumentsModalProps {
   onClose: () => void

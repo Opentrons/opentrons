@@ -6,9 +6,9 @@ import {
 } from '@opentrons/shared-data'
 import { AIR, MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
-import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
-import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { ALL_MODULE_SLOTS_OT2 } from '/protocol-designer/modules'
+import { DEFAULT_SLOT_MAP_OT2 } from '/protocol-designer/pages/Onboarding/constants'
+import { getLabwareIsCompatible } from '/protocol-designer/utils/labwareModuleCompatibility'
 
 import type {
   AddressableArea,
@@ -19,12 +19,12 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../labware-ingred/types'
+import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
-} from '../../step-forms'
-import type * as wellContentsSelectors from '../../top-selectors/well-contents'
+} from '/protocol-designer/step-forms'
+import type * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import type { CutoutConfigExtended } from './HardwareConfigurator/AddFixtureModal'
 import type { WellContentsByNumber } from './SlotDetailModal'
 

@@ -18,17 +18,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getMainPagePortalEl } from '..'
-import { selectors } from '../../../labware-ingred/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   formatPercentage,
   formatVolume,
-} from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
+
+import { getMainPagePortalEl } from '..'
 import { swatchColors } from '../DefineLiquidsModal/swatchColors'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'
-import type { WellIngredientNames } from '../../../steplist/types'
+import type { WellIngredientNames } from '/protocol-designer/steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4

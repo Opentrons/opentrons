@@ -3,16 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getEnableStacking } from '../../../../feature-flags/selectors'
-import { openIngredientSelector } from '../../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
-import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
-import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../../utils'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { EditLabwareQuantityModal } from '/protocol-designer/components/organisms/EditLabwareQuantityModal'
+import { LabwareCardOverflowMenu } from '/protocol-designer/components/organisms/LabwareCardOverflowMenu'
+import { getLiquidIdsOnLabware } from '/protocol-designer/components/organisms/utils'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+
 import { LabwareCard } from '../index'
 
 import type { ComponentProps } from 'react'
@@ -21,14 +22,14 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../LabwareCardOverflowMenu')
-vi.mock('../../../../ui/labware/selectors')
-vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../utils')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../EditLabwareQuantityModal')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/components/organisms/LabwareCardOverflowMenu')
+vi.mock('/protocol-designer/ui/labware/selectors')
+vi.mock('/protocol-designer/top-selectors/well-contents')
+vi.mock('/protocol-designer/components/organisms/utils')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/components/organisms/EditLabwareQuantityModal')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

@@ -17,16 +17,17 @@ import {
 } from '@opentrons/components'
 import { getTopLocationInStack } from '@opentrons/step-generation'
 
-import { DND_TYPES } from '../../../../constants'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { DND_TYPES } from '/protocol-designer/constants'
+import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
 import type { DropTargetMonitor } from 'react-dnd'
-import type { LabwareOnDeck } from '../../../../step-forms'
-import type { ThunkDispatch } from '../../../../types'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { DroppedItem, SharedControlsType } from '../types'
 
 interface LabwareControlsProps extends SharedControlsType {

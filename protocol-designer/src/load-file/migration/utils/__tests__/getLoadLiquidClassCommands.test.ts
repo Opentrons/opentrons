@@ -6,7 +6,7 @@ import { getLoadLiquidClassCommands } from '../getLoadLiquidClassCommands'
 
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { SavedStepFormState } from '../../../../step-forms/reducers'
+import type { SavedStepFormState } from '/protocol-designer/step-forms/reducers'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')

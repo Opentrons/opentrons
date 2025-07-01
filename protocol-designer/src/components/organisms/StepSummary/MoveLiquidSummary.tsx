@@ -19,7 +19,7 @@ import type {
   LiquidEntities,
   RobotState,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 interface MoveLiquidSummaryProps {
   currentStep: FormData

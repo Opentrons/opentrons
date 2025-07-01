@@ -18,16 +18,17 @@ import {
 } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 
-import { selectors } from '../../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { arrayToWellGroup } from '../../../utils'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { arrayToWellGroup } from '/protocol-designer/utils'
+
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 
 import type { WellGroup } from '@opentrons/components'
-import type { StepFieldName } from '../../../form-types'
-import type { NozzleType } from '../../../types'
+import type { StepFieldName } from '/protocol-designer/form-types'
+import type { NozzleType } from '/protocol-designer/types'
 
 interface SelectWellsModalProps {
   isOpen: boolean

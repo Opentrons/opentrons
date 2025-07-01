@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
-} from '../../../../../step-forms/selectors'
-import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getAllTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'

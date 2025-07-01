@@ -15,8 +15,9 @@ import {
 import {
   getMainPagePortalEl,
   SelectWellsModal,
-} from '../../../../../components/organisms'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
+} from '/protocol-designer/components/organisms'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

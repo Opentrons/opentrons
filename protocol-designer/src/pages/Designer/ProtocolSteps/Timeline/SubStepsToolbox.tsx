@@ -11,21 +11,22 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
-import { THERMOCYCLER_PROFILE } from '../../../../constants'
-import { getSubsteps } from '../../../../file-data/selectors'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
-import { getHoveredSubstep } from '../../../../ui/steps'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/components/atoms'
+import { THERMOCYCLER_PROFILE } from '/protocol-designer/constants'
+import { getSubsteps } from '/protocol-designer/file-data/selectors'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { getHoveredSubstep } from '/protocol-designer/ui/steps'
 import {
   hoverOnStep,
   hoverOnSubstep,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
+
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
 
-import type { SubstepIdentifier } from '../../../../steplist'
-import type { HoverOnSubstepAction } from '../../../../ui/steps'
+import type { SubstepIdentifier } from '/protocol-designer/steplist'
+import type { HoverOnSubstepAction } from '/protocol-designer/ui/steps'
 
 interface SubStepsToolboxProps {
   stepId: string

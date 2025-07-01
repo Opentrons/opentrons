@@ -18,20 +18,21 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getRobotType } from '../../../../../../file-data/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
-import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
+} from '/protocol-designer/step-forms/selectors'
+import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import {
   getMaxConditioningVolume,
   getMaxPushOutVolume,
-} from '../../../../../../utils'
+} from '/protocol-designer/utils'
+
 import {
   BlowoutLocationField,
   DisposalField,
@@ -47,7 +48,7 @@ import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData, StepFieldName } from '../../../../../../form-types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 

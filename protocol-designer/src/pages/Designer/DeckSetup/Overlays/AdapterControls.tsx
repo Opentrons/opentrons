@@ -14,12 +14,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { DND_TYPES } from '../../../../constants'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
+import { DND_TYPES } from '/protocol-designer/constants'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getLabwareIsCustom } from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'

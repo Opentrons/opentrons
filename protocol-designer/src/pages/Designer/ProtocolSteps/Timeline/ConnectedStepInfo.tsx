@@ -7,13 +7,13 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../components/organisms'
-import { selectors as dismissSelectors } from '../../../../dismiss'
-import { selectors as fileDataSelectors } from '../../../../file-data'
-import { stepIconsByType } from '../../../../form-types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getOrderedStepIds } from '../../../../step-forms/selectors'
-import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
+} from '/protocol-designer/components/organisms'
+import { selectors as dismissSelectors } from '/protocol-designer/dismiss'
+import { selectors as fileDataSelectors } from '/protocol-designer/file-data'
+import { stepIconsByType } from '/protocol-designer/form-types'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getOrderedStepIds } from '/protocol-designer/step-forms/selectors'
+import * as timelineWarningSelectors from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   getHoveredStepId,
   getHoveredSubstep,
@@ -22,11 +22,12 @@ import {
   getMultiSelectLastSelected,
   getSelectedStepId,
   actions as stepsActions,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import {
   hoverOnStep,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
+
 import { StepContainer } from './StepContainer'
 import {
   getMetaSelectedSteps,
@@ -37,13 +38,13 @@ import {
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
-import type { DeleteModalType } from '../../../../components/organisms'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState, ThunkAction } from '../../../../types'
+import type { DeleteModalType } from '/protocol-designer/components/organisms'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { BaseState, ThunkAction } from '/protocol-designer/types'
 import type {
   HoverOnStepAction,
   SelectMultipleStepsAction,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType

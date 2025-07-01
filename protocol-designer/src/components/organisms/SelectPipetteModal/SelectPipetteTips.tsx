@@ -21,17 +21,18 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { setFeatureFlags } from '../../../feature-flags/actions'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { createCustomTiprackDef } from '../../../labware-defs/actions'
-import { removeOpentronsPhrases } from '../../../utils'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
+import { removeOpentronsPhrases } from '/protocol-designer/utils'
+
 import { useKitchen } from '../Kitchen/useKitchen'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { PipetteMount, RobotType } from '@opentrons/shared-data'
-import type { BaseState } from '../../../types'
+import type { BaseState } from '/protocol-designer/types'
 
 interface SelectPipetteTipsProps {
   mount: PipetteMount

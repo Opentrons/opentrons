@@ -37,23 +37,30 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import {
+  FixedTrashText,
+  MagnetModuleChangeContent,
+} from '/protocol-designer/components/molecules'
+import {
   getDisableModuleRestrictions,
   getEnableMutlipleTempsOT2,
-} from '../../../feature-flags/selectors'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
-import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
-import { OT2_SUPPORTED_MODULE_MODELS } from '../../../pages/Onboarding/constants'
-import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { createModule } from '../../../step-forms/actions'
-import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
+} from '/protocol-designer/feature-flags/selectors'
+import {
+  deleteModule,
+  getAllModuleSlotsByTypeOt2,
+} from '/protocol-designer/modules'
+import { SlotWarning } from '/protocol-designer/pages/Designer/DeckSetup/SlotWarning'
+import { OT2_SUPPORTED_MODULE_MODELS } from '/protocol-designer/pages/Onboarding/constants'
+import { ModuleDiagram } from '/protocol-designer/pages/Onboarding/ModuleDiagram'
+import { getHasGen1MultiChannelPipette } from '/protocol-designer/step-forms'
+import { createModule } from '/protocol-designer/step-forms/actions'
+import { createModuleEntityAndChangeForm } from '/protocol-designer/step-forms/actions/thunks'
 import {
   getInitialDeckSetup,
   getSavedStepForms,
-} from '../../../step-forms/selectors'
-import { getDismissedHints } from '../../../tutorial/selectors'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
-import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
+} from '/protocol-designer/step-forms/selectors'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { useBlockingHint } from '../BlockingHintModal'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { useKitchen } from '../Kitchen/useKitchen'
@@ -62,8 +69,8 @@ import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { getModuleOnSlot } from './util'
 
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
-import type { StepType } from '../../../form-types'
-import type { OT2ModuleType, ThunkDispatch } from '../../../types'
+import type { StepType } from '/protocol-designer/form-types'
+import type { OT2ModuleType, ThunkDispatch } from '/protocol-designer/types'
 
 type MagneticModuleModels =
   | typeof MAGNETIC_MODULE_V1

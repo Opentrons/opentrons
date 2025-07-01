@@ -11,7 +11,7 @@ import type { WellFill } from '@opentrons/components'
 import type {
   ContentsByWell,
   WellContents,
-} from '../../../labware-ingred/types'
+} from '/protocol-designer/labware-ingred/types'
 
 const ingredIdsToColor = (
   groupIds: string[],

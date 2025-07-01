@@ -14,7 +14,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
+import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
+
 import { getMainPagePortalEl } from './Portal'
 
 interface ResetSettingsModalProps {

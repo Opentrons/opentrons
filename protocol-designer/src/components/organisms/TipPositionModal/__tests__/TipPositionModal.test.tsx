@@ -3,22 +3,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { TipPositionModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getRobotType } from '../../../../file-data/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
+import { TipPositionModal } from '..'
 import { TipPositionSideView } from '../TipPositionSideView'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../TipPositionSideView')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof TipPositionModal>) => {
   return renderWithProviders(<TipPositionModal {...props} />, {
     i18nInstance: i18n,

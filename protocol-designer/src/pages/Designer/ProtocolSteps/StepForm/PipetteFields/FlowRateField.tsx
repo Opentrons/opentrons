@@ -11,15 +11,16 @@ import {
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
-import { InputStepFormField } from '../../../../../components/molecules'
-import { getRobotType } from '../../../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { getMatchingTipLiquidSpecs } from '../../../../../utils'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
+
 import { getMaxUiFlowRate } from './utils'
 
 import type { PathOption } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../form-types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 import type { FieldProps } from '../types'
 
 interface FlowRateFieldProps extends FieldProps {
