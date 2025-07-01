@@ -86,6 +86,7 @@ export default defineConfig(
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'
           ),
+          '/protocol-designer/': path.resolve('./src/') + '/',
         },
       },
       server: {
