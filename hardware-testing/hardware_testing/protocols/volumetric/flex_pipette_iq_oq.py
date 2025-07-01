@@ -530,9 +530,10 @@ def run(ctx: ProtocolContext) -> None:
         }
         abs_values_at_this_volume: List[float] = list(results.values())
         avg = sum(abs_values_at_this_volume) / len(abs_values_at_this_volume)
-        if ctx.is_simulating():
-            avg = 2.5
-        cv = (stdev(abs_values_at_this_volume) / avg) * 100.0
+        if avg != 0.0:
+            cv = (stdev(abs_values_at_this_volume) / avg) * 100.0
+        else:
+            cv = -1.0  # NOTE: avoid divide-by-zero
         with open(results_filepath, "a") as _f:
             _f.write("==================\n")
             _f.write(f"VOLUME: {test_volume} uL\n")
@@ -540,7 +541,7 @@ def run(ctx: ProtocolContext) -> None:
             _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
             for col in "ABCDEFGH":
                 csv_row_abs_values = [
-                    str(results.get(f"{col}{row + 1}", ""))
+                    str(round(results.get(f"{col}{row + 1}", ""), 3))
                     for row in range(12)
                 ]
                 csv_row = f"{col},{','.join(csv_row_abs_values)}\n"
@@ -696,3 +697,7 @@ def run(ctx: ProtocolContext) -> None:
         )
         pip_for_dil.drop_tip()
         _on_plate_done()
+
+    with open(results_filepath, "r") as _f:
+        for line in _f.readlines():
+            ctx.comment(line.strip())
