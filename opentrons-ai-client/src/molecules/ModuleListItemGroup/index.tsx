@@ -135,11 +135,12 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             },
                             dropdownType: 'neutral' as DropdownBorder,
                             filterOptions: adapters
-                              ?.filter(adapter =>
-                                module.type === TEMPERATURE_MODULE_TYPE
-                                  ? adapter.includes('adapter')
-                                  : true
-                              )
+                              ?.filter(adapter => {
+                                if (module.type === TEMPERATURE_MODULE_TYPE) {
+                                  return adapter.includes('adapter')
+                                }
+                                return true
+                              })
                               ?.map(adapter => ({
                                 name: getDefDisplayName(adapter),
                                 value: adapter,
