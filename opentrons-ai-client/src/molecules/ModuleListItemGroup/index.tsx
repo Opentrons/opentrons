@@ -69,9 +69,9 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const { watch, setValue } = useFormContext()
   const { t } = useTranslation('create_protocol')
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
-
+const latestDefs = getOnlyLatestDefs()
   const allDefinitionsValues = useMemo(
-    () => Object.values(getOnlyLatestDefs()),
+    () => Object.values(latestDefs),
     []
   )
 

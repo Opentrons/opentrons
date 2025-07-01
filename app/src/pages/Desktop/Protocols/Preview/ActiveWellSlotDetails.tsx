@@ -11,13 +11,10 @@ import {
 import { getMmFromBottom } from '@opentrons/shared-data'
 
 import styles from './preview.module.css'
-import { TipSvg } from './tipSvg'
+import { TipSvg } from './TipSvg'
+import { WellSvg } from './WellSvg'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
-
-import MID_LAYER from '../../../../assets/images/tip_side_mid_layer.svg'
-import BOTTOM_LAYER from '../../../../assets/images/tip_side_top_layer.svg'
-import TOP_LAYER from '../../../../assets/images/tip_side_top_layer.svg'
 
 const WELL_HEIGHT_PIXELS = 71
 const WELL_WIDTH_PIXELS = 70
@@ -25,22 +22,31 @@ const PIXEL_DECIMALS = 2
 
 interface ActiveWellSlotDetailsProps {
   params: RunTimeCommand['params']
-  currentCommand: RunTimeCommand
   activeWellName: string
   labwareDepth: number
   xLabwareWellWidth: number
+  maxVolume: number
+  color: string
+  currentVolume: number
+  labwareWellMaxVolume: number
+  totalVolumeInWell: number
+  tipColor: string
 }
 export function ActiveWellSlotDetails(
   props: ActiveWellSlotDetailsProps
 ): JSX.Element {
   const {
     params,
-    currentCommand,
     activeWellName,
     labwareDepth,
     xLabwareWellWidth,
+    maxVolume,
+    color,
+    currentVolume,
+    totalVolumeInWell,
+    labwareWellMaxVolume,
+    tipColor,
   } = props
-  const volume: number = 'volume' in params ? params.volume : 0
   const zValue = 'wellLocation' in params ? params.wellLocation.z ?? 1 : 1
   const reference =
     'wellLocation' in params
@@ -63,7 +69,6 @@ export function ActiveWellSlotDetails(
     (WELL_WIDTH_PIXELS / xLabwareWellWidth) *
     ('wellLocation' in params ? params.wellLocation.x : 1)
   const roundedXPositionPixels = round(xPositionPixels, PIXEL_DECIMALS)
-
   return (
     <>
       <div className={styles.slot_details_active_step}>
@@ -78,12 +83,6 @@ export function ActiveWellSlotDetails(
           <div>
             {'flowRate' in params ? `flow rate: ${params.flowRate}` : null}
           </div>
-          <div>
-            {'wellLocation' in params
-              ? `well location: ${params.wellLocation.origin}, x: ${params.wellLocation.x}, y: ${params.wellLocation.x}, z: ${params.wellLocation.x}`
-              : null}
-          </div>
-          <div>{'volume' in params ? `volume: ${params.volume}` : null}</div>
         </div>
       </div> */}
       <div
@@ -102,25 +101,17 @@ export function ActiveWellSlotDetails(
           height="18rem"
           overflow={OVERFLOW_HIDDEN}
         >
-          <img
-            src={BOTTOM_LAYER}
-            style={{ position: POSITION_ABSOLUTE }}
-            alt="bottom layer"
+          <TipSvg
+            volume={currentVolume}
+            maxVolume={maxVolume}
+            roundedXPositionPixels={roundedXPositionPixels}
+            bottomPx={bottomPx}
+            color={tipColor}
           />
-          {/* <TipSvg volume={volume} maxVolume={100} /> */}
-          <img
-            src={MID_LAYER}
-            style={{
-              position: POSITION_ABSOLUTE,
-              transform: `translate(${roundedXPositionPixels}px)`,
-              bottom: `calc(${bottomPx}px + 33px)`,
-            }}
-            alt="mid layer"
-          />
-          <img
-            src={TOP_LAYER}
-            style={{ position: POSITION_ABSOLUTE }}
-            alt="top layer"
+          <WellSvg
+            volume={totalVolumeInWell}
+            maxVolume={labwareWellMaxVolume}
+            color={color}
           />
           {labwareDepth !== null && (
             <Box position={POSITION_ABSOLUTE} bottom="7.3rem" right="2.2rem">

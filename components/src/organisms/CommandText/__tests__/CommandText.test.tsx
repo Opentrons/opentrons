@@ -212,7 +212,7 @@ describe('CommandText', () => {
           allRunDefs={[]}
           commandTextData={mockCommandTextData}
           robotType={FLEX_ROBOT_TYPE}
-          command={moveToWellCommand}
+        command={moveToWellCommand}
         />,
         { i18nInstance: i18n }
       )
