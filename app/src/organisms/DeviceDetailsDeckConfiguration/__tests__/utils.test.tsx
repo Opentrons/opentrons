@@ -200,21 +200,22 @@ describe('getThermoUnconfiguredFixtures', () => {
 describe('getFixtureOptions', () => {
   it('Should get a trash bin for cutoutD3 and aa D3', () => {
     const result = getFixtureOptions('cutoutD3', 'D3')
-    expect(result).toEqual(  [[
-      {
-        cutoutId: 'cutoutD3',
-        cutoutFixtureId: 'trashBinAdapter',
-        addressableAreaId: 'movableTrashD3'
-      }
-    ],
-    [
-      {
-        cutoutId: 'cutoutD3',
-        cutoutFixtureId: 'stagingAreaRightSlot',
-        addressableAreaId: 'D3'
-      }
-    ]
-  ])
+    expect(result).toEqual([
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'trashBinAdapter',
+          addressableAreaId: 'movableTrashD3',
+        },
+      ],
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'stagingAreaRightSlot',
+          addressableAreaId: 'D3',
+        },
+      ],
+    ])
   })
   it('Should get staging area for cutoutD3 and aa fakeD4', () => {
     const result = getFixtureOptions('cutoutD3', 'fakeD4')

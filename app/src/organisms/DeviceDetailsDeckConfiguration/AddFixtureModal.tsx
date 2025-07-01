@@ -19,7 +19,6 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  DeckDefinition,
   getAADisplayName,
   getFixtureDisplayName,
   replaceCutoutFixtureWithComboFixture,
@@ -40,6 +39,7 @@ import type {
   CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -64,7 +64,7 @@ export function AddFixtureModal({
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,
-  deckDef
+  deckDef,
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()

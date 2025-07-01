@@ -1054,19 +1054,19 @@ export const getMainAAForAFixture = (
   } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
     return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
-    console.log("fixtureId: ", fixtureId)
+    console.log('fixtureId: ', fixtureId)
     console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
     console.log('aaListForFixtureId: ', aaListForFixtureId)
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       console.log('addressableAreaId: ', addressableAreaId)
       console.log('aa: ', aa)
       const vsId = getVisualSlotIdFromAAId(aa)
-      console.log("vsId: ", vsId)
+      console.log('vsId: ', vsId)
       const singleSlotId = getSingleSlotIdWithFakesFromVSId(vsId)
-      console.log("singleSlotId: ", singleSlotId)
+      console.log('singleSlotId: ', singleSlotId)
       return singleSlotId === addressableAreaId
     })
-    console.log("aa aa:", aa)
+    console.log('aa aa:', aa)
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
@@ -1198,13 +1198,11 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      console.log("vsId: ", vsId)
+      console.log('vsId: ', vsId)
       return aa === addressableAreaId
-        ? getSingleSlotIdWithFakesFromVSId(
-          vsId
-          )
+        ? getSingleSlotIdWithFakesFromVSId(vsId)
         : aa
-        })
+    })
     console.log('updated: ', updated)
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(

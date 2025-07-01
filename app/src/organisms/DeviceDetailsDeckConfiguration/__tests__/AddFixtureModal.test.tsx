@@ -7,7 +7,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
-  getDeckDefinitions,
   getFixtureDisplayName,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -45,7 +44,7 @@ describe('Touchscreen AddFixtureModal', () => {
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
       isOnDevice: true,
-      deckDef
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -101,7 +100,7 @@ describe('Desktop AddFixtureModal', () => {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
-      deckDef
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
