@@ -2,7 +2,7 @@
 
 Usage:
 
-    python3 tof_analysis.py <action> [options]
+    python3 tof_tools.py <action> [options]
 
 """
 
@@ -27,7 +27,7 @@ baseline_stacker = "baseline_stack_{axis}.json"
 baseline_sensor = "baseline_sensor_{axis}.json"
 
 global options
-options = ["Make Baseline", "Validate Labware", "Validation Checks", "Plot"]
+option = ["Make Baseline", "Validate Labware", "Validation Checks", "Plot"]
 
 CHUNK_SIZE = 100
 NUMBER_OF_ZONES = 10
@@ -252,29 +252,30 @@ def create_baseline(
     @return: The baseline measurement.
     """
     baseline = defaultdict(list)
-    aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
-    # Iterate through the histograms and create a map of zones to bin value
-    # per index of each histogram.
-    for zone, bin_list in histograms.items():
-        for bins in bin_list:
-            assert (
-                len(bins) == bin_count
-            ), f"Invalid number of bins in zone {zone}, got {len(bins)} expected: {bin_count}."
-            for bin, value in enumerate(bins):
-                aggregate[zone][bin].append(value)
+    if histograms:
+        aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
+        # Iterate through the histograms and create a map of zones to bin value
+        # per index of each histogram.
+        for zone, bin_list in histograms.items():
+            for bins in bin_list:
+                assert (
+                    len(bins) == bin_count
+                ), f"Invalid number of bins in zone {zone}, got {len(bins)} expected: {bin_count}."
+                for bin, value in enumerate(bins):
+                    aggregate[zone][bin].append(value)
 
-    # Iterate through the per-index bin map and calculate the threshold
-    # for that specific bin.
-    for zone, bins_dict in aggregate.items():
-        for bins in bins_dict.values():
-            mean = sum(bins) / len(bins)  # type: ignore
-            std = statistics.pstdev(bins)  # type: ignore
-            threshold = float("%.2f" % (mean + (std * deviation)))
-            baseline[zone].append(threshold)
+        # Iterate through the per-index bin map and calculate the threshold
+        # for that specific bin.
+        for zone, bins_dict in aggregate.items():
+            for bins in bins_dict.values():
+                mean = sum(bins) / len(bins)  # type: ignore
+                std = statistics.pstdev(bins)  # type: ignore
+                threshold = float("%.2f" % (mean + (std * deviation)))
+                baseline[zone].append(threshold)
 
-    assert (
-        len(baseline) == zone_count
-    ), f"Invalid number of zones, got {len(baseline)} expected {zone_count}"
+        assert (
+            len(baseline) == zone_count
+        ), f"Invalid number of zones, got {len(baseline)} expected {zone_count}"
     return dict(baseline)
 
 
@@ -515,13 +516,18 @@ def generate_baseline(args: argparse.Namespace) -> None:
     axis_list = args.axes
     stacker_list = args.stackers
     labware_list = args.labwares
+    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
+    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
     bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
-    zone_list = args.zones or list(range(0, NUMBER_OF_ZONES))
     max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
     deviation = args.std or DEFAULT_STD
-    zone_count = len(zone_list)
+    zone_count_x = len(zone_list_x)
+    zone_count_z = len(zone_list_z)
     bin_count = len(bins_list)
 
+    print(
+        f"\nGenerating baseline: LW={labware_list}, STD={deviation}, ZonesZ={zone_list_z}, ZonesX={zone_list_x}, Bins={bins_list}\n"
+    )
     # Gather data
     samples = 0
     data = defaultdict(lambda: defaultdict(list))
@@ -533,14 +539,16 @@ def generate_baseline(args: argparse.Namespace) -> None:
             stacker = row.Stacker_SN
             axis = row.Axis
 
-            # TODO: filter here
+            # Filter out rows based on parameters
             if stacker_list and stacker not in stacker_list:
                 continue
             if labware_list and labware not in labware_list:
                 continue
             if axis_list and axis not in axis_list:
                 continue
-            if zone_list and zone not in zone_list:
+            if zone_list_x and zone not in zone_list_x:
+                continue
+            if zone_list_z and zone not in zone_list_z:
                 continue
 
             # Get the bins
@@ -552,22 +560,61 @@ def generate_baseline(args: argparse.Namespace) -> None:
         if samples > max_samples:
             break
 
-    baseline_x = create_baseline(dict(data["x"]), zone_count, bin_count, deviation)
-    baseline_z = create_baseline(dict(data["z"]), zone_count, bin_count, deviation)
+    baseline_x = create_baseline(dict(data["x"]), zone_count_x, bin_count, deviation)
+    baseline_z = create_baseline(dict(data["z"]), zone_count_z, bin_count, deviation)
+    if not baseline_x and not baseline_z:
+        sys.exit(f"ERROR: Error generating baselines.")
 
     # print or save to json file
-    # given the
-    print(baseline_x)
+    output_file = args.output_file
+    if output_file is not None:
+        if not os.path.exists(output_file):
+            print(f"Creating {output_file}")
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+        print(f"Saving baseline data to - {output_file}.\n")
+        with open(output_file, "r+") as file:
+            definition = json.load(file)
+            unique_module_data = definition.get("uniqueModuleData", {})
+            tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
+            x_baseline = baseline_x or tof_sensor_baseline.get("X", "{}")
+            z_baseline = baseline_z or tof_sensor_baseline.get("Z", "{}")
+            definition.update(
+                {
+                    "uniqueModuleData": {
+                        "TOFSensorBaseline": {
+                            "X": str(x_baseline),
+                            "Z": str(z_baseline),
+                        }
+                    }
+                }
+            )
+            # Save to json file
+            file.seek(0)
+            json.dump(definition, file, indent=2)
+
+    print("\n--------------- GENERATED BASELINES ---------------\n")
+    print(
+        "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
+    )
+
+    if baseline_x:
+        print("Baseline X:\n")
+        print(baseline_x, "\n")
+    if baseline_z:
+        print("Baseline Z:\n")
+        print(baseline_z, "\n")
 
 
 def main(args: argparse.Namespace):
     match args.action:
         case "plot":
-            plot_something(args.dataframe, args.baseline)
+            plot_something(args)
         case "generate":
             generate_baseline(args)
         case "validate":
-            validate_something(args.dataframe, args.baseline)
+            validate_something(args)
         case _:
             sys.exit(f"ERROR: Invalid action {args.action}")
 
@@ -649,9 +696,14 @@ if __name__ == "__main__":
         nargs="+",
     )
     parser.add_argument(
-        "-z",
-        "--zones",
-        help="The list of zones to use, uses 1-9 if ommited.",
+        "--zones_x",
+        help="The list of zones to use for the X axis, uses 1-9 if ommited.",
+        type=int,
+        nargs="+",
+    )
+    parser.add_argument(
+        "--zones_z",
+        help="The list of zones to use for the Z axis, uses 1-9 if ommited.",
         type=int,
         nargs="+",
     )
