@@ -11,14 +11,13 @@ from collections import defaultdict
 from enum import Enum
 import json
 import sys
-from typing import DefaultDict, List, Optional
+from typing import DefaultDict, Dict, List, Optional
 import pandas as pd
 import statistics
 import os
 import traceback
 import plotly.graph_objects as go
 
-from numpy.typing import NDArray
 
 global baseline_x, baseline_y
 baseline_x = "baseline_x.json"
@@ -30,6 +29,12 @@ baseline_sensor = "baseline_sensor_{axis}.json"
 global options
 options = ["Make Baseline", "Validate Labware", "Validation Checks", "Plot"]
 
+CHUNK_SIZE = 100
+NUMBER_OF_ZONES = 10
+NUMBER_OF_BINS = 128
+
+DEFAULT_STD = 6
+DEFAULT_MAX_SAMPLES = 1000
 
 ACTIONS = ["plot", "generate", "validate"]
 
@@ -40,12 +45,13 @@ class StackerAxis(Enum):
     X = "x"
     Z = "z"
 
+
 class Baseline(Enum):
     """The type of data to use to create the baseline."""
 
     LABWARE = "labware"
     STACKER = "stacker"
-    AXIS    = "axis"
+    AXIS = "axis"
 
 
 def plot_baseline(plot_choice):
@@ -228,13 +234,60 @@ def plot_baseline(plot_choice):
             fig.show()
 
 
-def create_baseline(data: DefaultDict[int, List[NDArray]]):
-    """Creates a baseline given the dataframe and parameters."""
-    baseline: DefaultDict[int, List[float]] = defaultdict(list)
+def create_baseline2(
+    histograms: Dict[int, List[List[int]]],
+    zone_count: int = NUMBER_OF_ZONES,
+    bin_count: int = NUMBER_OF_BINS,
+    deviation: int = DEFAULT_STD,
+) -> Dict[int, List[float]]:
+    """Generate a TOF sensor baseline given multiple histogram readings."""
+    baseline = defaultdict(list)
     aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
     # Iterate through the histograms and create a map of zones to bin value
     # per index of each histogram.
-    for histogram in zip(*(h.items() for h in data)):
+    for zone, bin_list in histograms.items():
+        for bins in bin_list:
+            assert (
+                len(bins) == bin_count
+            ), f"Invalid number of bins in zone {zone}, got {len(bins)} expected: {bin_count}."
+            for bin, value in enumerate(bins):
+                aggregate[zone][bin].append(value)
+
+    # Iterate through the per-index bin map and calculate the threshold
+    # for that specific bin.
+    for zone, bins_dict in aggregate.items():
+        for bins in bins_dict.values():
+            mean = sum(bins) / len(bins)  # type: ignore
+            std = statistics.pstdev(bins)  # type: ignore
+            threshold = float("%.2f" % (mean + (std * deviation)))
+            baseline[zone].append(threshold)
+
+    assert (
+        len(baseline) == zone_count
+    ), f"Invalid number of zones, got {len(baseline)} expected {zone_count}"
+    return dict(baseline)
+
+
+def create_baseline(
+    histograms: List[Dict[int, List[int]]], deviation: int = 6
+) -> Dict[int, List[float]]:
+    """Generate a TOF sensor baseline given multiple histogram readings.
+
+    Baseline must be robust against variation the "no labware" reading of ANY
+    stacker should always be below the "baseline". For each bin, we calculate
+    the Mean and Standard Deviation (STD) of the samples. We then create the
+    "baseline": Baseline = Mean + deviation x Standard Deviation
+
+    @param histogram: a list of tof histogram measurements denoted as dicts of zone to bins.
+    @param std: the standard deviation to use when calculating baseline, defaults to 6.
+    @return: The baseline measurement.
+    """
+    assert len(histograms) > 1, "Need at least 2 histograms to generate a baseline."
+    baseline = defaultdict(list)
+    aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
+    # Iterate through the histograms and create a map of zones to bin value
+    # per index of each histogram.
+    for histogram in zip(*(h.items() for h in histograms)):
         for zone, bins in histogram:
             assert (
                 len(bins) == NUMBER_OF_BINS
@@ -464,72 +517,82 @@ def validate_something(args: argparse.Namespace) -> None:
     baseline_path: str = args.baseline
     axis: str = args.axis
     labware_list: Optional[List[str]] = []
-    if axis == 'x':
-        axis = 'X-Axis'
-    elif axis == 'z':
-        axis = 'Z-Axis'
+    if axis == "x":
+        axis = "X-Axis"
+    elif axis == "z":
+        axis = "Z-Axis"
     df = pd.read_csv(dataframe_path, header=None)
     for i, entry in enumerate(df.itertuples()):
-        if i == 0: continue
-        stacker = getattr(entry, '_2')
-        serial = getattr(entry, '_4')
-        labware = getattr(entry, '_6')
-        labware_stacked = getattr(entry, '_9')
-        values = getattr(entry, '_10')
+        if i == 0:
+            continue
+        stacker = getattr(entry, "_2")
+        serial = getattr(entry, "_4")
+        labware = getattr(entry, "_6")
+        labware_stacked = getattr(entry, "_9")
+        values = getattr(entry, "_10")
         values_json = json.loads(values)
         values_df = pd.DataFrame(values_json)
         result = sense_labware(axis, values_df)
-        print(f'Labware: {labware}\n\nStacked: {labware_stacked}\n\nStacker\n\n{stacker}\n\nSerial: {serial}\n\nRESULT: {result}\n\n')
+        print(
+            f"Labware: {labware}\n\nStacked: {labware_stacked}\n\nStacker\n\n{stacker}\n\nSerial: {serial}\n\nRESULT: {result}\n\n"
+        )
 
 
-def generate_baseline(dataframe_path: str, output_path: str, options: str | None = None) -> None:
+def generate_baseline(args: argparse.Namespace) -> None:
     """Generates a new baseline given the dataframe."""
-    if not os.path.exists(dataframe_path):
-        sys.exit(f"ERROR: Invalid dataframe file provided - {dataframe_path}")
+    if not os.path.exists(args.dataframe):
+        sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
 
-    df = pd.read_csv(dataframe_path)
-    zones = {}
-    labwares: DefaultDict[str, List[NDArray]] = defaultdict(list)
-    stackers: DefaultDict[str, List[NDArray]] = defaultdict(list)
-    sensors:  DefaultDict[str, List[NDArray]] = defaultdict(list)
-
-    return_zones = {}
-    return_labwares = {}
-    return_stackers = {}
-    return_sensors = {}
-    i = 0
+    data = defaultdict(lambda: defaultdict(list))
+    stacker_list = args.stackers
+    labware_list = args.labwares
+    axis_list = args.axes
+    zone_list = args.zones or list(range(0, NUMBER_OF_ZONES))
 
     # Gather data
-    for row in df.itertuples(index=False, name="data"):
-        labware = row.Labware_Name
-        stacker = row.Stacker_SN
-        sensor  = row.Axis
-        start_index = df.columns.get_loc("Time") + 1
-        bins = df.iloc[:, start_index:]
-        labwares[labware].append(bins)
-        stackers[stacker].append(bins)
-        sensors[sensor].append(bins)
+    samples = 0
+    chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
+    for df in chunks:
+        for row in df.itertuples(index=False, name="data"):
+            zone = row.Zone
+            labware = row.Labware_Name
+            stacker = row.Stacker_SN
+            axis = row.Axis
 
-    fo labware in labwares:
+            # TODO: filter here
+            if stacker_list and stacker not in stacker_list:
+                continue
+            if labware_list and labware not in labware_list:
+                continue
+            if axis_list and axis not in axis_list:
+                continue
+            if zone_list and zone not in zone_list:
+                continue
 
-    # Calculate the threshold
-    return (return_zones, return_labwares, return_stackers, return_sensors)
+            # Get the bins
+            start_index = df.columns.get_loc("Time") + 1
+            bins = list(row[start_index : start_index + NUMBER_OF_BINS])
+            data[axis][zone].append(bins)
+            samples += 1
 
-    baseline_x = create_baseline(dataframe_path, Baseline.AXIS, StackerAxis.X)
-    baseline_z = create_baseline(dataframe_path, Baseline.AXIS, StackerAxis.Z)
+        if samples > args.max_samples:
+            break
 
- 
+    baseline_z = create_baseline2(dict(data["z"]))
+    baseline_x = create_baseline2(dict(data["x"]))
+
 
 def main(args: argparse.Namespace):
     match args.action:
         case "plot":
             plot_something(args.dataframe, args.baseline)
         case "generate":
-            generate_baseline(args.dataframe, args.output_file)
+            generate_baseline(args)
         case "validate":
             validate_something(args.dataframe, args.baseline)
         case _:
             sys.exit(f"ERROR: Invalid action {args.action}")
+
 
 #    elif options[selection_int] == 'Validation Checks':
 #        baseline_checks = [
@@ -570,7 +633,8 @@ if __name__ == "__main__":
         formatter_class=argparse.RawTextHelpFormatter, description=__doc__
     )
     parser.add_argument(
-        "action", choices=ACTIONS,
+        "action",
+        choices=ACTIONS,
         help=(
             "plot: Plot the baseline, dataframe, or both superimposed.\n"
             "generate: Generate a baseline from the given dataframe.\n"
@@ -578,25 +642,55 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
-        "-d", "--dataframe",
+        "-d",
+        "--dataframe",
         help="Source file to CSV dataframe for generating baseline or plotting.",
     )
     parser.add_argument(
-        "-b", "--baseline",
+        "-b",
+        "--baseline",
         help="The path to the generated baseline JSON file for plotting and validating labware.",
     )
     parser.add_argument(
-        "-o", "--output_file",
+        "--std",
+        help="Standard devition to use when creating a baseline.",
+        default=DEFAULT_STD,
+    )
+    parser.add_argument(
+        "-o",
+        "--output_file",
         help="The output file of the generated baseline, prints to stdout if ommited.",
     )
     parser.add_argument(
-        "-l", "--labware_list",
-        help="The list of labware load names to validate detection with.",
+        "-a",
+        "--axes",
+        help="The axis to generate baseline for (x, z), generates both if empty.",
+        default=["x", "z"],
+        nargs="+",
     )
     parser.add_argument(
-        "-a", "--axis",
+        "-z",
+        "--zones",
+        help="The list of zones to use, uses 1-9 if ommited.",
         nargs="+",
-        help="The axis to validate [x, z], validates both if empty.",
+    )
+    parser.add_argument(
+        "-l",
+        "--labwares",
+        help="The list of labware to use, uses 'baseline' by default.",
+        default=["baseline"],
+        nargs="+",
+    )
+    parser.add_argument(
+        "-s",
+        "--stackers",
+        help="The list of stacker serial number to process data for, ex. FSTA1020250401005.",
+        nargs="+",
+    )
+    parser.add_argument(
+        "--max_samples",
+        help="The maximum number of samples (rows) to pricess from the dataframe.",
+        default=DEFAULT_MAX_SAMPLES,
     )
     args = parser.parse_args()
     main(args)
