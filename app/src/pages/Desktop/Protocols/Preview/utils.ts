@@ -5,10 +5,13 @@ import values from 'lodash/values'
 
 import { COLORS } from '@opentrons/components'
 import {
+  COLUMN,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  ROW,
+  SINGLE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -26,12 +29,14 @@ import type {
   CutoutId,
   LabwareDefinition2,
   Liquid,
+  NozzleConfigurationStyle,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
   ContentsByWell,
   DeckSlot,
+  LabwareTemporalProperties,
   ModuleEntities,
   PipetteTemporalProperties,
   RobotState,
@@ -275,4 +280,28 @@ export const getActiveLayer = (
     copy: activeCopy,
     isActiveLayerVisible: isStepAssosciatedWithLabware,
   }
+}
+
+export const getTopmostLabwareOnModuleFromStack = (
+  moduleId: string,
+  labware: LabwareTemporalProperties[]
+): string => {
+  return labware
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+export const getChannels = (
+  channels: number | null,
+  nozzles?: NozzleConfigurationStyle
+): number => {
+  let numChannels = channels ?? 1
+  if (nozzles === SINGLE) {
+    numChannels = 1
+  } else if (nozzles === COLUMN) {
+    numChannels = 8
+  } else if (nozzles === ROW) {
+    numChannels = 12
+  }
+  return numChannels
 }

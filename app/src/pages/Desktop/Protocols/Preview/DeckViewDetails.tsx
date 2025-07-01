@@ -2,8 +2,6 @@ import { Fragment } from 'react'
 import clsx from 'clsx'
 
 import {
-  BORDERS,
-  Box,
   COLORS,
   RobotCoordsForeignDiv,
   SingleSlotFixture,
@@ -26,6 +24,7 @@ import {
   getSlotIdsBlockedBySpanningForThermocycler,
   getSlotIsEmpty,
   getStagingAreaAddressableAreas,
+  getTopmostLabwareOnModuleFromStack,
 } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -37,7 +36,6 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
-  LabwareTemporalProperties,
   TimelineFrame,
 } from '@opentrons/step-generation'
 
@@ -141,18 +139,16 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 {labwareLoadedOnModuleId != null ? (
                   <>
                     <RobotCoordsForeignDiv>
-                      <Box
-                        backgroundColor={getBackgroundColor(
-                          hoveredSlot,
-                          selectedSlot,
-                          slot,
-                          isActiveLayerVisible
+                      <div
+                        className={clsx(
+                          styles.slot_box,
+                          getSlotColorClass(
+                            hoveredSlot,
+                            selectedSlot,
+                            slot,
+                            isActiveLayerVisible
+                          )
                         )}
-                        border="3px solid black"
-                        borderRadius={BORDERS.borderRadius8}
-                        width={`${STANDARD_X_WIDTH}px`}
-                        height={`${STANDARD_Y_HEIGHT}px`}
-                        padding="8px"
                       >
                         <StyledText
                           desktopStyle="captionRegular"
@@ -164,7 +160,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                             : labwareEntities[labwareLoadedOnModuleId].def
                                 .metadata.displayName}
                         </StyledText>
-                      </Box>
+                      </div>
                     </RobotCoordsForeignDiv>
                   </>
                 ) : null}
@@ -298,7 +294,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               <div
                 className={clsx(
                   styles.slot_box,
-                  isActive && styles.active_slot_box
+                  isActive && styles.hovered_inactive_slot_box
                 )}
               >
                 <StyledText desktopStyle="captionRegular" color={COLORS.white}>
@@ -396,7 +392,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               <div
                 className={clsx(
                   styles.slot_box,
-                  isActive && styles.active_slot_box
+                  isActive && styles.hovered_inactive_slot_box
                 )}
               >
                 <StyledText desktopStyle="captionRegular" color={COLORS.white}>
@@ -429,11 +425,22 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
   )
 }
 
-export const getTopmostLabwareOnModuleFromStack = (
-  moduleId: string,
-  labware: LabwareTemporalProperties[]
+const getSlotColorClass = (
+  hoveredSlot: string | null,
+  selectedSlot: string | null,
+  slot: string,
+  isSlotSelected: boolean
 ): string => {
-  return labware
-    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+  if (hoveredSlot === slot && isSlotSelected) {
+    return styles.hovered_active_slot_box
+  } else if (hoveredSlot === slot && !isSlotSelected) {
+    return styles.hovered_inactive_slot_box
+  } else if (selectedSlot === slot && isSlotSelected) {
+    return styles.hovered_active_slot_box
+  } else if (selectedSlot === slot && !isSlotSelected) {
+    return styles.hovered_inactive_slot_box
+  } else if (isSlotSelected) {
+    return styles.active_slot_box
+  }
+  return ''
 }

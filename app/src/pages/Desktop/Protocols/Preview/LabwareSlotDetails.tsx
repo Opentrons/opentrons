@@ -8,16 +8,22 @@ import {
 } from '@opentrons/components'
 import { wellFillFromWellContents } from '@opentrons/step-generation'
 
+import { ActiveWellSlotDetails } from './ActiveWellSlotDetails'
 import styles from './preview.module.css'
 import {
   getAllWellContentsAtFrame,
+  getChannels,
   getLiquidDetailInfo,
   getMissingTips,
 } from './utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareEntities, RobotState } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+  RobotState,
+} from '@opentrons/step-generation'
 
 interface LabwareSlotDetailsProps {
   topLabwareOnSlotId: string
@@ -26,6 +32,7 @@ interface LabwareSlotDetailsProps {
   liquids: Liquid[]
   currentCommand: RunTimeCommand
   robotState: RobotState
+  pipetteEntities: PipetteEntities
 }
 export function LabwareSlotDetails(
   props: LabwareSlotDetailsProps
@@ -37,6 +44,7 @@ export function LabwareSlotDetails(
     labwareEntities,
     currentCommand,
     robotState,
+    pipetteEntities,
   } = props
   const labwareLoadCommand = Object.values(commands).find(
     command =>
@@ -45,9 +53,22 @@ export function LabwareSlotDetails(
   )
   // TODO: this only works for single channel, need to update for multi-channels
   // by getting all the wells the multi-channel is using
-  const activeWellName = Object.values(robotState.pipettes).find(
-    pipette => pipette.entityId === topLabwareOnSlotId
-  )?.wellName
+  const pipetteTemporalProperties = Object.entries(robotState.pipettes).find(
+    ([id, pipette]) => pipette.entityId === topLabwareOnSlotId
+  )
+
+  const activeWellName =
+    pipetteTemporalProperties != null
+      ? pipetteTemporalProperties[1].wellName
+      : null
+
+  const channels =
+    pipetteTemporalProperties != null
+      ? getChannels(
+          pipetteEntities[pipetteTemporalProperties[0]].spec.channels,
+          pipetteTemporalProperties[1].nozzles
+        )
+      : 1
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname =
@@ -70,15 +91,15 @@ export function LabwareSlotDetails(
       : null
 
   const wellFill = wellFillFromWellContents(wellContents, liquidDisplayColors)
-  const labwareDisplayName =
-    labwareEntities[topLabwareOnSlotId].def.metadata.displayName
+  const labwareDisplayName = labwareDef.metadata.displayName
   const wellGroup: WellGroup | null =
     activeWellName != null
       ? {
           [activeWellName]: null,
         }
       : null
-
+  const labwareDepth = labwareDef.wells.A1.depth ?? 0
+  const labwareWellXWidth = labwareDef.wells.A1.x ?? 0
   const missingTips = getMissingTips(robotState.tipState, topLabwareOnSlotId)
   const liquidInfo = getLiquidDetailInfo(wellContents, liquids)
 
@@ -136,31 +157,17 @@ export function LabwareSlotDetails(
       </div>
       <Divider />
       {activeWellName != null ? (
-        <>
-          <div className={styles.slot_details_active_step}>
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {`Well ${activeWellName}`}
-            </StyledText>
-          </div>
-          <div className={styles.labware_details_padding}>
-            <div className={styles.labware_details_container}>
-              <div> {currentCommand.commandType}</div>
-              <div> {'speed' in params ? `speed: ${params.speed}` : null}</div>
-              <div>
-                {'flowRate' in params ? `flow rate: ${params.flowRate}` : null}
-              </div>
-              <div>
-                {'wellLocation' in params
-                  ? `well location: ${params.wellLocation.origin}, x: ${params.wellLocation.x}, y: ${params.wellLocation.x}, z: ${params.wellLocation.x}`
-                  : null}
-              </div>
-              <div>
-                {'volume' in params ? `volume: ${params.volume}` : null}
-              </div>
-            </div>
-          </div>
-          <Divider />
-        </>
+        channels === 1 ? (
+          <ActiveWellSlotDetails
+            labwareDepth={labwareDepth}
+            params={params}
+            currentCommand={currentCommand}
+            activeWellName={activeWellName}
+            xLabwareWellWidth={labwareWellXWidth}
+          />
+        ) : (
+          <div>TODO: support multi-channel</div>
+        )
       ) : null}
     </>
   )

@@ -256,6 +256,14 @@
   background-color: #737578;
 }
 
-.active_slot_box {
+.hovered_inactive_slot_box {
   background-color: #4a4c4e;
+}
+
+.active_slot_box {
+  background-color: #9e39a8; /* COLORS.purple50 */
+}
+
+.hovered_active_slot_box {
+  background-color: #612367; /* COLORS.purple60 */
 }

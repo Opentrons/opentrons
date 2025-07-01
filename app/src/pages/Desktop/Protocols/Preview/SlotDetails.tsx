@@ -55,6 +55,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     trashBinEntities,
     wasteChuteEntities,
     moduleEntities,
+    pipetteEntities,
   } = invariantContext
   const { commands } = analysis
   const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
@@ -73,7 +74,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
     <div className={styles.detail_container} style={{ width: '100%' }}>
-      <div className={styles.command_step}>
+      <div className={styles.command_step} style={{ overflowY: 'scroll' }}>
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
             <StyledText desktopStyle="bodyLargeSemiBold">Slot</StyledText>
@@ -123,6 +124,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             currentCommand={command}
             liquids={liquids}
             robotState={robotState}
+            pipetteEntities={pipetteEntities}
           />
         ) : null}
         {isTrashOnSlot ? (
