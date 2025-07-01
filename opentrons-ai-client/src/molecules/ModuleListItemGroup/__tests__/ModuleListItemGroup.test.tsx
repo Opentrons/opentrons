@@ -28,6 +28,12 @@ const modulesMock: TestDisplayModule[] = [
     model: 'temperatureModuleV2',
     name: 'Temperature Module GEN2',
   },
+  {
+    id: 'module-3',
+    type: 'thermocyclerModuleType',
+    model: 'thermocyclerModuleV2',
+    name: 'Thermocycler Module GEN2',
+  },
 ]
 
 const TestFormProviderComponent = () => {
@@ -55,13 +61,16 @@ describe('ModuleListItemGroup', () => {
     render()
 
     expect(screen.getAllByText('Adapter').length).toBe(2)
-    expect(screen.getAllByText('remove').length).toBe(2)
+    expect(screen.getAllByText('remove').length).toBe(3)
 
     screen.getByAltText('heaterShakerModuleType')
     screen.getByText('Heater-Shaker Module GEN1')
 
     screen.getByAltText('temperatureModuleType')
     screen.getByText('Temperature Module GEN2')
+
+    screen.getByAltText('thermocyclerModuleType')
+    screen.getByText('Thermocycler Module GEN2')
   })
 
   it('should remove the list item if remove is clicked', async () => {
@@ -118,5 +127,33 @@ describe('ModuleListItemGroup', () => {
     expect(
       within(secondModuleListItem).queryByText('Choose an adapter')
     ).not.toBeInTheDocument()
+  })
+
+  it('should not render dropdown for thermocycler module', () => {
+    render()
+
+    const listItems = screen.getAllByTestId('ListItem_default')
+    const thermocyclerListItem = listItems.find(item =>
+      within(item).queryByText('Thermocycler Module GEN2')
+    )
+
+    if (thermocyclerListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the thermocycler module list item.'
+      )
+    }
+
+    // Thermocycler should not have "Adapter" label
+    expect(
+      within(thermocyclerListItem).queryByText('Adapter')
+    ).not.toBeInTheDocument()
+
+    // Thermocycler should not have dropdown with "Choose an adapter"
+    expect(
+      within(thermocyclerListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
+
+    // But it should still have the remove button
+    expect(within(thermocyclerListItem).getByText('remove')).toBeInTheDocument()
   })
 })
