@@ -9,6 +9,7 @@ import {
   EmptySelectorButton,
   Flex,
   InfoScreen,
+  JUSTIFY_FLEX_START,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -51,7 +52,7 @@ export function LabwareLiquidsSection(): JSX.Element | null {
         {t('labware_section_textbody')}
       </StyledText>
 
-      <Flex justifyContent="flex-start">
+      <Flex justifyContent={JUSTIFY_FLEX_START}>
         <ButtonWrapper>
           <EmptySelectorButton
             onClick={() => {
@@ -84,7 +85,7 @@ export function LabwareLiquidsSection(): JSX.Element | null {
         {t('liquid_section_textbody')}
       </StyledText>
 
-      <Flex justifyContent="flex-start">
+      <Flex justifyContent={JUSTIFY_FLEX_START}>
         <ButtonWrapper>
           <EmptySelectorButton
             onClick={() => {
