@@ -70,7 +70,7 @@ export function useAssignLiquidClass(
   const liquidClassesInSourceWellsSet = allWellsAdjustedForPipette.reduce<
     Set<string>
   >((acc, wellName) => {
-    const liquidGroupsInWell = liquidsInLabware[wellName] ?? {}
+    const liquidGroupsInWell = liquidsInLabware?.[wellName] ?? {}
     for (const liquidGroup of Object.keys(liquidGroupsInWell)) {
       const liquidClass = allIngredientGroupFields[liquidGroup]?.liquidClass
       if (liquidClass != null) {
