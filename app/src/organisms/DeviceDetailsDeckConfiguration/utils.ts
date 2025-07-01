@@ -1,4 +1,5 @@
 import {
+  DeckDefinition,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
@@ -64,9 +65,11 @@ export const getModuleUnconfiguredFixtures = (
   unconfiguredMods: AttachedModule[],
   cutoutId: CutoutId,
   moduleModel: ModuleModel,
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDef: DeckDefinition
 ): CutoutConfigMap[][] => {
-  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(cutoutId)
+  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(cutoutId, deckDef)
+  console.log("addressableAreasById: ", addressableAreasById)
   const filteredMods = getFilteredModules(unconfiguredMods, moduleModel)
 
   return filteredMods
@@ -121,7 +124,8 @@ export const getThermoUnconfiguredFixtures = (
 export const getUnconfiguredMods = (
   cutoutId: CutoutId,
   unconfiguredMods: AttachedModule[],
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDef: DeckDefinition
 ): CutoutConfigMap[][] => {
   const availableOptions: CutoutConfigMap[][] = []
 
@@ -139,7 +143,8 @@ export const getUnconfiguredMods = (
       unconfiguredMods,
       cutoutId,
       model as ModuleModel,
-      addressableAreaId
+      addressableAreaId,
+      deckDef
     )
 
     availableOptions.push(...moduleOptions)
@@ -151,7 +156,8 @@ export const getUnconfiguredMods = (
 export const getModuleOptions = (
   cutoutId: CutoutId,
   unconfiguredMods: AttachedModule[],
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDef: DeckDefinition
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
   const aaMagBlockId = getMainAAForAFixture(
@@ -171,9 +177,10 @@ export const getModuleOptions = (
   if (unconfiguredMods.length > 0) {
     availableOptions = [
       ...availableOptions,
-      ...getUnconfiguredMods(cutoutId, unconfiguredMods, addressableAreaId),
+      ...getUnconfiguredMods(cutoutId, unconfiguredMods, addressableAreaId, deckDef),
     ]
   }
+  console.log("availableOptions: ", availableOptions)
   return availableOptions
 }
 
@@ -205,6 +212,7 @@ export const getFixtureOptions = (
     TRASH_BIN_ADAPTER_FIXTURE,
     addressableAreaId
   )
+  console.log("TrashBinAA: ", TrashBinAA)
   if (TrashBinAA != null) {
     availableOptions = [
       ...availableOptions,
@@ -217,6 +225,7 @@ export const getFixtureOptions = (
       ],
     ]
   }
+  console.log("availableOptions: ", availableOptions)
 
   const stagingAreaAA = getMainAAForAFixture(
     cutoutId,
@@ -235,6 +244,7 @@ export const getFixtureOptions = (
       ],
     ]
   }
+  console.log("availableOptions: ", availableOptions)
   return availableOptions
 }
 
@@ -243,12 +253,13 @@ export const getOptions = (
   providedFixtureOptions: CutoutFixtureId[] | undefined,
   unconfiguredMods: AttachedModule[],
   optionStage: string,
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  deckDefinition: DeckDefinition
 ): CutoutConfigMap[][] => {
   if (providedFixtureOptions != null) {
     return providedFixtureOptions?.map((o: CutoutFixtureId) => {
       const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
-        cutoutId
+        cutoutId, deckDefinition
       )
       const aaProvidedFixtureOptions = addressableAreasById[o]
       if (aaProvidedFixtureOptions != null) {
@@ -274,7 +285,7 @@ export const getOptions = (
     return getFixtureOptions(cutoutId, addressableAreaId)
   }
   if (optionStage === 'moduleOptions') {
-    return getModuleOptions(cutoutId, unconfiguredMods, addressableAreaId)
+    return getModuleOptions(cutoutId, unconfiguredMods, addressableAreaId, deckDefinition)
   }
   if (optionStage === 'wasteChuteOptions') {
     return getWasteChuteOptions(cutoutId)

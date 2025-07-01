@@ -30,6 +30,7 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getSingleSlotIdWithFakesFromVSId,
   getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
@@ -158,7 +159,7 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
-      const name = getVisualSlotIdForAA(
+      const vsId = getVisualSlotIdForAA(
         cutoutId,
         cutoutFixtureId,
         addressableAreaId
@@ -168,8 +169,8 @@ export function DeviceDetailsDeckConfiguration({
         displayList: [
           ...acc.displayList,
           {
-            displayLocation: name
-              ? getAASlotDisplayName(name)
+            displayLocation: vsId
+              ? getAASlotDisplayName(getSingleSlotIdWithFakesFromVSId(vsId) ?? addressableAreaId)
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },

@@ -19,6 +19,7 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  DeckDefinition,
   getAADisplayName,
   getFixtureDisplayName,
   replaceCutoutFixtureWithComboFixture,
@@ -46,6 +47,7 @@ interface AddFixtureModalProps {
   cutoutId: CutoutId
   addressableAreaId: AddressableAreaNamesWithFakes
   closeModal: () => void
+  deckDef: DeckDefinition
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
@@ -62,6 +64,7 @@ export function AddFixtureModal({
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,
+  deckDef
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -112,7 +115,8 @@ export function AddFixtureModal({
     providedFixtureOptions,
     unconfiguredMods,
     optionStage,
-    addressableAreaId
+    addressableAreaId,
+    deckDef
   )
 
   let nextStageOptions = null
