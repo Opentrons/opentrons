@@ -425,7 +425,6 @@ export const getReplacementFixtureForFixtureRemoval = (
       cutoutId,
       addressableAreaId
     )
-    console.log('cutoutFixtureReplacment; ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -1054,19 +1053,11 @@ export const getMainAAForAFixture = (
   } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
     return DEFAULT_AA_FOR_WASTE_CHUTE
   } else {
-    console.log('fixtureId: ', fixtureId)
-    console.log('visualSlotId', getVisualSlotIdFromAAId(addressableAreaId))
-    console.log('aaListForFixtureId: ', aaListForFixtureId)
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
-      console.log('addressableAreaId: ', addressableAreaId)
-      console.log('aa: ', aa)
       const vsId = getVisualSlotIdFromAAId(aa)
-      console.log('vsId: ', vsId)
       const singleSlotId = getSingleSlotIdWithFakesFromVSId(vsId)
-      console.log('singleSlotId: ', singleSlotId)
       return singleSlotId === addressableAreaId
     })
-    console.log('aa aa:', aa)
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
@@ -1185,7 +1176,6 @@ export const replaceCutoutFixtureRemove = (
     cutoutFixtureRemoved,
     deckDef
   )
-  console.log('aaForCutoutAndFixture; ', aaForCutoutAndFixture)
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
       return cutoutFixtureRemoved ===
@@ -1198,12 +1188,10 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      console.log('vsId: ', vsId)
       return aa === addressableAreaId
         ? getSingleSlotIdWithFakesFromVSId(vsId)
         : aa
     })
-    console.log('updated: ', updated)
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(
         value.sort(),
@@ -1212,7 +1200,6 @@ export const replaceCutoutFixtureRemove = (
           : updated?.sort()
       )
     )
-    console.log('match: ', match)
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes
     }
