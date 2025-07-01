@@ -1,25 +1,26 @@
 import type { ErrorCodes } from '../../errors'
 import type {
-  PipettingRunTimeCommand,
-  PipettingCreateCommand,
-} from './pipetting'
-import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
-import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
-import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
-import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
+  AnnotationCreateCommand,
+  AnnotationRunTimeCommand,
+} from './annotation'
+import type {
+  CalibrationCreateCommand,
+  CalibrationRunTimeCommand,
+} from './calibration'
+import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
 import type {
   IncidentalCreateCommand,
   IncidentalRunTimeCommand,
 } from './incidental'
+import type { ModuleCreateCommand, ModuleRunTimeCommand } from './module'
 import type {
-  AnnotationRunTimeCommand,
-  AnnotationCreateCommand,
-} from './annotation'
-import type {
-  CalibrationRunTimeCommand,
-  CalibrationCreateCommand,
-} from './calibration'
-import type { UnsafeRunTimeCommand, UnsafeCreateCommand } from './unsafe'
+  PipettingCreateCommand,
+  PipettingRunTimeCommand,
+} from './pipetting'
+import type { RobotCreateCommand, RobotRunTimeCommand } from './robot'
+import type { SetupCreateCommand, SetupRunTimeCommand } from './setup'
+import type { TimingCreateCommand, TimingRunTimeCommand } from './timing'
+import type { UnsafeCreateCommand, UnsafeRunTimeCommand } from './unsafe'
 
 export * from './annotation'
 export * from './calibration'
@@ -31,6 +32,7 @@ export * from './setup'
 export * from './timing'
 export * from './unsafe'
 export * from './support'
+export * from './robot'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
@@ -70,6 +72,7 @@ export type CreateCommand =
   | AnnotationCreateCommand // annotating command execution
   | IncidentalCreateCommand // command with only incidental effects (status bar animations)
   | UnsafeCreateCommand // command providing capabilities that are not safe for scientific uses
+  | RobotCreateCommand // command providing robotics capabilities below the protocol interaction model
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -82,6 +85,7 @@ export type RunTimeCommand =
   | AnnotationRunTimeCommand // annotating command execution
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
   | UnsafeRunTimeCommand // command providing capabilities that are not safe for scientific uses
+  | RobotRunTimeCommand // command providing robotics capabilities below the protocol interaction model
 
 export type RunCommandError =
   | RunCommandErrorUndefined
