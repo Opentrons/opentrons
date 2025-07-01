@@ -19,6 +19,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  type ModuleType,
 } from '@opentrons/shared-data'
 
 import { MODULES_FIELD_NAME } from '/ai-client/organisms/ModulesAndFixturesSection'
@@ -27,7 +28,6 @@ import { getOnlyLatestDefs } from '/ai-client/resources/utils'
 import { ModuleDiagram } from '../ModelDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
-import type { ModuleType } from '@opentrons/shared-data'
 import type { DisplayModule } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
@@ -72,6 +72,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
   const allDefinitionsValues = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     () => Object.values(getOnlyLatestDefs()),
     []
   )
@@ -101,13 +102,17 @@ export function ModuleListItemGroup(): JSX.Element | null {
                 <ListItem type="default" key={module.id}>
                   <ListItemCustomize
                     label={
-                      adapters != null && adapters.length > 0 && module.type !== THERMOCYCLER_MODULE_TYPE
+                      adapters != null &&
+                      adapters.length > 0 &&
+                      module.type !== THERMOCYCLER_MODULE_TYPE
                         ? t('modules_adapter_label')
                         : undefined
                     }
                     linkText={t('modules_remove_label')}
                     dropdown={
-                      adapters != null && adapters.length > 0 && module.type !== THERMOCYCLER_MODULE_TYPE
+                      adapters != null &&
+                      adapters.length > 0 &&
+                      module.type !== THERMOCYCLER_MODULE_TYPE
                         ? {
                             title: (null as unknown) as string,
                             width: '13rem',
