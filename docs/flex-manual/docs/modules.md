@@ -1,14 +1,24 @@
 # Modules
 
-Opentrons Flex integrates with a number of Opentrons hardware modules. All modules are peripherals that occupy deck slots, and most are controlled by the robot over a USB connection.
+Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
 
-This chapter describes the functions and physical specifications of modules that are compatible with the Opentrons Flex system, as well as how to attach and calibrate them. For further details on module setup and use, consult the manuals for the individual modules. For details on integrating modules into your protocols, see the [Protocol Designer section](protocol-development.md#protocol-designer) of the Protocol Development chapter or the online [Python Protocol API documentation](https://docs.opentrons.com/v2/).
+This chapter summarizes the functions and physical specifications of modules that are compatible with Opentrons Flex. It also covers the caddy attachment system and module calibration.
+
+!!!tip
+    - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [documentation and manuals section](https://opentrons.com/resources/knowledge-hub?c%5B%5D=documentation-manuals) of the Opentrons website.
+
+    - For details on integrating modules into your protocols, see the [Protocol Designer section](protocol-development.md#protocol-designer) of the Protocol Development chapter or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
+
 
 ## Supported modules
 
-Opentrons Flex is compatible with four types of on-deck Opentrons modules:
+Opentrons Flex is compatible with with the following Opentrons modules:
+
+- The **Absorbance Plate Reader** is a fully automated spectrophotometer that uses light absorbance to determine sample concentrations. This module is optimized for a variety of applications, including protein quantification, sample normalization, cell viability assays, and monitoring bacterial growth.
 
 - The **Heater-Shaker Module** provides on-deck heating and orbital shaking. The module can be heated to 95 °C, and can shake samples from 200 to 3000 rpm.
+
+- The **HEPA/UV Module** is a positive-pressure clean air and ultraviolet disinfectant accessory for Opentrons Flex. A single 15-minute filtration and UV cycle is sufficient to create an ISO-5 clean bench environment within the Flex enclosure.
 
 - The **Magnetic Block** is a passive device that holds labware close to its high-strength neodymium magnets. The OT-2 Magnetic Module GEN1 and GEN2, which actively move their magnets up and down relative to labware, are not supported on Opentrons Flex.
 
@@ -18,8 +28,12 @@ Opentrons Flex is compatible with four types of on-deck Opentrons modules:
 
 Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark indicates compatibility, and an X indicates incompatibility.
 
+<!-- observation: the X marks in the table are very small in the browser.
+Suggest enlarging both symbols for better readability -->
+
 | Device type and generation      | OT-2 | Flex |
 |---------------------------------|:----:|:----:|
+| Absorbance Plate Reader         |  ×   |  ✓   |
 | Heater-Shaker Module GEN1       |  ✓   |  ✓   |
 | Magnetic Module GEN1            |  ✓   |  ×   |
 | Magnetic Module GEN2            |  ✓   |  ×   |
@@ -29,6 +43,7 @@ Some modules originally designed for the OT-2 are compatible with Flex, as summa
 | Thermocycler Module GEN1        |  ✓   |  ×   |
 | Thermocycler Module GEN2        |  ✓   |  ✓   |
 | HEPA Module                     |  ✓   |  ×   |
+| HEPA/UV Module                  |  ×   |  ✓   |
 
 ## Module caddy system
 
@@ -71,7 +86,9 @@ Thermocycler Modules.
 </figcaption>
 </figure>
 
-Module calibration is required for all modules that install via a caddy: the Heater-Shaker, Temperature, and Thermocycler Modules. The Magnetic Block doesn't require calibration, and is ready for use as soon as you place it on the deck.
+Calibration is required for some modules that use a separate caddy, specifically the Heater-Shaker, Temperature, and Thermocycler Modules.
+
+Other modules do not require calibration and are ready for use upon installation. These include the Absorbance Plate Reader (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block
 
 ### When to calibrate modules
 
@@ -94,6 +111,115 @@ Instructions on the touchscreen or in the Opentrons App will guide you through t
 Once calibration is complete and you've removed the adapter and probe, the module will be ready for use in protocols.
 
 At any time, you can view and manage your module calibration data in the Opentrons App. Go to **Robot Settings** for your Flex and click on the **Calibration** tab.
+
+## Absorbance Plate Reader
+
+![plate reader hero](images/plate-reader-hero-lid-off.png)
+
+### Plate Reader Features
+
+The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The Absorbance Plate Reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
+
+!!!note
+    The Opentrons Flex Absorbance Plate Reader may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
+
+#### Measurement capabilities
+
+The Plate Reader uses 96 separate detection units for rapid sample analysis. The detection units use light in the 400–700 nanometer (nm) range to determine sample concentrations.
+
+#### Gripper compatibility
+
+The Opentrons Flex Gripper is required when using the Plate Reader. The Gripper is needed to move labware and the Plate Reader's lid, onto and off the module.
+
+#### Deck placement
+
+The Absorbance Plate Reader fits in deck slots A3–D3 only. It comes preinstalled in a caddy, which helps secure the unit to the deck. This module does not require calibration, but you can run Labware Position Check on any installed labware.
+
+#### Software Control
+
+The Absorbance Plate Reader is fully programmable in Protocol Designer and the Python Protocol API.
+
+### Plate Reader Specifications
+
+<table>
+    <tr>
+        <th>Specification</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><strong>Dimensions</strong></td>
+        <td>155.3 mm L x 95.5 mm W x 57 mm H</td>
+    </tr>
+    <tr>
+        <td><strong>Weight</strong></td>
+        <td>~790 g</td>
+    </tr>
+    <tr>
+        <td><strong>Module power</strong></td>
+        <td>
+            <ul>
+                <li>Input: USB 5 VDC, 3 A</li>
+                <li>Consumption: 2.5 W</li>
+                <li>Fuse: 1 A (very fast acting)</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Detection</strong></td>
+        <td>
+            <ul>
+                <li>Hardware: 96 photodiodes</li>
+                <li>Wavelengths: The plate reader emits light in the visible spectrum at 450 nm (blue), 562 nm (green), 600 nm (orange) and 650 nm (red).</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Measurement methods</strong></td>
+        <td>
+            <ul>
+                <li>Method: Absorbance</li>
+                <li>Techniques: Endpoint and kinetic</li>
+                <li>Range: 0–4.0 OD</li>
+                <li>Resolution: 0.001 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Accuracy</strong></td>
+        <td>The maximum deviation between the determined value and the true value.<br><br>At 405 nm:
+            <ul>
+                <li>≤ 1.5% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>≤ 3% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>At or above 450 nm:
+            <ul>
+                <li>≤ 1% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>1.5% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Linearity</strong></td>
+        <td>The maximum deviation between the true and determined increase of the value.<br><br>At 405 nm:
+            <ul>
+                <li>≤ 1.5% from 0.0–2.0 OD</li>
+                <li>≤ 3% 2.0–3.0 OD</li>
+            </ul>At or above 450 nm:
+            <ul>
+                <li>≤ 1% from 0.0–2.0 OD</li>
+                <li>≤ 1.5% from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Reproducibility</strong></td>
+        <td>The maximum deviation between the determined values when the measurement is repeated directly.<br>
+            <ul>
+                <li>≤ 0.5% + 0.005 OD from 0.0–2.0 OD</li>
+                <li>≤ 1% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+</table>
 
 ## Heater-Shaker Module GEN1
 
