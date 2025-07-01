@@ -18,12 +18,22 @@
   cursor: pointer;
 }
 
+.playButton:active,
+.playButton:hover {
+  background-color: #004196;
+}
+
 .fastButton {
   width: 48px;
   height: 48px;
   border-radius: 200px;
   background-color: #d0e6fe;
   cursor: pointer;
+}
+
+.fastButton:active,
+.fastButton:hover {
+  background-color: #a9cefd;
 }
 
 .buttons {

@@ -29,4 +29,5 @@ export * from './createTimelineFromRunCommands'
 export * from './constructInvariantContextFromRunCommands'
 export * from './pythonFormat'
 export * from './pythonFileUtils'
+export * from './liquidUtils'
 export const uuid: () => string = uuidv4

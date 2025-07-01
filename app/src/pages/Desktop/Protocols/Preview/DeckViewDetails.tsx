@@ -5,6 +5,7 @@ import {
   Box,
   COLORS,
   RobotCoordsForeignDiv,
+  SingleSlotFixture,
   StyledText,
 } from '@opentrons/components'
 import {
@@ -17,7 +18,6 @@ import {
   RobotType,
   RunTimeCommand,
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getSlotInLocationStack,
@@ -193,28 +193,34 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         })
         .map(addressableArea => {
           return (
-            <DeckViewOverlay
-              setHoveredSlot={setHoveredSlot}
-              key={addressableArea.id}
-              slotId={addressableArea.id}
-              slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
-              slotFillColor={COLORS.transparent}
-              robotType={robotType}
-              invariantContext={invariantContext}
-              robotState={robotState}
-              setSelectedSlot={setSelectedSlot}
-            >
-              {hoveredSlot === addressableArea.id ||
-              selectedSlot === addressableArea.id ? (
-                <div
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    backgroundColor: COLORS.grey40,
-                  }}
-                ></div>
-              ) : null}
-            </DeckViewOverlay>
+            <Fragment key={addressableArea.id}>
+              <SingleSlotFixture
+                onMouseEnter={() => {
+                  setHoveredSlot(addressableArea.id)
+                }}
+                onMouseLeave={() => {
+                  setHoveredSlot(null)
+                }}
+                onClick={() => {
+                  setSelectedSlot(addressableArea.id)
+                }}
+                cursor="pointer"
+                cutoutId={`cutout${addressableArea.id}` as CutoutId}
+                deckDefinition={deckDef}
+                slotClipColor={
+                  selectedSlot === addressableArea.id ||
+                  hoveredSlot === addressableArea.id
+                    ? COLORS.grey60
+                    : COLORS.transparent
+                }
+                fixtureBaseColor={
+                  selectedSlot === addressableArea.id ||
+                  hoveredSlot === addressableArea.id
+                    ? COLORS.grey40
+                    : COLORS.transparent
+                }
+              />
+            </Fragment>
           )
         })}
       {/* all labware on deck NOT those in modules */}

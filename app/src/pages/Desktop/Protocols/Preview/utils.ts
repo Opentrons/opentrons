@@ -164,20 +164,9 @@ export const getAllWellContentsAtFrame = (
 }
 
 export const getLiquidDetailInfo = (
-  liquidState: RobotState['liquidState'],
-  labwareDef: LabwareDefinition2,
-  labwareId: string,
+  wellContents: ContentsByWell,
   liquids: Liquid[]
 ): LiquidDetailInfo[] => {
-  const allWellContentsForActiveItem = getAllWellContentsAtFrame(
-    liquidState,
-    labwareDef
-  )
-  const wellContents =
-    allWellContentsForActiveItem != null
-      ? allWellContentsForActiveItem[labwareId]
-      : null
-
   const individualIds = getLiquidIdsOnLabware(wellContents)
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
 

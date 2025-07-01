@@ -52,12 +52,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                   setSelectedCommand(commands[0].id)
                 }}
               >
-                <Icon
-                  name="play-icon"
-                  width="15px"
-                  height="20px"
-                  color="#006cfa"
-                />
+                <Icon name="ot-end" width="25px" height="30px" color="#006cfa" />
               </button>
               <button className={styles.playButton} onClick={handlePlayPause}>
                 <Icon
@@ -73,12 +68,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                   setSelectedCommand(commands[commands.length - 1].id)
                 }}
               >
-                <Icon
-                  name="play-icon"
-                  width="15px"
-                  height="20px"
-                  color="#006cfa"
-                />
+                <Icon name="ot-start" width="25px" height="30px" color="#006cfa" />
               </button>
             </div>
           </div>

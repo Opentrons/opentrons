@@ -198,20 +198,15 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   }, [subCommands])
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      width="100%"
-      flexDirection="column"
-      overflow="hidden"
-    >
+    <Flex width="100%" flexDirection="column" overflow="hidden">
       <Flex
         onClick={() => {
           setIsExpanded(!isExpanded)
         }}
         cursor={CURSOR_POINTER}
-        alignItems={ALIGN_CENTER}
         paddingX="16px"
         width="100%"
+        alignItems="center"
         justifyContent="space-between"
         borderBottom={`1px solid ${COLORS.grey30}`}
         flexShrink={0}
@@ -288,13 +283,7 @@ function IndividualCommand({
   }, [isHighlighted])
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      gridGap={SPACING.spacing8}
-      padding="0px 16px"
-      width="100%"
-      ref={commandRef}
-    >
+    <Flex gridGap={SPACING.spacing8} padding="0px 16px" ref={commandRef}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}

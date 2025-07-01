@@ -6,12 +6,16 @@ import {
   RobotWorkSpace,
   StyledText,
 } from '@opentrons/components'
+import { wellFillFromWellContents } from '@opentrons/step-generation'
 
-import { getWellFillFromLabwareId } from '/app/transformations/analysis'
 import { getLabwareInfoByLiquidId } from '/app/transformations/commands'
 
 import styles from './preview.module.css'
-import { getLiquidDetailInfo, getMissingTips } from './utils'
+import {
+  getAllWellContentsAtFrame,
+  getLiquidDetailInfo,
+  getMissingTips,
+} from './utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -54,16 +58,20 @@ export function LabwareSlotDetails(
       ? labwareLoadCommandParams.displayName
       : null
   const { params } = currentCommand
-  const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
   const labwareDef = labwareEntities[topLabwareOnSlotId].def
-  //  TODO: need to use wellFillFromWellContents in protocol-designer
-  //  so that it update with liquid state and not based off of starting
-  //  liquids
-  const wellFill = getWellFillFromLabwareId(
-    topLabwareOnSlotId,
-    liquids,
-    labwareByLiquidId
+  const liquidDisplayColors = liquids.map(
+    liquid => liquid.displayColor ?? '0000000'
   )
+  const allWellContentsForActiveItem = getAllWellContentsAtFrame(
+    robotState.liquidState,
+    labwareDef
+  )
+  const wellContents =
+    allWellContentsForActiveItem != null
+      ? allWellContentsForActiveItem[topLabwareOnSlotId]
+      : null
+
+  const wellFill = wellFillFromWellContents(wellContents, liquidDisplayColors)
   const labwareDisplayName =
     labwareEntities[topLabwareOnSlotId].def.metadata.displayName
   const wellGroup: WellGroup | null =
@@ -74,12 +82,7 @@ export function LabwareSlotDetails(
       : null
 
   const missingTips = getMissingTips(robotState.tipState, topLabwareOnSlotId)
-  const liquidInfo = getLiquidDetailInfo(
-    robotState.liquidState,
-    labwareDef,
-    topLabwareOnSlotId,
-    liquids
-  )
+  const liquidInfo = getLiquidDetailInfo(wellContents, liquids)
 
   return (
     <>
