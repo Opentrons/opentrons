@@ -71,7 +71,6 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
   const allDefinitionsValues = useMemo(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     () => Object.values(getOnlyLatestDefs()),
     []
   )
