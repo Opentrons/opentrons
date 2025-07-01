@@ -1,4 +1,4 @@
-import { Chip, Icon } from '@opentrons/components'
+import { Chip, COLORS, Icon } from '@opentrons/components'
 
 import styles from './preview.module.css'
 
@@ -51,16 +51,16 @@ export function Controls(props: ControlsProps): JSX.Element {
               >
                 <Icon
                   name="ot-end"
-                  width="25px"
-                  height="30px"
-                  color="#006cfa"
+                  width="1.5625rem"
+                  height="1.875rem"
+                  color={COLORS.blue50}
                 />
               </button>
               <button className={styles.play_button} onClick={handlePlayPause}>
                 <Icon
                   name={isPlaying ? 'pause' : 'play-icon'}
-                  width="21px"
-                  height="24px"
+                  width="1.5625rem"
+                  height="1.5rem"
                   color="white"
                 />
               </button>
@@ -72,9 +72,9 @@ export function Controls(props: ControlsProps): JSX.Element {
               >
                 <Icon
                   name="ot-start"
-                  width="25px"
-                  height="30px"
-                  color="#006cfa"
+                  width="1.5625rem"
+                  height="1.875rem"
+                  color={COLORS.blue50}
                 />
               </button>
             </div>
@@ -87,6 +87,7 @@ export function Controls(props: ControlsProps): JSX.Element {
           value={currentCommandIndex + 1}
           className={styles.range_input}
           style={{
+            //  @ts-expect-error: TODO figure out how to fix this - seems like an issue with thinking i'm using styled-components?
             '--progress': `${
               ((currentCommandIndex + 1) / numCommandLength) * 100
             }%`,

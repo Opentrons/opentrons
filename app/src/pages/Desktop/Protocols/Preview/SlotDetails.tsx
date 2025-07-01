@@ -64,8 +64,12 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
   const isTrashOnSlot =
-    Object.values(trashBinEntities).some(trash => trash.location === slotId) ||
-    Object.values(wasteChuteEntities).some(trash => trash.location === slotId)
+    Object.values(trashBinEntities).some(
+      trash => trash.location.split('cutout')[1] === slotId
+    ) ||
+    Object.values(wasteChuteEntities).some(
+      trash => trash.location.split('cutout')[1] === slotId
+    )
   const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
     <div className={styles.detail_container} style={{ width: '100%' }}>
@@ -93,7 +97,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           style={{ height: '100px' }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
-          <div className={styles.commandText}>
+          <div className={styles.command_text}>
             <CommandText
               command={command}
               robotType={robotType}

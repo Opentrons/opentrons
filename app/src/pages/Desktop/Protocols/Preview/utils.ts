@@ -27,11 +27,13 @@ import type {
   LabwareDefinition2,
   Liquid,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
   ContentsByWell,
   DeckSlot,
   ModuleEntities,
+  PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
@@ -222,7 +224,55 @@ export const getBackgroundColor = (
   } else if (selectedSlot === slot && !isSlotSelected) {
     backgroundColor = COLORS.grey60
   } else if (isSlotSelected) {
-    backgroundColor = COLORS.purple40
+    backgroundColor = COLORS.purple50
   }
   return backgroundColor
+}
+
+interface ActiveLayer {
+  copy: string
+  isActiveLayerVisible: boolean
+}
+
+export const getActiveLayer = (
+  isTiprack: boolean,
+  pipettes: PipetteTemporalProperties[],
+  id: string,
+  selectedRunTimeCommand?: RunTimeCommand
+): ActiveLayer => {
+  const isStepAssosciatedWithLabwareState = pipettes.some(
+    pipette => pipette.entityId === id || pipette.tiprackId === id
+  )
+  const isStepAssosciatedWithLabwareId =
+    selectedRunTimeCommand != null &&
+    'labwareId' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.labwareId === id
+  const isMoveStepAssosciatedWithLabwareId =
+    selectedRunTimeCommand != null &&
+    'newLocation' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.newLocation?.labwareId === id
+  const isLoadStepAssosciatedWithLabwareId =
+    selectedRunTimeCommand != null &&
+    'labwareId' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.labwareId === id &&
+    selectedRunTimeCommand.commandType === 'loadLabware'
+
+  const isStepAssosciatedWithLabware =
+    isStepAssosciatedWithLabwareState ||
+    isStepAssosciatedWithLabwareId ||
+    isMoveStepAssosciatedWithLabwareId
+
+  let activeCopy = isTiprack
+    ? 'Tiprack used in transfer'
+    : 'Labware used in transfer'
+  if (isLoadStepAssosciatedWithLabwareId) {
+    activeCopy = 'Loading labware'
+  } else if (isMoveStepAssosciatedWithLabwareId) {
+    activeCopy = 'Moving labware'
+  }
+
+  return {
+    copy: activeCopy,
+    isActiveLayerVisible: isStepAssosciatedWithLabware,
+  }
 }

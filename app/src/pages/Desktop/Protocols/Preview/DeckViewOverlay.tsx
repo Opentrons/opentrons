@@ -37,6 +37,7 @@ interface SlotOverlayProps {
   robotState: RobotState
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
+  opacity?: number
 }
 
 export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
@@ -50,6 +51,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     robotState,
     setSelectedSlot,
     setHoveredSlot,
+    opacity = 1,
   } = props
   const { stagingAreaEntities, moduleEntities } = invariantContext
   const { modules } = robotState
@@ -93,7 +95,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{
-        opacity: 1,
+        opacity: opacity,
         flex: '1',
         cursor: CURSOR_POINTER,
         onClick: () => {

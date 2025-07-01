@@ -137,7 +137,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                             hoveredSlot,
                             selectedSlot,
                             slot,
-                            isPipetteOverTrash ?? false
+                            isPipetteOverTrash
                           )}
                           onClick={() => {
                             setSelectedSlot(slot)

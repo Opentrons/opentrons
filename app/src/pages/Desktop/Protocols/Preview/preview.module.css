@@ -164,7 +164,7 @@
   flex-direction: column;
 }
 
-.commandText {
+.command_text {
   border-radius: 4px;
   background-color: #f4def7;
   padding: 8px;
@@ -245,4 +245,17 @@
   padding: 16px;
   border-radius: 4px;
   flex-direction: column;
+}
+
+.slot_box {
+  border: 3px solid black;
+  border-radius: 8px;
+  width: 127.76px; /* STANDARD_X_WIDTH */
+  height: 85.48px; /* STANDARD_Y_HEIGHT */
+  padding: 8px;
+  background-color: #737578;
+}
+
+.active_slot_box {
+  background-color: #4a4c4e;
 }

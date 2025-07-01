@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import clsx from 'clsx'
 
 import {
   BORDERS,
@@ -20,6 +21,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import styles from './preview.module.css'
 import {
+  getActiveLayer,
   getBackgroundColor,
   getSlotIdsBlockedBySpanningForThermocycler,
   getSlotIsEmpty,
@@ -101,26 +103,24 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           selectedRunTimeCommand != null &&
           'moduleId' in selectedRunTimeCommand.params &&
           selectedRunTimeCommand.params.moduleId === id
-        const isStepAssosciatedWithLabware =
-          Object.values(pipettes).some(
-            pipette => pipette.entityId === labwareLoadedOnModuleId
-          ) ||
-          (selectedRunTimeCommand != null &&
-            'newLocation' in selectedRunTimeCommand.params &&
-            selectedRunTimeCommand.params.newLocation.moduleId === id)
 
+        const isTiprack =
+          labwareEntities[labwareLoadedOnModuleId]?.def.parameters.isTiprack
+        const { copy, isActiveLayerVisible } = getActiveLayer(
+          isTiprack,
+          Object.values(pipettes),
+          labwareLoadedOnModuleId,
+          selectedRunTimeCommand
+        )
+
+        const isActive = selectedSlot === slot || hoveredSlot === slot
         return (
           <Fragment key={id}>
             <DeckViewOverlay
               key={slot}
               slotId={slot}
               slotPosition={slotPosition}
-              slotFillColor={getBackgroundColor(
-                hoveredSlot,
-                selectedSlot,
-                slot,
-                isStepAssosciatedWithModule
-              )}
+              slotFillColor={isActive ? COLORS.grey60 : COLORS.grey50}
               robotType={robotType}
               invariantContext={invariantContext}
               robotState={robotState}
@@ -130,10 +130,11 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               <div className={styles.align_deck_modules}>
                 {moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE ? (
                   <div className={styles.module_copy}>
-                    <StyledText desktopStyle="bodyLargeRegular" color="white">
-                      {isStepAssosciatedWithModule
-                        ? 'Thermocycler changing state'
-                        : getModuleDef2(moduleEntities[id].model).displayName}
+                    <StyledText
+                      desktopStyle="bodyLargeRegular"
+                      color={COLORS.white}
+                    >
+                      {getModuleDef2(moduleEntities[id].model).displayName}
                     </StyledText>
                   </div>
                 ) : null}
@@ -145,7 +146,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                           hoveredSlot,
                           selectedSlot,
                           slot,
-                          isStepAssosciatedWithLabware
+                          isActiveLayerVisible
                         )}
                         border="3px solid black"
                         borderRadius={BORDERS.borderRadius8}
@@ -156,12 +157,12 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                         <StyledText
                           desktopStyle="captionRegular"
                           transform={`rotate(180deg) scaleX(-1)`}
-                          color="white"
+                          color={COLORS.white}
                         >
-                          {
-                            labwareEntities[labwareLoadedOnModuleId].def
-                              .metadata.displayName
-                          }
+                          {isActiveLayerVisible
+                            ? copy
+                            : labwareEntities[labwareLoadedOnModuleId].def
+                                .metadata.displayName}
                         </StyledText>
                       </Box>
                     </RobotCoordsForeignDiv>
@@ -169,6 +170,29 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 ) : null}
               </div>
             </DeckViewOverlay>
+            {isStepAssosciatedWithModule ? (
+              <DeckViewOverlay
+                key={slot}
+                slotId={slot}
+                slotPosition={slotPosition}
+                opacity={0.9}
+                slotFillColor={isActive ? COLORS.purple60 : COLORS.purple50}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                <StyledText
+                  desktopStyle="bodyLargeRegular"
+                  color={COLORS.white}
+                >
+                  {selectedRunTimeCommand.commandType === 'loadModule'
+                    ? 'Load Thermocycler'
+                    : 'Thermocycler changing state'}
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
           </Fragment>
         )
       })}
@@ -239,19 +263,14 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        const isStepAssosciatedWithLabwareState = Object.values(pipettes).some(
-          pipette => pipette.entityId === id || pipette.tiprackId === id
+        const isTiprack = labwareEntities[id].def.parameters.isTiprack
+        const { copy, isActiveLayerVisible } = getActiveLayer(
+          isTiprack,
+          Object.values(pipettes),
+          id,
+          selectedRunTimeCommand
         )
-        const isStepAssosciatedWithLabwareId =
-          selectedRunTimeCommand != null &&
-          (('labwareId' in selectedRunTimeCommand.params &&
-            selectedRunTimeCommand.params.labwareId === id) ||
-            ('newLocation' in selectedRunTimeCommand.params &&
-              selectedRunTimeCommand.params.newLocation?.labwareId === id))
-
-        const isStepAssosciatedWithLabware =
-          isStepAssosciatedWithLabwareState || isStepAssosciatedWithLabwareId
-
+        const isActive = selectedSlot === slot || hoveredSlot === slot
         return (
           <Fragment key={id}>
             <RobotCoordsForeignDiv
@@ -276,24 +295,35 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 },
               }}
             >
-              <Box
-                backgroundColor={getBackgroundColor(
-                  hoveredSlot,
-                  selectedSlot,
-                  slot,
-                  isStepAssosciatedWithLabware
+              <div
+                className={clsx(
+                  styles.slot_box,
+                  isActive && styles.active_slot_box
                 )}
-                border="3px solid black"
-                borderRadius={BORDERS.borderRadius8}
-                width={`${STANDARD_X_WIDTH}px`}
-                height={`${STANDARD_Y_HEIGHT}px`}
-                padding="8px"
               >
-                <StyledText desktopStyle="captionRegular" color="white">
+                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
                   {labwareEntities[id].def.metadata.displayName}
                 </StyledText>
-              </Box>
+              </div>
             </RobotCoordsForeignDiv>
+            {isActiveLayerVisible ? (
+              <DeckViewOverlay
+                key={`${slot}_activeSlot_labware`}
+                slotId={slot}
+                slotPosition={slotPosition}
+                slotFillColor={isActive ? COLORS.purple60 : COLORS.purple50}
+                opacity={0.9}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                <StyledText desktopStyle="captionSemiBold" color={COLORS.white}>
+                  {copy}
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
           </Fragment>
         )
       })}
@@ -330,18 +360,15 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        const isStepAssosciatedWithLabwareState = Object.values(pipettes).some(
-          pipette => pipette.entityId === id || pipette.tiprackId === id
+        const isTiprack = labwareEntities[id].def.parameters.isTiprack
+        const { copy, isActiveLayerVisible } = getActiveLayer(
+          isTiprack,
+          Object.values(pipettes),
+          id,
+          selectedRunTimeCommand
         )
-        const isStepAssosciatedWithLabwareId =
-          selectedRunTimeCommand != null &&
-          (('labwareId' in selectedRunTimeCommand.params &&
-            selectedRunTimeCommand.params.labwareId === id) ||
-            ('newLocation' in selectedRunTimeCommand.params &&
-              selectedRunTimeCommand.params.newLocation?.labwareId === id))
-
-        const isStepAssosciatedWithLabware =
-          isStepAssosciatedWithLabwareState || isStepAssosciatedWithLabwareId
+        const isActive =
+          selectedSlot === slotForOnTheDeck || hoveredSlot === slotForOnTheDeck
 
         return (
           <Fragment key={id}>
@@ -366,24 +393,35 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 },
               }}
             >
-              <Box
-                backgroundColor={getBackgroundColor(
-                  hoveredSlot,
-                  selectedSlot,
-                  slotForOnTheDeck,
-                  isStepAssosciatedWithLabware
+              <div
+                className={clsx(
+                  styles.slot_box,
+                  isActive && styles.active_slot_box
                 )}
-                border="3px solid black"
-                borderRadius={BORDERS.borderRadius8}
-                width={`${STANDARD_X_WIDTH}px`}
-                height={`${STANDARD_Y_HEIGHT}px`}
-                padding="8px"
               >
-                <StyledText desktopStyle="captionRegular" color="white">
+                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
                   {labwareEntities[id].def.metadata.displayName}
                 </StyledText>
-              </Box>
+              </div>
             </RobotCoordsForeignDiv>
+            {isActiveLayerVisible ? (
+              <DeckViewOverlay
+                key={`${slotForOnTheDeck}_activeSlot_adapter`}
+                slotId={slotForOnTheDeck}
+                slotPosition={slotPosition}
+                slotFillColor={isActive ? COLORS.purple60 : COLORS.purple50}
+                opacity={0.9}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
+                  {copy}
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
           </Fragment>
         )
       })}
