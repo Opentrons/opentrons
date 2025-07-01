@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import StackerReengageLatch from 'app/assets/images/flex_stacker_reengage_latch.png'
 import StackerClearObstructions from '/app/assets/videos/error-recovery/FlexStacker_ClearObstructions.webm'
 import StackerEmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
 import StackerFillHopper from '/app/assets/videos/error-recovery/FlexStacker_FillHopper.webm'
@@ -248,7 +249,7 @@ export function ReengageLatch(props: RecoveryContentProps): JSX.Element {
           headline={t('prepare_for_stacker_latch_reengage')}
           message={t('stacker_latch_will_reengage')}
         />
-        <RightColumnAnimation animationSrc={StackerEmptyHopper} />
+        <RightColumnAnimation animationSrc={StackerReengageLatch} />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}
