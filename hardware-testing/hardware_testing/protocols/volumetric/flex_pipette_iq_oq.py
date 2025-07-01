@@ -524,10 +524,13 @@ def run(ctx: ProtocolContext) -> None:
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
     def _save_results_to_csv(test_volume: float, abs_values: Dict[str, float]) -> None:
-        results = {
-            w.well_name: abs_values[w.well_name]
-            for w in dest_wells_by_volume[test_volume]
-        }
+        if test_volume == 0:  # NOTE: diluent step, so read all wells
+            results = abs_values
+        else:
+            results = {
+                w.well_name: abs_values[w.well_name]
+                for w in dest_wells_by_volume[test_volume]
+            }
         abs_values_at_this_volume: List[float] = list(results.values())
         avg = sum(abs_values_at_this_volume) / len(abs_values_at_this_volume)
         if avg != 0.0:
@@ -540,12 +543,12 @@ def run(ctx: ProtocolContext) -> None:
             _f.write("==================\n")
             _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
             for col in "ABCDEFGH":
-                csv_row_abs_values = [
-                    str(round(results.get(f"{col}{row + 1}", ""), 3))
-                    for row in range(12)
-                ]
-                csv_row = f"{col},{','.join(csv_row_abs_values)}\n"
-                _f.write(csv_row)
+                csv_row = f"{col}"
+                for row in range(12):
+                    w_name = f"{col}{row + 1}"
+                    val_str = str(round(results[w_name], 3)) if w_name in results else ""
+                    csv_row += f",{val_str}"
+                _f.write(csv_row + "\n")
             _f.write(f"CV,{round(cv, 2)}\n")
             _f.write(f"AVG,{round(avg, 2)}\n")
             ctx.comment(f"RESULT: {test_volume} uL %CV = {round(cv, 2)}%")
@@ -561,8 +564,6 @@ def run(ctx: ProtocolContext) -> None:
                 ctx, plate, heater_shaker, plate_reader, filename()
             )
             for vol in ul_in_this_plate:
-                if vol <= 0.0:
-                    continue
                 _save_results_to_csv(vol, _absorbance_values)
         plate = None
         ul_in_this_plate = []
@@ -590,9 +591,10 @@ def run(ctx: ProtocolContext) -> None:
             plate = plates.pop(-1)
             assert dest_wells[0] in plate.wells(), \
                 f"dest well {dest_wells[0]} not in {plate} on top of {plate.parent}"
-            ul_in_this_plate.append(ul)
             ctx.move_labware(plate, adapter, use_gripper=True)
             heater_shaker.close_labware_latch()
+
+        ul_in_this_plate.append(ul)
 
         # TRANSFER DILUENT TO PLATE
         dil_ul = DYE_READER_IDEAL_UL - ul
