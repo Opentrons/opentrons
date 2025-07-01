@@ -1,3 +1,4 @@
+export * from './getRobotContextCommandText'
 export * from './getLoadCommandText'
 export * from './getTemperatureCommandText'
 export * from './getTCRunProfileCommandText'
