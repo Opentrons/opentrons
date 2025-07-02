@@ -201,7 +201,8 @@ And for each dispense, the pipette:
 * Delays for 0.5 second. 
 * Retracts to 2 mm above the top of the well at 4 mm/sec. 
 
-In many cases, the liquid class definition represents fine-tuned changes optimized for each liquid class. If you instead use the Flex P50 1-channel pipette to transfer 50 µL of the volatile ``liquid_2``, transfer behavior would include: 
+In many cases, the liquid class definition represents fine-tuned changes optimized for each liquid class. If you instead use the Flex P50 1-channel pipette to transfer 50 µL of the volatile ``liquid_2``, transfer behavior would include:
+ 
 * Submerging into and retracting from the volatile ``liquid_2`` at 100 mm/sec.
 * Adding larger air gaps after aspirating *and* dispensing to prevent dripping onto the deck.
 * Aspirating and dispensing at 30 µL/sec with a larger correction by volume. 

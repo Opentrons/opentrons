@@ -250,7 +250,7 @@ During a ``consolidate()``, air gaps still occur after every aspiration. In this
     Dispensing 210.0 uL into B1 of well plate on 2 at 92.86 uL/sec
     Dropping tip into A1 of Opentrons Fixed Trash on 12
     
-If adding an air gap would exceed the pipette's maximum volume, a legacy complex command will use a :ref:`tip refilling strategy <complex-tip-refilling>`. For example, this command uses a 300 µL pipette to transfer 300 µL of liquid plus an air gap::
+If adding an air gap would exceed the pipette's maximum volume, a complex command will use a :ref:`tip refilling strategy <complex-tip-refilling>`. For example, this command uses a 300 µL pipette to transfer 300 µL of liquid plus an air gap::
 
     pipette.transfer(
         volume=300,
