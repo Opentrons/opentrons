@@ -239,7 +239,6 @@ export const getFixtureOptions = (
     STAGING_AREA_RIGHT_SLOT_FIXTURE,
     addressableAreaId
   )
-  console.log('stagingAreaAA: ', stagingAreaAA)
 
   if (stagingAreaAA != null && stagingAreaAA !== addressableAreaId) {
     availableOptions = [
