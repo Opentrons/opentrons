@@ -135,6 +135,7 @@ class FixtureSettings:
     test_report: report.CSVReport
     scale_delay: int
     blank_trials: int
+    submerge_depth: float
     isolate_volumes: bool
 
     @classmethod
@@ -174,6 +175,9 @@ class FixtureSettings:
         labware_on_scale = lookup_key("labware_on_scale", csv_params)[0]
         labware_on_scale_well_name = lookup_key("labware_on_scale", csv_params)[1]
         slot_scale = lookup_key("slot_scale", csv_params)[0]
+        scale_delay = int(lookup_key("scale_delay", csv_params)[0])
+        blank_trials = int(lookup_key("blank_trials", csv_params)[0])
+        submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -303,8 +307,9 @@ class FixtureSettings:
             env_serial=env_serial,
             pipette_tag=pipette_tag,
             test_report=test_report,
-            scale_delay=10,
-            blank_trials=10,
+            scale_delay=scale_delay,
+            blank_trials=blank_trials,
+            submerge_depth=submerge_depth,
             isolate_volumes=False,
         )
 
@@ -682,7 +687,9 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
-    offset = _get_offset_for_channel(fixture_settings, channel, -1.5)
+    offset = _get_offset_for_channel(
+        fixture_settings, channel, fixture_settings.submerge_depth
+    )
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
