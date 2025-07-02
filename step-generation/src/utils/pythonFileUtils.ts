@@ -10,10 +10,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { getPythonLiquidClassName } from './liquidClassUtils'
+import { getSlotInLocationStack } from './misc'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
+  getChunkForIndentingLists,
+  INDENT,
   indentPyLines,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
@@ -23,6 +26,7 @@ import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
+  LabwareEntity,
   LabwareLiquidState,
   LiquidEntities,
   ModuleEntities,
@@ -247,6 +251,7 @@ export function getLoadLabware(
 export function getLoadPipettes(
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware'],
   pipetteRobotState: TimelineFrame['pipettes']
 ): string {
   const pythonPipette = Object.values(pipetteEntities)
@@ -259,14 +264,31 @@ export function getLoadPipettes(
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const tiprackPythonNames = tiprackDefURI
-        .flatMap(defURI =>
-          Object.values(labwareEntities).filter(
-            lw => lw.labwareDefURI === defURI
-          )
-        )
+      const allTipracks = tiprackDefURI.reduce(
+        (acc: LabwareEntity[], defURI) => {
+          for (const lw of Object.values(labwareEntities)) {
+            if (lw.labwareDefURI === defURI) {
+              acc.push(lw)
+            }
+          }
+          return acc
+        },
+        []
+      )
+      const onDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
+          'offDeck'
+      )
+      const offDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
+          'offDeck'
+      )
+      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
         .map(tiprack => tiprack.pythonName)
         .join(', ')
+
       const pythonTipRacks =
         tiprackDefURI.length === 0 ? '' : `, tip_racks=[${tiprackPythonNames}]`
 
@@ -304,19 +326,67 @@ export function getLoadLiquids(
   liquidEntities: LiquidEntities,
   labwareEntities: LabwareEntities
 ): string {
-  const pythonLoadLiquids = Object.entries(liquidsByLabwareId)
-    .flatMap(([labwareId, liquidState]) => {
+  const groupedLiquids = Object.entries(liquidsByLabwareId).reduce(
+    (
+      acc: Record<
+        string,
+        {
+          labwarePythonName: string
+          liquidPythonName: string
+          volume: number
+          wells: string[]
+        }
+      >,
+      [labwareId, liquidState]
+    ) => {
       const labwarePythonName = labwareEntities[labwareId].pythonName
 
-      return Object.entries(liquidState).flatMap(([well, locationState]) =>
-        Object.entries(locationState)
-          .map(([liquidGroupId, volume]) => {
-            const liquidPythonName = liquidEntities[liquidGroupId].pythonName
-            return `${labwarePythonName}[${formatPyStr(
-              well
-            )}].load_liquid(${liquidPythonName}, ${volume.volume})`
-          })
-          .join('\n')
+      Object.entries(liquidState).forEach(([well, locationState]) => {
+        Object.entries(locationState).forEach(([liquidGroupId, volumeInfo]) => {
+          const liquidPythonName = liquidEntities[liquidGroupId].pythonName
+
+          const key = `${labwarePythonName}__${liquidPythonName}__${volumeInfo.volume}`
+          if (!acc[key]) {
+            acc[key] = {
+              labwarePythonName,
+              liquidPythonName,
+              volume: volumeInfo.volume,
+              wells: [],
+            }
+          }
+          acc[key].wells.push(well)
+        })
+      })
+
+      return acc
+    },
+    {}
+  )
+
+  const pythonLoadLiquids = Object.values(groupedLiquids)
+    .map(({ labwarePythonName, liquidPythonName, volume, wells }) => {
+      const formattedWells = wells.map(w => formatPyStr(w))
+      const wellChunks = getChunkForIndentingLists(formattedWells, 8)
+
+      const indentedWells = wellChunks
+        .map(chunk => INDENT + chunk.join(', '))
+        .join(',\n')
+
+      const pythonWells =
+        formattedWells.length < 8
+          ? formattedWells.join(', ')
+          : `\n${indentedWells}\n${INDENT}`
+
+      const loadLiquidArgs = [
+        `wells=[${pythonWells}],\n` +
+          `liquid=${liquidPythonName},\n` +
+          `volume=${volume},\n`,
+      ].join()
+
+      return (
+        `${labwarePythonName}.load_liquid(\n` +
+        `${indentPyLines(loadLiquidArgs)}` +
+        `)`
       )
     })
     .join('\n')
@@ -410,7 +480,7 @@ export function pythonDefRun(
       labware,
       labwareNicknamesById
     ),
-    getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
+    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
           getLoadTrashBins(trashBinEntities),

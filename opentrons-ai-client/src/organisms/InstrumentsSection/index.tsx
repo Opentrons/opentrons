@@ -17,8 +17,8 @@ import {
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
-import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
+import { ControlledDropdownMenu } from '/ai-client/atoms/ControlledDropdownMenu'
+import { ControlledRadioButtonGroup } from '/ai-client/molecules/ControlledRadioButtonGroup'
 
 export const ROBOT_FIELD_NAME = 'instruments.robot'
 export const PIPETTES_FIELD_NAME = 'instruments.pipettes'

@@ -187,7 +187,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     ? curryCommandCreator
     : curryWithoutPython
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-    //  only emit the command if previous nozzle state is different
+    //  only emit the command if previous nozzle state and tiprack state are different
     (channels === 96 || channels === 8) &&
     args.nozzles != null &&
     (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)

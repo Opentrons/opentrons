@@ -19,21 +19,24 @@ Additionally, the `promote-to-staging` and `promote-to-production` scripts will 
 
 ### Cut a new version to sandbox
 
-This process is still manual. Check out the commit you would like to release, and:
+This process is still manual:
 
 ```shell
-git tag -a ${name}@${version} -m "chore(release): ${name} ${version}"
-git push --tags
+git fetch  # make sure your local git knows about all remote changes
+git tag -a ${name}@${version} -m "chore(release): ${name} ${version}" origin/${branchname}
+git log ${name}@${version}  # confirm that you applied the tag to the right commit
+git push ${name}@${version}
 ```
 
 - `name` - The name of the project in the monorepo. Make sure this matches the directory name exactly, as it determines what actions are triggered when the tag is pushed.
 - `version` - The version to bump to
+- `branchname` - The remote branch to apply the tag to. Specifying `origin/${branchname}` ensures the tag is applied to the code as it exists on the remote branch, even if you've messed up your branch locally. And this works even if you're checked out to a different branch locally.
 
 For example, to bump Protocol Designer to version 3.0.0:
 
 ```shell
-git tag -a protocol-designer@3.0.0 -m "chore(release): protocol-designer 3.0.0"
-git push --tags
+git tag -a protocol-designer@3.0.0 -m "chore(release): protocol-designer 3.0.0" origin/chore_release-pd-3.0.0
+git push protocol-designer@3.0.0
 ```
 
 When the tag is pushed to Travis, it will build the release artifact and place it in:

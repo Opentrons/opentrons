@@ -21,13 +21,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
-import { getOnlyLatestDefs } from '../../resources/utils'
+import { MODULES_FIELD_NAME } from '/ai-client/organisms/ModulesAndFixturesSection'
+import { getOnlyLatestDefs } from '/ai-client/resources/utils'
+
 import { ModuleDiagram } from '../ModelDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-import type { DisplayModule } from '../../organisms/ModulesAndFixturesSection'
+import type { DisplayModule } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -85,19 +86,20 @@ export function ModuleListItemGroup(): JSX.Element | null {
   return (
     <>
       {modulesWatch?.map(module => {
+        const moduleId = module.id
         const adapters = RECOMMENDED_LABWARE_BY_MODULE[module.type]
 
         return (
           <Controller
-            key={module.id}
+            key={moduleId}
             name={MODULES_FIELD_NAME}
             render={({ field }) => {
               const currentModule = field.value.find(
-                (m: DisplayModule) => m.id === module.id
+                (m: DisplayModule) => m.id === moduleId
               )
 
               return (
-                <ListItem type="default" key={module.id}>
+                <ListItem type="default" key={moduleId}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
@@ -120,7 +122,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             onClick: (value: string) => {
                               field.onChange(
                                 field.value.map((m: DisplayModule) =>
-                                  m.id === module.id
+                                  m.id === moduleId
                                     ? {
                                         ...m,
                                         adapter: {
@@ -133,17 +135,24 @@ export function ModuleListItemGroup(): JSX.Element | null {
                               )
                             },
                             dropdownType: 'neutral' as DropdownBorder,
-                            filterOptions: adapters?.map(adapter => ({
-                              name: getDefDisplayName(adapter),
-                              value: adapter,
-                            })),
+                            filterOptions: adapters
+                              ?.filter(adapter => {
+                                if (module.type === TEMPERATURE_MODULE_TYPE) {
+                                  return adapter.includes('adapter')
+                                }
+                                return true
+                              })
+                              ?.map(adapter => ({
+                                name: getDefDisplayName(adapter),
+                                value: adapter,
+                              })),
                           }
                         : undefined
                     }
                     onClick={() => {
                       setValue(
                         MODULES_FIELD_NAME,
-                        modulesWatch.filter(m => m.id !== module.id),
+                        modulesWatch.filter(m => m.id !== moduleId),
                         { shouldValidate: true }
                       )
                     }}
