@@ -130,8 +130,6 @@ Le présent produit est conforme aux spécifications techniques applicables d’
 
 ### WEEE Policy
 
-[//]: # (leveraging attr_list extension, maintain markdown purity)
-
 <figure markdown="span" style="float: right; width: 10%;">
     ![WEEE symbol](images/iso-warnings/WEEE.svg)
 </figure>

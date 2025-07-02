@@ -15,8 +15,6 @@ The following table lists the chemicals you can use to clean your Stacker. Dilut
 | Distilled water | You can use distilled water to clean or rinse your Stacker. |
 
 !!!warning
-    Do not:
-
-    * Put the Stacker in an autoclave.
-    * Clean the Stacker with acetone.
-    * Disassemble the Stacker for cleaning or attempt to clean its internal electronic components or mechanical parts.
+    * Do not put the Stacker in an autoclave.
+    * Do not clean the Stacker with acetone.
+    * Do not disassemble the Stacker for cleaning or attempt to clean its internal electronic components or mechanical parts.

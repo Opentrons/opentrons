@@ -4,7 +4,7 @@
   --md-primary-fg-color: #006CFA; /* Header and footer color */
   --md-accent-fg-color: #F09D20; /* Accent color */
   /* Creates a dot for stacker color statuses */
-  --status-dot-size: 24px;
+  --status-dot-size: 1rem;
 }
 
 .md-header {
@@ -51,10 +51,6 @@
   background-color: #F09D20;
  }
 
-.centered-text {
-  text-align: center;
-}
-
 .img-medium {
     width: 70%;
     height: auto; 
@@ -66,17 +62,18 @@
 }
 
 figcaption {
-  font-style: normal; /* This will explicitly set the font style to normal for figcaption */
+  font-style: normal; /* Might not need it. This will explicitly set the font style to normal for figcaption */
 }
 
 /* A specific class for the final figure on a page */
 /* Using padding-top to avoid margin collapse issues */
 .md-content__inner > .figure-end-of-doc {
   padding-top: 150px;
+  padding-bottom: 25px;
 }
 
 .figure-end-of-doc img {
-  width: 60%;
+  width: 70%;
 }
 
 /* New class for end-of-doc trademark text */

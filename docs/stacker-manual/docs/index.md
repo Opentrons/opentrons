@@ -1,11 +1,13 @@
-[![opentrons logo](images/tm-opentrons-flex.png)](https://opentrons.com/)
+[![Opentrons Flex logo](images/TM-flex-fullmark-blackcolor.svg)](https://opentrons.com/)
+
+<!-- If there's a new logo .svg please provide it. -->
 
 # Stacker Module GEN1 Instruction Manual
 
 ![Stacker hero image](images/stacker-hero.png)
 
-<div class="centered-text">
-    <strong><a href="https://opentrons.com/">Opentrons Labworks Inc</a></strong><br>August 2025
+<div style="text-align: center;">
+    <strong>Opentrons Labworks Inc</strong><br>August 2025
 </div>
 
 ## Product Description
