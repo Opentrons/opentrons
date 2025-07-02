@@ -54,186 +54,6 @@ class Baseline(Enum):
     AXIS = "axis"
 
 
-def plot_baseline(plot_choice):
-    if plot_choice.lower() == "baseline":
-        baselines = [baseline_x, baseline_z]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for baseline in baselines:
-            try:
-                file = open(baseline, "r")
-            except:
-                raise
-            baseline_dict = json.load(file)
-            # Create line traces for each zone
-            fig = go.Figure()
-            for zone in baseline_dict:
-                zone_data = baseline_dict[zone]
-                fig.add_trace(
-                    go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Zone {zone}")
-                )
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Sensor Baseline: {baseline}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title="Zones",
-                template="plotly_white",
-            )
-            fig.show()
-    elif plot_choice.lower() == "labware data":
-        file_csv = input("Path to labware csv: ")
-        axis = input("Which axis? z or x?: ")
-        try:
-            file_df = pd.read_csv(file_csv)
-        except:
-            print("Cannot read file")
-
-        if axis == "z":
-            baseline_file = baseline_z
-            zone = "1"
-        elif axis == "x":
-            baseline_file = baseline_x
-            zone = "6"
-        try:
-            bfile = open(baseline_file)
-        except:
-            print("Could not find baseline")
-        baseline_dict = json.load(bfile)
-        bfile.close()
-        lab_data = process_data(file_df)
-
-        bins = [x for x in range(1, 129)]
-        fig = go.Figure()
-        zone_data = baseline_dict[zone]
-        fig.add_trace(
-            go.Scatter(
-                x=bins,
-                y=zone_data,
-                mode="lines",
-                name=f"Baseline {axis}",
-                line=dict(dash="dash"),
-            )
-        )
-
-        zone_data = lab_data[zone]
-        fig.add_trace(go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Labware"))
-
-        fig.update_layout(
-            title=f"Labware with Baseline",
-            xaxis_title="Bins",
-            yaxis_title="Photon Count",
-            legend_title="Zones",
-            template="plotly_white",
-        )
-        fig.show()
-
-    elif plot_choice.lower() == "labware comparison":
-        labwares_files = [
-            baseline_labware.format(axis="x"),
-            baseline_labware.format(axis="z"),
-        ]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for labware_data in labwares_files:
-            try:
-                file = open(labware_data, "r")
-            except:
-                raise
-
-            labwares_dict = json.load(file)
-            if "x" in labware_data.split("_")[-1]:
-                zone = "6"
-            elif "z" in labware_data.split("_")[-1]:
-                zone = "1"
-
-            # Create line traces for each zone
-            fig = go.Figure()
-
-            for labware in labwares_dict:
-                y_data = labwares_dict[labware][zone]
-                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=labware))
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Labware Comparison: {labware_data}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title=f"Zone: {zone}",
-                template="plotly_white",
-            )
-            fig.show()
-
-    elif plot_choice.lower() == "stacker comparison":
-        stackers_files = [
-            baseline_stacker.format(axis="x"),
-            baseline_stacker.format(axis="z"),
-        ]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for stacker_data in stackers_files:
-            try:
-                file = open(stacker_data, "r")
-            except:
-                raise
-
-            stackers_dict = json.load(file)
-            if "x" in stacker_data.split("_")[-1]:
-                zone = "6"
-            elif "z" in stacker_data.split("_")[-1]:
-                zone = "1"
-
-            # Create line traces for each zone
-            fig = go.Figure()
-
-            for stacker in stackers_dict:
-                y_data = stackers_dict[stacker][zone]
-                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=stacker))
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Stacker Comparison: {stacker_data}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title=f"Zone: {zone}",
-                template="plotly_white",
-            )
-            fig.show()
-
-    elif plot_choice.lower() == "sensor comparison":
-        sensors_files = [
-            baseline_sensor.format(axis="x"),
-            baseline_sensor.format(axis="z"),
-        ]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for sensor_data in sensors_files:
-            try:
-                file = open(sensor_data, "r")
-            except:
-                raise
-
-            sensors_dict = json.load(file)
-            if "x" in sensor_data.split("_")[-1]:
-                zone = "6"
-            elif "z" in sensor_data.split("_")[-1]:
-                zone = "1"
-
-            # Create line traces for each zone
-            fig = go.Figure()
-
-            for sensor in sensors_dict:
-                y_data = sensors_dict[sensor][zone]
-                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=sensor))
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Sensor Comparison: {file}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title=f"Zone: {zone}",
-                template="plotly_white",
-            )
-            fig.show()
-
-
 def create_baseline(
     histograms: Dict[int, List[List[int]]],
     zone_count: int = NUMBER_OF_ZONES,
@@ -476,36 +296,203 @@ def test_baseline(baseline, df_path):
     plot_tests(hashes_lab, 1, axis)
 
 
-def plot_something(dataframe_path: str, baseline_path: str) -> None:
+def plot_baseline(args: argparse.Namespace) -> None:
     """Plots the dataframe, baseline, or both in the same graph."""
-    print("Plot something!")
+    if len(args.axis) != 1:
+        sys.exit(f"ERROR: You can only plot one axis, provided: {args.axis}")
+    axis = StackerAxis(args.axis[0] or StackerAxis.X.name)
+    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
+    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
+    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
+    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
+    zone_count_x = len(zone_list_x)
+    zone_count_z = len(zone_list_z)
+    bin_count = len(bins_list)
 
+    baseline_list = args.baseline
+    for baseline_path in baseline_list:
+        if not os.path.exists(baseline_path):
+            sys.exit(f"ERROR: Invalid baseline file provided - {baseline_path}")
 
-def validate_something(args: argparse.Namespace) -> None:
-    """Validates the baseline and dataframe and determines if the labware is detected."""
-    dataframe_path: str = args.dataframe
-    baseline_path: str = args.baseline
-    axis: str = args.axis
-    labware_list: Optional[List[str]] = []
-    if axis == "x":
-        axis = "X-Axis"
-    elif axis == "z":
-        axis = "Z-Axis"
-    df = pd.read_csv(dataframe_path, header=None)
-    for i, entry in enumerate(df.itertuples()):
-        if i == 0:
-            continue
-        stacker = getattr(entry, "_2")
-        serial = getattr(entry, "_4")
-        labware = getattr(entry, "_6")
-        labware_stacked = getattr(entry, "_9")
-        values = getattr(entry, "_10")
-        values_json = json.loads(values)
-        values_df = pd.DataFrame(values_json)
-        result = sense_labware(axis, values_df)
-        print(
-            f"Labware: {labware}\n\nStacked: {labware_stacked}\n\nStacker\n\n{stacker}\n\nSerial: {serial}\n\nRESULT: {result}\n\n"
+        with open(baseline_path, "r") as file:
+            definition = json.load(file)
+            baseline = definition["uniqueModuleData"]["TOFSensorBaseline"]
+            baseline_version = baseline.pop("version", 1)
+            print(f"Plotting baseline V{baseline_version}")
+
+            # Create line traces for each zone
+            fig = go.Figure()
+            for zone, bins in baseline.items():
+                print(zone, bins)
+                return
+                zone_data = baseline_dict[zone]
+                fig.add_trace(
+                    go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Zone {zone}")
+                )
+
+            # Customize layout
+            fig.update_layout(
+                title=f"TOF Sensor Baseline: {baseline}",
+                xaxis_title="Bins",
+                yaxis_title="Photon Count",
+                legend_title="Zones",
+                template="plotly_white",
+            )
+            fig.show()
+
+    return
+
+    if plot_choice.lower() == "labware data":
+        file_csv = input("Path to labware csv: ")
+        axis = input("Which axis? z or x?: ")
+        try:
+            file_df = pd.read_csv(file_csv)
+        except:
+            print("Cannot read file")
+
+        if axis == "z":
+            baseline_file = baseline_z
+            zone = "1"
+        elif axis == "x":
+            baseline_file = baseline_x
+            zone = "6"
+        try:
+            bfile = open(baseline_file)
+        except:
+            print("Could not find baseline")
+        baseline_dict = json.load(bfile)
+        bfile.close()
+        lab_data = process_data(file_df)
+
+        bins = [x for x in range(1, 129)]
+        fig = go.Figure()
+        zone_data = baseline_dict[zone]
+        fig.add_trace(
+            go.Scatter(
+                x=bins,
+                y=zone_data,
+                mode="lines",
+                name=f"Baseline {axis}",
+                line=dict(dash="dash"),
+            )
         )
+
+        zone_data = lab_data[zone]
+        fig.add_trace(go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Labware"))
+
+        fig.update_layout(
+            title=f"Labware with Baseline",
+            xaxis_title="Bins",
+            yaxis_title="Photon Count",
+            legend_title="Zones",
+            template="plotly_white",
+        )
+        fig.show()
+
+    elif plot_choice.lower() == "labware comparison":
+        labwares_files = [
+            baseline_labware.format(axis="x"),
+            baseline_labware.format(axis="z"),
+        ]
+        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
+        for labware_data in labwares_files:
+            try:
+                file = open(labware_data, "r")
+            except:
+                raise
+
+            labwares_dict = json.load(file)
+            if "x" in labware_data.split("_")[-1]:
+                zone = "6"
+            elif "z" in labware_data.split("_")[-1]:
+                zone = "1"
+
+            # Create line traces for each zone
+            fig = go.Figure()
+
+            for labware in labwares_dict:
+                y_data = labwares_dict[labware][zone]
+                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=labware))
+
+            # Customize layout
+            fig.update_layout(
+                title=f"TOF Labware Comparison: {labware_data}",
+                xaxis_title="Bins",
+                yaxis_title="Photon Count",
+                legend_title=f"Zone: {zone}",
+                template="plotly_white",
+            )
+            fig.show()
+
+    elif plot_choice.lower() == "stacker comparison":
+        stackers_files = [
+            baseline_stacker.format(axis="x"),
+            baseline_stacker.format(axis="z"),
+        ]
+        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
+        for stacker_data in stackers_files:
+            try:
+                file = open(stacker_data, "r")
+            except:
+                raise
+
+            stackers_dict = json.load(file)
+            if "x" in stacker_data.split("_")[-1]:
+                zone = "6"
+            elif "z" in stacker_data.split("_")[-1]:
+                zone = "1"
+
+            # Create line traces for each zone
+            fig = go.Figure()
+
+            for stacker in stackers_dict:
+                y_data = stackers_dict[stacker][zone]
+                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=stacker))
+
+            # Customize layout
+            fig.update_layout(
+                title=f"TOF Stacker Comparison: {stacker_data}",
+                xaxis_title="Bins",
+                yaxis_title="Photon Count",
+                legend_title=f"Zone: {zone}",
+                template="plotly_white",
+            )
+            fig.show()
+
+    elif plot_choice.lower() == "sensor comparison":
+        sensors_files = [
+            baseline_sensor.format(axis="x"),
+            baseline_sensor.format(axis="z"),
+        ]
+        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
+        for sensor_data in sensors_files:
+            try:
+                file = open(sensor_data, "r")
+            except:
+                raise
+
+            sensors_dict = json.load(file)
+            if "x" in sensor_data.split("_")[-1]:
+                zone = "6"
+            elif "z" in sensor_data.split("_")[-1]:
+                zone = "1"
+
+            # Create line traces for each zone
+            fig = go.Figure()
+
+            for sensor in sensors_dict:
+                y_data = sensors_dict[sensor][zone]
+                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=sensor))
+
+            # Customize layout
+            fig.update_layout(
+                title=f"TOF Sensor Comparison: {file}",
+                xaxis_title="Bins",
+                yaxis_title="Photon Count",
+                legend_title=f"Zone: {zone}",
+                template="plotly_white",
+            )
+            fig.show()
 
 
 def generate_baseline(args: argparse.Namespace) -> None:
@@ -513,7 +500,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
     if not os.path.exists(args.dataframe):
         sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
 
-    axis_list = args.axes
+    axis_list = args.axis
     stacker_list = args.stackers
     labware_list = args.labwares
     baseline_version = args.baseline_version
@@ -612,10 +599,37 @@ def generate_baseline(args: argparse.Namespace) -> None:
         print(baseline_z, "\n")
 
 
+def validate_something(args: argparse.Namespace) -> None:
+    """Validates the baseline and dataframe and determines if the labware is detected."""
+    dataframe_path: str = args.dataframe
+    baseline_path: str = args.baseline
+    axis: str = args.axis
+    labware_list: Optional[List[str]] = []
+    if axis == "x":
+        axis = "X-Axis"
+    elif axis == "z":
+        axis = "Z-Axis"
+    df = pd.read_csv(dataframe_path, header=None)
+    for i, entry in enumerate(df.itertuples()):
+        if i == 0:
+            continue
+        stacker = getattr(entry, "_2")
+        serial = getattr(entry, "_4")
+        labware = getattr(entry, "_6")
+        labware_stacked = getattr(entry, "_9")
+        values = getattr(entry, "_10")
+        values_json = json.loads(values)
+        values_df = pd.DataFrame(values_json)
+        result = sense_labware(axis, values_df)
+        print(
+            f"Labware: {labware}\n\nStacked: {labware_stacked}\n\nStacker\n\n{stacker}\n\nSerial: {serial}\n\nRESULT: {result}\n\n"
+        )
+
+
 def main(args: argparse.Namespace):
     match args.action:
         case "plot":
-            plot_something(args)
+            plot_baseline(args)
         case "generate":
             generate_baseline(args)
         case "validate":
@@ -639,23 +653,6 @@ def main(args: argparse.Namespace):
 #        except:
 #            pass
 #
-#    elif options[selection_int] == 'Plot':
-#        plots = [
-#            'Baseline',
-#            'Labware Data',
-#            'Labware Comparison',
-#            'Stacker Comparison',
-#            'Sensor Comparison',
-#        ]
-#        for i, plot in enumerate(plots):
-#            print(f'{i}) {plot}')
-#        plot_choice = int(input("What to plot? "))
-#        try:
-#            plot_baseline(plots[plot_choice])
-#        except:
-#            print('No baseline data, run \'Make Baseline\' first')
-#            traceback.print_exc()
-#            sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -679,6 +676,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-b",
         "--baseline",
+        nargs="+",
         help="The path to the generated baseline JSON file for plotting and validating labware.",
     )
     parser.add_argument(
@@ -699,7 +697,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-a",
-        "--axes",
+        "--axis",
         help="The axis to generate baseline for (x, z), generates both if empty.",
         default=["x", "z"],
         type=str,
