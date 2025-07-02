@@ -735,6 +735,7 @@ export const savedStepForms = (
               ...handleFormChange(
                 {
                   pipette: null,
+                  tipRack: null,
                 },
                 form,
                 _getPipetteEntitiesRootState(rootState),
