@@ -329,6 +329,13 @@ describe('liquid class compatibility', () => {
     }
     expect(incompatibleLiquidClass(fields)).toBe(null)
   })
+  it('should return null if the tiprack is null', () => {
+    fields = {
+      ...fields,
+      tipRack: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
   it('should return null if the liquid class is compatible with the pipette, tips, volume, and path', () => {
     expect(incompatibleLiquidClass(fields)).toBe(null)
   })
