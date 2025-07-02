@@ -85,19 +85,20 @@ export function ModuleListItemGroup(): JSX.Element | null {
   return (
     <>
       {modulesWatch?.map(module => {
+        const moduleId = module.id
         const adapters = RECOMMENDED_LABWARE_BY_MODULE[module.type]
 
         return (
           <Controller
-            key={module.id}
+            key={moduleId}
             name={MODULES_FIELD_NAME}
             render={({ field }) => {
               const currentModule = field.value.find(
-                (m: DisplayModule) => m.id === module.id
+                (m: DisplayModule) => m.id === moduleId
               )
 
               return (
-                <ListItem type="default" key={module.id}>
+                <ListItem type="default" key={moduleId}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0
@@ -120,7 +121,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                             onClick: (value: string) => {
                               field.onChange(
                                 field.value.map((m: DisplayModule) =>
-                                  m.id === module.id
+                                  m.id === moduleId
                                     ? {
                                         ...m,
                                         adapter: {
@@ -150,7 +151,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     onClick={() => {
                       setValue(
                         MODULES_FIELD_NAME,
-                        modulesWatch.filter(m => m.id !== module.id),
+                        modulesWatch.filter(m => m.id !== moduleId),
                         { shouldValidate: true }
                       )
                     }}
