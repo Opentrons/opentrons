@@ -1,36 +1,33 @@
 import round from 'lodash/round'
 
-import {
-  Box,
-  COLORS,
-  OVERFLOW_HIDDEN,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  StyledText,
-} from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 import { getMmFromBottom } from '@opentrons/shared-data'
 
 import styles from './preview.module.css'
 import { TipSvg } from './TipSvg'
+import { getTipSvgInfo, getWellVolume } from './utils'
 import { WellSvg } from './WellSvg'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LabwareWellMap,
+  Liquid,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { LocationLiquidState } from '@opentrons/step-generation'
 
-const WELL_HEIGHT_PIXELS = 71
-const WELL_WIDTH_PIXELS = 70
+const WELL_HEIGHT_PIXELS = 54
+const WELL_WIDTH_PIXELS = 20
 const PIXEL_DECIMALS = 2
 
 interface ActiveWellSlotDetailsProps {
   params: RunTimeCommand['params']
   activeWellName: string
-  labwareDepth: number
-  xLabwareWellWidth: number
-  maxVolume: number
-  color: string
-  currentVolume: number
-  labwareWellMaxVolume: number
-  totalVolumeInWell: number
-  tipColor: string
+  wellColor: string
+  wells: LabwareWellMap
+  pipetteLocationLiquidState: LocationLiquidState | null
+  labwareLocationLiquidState: LocationLiquidState | null
+  liquids: Liquid[]
+  tipMaxVolume: number
 }
 export function ActiveWellSlotDetails(
   props: ActiveWellSlotDetailsProps
@@ -38,16 +35,20 @@ export function ActiveWellSlotDetails(
   const {
     params,
     activeWellName,
-    labwareDepth,
-    xLabwareWellWidth,
-    maxVolume,
-    color,
-    currentVolume,
-    totalVolumeInWell,
-    labwareWellMaxVolume,
-    tipColor,
+    wellColor,
+    wells,
+    liquids,
+    pipetteLocationLiquidState,
+    labwareLocationLiquidState,
+    tipMaxVolume,
   } = props
+
+  const labwareDepth = wells.A1.depth ?? 0
+  const xLabwareWellWidth = wells.A1.x ?? 0
+  const labwareWellMaxVolume = wells.A1.totalLiquidVolume
   const zValue = 'wellLocation' in params ? params.wellLocation.z ?? 1 : 1
+
+  //  TODO: add support for rest of references
   const reference =
     'wellLocation' in params
       ? params.wellLocation.origin === 'top'
@@ -69,6 +70,16 @@ export function ActiveWellSlotDetails(
     (WELL_WIDTH_PIXELS / xLabwareWellWidth) *
     ('wellLocation' in params ? params.wellLocation.x : 1)
   const roundedXPositionPixels = round(xPositionPixels, PIXEL_DECIMALS)
+
+  const { tipColor, tipCurrentVolume } =
+    pipetteLocationLiquidState != null
+      ? getTipSvgInfo(pipetteLocationLiquidState, liquids)
+      : { tipColor: COLORS.grey40, tipCurrentVolume: 0 }
+
+  const totalVolumeInWell =
+    labwareLocationLiquidState != null
+      ? getWellVolume(labwareLocationLiquidState)
+      : 0
   return (
     <>
       <div className={styles.slot_details_active_step}>
@@ -76,60 +87,47 @@ export function ActiveWellSlotDetails(
           {`Well ${activeWellName}`}
         </StyledText>
       </div>
-      {/* <div className={styles.labware_details_padding}>
-        <div className={styles.labware_details_container}>
-          <div> {currentCommand.commandType}</div>
-          <div> {'speed' in params ? `speed: ${params.speed}` : null}</div>
-          <div>
-            {'flowRate' in params ? `flow rate: ${params.flowRate}` : null}
+      <div>
+        <div className={styles.well_details_speed_container}>
+          {'speed' in params ? (
+            <div className={styles.well_details_speed}>
+              <StyledText desktopStyle="bodyDefaultRegular">Speed</StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{`${params.speed} uL/s`}</StyledText>
+            </div>
+          ) : null}
+        </div>
+        <div className={styles.well_detail_svg_positioning}>
+          <div className={styles.well_detail_svg_container}>
+            <TipSvg
+              volume={tipCurrentVolume}
+              maxVolume={tipMaxVolume}
+              roundedXPositionPixels={roundedXPositionPixels}
+              bottomPx={bottomPx}
+              color={tipColor}
+            />
+            <WellSvg
+              volume={totalVolumeInWell}
+              maxVolume={labwareWellMaxVolume}
+              color={wellColor}
+            />
+            {labwareDepth !== null && (
+              <div className={styles.well_details_caption_side}>
+                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+                  {round(labwareDepth, 0)}
+                  {'mL'}
+                </StyledText>
+              </div>
+            )}
+            {xLabwareWellWidth !== null && (
+              <div className={styles.well_details_caption_bottom}>
+                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+                  {xLabwareWellWidth}
+                  {'mL'}
+                </StyledText>
+              </div>
+            )}
           </div>
         </div>
-      </div> */}
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          width: '100%',
-          justifyContent: 'center',
-          height: '6rem',
-          padding: '7px',
-        }}
-      >
-        <Box
-          position={POSITION_RELATIVE}
-          width="15.8125rem"
-          height="18rem"
-          overflow={OVERFLOW_HIDDEN}
-        >
-          <TipSvg
-            volume={currentVolume}
-            maxVolume={maxVolume}
-            roundedXPositionPixels={roundedXPositionPixels}
-            bottomPx={bottomPx}
-            color={tipColor}
-          />
-          <WellSvg
-            volume={totalVolumeInWell}
-            maxVolume={labwareWellMaxVolume}
-            color={color}
-          />
-          {labwareDepth !== null && (
-            <Box position={POSITION_ABSOLUTE} bottom="7.3rem" right="2.2rem">
-              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                {round(labwareDepth, 0)}
-                {'mL'}
-              </StyledText>
-            </Box>
-          )}
-          {xLabwareWellWidth !== null && (
-            <Box position={POSITION_ABSOLUTE} bottom="2rem" right="6.5rem">
-              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                {xLabwareWellWidth}
-                {'mL'}
-              </StyledText>
-            </Box>
-          )}
-        </Box>
       </div>
     </>
   )

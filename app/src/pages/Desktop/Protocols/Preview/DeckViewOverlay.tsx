@@ -77,7 +77,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     return null
   }
 
-  //    TODO: extend for Ot-2
+  // TODO: extend for Ot-2
   const { width, height, x, y } = getFlexHoverDimensions(
     stagingAreaLocations,
     cutoutId,

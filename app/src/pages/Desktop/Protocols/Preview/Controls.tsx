@@ -87,7 +87,8 @@ export function Controls(props: ControlsProps): JSX.Element {
           value={currentCommandIndex + 1}
           className={styles.range_input}
           style={{
-            //  @ts-expect-error: TODO figure out how to fix this - seems like an issue with thinking i'm using styled-components?
+            //  @ts-expect-error: TODO figure out how to fix this - seems like
+            //  an issue with thinking i'm using styled-components?
             '--progress': `${
               ((currentCommandIndex + 1) / numCommandLength) * 100
             }%`,

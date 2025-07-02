@@ -30,13 +30,12 @@ export function WellSvg({
       </defs>
       <style>
         {`
-            .cls-1 { fill: #f3f3f3; stroke-width: 0px; }
+            .cls-1 { fill: none; stroke-width: 0px; }
             .cls-2 { fill: none; stroke: #16212d; stroke-linecap: round; stroke-width: 2px; stroke-miterlimit: 10; }
             .cls-3 { fill: none; stroke: #4a4c4e; stroke-width: 1.5px; stroke-miterlimit: 10; }
           `}
       </style>
 
-      {/* Background cover */}
       <path
         id="cover"
         className="cls-1"
@@ -50,14 +49,12 @@ export function WellSvg({
         clipPath="url(#wellFillClip)"
       />
 
-      {/* Well outline */}
       <path
         id="well"
         className="cls-2"
         d="M43.2,61.4h10v64.7c0,12.7,10.3,23,23,23h3c12.7,0,23-10.3,23-23V61.4h10"
       />
 
-      {/* Measurements */}
       <g id="height_measurement">
         <g>
           <line className="cls-3" x1="125.5" y1="61.4" x2="125.5" y2="74.5" />
@@ -71,12 +68,12 @@ export function WellSvg({
 
       <g id="width_measurement">
         <g>
-          <line className="cls-3" x1="102" y1="160.9" x2="97.8" y2="160.9" />
-          <line className="cls-3" x1="102" y1="165.4" x2="102" y2="156.3" />
+          <line className="cls-3" x1="112" y1="160.9" x2="107.8" y2="160.9" />
+          <line className="cls-3" x1="112" y1="165.4" x2="112" y2="156.3" />
         </g>
         <g>
-          <line className="cls-3" x1="53.3" y1="160.9" x2="57.4" y2="160.9" />
-          <line className="cls-3" x1="53.3" y1="156.3" x2="53.3" y2="165.4" />
+          <line className="cls-3" x1="43.3" y1="160.9" x2="47.4" y2="160.9" />
+          <line className="cls-3" x1="43.3" y1="156.3" x2="43.3" y2="165.4" />
         </g>
       </g>
     </svg>

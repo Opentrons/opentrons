@@ -1,3 +1,5 @@
+import { POSITION_ABSOLUTE } from '@opentrons/components'
+
 interface TipSvgProps {
   volume: number
   maxVolume: number
@@ -13,7 +15,7 @@ export const TipSvg = ({
   bottomPx,
   color,
 }: TipSvgProps): JSX.Element => {
-  const percent = Math.min(Math.max(volume / maxVolume, 0), 1) // clamp between 0–1
+  const percent = Math.min(Math.max(volume / maxVolume, 0), 1)
   const pathTopY = 0.2
   const pathBottomY = 80
   const pathHeight = pathBottomY - pathTopY
@@ -24,7 +26,7 @@ export const TipSvg = ({
       viewBox="0 0 164.9 188.6"
       xmlns="http://www.w3.org/2000/svg"
       style={{
-        position: 'absolute',
+        position: POSITION_ABSOLUTE,
         transform: `translate(${roundedXPositionPixels}px)`,
         bottom: `${bottomPx + 33}px`,
       }}

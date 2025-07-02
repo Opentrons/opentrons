@@ -52,29 +52,9 @@ export function LabwareSlotDetails(
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
   )
-  // TODO: this only works for single channel, need to update for multi-channels
-  // by getting all the wells the multi-channel is using
   const pipetteTemporalProperties = Object.entries(robotState.pipettes).find(
-    ([id, pipette]) => pipette.entityId === topLabwareOnSlotId
+    ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
   )
-
-  const activeWellName =
-    pipetteTemporalProperties != null
-      ? pipetteTemporalProperties[1].wellName
-      : null
-
-  const channels =
-    pipetteTemporalProperties != null
-      ? getChannels(
-          pipetteEntities[pipetteTemporalProperties[0]].spec.channels,
-          pipetteTemporalProperties[1].nozzles
-        )
-      : 1
-  const maxVolume =
-    pipetteTemporalProperties != null
-      ? pipetteEntities[pipetteTemporalProperties[0]].spec.liquids.default
-          .maxVolume
-      : 0
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname =
@@ -84,8 +64,10 @@ export function LabwareSlotDetails(
       : null
   const { params } = currentCommand
   const labwareDef = labwareEntities[topLabwareOnSlotId].def
+  const labwareDisplayName = labwareDef.metadata.displayName
+
   const liquidDisplayColors = liquids.map(
-    liquid => liquid.displayColor ?? '0000000'
+    liquid => liquid.displayColor ?? COLORS.grey40
   )
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
     robotState.liquidState,
@@ -97,18 +79,20 @@ export function LabwareSlotDetails(
       : null
 
   const wellFill = wellFillFromWellContents(wellContents, liquidDisplayColors)
-  const labwareDisplayName = labwareDef.metadata.displayName
+  const activeWellName =
+    pipetteTemporalProperties != null
+      ? pipetteTemporalProperties[1].wellName
+      : null
   const wellGroup: WellGroup | null =
     activeWellName != null
       ? {
           [activeWellName]: null,
         }
       : null
-  const labwareDepth = labwareDef.wells.A1.depth ?? 0
-  const labwareWellXWidth = labwareDef.wells.A1.x ?? 0
-  const labwareWellMaxVolume = labwareDef.wells.A1.totalLiquidVolume
+  const { wells } = labwareDef
   const missingTips = getMissingTips(robotState.tipState, topLabwareOnSlotId)
   const liquidInfo = getLiquidDetailInfo(wellContents, liquids)
+
   const pipetteLocationLiquidState =
     pipetteTemporalProperties != null
       ? robotState.liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
@@ -117,31 +101,20 @@ export function LabwareSlotDetails(
     activeWellName != null
       ? robotState.liquidState.labware[topLabwareOnSlotId]?.[activeWellName]
       : null
-  const totalVolume =
-    pipetteLocationLiquidState != null
-      ? Object.values(pipetteLocationLiquidState).reduce(
-          (sum, { volume }) => sum + volume,
-          0
-        )
+
+  const tipMaxVolume =
+    pipetteTemporalProperties != null
+      ? pipetteEntities[pipetteTemporalProperties[0]].spec.liquids.default
+          .maxVolume
       : 0
 
-  const ingredIds =
-    pipetteLocationLiquidState != null
-      ? Object.keys(pipetteLocationLiquidState)
-      : []
-  const colorsInTip = liquids
-    .filter(liquid => ingredIds.includes(liquid.id))
-    ?.map(liquid => liquid.displayColor)
-
-  //  TODO: remove air gap volume from here
-  const totalVolumeInWell =
-    labwareLocationLiquidState != null
-      ? Object.values(labwareLocationLiquidState).reduce(
-          (sum, { volume }) => sum + volume,
-          0
+  const channels =
+    pipetteTemporalProperties != null
+      ? getChannels(
+          pipetteEntities[pipetteTemporalProperties[0]].spec.channels,
+          pipetteTemporalProperties[1].nozzles
         )
-      : 0
-
+      : 1
   return (
     <>
       <div>
@@ -198,20 +171,14 @@ export function LabwareSlotDetails(
       {activeWellName != null ? (
         channels === 1 ? (
           <ActiveWellSlotDetails
-            labwareDepth={labwareDepth}
+            wells={wells}
             params={params}
             activeWellName={activeWellName}
-            xLabwareWellWidth={labwareWellXWidth}
-            maxVolume={maxVolume}
-            color={wellFill[activeWellName]}
-            currentVolume={totalVolume ?? 0}
-            totalVolumeInWell={totalVolumeInWell}
-            labwareWellMaxVolume={labwareWellMaxVolume}
-            tipColor={
-              colorsInTip.length > 1
-                ? COLORS.grey40
-                : colorsInTip[0] ?? COLORS.grey40
-            }
+            wellColor={wellFill[activeWellName]}
+            labwareLocationLiquidState={labwareLocationLiquidState}
+            pipetteLocationLiquidState={pipetteLocationLiquidState}
+            liquids={liquids}
+            tipMaxVolume={tipMaxVolume}
           />
         ) : (
           <div>TODO: support multi-channel</div>

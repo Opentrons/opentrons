@@ -74,7 +74,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
     <div className={styles.detail_container} style={{ width: '100%' }}>
-      <div className={styles.command_step} style={{ overflowY: 'scroll' }}>
+      <div className={styles.slot_details}>
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
             <StyledText desktopStyle="bodyLargeSemiBold">Slot</StyledText>
@@ -93,10 +93,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           </div>
         </div>
         <Divider />
-        <div
-          className={styles.slot_details_active_step}
-          style={{ height: '100px' }}
-        >
+        <div className={styles.command_text_container}>
           <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
           <div className={styles.command_text}>
             <CommandText
@@ -135,8 +132,5 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   )
 }
 
-// update layout of labware + well details
-// update the back and end icons near the play.pause button
 // how does the layout look when there are steps not in a group?
-// update the copy on the labware when they are active for the step
-// do we have assets of aspirating/dispensing into a well?
+// fix the background to span full height

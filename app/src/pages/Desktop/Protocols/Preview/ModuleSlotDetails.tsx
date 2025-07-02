@@ -69,7 +69,7 @@ export function ModuleSlotDetails(props: ModuleSlotDetailsProps): JSX.Element {
       break
     }
     default:
-      moduleDetails = <div>TODO</div>
+      moduleDetails = <div>TODO: wire up module details</div>
   }
 
   return (

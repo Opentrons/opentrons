@@ -20,7 +20,6 @@ import { DeckViewOverlay } from './DeckViewOverlay'
 import styles from './preview.module.css'
 import {
   getActiveLayer,
-  getBackgroundColor,
   getSlotIdsBlockedBySpanningForThermocycler,
   getSlotIsEmpty,
   getStagingAreaAddressableAreas,
@@ -68,18 +67,12 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     hoveredSlot,
   } = props
   const { labware, modules, pipettes } = robotState
-  const {
-    labwareEntities,
-    moduleEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, moduleEntities, trashBinEntities } = invariantContext
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
     moduleEntities,
     robotType
   )
-  const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const trashSlots = Object.values(trashBinEntities).map(
     trash => trash.location.split('cutout')[1]
   )
@@ -206,7 +199,6 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
             getSlotIsEmpty(robotState, addressableArea.id) &&
-            !(addressableArea.id === 'D3' && hasWasteChute) &&
             !trashSlots.includes(addressableArea.id)
           )
         })
