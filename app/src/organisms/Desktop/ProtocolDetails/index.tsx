@@ -41,6 +41,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
@@ -517,7 +518,8 @@ export function ProtocolDetails(
                     grid-gap: 4px;
                   `}
                 >
-                  {enableProtocolTimeline ? (
+                  {/* TODO: add OT-2 support */}
+                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
                     <SecondaryButton
                       onClick={handleClickTimeline}
                       cursor={CURSOR_POINTER}
