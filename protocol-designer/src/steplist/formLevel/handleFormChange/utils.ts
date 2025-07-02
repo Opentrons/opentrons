@@ -535,6 +535,14 @@ const getNoLiquidClassValuesMoveLiquid = (
       aspirate_mmFromBottom: allOT2Defaults.aspirate_mmFromBottom,
       aspirate_position_reference: allOT2Defaults.aspirate_position_reference,
       aspirate_touchTip_checkbox: allOT2Defaults.aspirate_touchTip_checkbox,
+      aspirate_submerge_speed: zSpeedOT2,
+      aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      aspirate_submerge_delay_seconds:
+        allOT2Defaults.aspirate_submerge_delay_seconds,
+      aspirate_retract_speed: zSpeedOT2,
+      aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      aspirate_retract_delay_seconds:
+        allOT2Defaults.aspirate_retract_delay_seconds,
     }
     const pushOutVolume =
       tiprackEntity != null
@@ -559,17 +567,17 @@ const getNoLiquidClassValuesMoveLiquid = (
       dispense_touchTip_checkbox: allOT2Defaults.dispense_touchTip_checkbox,
       pushOut_checkbox: pushOutVolume > 0,
       pushOut_volume: pushOutVolume,
+      dispense_submerge_speed: zSpeedOT2,
+      dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      dispense_submerge_delay_seconds:
+        allOT2Defaults.dispense_submerge_delay_seconds,
+      dispense_retract_speed: zSpeedOT2,
+      dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      dispense_retract_delay_seconds:
+        allOT2Defaults.dispense_retract_delay_seconds,
       ...dipsosalFields,
     }
     return {
-      aspirate_submerge_speed: zSpeedOT2,
-      aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      aspirate_retract_speed: zSpeedOT2,
-      aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      dispense_submerge_speed: zSpeedOT2,
-      dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      dispense_retract_speed: zSpeedOT2,
-      dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'aspirate'
         ? aspirateOT2Defaults
         : {}),
