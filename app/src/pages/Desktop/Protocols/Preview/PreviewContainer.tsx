@@ -29,7 +29,7 @@ interface ContainerProps {
   protocolKey: string
   srcFileNames: string[]
 }
-export function Container(props: ContainerProps): JSX.Element {
+export function PreviewContainer(props: ContainerProps): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
 
@@ -90,6 +90,11 @@ export function Container(props: ContainerProps): JSX.Element {
     srcFileNames,
     analysis
   )
+  const commandLength = analysis.commands.length
+  const percentComplete =
+    selectedCommandIndex != null
+      ? (selectedCommandIndex / commandLength) * 100
+      : 0
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
 
@@ -117,6 +122,7 @@ export function Container(props: ContainerProps): JSX.Element {
         handlePlayPause={handlePlayPause}
         isPlaying={isPlaying}
         commands={commands}
+        groupedCommands={groupedCommands}
       />
       <div className={styles.preview_container}>
         <DeckView
@@ -135,6 +141,7 @@ export function Container(props: ContainerProps): JSX.Element {
             onClose={() => {
               setSelectedSlot(null)
             }}
+            percentComplete={percentComplete}
             analysis={analysis}
             robotType={robotType ?? FLEX_ROBOT_TYPE}
             allRunDefs={allRunDefs}
@@ -147,6 +154,7 @@ export function Container(props: ContainerProps): JSX.Element {
             currentCommandIndex={selectedCommandIndex}
             groupedCommands={groupedCommands}
             setSelectedCommand={setSelectedCommand}
+            percentComplete={percentComplete}
           />
         )}
       </div>

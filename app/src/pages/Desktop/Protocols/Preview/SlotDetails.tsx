@@ -36,6 +36,7 @@ interface SlotDetailsProps {
   allRunDefs: LabwareDefinition[]
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
+  percentComplete: number
 }
 export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const {
@@ -48,6 +49,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     allRunDefs,
     analysis,
     liquids,
+    percentComplete,
   } = props
   const { labware, modules } = robotState
   const {
@@ -73,7 +75,29 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     )
   const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
-    <div className={styles.detail_container} style={{ width: '100%' }}>
+    <div className={styles.slot_container}>
+      <div className={styles.command_step}>
+        <div className={styles.command_step_header}>
+          <StyledText desktopStyle="bodyDefaultRegular">Timeline</StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+          >{`${percentComplete.toFixed(0)}% complete`}</StyledText>
+        </div>
+        <Divider />
+        <div className={styles.command_text_container}>
+          <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
+          <div className={styles.command_text}>
+            <CommandText
+              command={command}
+              robotType={robotType}
+              color={COLORS.black90}
+              commandTextData={analysis}
+              allRunDefs={allRunDefs}
+            />
+          </div>
+        </div>
+      </div>
       <div className={styles.slot_details}>
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
@@ -89,20 +113,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             />
           </div>
           <div onClick={onClose} className={styles.cursor_pointer}>
-            <Icon name="close" size="28px" />
-          </div>
-        </div>
-        <Divider />
-        <div className={styles.command_text_container}>
-          <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
-          <div className={styles.command_text}>
-            <CommandText
-              command={command}
-              robotType={robotType}
-              color={COLORS.black90}
-              commandTextData={analysis}
-              allRunDefs={allRunDefs}
-            />
+            <Icon name="close" size="1.75rem" />
           </div>
         </div>
         <Divider />
@@ -131,6 +142,3 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     </div>
   )
 }
-
-// how does the layout look when there are steps not in a group?
-// fix the background to span full height

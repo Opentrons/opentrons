@@ -10,8 +10,8 @@ import {
   getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
 
-import { Container } from './Container'
 import styles from './preview.module.css'
+import { PreviewContainer } from './PreviewContainer'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
@@ -32,7 +32,7 @@ export function Preview(): JSX.Element {
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <Container
+    <PreviewContainer
       analysis={storedProtocol.mostRecentAnalysis}
       groupedCommands={groupedCommands}
       protocolKey={protocolKey}

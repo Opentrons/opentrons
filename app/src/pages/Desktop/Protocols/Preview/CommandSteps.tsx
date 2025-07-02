@@ -12,7 +12,8 @@ interface CommandStepsProps {
   groupedCommands: GroupedCommands | null
   analysis: ProtocolAnalysisOutput
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
-  currentCommandIndex: number | undefined
+  percentComplete: number
+  currentCommandIndex?: number
 }
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
   const {
@@ -20,12 +21,8 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     groupedCommands,
     analysis,
     setSelectedCommand,
+    percentComplete,
   } = props
-  const commandLength = analysis.commands.length
-  const percentComplete =
-    currentCommandIndex != null
-      ? (currentCommandIndex / commandLength) * 100
-      : 0
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>

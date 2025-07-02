@@ -1,9 +1,14 @@
 import { Chip, COLORS, Icon } from '@opentrons/components'
 
 import styles from './preview.module.css'
+import {
+  getNextGroupFirstCommandId,
+  getPreviousGroupFirstCommandId,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface ControlsProps {
   numErrors: number
@@ -14,6 +19,7 @@ interface ControlsProps {
   handlePlayPause: () => void
   isPlaying: boolean
   commands: RunTimeCommand[]
+  groupedCommands: GroupedCommands | null
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -25,7 +31,32 @@ export function Controls(props: ControlsProps): JSX.Element {
     handlePlayPause,
     isPlaying,
     commands,
+    groupedCommands,
   } = props
+  const currentCommandId = commands[currentCommandIndex].id
+  const nextGroupFirstCommandId = getNextGroupFirstCommandId(
+    groupedCommands,
+    currentCommandId
+  )
+  const previousGroupFirstCommandId = getPreviousGroupFirstCommandId(
+    groupedCommands,
+    currentCommandId
+  )
+
+  const handleBack = (): void => {
+    if (previousGroupFirstCommandId != null) {
+      setSelectedCommand(previousGroupFirstCommandId)
+    } else {
+      setSelectedCommand(commands[0].id)
+    }
+  }
+  const handleForward = (): void => {
+    if (nextGroupFirstCommandId != null) {
+      setSelectedCommand(nextGroupFirstCommandId)
+    } else {
+      setSelectedCommand(commands[commands.length - 1].id)
+    }
+  }
 
   return (
     <>
@@ -43,12 +74,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               </div>
             </div>
             <div className={styles.buttons}>
-              <button
-                className={styles.fast_button}
-                onClick={() => {
-                  setSelectedCommand(commands[0].id)
-                }}
-              >
+              <button className={styles.fast_button} onClick={handleBack}>
                 <Icon
                   name="ot-end"
                   width="1.5625rem"
@@ -64,12 +90,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                   color="white"
                 />
               </button>
-              <button
-                className={styles.fast_button}
-                onClick={() => {
-                  setSelectedCommand(commands[commands.length - 1].id)
-                }}
-              >
+              <button className={styles.fast_button} onClick={handleForward}>
                 <Icon
                   name="ot-start"
                   width="1.5625rem"
