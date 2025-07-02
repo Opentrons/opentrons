@@ -41,6 +41,7 @@ import type {
   CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -51,6 +52,7 @@ interface AddFixtureModalProps {
   cutoutId: CutoutId
   addressableAreaId: AddressableAreaNamesWithFakes
   closeModal: () => void
+  deckDef: DeckDefinition
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
@@ -67,6 +69,7 @@ export function AddFixtureModal({
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,
+  deckDef,
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -117,7 +120,8 @@ export function AddFixtureModal({
     providedFixtureOptions,
     unconfiguredMods,
     optionStage,
-    addressableAreaId
+    addressableAreaId,
+    deckDef
   )
 
   let nextStageOptions = null

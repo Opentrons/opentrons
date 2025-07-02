@@ -123,6 +123,7 @@ export function useDeckConfigurationEditingTools(
             setTargetCutoutId(null)
           }}
           isOnDevice={isOnDevice}
+          deckDef={deckDef}
         />
       ) : null,
   }
