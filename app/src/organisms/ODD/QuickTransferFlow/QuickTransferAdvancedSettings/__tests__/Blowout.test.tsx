@@ -5,12 +5,178 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
-import QuickTransferState from '../__fixtures__/QuickTransferState.json'
 import { BlowOut } from '../BlowOut'
 
 import type { ComponentProps } from 'react'
 
+const mockByPipette = [
+  {
+    pipetteModel: 'flex_1channel_50',
+    byTipType: [
+      {
+        tiprack: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
+        aspirate: {
+          correctionByVolume: [[0.0, 0.0]],
+          flowRateByVolume: [
+            [1.0, 35.0],
+            [50.0, 35.0],
+          ],
+        },
+        singleDispense: {
+          correctionByVolume: [[0.0, 0.0]],
+          flowRateByVolume: [[1.0, 50.0]],
+          retract: {
+            airGapByVolume: [
+              [1.0, 0.1],
+              [49.9, 0.1],
+              [50.0, 0.0],
+            ],
+          },
+          submerge: {
+            positionReference: 'well-top',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 2,
+            },
+            speed: 100,
+            delay: {
+              enable: false,
+              params: {
+                duration: 0,
+              },
+            },
+          },
+        },
+        multiDispense: {},
+      },
+    ],
+  },
+]
+
+const mockLiquidClasses = {
+  ethanol: {
+    liquidClassName: 'mock ethanol',
+    displayName: 'Volatile',
+    description: '80% ethanol',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+  glyeral: {
+    liquidClassName: 'mock glyeral',
+    displayName: 'Viscous',
+    description: '50% glycerol',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+  water: {
+    displayName: 'Aqueous',
+    liquidClassName: 'mock water',
+    description: 'Deionized water',
+    schemaVersion: 0,
+    namespace: '',
+    byPipette: mockByPipette,
+  },
+} as any
+
 vi.mock('/app/redux-resources/analytics')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<any>()
+  return {
+    ...actual,
+    getAllLiquidClassDefs: () => ({
+      waterV1: mockLiquidClasses.water,
+      ethanol80V1: mockLiquidClasses.ethanol,
+      glycerol50V1: mockLiquidClasses.glyeral,
+      none: mockLiquidClasses.water,
+    }),
+  }
+})
+
+const mockState = {
+  pipette: {
+    displayName: 'Flex 1-Channel 50 µL',
+    model: 'p50',
+    displayCategory: 'FLEX',
+    channels: 1,
+    shaftULperMM: 716,
+    liquids: {
+      default: {
+        $otSharedSchema:
+          '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
+        supportedTips: {
+          t50: {
+            defaultBlowOutFlowRate: {
+              default: 1000,
+            },
+          },
+        },
+        maxVolume: 50,
+        minVolume: 5,
+        defaultTipracks: [
+          'opentrons/opentrons_flex_96_tiprack_50ul/1',
+          'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        ],
+      },
+      lowVolumeDefault: {
+        $otSharedSchema:
+          '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
+        supportedTips: {
+          t50: {
+            defaultBlowOutFlowRate: {
+              default: 1000,
+            },
+          },
+        },
+        maxVolume: 30,
+        minVolume: 1,
+        defaultTipracks: [
+          'opentrons/opentrons_flex_96_tiprack_50ul/1',
+          'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        ],
+      },
+    },
+  } as any,
+  mount: 'left',
+  tipRack: {
+    wells: {
+      A1: {
+        totalLiquidVolume: 200,
+      },
+    },
+    parameters: {
+      format: '96Standard',
+      quirks: [],
+      isTiprack: true,
+      tipLength: 57.9,
+      tipOverlap: 10.5,
+      isMagneticModuleCompatible: false,
+      loadName: 'opentrons_flex_96_tiprack_50ul',
+    },
+  } as any,
+  source: {},
+  sourceWells: ['A1'],
+  destination: 'source',
+  destinationWells: ['A1'],
+  transferType: 'transfer',
+  volume: 15,
+  path: 'single',
+  changeTip: 'once',
+  dropTipLocation: {
+    cutoutFixtureId: 'trashBinAdapter',
+    cutoutId: 'cutoutA3',
+  },
+  liquidClass: {
+    byPipette: mockByPipette,
+    description: 'Deionized water',
+    displayName: 'Aqueous',
+    liquidClassName: 'water',
+    namespace: 'opentrons',
+    schemaVersion: 1,
+  },
+} as any
 
 const render = (props: ComponentProps<typeof BlowOut>) => {
   return renderWithProviders(<BlowOut {...props} />, {
@@ -25,7 +191,7 @@ describe('BlowOut', () => {
   beforeEach(() => {
     props = {
       onBack: vi.fn(),
-      state: QuickTransferState as any,
+      state: mockState,
       dispatch: vi.fn(),
       kind: 'dispense',
     }
