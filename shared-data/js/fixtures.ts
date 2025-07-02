@@ -1101,17 +1101,10 @@ export const replaceCutoutFixtureWithComboFixture = (
     getDeckDefFromRobotType('OT-3 Standard')
   )
 
+  console.log('addedCutoutConfigs: ', addedCutoutConfigs)
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
-    // Only handle SINGLE_RIGHT_CUTOUTS
-    if (
-      !SINGLE_RIGHT_CUTOUTS.includes(aaCutoutItem.cutoutId) ||
-      aaCutoutItem.cutoutFixtureId ===
-        WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-    ) {
-      return { ...aaCutoutItem }
-    }
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById
