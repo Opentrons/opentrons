@@ -140,12 +140,11 @@ export function DefineLiquidsModal(
   const liquidClassOptions = [
     { name: t('liquids:dont_use_liquid_class'), value: '' },
     ...Object.entries(sortedLiquidClassDefs).map(
-      ([liquidClassDefName, { displayName, description }]) => {
+      ([liquidClassDefName, { displayName }]) => {
         return {
           value: liquidClassDefName,
-          name: t('liquids:liquid_class_name_description', {
+          name: t('liquids:liquid_class_name', {
             displayName,
-            description,
           }),
         }
       }
