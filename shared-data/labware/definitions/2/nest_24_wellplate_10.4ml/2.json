@@ -328,7 +328,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "nest_24_wellplate_10.4ml"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {

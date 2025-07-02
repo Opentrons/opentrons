@@ -190,7 +190,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "nest_12_reservoir_22ml"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
