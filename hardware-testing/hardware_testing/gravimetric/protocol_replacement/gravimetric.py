@@ -25,7 +25,7 @@ from opentrons.config import infer_config_base_dir
 from opentrons.types import Point
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -650,6 +650,14 @@ def run_one_test(
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     fixture_settings = FixtureSettings.build(ctx)
+    try:
+        _do_run(ctx, fixture_settings)
+    finally:
+        if fixture_settings.recorder.is_recording:
+            fixture_settings.recorder.stop()
+
+
+def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
     print_info("Picking up first tip.")
     pick_up_tip_for_channel(fixture_settings, first_tip, 1)

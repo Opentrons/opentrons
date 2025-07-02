@@ -381,8 +381,10 @@ export const getMaxConditioningVolume = (args: {
     pipetteSpecs,
   } = args
   const { liquids } = pipetteSpecs
+  const minVolumeForMultiDispense = transferVolume * 2
   const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+    minVolumeForMultiDispense < liquids.default.minVolume &&
+    'lowVolumeDefault' in liquids
   const tiprack = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
@@ -394,7 +396,10 @@ export const getMaxConditioningVolume = (args: {
       : liquids.default.maxVolume,
     ...(tipMaxVolume != null ? [tipMaxVolume] : [])
   )
-  return maxWorkingVolume - disposalVolume - transferVolume
+  return Math.max(
+    0,
+    maxWorkingVolume - disposalVolume - minVolumeForMultiDispense
+  )
 }
 
 // for stacking

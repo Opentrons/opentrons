@@ -8,7 +8,7 @@ return_tip,TRUE,,,,,,,,
 touch_tip,FALSE,,,,,,,,
 liquid,water,Deionized water,#0000ff,100000,,,,,
 tipracks_20ul,,,,,,,,,
-tipracks_50ul,D2
+tipracks_50ul,D2,D3,C2,C3,B1,B2
 tipracks_200ul,,,,,,,,,
 tipracks_1000ul,,,,,,,,,
 labware_on_scale,nest_1_reservoir_195ml,A1,,,,,,,

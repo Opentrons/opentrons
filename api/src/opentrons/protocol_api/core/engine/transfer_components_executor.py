@@ -191,7 +191,6 @@ class TransferComponentsExecutor:
             )
             tx_utils.raise_if_location_inside_liquid(
                 location=submerge_start_location,
-                well_location=self._target_location,
                 well_core=self._target_well,
                 location_check_descriptors=LocationCheckDescriptors(
                     location_type="submerge start",
@@ -372,7 +371,6 @@ class TransferComponentsExecutor:
         )
         tx_utils.raise_if_location_inside_liquid(
             location=retract_location,
-            well_location=self._target_location,
             well_core=self._target_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -499,7 +497,6 @@ class TransferComponentsExecutor:
             )
             tx_utils.raise_if_location_inside_liquid(
                 location=retract_location,
-                well_location=self._target_location,
                 well_core=self._target_well,
                 location_check_descriptors=LocationCheckDescriptors(
                     location_type="retract end",
@@ -647,7 +644,6 @@ class TransferComponentsExecutor:
         )
         tx_utils.raise_if_location_inside_liquid(
             location=retract_location,
-            well_location=self._target_location,
             well_core=self._target_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",

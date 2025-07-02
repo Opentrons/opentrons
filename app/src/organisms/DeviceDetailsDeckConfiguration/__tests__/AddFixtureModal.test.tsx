@@ -15,15 +15,18 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { Modules } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { AttachedModule, Modules } from '@opentrons/api-client'
+import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
@@ -37,8 +40,14 @@ const render = (props: ComponentProps<typeof AddFixtureModal>) => {
 
 describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
+  let sendIdentifyStacker: (
+    module: AttachedModule,
+    start: boolean,
+    color?: IdentifyColor
+  ) => void
 
   beforeEach(() => {
+    sendIdentifyStacker = vi.fn()
     props = {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
@@ -55,13 +64,14 @@ describe('Touchscreen AddFixtureModal', () => {
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
+    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
 
   it('should render text and buttons', () => {
     render(props)
     screen.getByText('Add to Slot D3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -82,7 +92,7 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to Slot D3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     expect(screen.queryByText('Staging area slot')).toBeNull()
     screen.getByText('Trash bin')
@@ -115,7 +125,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to Slot D3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
 
     screen.getByText('Fixtures')
@@ -134,7 +144,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to Slot A1')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -148,7 +158,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to Slot B3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -163,7 +173,7 @@ describe('Desktop AddFixtureModal', () => {
     render(props)
     screen.getByText('Add to Slot B2')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Magnetic Block GEN1')
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()

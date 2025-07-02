@@ -18,21 +18,21 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../atoms/TextAreaField'
-import { FileUpload } from '../../molecules/FileUpload'
-import { UploadInput } from '../../molecules/UploadInput'
+import { TextAreaField } from '/ai-client/atoms/TextAreaField'
+import { FileUpload } from '/ai-client/molecules/FileUpload'
+import { UploadInput } from '/ai-client/molecules/UploadInput'
 import {
   chatDataAtom,
   chatHistoryAtom,
   createProtocolChatAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { ChangeEvent } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { UpdateOptions } from '../../resources/types'
+import type { UpdateOptions } from '/ai-client/resources/types'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
@@ -219,7 +219,6 @@ export function UpdateProtocol(): JSX.Element {
 
   function processDataAndNavigateToChat(): void {
     // Format the prompt for all update types
-    const introText = t('modify_intro')
     const originalCodeText =
       pythonText !== ''
         ? t('modify_python_code') +
@@ -227,10 +226,11 @@ export function UpdateProtocol(): JSX.Element {
           pythonText +
           `\n\`\`\`\n\n`
         : ''
-    const updateTypeText =
-      t('modify_type_of_update') + updateType?.value + `\n\n`
-    const detailsText = t('modify_details_of_change') + detailsValue + '\n'
-    const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
+    const updateTypeText = `${t('modify_type_of_update')}${
+      updateType?.name
+    }\n\n`
+    const detailsText = `${t('modify_details_of_change')}${detailsValue}\n`
+    const chatPrompt = `${originalCodeText}${updateTypeText}${detailsText}`
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,

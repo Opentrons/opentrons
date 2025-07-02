@@ -2,8 +2,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { ModuleListItemGroup } from '../index'
 
 // Define a local type matching the usage in the mock
@@ -92,7 +93,7 @@ describe('ModuleListItemGroup', () => {
     const listBox = await screen.findByRole('listbox')
 
     const adapterOptionButton = within(listBox).getByText(
-      'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+      'Opentrons 96 Deep Well Temperature Module Adapter'
     )
 
     fireEvent.click(adapterOptionButton)
@@ -110,7 +111,7 @@ describe('ModuleListItemGroup', () => {
 
     expect(
       within(secondModuleListItem).getByText(
-        'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+        'Opentrons 96 Deep Well Temperature Module Adapter'
       )
     ).toBeInTheDocument()
 
