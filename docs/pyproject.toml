@@ -11,9 +11,5 @@ dependencies = [
     "mkdocs-parent-css-plugin",
 ]
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
 [tool.uv.sources]
 mkdocs-parent-css-plugin = { path = "mkdocs-parent-css-plugin", editable = true }

@@ -118,7 +118,7 @@ wheels = [
 [[package]]
 name = "docs"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "mkdocs" },
     { name = "mkdocs-autorefs" },
