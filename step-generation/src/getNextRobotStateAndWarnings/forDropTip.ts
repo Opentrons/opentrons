@@ -26,5 +26,8 @@ export function forDropTip(
   robotState.tipState.pipettes[pipetteId].hasTip = false
   robotState.tipState.pipettes[pipetteId].tiprackURI = null
   robotState.pipettes[pipetteId].tiprackId = undefined
+<<<<<<< HEAD
   robotState.pipettes[pipetteId].entityId = undefined
+=======
+>>>>>>> edge
 }

@@ -2,12 +2,16 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+import {
+  OPENTRONS_FLEX,
+  ROBOT_FIELD_NAME,
+} from '/ai-client/organisms/InstrumentsSection'
+import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
+import { fillProtocolFormatSectionAndClickConfirm } from '/ai-client/resources/utils/createProtocolTestUtils'
+
 import { ProtocolSectionsContainer } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { PROTOCOL_FORMAT, PYTHON } from '../../../resources/constants'
-import { fillProtocolFormatSectionAndClickConfirm } from '../../../resources/utils/createProtocolTestUtils'
-import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../../InstrumentsSection'
 
 const TestFormProviderComponent = ({ defaultValues = {} } = {}) => {
   const methods = useForm({

@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
-import type { FixtureType } from '../../organisms/ModulesAndFixturesSection'
+import trash_bin_img from '/ai-client/assets/images/fixtures/flex_trash_bin.png'
+import staging_area_img from '/ai-client/assets/images/fixtures/staging_area.png'
+import waste_chute_img from '/ai-client/assets/images/fixtures/waste_chute.png'
 
-import trash_bin_img from '../../assets/images/fixtures/flex_trash_bin.png'
-import staging_area_img from '../../assets/images/fixtures/staging_area.png'
-import waste_chute_img from '../../assets/images/fixtures/waste_chute.png'
+import type { FixtureType } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 interface Props {
   type: FixtureType

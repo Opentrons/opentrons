@@ -48,4 +48,5 @@ export const forDropTipInPlace = (
     entityId,
   })
   robotState.pipettes[pipetteId].entityId = undefined
+  robotState.pipettes[pipetteId].tiprackId = undefined
 }

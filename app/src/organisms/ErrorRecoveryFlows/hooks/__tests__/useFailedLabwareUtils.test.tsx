@@ -577,6 +577,61 @@ describe('getFailedCmdRelevantLabware', () => {
   })
 })
 
+describe('getRelevantPickUpTipCommand', () => {
+  it('should return null when failedCommandByRunRecord does not have pipetteId in params', () => {
+    const failedCommand = {
+      commandType: 'dispenseInPlace',
+      params: {
+        wellName: 'A1',
+      },
+    } as any
+
+    const runCommands = {
+      data: [failedCommand],
+    } as any
+
+    const result = getRelevantFailedLabwareCmdFrom({
+      failedCommand: { byRunRecord: failedCommand } as any,
+      runCommands,
+    })
+
+    expect(result).toBeNull()
+  })
+
+  it('should return pickUpTip command when failedCommandByRunRecord has pipetteId', () => {
+    const pickUpTipCommand = {
+      key: 'pickUpTipKey',
+      commandType: 'pickUpTip',
+      params: {
+        pipetteId: 'pipetteId',
+        labwareId: 'labwareId',
+        wellName: 'A1',
+      },
+    } as any
+
+    const failedCommand = {
+      key: 'failedKey',
+      commandType: 'dispenseInPlace',
+      params: {
+        pipetteId: 'pipetteId',
+        labwareId: 'labwareId',
+      },
+      error: { isDefined: true, errorType: DEFINED_ERROR_TYPES.OVERPRESSURE },
+    } as any
+
+    const runCommands = {
+      data: [pickUpTipCommand, failedCommand],
+    } as any
+
+    const result = getRelevantFailedLabwareCmdFrom({
+      failedCommand: { byRunRecord: failedCommand } as any,
+      runCommands,
+    })
+
+    expect(result).toBe(pickUpTipCommand)
+  })
+})
+
 describe('useFailedLabwareUtils', () => {
   const mockPickUpTipCommand = {
     key: 'pickUpTipKey',

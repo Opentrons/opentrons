@@ -1,9 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { displayExitConfirmModalAtom } from '../../../resources/atoms'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+import { displayExitConfirmModalAtom } from '/ai-client/resources/atoms'
+
 import { ExitConfirmModal } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
