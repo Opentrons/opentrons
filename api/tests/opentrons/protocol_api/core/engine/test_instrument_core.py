@@ -2422,7 +2422,7 @@ def test_remove_air_gap_during_transfer_with_liquid_class(
     expected_air_gap_flow_rate: float,
     version: APIVersion,
 ) -> None:
-    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    """It should remove air gap by calling dispense and delay with liquid class props."""
     test_transfer_props = decoy.mock(cls=TransferProperties)
     air_gap_correction_by_vol = 0.321
     current_volume = 0.654
@@ -2471,7 +2471,7 @@ def test_remove_air_gap_during_transfer_with_liquid_class_handles_delays(
     subject: InstrumentCore,
     version: APIVersion,
 ) -> None:
-    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    """It should remove air gap by calling dispense and delay with liquid class props."""
     test_transfer_props = decoy.mock(cls=TransferProperties)
     air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
