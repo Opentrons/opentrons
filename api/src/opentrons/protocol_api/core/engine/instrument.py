@@ -2145,7 +2145,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return
 
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            last_air_gap
+            self.get_current_volume() - last_air_gap
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(
