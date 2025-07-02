@@ -491,8 +491,8 @@ def run(ctx: ProtocolContext) -> None:
 
     # ENABLE LIQUID-MENISCUS PIPETTING
     if ctx.params.pipette_at_liquid_meniscus:
-        for pip in [test_pip, pip_for_dil]:
-            _cls = test_class.get_for(pip, pip.tip_racks[0])
+        for pip, rack in [(test_pip, test_pip.tip_racks[0]), (pip_for_dil, diluent_tips)]:
+            _cls = test_class.get_for(pip, rack)
             _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
             _cls.aspirate.aspirate_position.offset.z = -1.5
             _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
