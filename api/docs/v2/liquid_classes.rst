@@ -135,7 +135,7 @@ Start by definining the tips, trash, pipette, and labware used in your transfers
 
     from opentrons import protocol_api
 
-    requirements = {"robotType": "Flex", "apiLevel": "|2.24|"}
+    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     # define tips, trash, and pipette
     def run(protocol: protocol_api.ProtocolContext):
@@ -150,7 +150,7 @@ Start by definining the tips, trash, pipette, and labware used in your transfers
         )
 
     # load source and destination labware
-       reservoir = protocol.load_labware(
+        reservoir = protocol.load_labware(
            load_name="nest_12_reservoir_15ml", location="C3"
         )
         plate = protocol.load_labware(
