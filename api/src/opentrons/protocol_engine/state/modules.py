@@ -140,6 +140,8 @@ _OT2_THERMOCYCLER_ADDITIONAL_SLOTS = [
 ]
 _OT3_THERMOCYCLER_ADDITIONAL_SLOTS = [DeckSlotName.SLOT_A1]
 
+_COLUMN_4_MODULES = [ModuleModel.FLEX_STACKER_MODULE_V1]
+
 
 @dataclass(frozen=True)
 class HardwareModule:
@@ -1303,9 +1305,8 @@ class ModuleView:
         location: DeckSlotLocation,
     ) -> None:
         """Raise if the given location has a module in it."""
-        column_4_modules = [ModuleModel.FLEX_STACKER_MODULE_V1]
         for module in self.get_all():
-            if module.model in column_4_modules and module.location == location:
+            if module.model in _COLUMN_4_MODULES and module.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location.slotName.value[:1]}4."
                 )
