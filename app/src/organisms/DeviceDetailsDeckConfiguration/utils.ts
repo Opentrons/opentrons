@@ -233,7 +233,6 @@ export const getFixtureOptions = (
       ],
     ]
   }
-  console.log('availableOptions: ', availableOptions)
 
   const stagingAreaAA = getMainAAForAFixture(
     cutoutId,
