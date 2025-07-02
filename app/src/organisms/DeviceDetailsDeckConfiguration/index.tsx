@@ -27,10 +27,10 @@ import {
   getAAByAAId,
   getAAComboFixtureDisplayName,
   getAASlotDisplayName,
+  getAAWithFakesFromVSId,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  getSingleSlotIdWithFakesFromVSId,
   getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
@@ -171,7 +171,7 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getSingleSlotIdWithFakesFromVSId(vsId) ?? addressableAreaId
+                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
                 )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,

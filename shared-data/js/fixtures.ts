@@ -953,7 +953,7 @@ export const getVisualSlotIdFromAAId = (
   return vsId as string // should always find a match
 }
 
-export const getSingleSlotIdWithFakesFromVSId = (
+export const getAAWithFakesFromVSId = (
   vsId: string
 ): AddressableAreaNamesWithFakes | null => {
   switch (vsId) {
@@ -1055,7 +1055,7 @@ export const getMainAAForAFixture = (
   } else {
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
-      const singleSlotId = getSingleSlotIdWithFakesFromVSId(vsId)
+      const singleSlotId = getAAWithFakesFromVSId(vsId)
       return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
@@ -1101,7 +1101,6 @@ export const replaceCutoutFixtureWithComboFixture = (
     getDeckDefFromRobotType('OT-3 Standard')
   )
 
-  console.log('addedCutoutConfigs: ', addedCutoutConfigs)
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
@@ -1181,9 +1180,7 @@ export const replaceCutoutFixtureRemove = (
   } else {
     const updated = aaForCutoutAndFixture?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      return aa === addressableAreaId
-        ? getSingleSlotIdWithFakesFromVSId(vsId)
-        : aa
+      return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
     })
     const match = Object.entries(addressableAreasById).find(([, value]) =>
       isEqual(
