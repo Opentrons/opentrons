@@ -11,7 +11,9 @@ import {
   Flex,
   getLabwareDefinitionsFromCommands,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -35,6 +37,12 @@ interface AnnotatedStepsProps {
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 
+const HIDE_SCROLLBAR = css`
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`
+
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
     analysis,
@@ -42,11 +50,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     groupedCommands,
     setSelectedCommand,
   } = props
-  const HIDE_SCROLLBAR = css`
-    ::-webkit-scrollbar {
-      display: none;
-    }
-  `
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
     () =>
@@ -122,8 +125,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           <Flex
             alignItems={ALIGN_CENTER}
             gridGap={SPACING.spacing8}
-            padding="0px 16px"
-            flexDirection="column"
+            padding={`0rem ${SPACING.spacing16}`}
+            flexDirection={DIRECTION_COLUMN}
           >
             {analysis?.errors.map(error => (
               <Flex
@@ -133,13 +136,13 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 backgroundColor={COLORS.red20}
                 borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
-                alignItems="center"
+                alignItems={ALIGN_CENTER}
                 css={css`
                   transition: background-color 500ms ease-out,
                     border-color 500ms ease-out;
                 `}
               >
-                <Icon name="ot-alert" size="16px" color={COLORS.red60} />
+                <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {error.detail}
                 </StyledText>
@@ -191,16 +194,20 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   }, [subCommands])
 
   return (
-    <Flex width="100%" flexDirection="column" overflow="hidden">
+    <Flex
+      width="100%"
+      flexDirection={DIRECTION_COLUMN}
+      overflow={OVERFLOW_HIDDEN}
+    >
       <Flex
         onClick={() => {
           setIsExpanded(!isExpanded)
         }}
         cursor={CURSOR_POINTER}
-        paddingX="16px"
+        paddingX={SPACING.spacing16}
         width="100%"
-        alignItems="center"
-        justifyContent="space-between"
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
         borderBottom={`1px solid ${COLORS.grey30}`}
         flexShrink={0}
       >
@@ -216,19 +223,15 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
 
       {isExpanded ? (
         <Flex
-          flexDirection="column"
-          padding="8px"
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing8}
           //  TODO: make max height dynamic based on
           //  amount of space left
           maxHeight="300px"
           borderBottom={`1px solid ${COLORS.grey30}`}
           overflowY={OVERFLOW_AUTO}
           gridGap={SPACING.spacing4}
-          css={css`
-            ::-webkit-scrollbar {
-              display: none;
-            }
-          `}
+          css={HIDE_SCROLLBAR}
         >
           {subCommands.map((c, i) => (
             <IndividualCommand
@@ -276,7 +279,11 @@ function IndividualCommand({
   }, [isHighlighted])
 
   return (
-    <Flex gridGap={SPACING.spacing8} padding="0px 16px" ref={commandRef}>
+    <Flex
+      gridGap={SPACING.spacing8}
+      padding={`0px ${SPACING.spacing16}`}
+      ref={commandRef}
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
