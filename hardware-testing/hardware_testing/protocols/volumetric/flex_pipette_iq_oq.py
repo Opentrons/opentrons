@@ -29,7 +29,7 @@ READER_ABSORBANCE = 450
 
 # TODO: (sigler) test using Buonoy at low volumes
 DYE_READER_IDEAL_UL = 200.0
-DYE_SHAKER_MAX_UL = 250.0
+DYE_SHAKER_MAX_UL = 200.0
 DYE_CONFIGS = {
     "dye_e": (0.1, 0.99, "#880000"),
     "dye_d": (1.0, 1.99, "#CC0000"),
@@ -347,7 +347,7 @@ def load_liquid_dye(
     trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
     liquid_and_trials_by_volume = {
         v: (ctx.define_liquid(
-            name=f"{name}_{min(v, DYE_SHAKER_MAX_UL)}ul",
+            name=f"{name}_{min(v, v / ceil(v / DYE_SHAKER_MAX_UL))}ul",
             description=f"{name}_{min(v, DYE_SHAKER_MAX_UL)}ul",
             display_color=cfg[2],
         ), t)
@@ -664,8 +664,9 @@ def run(ctx: ProtocolContext) -> None:
                 test_class, ul, list_of_the_same_src_well, dst_wells_organized_by_channel, new_tip="always"
             )
         else:
+            dist_vol = ul / ceil(ul / DYE_SHAKER_MAX_UL)
             test_pip.distribute_with_liquid_class(
-                test_class, ul / 4, src_well, dst_wells_organized_by_channel, new_tip="always"
+                test_class, dist_vol, src_well, dst_wells_organized_by_channel, new_tip="always"
             )
 
         # Transfer & SHAKE/READ the FINAL PLATE
