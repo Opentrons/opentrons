@@ -257,6 +257,9 @@ export const incompatibleLiquidClass: (
   fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ) => FormWarning | null = formData => {
   const { pipette, tipRack, volume: rawVolume } = formData
+  if (pipette == null) {
+    return null
+  }
   // don't show warnings for OT-2
   const isOT2 = Object.values(OT2_PIPETTES).includes(pipette.name)
   if (isOT2) {

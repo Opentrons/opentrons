@@ -306,7 +306,7 @@ const MOCK_WATER = {
     },
   ],
 } as LiquidClass
-describe('class compatibility', () => {
+describe('liquid class compatibility', () => {
   let fields: any
   beforeEach(() => {
     fields = {
@@ -322,7 +322,13 @@ describe('class compatibility', () => {
       water: MOCK_WATER,
     })
   })
-
+  it('should return null if the pipette is null', () => {
+    fields = {
+      ...fields,
+      pipette: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
   it('should return null if the liquid class is compatible with the pipette, tips, volume, and path', () => {
     expect(incompatibleLiquidClass(fields)).toBe(null)
   })
