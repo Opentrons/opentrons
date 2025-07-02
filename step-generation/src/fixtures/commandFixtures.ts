@@ -333,6 +333,15 @@ export const aspirateHelperLiquidClass = (submergeParams: {
             },
             meta: AIR_GAP_META,
           },
+          ...(dispenseDelay > 0
+            ? [
+                {
+                  commandType: 'waitForDuration',
+                  key: expect.any(String),
+                  params: { seconds: dispenseDelay },
+                },
+              ]
+            : []),
         ]
       : []),
     // ...(shouldProbe

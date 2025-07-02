@@ -688,6 +688,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                       : {}),
                     pushOut: 0,
                   }),
+                  ...delayAfterDispenseCommands,
                 ]
               : []
           const moveToSourceWellTopCommand = [
