@@ -514,8 +514,8 @@ export const getFlexHoverDimensions = (
   } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
     xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
   }
-  const x = hasTCOnSlot ? xSlotPosition : xSlotPosition
-  const y = hasTCOnSlot ? ySlotPosition : ySlotPosition
+  const x = hasTCOnSlot ? xSlotPosition + 20 : xSlotPosition
+  const y = hasTCOnSlot ? ySlotPosition - 70 : ySlotPosition
 
   return { width: xDimension, height: Y_DIMENSION, x, y }
 }
@@ -531,7 +531,7 @@ export const getOT2HoverDimensions = (
     width: hasTCOnSlot ? 260 : 128,
     height: hasTCOnSlot ? 178 : 85,
     x,
-    y:  y,
+    y: hasTCOnSlot ? y - 72 : y,
   }
 }
 
