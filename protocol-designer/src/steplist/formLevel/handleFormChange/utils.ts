@@ -513,9 +513,13 @@ const getNoLiquidClassValuesMoveLiquid = (
         : {}
     return {
       aspirate_submerge_speed: zSpeedOT2,
+      aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       aspirate_retract_speed: zSpeedOT2,
+      aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       dispense_submerge_speed: zSpeedOT2,
+      dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       dispense_retract_speed: zSpeedOT2,
+      dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       ...dipsosalFields,
     }
   }
