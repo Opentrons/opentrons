@@ -20,13 +20,6 @@ export function StackerShuttleEmptySkip(
   const { step, route } = recoveryMap
   const { STACKER_SHUTTLE_EMPTY_SKIP } = RECOVERY_MAP
 
-  const buildUnexpectedStep = (): JSX.Element => {
-    console.warn(
-      `StackerShuttleEmptySkip: ${step} in ${route} not explicitly handled. Rerouting.`
-    )
-    return <SelectRecoveryOption {...props} />
-  }
-
   const buildContent = (): JSX.Element => {
     switch (step) {
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.EMPTY_STACKER:
@@ -46,7 +39,10 @@ export function StackerShuttleEmptySkip(
       case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
       default:
-        return buildUnexpectedStep()
+        console.warn(
+          `StackerShuttleEmptySkip: ${step} in ${route} not explicitly handled. Rerouting.`
+        )
+        return <SelectRecoveryOption {...props} />
     }
   }
 

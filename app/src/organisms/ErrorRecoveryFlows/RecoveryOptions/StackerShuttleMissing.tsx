@@ -16,13 +16,6 @@ export function StackerShuttleMissing(
   const { step, route } = recoveryMap
   const { STACKER_SHUTTLE_MISSING_RETRY } = RECOVERY_MAP
 
-  const buildUnexpectedStep = (): JSX.Element => {
-    console.warn(
-      `StackerShuttleMissing: ${step} in ${route} not explicitly handled. Rerouting.`
-    )
-    return <SelectRecoveryOption {...props} />
-  }
-
   const buildContent = (): JSX.Element => {
     switch (step) {
       case STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
@@ -34,7 +27,10 @@ export function StackerShuttleMissing(
       case STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY:
         return <RetryStepInfo {...props} />
       default:
-        return buildUnexpectedStep()
+        console.warn(
+          `StackerShuttleMissing: ${step} in ${route} not explicitly handled. Rerouting.`
+        )
+        return <SelectRecoveryOption {...props} />
     }
   }
 

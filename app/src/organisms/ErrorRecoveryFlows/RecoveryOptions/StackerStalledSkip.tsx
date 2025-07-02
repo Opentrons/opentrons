@@ -14,13 +14,6 @@ export function StackerStalledSkip(props: RecoveryContentProps): JSX.Element {
   const { step, route } = recoveryMap
   const { STACKER_STALLED_SKIP } = RECOVERY_MAP
 
-  const buildUnexpectedStep = (): JSX.Element => {
-    console.warn(
-      `StackerStalledSkip: ${step} in ${route} not explicitly handled. Rerouting.`
-    )
-    return <SelectRecoveryOption {...props} />
-  }
-
   const buildContent = (): JSX.Element => {
     switch (step) {
       case STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
@@ -33,7 +26,10 @@ export function StackerStalledSkip(props: RecoveryContentProps): JSX.Element {
       case STACKER_STALLED_SKIP.STEPS.SKIP:
         return <SkipStepInfo {...props} />
       default:
-        return buildUnexpectedStep()
+        console.warn(
+          `StackerStalledSkip: ${step} in ${route} not explicitly handled. Rerouting.`
+        )
+        return <SelectRecoveryOption {...props} />
     }
   }
 
