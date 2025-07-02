@@ -438,6 +438,35 @@
           }
         }
       }
+    },
+    "HeightVolumePair": {
+      "type": "object",
+      "required": ["height", "volume"],
+      "properties": {
+        "height": {
+          "description": "The height withinin a well at a user-defined volume.",
+          "type": "number"
+        },
+        "volume": {
+          "description": "A user-defined volume at a known height within a well.",
+          "type": "number"
+        }
+      },
+    },
+    "UserDefinedVolumes": {
+      "type": "object",
+      "required": ["heightToVolumeMap"],
+      "properties": {
+        "heightToVolumeMap": {
+          "description": "A list mapping heights to volumes [height, volume]",
+          "type": "array",
+          "minItems": 1,
+          "items": 
+            {
+              "$ref": "#/definitions/HeightVolumePair"
+            }
+        }
+      }
     }
   },
   "type": "object",
@@ -713,7 +742,14 @@
       "type": ["object", "null"],
       "description": "A dictionary holding all unique inner well geometries in a labware.",
       "additionalProperties": {
-        "$ref": "#/definitions/InnerWellGeometry"
+        "oneOf": [
+          {
+            "$ref": "#/definitions/InnerWellGeometry",
+          },
+          {
+            "$ref": "#/definitions/UserDefinedVolumes",
+          }
+        ]
       }
     }
   }
