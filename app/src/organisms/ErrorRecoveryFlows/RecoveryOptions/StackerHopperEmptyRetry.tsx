@@ -11,19 +11,15 @@ export function StackerHopperEmptyRetry(
   const { step, route } = recoveryMap
   const { STACKER_HOPPER_EMPTY_RETRY } = RECOVERY_MAP
 
-  const buildContent = (): JSX.Element => {
-    switch (step) {
-      case STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER:
-        return <StackerHopperLwInfo {...props} />
-      case STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        console.warn(
-          `StackerHopperEmptyRetry: ${step} in ${route} not explicitly handled. Rerouting.`
-        )
-        return <SelectRecoveryOption {...props} />
-    }
+  switch (step) {
+    case STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER:
+      return <StackerHopperLwInfo {...props} />
+    case STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY:
+      return <RetryStepInfo {...props} />
+    default:
+      console.warn(
+        `StackerHopperEmptyRetry: ${step} in ${route} not explicitly handled. Rerouting.`
+      )
+      return <SelectRecoveryOption {...props} />
   }
-
-  return buildContent()
 }

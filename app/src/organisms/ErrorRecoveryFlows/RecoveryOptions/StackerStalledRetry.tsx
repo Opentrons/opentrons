@@ -13,22 +13,18 @@ export function StackerStalledRetry(props: RecoveryContentProps): JSX.Element {
   const { step, route } = recoveryMap
   const { STACKER_STALLED_RETRY } = RECOVERY_MAP
 
-  const buildContent = (): JSX.Element => {
-    switch (step) {
-      case STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-      case STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
-        return <StackerHomeShuttle {...props} />
-      case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
-        return <StackerHopperLwInfo {...props} />
-      case STACKER_STALLED_RETRY.STEPS.RETRY:
-        return <RetryStepInfo {...props} />
-      default:
-        console.warn(
-          `StackerStalledRetry: ${step} in ${route} not explicitly handled. Rerouting.`
-        )
-        return <SelectRecoveryOption {...props} />
-    }
+  switch (step) {
+    case STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
+    case STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+      return <StackerHomeShuttle {...props} />
+    case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
+      return <StackerHopperLwInfo {...props} />
+    case STACKER_STALLED_RETRY.STEPS.RETRY:
+      return <RetryStepInfo {...props} />
+    default:
+      console.warn(
+        `StackerStalledRetry: ${step} in ${route} not explicitly handled. Rerouting.`
+      )
+      return <SelectRecoveryOption {...props} />
   }
-
-  return buildContent()
 }
