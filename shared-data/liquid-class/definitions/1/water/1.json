@@ -202,11 +202,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 0.1],
-                [49.9, 0.1],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -450,11 +446,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 0.1],
-                [49.9, 0.1],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -703,11 +695,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 0.1],
-                [49.9, 0.1],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -951,11 +939,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 0.1],
-                [49.9, 0.1],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -1202,11 +1186,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -1452,11 +1432,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -1694,11 +1670,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -1932,11 +1904,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -2170,11 +2138,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -2408,11 +2372,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -2659,11 +2619,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -2909,11 +2865,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -3151,11 +3103,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -3389,11 +3337,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -3627,11 +3571,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -3865,11 +3805,7 @@
                 }
               },
               "speed": 50,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -4108,11 +4044,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -4346,11 +4278,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
-                [50.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -4584,11 +4512,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -4822,11 +4746,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
-                [200.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -5060,11 +4980,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -5298,11 +5214,7 @@
                 }
               },
               "speed": 35,
-              "airGapByVolume": [
-                [10.0, 10.0],
-                [990.0, 10.0],
-                [1000.0, 0.0]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
