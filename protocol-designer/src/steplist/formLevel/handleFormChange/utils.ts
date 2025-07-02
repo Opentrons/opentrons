@@ -18,7 +18,11 @@ import {
 
 import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../constants'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
+import {
+  canPipetteUseLabware,
+  getDefaultPushOutVolume,
+  getWellSetForMultichannel,
+} from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 
 import type {
@@ -485,7 +489,8 @@ const getNoLiquidClassValuesMoveLiquid = (
   convertedPipetteName: string,
   liquidHandlingAction: LiquidClassSettingsType,
   robotType: RobotType,
-  pipetteSpecs: PipetteV2Specs
+  pipetteSpecs: PipetteV2Specs,
+  labwareEntities: LabwareEntities
 ): Record<string, any> => {
   const { tipRack: tiprack, path, volume: rawVolume, stepType } = rawForm
   if (stepType !== 'moveLiquid') {
@@ -493,6 +498,10 @@ const getNoLiquidClassValuesMoveLiquid = (
     return {}
   }
   const volume = Number(rawVolume)
+  const tiprackEntity =
+    Object.values(labwareEntities).find(
+      ({ labwareDefURI }) => labwareDefURI === tiprack
+    ) ?? null
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
@@ -511,6 +520,47 @@ const getNoLiquidClassValuesMoveLiquid = (
             blowout_location: SOURCE_WELL_BLOWOUT_DESTINATION,
           }
         : {}
+    const allOT2Defaults = getDefaultsForStepType('moveLiquid')
+    const aspirateOT2Defaults = {
+      aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
+      aspirate_wellOrder_second: allOT2Defaults.aspirate_wellOrder_second,
+      preWetTip: allOT2Defaults.preWetTip,
+      aspirate_airGap_checkbox: allOT2Defaults.aspirate_airGap_checkbox,
+      aspirate_airGap_volume: allOT2Defaults.aspirate_airGap_volume,
+      aspirate_mix_checkbox: allOT2Defaults.aspirate_mix_checkbox,
+      aspirate_mix_times: allOT2Defaults.aspirate_mix_times,
+      aspirate_delay_checkbox: allOT2Defaults.aspirate_delay_checkbox,
+      aspirate_delay_seconds: allOT2Defaults.aspirate_delay_seconds,
+      aspirate_flowRate: allOT2Defaults.aspirate_flowRate,
+      aspirate_mmFromBottom: allOT2Defaults.aspirate_mmFromBottom,
+      aspirate_position_reference: allOT2Defaults.aspirate_position_reference,
+      aspirate_touchTip_checkbox: allOT2Defaults.aspirate_touchTip_checkbox,
+    }
+    const pushOutVolume =
+      tiprackEntity != null
+        ? getDefaultPushOutVolume(
+            Number(rawForm.volume),
+            pipetteSpecs,
+            tiprackEntity.def
+          )
+        : 0
+    const dispenseOT2Defaults = {
+      dispense_wellOrder_first: allOT2Defaults.dispense_wellOrder_first,
+      dispense_wellOrder_second: allOT2Defaults.dispense_wellOrder_second,
+      dispense_airGap_checkbox: allOT2Defaults.dispense_airGap_checkbox,
+      dispense_airGap_volume: allOT2Defaults.dispense_airGap_volume,
+      dispense_mix_checkbox: allOT2Defaults.dispense_mix_checkbox,
+      dispense_mix_times: allOT2Defaults.dispense_mix_times,
+      dispense_delay_checkbox: allOT2Defaults.dispense_delay_checkbox,
+      dispense_delay_seconds: allOT2Defaults.dispense_delay_seconds,
+      dispense_flowRate: allOT2Defaults.dispense_flowRate,
+      dispense_mmFromBottom: allOT2Defaults.dispense_mmFromBottom,
+      dispense_position_reference: allOT2Defaults.dispense_position_reference,
+      dispense_touchTip_checkbox: allOT2Defaults.dispense_touchTip_checkbox,
+      pushOut_checkbox: pushOutVolume > 0,
+      pushOut_volume: pushOutVolume,
+      ...dipsosalFields,
+    }
     return {
       aspirate_submerge_speed: zSpeedOT2,
       aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
@@ -520,7 +570,12 @@ const getNoLiquidClassValuesMoveLiquid = (
       dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       dispense_retract_speed: zSpeedOT2,
       dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      ...dipsosalFields,
+      ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'aspirate'
+        ? aspirateOT2Defaults
+        : {}),
+      ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'dispense'
+        ? dispenseOT2Defaults
+        : {}),
     }
   }
   if (liquidClassValuesForTip == null) {
@@ -1064,7 +1119,8 @@ export const getLiquidClassesValues = (args: {
           convertedPipetteName,
           liquidHandlingAction,
           robotType,
-          pipetteSpecs
+          pipetteSpecs,
+          labwareEntities
         )
       : getNoLiquidClassValuesMix(
           rawForm,
