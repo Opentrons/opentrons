@@ -410,7 +410,7 @@ def shake_and_read_plate(
 
     # SHAKE FOR 60 SECONDS
     shaker.close_labware_latch()
-    shaker.set_and_wait_for_shake_speed(1100)
+    shaker.set_and_wait_for_shake_speed(1500)
     ctx.delay(seconds=60)
     shaker.deactivate_shaker()
     shaker.open_labware_latch()
