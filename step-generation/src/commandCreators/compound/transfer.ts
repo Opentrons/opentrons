@@ -620,6 +620,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
+                    pushOut: 0,
                   }),
                   ...delayAfterDispenseCommands,
                 ]
