@@ -20,10 +20,10 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 // prettier-ignore
 import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
 
+import { Preview } from '/app/pages/Desktop/Protocols/Preview'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
-import { Preview } from '../../pages/Desktop/Protocols/Preview'
 import { DesktopApp } from '../DesktopApp'
 import { useSoftwareUpdatePoll } from '../hooks'
 
@@ -44,6 +44,7 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
+vi.mock('/app/pages/Desktop/Protocols/Preview')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -130,7 +131,7 @@ describe('DesktopApp', () => {
   })
 
   it('renders a ProtocolsTimeline component from /preview', () => {
-    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/timeline`)
+    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/preview`)
     screen.getByText('Mock Preview')
   })
 
