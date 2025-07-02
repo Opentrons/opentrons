@@ -50,7 +50,7 @@ const modulesMock: TestDisplayModule[] = [
     id: 'module-6',
     type: 'absorbanceReaderType',
     model: 'absorbanceReaderV1',
-    name: 'Absorbance Plate Reader Module',
+    name: 'Absorbance Plate Reader Module GEN1',
   },
 ]
 
@@ -97,7 +97,7 @@ describe('ModuleListItemGroup', () => {
     screen.getByText('Magnetic Block GEN1')
 
     screen.getByAltText('absorbanceReaderType')
-    screen.getByText('Absorbance Plate Reader Module')
+    screen.getByText('Absorbance Plate Reader Module GEN1')
   })
 
   it('should remove the list item if remove is clicked', async () => {
@@ -217,7 +217,7 @@ describe('ModuleListItemGroup', () => {
 
     // Test Absorbance Reader
     const absorbanceReaderListItem = listItems.find(item =>
-      within(item).queryByText('Absorbance Plate Reader Module')
+      within(item).queryByText('Absorbance Plate Reader Module GEN1')
     )
     if (absorbanceReaderListItem == null) {
       throw new Error(
