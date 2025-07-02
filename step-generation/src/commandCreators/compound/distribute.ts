@@ -789,6 +789,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 volume: conditioningVolume,
                 flowRate: dispenseFlowRateUlSec,
                 correctionVolume: dispenseCorrectionVolumeForConditioningVolume,
+                pushOut: 0,
               }),
               ...delayAfterDispenseCommands,
             ]

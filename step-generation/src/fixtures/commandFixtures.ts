@@ -330,6 +330,7 @@ export const aspirateHelperLiquidClass = (submergeParams: {
               pipetteId,
               volume: dispenseAirGap,
               flowRate: dispenseFlowRate,
+              pushOut: 0,
             },
             meta: AIR_GAP_META,
           },
