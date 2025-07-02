@@ -189,7 +189,6 @@ export const getModuleOptions = (
       ),
     ]
   }
-  console.log('availableOptions: ', availableOptions)
   return availableOptions
 }
 
