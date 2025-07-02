@@ -3,11 +3,9 @@
 }
 
 .heading_text {
-  font-family: Public Sans;
   font-weight: 700;
   font-size: 26px;
   line-height: 32px;
-  letter-spacing: 0px;
 }
 
 .play_button {
@@ -66,7 +64,6 @@
 }
 
 .range_input {
-  -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 4px;
@@ -78,18 +75,18 @@
 .range_input::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background: linear-gradient(
-    to right,
-    #006cfa 0%,
-    #006cfa var(--progress, 0%),
-    #ccc var(--progress, 0%),
-    #ccc 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      #006cfa 0%,
+      #006cfa var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
 }
 
 /* Hide thumb initially */
 .range_input::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
   width: 12px;
   height: 12px;
@@ -150,7 +147,7 @@
 }
 
 .deck_view_padding {
-  padding: 0px 16px;
+  padding: 0 16px;
 }
 
 .align_deck_modules {
@@ -164,14 +161,14 @@
 }
 
 .slot_details_active_step {
-  padding: 0px 16px 16px 16px;
+  padding: 0 16px 16px 16px;
   grid-gap: 8px;
   display: flex;
   flex-direction: column;
 }
 
 .command_text_container {
-  padding: 0px 16px 16px 16px;
+  padding: 0 16px 16px 16px;
   grid-gap: 8px;
   display: flex;
   flex-direction: column;
