@@ -76,6 +76,7 @@ export function StackerHomeShuttle(props: RecoveryContentProps): JSX.Element {
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryBtnOnClick}
+        primaryBtnTextOverride={t('home_now')}
         secondaryBtnOnClick={goBackPrevStep}
       />
     </RecoverySingleColumnContentWrapper>

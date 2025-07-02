@@ -2,7 +2,6 @@ import { RECOVERY_MAP } from '../constants'
 import {
   HoldingLabware,
   ReleaseLabware,
-  RetryStepInfo,
   SkipStepInfo,
   StackerEmptyHopper,
   StackerHomeShuttle,
