@@ -252,7 +252,6 @@ export const getFixtureOptions = (
       ],
     ]
   }
-  console.log('availableOptions: ', availableOptions)
   return availableOptions
 }
 
