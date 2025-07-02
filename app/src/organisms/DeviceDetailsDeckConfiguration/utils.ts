@@ -74,7 +74,6 @@ export const getModuleUnconfiguredFixtures = (
     cutoutId,
     deckDef
   )
-  console.log('addressableAreasById: ', addressableAreasById)
   const filteredMods = getFilteredModules(unconfiguredMods, moduleModel)
 
   return filteredMods
