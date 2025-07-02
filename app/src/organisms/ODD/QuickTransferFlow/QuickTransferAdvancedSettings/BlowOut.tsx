@@ -15,12 +15,20 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
   getTipTypeFromTipRackDefinition,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  linearInterpolate,
   LOW_VOLUME_PIPETTES,
+  NONE_LIQUID_CLASS_NAME,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -31,7 +39,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from '../constants'
-import { getPipetteName } from '../utils'
+import { getMaxUiFlowRate, getPipetteName } from '../utils'
 
 import type { Dispatch } from 'react'
 import type { DeckConfiguration, SupportedTip } from '@opentrons/shared-data'
@@ -114,9 +122,9 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOutDispense?.location)
+  >(state.blowOutDispense?.location as BlowOutLocation | undefined)
   const [speed, setSpeed] = useState<number | null>(
-    state.blowOutDispense?.speed ?? null
+    (state.blowOutDispense?.speed as number) ?? null
   )
 
   const enableBlowOutDisplayItems = [
@@ -203,11 +211,93 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const flowRatesForSupportedTip: SupportedTip | undefined =
     state.volume < 5 &&
     `lowVolumeDefault` in liquidSpecs &&
-    LOW_VOLUME_PIPETTES.includes(pipetteName)
+    LOW_VOLUME_PIPETTES.includes(pipetteName as string)
       ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
       : liquidSpecs.default.supportedTips[tipType]
+
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassMap = new Map<string, string>([
+    ['none', NONE_LIQUID_CLASS_NAME],
+    ['water', WATER_LIQUID_CLASS_NAME],
+    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
+    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
+  ])
+
+  const selectedLiquidClass = liquidClassMap.get(
+    state.liquidClass?.liquidClassName ?? 'none'
+  )
+  console.log('selectedLiquidClass', selectedLiquidClass)
+  // if no liquid class is selected, use the
+  const liquidClassDef =
+    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
+  const convertedPipetteName =
+    state.pipette != null ? getFlexNameConversion(state.pipette) : null
+
   const minFlowRate = 1
-  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
+  const { loadName: currentTiprackLoadName } = state.tipRack.parameters
+
+  const tipTypeSettings = liquidClassDef?.byPipette
+    ?.find(({ pipetteModel }) => convertedPipetteName === pipetteModel)
+    ?.byTipType.find(tipObject => {
+      const tiprackLoadName = tipObject.tiprack.split('/')[1]
+      return tiprackLoadName === currentTiprackLoadName
+    })
+
+  const correctionByVolume = tipTypeSettings?.singleDispense?.correctionByVolume
+  const retract = tipTypeSettings?.singleDispense?.retract
+
+  const referenceVolumesForByVolumeInterpolation = getTransferPlanAndReferenceVolumes(
+    {
+      pipetteSpecs: state.pipette,
+      volume: state.volume,
+      tiprackDefinition: state.tipRack,
+      path: state.path,
+      numDispenseWells: state.destinationWells.length,
+      aspirateAirGapByVolume:
+        (retract?.airGapByVolume as Array<[number, number]>) ?? null,
+      conditioningByVolume:
+        (correctionByVolume as Array<[number, number]>) ?? null,
+      disposalByVolume: null, // note always null because blowout is available only for single dispense
+    }
+  )
+
+  const [referenceVolumeFlowRate, referenceVolumeCorrection] = [
+    referenceVolumesForByVolumeInterpolation.referenceVolumes?.flowRate
+      .dispense,
+    referenceVolumesForByVolumeInterpolation.referenceVolumes?.correction
+      .dispense,
+  ]
+
+  const liquidClassValuesForPipette = liquidClassDef?.byPipette?.find(
+    ({ pipetteModel }) => convertedPipetteName === pipetteModel
+  )
+  const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
+    tipObject => {
+      const tiprackLoadName = tipObject.tiprack.split('/')[1]
+      return tiprackLoadName === currentTiprackLoadName
+    }
+  )
+
+  const correctionVolume =
+    referenceVolumeCorrection != null &&
+    (liquidClassValuesForTip?.singleDispense?.correctionByVolume?.length ?? 0) >
+      0
+      ? linearInterpolate(
+          referenceVolumeCorrection,
+          liquidClassValuesForTip?.singleDispense?.correctionByVolume as Array<
+            [number, number]
+          >
+        )
+      : 0
+
+  const maxFlowRate = getMaxUiFlowRate({
+    targetVolume: referenceVolumeFlowRate,
+    channels: state.pipette.channels,
+    tipLiquidSpecs: flowRatesForSupportedTip,
+    flowRateType: 'blowout',
+    correctionVolume: correctionVolume ?? 0,
+    shaftULperMM: state.pipette.shaftULperMM,
+  })
 
   const speedError =
     speed != null && (speed < minFlowRate || speed > maxFlowRate)
