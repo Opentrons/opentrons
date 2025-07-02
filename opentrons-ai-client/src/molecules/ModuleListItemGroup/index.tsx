@@ -87,6 +87,15 @@ export function ModuleListItemGroup(): JSX.Element | null {
     <>
       {modulesWatch?.map(module => {
         const adapters = RECOMMENDED_LABWARE_BY_MODULE[module.type]
+        const shouldShowAdapterOptions =
+          adapters != null &&
+          adapters.length > 0 &&
+          ![
+            THERMOCYCLER_MODULE_TYPE,
+            MAGNETIC_MODULE_TYPE,
+            MAGNETIC_BLOCK_TYPE,
+            ABSORBANCE_READER_TYPE,
+          ].includes(module.type)
 
         return (
           <Controller
@@ -101,23 +110,13 @@ export function ModuleListItemGroup(): JSX.Element | null {
                 <ListItem type="default" key={module.id}>
                   <ListItemCustomize
                     label={
-                      adapters != null &&
-                      adapters.length > 0 &&
-                      module.type !== THERMOCYCLER_MODULE_TYPE &&
-                      module.type !== MAGNETIC_MODULE_TYPE &&
-                      module.type !== MAGNETIC_BLOCK_TYPE &&
-                      module.type !== ABSORBANCE_READER_TYPE
+                      shouldShowAdapterOptions
                         ? t('modules_adapter_label')
                         : undefined
                     }
                     linkText={t('modules_remove_label')}
                     dropdown={
-                      adapters != null &&
-                      adapters.length > 0 &&
-                      module.type !== THERMOCYCLER_MODULE_TYPE &&
-                      module.type !== MAGNETIC_MODULE_TYPE &&
-                      module.type !== MAGNETIC_BLOCK_TYPE &&
-                      module.type !== ABSORBANCE_READER_TYPE
+                      shouldShowAdapterOptions
                         ? {
                             title: (null as unknown) as string,
                             width: '13rem',
