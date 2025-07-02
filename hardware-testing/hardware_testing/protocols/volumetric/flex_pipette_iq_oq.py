@@ -491,12 +491,13 @@ def run(ctx: ProtocolContext) -> None:
 
     # ENABLE LIQUID-MENISCUS PIPETTING
     if ctx.params.pipette_at_liquid_meniscus:
-        _cls = test_class.get_for(test_pip, test_pip.tip_racks[0])
-        _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
-        _cls.aspirate.aspirate_position.offset.z = -1.5
-        _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
-        is_eth = bool("ethanol" in test_class.name.lower() or "volatile" in test_class.name.lower())
-        _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
+        for pip in [test_pip, pip_for_dil]:
+            _cls = test_class.get_for(pip, pip.tip_racks[0])
+            _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            _cls.aspirate.aspirate_position.offset.z = -1.5
+            _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
+            is_eth = bool("ethanol" in test_class.name.lower() or "volatile" in test_class.name.lower())
+            _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
     # TEST EACH VOLUME
     plate: Optional[Labware] = None
@@ -548,12 +549,12 @@ def run(ctx: ProtocolContext) -> None:
                 csv_row = f"{col}"
                 for row in range(12):
                     w_name = f"{col}{row + 1}"
-                    val_str = str(round(results[w_name], 3)) if w_name in results else ""
+                    val_str = str(results[w_name]) if w_name in results else ""
                     csv_row += f",{val_str}"
                 _f.write(csv_row + "\n")
-            _f.write(f"CV,{round(cv, 2)}\n")
-            _f.write(f"AVG,{round(avg, 2)}\n")
-            ctx.comment(f"RESULT: {test_volume} uL %CV = {round(cv, 2)}%")
+            _f.write(f"CV,{cv}\n")
+            _f.write(f"AVG,{avg}\n")
+            ctx.comment(f"RESULT: {test_volume} uL %CV = {cv}%")
 
     def _on_plate_done() -> None:
         nonlocal plate, ul_in_this_plate
