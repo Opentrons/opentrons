@@ -159,7 +159,7 @@ Flex robots manufactured before September 2025 require an upgrade kit. This kit 
 
 Refer to your robot's serial number to determine if an upgrade kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require the upgrade kit.
 
-![flex serial number](images/serial-number-cropped2.png){width="50%"}
+![Flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
 

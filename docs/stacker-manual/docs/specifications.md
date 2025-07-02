@@ -43,7 +43,7 @@ The following table lists the environmental conditions for recommended use, acce
 |    | Recommended | Acceptable | Storage and transportation |
 |----|----|----|----|
 | Ambient temperature | +20 to +25 °C | +2 to +40 °C | -10 to +60 °C |
-| Relative humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10-85%, non-condensing (below 30 °C) |
+| Relative humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
 | Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
 | Pollution degree | 2 or lower | 2 or lower | 2 or lower |
 
@@ -112,7 +112,7 @@ The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Lib
                 <li>Bio-Rad 96 Well Plate 200 µL PCR</li>
                 <li>Bio-Rad 384 Well Plate 50 µL</li>
                 <li>Corning 24 Well Plate 3.4 mL Flat</li>
-                <li>NEST 96 Deep Well Plate 2mL</li>
+                <li>NEST 96 Deep Well Plate 2 mL</li>
                 <li>NEST 96 Well Plate 100 µL PCR Full Skirt</li>
                 <li>NEST 96 Well Plate 200 µL Flat</li>
                 <li>ThermoFisher Armadillo PCR Plate, 384-Well, Clear Wells</li>

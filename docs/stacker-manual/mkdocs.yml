@@ -18,7 +18,7 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-      title: <u>Page Contents</u>
+      title: Page Contents
       toc_depth: 3
   - admonition
   - abbr
@@ -30,7 +30,7 @@ copyright:
   Copyright © OPENTRONS, 2025. ALL RIGHTS RESERVED
 
 nav:
-  - Product and Manufacturer Description: index.md
+  - Product Description: index.md
   - Safety and Compliance: compliance.md
   - Product Specifications: specifications.md
   - Pre-installation Information: preinstall.md
