@@ -103,7 +103,10 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     label={
                       adapters != null &&
                       adapters.length > 0 &&
-                      module.type !== THERMOCYCLER_MODULE_TYPE
+                      module.type !== THERMOCYCLER_MODULE_TYPE &&
+                      module.type !== MAGNETIC_MODULE_TYPE &&
+                      module.type !== MAGNETIC_BLOCK_TYPE &&
+                      module.type !== ABSORBANCE_READER_TYPE
                         ? t('modules_adapter_label')
                         : undefined
                     }
@@ -111,7 +114,10 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     dropdown={
                       adapters != null &&
                       adapters.length > 0 &&
-                      module.type !== THERMOCYCLER_MODULE_TYPE
+                      module.type !== THERMOCYCLER_MODULE_TYPE &&
+                      module.type !== MAGNETIC_MODULE_TYPE &&
+                      module.type !== MAGNETIC_BLOCK_TYPE &&
+                      module.type !== ABSORBANCE_READER_TYPE
                         ? {
                             title: (null as unknown) as string,
                             width: '13rem',
