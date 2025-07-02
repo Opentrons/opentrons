@@ -143,9 +143,7 @@ export function DefineLiquidsModal(
       ([liquidClassDefName, { displayName }]) => {
         return {
           value: liquidClassDefName,
-          name: t('liquids:liquid_class_name', {
-            displayName,
-          }),
+          name: displayName,
         }
       }
     ),
