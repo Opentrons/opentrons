@@ -93,7 +93,7 @@ describe('ModuleListItemGroup', () => {
     const listBox = await screen.findByRole('listbox')
 
     const adapterOptionButton = within(listBox).getByText(
-      'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+      'Opentrons 96 Deep Well Temperature Module Adapter'
     )
 
     fireEvent.click(adapterOptionButton)
@@ -111,7 +111,7 @@ describe('ModuleListItemGroup', () => {
 
     expect(
       within(secondModuleListItem).getByText(
-        'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+        'Opentrons 96 Deep Well Temperature Module Adapter'
       )
     ).toBeInTheDocument()
 
