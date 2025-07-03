@@ -82,8 +82,8 @@ describe('_getNextTip', () => {
       invariantContext: _invariantContext,
       labwareLocations: { [tiprackId]: { stack: [tiprackId, '8'] } },
       pipetteLocations: {
-        p300SingleId: { mount: 'left' },
-        p300MultiId: { mount: 'right' },
+        p300SingleId: { mount: 'left', location: 'home' },
+        p300MultiId: { mount: 'right', location: 'home' },
       },
       tiprackSetting: { [tiprackId]: true },
     })
@@ -152,7 +152,7 @@ describe('getNextTiprack - single-channel', () => {
         tiprack1Id: { stack: ['tiprack1Id', '1'] },
         sourcePlateId: { stack: ['sourcePlateId', '2'] },
       },
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       tiprackSetting: { tiprack1Id: true },
     })
 
@@ -172,7 +172,7 @@ describe('getNextTiprack - single-channel', () => {
   it('single tiprack, empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: { tiprack1Id: { stack: ['tiprack1Id', '1'] } },
       tiprackSetting: { tiprack1Id: false },
     })
@@ -189,7 +189,7 @@ describe('getNextTiprack - single-channel', () => {
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '1'] },
         tiprack2Id: { stack: ['tiprack2Id', '11'] },
@@ -210,7 +210,7 @@ describe('getNextTiprack - single-channel', () => {
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
         tiprack2Id: { stack: ['tiprack2Id', '11'] },
@@ -234,7 +234,7 @@ describe('getNextTiprack - single-channel', () => {
   it('multiple tipracks, all empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
         tiprack2Id: { stack: ['tiprack2Id', '11'] },
@@ -256,7 +256,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, totally full', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '1'] },
       },
@@ -277,7 +277,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, partially full', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
@@ -303,7 +303,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
@@ -322,7 +322,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, a well missing from each column, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },
@@ -357,7 +357,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
         tiprack2Id: { stack: ['tiprack2Id', '3'] },
@@ -379,7 +379,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '1'] },
         tiprack2Id: { stack: ['tiprack2Id', '2'] },
@@ -439,7 +439,7 @@ describe('getNextTiprack - 8-channel', () => {
   it('multiple tipracks, all empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '1'] },
         tiprack2Id: { stack: ['tiprack2Id', '2'] },
@@ -470,7 +470,7 @@ describe('getModuleState', () => {
     }
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
       },

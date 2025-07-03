@@ -99,12 +99,12 @@ export const substepTimelineSingleChannel = (
           }
           const { volume, pipetteId } = command.params
           const pipetteEntity = pipettes[pipetteId]
-          const entityId = pipetteEntity.entityId ?? ''
+          const location = pipetteEntity.location ?? ''
           const wellName = pipetteEntity.wellName ?? ''
-          const isMoveToWell = labwareEntities[entityId] != null
+          const isMoveToWell = labwareEntities[location] != null
 
           if (isMoveToWell) {
-            const { id: labwareId } = invariantContext.labwareEntities[entityId]
+            const { id: labwareId } = invariantContext.labwareEntities[location]
 
             const wellInfo = {
               labwareId,
@@ -130,16 +130,16 @@ export const substepTimelineSingleChannel = (
               ],
             }
           } else {
-            const isWasteChute = wasteChuteEntities[entityId] != null
+            const isWasteChute = wasteChuteEntities[location] != null
             const wellInfo = {
-              additionalEquipmentId: entityId,
+              additionalEquipmentId: location,
               wells: [],
               preIngreds: isWasteChute
-                ? liquidState.wasteChute[entityId]
-                : liquidState.trashBins[entityId],
+                ? liquidState.wasteChute[location]
+                : liquidState.trashBins[location],
               postIngreds: isWasteChute
-                ? nextRobotState.liquidState.wasteChute[entityId]
-                : nextRobotState.liquidState.trashBins[entityId],
+                ? nextRobotState.liquidState.wasteChute[location]
+                : nextRobotState.liquidState.trashBins[location],
             }
 
             return {
@@ -218,9 +218,9 @@ export const substepTimelineMultiChannel = (
 
           const { volume, pipetteId } = command.params
           const pipetteEntity = pipettes[pipetteId]
-          const entityId = pipetteEntity.entityId ?? ''
+          const location = pipetteEntity.location ?? ''
           const wellName = pipetteEntity.wellName ?? ''
-          const isMoveToWell = labwareEntities[entityId] != null
+          const isMoveToWell = labwareEntities[location] != null
           const channels = pipetteEntities[pipetteId].spec.channels
           const nozzles = pipetteEntity.nozzles
 
@@ -236,7 +236,7 @@ export const substepTimelineMultiChannel = (
             const {
               def: labwareDef,
               id: labwareId,
-            } = invariantContext.labwareEntities[entityId]
+            } = invariantContext.labwareEntities[location]
             const wellsForTips =
               numChannels &&
               labwareDef &&
@@ -268,16 +268,16 @@ export const substepTimelineMultiChannel = (
               prevRobotState: nextRobotState,
             }
           } else {
-            const isWasteChute = wasteChuteEntities[entityId] != null
+            const isWasteChute = wasteChuteEntities[location] != null
             const wellInfo = {
-              additionalEquipmentId: entityId,
+              additionalEquipmentId: location,
               wells: [],
               preIngreds: isWasteChute
-                ? liquidState.wasteChute[entityId]
-                : liquidState.trashBins[entityId],
+                ? liquidState.wasteChute[location]
+                : liquidState.trashBins[location],
               postIngreds: isWasteChute
-                ? nextRobotState.liquidState.wasteChute[entityId]
-                : nextRobotState.liquidState.trashBins[entityId],
+                ? nextRobotState.liquidState.wasteChute[location]
+                : nextRobotState.liquidState.trashBins[location],
             }
 
             return {

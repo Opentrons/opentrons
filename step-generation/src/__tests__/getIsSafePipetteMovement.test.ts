@@ -76,7 +76,7 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     mockRobotState = {
-      pipettes: { pip: { mount: 'left' } },
+      pipettes: { pip: { mount: 'left', location: 'home' } },
       labware: {
         [mockLabwareId]: { stack: ['mockLabwareId', 'D2'] },
         [mockTiprackId]: { stack: ['mockTiprackId', 'A2'] },

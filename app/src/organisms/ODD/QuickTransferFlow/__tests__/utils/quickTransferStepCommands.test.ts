@@ -68,6 +68,7 @@ const mockRobotState: TimelineFrame = {
   pipettes: {
     mockPipette: {
       mount: 'left',
+      location: 'home',
     },
   },
   labware: {

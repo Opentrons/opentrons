@@ -156,6 +156,7 @@ export function Onboarding(): JSX.Element | null {
                 mount,
                 name: formPipette.pipetteName as PipetteName,
                 tiprackDefURI: formPipette.tiprackDefURI,
+                location: 'home',
               },
             ]
           : acc

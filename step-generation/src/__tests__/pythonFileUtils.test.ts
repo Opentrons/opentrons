@@ -334,8 +334,8 @@ describe('getLoadPipettes', () => {
       },
     }
     const pipetteRobotState: TimelineFrame['pipettes'] = {
-      [pipette1]: { mount: 'left' },
-      [pipette2]: { mount: 'right' },
+      [pipette1]: { mount: 'left', location: 'home' },
+      [pipette2]: { mount: 'right', location: 'home' },
     }
     const labwareRobotState: TimelineFrame['labware'] = {
       [tiprack1]: { stack: [tiprack1, 'offDeck'] },
@@ -371,7 +371,7 @@ pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks
     }
     const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
-      [pipette1]: { mount: 'left' },
+      [pipette1]: { mount: 'left', location: 'home' },
     }
 
     expect(
@@ -403,7 +403,7 @@ pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
 
     const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
-      [pipette1]: { mount: 'left' },
+      [pipette1]: { mount: 'left', location: 'home' },
     }
 
     expect(

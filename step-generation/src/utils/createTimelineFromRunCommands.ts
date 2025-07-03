@@ -30,6 +30,7 @@ export function getResultingTimelineFrameFromRunCommands(
           ...acc,
           [command.result.pipetteId]: {
             mount: command.params.mount,
+            location: 'home',
           },
         }
       }

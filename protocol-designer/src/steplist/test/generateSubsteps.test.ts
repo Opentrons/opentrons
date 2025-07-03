@@ -44,7 +44,7 @@ describe('generateSubstepItem', () => {
     }
     robotState = makeInitialRobotState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      pipetteLocations: { p300SingleId: { mount: 'left', location: 'home' } },
       labwareLocations: {
         tiprack1Id: { stack: ['tiprack1Id', '2'] },
         sourcePlateId: { stack: ['sourcePlateId', '4'] },

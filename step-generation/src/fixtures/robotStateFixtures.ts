@@ -237,10 +237,12 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
     [DEFAULT_PIPETTE]: {
       mount: 'left',
       tiprackId: 'tiprack1Id',
+      location: 'home',
     },
     [MULTI_PIPETTE]: {
       mount: 'right',
       tiprackId: 'tiprack1Id',
+      location: 'home',
     },
   },
   labwareLocations: {
@@ -275,9 +277,11 @@ export const makeStateArgsLabwareOffDeck = (): StandardMakeStateArgs => ({
   pipetteLocations: {
     [DEFAULT_PIPETTE]: {
       mount: 'left',
+      location: 'home',
     },
     [MULTI_PIPETTE]: {
       mount: 'right',
+      location: 'home',
     },
   },
   labwareLocations: {

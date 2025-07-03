@@ -37,6 +37,7 @@ describe('snapshot tests', () => {
         pipetteLocations: {
           p300SingleId: {
             mount: 'left',
+            location: 'home',
           },
         },
         tiprackSetting: {

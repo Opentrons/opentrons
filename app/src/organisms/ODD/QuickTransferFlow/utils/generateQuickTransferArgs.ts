@@ -89,6 +89,7 @@ function getInvariantContextAndRobotState(
   const pipetteLocations: RobotState['pipettes'] = {
     [pipetteId]: {
       mount: quickTransferState.mount,
+      location: 'home',
     },
   }
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)

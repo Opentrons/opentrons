@@ -16,7 +16,7 @@ export function forDispense(
   const entityId =
     'labwareId' in params
       ? params.labwareId
-      : robotState.pipettes[pipetteId].entityId ?? ''
+      : robotState.pipettes[pipetteId].location ?? ''
   const wellName =
     'wellName' in params
       ? params.wellName

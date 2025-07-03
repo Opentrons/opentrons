@@ -24,12 +24,12 @@ export function forMoveToAddressableArea(
       getTrashLocationFromAddressableAreaName(addressableAreaName)
   )?.id
 
-  const entityId = addressableAreaInWasteChute
+  const location = addressableAreaInWasteChute
     ? Object.values(wasteChuteEntities)[0].id
-    : trashBinId
+    : trashBinId ?? 'home'
   const { robotState } = robotStateAndWarnings
   robotState.pipettes[pipetteId] = {
     ...robotState.pipettes[pipetteId],
-    entityId,
+    location,
   }
 }

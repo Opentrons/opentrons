@@ -40,6 +40,7 @@ const initialRobotState: RobotState = {
   pipettes: {
     pipetteId: {
       mount: 'left',
+      location: 'home',
     },
   },
   liquidState: {
@@ -341,6 +342,7 @@ describe('steps actions', () => {
                     pipettes: {
                       pipetteId: {
                         mount: 'left',
+                        location: 'home',
                       },
                     },
                     tipState: {
@@ -489,6 +491,7 @@ describe('steps actions', () => {
                     pipettes: {
                       pipetteId: {
                         mount: 'left',
+                        location: 'home',
                       },
                     },
                     tipState: {

@@ -75,6 +75,7 @@ const MOCK_INITIAL_ROBOT_STATE = {
   pipettes: {
     'a212ebf2-bbd7-4946-a0e7-894a55e730ce': {
       mount: 'left',
+      location: 'home',
     },
   },
   liquidState: {

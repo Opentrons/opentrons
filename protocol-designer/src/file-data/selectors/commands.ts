@@ -62,6 +62,7 @@ export const getInitialRobotState: (
       initialDeckSetup.pipettes,
       (p: PipetteOnDeck): PipetteTemporalProperties => ({
         mount: p.mount,
+        location: 'home',
       })
     )
     const labware: Record<string, LabwareTemporalProperties> = mapValues(

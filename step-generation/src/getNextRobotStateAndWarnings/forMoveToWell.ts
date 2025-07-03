@@ -10,7 +10,7 @@ export function forMoveToWell(
   const { robotState } = robotStateAndWarnings
   robotState.pipettes[pipetteId] = {
     ...robotState.pipettes[pipetteId],
-    entityId: labwareId,
+    location: labwareId,
     wellName: wellName,
   }
 }

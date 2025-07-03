@@ -358,9 +358,11 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
   },
   "pipettes": {
     "p10SingleId": {
+      "location": "home",
       "mount": "left",
     },
     "p300MultiId": {
+      "location": "home",
       "mount": "right",
     },
   },

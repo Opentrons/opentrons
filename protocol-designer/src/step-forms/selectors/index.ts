@@ -361,7 +361,7 @@ const _getInitialDeckSetup = (
     pipettes: mapValues<{}, PipetteOnDeck>(
       pipetteLocations as Record<Mount, string>,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
-        return { mount, ...pipetteEntities[pipetteId] }
+        return { mount, location: 'home', ...pipetteEntities[pipetteId] }
       }
     ),
     additionalEquipmentOnDeck: additionalEquipmentEntitiesOnDeck,

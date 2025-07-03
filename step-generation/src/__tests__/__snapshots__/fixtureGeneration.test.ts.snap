@@ -19362,6 +19362,7 @@ exports[`snapshot tests > makeState 1`] = `
   "modules": {},
   "pipettes": {
     "p300SingleId": {
+      "location": "home",
       "mount": "left",
     },
   },

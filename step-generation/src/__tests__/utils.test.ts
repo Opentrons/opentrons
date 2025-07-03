@@ -349,8 +349,8 @@ describe('makeInitialRobotState', () => {
           },
         },
         pipetteLocations: {
-          p10SingleId: { mount: 'left' },
-          p300MultiId: { mount: 'right' },
+          p10SingleId: { mount: 'left', location: 'home' },
+          p300MultiId: { mount: 'right', location: 'home' },
         },
       })
     ).toMatchSnapshot()

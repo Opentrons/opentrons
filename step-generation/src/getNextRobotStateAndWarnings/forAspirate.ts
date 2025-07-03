@@ -29,7 +29,7 @@ export function forAspirate(
   const labwareId =
     'labwareId' in params
       ? params.labwareId
-      : robotState.pipettes[pipetteId].entityId ?? ''
+      : robotState.pipettes[pipetteId].location ?? ''
   const wellName =
     'wellName' in params
       ? params.wellName

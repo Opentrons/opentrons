@@ -43,12 +43,14 @@ export const editPipettes = (
           mount: oppositePipette.mount,
           name: oppositePipette.name,
           tiprackDefURI: oppositePipette.tiprackDefURI,
+          location: oppositePipette.location,
         }
       : null
   const newPip: PipetteFieldsData = {
     mount: mount,
     name: selectedPip,
     tiprackDefURI: selectedTips,
+    location: 'home',
   }
 
   const newPipetteArray: PipetteFieldsData[] =

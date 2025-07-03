@@ -110,6 +110,7 @@ export interface LabwareTemporalProperties {
 }
 export interface PipetteTemporalProperties {
   mount: Mount
+  location: 'home' | string
   nozzles?: NozzleConfigurationStyle
   prevNozzles?: NozzleConfigurationStyle
 }

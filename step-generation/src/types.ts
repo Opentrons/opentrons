@@ -35,8 +35,9 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
-  //  entityId is either a labwareId or a trashBin/wasteChute id
-  entityId?: string
+  //  location is either a labwareId a trashBin/wasteChute id, or home
+  //  home is used before the pipette has moved in the protocol
+  location: 'home' | string
   //  primary nozzle's wellName if over a labware
   wellName?: string
   //  pipette's nozzle configuration

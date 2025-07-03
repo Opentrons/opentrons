@@ -19,6 +19,7 @@ export const initialRobotState: RobotState = {
   pipettes: {
     pipetteId: {
       mount: 'left',
+      location: 'home',
     },
   },
   liquidState: {
