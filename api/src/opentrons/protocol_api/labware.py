@@ -279,7 +279,7 @@ class Well:
         if isinstance(mensicus, SimulatedProbeResult):
             # make meniscus a placeholder value to prevent Location and everything that 
             # references that to have to handle SimulatedProbeResult
-            meniscus = Point(x=0, y=0, z=0) 
+            meniscus = Point(x=0, y=0, z=z) 
         return Location(
             point=meniscus,
             labware=self,
