@@ -111,7 +111,7 @@ export function LeftColumnLabwareInfo({
         step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER)
     ) {
       return labwareQuantity != null && labwareQuantity > 0
-        ? labwareQuantity - 1  // one has been moved manually onto the shuttle
+        ? labwareQuantity - 1 // one has been moved manually onto the shuttle
         : null
     } else {
       return labwareQuantity

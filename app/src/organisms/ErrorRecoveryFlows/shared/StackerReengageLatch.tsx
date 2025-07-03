@@ -1,10 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import {
-  JUSTIFY_CENTER,
-  RESPONSIVENESS,
-} from '@opentrons/components'
+import { JUSTIFY_CENTER, RESPONSIVENESS } from '@opentrons/components'
 
 import ReengageLatch from '/app/assets/images/flex_stacker_reengage_latch.png'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'

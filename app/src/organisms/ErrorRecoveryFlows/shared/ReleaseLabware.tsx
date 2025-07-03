@@ -75,7 +75,7 @@ export function ReleaseLabware({
   }
   const animationSrc =
     route === STACKER_SHUTTLE_EMPTY_RETRY.ROUTE ||
-      route === STACKER_SHUTTLE_EMPTY_SKIP.ROUTE
+    route === STACKER_SHUTTLE_EMPTY_SKIP.ROUTE
       ? stackerReleaseLatchAnimation
       : gripperReleaseAnimation
 
@@ -102,10 +102,7 @@ export function ReleaseLabware({
         </Flex>
         <Flex css={ANIMATION_CONTAINER_STYLE}>
           <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
-            <source
-              src={animationSrc}
-              data-testid="release-animation"
-            />
+            <source src={animationSrc} data-testid="release-animation" />
           </AnimationVideo>
         </Flex>
       </TwoColumn>
