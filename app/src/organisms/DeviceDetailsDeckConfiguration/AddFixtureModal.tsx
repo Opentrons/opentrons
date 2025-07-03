@@ -150,24 +150,6 @@ export function AddFixtureModal({
         />
       </>
     )
-  } else if (
-    optionStage === 'fixtureOptions' &&
-    cutoutId === WASTE_CHUTE_CUTOUT &&
-    addressableAreaId === 'D3'
-  ) {
-    nextStageOptions = (
-      <>
-        <FixtureOption
-          key="wasteChuteStageOption"
-          optionName="Waste chute"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('wasteChuteOptions')
-          }}
-          isOnDevice={isOnDevice}
-        />
-      </>
-    )
   }
 
   const sendIdentifyStacker = useSendIdentifyStacker()

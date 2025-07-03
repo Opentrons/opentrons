@@ -220,7 +220,6 @@ export const getFixtureOptions = (
     TRASH_BIN_ADAPTER_FIXTURE,
     addressableAreaId
   )
-  console.log('TrashBinAA: ', TrashBinAA)
   if (TrashBinAA != null) {
     availableOptions = [
       ...availableOptions,
@@ -251,6 +250,11 @@ export const getFixtureOptions = (
         },
       ],
     ]
+  }
+
+  if (cutoutId == 'cutoutD3') {
+    const wasteChuteOptions = getWasteChuteOptions(cutoutId)
+    availableOptions = [...availableOptions, ...wasteChuteOptions]
   }
   return availableOptions
 }
