@@ -119,7 +119,13 @@
   "tip_position": {
     "title": "Tip Positioning",
     "caption": "Must be between {{min}} and {{max}}",
-    "warning": "Tip position is close to the edge of the well and may cause collisions.",
+    "warning": {
+      "close_to_edge": "Tip position is close to the edge of the well and may cause collisions.",
+      "submerge_retract_in_well": {
+        "header": "The tip position may be inside the liquid",
+        "subtext": "The tip must be above the ending height of the liquid for a valid transfer command"
+      }
+    },
     "radio_button": {
       "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
       "blowout": "0 mm from the top center (default)",

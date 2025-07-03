@@ -27,13 +27,17 @@ import {
 } from '@opentrons/shared-data'
 
 import { getIsTouchTipField } from '../../../form-types'
-import { prefixMap } from '../../../resources/utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
-import { PERCENT_RANGE_TO_SHOW_WARNING, TOO_MANY_DECIMALS } from './constants'
+import {
+  MoveLiquidPrefixToAction,
+  PERCENT_RANGE_TO_SHOW_WARNING,
+  TOO_MANY_DECIMALS,
+} from './constants'
 import { useDefaultPosition, usePositionReference } from './hooks'
 import { TipPositionSideView } from './TipPositionSideView'
 import { TipPositionTopView } from './TipPositionTopView'
+import { getIsTipInWell } from './utils'
 import * as utils from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
@@ -109,10 +113,10 @@ export function TipPositionModal(
       : String(zSpec?.value)
   )
   const [yValue, setYValue] = useState<string | null>(
-    ySpec?.value == null ? null : String(ySpec?.value)
+    ySpec?.value == null ? '0' : String(ySpec?.value)
   )
   const [xValue, setXValue] = useState<string | null>(
-    xSpec?.value == null ? null : String(xSpec?.value)
+    xSpec?.value == null ? '0' : String(xSpec?.value)
   )
   const {
     positionReferenceDropdown,
@@ -124,6 +128,15 @@ export function TipPositionModal(
     updateZValue: setZValue,
     wellDepth: wellDepthMm,
   })
+
+  // submerge/retract in well warning
+  const isInWell =
+    zValue != null && zValue !== ''
+      ? getIsTipInWell(Number(zValue), reference, wellDepthMm)
+      : false
+  const isSubmergeOrRetract =
+    MoveLiquidPrefixToAction[prefix] === 'submerge' ||
+    MoveLiquidPrefixToAction[prefix] === 'retract'
 
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = useState<boolean>(true)
@@ -271,7 +284,9 @@ export function TipPositionModal(
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', { prefix: prefixMap[prefix] })}
+      title={t('shared:tip_position', {
+        prefix: MoveLiquidPrefixToAction[prefix],
+      })}
       onClose={handleCancel}
       footer={
         <Flex
@@ -297,8 +312,20 @@ export function TipPositionModal(
         {isXValueNearEdge || isYValueNearEdge || isZValueAtBottom ? (
           <Banner type="warning">
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('tip_position.warning')}
+              {t('tip_position.warning.close_to_edge')}
             </StyledText>
+          </Banner>
+        ) : null}
+        {isInWell && isSubmergeOrRetract ? (
+          <Banner type="warning">
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText desktopStyle="bodyDefaultSemiBold">
+                {t('tip_position.warning.submerge_retract_in_well.header')}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('tip_position.warning.submerge_retract_in_well.subtext')}
+              </StyledText>
+            </Flex>
           </Banner>
         ) : null}
         <Flex gridGap={SPACING.spacing40}>

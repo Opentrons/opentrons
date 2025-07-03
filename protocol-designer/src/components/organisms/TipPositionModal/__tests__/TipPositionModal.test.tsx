@@ -15,6 +15,7 @@ import {
 import { TipPositionSideView } from '../TipPositionSideView'
 
 import type { ComponentProps } from 'react'
+import type { MoveLiquidPrefixType } from '../../../../resources/types'
 
 vi.mock('../TipPositionSideView')
 vi.mock('../../../../file-data/selectors')
@@ -94,6 +95,27 @@ describe('TipPositionModal', () => {
     screen.getByText(
       'Tip position is close to the edge of the well and may cause collisions.'
     )
+  })
+  describe('submerge/retract in well warning', () => {
+    const prefixes = [
+      'aspirate_submerge',
+      'dispense_submerge',
+      'aspirate_retract',
+      'dispense_retract',
+    ] as MoveLiquidPrefixType[]
+    prefixes.forEach(prefix => {
+      it(`renders the banner if the prefix is ${prefix} and the z value is inside the well`, () => {
+        props.prefix = prefix
+        props.specs.z.value = -1
+        props.specs.y.value = 0
+        props.specs.x.value = 0
+        render(props)
+        screen.getByText('The tip position may be inside the liquid')
+        screen.getByText(
+          'The tip must be above the ending height of the liquid for a valid transfer command'
+        )
+      })
+    })
   })
   it('renders the captions, and visual', () => {
     render(props)
