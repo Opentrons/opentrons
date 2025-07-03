@@ -397,6 +397,18 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: numberOrNull,
   },
+  aspirate_submerge_mmFromBottom: {
+    castValue: Number,
+  },
+  dispense_submerge_mmFromBottom: {
+    castValue: Number,
+  },
+  aspirate_retract_mmFromBottom: {
+    castValue: Number,
+  },
+  dispense_retract_mmFromBottom: {
+    castValue: Number,
+  },
 }
 export const castField = (name: StepFieldName, value: unknown): unknown => {
   const fieldCaster =

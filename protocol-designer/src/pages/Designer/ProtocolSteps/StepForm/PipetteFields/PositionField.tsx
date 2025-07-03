@@ -124,9 +124,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   const mmFromBottom = typeof rawZValue === 'number' ? rawZValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    zValue =
-      mmFromBottom ??
-      getDefaultMmFromEdge({ name: zName, wellDepth: wellDepthMm })
+    zValue = mmFromBottom ?? getDefaultMmFromEdge({ name: zName })
   }
 
   let modal = (

@@ -16,11 +16,8 @@ import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
 import type { PositionReference } from '@opentrons/shared-data'
 import type { StepFieldName } from '../../../form-types'
 
-export function getDefaultMmFromEdge(args: {
-  name: StepFieldName
-  wellDepth?: number
-}): number {
-  const { name, wellDepth = 0 } = args
+export function getDefaultMmFromEdge(args: { name: StepFieldName }): number {
+  const { name } = args
 
   switch (name) {
     case 'mix_mmFromBottom':
@@ -30,10 +27,9 @@ export function getDefaultMmFromEdge(args: {
     case 'aspirate_mmFromBottom':
     case 'aspirate_retract_mmFromBottom':
     case 'dispense_retract_mmFromBottom':
-      return DEFAULT_MM_OFFSET_FROM_BOTTOM
     case 'aspirate_submerge_mmFromBottom':
     case 'dispense_submerge_mmFromBottom':
-      return round(wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP, 1)
+      return DEFAULT_MM_OFFSET_FROM_BOTTOM
     default:
       // touch tip fields
       console.assert(
