@@ -11,6 +11,8 @@ from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons_shared_data.pipette.pipette_definition import (
     ulPerMMDefinition,
+    PipetteModelVersionType,
+    PipetteConfigurations,
 )
 
 
@@ -40,47 +42,18 @@ def _get_max_flow_rate_at_volume(
     return round(ul_per_mm * max_speed, 1)
 
 
-def get_all_pipette_models() -> Iterator[PipetteModel]:
-    paths_to_validate = (
-        get_shared_data_root() / "pipette" / "definitions" / "2" / "liquid"
-    )
-
-    _channel_model_str = {
-        "single_channel": "single",
-        "ninety_six_channel": "96",
-        "eight_channel": "multi",
-        "eight_channel_em": "multi_em",
-    }
-    assert os.listdir(paths_to_validate), "You have a path wrong"
-    for channel_dir in os.listdir(paths_to_validate):
-        for model_dir in os.listdir(paths_to_validate / channel_dir):
-            for liquid_file in os.listdir(paths_to_validate / channel_dir / model_dir):
-                for version_file in os.listdir(
-                    paths_to_validate / channel_dir / model_dir / liquid_file
-                ):
-                    version_list = version_file.split(".json")[0].split("_")
-                    built_model: PipetteModel = PipetteModel(
-                        f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
-                    )
-                    if version_list[0] != "1" and version_list[1] != "0":
-                        yield built_model
-
-
-@pytest.mark.parametrize("pipette", list(get_all_pipette_models()))
 @pytest.mark.parametrize("action", ["aspirate", "dispense"])
-def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
+def test_max_flow_rates_per_volume(
+    pipette_configuration: PipetteConfigurations, action: str
+) -> None:
     """Verify the max flow rate values for each pipette's supported tip is in range"""
-    pipette_model_version = convert_pipette_model(pipette)
-    definition = load_definition(
-        pipette_model_version.pipette_type,
-        pipette_model_version.pipette_channels,
-        pipette_model_version.pipette_version,
-        pipette_model_version.oem_type,
+    pipette_model_version_str = str(
+        PipetteModelVersionType.from_definition(pipette_configuration)
     )
-
-    pipette_model_version_str = f"{pipette_model_version}"
-
-    for liquid_name, liquid_properties in definition.liquid_properties.items():
+    for (
+        liquid_name,
+        liquid_properties,
+    ) in pipette_configuration.liquid_properties.items():
         for tip_type, supported_tip in liquid_properties.supported_tips.items():
 
             """TODO: the following models do not pass the asserts since the uiMaxFlowRate was raised

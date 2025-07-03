@@ -96,6 +96,18 @@ class PipetteModelVersionType:
 
         return f"{base_name}_v{self.pipette_version}"
 
+    @classmethod
+    def from_definition(
+        cls, definition: PipetteConfigurations
+    ) -> "PipetteModelVersionType":
+        """Build from a model version type."""
+        return cls(
+            pipette_type=definition.family.model,
+            pipette_channels=definition.family.channels,
+            pipette_version=definition.version,
+            oem_type=definition.family.oem_type,
+        )
+
 
 class FlowRateDefinition(BaseModel):
     default: float = Field(..., description="Highest API level default fallback.")
