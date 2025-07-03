@@ -26,24 +26,22 @@ Opentrons Flex is compatible with with the following Opentrons modules:
 
 - The **Thermocycler Module** provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
 
-Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark indicates compatibility, and an X indicates incompatibility.
+Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :heavy_check_mark: indicates compatibility, and an :heavy_multiplication_x: indicates incompatibility.
 
-<!-- observation: the X marks in the table are very small in the browser.
-Suggest enlarging both symbols for better readability -->
 
-| Device type and generation      | OT-2 | Flex |
-|---------------------------------|:----:|:----:|
-| Absorbance Plate Reader         |  ×   |  ✓   |
-| Heater-Shaker Module GEN1       |  ✓   |  ✓   |
-| Magnetic Module GEN1            |  ✓   |  ×   |
-| Magnetic Module GEN2            |  ✓   |  ×   |
-| Magnetic Block GEN1             |  ×   |  ✓   |
-| Temperature Module GEN1         |  ✓   |  ×   |
-| Temperature Module GEN2         |  ✓   |  ✓   |
-| Thermocycler Module GEN1        |  ✓   |  ×   |
-| Thermocycler Module GEN2        |  ✓   |  ✓   |
-| HEPA Module                     |  ✓   |  ×   |
-| HEPA/UV Module                  |  ×   |  ✓   |
+| Device type and generation    | OT-2                     | Flex                     |
+|:------------------------------|:------------------------:|:------------------------:|
+| Absorbance Plate Reader       | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Heater-Shaker Module GEN1     | :heavy_check_mark:       | :heavy_check_mark:       |
+| HEPA Module                   | :heavy_check_mark:       | :heavy_multiplication_x: |
+| HEPA/UV Module                | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Magnetic Block GEN1           | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Magnetic Module GEN1          | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Magnetic Module GEN2          | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Temperature Module GEN1       | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Temperature Module GEN2       | :heavy_check_mark:       | :heavy_check_mark:       |
+| Thermocycler Module GEN1      | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Thermocycler Module GEN2      | :heavy_check_mark:       | :heavy_check_mark: 
 
 ## Module caddy system
 
@@ -88,7 +86,7 @@ Thermocycler Modules.
 
 Calibration is required for some modules that use a separate caddy, specifically the Heater-Shaker, Temperature, and Thermocycler Modules.
 
-Other modules do not require calibration and are ready for use upon installation. These include the Absorbance Plate Reader (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block.
+Other modules do not require calibration and are ready for use upon installation. These include the plate reader (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block.
 
 ### When to calibrate modules
 
@@ -118,26 +116,26 @@ At any time, you can view and manage your module calibration data in the Opentro
 
 ### Plate Reader Features
 
-The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The Absorbance Plate Reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
+The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The plate reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
 
 !!!note
-    The Opentrons Flex Absorbance Plate Reader may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
+    The plate reader may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
 
 #### Measurement capabilities
 
-The Plate Reader uses 96 separate detection units for rapid sample analysis. The detection units use light in the 400–700 nanometer (nm) range to determine sample concentrations.
+The plate reader uses 96 separate detection units for rapid sample analysis. The detection units use light in the 400–700 nanometer (nm) range to determine sample concentrations.
 
 #### Gripper compatibility
 
-The Opentrons Flex Gripper is required when using the Plate Reader. The Gripper is needed to move labware and the Plate Reader's lid, onto and off the module.
+The Opentrons Flex Gripper is required when using the plate reader. The Gripper is needed to move labware and the plate reader's lid, onto and off the module.
 
 #### Deck placement
 
-The Absorbance Plate Reader fits in deck slots A3–D3 only. It comes preinstalled in a caddy, which helps secure the unit to the deck. This module does not require calibration, but you can run Labware Position Check on any installed labware.
+The plate reader fits in deck slots A3–D3 only. It comes preinstalled in a caddy, which helps secure the unit to the deck. This module does not require calibration, but you can run Labware Position Check on any installed labware.
 
 #### Software Control
 
-The Absorbance Plate Reader is fully programmable in Protocol Designer and the Python Protocol API.
+The plate reader is fully programmable in Protocol Designer and the Python Protocol API.
 
 ### Plate Reader Specifications
 
