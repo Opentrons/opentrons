@@ -65,6 +65,10 @@ figure.general > figcaption {
   font-style: normal;
 }
 
+figure.screenshot img {
+  border: 1px solid #888;
+}
+
 .md-content__inner > .figure-end-of-doc {
   padding-top: 150px;
   padding-bottom: 25px;
