@@ -21,7 +21,7 @@ interface UsePositionReferenceResult {
 
 export function usePositionReference(args: {
   zValue: number
-  updateZValue: Dispatch<SetStateAction<string | null>>
+  updateZValue: Dispatch<SetStateAction<string>>
   wellDepth: number
   initialReference?: unknown
 }): UsePositionReferenceResult {
