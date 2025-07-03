@@ -2302,7 +2302,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         LOG_GING.info("done")
         #print("done")
     except Exception as err:
-        
+        await api.drop_tip(mount, home_after=False)
         printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
         if LOG_GING == '':
@@ -2310,7 +2310,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         LOG_GING.error(printsig)
         LOG_GING.critical(err)
         await api.home()
-        await api.drop_tip(mount, home_after=False)
+        
 
 
 if __name__ == "__main__":
