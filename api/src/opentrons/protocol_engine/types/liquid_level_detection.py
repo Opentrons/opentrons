@@ -3,7 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 from pydantic import BaseModel, model_serializer, model_validator
 
 
@@ -147,6 +147,8 @@ class SimulatedProbeResult(BaseModel):
 # Work around https://github.com/pydantic/pydantic/issues/6830 - do not change the order of
 # this union
 LiquidTrackingType = float | SimulatedProbeResult
+
+# UserDefinedVolumeDict = Dict[str, float]
 
 
 class LoadedVolumeInfo(BaseModel):

@@ -99,8 +99,10 @@ from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
 from .frustum_helpers import (
-    find_volume_at_well_height,
-    find_height_at_well_volume,
+    find_height_inner_well_geometry,
+    find_volume_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
 from ._labware_origin_math import get_parent_placement_origin_to_lw_origin
@@ -2065,6 +2067,34 @@ class GeometryView:
             )
         return handling_height
 
+    def find_volume_at_well_height(
+        target_height: LiquidTrackingType,
+        well_geometry: InnerWellGeometry | UserDefinedVolumes,
+    ) -> LiquidTrackingType:
+        """Call the correct volume from height function based on well geoemtry type."""
+        if isinstance(well_geometry, InnerWellGeometry):
+            return find_volume_inner_well_geometry(
+                target_height=target_height, well_geometry=well_geometry
+            )
+        else:
+            return find_volume_user_defined_volumes(
+                target_height=target_height, well_geometry=well_geometry
+            )
+
+    def find_height_at_well_volume(
+        target_volume: LiquidTrackingType,
+        well_geometry: InnerWellGeometry | UserDefinedVolumes,
+    ) -> LiquidTrackingType:
+        """Call the correct height from volume function based on well geoemtry type."""
+        if isinstance(well_geometry, InnerWellGeometry):
+            return find_height_inner_well_geometry(
+                target_volume=target_volume, well_geometry=well_geometry
+            )
+        else:
+            return find_height_user_defined_volumes(
+                target_height=target_height, well_geometry=well_geometry
+            )
+
     def get_well_height_after_liquid_handling(
         self,
         labware_id: str,
@@ -2082,8 +2112,10 @@ class GeometryView:
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
+        # need to discern by type here actually
+
         try:
-            initial_volume = find_volume_at_well_height(
+            initial_volume = self.find_volume_at_well_height(
                 target_height=initial_height, well_geometry=well_geometry
             )
             final_volume = initial_volume + (
@@ -2097,7 +2129,7 @@ class GeometryView:
             # NOTE(cm): if final_volume is outside the bounds of the well, it will get
             # adjusted inside find_height_at_well_volume to accomodate well the height
             # calculation.
-            height_inside_well = find_height_at_well_volume(
+            height_inside_well = self.find_height_at_well_volume(
                 target_volume=final_volume, well_geometry=well_geometry
             )
             return self._validate_well_position(

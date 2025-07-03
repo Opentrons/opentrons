@@ -16,6 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     CuboidalFrustum,
     SquaredConeSegment,
+    UserDefinedVolumes,
 )
 
 
@@ -359,7 +360,70 @@ def _find_volume_in_partial_frustum(
     )
 
 
-def find_volume_at_well_height(
+def find_volume_user_defined_volumes(
+    target_height: LiquidTrackingType, well_geometry: UserDefinedVolumes
+) -> LiquidTrackingType:
+    """Return a linear interpolation of volume based on target height."""
+    if isinstance(target_height, SimulatedProbeResult):
+        return target_height
+    max_height = well_geometry[-1].height
+    if target_height < 0 or target_height > max_height:
+        raise InvalidLiquidHeightFound(
+            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
+        )
+    # note: i think lets require UserDefinedVolumes
+    # to have at least two entries: (0: 0) and (well_depth: well_capacity)
+
+    prev_height = 0.0
+    for pair in well_geometry:
+        if target_height == pair.height:
+            return pair.volume
+        if target_height > prev_height and target_height < pair.height:
+            proportional_diff = (target_height - prev_height) / (
+                pair.height - prev_height
+            )
+            target_volume = (
+                prev_volume + (pair.volume - prev_volume) * proportional_diff
+            )
+            return target_volume
+    raise InvalidLiquidHeightFound(
+        f"Unable to find volume at target height {target_height}."
+    )
+
+
+def find_height_user_defined_volumes(
+    target_volume: LiquidTrackingType,
+    well_geometry: UserDefinedVolumes,
+) -> LiquidTrackingType:
+    """Return a linear interpolation of height based on target volume."""
+    if isinstance(target_volume, SimulatedProbeResult):
+        return target_volume
+    max_volume = well_geometry[-1].volume
+    if target_volume < 0 or target_volume > max_volume:
+        raise InvalidLiquidHeightFound(
+            f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
+        )
+    # note: i think lets require UserDefinedVolumes
+    # to have at least two entries: (0: 0) and (well_depth: well_capacity)
+
+    prev_volume = 0.0
+    for pair in well_geometry:
+        if target_volume == pair.volume:
+            return pair.height
+        if target_volume > prev_volume and target_volume < pair.volume:
+            proportional_diff = (target_volume - prev_volume) / (
+                pair.volume - prev_volume
+            )
+            target_height = (
+                prev_height + (pair.height - prev_height) * proportional_diff
+            )
+            return target_height
+    raise InvalidLiquidHeightFound(
+        f"Unable to find volume at target volume {target_volume}."
+    )
+
+
+def find_volume_inner_well_geometry(
     target_height: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
 ) -> LiquidTrackingType:
@@ -434,7 +498,7 @@ def _find_height_in_partial_frustum(
     )
 
 
-def find_height_at_well_volume(
+def find_height_inner_well_geometry(
     target_volume: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
 ) -> LiquidTrackingType:

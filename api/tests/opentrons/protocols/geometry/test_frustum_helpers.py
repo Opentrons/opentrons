@@ -20,8 +20,10 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
-    find_height_at_well_volume,
-    find_volume_at_well_height,
+    find_height_inner_well_geometry,
+    find_volume_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_user_defined_volumes,
     _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
