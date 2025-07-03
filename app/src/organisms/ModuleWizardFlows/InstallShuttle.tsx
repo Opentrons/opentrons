@@ -15,8 +15,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-// TODO (chb, 2025-05-15): replace this imported video with a video of the shuttle being installed
-import videoPlaceholder from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import StackerInstallShuttle from '/app/assets/videos/error-recovery/FlexStacker_InstallShuttle.webm'
 import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
@@ -117,7 +116,7 @@ export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
                 max-height: 100%;
               `}
             >
-              <source src={videoPlaceholder} />
+              <source src={StackerInstallShuttle} />
             </AnimationVideo>
           </Flex>
         }

@@ -21,13 +21,14 @@ export {
   findThermocyclerProfileRepetitions,
 }
 export * from './commandCreatorArgsGetters'
-export * from './heaterShakerCollision'
-export * from './createTimelineFromRunCommands'
-export * from './misc'
-export * from './safePipetteMovements'
-export * from './createTimelineFromRunCommands'
 export * from './constructInvariantContextFromRunCommands'
-export * from './pythonFormat'
-export * from './pythonFileUtils'
+export * from './createTimelineFromRunCommands'
+export * from './createTimelineFromRunCommands'
+export * from './heaterShakerCollision'
+export * from './liquidClassUtils'
 export * from './liquidUtils'
+export * from './misc'
+export * from './pythonFileUtils'
+export * from './pythonFormat'
+export * from './safePipetteMovements'
 export const uuid: () => string = uuidv4

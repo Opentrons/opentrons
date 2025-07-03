@@ -27,6 +27,7 @@ import {
   SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
@@ -91,9 +92,12 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
         return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
           raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
         ) ||
-          cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
+          (cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
             FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa)
-          ) ? null : (
+          ) &&
+            !cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
+              WASTE_CHUTE_ADDRESSABLE_AREAS.includes(raa)
+            )) ? null : (
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
             deckDef={deckDef}

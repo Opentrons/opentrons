@@ -373,7 +373,10 @@ export function TipPositionModal(
             gridGap={SPACING.spacing8}
             width="100%"
           >
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+            >
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t(`modal:tip_position.view.${view}`)}
               </StyledText>

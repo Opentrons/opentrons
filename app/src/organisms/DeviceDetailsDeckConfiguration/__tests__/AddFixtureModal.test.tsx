@@ -6,6 +6,7 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -29,6 +30,7 @@ vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
+const deckDef = getDeckDefFromRobotType('OT-3 Standard')
 
 const render = (props: ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -51,6 +53,7 @@ describe('Touchscreen AddFixtureModal', () => {
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
       isOnDevice: true,
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -107,6 +110,7 @@ describe('Desktop AddFixtureModal', () => {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -160,6 +164,7 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Add')[0])
     screen.getByText('Trash bin')
+    console.log('screen: ', screen)
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
   })
 
