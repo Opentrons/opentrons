@@ -226,8 +226,6 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const selectedLiquidClass = liquidClassMap.get(
     state.liquidClass?.liquidClassName ?? 'none'
   )
-  console.log('selectedLiquidClass', selectedLiquidClass)
-  // if no liquid class is selected, use the
   const liquidClassDef =
     allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
   const convertedPipetteName =
