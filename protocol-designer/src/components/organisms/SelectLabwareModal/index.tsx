@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   CheckboxField,
   CURSOR_POINTER,
-  CustomizeExpandButton,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
@@ -18,9 +17,6 @@ import {
   InputField,
   JUSTIFY_CENTER,
   JUSTIFY_END,
-  ListButton,
-  ListButtonAccordion,
-  ListButtonAccordionContainer,
   Modal,
   PrimaryButton,
   SecondaryButton,
@@ -47,24 +43,12 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import {
-  selectAdapter,
-  selectLid,
-  selectTopLabware,
-  selectTopLabwareAmount,
-} from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
-  ORDERED_CATEGORIES,
 } from '../../../pages/Designer/DeckSetup/constants'
-import {
-  getLabwareCompatibleWithAdapter,
-  getLabwareIsRecommended,
-  getStackerDefinition,
-} from '../../../pages/Designer/DeckSetup/utils'
-import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
+import { getLabwareIsRecommended } from '../../../pages/Designer/DeckSetup/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
@@ -73,9 +57,10 @@ import {
   getLabwareCompatibleWithModule,
 } from '../../../utils/labwareModuleCompatibility'
 import { getMainPagePortalEl } from '../Portal'
+import { SelectCustomLabware } from './SelectCustomLabware'
+import { SelectLabware } from './SelectLabware'
 
 import type { ChangeEvent } from 'react'
-import type { StackingProps } from '@opentrons/components'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -86,6 +71,8 @@ const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
+const UNIVERSAL_LID_LOADNAME = 'opentrons_tough_universal_lid'
+
 interface SelectLabwareModalProps {
   slot: DeckSlotId
   onClose: () => void
@@ -93,7 +80,7 @@ interface SelectLabwareModalProps {
   slotFull: boolean
 }
 
-interface LabwareInfo {
+export interface LabwareInfo {
   uri: string
   def: LabwareDefinition2
 }
@@ -113,21 +100,15 @@ export function SelectLabwareModal(
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
-  const lidLoadNames = Object.values(defs)
-    .filter(
-      def =>
-        def.allowedRoles?.includes('lid') &&
-        def.parameters.loadName !== TIPRACK_LID_LOADNAME
-    )
-    ?.map(def => def.parameters.loadName)
-
+  const universalLid = Object.entries(defs).find(
+    ([_, def]) => def.parameters.loadName === UNIVERSAL_LID_LOADNAME
+  )
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedTopLabware,
     selectedModuleModel,
     selectedAdapterDefURI,
-    selectedLidLabware,
   } = zoomedInSlotInfo
 
   const hasNoLabware =
@@ -314,10 +295,6 @@ export function SelectLabwareModal(
     }
   }
 
-  const stackingPropsShared = {
-    inputTitle: t('labware_quantity'),
-    errorMessage: t('unsupported_range'),
-  }
   return createPortal(
     <Modal
       marginLeft="0"
@@ -416,373 +393,34 @@ export function SelectLabwareModal(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          overflowY="auto"
+          overflowY="scroll"
           maxHeight="15.5rem"
           paddingTop={SPACING.spacing8}
         >
-          {filteredLabwareByCategory[CUSTOM_CATEGORY].length > 0 ? (
-            <ListButton
-              key={`ListButton_${CUSTOM_CATEGORY}`}
-              type="noActive"
-              onClick={() => {
-                handleCategoryClick(CUSTOM_CATEGORY)
-              }}
-            >
-              <ListButtonAccordionContainer id={`${CUSTOM_CATEGORY}_${slot}`}>
-                <ListButtonAccordion
-                  mainHeadline={t(`${CUSTOM_CATEGORY}`)}
-                  isExpanded={areCategoriesExpanded[CUSTOM_CATEGORY]}
-                >
-                  {filteredLabwareByCategory[CUSTOM_CATEGORY].map(
-                    ({ uri }, index) => (
-                      <CustomizeExpandButton
-                        enableStackingFF={enableStacking}
-                        loadName={customLabwareDefs[uri].parameters.loadName}
-                        allowInputField={onFlexStacker}
-                        key={`${index}_${uri}`}
-                        id={`${index}_${uri}`}
-                        buttonText={customLabwareDefs[uri].metadata.displayName}
-                        buttonValue={uri}
-                        onChange={e => {
-                          e.stopPropagation()
-                          dispatch(selectTopLabware({ labwareDefURI: uri }))
-                        }}
-                        isSelected={uri === selectedTopLabware.labwareDefURI}
-                      />
-                    )
-                  )}
-                </ListButtonAccordion>
-              </ListButtonAccordionContainer>
-            </ListButton>
-          ) : null}
+          <SelectCustomLabware
+            slot={slot}
+            handleCategoryClick={handleCategoryClick}
+            areCategoriesExpanded={areCategoriesExpanded}
+            onFlexStacker={onFlexStacker}
+            filteredLabwareByCategory={filteredLabwareByCategory}
+            universalLid={universalLid}
+          />
           {slotFull ? (
             <InfoScreen
               content={t('remove_existing_labware')}
               subContent={t('labware_already_in_slot')}
             />
           ) : (
-            <>
-              {ORDERED_CATEGORIES.map(category => {
-                if (filteredLabwareByCategory[category].length > 0) {
-                  return (
-                    <ListButton
-                      key={`ListButton_${category}`}
-                      type="noActive"
-                      onClick={() => {
-                        handleCategoryClick(category)
-                      }}
-                    >
-                      <ListButtonAccordionContainer id={`${category}_${slot}`}>
-                        <ListButtonAccordion
-                          mainHeadline={t(`${category}`)}
-                          isExpanded={areCategoriesExpanded[category]}
-                        >
-                          {filteredLabwareByCategory[category]?.map(
-                            ({ def, uri }, index) => {
-                              const loadName = def.parameters.loadName
-                              const isAdapter = def.allowedRoles?.includes(
-                                'adapter'
-                              )
-                              const stackingLabwareDefUri = getStackerDefinition(
-                                {
-                                  ...defs,
-                                  ...customLabwareDefs,
-                                },
-                                loadName
-                              )
-
-                              const stackingProps: StackingProps | null =
-                                stackingLabwareDefUri != null &&
-                                slot !== 'offDeck' &&
-                                enableStacking
-                                  ? {
-                                      ...stackingPropsShared,
-                                      inputCaption: t('valid_range', {
-                                        max:
-                                          defs[stackingLabwareDefUri]
-                                            .stackLimit,
-                                      }),
-                                      definition: defs[stackingLabwareDefUri],
-                                      inputFieldValue:
-                                        selectedTopLabware.amount ?? 0,
-                                      onInputFieldChange: (
-                                        e: ChangeEvent<any>
-                                      ) => {
-                                        dispatch(
-                                          selectTopLabwareAmount({
-                                            amount: parseInt(
-                                              e.target.value as string
-                                            ),
-                                          })
-                                        )
-                                      },
-                                      checkboxCaption: t('with_lid', {
-                                        name:
-                                          defs[stackingLabwareDefUri].metadata
-                                            .displayName,
-                                      }),
-                                      checked: selectedLidLabware != null,
-                                      onCheckboxChange: () => {
-                                        dispatch(
-                                          selectLid({
-                                            labwareDefURI:
-                                              selectedLidLabware ===
-                                              stackingLabwareDefUri
-                                                ? null
-                                                : stackingLabwareDefUri,
-                                          })
-                                        )
-                                      },
-                                    }
-                                  : null
-
-                              return searchFilter(def.metadata.displayName) &&
-                                !getIsLabwareFiltered(def) ? (
-                                <Fragment
-                                  key={`${index}_${category}_${loadName}`}
-                                >
-                                  <CustomizeExpandButton
-                                    enableStackingFF={enableStacking}
-                                    loadName={loadName}
-                                    allowInputField={
-                                      onFlexStacker ||
-                                      lidLoadNames.includes(loadName)
-                                    }
-                                    stackingProps={stackingProps ?? undefined}
-                                    id={`${index}_${category}_${loadName}`}
-                                    buttonText={def.metadata.displayName}
-                                    buttonValue={uri}
-                                    onChange={e => {
-                                      e.stopPropagation()
-                                      if (isAdapter) {
-                                        dispatch(
-                                          selectAdapter({
-                                            adapterDefURI:
-                                              uri === selectedAdapterDefURI
-                                                ? null
-                                                : uri,
-                                          })
-                                        )
-                                        dispatch(
-                                          selectTopLabware({
-                                            labwareDefURI: null,
-                                          })
-                                        )
-                                      } else {
-                                        dispatch(
-                                          selectTopLabware({
-                                            labwareDefURI:
-                                              uri ===
-                                              selectedTopLabware.labwareDefURI
-                                                ? null
-                                                : uri,
-                                          })
-                                        )
-                                      }
-                                    }}
-                                    isSelected={
-                                      (isAdapter &&
-                                        uri === selectedAdapterDefURI) ||
-                                      (!isAdapter &&
-                                        uri ===
-                                          selectedTopLabware.labwareDefURI)
-                                    }
-                                  />
-
-                                  {isAdapter &&
-                                    uri === selectedAdapterDefURI &&
-                                    getLabwareCompatibleWithAdapter(
-                                      defs,
-                                      enableStacking,
-                                      loadName
-                                    )?.length > 0 && (
-                                      <ListButtonAccordionContainer
-                                        id={`nestedAccordionContainer_${loadName}`}
-                                      >
-                                        <ListButtonAccordion
-                                          key={`${index}_${category}_${loadName}_accordion`}
-                                          isNested
-                                          mainHeadline={t(
-                                            'adapter_compatible_lab'
-                                          )}
-                                          isExpanded={
-                                            uri === selectedAdapterDefURI
-                                          }
-                                        >
-                                          {has96Channel &&
-                                          loadName === ADAPTER_96_CHANNEL
-                                            ? permittedTipracks.map(
-                                                (tiprackDefUri, index) => {
-                                                  const nestedDef =
-                                                    defs[tiprackDefUri]
-                                                  return (
-                                                    <CustomizeExpandButton
-                                                      enableStackingFF={
-                                                        enableStacking
-                                                      }
-                                                      loadName={loadName}
-                                                      allowInputField={false}
-                                                      key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
-                                                      id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
-                                                      buttonText={
-                                                        nestedDef?.metadata
-                                                          .displayName ?? ''
-                                                      }
-                                                      buttonValue={
-                                                        tiprackDefUri
-                                                      }
-                                                      onChange={e => {
-                                                        e.stopPropagation()
-                                                        dispatch(
-                                                          selectTopLabware({
-                                                            labwareDefURI: tiprackDefUri,
-                                                          })
-                                                        )
-                                                      }}
-                                                      isSelected={
-                                                        tiprackDefUri ===
-                                                        selectedTopLabware.labwareDefURI
-                                                      }
-                                                    />
-                                                  )
-                                                }
-                                              )
-                                            : getLabwareCompatibleWithAdapter(
-                                                {
-                                                  ...defs,
-                                                  ...customLabwareDefs,
-                                                },
-                                                enableStacking,
-                                                loadName
-                                              ).map(nestedDefUri => {
-                                                const nestedDef =
-                                                  defs[nestedDefUri] ??
-                                                  customLabwareDefs[
-                                                    nestedDefUri
-                                                  ]
-
-                                                const stackingLabwareDefUri = getStackerDefinition(
-                                                  {
-                                                    ...defs,
-                                                    ...customLabwareDefs,
-                                                  },
-                                                  nestedDef.parameters.loadName
-                                                )
-
-                                                const stackingProps: StackingProps | null =
-                                                  stackingLabwareDefUri !=
-                                                    null && slot !== 'offDeck'
-                                                    ? {
-                                                        ...stackingPropsShared,
-                                                        checkboxCaption: t(
-                                                          'with_lid',
-                                                          {
-                                                            name:
-                                                              defs[
-                                                                stackingLabwareDefUri
-                                                              ].metadata
-                                                                .displayName,
-                                                          }
-                                                        ),
-                                                        checked:
-                                                          selectedLidLabware !=
-                                                          null,
-                                                        onCheckboxChange: () => {
-                                                          dispatch(
-                                                            selectLid({
-                                                              labwareDefURI:
-                                                                selectedLidLabware ===
-                                                                stackingLabwareDefUri
-                                                                  ? null
-                                                                  : stackingLabwareDefUri,
-                                                            })
-                                                          )
-                                                        },
-                                                        inputCaption: t(
-                                                          'valid_range',
-                                                          {
-                                                            max:
-                                                              defs[
-                                                                stackingLabwareDefUri
-                                                              ].stackLimit,
-                                                          }
-                                                        ),
-                                                        definition:
-                                                          defs[
-                                                            stackingLabwareDefUri
-                                                          ],
-                                                        inputFieldValue:
-                                                          selectedTopLabware.amount ??
-                                                          1,
-                                                        onInputFieldChange: (
-                                                          e: ChangeEvent<any>
-                                                        ) => {
-                                                          dispatch(
-                                                            selectTopLabwareAmount(
-                                                              {
-                                                                amount: parseInt(
-                                                                  e.target
-                                                                    .value as string
-                                                                ),
-                                                              }
-                                                            )
-                                                          )
-                                                        },
-                                                      }
-                                                    : null
-
-                                                return (
-                                                  <CustomizeExpandButton
-                                                    enableStackingFF={
-                                                      enableStacking
-                                                    }
-                                                    loadName={
-                                                      nestedDef.parameters
-                                                        .loadName
-                                                    }
-                                                    allowInputField={lidLoadNames.includes(
-                                                      nestedDef.parameters
-                                                        .loadName
-                                                    )}
-                                                    stackingProps={
-                                                      stackingProps ?? undefined
-                                                    }
-                                                    key={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                                    id={`${index}_${category}_${loadName}_${nestedDefUri}`}
-                                                    buttonText={
-                                                      nestedDef?.metadata
-                                                        .displayName ?? ''
-                                                    }
-                                                    buttonValue={nestedDefUri}
-                                                    onChange={e => {
-                                                      e.stopPropagation()
-                                                      dispatch(
-                                                        selectTopLabware({
-                                                          labwareDefURI: nestedDefUri,
-                                                        })
-                                                      )
-                                                    }}
-                                                    isSelected={
-                                                      nestedDefUri ===
-                                                      selectedTopLabware.labwareDefURI
-                                                    }
-                                                  />
-                                                )
-                                              })}
-                                        </ListButtonAccordion>
-                                      </ListButtonAccordionContainer>
-                                    )}
-                                </Fragment>
-                              ) : null
-                            }
-                          )}
-                        </ListButtonAccordion>
-                      </ListButtonAccordionContainer>
-                    </ListButton>
-                  )
-                }
-              })}
-            </>
+            <SelectLabware
+              slot={slot}
+              handleCategoryClick={handleCategoryClick}
+              areCategoriesExpanded={areCategoriesExpanded}
+              onFlexStacker={onFlexStacker}
+              filteredLabwareByCategory={filteredLabwareByCategory}
+              searchFilter={searchFilter}
+              getIsLabwareFiltered={getIsLabwareFiltered}
+              universalLid={universalLid}
+            />
           )}
         </Flex>
       </Flex>

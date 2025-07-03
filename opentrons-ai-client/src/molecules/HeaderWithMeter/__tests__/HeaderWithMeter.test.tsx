@@ -14,6 +14,7 @@ import { HeaderWithMeter } from '../index'
 
 vi.mock('react-router-dom', () => ({
   useNavigate: vi.fn(),
+  useLocation: vi.fn(() => ({ pathname: '/' })),
 }))
 
 const render = (): ReturnType<typeof renderWithProviders> => {
