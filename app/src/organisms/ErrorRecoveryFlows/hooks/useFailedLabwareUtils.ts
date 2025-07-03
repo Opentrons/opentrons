@@ -374,6 +374,7 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerStallOrCollision',
       'flexStackerShuttleMissing',
       'flexStackerHopperLabwareFailed',
+      'flexStackerLabwareRetrieveFailed',
     ].includes(error.errorType)
   if (recentRelevantFailedLabwareCmd == null) {
     return null
