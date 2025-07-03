@@ -700,7 +700,61 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
-## Advanced operation
+## Command Line Operation Over SSH
+
+You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you run protocols directly from the command line or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
+
+!!!Note
+    - SSH keys are required before you can connect to Flex and issue commands from a terminal.
+    - If you're unable to use a Wi-Fi network for SSH, see Hardwired SSH Connections below.
+
+### Creating SSH Keys
+
+Follow these steps to create SSH keys on your Mac, Windows, or Linux computer:
+
+1. Open a terminal window and type this command:
+
+    ```
+    ssh-keygen -f robot_key -t ecdsa
+    ```
+
+1. Create a passphrase when prompted. This process generates a file, `robot_key.pub`. A passphrase is not required, but you should create one.
+
+1. Copy the `robot_key.pub` file to the root of a USB-A flash drive. You will use this USB drive (and the saved key) for SSH authentication to the robot.
+
+    !!!note
+        The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. macOS can read and write to FAT-formatted drives.
+
+1. Eject the USB drive.
+
+### Making an SSH Connection
+
+To make an SSH connection:
+
+1. Insert the USB drive that holds the SSH key created earlier into a USB port on your Flex.
+
+1. On your computer, open a terminal window and type the commands shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+
+    ```
+    curl \
+    --location --request POST \
+    'http://ROBOT_IP: 31950/server/ssh_keys/from_local'
+    ```
+    The command is successful when you see a response message that indicates a new key was added.
+
+1. After adding the key, type the command shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+
+    ```
+    ssh -i robot_key root@ROBOT_IP
+    ```
+
+1. Type the passphrase you set when creating the SSH key.
+
+When an SSH connection is successful, the terminal command prompt changes to `root@Flex` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
+
+### Hardwired SSH Connections
+
+START HERE ON TUESDAY
 
 ### Jupyter Notebook
 
