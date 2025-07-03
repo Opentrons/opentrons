@@ -1381,9 +1381,9 @@ class ProtocolContext(CommandPublisher):
 
         :param name: Name of an Opentrons-verified liquid class. Must be one of:
 
-            - ``"water"``: an Opentrons-verified liquid class based on deionized water. 
-            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol. 
-            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol. 
+            - ``"water"``: an Opentrons-verified liquid class based on deionized water.
+            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
+            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
         """
@@ -1402,8 +1402,8 @@ class ProtocolContext(CommandPublisher):
         :param name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
         :param properties: A dict of transfer properties for the Flex pipette and tips to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be in the format returned by :py:meth:`.LiquidClass.get_for`. See also the `liquid class JSON schema <https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/schemas>`_.
 
-        :param base_liquid_class: An Opentrons-verified liquid class to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the Flex pipette and tips. All other properties will remain the same as those in the base class. 
-                
+        :param base_liquid_class: An Opentrons-verified liquid class to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the Flex pipette and tips. All other properties will remain the same as those in the base class.
+
         :param display_name: An optional name for the liquid class. Defaults to the title-case ``name`` if a display name isn't provided.
 
         """
