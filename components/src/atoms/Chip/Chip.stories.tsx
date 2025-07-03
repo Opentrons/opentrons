@@ -1,6 +1,6 @@
 import { Chip as ChipComponent } from '.'
 import { COLORS } from '../../helix-design-system'
-import { Flex, STYLE_PROPS } from '../../primitives'
+import { STYLE_PROPS } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -38,18 +38,25 @@ const meta: Meta<typeof ChipComponent> = {
         type: 'select',
       },
     },
+    pulseIcon: {
+      control: {
+        type: 'boolean',
+      },
+    },
   },
   component: ChipComponent,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
-      <Flex
-        padding={SPACING.spacing16}
-        backgroundColor={COLORS.grey50}
-        width="59rem"
+      <div
+        style={{
+          padding: SPACING.spacing16,
+          backgroundColor: COLORS.grey50,
+          width: '59rem',
+        }}
       >
         <Story />
-      </Flex>
+      </div>
     ),
   ],
 }

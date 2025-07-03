@@ -1,6 +1,9 @@
 import { I18nextProvider } from 'react-i18next'
 
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
+
+import '@opentrons/components/styles'
+
 import { i18n } from '../app/src/i18n'
 
 global.APP_SHELL_REMOTE = {
