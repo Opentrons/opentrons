@@ -101,7 +101,7 @@ export function SelectLabwareModal(
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
   const universalLid = Object.entries(defs).find(
-    ([id, def]) => def.parameters.loadName === UNIVERSAL_LID_LOADNAME
+    ([_, def]) => def.parameters.loadName === UNIVERSAL_LID_LOADNAME
   )
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)

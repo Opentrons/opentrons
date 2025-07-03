@@ -316,12 +316,10 @@ export function DeckSetupToolbox(
                       createdStackForSlot[createdStackForSlot.length - 1]
                     ]
                   }
-                  lidId={
-                    createdLidForSlot != null &&
-                    createdStackForSlot.includes(createdLidForSlot?.id)
-                      ? undefined
-                      : createdLidForSlot?.id
-                  }
+                  {...(createdLidForSlot != null &&
+                  createdStackForSlot.includes(createdLidForSlot?.id)
+                    ? {}
+                    : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
                 />
               ) : null}

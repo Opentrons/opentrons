@@ -185,7 +185,7 @@ export const getLabwareCompatibleWithAdapter = (
   }
 }
 
-const getStackerDefinitionsFromDef = (
+const getStackerDefinitionsFromLoadName = (
   defs: LabwareDefByDefURI,
   loadName: string
 ): string[] | null => {
@@ -219,7 +219,7 @@ export const getStackerDefinitions = (
     category != null && !CATEGORIES_WITH_NO_LID.includes(category)
       ? universalLidURI
       : null
-  const supportedDef = getStackerDefinitionsFromDef(defs, loadName)
+  const supportedDef = getStackerDefinitionsFromLoadName(defs, loadName)
   return [
     ...(supportedDef != null ? supportedDef : []),
     ...(universalLid != null ? [universalLid] : []),
