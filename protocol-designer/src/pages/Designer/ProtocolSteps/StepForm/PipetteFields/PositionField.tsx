@@ -159,12 +159,12 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
       },
       x: {
         name: xName,
-        value: rawXValue != null ? Number(rawXValue) : null,
+        value: rawXValue != null ? Number(rawXValue) : 0,
         updateValue: xUpdateValue,
       },
       y: {
         name: yName,
-        value: rawYValue != null ? Number(rawYValue) : null,
+        value: rawYValue != null ? Number(rawYValue) : 0,
         updateValue: yUpdateValue,
       },
     }

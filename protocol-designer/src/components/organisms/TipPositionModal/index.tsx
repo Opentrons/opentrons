@@ -49,8 +49,8 @@ import type { MoveLiquidPrefixType } from '../../../resources/types'
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
   name: StepFieldName
-  value: number | null
-  updateValue: (val?: number | null) => void
+  value: number
+  updateValue: (val: number) => void
 }
 export type PositionSpecs = Record<Offset, PositionSpec>
 
@@ -103,7 +103,7 @@ export function TipPositionModal(
   })
   const defaultPosition = useDefaultPosition(formData, prefix)
 
-  const [zValue, setZValue] = useState<string | null>(
+  const [zValue, setZValue] = useState<string>(
     zSpec?.value == null
       ? String(
           referenceSpec?.value === POSITION_REFERENCE_BOTTOM
@@ -112,10 +112,10 @@ export function TipPositionModal(
         )
       : String(zSpec?.value)
   )
-  const [yValue, setYValue] = useState<string | null>(
+  const [yValue, setYValue] = useState<string>(
     ySpec?.value == null ? '0' : String(ySpec?.value)
   )
-  const [xValue, setXValue] = useState<string | null>(
+  const [xValue, setXValue] = useState<string>(
     xSpec?.value == null ? '0' : String(xSpec?.value)
   )
   const {
@@ -225,9 +225,9 @@ export function TipPositionModal(
 
   const handleDone = (): void => {
     if (!hasErrors) {
-      zSpec?.updateValue(zValue === null ? null : Number(zValue))
-      xSpec?.updateValue(xValue === null ? null : Number(xValue))
-      ySpec?.updateValue(yValue === null ? null : Number(yValue))
+      zSpec?.updateValue(Number(zValue))
+      xSpec?.updateValue(Number(xValue))
+      ySpec?.updateValue(Number(yValue))
       referenceSpec?.updateValue(reference)
       closeModal()
     }
@@ -239,7 +239,7 @@ export function TipPositionModal(
 
   const handleChange = (
     newValueRaw: string,
-    setValue: Dispatch<SetStateAction<string | null>>
+    setValue: Dispatch<SetStateAction<string>>
   ): void => {
     // if string, strip non-number characters from string and cast to number
     const newValue =

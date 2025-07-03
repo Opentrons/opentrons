@@ -52,7 +52,7 @@ describe('TipPositionModal', () => {
       specs: {
         z: {
           name: 'aspirate_mmFromBottom',
-          value: null,
+          value: 0,
           updateValue: mockUpdateZSpec,
         },
         y: {
