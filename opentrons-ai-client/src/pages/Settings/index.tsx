@@ -46,7 +46,7 @@ export function Settings(): JSX.Element {
   }
 
   const handleBackClick = (): void => {
-    navigate('/')
+    navigate(-1)
   }
 
   return (
@@ -66,7 +66,7 @@ export function Settings(): JSX.Element {
           width="100%"
           height="100%"
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
             <Btn
               onClick={handleBackClick}
               css={BACK_BUTTON_STYLE}
@@ -79,10 +79,7 @@ export function Settings(): JSX.Element {
                 gridGap={SPACING.spacing4}
               >
                 <Icon name="arrow-left" size="1.5rem" color={COLORS.grey60} />
-                <StyledText
-                  desktopStyle="bodyDefaultSemiBold"
-                  color={COLORS.grey60}
-                >
+                <StyledText desktopStyle="bodyDefaultSemiBold">
                   {t('back')}
                 </StyledText>
               </Flex>

@@ -50,7 +50,7 @@ describe('Settings', () => {
   it('should navigate to landing page when back button is clicked', () => {
     render()
     fireEvent.click(screen.getByText('Back'))
-    expect(mockNavigate).toHaveBeenCalledWith('/')
+    expect(mockNavigate).toHaveBeenCalledWith(-1)
   })
 
   it('should render Feature Flags section when prerelease mode is enabled', () => {

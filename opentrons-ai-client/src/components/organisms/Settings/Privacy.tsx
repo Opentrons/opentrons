@@ -25,11 +25,7 @@ export function Privacy({
   const { t } = useTranslation('protocol_generator')
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      height="100%"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText desktopStyle="bodyLargeSemiBold">{t('privacy')}</StyledText>
       <ListItem
         padding={SPACING.spacing16}
