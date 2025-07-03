@@ -252,7 +252,7 @@ export const getFixtureOptions = (
     ]
   }
 
-  if (cutoutId === 'cutoutD3') {
+  if (cutoutId === 'cutoutD3' && addressableAreaId === 'D3') {
     const wasteChuteOptions = getWasteChuteOptions(cutoutId)
     availableOptions = [...availableOptions, ...wasteChuteOptions]
   }
