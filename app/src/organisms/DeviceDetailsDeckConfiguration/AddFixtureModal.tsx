@@ -24,7 +24,6 @@ import {
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
@@ -145,24 +144,6 @@ export function AddFixtureModal({
           buttonText={t('add')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
-          }}
-          isOnDevice={isOnDevice}
-        />
-      </>
-    )
-  } else if (
-    optionStage === 'fixtureOptions' &&
-    cutoutId === WASTE_CHUTE_CUTOUT &&
-    addressableAreaId === 'D3'
-  ) {
-    nextStageOptions = (
-      <>
-        <FixtureOption
-          key="wasteChuteStageOption"
-          optionName="Waste chute"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('wasteChuteOptions')
           }}
           isOnDevice={isOnDevice}
         />
