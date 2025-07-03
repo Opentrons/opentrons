@@ -257,25 +257,26 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 .. code-block:: python
 
- # examples of required properties in a dictionary for your pipette and tip racks
-    custom_liquid_class_properties = {
-      "flex_1channel_50": {
+ # examples of required properties in a dictionary for the pipette and tip racks
+ custom_liquid_class_properties = {
+    "flex_1channel_50": {
         "opentrons/opentrons_flex_96_tiprack_50ul/1": {
             "aspirate": {
                 "aspirate_position": {
-                     "offset": {"x": 1, "y": 2, "z": 3},
-                     "position_reference": "well-bottom",
-                  },
-              },
-          },
-      }
-    
+                    "offset": {"x": 1, "y": 2, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+            },
+        },
+    },
+  }
+              
  # create a new liquid class
-    custom_viscous = protocol.define_liquid_class(
-      name="custom_viscous",
-      properties=custom_liquid_class_properties,
-      display_name="Custom Viscous"
-    )
+ custom_viscous = protocol.define_liquid_class(
+    name="custom_viscous",
+    properties=custom_liquid_class_properties,
+    display_name="Custom Viscous"
+  )
 
 .. versionadded:: 2.24
 

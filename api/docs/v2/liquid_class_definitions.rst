@@ -19,6 +19,7 @@ This section details specific changes to transfer behavior for each Opentrons-ve
 To use the tables below, select your liquid class: :ref:`aqueous`, :ref:`viscous`, or :ref:`volatile`. Then, click different tabs to view your pipette and tip combination. 
 
 In a liquid class transfer, flow rates and air gap or push out volumes vary based on the pipette and tip combination used in your protocol. Let's say you use a Flex P1000 1-channel pipette and Flex 200 µL tips to aspirate a volatile liquid. The transfer volume specifies the flow rate: 
+
 * 7 µL/sec to aspirate 5 µL
 * 50 µL/sec to aspirate 50 µL
 * 200 µL/sec to aspirate 200 µL 

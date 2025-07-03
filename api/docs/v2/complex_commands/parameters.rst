@@ -68,7 +68,7 @@ One reason to set ``new_tip="always"`` is to avoid cross-contamination between w
 
 :py:meth:`~.InstrumentContext.transfer` and :py:meth:`~.InstrumentContext.transfer_with_liquid_class` will pick up a new tip before *every* aspirate when ``new_tip="always"``. This includes when :ref:`tip refilling <complex-tip-refilling>` requires multiple aspirations from a single source well.
 
-Both legacy and liquid class consolidate and distribute methods only pick up one tip, even when ``new_tip="always"``. For example, this ``distribute()`` command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL)::
+:py:meth:`~.InstrumentContext.distribute` and :py:meth:`~.InstrumentContext.consolidate` only pick up one tip, even when ``new_tip="always"``. For example, this ``distribute()`` command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL)::
 
     pipette.distribute(
         volume=200,
@@ -411,8 +411,8 @@ In a liquid class complex command, use the ``trash_location`` to drop tips in th
 
 .. code-block:: python
 
-    liquid_1 = protocol_context.get_liquid_class("ethanol_80")
-    trash = protocol_context.load_trash_bin('A3')
+    liquid_1 = protocol.get_liquid_class(name="ethanol_80")
+    trash = protocol.load_trash_bin(location='A3')
     pipette.transfer_with_liquid_class(
         liquid_class=liquid_1,
         volume=100,
