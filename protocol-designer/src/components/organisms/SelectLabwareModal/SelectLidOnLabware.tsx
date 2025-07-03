@@ -61,7 +61,7 @@ export function SelectLidOnLabware(
       <ListButtonAccordion
         key={`${category}_${loadName}_accordion`}
         isNested
-        mainHeadline={t('lid_compatible_labware')}
+        mainHeadline={t('labware_compatible_lids')}
         isExpanded={parentLabwareURI === selectedTopLabware.labwareDefURI}
       >
         {lidURIs.map(defUri => {

@@ -49,7 +49,7 @@
   "labware_already_in_slot": "Labware already in this slot cannot be combined with other labware.",
   "labware_quantity": "Labware quantity",
   "labware": "Labware",
-  "lid_compatible_labware": "Lid compatible labware",
+  "labware_compatible_lids": "Labware-compatible lids",
   "lid": "Lids",
   "liquid": "Liquid",
   "liquids": "Liquids",
