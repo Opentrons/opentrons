@@ -37,7 +37,6 @@ export const forDropTipInPlace = (
     hasTip: false,
     tiprackURI: null,
   }
-  robotState.pipettes[pipetteId].tiprackId = undefined
 
   dispenseUpdateLiquidState({
     invariantContext,
@@ -47,5 +46,6 @@ export const forDropTipInPlace = (
     robotStateAndWarnings,
     entityId,
   })
+
   robotState.pipettes[pipetteId].tiprackId = undefined
 }
