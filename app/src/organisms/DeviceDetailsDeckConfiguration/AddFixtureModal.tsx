@@ -24,7 +24,6 @@ import {
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
