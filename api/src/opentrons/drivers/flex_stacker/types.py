@@ -53,6 +53,7 @@ class HardwareRevision(Enum):
     NFF = "nff"
     EVT = "a1"
     DVT = "b1"
+    PVT = "b2"
 
 
 @dataclass

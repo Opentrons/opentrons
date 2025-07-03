@@ -78,14 +78,13 @@ export const createProtocolAtom = atom<CreateProtocolAtomProps>({
 
 export const displayExitConfirmModalAtom = atom<boolean>(false)
 
-export const displayFeatureFlagsModalAtom = atom<boolean>(false)
-
 // feature flag atoms are a bit more fancy
 // they leverage local storage to persist settings across browser refreshes
 
 const DEFAULT_FEATURE_FLAG_STATE = {
   enablePrereleaseMode: false,
   enablePDProtocolGeneration: true,
+  enableAnalytics: true,
 }
 
 const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(
@@ -99,7 +98,6 @@ export const featureFlagsAtom = atom(
     // reset all feature flags to false if turning off prerelease mode
     if (update.enablePrereleaseMode === false) {
       set(rawFeatureFlagsAtom, { ...DEFAULT_FEATURE_FLAG_STATE })
-      set(displayFeatureFlagsModalAtom, false)
     } else {
       set(rawFeatureFlagsAtom, {
         ...get(rawFeatureFlagsAtom),

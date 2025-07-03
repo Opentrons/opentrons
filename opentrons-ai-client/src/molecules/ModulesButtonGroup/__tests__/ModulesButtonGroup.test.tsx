@@ -2,12 +2,13 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { MODULES_FIELD_NAME } from '/ai-client/organisms/ModulesAndFixturesSection'
+
 import { i18n } from '../../../i18n'
-import { MODULES_FIELD_NAME } from '../../../organisms/ModulesAndFixturesSection'
 import { ModulesButtonGroup } from '../index'
 
-import type { DisplayModule } from '../../../organisms/ModulesAndFixturesSection'
+import type { DisplayModule } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 const modulesMock: DisplayModule[] = [
   {

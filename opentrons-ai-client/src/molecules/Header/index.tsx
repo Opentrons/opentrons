@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
@@ -18,13 +19,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  displayExitConfirmModalAtom,
-  displayFeatureFlagsModalAtom,
-  featureFlagsAtom,
-} from '../../resources/atoms'
-import { CLIENT_MAX_WIDTH } from '../../resources/constants'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+import { CLIENT_MAX_WIDTH } from '/ai-client/resources/constants'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
+import { displayExitConfirmModalAtom } from '../../resources/atoms'
 import { SettingsButton } from '../SettingsButton'
 
 const HeaderBar = styled(Flex)`
@@ -67,12 +65,10 @@ interface HeaderProps {
 export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { logout } = useAuth0()
+  const navigate = useNavigate()
+  const location = useLocation()
   const trackEvent = useTrackEvent()
   const [, setDisplayExitConfirmModal] = useAtom(displayExitConfirmModalAtom)
-  const [featureFlags] = useAtom(featureFlagsAtom)
-  const [, setDisplayFeatureFlagsModalAtom] = useAtom(
-    displayFeatureFlagsModalAtom
-  )
 
   async function handleLoginOrExitClick(): Promise<void> {
     if (isExitButton) {
@@ -84,6 +80,14 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
     trackEvent({ name: 'user-logout', properties: {} })
   }
 
+  function handleSettingsClick(): void {
+    if (location.pathname === '/settings') {
+      navigate(-1)
+    } else {
+      navigate('/settings')
+    }
+  }
+
   return (
     <HeaderBar>
       <HeaderBarContent>
@@ -91,20 +95,13 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
           <HeaderTitle>{t('opentrons')}</HeaderTitle>
           <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           <LogoutOrExitButton onClick={handleLoginOrExitClick}>
             {isExitButton ? t('exit') : t('logout')}
           </LogoutOrExitButton>
-
-          {featureFlags.enablePrereleaseMode && (
-            <Box marginLeft={SPACING.spacing32} marginTop="-.5rem">
-              <SettingsButton
-                onClick={() => {
-                  setDisplayFeatureFlagsModalAtom(true)
-                }}
-              />
-            </Box>
-          )}
+          <Box marginLeft={SPACING.spacing16}>
+            <SettingsButton onClick={handleSettingsClick} />
+          </Box>
         </Flex>
       </HeaderBarContent>
     </HeaderBar>
