@@ -102,6 +102,9 @@ export function LeftColumnLabwareInfo({
   }
 
   const buildQuantity = (): number | null => {
+    if (!showQuantity) {
+      return null
+    }
     if (
       (route === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
         step === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
@@ -114,7 +117,7 @@ export function LeftColumnLabwareInfo({
         ? labwareQuantity - 1 // one has been moved manually onto the shuttle
         : null
     } else {
-      return labwareQuantity
+      return labwareQuantity ?? null
     }
   }
 
@@ -124,7 +127,7 @@ export function LeftColumnLabwareInfo({
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: showQuantity
+        tagText: buildQuantity()
           ? t('quantity', { quantity: buildQuantity() })
           : null,
         subText: undefined, // TODO (tz, 5-1-2025): get lid name

@@ -1,5 +1,8 @@
 import { screen, waitFor } from '@testing-library/react'
+import { routerActions } from 'connected-react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { manualAddressesReducer } from '@opentrons/discovery-client/src/store/reducer'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -15,10 +18,12 @@ describe('SkipStepInfo', () => {
   let props: ComponentProps<typeof SkipStepInfo>
   let mockHandleMotionRouting: Mock
   let mockSkipFailedCommand: Mock
+  let mockManualRetrieve: Mock
 
   beforeEach(() => {
     mockHandleMotionRouting = vi.fn(() => Promise.resolve())
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
+    mockManualRetrieve = vi.fn(() => Promise.resolve())
 
     props = {
       routeUpdateActions: {
@@ -26,6 +31,7 @@ describe('SkipStepInfo', () => {
       } as any,
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
+        manualRetrieve: mockManualRetrieve,
       } as any,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
@@ -114,5 +120,31 @@ describe('SkipStepInfo', () => {
     render(props)
 
     expect(screen.getAllByText('UNEXPECTED STEP')[0]).toBeInTheDocument()
+  })
+
+  it.each([
+    RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+  ])('calls manualRetreive when the route is %s', async route => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption = route
+    render(props)
+
+    clickButtonLabeled('Continue run now')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockManualRetrieve).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+        mockManualRetrieve.mock.invocationCallOrder[0]
+      )
+    })
   })
 })
