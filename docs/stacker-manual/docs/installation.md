@@ -23,7 +23,7 @@ The Stacker attaches to the right side of your robot and requires a replacement 
     !!!tip
         Hand tighten the screws until the window panels are reasonably secure. This is not a trial of strength. Excessive torque may damage the screws.
 
-    ![Attaching replacement window panel](images/window-attach-detail.png){: .img-medium }
+    ![Attaching a replacement window panel](images/window-attach-detail.png){: .img-medium }
 
     !!!Note
         A properly attached panel fits flush and square to the robot's frame, without gaps or misalignment. This helps ensure a good connection between the safety interlock pins on panel and Flex.

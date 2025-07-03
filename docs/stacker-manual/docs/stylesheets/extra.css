@@ -56,17 +56,15 @@
     height: auto; 
 }
 
-/* Controls text length for back-matter */
+/* Controls text length for back-matter text*/
 .caption-text-block {
   max-width: 35em; /* Adjust length */
 }
 
-figcaption {
-  font-style: normal; /* Might not need it. This will explicitly set the font style to normal for figcaption */
+figure.general > figcaption {
+  font-style: normal;
 }
 
-/* A specific class for the final figure on a page */
-/* Using padding-top to avoid margin collapse issues */
 .md-content__inner > .figure-end-of-doc {
   padding-top: 150px;
   padding-bottom: 25px;
@@ -78,8 +76,8 @@ figcaption {
 
 /* New class for end-of-doc trademark text */
 .trademark-text {
-    font-size: 0.85em;  /* set size */
-    color: #555;       /* set color */
-    display: block;     /* text acts like a paragraph */
-    margin-top: 2em;   /* spacing at top */
+    font-size: 0.85em;
+    color: #555;
+    display: block;
+    margin-top: 2em;
 }

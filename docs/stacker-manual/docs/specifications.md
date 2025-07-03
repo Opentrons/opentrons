@@ -1,18 +1,18 @@
 # Product Specifications
 
-![labeled-parts](images/parts-map4.png)
+![Stacker with labels identifying main features](images/parts-map4.png)
 
 ## Stacker Box Parts
 
 The Stacker is packaged separately from the User Kit and ships with its own set of parts. The Stacker box contains the following items:
 
-![stacker-box](images/stacker-box3.svg)
+![Stacker box contents](images/stacker-box3.svg)
 
 ## User Kit Parts
 
 The User Kit is packaged separately from the Stacker and ships with its own set of parts. Each kit supports up to 4 Stackers. The User Kit contains following items:
 
-![user-kit](images/user-kit5.svg)
+![Stacker user kit contents](images/user-kit5.svg)
 
 ## Physical Specifications
 

@@ -10,7 +10,7 @@ Once attached, the Stacker becomes part of column 4, like a [staging area slot](
 
 After your Stacker is attached to the deck and powered on, instructions and animated images on the touchscreen take you through a guided setup.
 
-![touchscreen deck map](images/touchscreen-map.png)
+![Touchscreen deck map](images/deck-map.png) <!-- larger image, no border re: review comment-->
 
 Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](postinstall.md).
 
@@ -18,17 +18,17 @@ Because you can install a Stacker anywhere in column 4, and connect it to any po
 
 Each Stacker ships with its own deck plate adapter. The adapter secures the Stacker to the deck of your robot.
 
-![deck plate adapter](images/deck-plate-adapter.png){: .img-medium }
+![Stacker deck plate adapter](images/deck-plate-adapter.png){: .img-medium }
 
 A separate Waste Chute Adapter (shown below) allows you to install the Stacker and the [Waste Chute](https://opentrons.com/products/opentrons-flex-waste-chute-gen1) in adjacent slots (D3 and D4).
 
-![waste chute adapter](images/waste-chute-adapter.png){: .img-medium }
+![Stacker waste chute deck plate adapter](images/waste-chute-adapter.png){: .img-medium }
 
 ## Power and Data Hub
 
 This external component provides power to the Stacker and bidirectional data connectivity between each attached Stacker and your Flex.
 
-![power data hub](images/power-hub.png){: .img-medium }
+![Stacker power and data hub](images/power-hub.png){: .img-medium }
 
 All the module's power and data cables route through the hub, which can support up to four Stackers on the same robot. The on/off switch on the hub controls power to all connected Stackers. The four labeled ports (S-1 through S-4) help you identify each Stacker's deck location during setup.
 
@@ -36,7 +36,7 @@ All the module's power and data cables route through the hub, which can support 
 
 The following illustration shows the physical cable connections on the hub. [Part 4 of the installation instructions](installation.md#part-4-connecting-the-hub-and-cables) will provide more information about how to connect these cables.
 
-![power-data-cables](images/power-and-data.png)
+![Power and data cable](images/power-and-data.png)
 
 The following table lists and describes the function of each cable.
 
