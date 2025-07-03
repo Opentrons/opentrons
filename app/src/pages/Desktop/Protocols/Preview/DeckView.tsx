@@ -34,6 +34,17 @@ import type {
   TimelineFrame,
 } from '@opentrons/step-generation'
 
+const POTENTIAL_TRASH_COMMAND_TYPES = [
+  'moveToAddressableArea',
+  'moveToAddressableAreaForDropTip',
+  'dropTip',
+  'dropTipInPlace',
+  'airGapInPlace',
+  'blowOutInPlace',
+  'blowOut',
+  'airGap',
+]
+
 interface DeckViewProps {
   invariantContext: InvariantContext
   robotState: TimelineFrame
@@ -113,13 +124,19 @@ export function DeckView(props: DeckViewProps): JSX.Element {
               ))}
               {Object.values(trashBinEntities).length > 0
                 ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
-                    // TODO: the dropTipInPlace command doesn't have
+                    // TODO: the dropTipInPlace, airGapInplace, and
+                    // blowoutInPlace commands don't have
                     // any knowledge of where its dropping. would be
-                    // nice to expand the results key to include the addressable
-                    // area name
-                    const isPipetteOverTrash = Object.values(
-                      robotState.pipettes
-                    ).some(pipette => pipette.entityId === id)
+                    // nice to expand the results key to include the
+                    // addressable area name
+                    const isPipetteOverTrash =
+                      Object.values(robotState.pipettes).some(
+                        pipette => pipette.entityId === id
+                      ) &&
+                      selectedRunTimeCommand != null &&
+                      POTENTIAL_TRASH_COMMAND_TYPES.includes(
+                        selectedRunTimeCommand.commandType
+                      )
 
                     return (
                       <Fragment key={cutoutId}>
