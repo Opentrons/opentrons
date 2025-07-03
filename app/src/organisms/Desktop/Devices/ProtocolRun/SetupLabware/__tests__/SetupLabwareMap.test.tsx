@@ -6,7 +6,7 @@ import { when } from 'vitest-when'
 import { BaseDeck } from '@opentrons/components'
 import {
   fixtureTiprack300ul,
-  getModuleDef2,
+  getModuleDef,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
@@ -36,10 +36,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof getModuleDef2>()
+  const actualSharedData = await importOriginal<typeof getModuleDef>()
   return {
     ...actualSharedData,
-    getModuleDef2: vi.fn(),
+    getModuleDef: vi.fn(),
   }
 })
 
@@ -210,10 +210,10 @@ describe('SetupLabwareMap', () => {
       },
     ])
 
-    when(vi.mocked(getModuleDef2))
+    when(vi.mocked(getModuleDef))
       .calledWith(mockMagneticModule.model)
       .thenReturn(mockMagneticModule as any)
-    when(vi.mocked(getModuleDef2))
+    when(vi.mocked(getModuleDef))
       .calledWith(mockTCModule.model)
       .thenReturn(mockTCModule as any)
 
