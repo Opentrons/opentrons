@@ -88,7 +88,7 @@ Thermocycler Modules.
 
 Calibration is required for some modules that use a separate caddy, specifically the Heater-Shaker, Temperature, and Thermocycler Modules.
 
-Other modules do not require calibration and are ready for use upon installation. These include the Absorbance Plate Reader (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block
+Other modules do not require calibration and are ready for use upon installation. These include the Absorbance Plate Reader (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block.
 
 ### When to calibrate modules
 
