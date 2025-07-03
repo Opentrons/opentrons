@@ -158,46 +158,7 @@ describe('getMaxConditioningVolume', () => {
     } as any
 
     const result = getMaxConditioningVolume(args)
-    expect(result).toBe(200 - 5 - 10)
-  })
-
-  it('should calculate the max conditioning volume with low volume liquid specs and tiprack volume', () => {
-    const args = {
-      transferVolume: 4,
-      disposalVolume: 1,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_10ul/1',
-      labwareEntities: {
-        tiprack: {
-          id: 'tiprack',
-          labwareDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
-          def: {
-            parameters: {
-              loadName: 'opentrons_96_tiprack_10ul',
-            },
-            wells: {
-              A1: {
-                totalLiquidVolume: 10,
-              },
-            },
-          },
-        },
-      },
-      pipetteSpecs: {
-        liquids: {
-          default: {
-            maxVolume: 10,
-            minVolume: 5,
-          },
-          lowVolumeDefault: {
-            maxVolume: 5,
-            minVolume: 0.1,
-          },
-        },
-      },
-    } as any
-
-    const result = getMaxConditioningVolume(args)
-    expect(result).toBe(5 - 4 - 1)
+    expect(result).toBe(200 - 5 - 10 * 2)
   })
 
   it('should calculate the max conditioning volume without tiprack volume', () => {
@@ -217,7 +178,7 @@ describe('getMaxConditioningVolume', () => {
     } as any
 
     const result = getMaxConditioningVolume(args)
-    expect(result).toBe(200 - 5 - 10)
+    expect(result).toBe(200 - 5 - 10 * 2)
   })
 
   it('should handle zero disposal volume', () => {
@@ -252,7 +213,7 @@ describe('getMaxConditioningVolume', () => {
     } as any
 
     const result = getMaxConditioningVolume(args)
-    expect(result).toBe(200 - 10)
+    expect(result).toBe(200 - 10 * 2)
   })
 })
 

@@ -25,6 +25,10 @@ describe('MultiInputField', () => {
 
   beforeEach(() => {
     props = {
+      formData: {
+        stepType: 'moveLiquid',
+        id: 'mockFormId',
+      },
       name: 'Retract',
       tooltipContent: 'some tooltip content',
       prefix: 'aspirate_retract',

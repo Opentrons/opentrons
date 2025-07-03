@@ -3,17 +3,21 @@
 import json
 import tempfile
 
+import subprocess
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 
-from click.testing import CliRunner
-from opentrons.cli.analyze import analyze
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+import pytest
 
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH = (
     Path(__file__).parent / "../../../hardware_testing/gravimetric/protocol_replacement"
+)
+VIAL_LABWARE_DEF = (
+    Path(__file__).parent
+    / "../../../hardware_testing/labware/radwag_pipette_calibration_vial/1.json"
 )
 GRAVIMETRIC_PROTOCOL_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "gravimetric.py"
 CSV_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "96ch200.csv"
@@ -23,7 +27,7 @@ CSV_FILEPATH = GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / "96ch200.csv"
 class _AnalysisCLIResult:
     exit_code: int
     json_output: Optional[Dict[str, Any]]
-    stdout_stderr: str
+    stdout_stderr: bytes
 
 
 # Function copied from api/tests/opentrons/cli/test_cli.py
@@ -45,8 +49,14 @@ def _get_analysis_result(
     """
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
-        runner = CliRunner()
-        args = [output_type, str(analysis_output_file)]
+        args = [
+            "python",
+            "-m",
+            "opentrons.cli",
+            "analyze",
+            output_type,
+            str(analysis_output_file),
+        ]
 
         if rtp_values is not None:
             args.extend(["--rtp-values", rtp_values])
@@ -59,33 +69,74 @@ def _get_analysis_result(
         if check:
             args.append("--check")
 
-        result = runner.invoke(analyze, args)
+        process = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if analysis_output_file.exists():
             json_output = json.loads(analysis_output_file.read_bytes())
         else:
             json_output = None
         return _AnalysisCLIResult(
-            exit_code=result.exit_code,
+            exit_code=process.returncode,
             json_output=json_output,
-            stdout_stderr=result.output,
+            stdout_stderr=process.stdout,
         )
 
 
-# TODO (spp, 2025-06-10): update this test to verify that the gravimetric protocol
-#   analyzes successfully once the protocol and CSV file values are corrected.
-#   It's better to write a *single* test that verifies all aspects of its analysis result
-#   than writing a different one for each aspect since the gravimetric test is complex
-#   and analyzing it takes a long time.
-def test_gravimetric_test_protocol_uses_latest_api_version() -> None:
-    """Should check that gravimetric test protocol uses the latest Python API version."""
+@pytest.mark.parametrize(
+    "pipette",
+    [
+        pytest.param("1ch50"),
+    ],
+)
+def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
+    """Check that gravimetric test protocol uses the latest Python API version and simulates."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH],
         "--json-output",
-        rtp_files=json.dumps({"qc_test_profile": str(CSV_FILEPATH.resolve())}),
+        rtp_files=json.dumps(
+            {
+                "qc_test_profile": str(
+                    (GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / f"{pipette}.csv").resolve()
+                )
+            }
+        ),
     )
+    print(result.stdout_stderr)
     assert result.exit_code == 0
-    assert result.json_output is not None
+    assert result.json_output
     assert result.json_output["config"]["apiVersion"] == [
         MAX_SUPPORTED_VERSION.major,
         MAX_SUPPORTED_VERSION.minor,
     ]
+
+
+@pytest.mark.parametrize(
+    argnames=["csv"],
+    argvalues=[
+        # ["1ch1000.csv"], # Some of these are commented out just cause they take so long.
+        # ["1ch1000_extra.csv"],
+        ["1ch50.csv"],
+        # ["1ch50_extra.csv"],
+        ["96ch1000.csv"],
+        # ["96ch200.csv"], #Needs LC to complete
+        # ["8ch1000.csv"],
+        # ["8ch1000_extra.csv"],
+        ["8ch50.csv"],
+        # ["8ch50_extra.csv"],
+    ],
+)
+def test_analasis(csv: str) -> None:
+    """Make sure each CSV can analyze successfully."""
+    result = _get_analysis_result(
+        [GRAVIMETRIC_PROTOCOL_FILEPATH, VIAL_LABWARE_DEF],
+        "--json-output",
+        check=True,
+        rtp_files=json.dumps(
+            {
+                "qc_test_profile": str(
+                    (GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / csv).resolve()
+                )
+            }
+        ),
+    )
+    print(result.stdout_stderr)
+    assert result.exit_code == 0

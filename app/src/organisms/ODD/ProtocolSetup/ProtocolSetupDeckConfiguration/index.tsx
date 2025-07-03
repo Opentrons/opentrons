@@ -12,6 +12,7 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
@@ -147,6 +148,7 @@ export function ProtocolSetupDeckConfiguration({
               }}
               providedFixtureOptions={providedFixtureOptions}
               isOnDevice
+              deckDef={getDeckDefFromRobotType(FLEX_ROBOT_TYPE)}
             />
           ) : null}
         </>,

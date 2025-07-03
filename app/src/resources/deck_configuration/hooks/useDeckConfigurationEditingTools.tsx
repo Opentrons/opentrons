@@ -5,6 +5,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
+  isFixtureInUsbModules,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -98,8 +99,11 @@ export function useDeckConfigurationEditingTools(
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber:
-                cutoutConfig.opentronsModuleSerialNumber ?? undefined,
+              opentronsModuleSerialNumber: isFixtureInUsbModules(
+                replacementFixtureId
+              )
+                ? cutoutConfig.opentronsModuleSerialNumber
+                : undefined,
             }
           : cutoutConfig
       })
@@ -119,6 +123,7 @@ export function useDeckConfigurationEditingTools(
             setTargetCutoutId(null)
           }}
           isOnDevice={isOnDevice}
+          deckDef={deckDef}
         />
       ) : null,
   }

@@ -11,9 +11,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ControlledTextAreaField } from '../../atoms/ControlledTextAreaField'
-import { PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
-import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
+import { ControlledTextAreaField } from '/ai-client/atoms/ControlledTextAreaField'
+import {
+  OPENTRONS_FLEX,
+  ROBOT_FIELD_NAME,
+} from '/ai-client/organisms/InstrumentsSection'
+import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
 
 const RUNTIME_PARAMETERS_FIELD_NAME = 'runtime_parameters'
 

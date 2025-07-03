@@ -4,6 +4,7 @@ import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
+  getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
@@ -21,6 +22,8 @@ import {
 } from '../utils'
 
 import type { AttachedModule } from '@opentrons/api-client'
+
+const deckDef = getDeckDefFromRobotType('OT-3 Standard')
 
 describe('getModuleOptions', () => {
   const attachedModules = [
@@ -44,7 +47,7 @@ describe('getModuleOptions', () => {
     },
   ] as AttachedModule[]
   it('should get mag block and heater shaker to place on AA A3', () => {
-    const result = getModuleOptions('cutoutA3', attachedModules, 'A3')
+    const result = getModuleOptions('cutoutA3', attachedModules, 'A3', deckDef)
     expect(result).toEqual([
       [
         {
@@ -64,7 +67,7 @@ describe('getModuleOptions', () => {
     ])
   })
   it('should get mag block to place on AA A3', () => {
-    const result = getModuleOptions('cutoutA3', [], 'A3')
+    const result = getModuleOptions('cutoutA3', [], 'A3', deckDef)
     expect(result).toEqual([
       [
         {
@@ -103,7 +106,8 @@ describe('getModuleUnconfiguredFixtures', () => {
       attachedModules,
       'cutoutB3',
       FLEX_STACKER_MODULE_V1,
-      'fakeB4'
+      'fakeB4',
+      deckDef
     )
     expect(result).toEqual([
       [
@@ -130,7 +134,8 @@ describe('getModuleUnconfiguredFixtures', () => {
       attachedModules,
       'cutoutD1',
       HEATERSHAKER_MODULE_V1,
-      'D1'
+      'D1',
+      deckDef
     )
     expect(result).toEqual([
       [

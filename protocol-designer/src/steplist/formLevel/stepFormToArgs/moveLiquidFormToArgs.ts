@@ -236,7 +236,7 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.dispense_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterDispenseSpeed =
-    hydratedFormData.aspirate_touchTip_speed ?? null
+    hydratedFormData.dispense_touchTip_speed ?? null
   const touchTipAfterDispenseMmFromEdge =
     hydratedFormData.dispense_touchTip_mmFromEdge ?? null
 
