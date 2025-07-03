@@ -275,8 +275,13 @@ class Well:
         :return: A :py:class:`~opentrons.types.Location` corresponding to the liquid meniscus, plus a target position and ``z`` offset as specified.
 
         """
+        meniscus = self._core.get_meniscus(z_offset=z)
+        if isinstance(mensicus, SimulatedProbeResult):
+            # make meniscus a placeholder value to prevent Location and everything that 
+            # references that to have to handle SimulatedProbeResult
+            meniscus = Point(x=0, y=0, z=0) 
         return Location(
-            point=Point(x=0, y=0, z=z),
+            point=meniscus,
             labware=self,
             _meniscus_tracking=MeniscusTrackingTarget(target),
         )
