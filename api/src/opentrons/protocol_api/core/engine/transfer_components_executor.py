@@ -229,7 +229,9 @@ class TransferComponentsExecutor:
             and self._target_well is not None
         )
         aspirate_props = self._transfer_properties.aspirate
-        correction_volume = aspirate_props.correction_by_volume.get_for_volume(volume)
+        correction_volume = aspirate_props.correction_by_volume.get_for_volume(
+            self._instrument.get_current_volume() + volume
+        )
         self._instrument.aspirate(
             location=self._target_location,
             well_core=None,
@@ -252,7 +254,7 @@ class TransferComponentsExecutor:
     ) -> None:
         """Dispense according to dispense properties and wait if enabled."""
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
-            volume
+            self._instrument.get_current_volume() - volume
         )
         self._instrument.dispense(
             location=self._target_location,
@@ -895,7 +897,7 @@ class TransferComponentsExecutor:
             return
         aspirate_props = self._transfer_properties.aspirate
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
-            air_gap_volume
+            self._instrument.get_current_volume() + air_gap_volume
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(
