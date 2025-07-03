@@ -180,15 +180,14 @@ export const getLiquidDetailInfo = (
 ): LiquidDetailInfo[] => {
   const individualIds = getLiquidIdsOnLabware(wellContents)
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
-
   const liquidInfo: LiquidDetailInfo[] = individualIds.map(liquidId => {
-    const totalVolume = sum(Object.values(volumesPerLiquid[parseInt(liquidId)]))
+    const totalVolume = sum(Object.values(volumesPerLiquid[liquidId]))
     const matchingLiquid = liquids.find(liquid => liquid.id === liquidId)
 
     return {
       totalVolume,
       //  TODO: add default liquid color
-      color: matchingLiquid?.displayColor ?? '000000',
+      color: matchingLiquid?.displayColor ?? COLORS.black70,
       displayName: matchingLiquid?.displayName ?? 'unknown display name',
     }
   })

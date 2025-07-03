@@ -72,9 +72,8 @@ export function getResultingTimelineFrameFromRunCommands(
           )
         } else if ('labwareId' in command.params.location) {
           const labwareId = command.params.location.labwareId
-          // const labwareIdStack = labwareLocations[labwareId].stack
-          //  TODO: fix this bug
-          stack.push(labwareId)
+          const labwareIdStack = acc[labwareId].stack
+          stack.push(labwareId, ...labwareIdStack)
         } else {
           stack.push(command.params.location.addressableAreaName)
         }

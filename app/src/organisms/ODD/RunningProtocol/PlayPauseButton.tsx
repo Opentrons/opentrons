@@ -16,7 +16,7 @@ import type { RunStatus } from '@opentrons/api-client'
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
-  background-color: ${COLORS.blue40};
+  background-color: ${COLORS.blue50};
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
