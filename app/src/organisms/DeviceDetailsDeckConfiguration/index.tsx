@@ -27,10 +27,11 @@ import {
   getAAByAAId,
   getAAComboFixtureDisplayName,
   getAASlotDisplayName,
-  getAASlotIdForAA,
+  getAAWithFakesFromVSId,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
@@ -158,7 +159,7 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
-      const name = getAASlotIdForAA(
+      const vsId = getVisualSlotIdForAA(
         cutoutId,
         cutoutFixtureId,
         addressableAreaId
@@ -168,8 +169,10 @@ export function DeviceDetailsDeckConfiguration({
         displayList: [
           ...acc.displayList,
           {
-            displayLocation: name
-              ? getAASlotDisplayName(name)
+            displayLocation: vsId
+              ? getAASlotDisplayName(
+                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+                )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },

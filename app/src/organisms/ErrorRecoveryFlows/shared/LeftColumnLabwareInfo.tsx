@@ -67,8 +67,8 @@ export function LeftColumnLabwareInfo({
       }
     } else {
       switch (step) {
-        case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
-        case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
+        case STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -76,9 +76,9 @@ export function LeftColumnLabwareInfo({
               deckLabel: displayNameCurrentLoc.toUpperCase(),
             },
           }
-        case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-        case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -100,12 +100,12 @@ export function LeftColumnLabwareInfo({
 
   const buildQuantity = (): number | null => {
     switch (step) {
-      case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
-      case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
+      case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
+      case STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.FILL_HOPPER:
         return labwareQuantity
-      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
+      case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+      case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         return null
       default:
         return labwareQuantity

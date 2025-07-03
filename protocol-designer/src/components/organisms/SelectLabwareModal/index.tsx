@@ -578,7 +578,17 @@ export function SelectLabwareModal(
                                                 : uri,
                                           })
                                         )
+                                        dispatch(
+                                          selectAdapter({
+                                            adapterDefURI: null,
+                                          })
+                                        )
                                       }
+                                      dispatch(
+                                        selectLid({
+                                          labwareDefURI: null,
+                                        })
+                                      )
                                     }}
                                     isSelected={
                                       (isAdapter &&

@@ -387,7 +387,8 @@ export const savedStepForms = (
             },
           }
         } else if (
-          savedForm.dropTip_location == null &&
+          (locationUpdate[savedForm.dropTip_location] == null ||
+            savedForm.dropTip_location == null) &&
           (name === 'trashBin' || name === 'wasteChute')
         ) {
           return {
@@ -734,6 +735,7 @@ export const savedStepForms = (
               ...handleFormChange(
                 {
                   pipette: null,
+                  tipRack: null,
                 },
                 form,
                 _getPipetteEntitiesRootState(rootState),

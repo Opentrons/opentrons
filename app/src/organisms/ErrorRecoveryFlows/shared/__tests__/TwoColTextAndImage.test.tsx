@@ -47,7 +47,7 @@ describe('TwoColTextAndImage', () => {
       },
       recoveryMap: {
         route: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
-        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.MANUAL_REPLACE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.LOAD_SHUTTLE,
       },
       recoveryCommands: {
         closeLabwareLatch: mockCloseLabwareLatch,

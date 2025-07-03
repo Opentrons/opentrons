@@ -23,6 +23,13 @@ import {
   SelectRecoveryOption,
   SkipStepNewTips,
   SkipStepSameTips,
+  StackerHopperEmptyRetry,
+  StackerHopperEmptySkip,
+  StackerShuttleEmptyRetry,
+  StackerShuttleEmptySkip,
+  StackerShuttleMissing,
+  StackerStalledRetry,
+  StackerStalledSkip,
 } from './RecoveryOptions'
 import {
   ErrorDetailsModal,
@@ -235,6 +242,28 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     return <HomeAndRetry {...props} />
   }
 
+  const buildStackerHopperEmptyRetry = (): JSX.Element => {
+    return <StackerHopperEmptyRetry {...props} />
+  }
+  const buildStackerHopperEmptySkip = (): JSX.Element => {
+    return <StackerHopperEmptySkip {...props} />
+  }
+  const buildStackerShuttleEmptyRetry = (): JSX.Element => {
+    return <StackerShuttleEmptyRetry {...props} />
+  }
+  const buildStackerShuttleEmptySkip = (): JSX.Element => {
+    return <StackerShuttleEmptySkip {...props} />
+  }
+  const buildStackerShuttleMissing = (): JSX.Element => {
+    return <StackerShuttleMissing {...props} />
+  }
+  const buildStackerStalledRetry = (): JSX.Element => {
+    return <StackerStalledRetry {...props} />
+  }
+  const buildStackerStalledSkip = (): JSX.Element => {
+    return <StackerStalledSkip {...props} />
+  }
+
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
       return buildSelectRecoveryOption()
@@ -263,14 +292,21 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
-    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
-    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-    case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
-    case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
-    case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       return buildManualReplaceLwAndRetry()
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+      return buildStackerHopperEmptyRetry()
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      return buildStackerHopperEmptySkip()
+    case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+      return buildStackerStalledRetry()
+    case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      return buildStackerStalledSkip()
+    case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      return buildStackerShuttleMissing()
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      return buildStackerShuttleEmptyRetry()
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      return buildStackerShuttleEmptySkip()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
