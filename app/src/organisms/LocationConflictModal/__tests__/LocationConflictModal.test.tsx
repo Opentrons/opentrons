@@ -18,17 +18,20 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockFlexStacker, mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import {
+  mockFlexStacker,
+  mockHeaterShaker,
+} from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
+import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
-import { AttachedModule } from '@opentrons/api-client'
-import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
@@ -55,10 +58,10 @@ const render = (props: ComponentProps<typeof LocationConflictModal>) => {
 describe('LocationConflictModal', () => {
   let props: ComponentProps<typeof LocationConflictModal>
   let sendIdentifyStacker: (
-      module: AttachedModule,
-      start: boolean,
-      color?: IdentifyColor
-    ) => void
+    module: AttachedModule,
+    start: boolean,
+    color?: IdentifyColor
+  ) => void
   const mockUpdate = vi.fn()
   beforeEach(() => {
     props = {
