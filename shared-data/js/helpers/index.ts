@@ -51,6 +51,7 @@ export * from './parseAddressableArea'
 export * from './validateCustomLabwareHelper'
 export * from './getWellRangeForLiquidLabwarePair'
 export * from './labwareSchemaShims'
+export * from './pairsFromArray'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
