@@ -396,7 +396,7 @@ Here are some diagrams that help you visualize the examples described above.
 | ![Labware with 3 square wells and 9 circular wells.](images/labware-layout-irregular-wells-not-identical.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
 | ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](images/labware-layout-irregular-multiple-grids.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
 
-If you need help creating a custom labware definition, contact our support team by email (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service
+If you need help creating custom labware definitions, contact our support team by email (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service
 
 #### Python API 
 
