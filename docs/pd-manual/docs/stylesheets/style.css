@@ -1,0 +1,63 @@
+/* Colors from the Opentrons color palette on Confluence */
+:root {
+    --md-primary-fg-color: #006CFA; /* Header and footer color */
+    --md-accent-fg-color: #F09D20; /* Accent color */
+  }
+  .md-header {
+    background-color: var(--md-primary-fg-color);
+  }
+  .md-footer {
+    background-color: var(--md-primary-fg-color);
+  }
+
+/* change table header row background colors to Opentrons blue */
+th {
+    background-color: #D0E6FE;
+}
+
+/* add background to images */
+figure.screenshot img {
+  border: 3px solid #888;
+}
+
+/* list bullets: squares */
+article ul li {
+  list-style-type: square;
+}
+article ul li::marker {
+  color: #006CFA;
+
+
+/* Circular bullets for instruction lists */
+
+.instruction-list > ol {
+  list-style: none; 
+  padding-left: 0; 
+}
+
+
+.instruction-list > ol > li {
+  margin-bottom: 0.5em; 
+  position: relative; 
+  padding-left: 2.5em; 
+}
+
+
+.instruction-list > ol > li::before {
+  content: counter(list-item); 
+  background-color: #006CFA; 
+  color: white; 
+  border-radius: 50%; 
+  width: 1.8em; 
+  height: 1.8em; 
+  line-height: 1.8em; 
+  text-align: center; 
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center; 
+  position: absolute; 
+  left: 0; 
+  top: 0; 
+  font-weight: bold; 
+  font-size: 0.9em; 
+}
