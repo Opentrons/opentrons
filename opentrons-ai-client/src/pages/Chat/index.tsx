@@ -7,16 +7,16 @@ import styled from 'styled-components'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ChatDisplay } from '../../molecules/ChatDisplay'
-import { ChatFooter } from '../../molecules/ChatFooter'
-import { FeedbackModal } from '../../molecules/FeedbackModal'
+import { ChatDisplay } from '/ai-client/molecules/ChatDisplay'
+import { ChatFooter } from '/ai-client/molecules/ChatFooter'
+import { FeedbackModal } from '/ai-client/molecules/FeedbackModal'
 import {
   chatDataAtom,
   createProtocolChatAtom,
   feedbackModalAtom,
   scrollToBottomAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
+} from '/ai-client/resources/atoms'
 
 export interface InputType {
   userPrompt: string

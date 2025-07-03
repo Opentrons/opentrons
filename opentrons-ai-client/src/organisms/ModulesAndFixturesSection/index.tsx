@@ -11,10 +11,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { FixtureListItemGroup } from '../../molecules/FixtureListItemGroup'
-import { FixturesButtonGroup } from '../../molecules/FixturesButtonGroup'
-import { ModuleListItemGroup } from '../../molecules/ModuleListItemGroup'
-import { ModulesButtonGroup } from '../../molecules/ModulesButtonGroup'
+import { FixtureListItemGroup } from '/ai-client/molecules/FixtureListItemGroup'
+import { FixturesButtonGroup } from '/ai-client/molecules/FixturesButtonGroup'
+import { ModuleListItemGroup } from '/ai-client/molecules/ModuleListItemGroup'
+import { ModulesButtonGroup } from '/ai-client/molecules/ModulesButtonGroup'
+
 import { OPENTRONS_FLEX, ROBOT_FIELD_NAME } from '../InstrumentsSection'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'

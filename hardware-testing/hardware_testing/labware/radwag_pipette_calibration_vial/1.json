@@ -26,10 +26,11 @@
       "depth": 40,
       "totalLiquidVolume": 2152.38,
       "shape": "circular",
-      "diameter": 14.5,
+      "diameter": 14.65,
       "x": 64,
       "y": 43,
-      "z": 46
+      "z": 46,
+      "geometryDefinitionId": "cylinder"
     }
   },
   "brand": {
@@ -53,5 +54,18 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "cylinder": {
+      "sections": [
+         {
+          "shape": "conical",
+          "topDiameter": 14.65,
+          "bottomDiameter": 14.65,
+          "topHeight": 40.0,
+          "bottomHeight": 0.0
+        }
+      ]
+    }
   }
 }

@@ -192,7 +192,7 @@ If you're using labware from a manufacturer that's not listed here, refer to the
 
 ## Servicing Flex
 
-Opentrons Flex is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair Flex yourself. Opentrons offers multiple levels of service for Flex and related Opentrons hardware, some of which include maintenance and repairs. All Opentrons hardware also has a 1-year warranty, which you can extend to 2 years.
+Opentrons Flex is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair Flex yourself. Opentrons offers multiple levels of service for Flex and related Opentrons hardware, some of which include maintenance and repairs.
 
 ### Opentrons services
 
@@ -201,7 +201,6 @@ Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, 
 - Onboarding with an Opentrons field applications scientist.
 - Parts for yearly preventive maintenance.
 - Access to a dedicated support engineer.
-- Extension of the Opentrons warranty from 1 to 2 years.
 
 In addition, Opentrons Care Plus includes on-site visits for:
 

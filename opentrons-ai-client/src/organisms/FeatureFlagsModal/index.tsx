@@ -10,7 +10,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { displayFeatureFlagsModalAtom } from '../../resources/atoms'
+import { displayFeatureFlagsModalAtom } from '/ai-client/resources/atoms'
+
 import { FeatureFlags } from '../FeatureFlags'
 
 export function FeatureFlagsModal(): JSX.Element {

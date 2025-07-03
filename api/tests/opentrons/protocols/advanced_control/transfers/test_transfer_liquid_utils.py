@@ -7,10 +7,14 @@ from contextlib import nullcontext as does_not_raise
 
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import ProtocolEngineError
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
 )
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
+from opentrons.protocol_engine.errors import (
+    LiquidHeightUnknownError,
+    IncompleteLabwareDefinitionError,
+)
 from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocol_api.labware import Well, Labware
@@ -190,7 +194,6 @@ def test_raise_only_if_pip_location_inside_liquid(
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise an error if we have access to liquid height and pipette is in liquid."""
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
@@ -204,19 +207,21 @@ def test_raise_only_if_pip_location_inside_liquid(
     with expected_raise:
         raise_if_location_inside_liquid(
             location=pip_location,
-            well_location=well_location,
             well_core=well_core,
             location_check_descriptors=location_descriptors,
             logger=logger,
         )
 
 
+@pytest.mark.parametrize(
+    "error_raised", [LiquidHeightUnknownError(), IncompleteLabwareDefinitionError()]
+)
 def test_log_warning_if_pip_location_cannot_be_validated(
     decoy: Decoy,
+    error_raised: ProtocolEngineError,
 ) -> None:
     """It should log a warning if we don't have access to liquid height."""
     pip_location = Location(point=Point(1, 2, 3), labware=None)
-    well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
     location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
@@ -224,12 +229,11 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     )
     logger = decoy.mock(cls=Logger)
 
-    decoy.when(well_core.current_liquid_height()).then_raise(LiquidHeightUnknownError())
+    decoy.when(well_core.current_liquid_height()).then_raise(error_raised)
     decoy.when(well_core.get_bottom(0)).then_return(Point(0, 0, 0))
     decoy.when(well_core.get_display_name()).then_return("Well A1 of test_labware")
     raise_if_location_inside_liquid(
         location=pip_location,
-        well_location=well_location,
         well_core=well_core,
         location_check_descriptors=location_descriptors,
         logger=logger,
@@ -237,8 +241,9 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     decoy.verify(
         logger.info(
             "Could not verify height of liquid in well Well A1 of test_labware, either"
-            " because the liquid in this well has not been probed or because"
-            " liquid was not loaded in this well using `load_liquid`."
+            " because the liquid in this well has not been probed or"
+            " liquid was not loaded in this well using `load_liquid` or"
+            " inner geometry is not available for the target well."
             " Proceeding without verifying if retract end location is outside the liquid."
         )
     )
@@ -258,7 +263,7 @@ def test_grouping_wells_for_column_96_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
     assert len(wells) == 2
     assert wells[0].well_name == "A1"
     assert wells[1].well_name == "A2"
@@ -278,7 +283,7 @@ def test_grouping_wells_for_column_384_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
     assert len(wells) == 4
     assert wells[0].well_name == "A1"
     assert wells[1].well_name == "B1"
@@ -301,13 +306,13 @@ def test_grouping_wells_for_column_96_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Could not target all wells"):
-        group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    with pytest.raises(ValueError, match="Pipette will access source wells"):
+        group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
 
     # non-contiguous wells from the same labware
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:7] + [mock_wells[-1], mock_wells[7]], nozzle_map
+            mock_wells[:7] + [mock_wells[-1], mock_wells[7]], nozzle_map, "source"
         )
 
     other_labware = decoy.mock(cls=Labware)
@@ -317,9 +322,9 @@ def test_grouping_wells_for_column_96_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:7] + [other_well], nozzle_map
+            mock_wells[:7] + [other_well], nozzle_map, "source"
         )
 
 
@@ -338,16 +343,18 @@ def test_grouping_wells_for_column_384_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Could not target all wells"):
-        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+    with pytest.raises(ValueError, match="Pipette will access destination wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:-1], nozzle_map, "destination"
+        )
 
     # non-contiguous or every other wells from the same labware
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:2] + [mock_wells[-1]], nozzle_map
+            mock_wells[:2] + [mock_wells[-1]], nozzle_map, "source"
         )
         group_wells_for_multi_channel_transfer(
-            mock_wells[:-1] + [mock_wells[0]], nozzle_map
+            mock_wells[:-1] + [mock_wells[0]], nozzle_map, "destination"
         )
 
     other_labware = decoy.mock(cls=Labware)
@@ -357,9 +364,9 @@ def test_grouping_wells_for_column_384_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:15] + [other_well], nozzle_map
+            mock_wells[:15] + [other_well], nozzle_map, "source"
         )
 
 
@@ -378,7 +385,9 @@ def test_grouping_wells_for_row_96_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    wells = group_wells_for_multi_channel_transfer(
+        mock_wells, nozzle_map, "destination"
+    )
     assert len(wells) == 2
     assert wells[0].well_name == "A1"
     assert wells[1].well_name == "B1"
@@ -399,7 +408,7 @@ def test_grouping_wells_for_row_384_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    wells = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
     assert len(wells) == 4
     assert wells[0].well_name == "A1"
     assert wells[1].well_name == "A2"
@@ -423,13 +432,13 @@ def test_grouping_wells_for_row_96_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Could not target all wells"):
-        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+    with pytest.raises(ValueError, match="Pipette will access source wells"):
+        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map, "source")
 
     # non-contiguous wells from the same labware
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group source wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:11] + [mock_wells[-1], mock_wells[11]], nozzle_map
+            mock_wells[:11] + [mock_wells[-1], mock_wells[11]], nozzle_map, "source"
         )
 
     other_labware = decoy.mock(cls=Labware)
@@ -439,9 +448,9 @@ def test_grouping_wells_for_row_96_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group destination wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:11] + [other_well], nozzle_map
+            mock_wells[:11] + [other_well], nozzle_map, "destination"
         )
 
 
@@ -461,16 +470,18 @@ def test_grouping_wells_for_row_384_plate_raises(
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
     # leftover wells
-    with pytest.raises(ValueError, match="Could not target all wells"):
-        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+    with pytest.raises(ValueError, match="Pipette will access destination wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:-1], nozzle_map, "destination"
+        )
 
     # non-contiguous or every other wells from the same labware
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:2] + [mock_wells[-1]], nozzle_map
+            mock_wells[:2] + [mock_wells[-1]], nozzle_map, "destination"
         )
         group_wells_for_multi_channel_transfer(
-            mock_wells[:-1] + [mock_wells[0]], nozzle_map
+            mock_wells[:-1] + [mock_wells[0]], nozzle_map, "source"
         )
 
     other_labware = decoy.mock(cls=Labware)
@@ -480,9 +491,9 @@ def test_grouping_wells_for_row_384_plate_raises(
     decoy.when(other_well.parent).then_return(other_labware)
 
     # non-contiguous wells from different labware, well name is correct though
-    with pytest.raises(ValueError, match="Could not resolve wells"):
+    with pytest.raises(ValueError, match="Could not group destination wells"):
         group_wells_for_multi_channel_transfer(
-            mock_wells[:23] + [other_well], nozzle_map
+            mock_wells[:23] + [other_well], nozzle_map, "destination"
         )
 
 
@@ -495,7 +506,9 @@ def test_grouping_wells_for_full_96_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_96_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, _96_FULL_MAP)
+    wells = group_wells_for_multi_channel_transfer(
+        mock_wells, _96_FULL_MAP, "destination"
+    )
     assert len(wells) == 1
     assert wells[0].well_name == "A1"
 
@@ -510,7 +523,7 @@ def test_grouping_wells_for_full_384_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_384_well_labware)
 
-    wells = group_wells_for_multi_channel_transfer(mock_wells, _96_FULL_MAP)
+    wells = group_wells_for_multi_channel_transfer(mock_wells, _96_FULL_MAP, "source")
     assert len(wells) == 4
     assert wells[0].well_name == "A1"
     assert wells[1].well_name == "B1"
@@ -529,8 +542,8 @@ def test_grouping_wells_raises_for_unsupported_configuration() -> None:
         front_right_nozzle="D1",
         valid_nozzle_maps=ValidNozzleMaps(maps={"Half": ["A1", "B1", "C1", "D1"]}),
     )
-    with pytest.raises(ValueError, match="Unsupported tip configuration"):
-        group_wells_for_multi_channel_transfer([], nozzle_map)
+    with pytest.raises(ValueError, match="Unsupported nozzle configuration"):
+        group_wells_for_multi_channel_transfer([], nozzle_map, "source")
 
 
 @pytest.mark.parametrize(
@@ -556,5 +569,5 @@ def test_grouping_well_returns_all_wells_for_non_96_or_384_plate(
         decoy.when(mock_well.well_name).then_return(well_name)
         decoy.when(mock_well.parent).then_return(mock_reservoir)
 
-    result = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    result = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
     assert result == mock_wells
