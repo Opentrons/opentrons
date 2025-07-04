@@ -21,9 +21,9 @@ import {
   TipPositionModal,
   ZTipPositionModal,
 } from '/protocol-designer/components/organisms'
+import { MoveLiquidPrefixToAction } from '/protocol-designer/components/organisms/TipPositionModal/constants'
 import { getDefaultMmFromEdge } from '/protocol-designer/components/organisms/TipPositionModal/utils'
 import { getIsDelayPositionField } from '/protocol-designer/form-types'
-import { prefixMap } from '/protocol-designer/resources/utils'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
 import type { PositionSpecs } from '/protocol-designer/components/organisms'
@@ -159,12 +159,12 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
       },
       x: {
         name: xName,
-        value: rawXValue != null ? Number(rawXValue) : null,
+        value: rawXValue != null ? Number(rawXValue) : 0,
         updateValue: xUpdateValue,
       },
       y: {
         name: yName,
-        value: rawYValue != null ? Number(rawYValue) : null,
+        value: rawYValue != null ? Number(rawYValue) : 0,
         updateValue: yUpdateValue,
       },
     }
@@ -206,7 +206,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
               t('protocol_steps:tip_position', {
-                prefix: prefixMap[prefix],
+                prefix: MoveLiquidPrefixToAction[prefix],
               }),
               'capitalize'
             )}

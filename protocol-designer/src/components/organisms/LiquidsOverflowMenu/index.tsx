@@ -32,7 +32,7 @@ import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import type { MouseEvent, RefObject } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
-const TOP_POSITION = '13.6875rem'
+const TOP_POSITION = '14.2rem'
 const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '25.675rem'
 interface LiquidsOverflowMenuProps {
   onClose: () => void

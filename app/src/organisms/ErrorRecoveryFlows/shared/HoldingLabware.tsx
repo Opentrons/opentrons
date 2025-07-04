@@ -85,12 +85,12 @@ export function HoldingLabware({
           case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER
             )
           case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
             )
           default: {
             console.error('Unexpected recovery option for gripper routing.')

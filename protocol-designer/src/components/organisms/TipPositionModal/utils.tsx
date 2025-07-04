@@ -2,6 +2,7 @@ import floor from 'lodash/floor'
 import round from 'lodash/round'
 
 import {
+  getMmFromBottom,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
@@ -156,4 +157,16 @@ export const getIsZValueAtBottom = (
       break
   }
   return round(parseFloat(zValue), 1) === round(minZValue, 1)
+}
+
+export const getIsTipInWell = (
+  z: number,
+  positionReference: PositionReference,
+  wellDepth: number | null
+): boolean => {
+  if (wellDepth == null) {
+    return false
+  }
+  const mmFromBottom = getMmFromBottom(z, positionReference, wellDepth)
+  return mmFromBottom != null && mmFromBottom <= wellDepth
 }

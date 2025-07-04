@@ -8,6 +8,10 @@ import { i18n } from '/ai-client/i18n'
 import { Header } from '../index'
 
 vi.mock('@auth0/auth0-react')
+vi.mock('react-router-dom', () => ({
+  useNavigate: vi.fn(() => vi.fn()),
+  useLocation: vi.fn(() => ({ pathname: '/' })),
+}))
 const mockLogout = vi.fn()
 const mockUseTrackEvent = vi.fn()
 

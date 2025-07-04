@@ -51,5 +51,5 @@ LabwareCardField.args = {
     pythonName: 'mockPythonName',
     stack: ['mockId', 'A1'],
   },
-  lidDisplayName: 'Opentrons Flex Tip Rack Lid',
+  lidId: 'mockLidId',
 }

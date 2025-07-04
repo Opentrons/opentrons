@@ -42,11 +42,12 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 interface LabwareCardOverflowMenuProps {
   labwareIds: string[]
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
+  lidId?: string
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
 ): JSX.Element | null {
-  const { labwareIds, setShowOverflowMenu } = props
+  const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -102,11 +103,13 @@ export function LabwareCardOverflowMenu(
     savedSteps,
     deckSetupLabware[topLabwareId]
   )
-
   const handleClear = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
     })
+    if (lidId != null) {
+      dispatch(deleteContainer({ labwareId: lidId }))
+    }
     if (isAdapter) {
       dispatch(
         editSlotInfo({

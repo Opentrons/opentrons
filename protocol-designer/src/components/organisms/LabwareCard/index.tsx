@@ -39,11 +39,11 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 interface LabwareCardProps {
   labware: LabwareOnDeck
   quantity: number
-  lidDisplayName?: string
+  lidId?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidDisplayName, quantity } = props
+  const { labware, lidId, quantity } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -107,6 +107,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
             labwareIds={allLabwareIdsOnStack}
+            lidId={lidId}
           />
         ) : null}
         <ListItem type="default" backgroundColor={COLORS.grey30}>
@@ -134,12 +135,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                     {displayName}
                   </StyledText>
                 ) : null}
-                {lidDisplayName != null ? (
+                {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
                     desktopStyle="captionRegular"
                     color={COLORS.grey60}
                   >
-                    {t('with_lid', { name: lidDisplayName })}
+                    {t('with_lid', {
+                      name: deckSetupLabware[lidId].def.metadata.displayName,
+                    })}
                   </StyledText>
                 ) : null}
 

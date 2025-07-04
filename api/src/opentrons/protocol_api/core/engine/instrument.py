@@ -1698,15 +1698,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 conditioning_volume=conditioning_vol,
             )
 
-            # If the tip has volumes correspoinding to multiple destinations, then
+            # If the tip has volumes corresponding to multiple destinations, then
             # multi-dispense in those destinations.
             # If the tip has a volume corresponding to a single destination, then
             # do a single-dispense into that destination.
-            for next_vol, next_dest in vol_dest_combo:
+            for dispense_vol, dispense_dest in vol_dest_combo:
                 if use_single_dispense:
                     tip_contents = self.dispense_liquid_class(
-                        volume=next_vol,
-                        dest=next_dest,
+                        volume=dispense_vol,
+                        dest=dispense_dest,
                         source=source,
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
@@ -1718,8 +1718,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 else:
                     tip_contents = self.dispense_liquid_class_during_multi_dispense(
-                        volume=next_vol,
-                        dest=next_dest,
+                        volume=dispense_vol,
+                        dest=dispense_dest,
                         source=source,
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
@@ -2145,7 +2145,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return
 
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            last_air_gap
+            self.get_current_volume() - last_air_gap
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(

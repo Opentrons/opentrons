@@ -566,9 +566,9 @@ describe('getLoadLiquidClasses', () => {
     ).toBe(
       `
 # Load Liquid Classes:
-water_v1 = protocol.get_liquid_class("water")
-ethanol_80_v1 = protocol.get_liquid_class("ethanol_80")
-glycerol_50_v1 = protocol.get_liquid_class("glycerol_50")`.trimStart()
+water_base_class = protocol.get_liquid_class("water")
+ethanol_80_base_class = protocol.get_liquid_class("ethanol_80")
+glycerol_50_base_class = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })

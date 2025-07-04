@@ -56,7 +56,7 @@ describe('LabwareCard', () => {
         labwareDefURI: 'mockuri',
         def: fixture96Plate as LabwareDefinition2,
       },
-      lidDisplayName: 'mock lid',
+      lidId: 'lidId',
       quantity: 1,
     }
     vi.mocked(EditLabwareQuantityModal).mockReturnValue(
@@ -82,6 +82,16 @@ describe('LabwareCard', () => {
           id: 'labwareId',
           labwareDefURI: 'mockuri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          stack: ['labwareId', 'A1'],
+        },
+        lidId: {
+          id: 'lidId',
+          labwareDefURI: 'mockuri',
+          def: ({
+            ...fixture96Plate,
+            metadata: { displayName: 'mock lid' },
+          } as any) as LabwareDefinition2,
           pythonName: 'mockPythonName',
           stack: ['labwareId', 'A1'],
         },

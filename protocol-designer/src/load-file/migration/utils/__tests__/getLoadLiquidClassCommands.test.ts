@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  ETHANOL_LIQUID_CLASS_NAME,
+  getAllLiquidClassDefs,
+  GLYCEROL_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 
 import { getLoadLiquidClassCommands } from '../getLoadLiquidClassCommands'
 
@@ -28,14 +32,14 @@ const MOCK_PIPETTE_ENTITIES = ({
 const MOCK_SAVED_STEP_FORMS = ({
   step0: {
     pipette: 'mockPipette1',
-    liquidClass: 'mockLiquidClass1',
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
     tipRack: 'mockTipRack1',
     stepType: 'moveLiquid',
     id: 'step0',
   },
   step1: {
     pipette: 'mockPipette1',
-    liquidClass: 'mockLiquidClass2',
+    liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
     tipRack: 'mockTipRack3',
     stepType: 'mix',
     id: 'step1',
@@ -43,7 +47,8 @@ const MOCK_SAVED_STEP_FORMS = ({
 } as unknown) as SavedStepFormState
 
 const mockLiquidClasses = {
-  mockLiquidClass1: {
+  [ETHANOL_LIQUID_CLASS_NAME]: {
+    liquidClassName: 'ethanol_80',
     byPipette: [
       {
         pipetteModel: 'flex_1channel_1000',
@@ -58,7 +63,8 @@ const mockLiquidClasses = {
       },
     ],
   },
-  mockLiquidClass2: {
+  [GLYCEROL_LIQUID_CLASS_NAME]: {
+    liquidClassName: 'glycerol_50',
     byPipette: [
       {
         pipetteModel: 'flex_1channel_1000',
@@ -94,7 +100,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack1',
-            liquidClassName: 'mockLiquidClass1',
+            liquidClassName: 'ethanol_80',
             pipetteModel: 'flex_1channel_1000',
           },
         },
@@ -105,7 +111,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack3',
-            liquidClassName: 'mockLiquidClass2',
+            liquidClassName: 'glycerol_50',
             pipetteModel: 'flex_1channel_1000',
           },
         },
@@ -120,7 +126,7 @@ describe('getLoadLiquidClassCommands', () => {
         stepType: 'moveLiquid',
         id: 'step2',
         pipette: 'mockPipette1',
-        liquidClass: 'mockLiquidClass2',
+        liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
         tipRack: 'mockTipRack3',
       },
     })
@@ -131,7 +137,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack1',
-            liquidClassName: 'mockLiquidClass1',
+            liquidClassName: 'ethanol_80',
             pipetteModel: 'flex_1channel_1000',
           },
         },
@@ -142,7 +148,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack3',
-            liquidClassName: 'mockLiquidClass2',
+            liquidClassName: 'glycerol_50',
             pipetteModel: 'flex_1channel_1000',
           },
         },
@@ -165,7 +171,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack1',
-            liquidClassName: 'mockLiquidClass1',
+            liquidClassName: 'ethanol_80',
             pipetteModel: 'flex_1channel_1000',
           },
         },
@@ -188,7 +194,7 @@ describe('getLoadLiquidClassCommands', () => {
         params: {
           liquidClassRecord: {
             tiprack: 'mockTipRack1',
-            liquidClassName: 'mockLiquidClass1',
+            liquidClassName: 'ethanol_80',
             pipetteModel: 'flex_1channel_1000',
           },
         },

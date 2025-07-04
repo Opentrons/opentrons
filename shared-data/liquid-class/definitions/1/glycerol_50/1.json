@@ -1,6 +1,6 @@
 {
   "liquidClassName": "glycerol_50",
-  "displayName": "Viscous (50% glycerol)",
+  "displayName": "Viscous",
   "description": "50% glycerol",
   "schemaVersion": 1,
   "version": 1,
@@ -237,8 +237,8 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.5],
-              [10.0, -0.2],
+              [1.0, -0.2],
+              [10.0, 0.1],
               [50.0, -0.2]
             ],
             "conditioningByVolume": [
@@ -489,8 +489,8 @@
             "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [1.0, -0.5],
-              [10.0, -0.2],
+              [1.0, -0.2],
+              [10.0, 0.1],
               [50.0, -0.2]
             ],
             "conditioningByVolume": [
@@ -1254,9 +1254,9 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1505,9 +1505,9 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1752,7 +1752,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -1999,7 +1999,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -2248,7 +2248,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -2495,7 +2495,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -2749,9 +2749,9 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3000,9 +3000,9 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3247,7 +3247,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -3494,7 +3494,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -3743,7 +3743,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3990,7 +3990,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4252,9 +4252,9 @@
             ],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4511,9 +4511,9 @@
             ],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
-              [10.0, -0.2],
-              [50.0, 0.0]
+              [5.0, -0.25],
+              [10.0, 0.1],
+              [50.0, 0.2]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4758,7 +4758,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -5005,7 +5005,7 @@
             "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
-              [5.0, -0.3],
+              [5.0, -0.2],
               [50.0, -0.3],
               [200.0, -0.8]
             ],
@@ -5143,7 +5143,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 250.0
+                  "flowRate": 224.0
                 }
               },
               "touchTip": {
@@ -5224,7 +5224,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 224.0
                 }
               },
               "touchTip": {
@@ -5255,7 +5255,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -5391,7 +5391,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 250.0
+                  "flowRate": 224.0
                 }
               },
               "touchTip": {
@@ -5472,7 +5472,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 224.0
                 }
               },
               "touchTip": {
@@ -5503,7 +5503,7 @@
               [0.0, 0.0],
               [10.0, -0.2],
               [100.0, -0.1],
-              [1000.0, -2.5]
+              [1000.0, 12]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],

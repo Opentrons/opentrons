@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Chat } from './pages/Chat'
 import { CreateProtocol } from './pages/CreateProtocol'
 import { Landing } from './pages/Landing'
+import { Settings } from './pages/Settings'
 import { UpdateProtocol } from './pages/UpdateProtocol'
 
 import type { RouteProps } from './resources/types'
@@ -25,6 +26,12 @@ const opentronsAIRoutes: RouteProps[] = [
     name: 'Update An Existing Protocol',
     navLinkTo: '/update-protocol',
     path: '/update-protocol',
+  },
+  {
+    Component: Settings,
+    name: 'Settings',
+    navLinkTo: '/settings',
+    path: '/settings',
   },
 ]
 
