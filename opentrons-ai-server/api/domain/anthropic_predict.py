@@ -3,14 +3,15 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, cast
+from typing import Any, ContextManager, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
-import weave  # type: ignore
+import weave
 from anthropic import Anthropic
 from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
+from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
@@ -18,7 +19,35 @@ from api.settings import Settings
 
 MessageType = Literal["create", "update"]
 
-weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+
+# Global variable to track Weave state
+_weave_initialized = False
+_analytics_enabled = False
+
+
+def setup_weave_analytics(enable_analytics: bool) -> None:
+    """Setup Weave and set analytics preference for this request."""
+    global _weave_initialized, _analytics_enabled
+
+    # Update analytics preference
+    _analytics_enabled = enable_analytics
+    logger.debug(f"Analytics {'enabled' if enable_analytics else 'disabled'} for this request")
+
+    # Initialize Weave on first call (regardless of analytics preference)
+    if not _weave_initialized:
+        try:
+            weave.init("test-purpose-july-setttings")
+            _weave_initialized = True
+            logger.info("Weave initialized")
+        except Exception as e:
+            logger.error(f"Failed to initialize Weave: {e}")
+
+
+def get_tracing_context() -> ContextManager[None]:
+    """Get context manager that controls Weave tracing based on current analytics preference."""
+    return set_tracing_enabled(_analytics_enabled)
+
+
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
