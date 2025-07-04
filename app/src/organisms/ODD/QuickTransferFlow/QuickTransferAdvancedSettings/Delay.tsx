@@ -117,7 +117,7 @@ export function Delay(props: DelayProps): JSX.Element {
   }
 
   const setSaveOrContinueButtonText =
-    delayIsEnabled && currentStep < 3 ? t('shared:continue') : t('shared:save')
+    delayIsEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
   // allow a maximum of 10 digits for delay duration
   const durationRange = { min: 1, max: 9999999999 }
