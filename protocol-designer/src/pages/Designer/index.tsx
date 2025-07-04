@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { DefineLiquidsModal } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { getFileMetadata } from '../../file-data/selectors'
 import { generateNewProtocol } from '../../labware-ingred/actions'

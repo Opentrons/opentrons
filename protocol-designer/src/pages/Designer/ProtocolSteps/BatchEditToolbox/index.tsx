@@ -9,7 +9,7 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import {
   changeBatchEditField,
   resetBatchEditFieldChanges,

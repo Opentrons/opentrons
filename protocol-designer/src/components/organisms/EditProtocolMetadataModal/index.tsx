@@ -54,7 +54,6 @@ export function EditProtocolMetadataModal(
       marginLeft="0"
       title={t('shared:edit_protocol_metadata')}
       type="info"
-      closeOnOutsideClick
       onClose={onClose}
       childrenPadding={SPACING.spacing24}
       footer={

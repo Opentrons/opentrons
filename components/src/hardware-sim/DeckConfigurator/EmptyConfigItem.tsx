@@ -29,8 +29,11 @@ import type {
 interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  addressableArea: AddressableAreaNamesWithFakes
-  handleClickAdd: (fixtureLocation: CutoutId) => void
+  addressableAreaId: AddressableAreaNamesWithFakes
+  handleClickAdd: (
+    fixtureLocation: CutoutId,
+    addressableArea: AddressableAreaNamesWithFakes
+  ) => void
 }
 
 export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
@@ -38,7 +41,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     deckDefinition,
     handleClickAdd,
     fixtureLocation,
-    addressableArea,
+    addressableAreaId,
   } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
@@ -52,7 +55,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
   const offsetVector = getAALocationForCutoutAndFixtureId(
-    addressableArea,
+    addressableAreaId,
     deckDefinition
   )
 
@@ -79,9 +82,9 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
       <Btn
         css={EMPTY_CONFIG_STYLE}
         onClick={() => {
-          handleClickAdd(fixtureLocation)
+          handleClickAdd(fixtureLocation, addressableAreaId)
         }}
-        data-testid={addressableArea}
+        data-testid={addressableAreaId}
       >
         <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
       </Btn>

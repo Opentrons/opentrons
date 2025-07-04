@@ -13,14 +13,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { feedbackModalAtom, tokenAtom } from '../../resources/atoms'
+import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
   PROD_FEEDBACK_END_POINT,
   STAGING_FEEDBACK_END_POINT,
-} from '../../resources/constants'
-import { useApiCall } from '../../resources/hooks'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+} from '/ai-client/resources/constants'
+import { useApiCall } from '/ai-client/resources/hooks'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { AxiosRequestConfig } from 'axios'
 

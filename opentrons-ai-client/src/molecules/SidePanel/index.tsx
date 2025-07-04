@@ -14,7 +14,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import { PromptButton } from '../../organisms/PromptButton'
+import { PromptButton } from '/ai-client/organisms/PromptButton'
 
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 

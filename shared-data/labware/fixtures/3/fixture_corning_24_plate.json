@@ -35,8 +35,11 @@
         "y": -85.47,
         "z": 20.27
       }
-    },
-    "footprint": {
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
       "backLeft": {
         "x": 0,
         "y": 0

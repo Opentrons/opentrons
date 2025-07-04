@@ -25,7 +25,7 @@ import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,

@@ -78,6 +78,9 @@ coverage.xml
 docs/_build/
 docs/build/
 
+# mkdocs documentation
+docs/*/site/
+
 # PyBuilder
 target/
 .idea/

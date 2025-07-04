@@ -17,7 +17,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 import { FlexHardware, Ot2Modules } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 

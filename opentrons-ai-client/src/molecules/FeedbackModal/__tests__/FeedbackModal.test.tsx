@@ -1,23 +1,24 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { feedbackModalAtom } from '/ai-client/resources/atoms'
+
 import { FeedbackModal } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { feedbackModalAtom } from '../../../resources/atoms'
 
 const mockUseTrackEvent = vi.fn()
 const mockCallApi = vi.fn().mockResolvedValue({})
 
-vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
-vi.mock('../../../resources/hooks', () => ({
+vi.mock('/ai-client/resources/hooks', () => ({
   useApiCall: () => ({
     callApi: mockCallApi,
   }),

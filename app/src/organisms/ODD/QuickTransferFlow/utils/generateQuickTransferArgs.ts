@@ -402,14 +402,12 @@ export function generateQuickTransferArgs(
       quickTransferState.delayAspirate != null
         ? {
             seconds: quickTransferState.delayAspirate?.delayDuration,
-            mmFromBottom: quickTransferState.delayAspirate.positionFromBottom,
           }
         : null,
     dispenseDelay:
       quickTransferState.delayDispense != null
         ? {
             seconds: quickTransferState.delayDispense?.delayDuration,
-            mmFromBottom: quickTransferState.delayDispense.positionFromBottom,
           }
         : null,
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
@@ -476,16 +474,12 @@ export function generateQuickTransferArgs(
           quickTransferState.delayAspirate != null
             ? {
                 seconds: quickTransferState.delayAspirate.delayDuration,
-                mmFromBottom:
-                  quickTransferState.delayAspirate.positionFromBottom,
               }
             : null,
         dispenseDelay:
           quickTransferState.delayDispense != null
             ? {
                 seconds: quickTransferState.delayDispense.delayDuration,
-                mmFromBottom:
-                  quickTransferState.delayDispense.positionFromBottom,
               }
             : null,
         mixBeforeAspirate:

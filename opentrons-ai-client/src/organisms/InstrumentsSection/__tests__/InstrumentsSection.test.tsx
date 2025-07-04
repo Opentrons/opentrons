@@ -2,9 +2,10 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { InstrumentsSection } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
 
 const TestFormProviderComponent = () => {
   const methods = useForm({

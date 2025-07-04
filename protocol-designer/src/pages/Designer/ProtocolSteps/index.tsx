@@ -31,7 +31,7 @@ import {
   StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {

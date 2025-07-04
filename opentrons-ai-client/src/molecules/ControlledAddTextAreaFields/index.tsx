@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../atoms/TextAreaField'
+import { TextAreaField } from '/ai-client/atoms/TextAreaField'
 
 export interface ControlledAddTextAreaFieldsProps {
   fieldName: string

@@ -247,6 +247,11 @@ export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
   'cutoutD2',
 ]
 
+export const LEFT_AND_CENTER_CUTOUTS = [
+  ...SINGLE_LEFT_CUTOUTS,
+  ...SINGLE_CENTER_CUTOUTS,
+]
+
 export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
@@ -302,7 +307,10 @@ export type FlexFakeAddressableAreaName =
   | 'fakeC4'
   | 'fakeD4'
 
-export type FakeStagingAreaRightSlot = 'fakeStagingAreaRightSlot'
+export type FakeCutoutFixtureId =
+  | 'fakeStagingAreaRightSlot'
+  | 'fakeWasteChuteWithEmptySlot'
+  | 'fakeStagingSlotWithMagBlockV1'
 
 export type AddressableAreaNamesWithFakes =
   | AddressableAreaName
@@ -310,9 +318,7 @@ export type AddressableAreaNamesWithFakes =
 
 export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
 
-export type CutoutFixtureIdsWithFakes =
-  | CutoutFixtureId
-  | FakeStagingAreaRightSlot
+export type CutoutFixtureIdsWithFakes = CutoutFixtureId | FakeCutoutFixtureId
 
 export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
 
@@ -581,6 +587,12 @@ export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
 export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
   'fakeStagingAreaRightSlot'
 
+export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT: 'fakeWasteChuteWithEmptySlot' =
+  'fakeWasteChuteWithEmptySlot'
+
+export const FAKE_STAGING_SLOT_WITH_MAG_BLOCK: 'fakeStagingSlotWithMagBlockV1' =
+  'fakeStagingSlotWithMagBlockV1'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -644,17 +656,29 @@ export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
 ]
 
-export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
 ]
 
 export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
+  // TODO (tz, 6-14-25): we need to remove this from our code base?
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_WITH_FAKE_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  // TODO (tz, 6-14-25): we need to remove this from our code base?
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
 ]
 
 export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
@@ -673,6 +697,15 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
+
+export const COMBO_FIXTURES: CutoutFixtureId[] = [
+  ...FLEX_STACKER_FIXTURES,
+  ...MAGNETIC_BLOCK_FIXTURES,
+  ...WASTE_CHUTE_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+]
+
+export const DEFAULT_AA_FOR_WASTE_CHUTE = '96ChannelWasteChute'
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
 

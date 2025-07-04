@@ -12,6 +12,7 @@ type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   layout: ComponentProps<typeof InterventionContent>['infoProps']['layout']
   /* Renders a warning InlineNotification if provided. */
   bannerText?: string | null
+  showQuantity?: boolean
 }
 // TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
 // The left column component adjacent to RecoveryDeckMap/TipSelection.
@@ -22,6 +23,7 @@ export function LeftColumnLabwareInfo({
   layout,
   bannerText,
   recoveryMap,
+  showQuantity = true,
 }: LeftColumnLabwareInfoProps): JSX.Element {
   const { step, route } = recoveryMap
   const {
@@ -67,8 +69,9 @@ export function LeftColumnLabwareInfo({
       }
     } else {
       switch (step) {
-        case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
-        case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
+        case STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER:
+        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -76,9 +79,9 @@ export function LeftColumnLabwareInfo({
               deckLabel: displayNameCurrentLoc.toUpperCase(),
             },
           }
-        case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-        case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
+        case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -99,16 +102,22 @@ export function LeftColumnLabwareInfo({
   }
 
   const buildQuantity = (): number | null => {
-    switch (step) {
-      case STACKER_STALLED_RETRY.STEPS.CONFIRM_RETRY:
-      case STACKER_STALLED_SKIP.STEPS.CONFIRM_RETRY:
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.CONFIRM_RETRY:
-        return labwareQuantity
-      case STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE:
-      case STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-        return null
-      default:
-        return labwareQuantity
+    if (!showQuantity) {
+      return null
+    }
+    if (
+      (route === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
+        step === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
+      (route === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE &&
+        step === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
+      (route === RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE &&
+        step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER)
+    ) {
+      return labwareQuantity != null && labwareQuantity > 0
+        ? labwareQuantity - 1 // one has been moved manually onto the shuttle
+        : null
+    } else {
+      return labwareQuantity ?? null
     }
   }
 

@@ -496,6 +496,7 @@
     "parameters",
     "ordering",
     "extents",
+    "features",
     "wells",
     "groups"
   ],
@@ -614,18 +615,41 @@
       }
     },
     "extents": {
-      "description": "The outer dimensions of the labware.",
+      "description": "The outer dimensions of the labware. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
-      "required": ["total", "footprint"],
+      "required": ["total"],
       "additionalProperties": false,
       "properties": {
         "total": {
           "description": "The all-encompassing outer dimensions of the labware.",
           "$ref": "#/definitions/axisAlignedBoundingBox3D"
-        },
-        "footprint": {
-          "description": "The outer dimensions of the labware where it meets the deck.",
-          "$ref": "#/definitions/axisAlignedBoundingBox2D"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Locating features when this labware is a part of a stackup.",
+      "required": [],
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
+              "type": "number"
+            }
+          }
         }
       }
     },

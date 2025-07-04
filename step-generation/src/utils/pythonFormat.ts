@@ -14,7 +14,7 @@ export const OFF_DECK = 'protocol_api.OFF_DECK'
 /** The variable name for the Python dict containing the custom labware defintions. */
 export const CUSTOM_LABWARE_DICT_NAME = 'CUSTOM_LABWARE'
 
-const INDENT = '    '
+export const INDENT = '    '
 
 /** Indent each of the lines in `text`. */
 export function indentPyLines(text: string): string {
@@ -40,19 +40,6 @@ export function formatPyValue(value: any): string {
       if (value === null) {
         return 'None'
       } else if (Array.isArray(value)) {
-        // Detect nested tuple: e.g., [[10, 4], [12, 2]]
-        if (
-          value.length > 0 &&
-          value.every(
-            element =>
-              Array.isArray(element) &&
-              element.length === 2 &&
-              element.every(number => typeof number === 'number')
-          )
-        ) {
-          // Format as list of tuples: [(10, 4), (12, 2)]
-          return `[${value.map(([a, b]) => `(${a}, ${b})`).join(', ')}]`
-        }
         return formatPyList(value)
       } else {
         return formatPyDict(value as Record<string, any>)
@@ -69,29 +56,54 @@ export function formatPyStr(str: string): string {
   return JSON.stringify(str)
 }
 
+/** Render an array value as a Python tuple. */
+export function formatPyTuple(list: any[]): string {
+  return `(${list.map(value => formatPyValue(value)).join(', ')})`
+}
+
 /** Render an array value as a Python list. */
 export function formatPyList(list: any[]): string {
+  // Format array of number pairs as Python list of tuples: [(10, 4), (12, 2)]
+  if (
+    list.every(
+      element =>
+        Array.isArray(element) &&
+        element.length === 2 &&
+        element.every(number => typeof number === 'number')
+    )
+  ) {
+    return `[${list.map((value: any[]) => formatPyTuple(value)).join(', ')}]`
+  }
+
   return `[${list.map(value => formatPyValue(value)).join(', ')}]`
 }
 
+function isScalar(value: any): boolean {
+  return (
+    ['undefined', 'boolean', 'number', 'string'].includes(typeof value) ||
+    value === null
+  )
+}
+
 /** Render an object as a Python dict. */
-export function formatPyDict(
-  dict: Record<string, any>,
-  allSingleLine?: boolean
-): string {
+export function formatPyDict(dict: Record<string, any>): string {
   const dictEntries = Object.entries(dict)
-  // Render dict on single line if it has 1 entry, else render 1 entry per line.
-  if (dictEntries.length <= 1 && !allSingleLine) {
-    return `{${dictEntries
+  // Render dict on single line if it has 1 entry or if all entries are scalar and
+  // they fit on a short line.
+  const allScalar = dictEntries.every(([keyBy, value]) => isScalar(value))
+  if (dictEntries.length <= 1 || allScalar) {
+    const oneLiner = `{${dictEntries
       .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
       .join(', ')}}`
-  } else {
-    return `{\n${indentPyLines(
-      dictEntries
-        .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
-        .join(',\n')
-    )},\n}`
+    if (dictEntries.length <= 1 || oneLiner.length < 64) {
+      return oneLiner
+    }
   }
+  return `{\n${indentPyLines(
+    dictEntries
+      .map(([key, value]) => `${formatPyStr(key)}: ${formatPyValue(value)}`)
+      .join(',\n')
+  )},\n}`
 }
 
 /** Render a WellLocation to Python.
@@ -138,4 +150,15 @@ export function formatPyWellLocation(wellLocation?: WellLocation): string {
     python += `.move(types.Point(${args.join(', ')}))`
   }
   return python
+}
+
+export function getChunkForIndentingLists(
+  lists: string[],
+  size: number
+): string[][] {
+  const chunks: string[][] = []
+  for (let index = 0; index < lists.length; index += size) {
+    chunks.push(lists.slice(index, index + size))
+  }
+  return chunks
 }

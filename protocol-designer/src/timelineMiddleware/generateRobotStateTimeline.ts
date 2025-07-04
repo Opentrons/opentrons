@@ -1,7 +1,6 @@
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
-  curryWithoutPython,
   dropTip,
   dropTipInTrash,
   dropTipInWasteChute,
@@ -58,12 +57,6 @@ export const generateRobotStateTimeline = (
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
-      // TODO: update to only mix requiring curryCommandCreator
-      const commandCreator =
-        args.commandCreatorFnName !== 'transfer'
-          ? curryCommandCreator
-          : curryWithoutPython
-
       //  assume that whenever we have a pipetteId we also have a dropTipLocation
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
@@ -81,14 +74,14 @@ export const generateRobotStateTimeline = (
         const isTrashBin =
           invariantContext.trashBinEntities[dropTipLocation] != null
         let dropTipCommands = [
-          commandCreator(dropTip, {
+          curryCommandCreator(dropTip, {
             pipette: pipetteId,
             dropTipLocation,
           }),
         ]
         if (isWasteChute) {
           dropTipCommands = [
-            commandCreator(dropTipInWasteChute, {
+            curryCommandCreator(dropTipInWasteChute, {
               pipetteId,
               wasteChuteId:
                 invariantContext.wasteChuteEntities[dropTipLocation].id,
@@ -100,7 +93,7 @@ export const generateRobotStateTimeline = (
           const trashLocation =
             invariantContext.trashBinEntities[dropTipLocation].location
           dropTipCommands = [
-            commandCreator(dropTipInTrash, {
+            curryCommandCreator(dropTipInTrash, {
               pipetteId,
               trashLocation: trashLocation as CutoutId,
             }),

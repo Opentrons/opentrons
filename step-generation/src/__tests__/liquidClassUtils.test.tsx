@@ -15,6 +15,7 @@ import {
   getFlowRateAndOffsetParamsTransferLike,
   SOURCE_LABWARE,
 } from '../fixtures'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
 import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -32,10 +33,10 @@ describe('getCustomLiquidClassProperties', () => {
           pushOut: 0,
           touchTipAfterDispenseSpeed: 5,
           touchTipAfterDispenseMmFromEdge: 3,
-          aspirateSubmergeDelay: { seconds: 5, mmFromBottom: 0 },
-          aspirateRetractDelay: { seconds: 10, mmFromBottom: 0 },
-          dispenseSubmergeDelay: { seconds: 50, mmFromBottom: 0 },
-          dispenseRetractDelay: { seconds: 40, mmFromBottom: 0 },
+          aspirateSubmergeDelay: { seconds: 5 },
+          aspirateRetractDelay: { seconds: 10 },
+          dispenseSubmergeDelay: { seconds: 50 },
+          dispenseRetractDelay: { seconds: 40 },
           sourceWells: ['A1'],
           destWells: ['A2'],
           pipette: DEFAULT_PIPETTE,
@@ -50,12 +51,12 @@ describe('getCustomLiquidClassProperties', () => {
           preWetTip: true,
           touchTipAfterAspirate: true,
           mixBeforeAspirate: { times: 4, volume: 10 },
-          aspirateDelay: { seconds: 12, mmFromBottom: 0 },
-          dispenseDelay: { seconds: 20, mmFromBottom: 0 },
+          aspirateDelay: { seconds: 12 },
+          dispenseDelay: { seconds: 20 },
           aspirateAirGapVolume: 2,
           touchTipAfterDispense: true,
           mixInDestination: { volume: 10, times: 3 },
-          blowoutLocation: 'source',
+          blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
           dropTipLocation: FIXED_TRASH_ID,
           aspirateXOffset: 0,
           dispenseXOffset: 0,
@@ -95,133 +96,77 @@ describe('getCustomLiquidClassProperties', () => {
       })
     ).toEqual(
       `
-{
-    "p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
-        "aspirate": {
-            "aspirate_position": {
-                "offset": {
-                    "x": 0,
-                    "y": 0,
-                    "z": 2,
-                },
+{"p20_single_gen2": {"opentrons/opentrons_96_tiprack_20ul/1": {
+    "aspirate": {
+        "aspirate_position": {
+            "offset": {"x": 0, "y": 0, "z": 2},
+            "position_reference": "well-bottom",
+        },
+        "flow_rate_by_volume": [(0, 2.1)],
+        "pre_wet": True,
+        "correction_by_volume": [(0, 5)],
+        "delay": {"enabled": True, "duration": 12},
+        "mix": {"enabled": True, "repetitions": 4, "volume": 10},
+        "submerge": {
+            "delay": {"enabled": True, "duration": 5},
+            "speed": 50,
+            "start_position": {
+                "offset": {"x": 1, "y": 0, "z": 5},
                 "position_reference": "well-bottom",
             },
-            "flow_rate_by_volume": [(0, 2.1)],
-            "pre_wet": True,
-            "correction_by_volume": [(0, 5)],
-            "delay": {
+        },
+        "retract": {
+            "air_gap_by_volume": [(0, 2)],
+            "delay": {"enabled": True, "duration": 10},
+            "end_position": {
+                "offset": {"x": 2, "y": -1, "z": -4},
+                "position_reference": "well-top",
+            },
+            "speed": 51,
+            "touch_tip": {
                 "enabled": True,
-                "duration": 12,
-            },
-            "mix": {
-                "enabled": True,
-                "repetitions": 4,
-                "volume": 10,
-            },
-            "submerge": {
-                "delay": {
-                    "enabled": True,
-                    "duration": 5,
-                },
-                "speed": 50,
-                "start_position": {
-                    "offset": {
-                        "x": 1,
-                        "y": 0,
-                        "z": 5,
-                    },
-                    "position_reference": "well-bottom",
-                },
-            },
-            "retract": {
-                "air_gap_by_volume": [(0, 2)],
-                "delay": {
-                    "enabled": True,
-                    "duration": 10,
-                },
-                "end_position": {
-                    "offset": {
-                        "x": 2,
-                        "y": -1,
-                        "z": -4,
-                    },
-                    "position_reference": "well-top",
-                },
-                "speed": 51,
-                "touch_tip": {
-                    "enabled": True,
-                    "z_offset": -3.4,
-                    "mm_from_edge": 10,
-                    "speed": 11,
-                },
+                "z_offset": -3.4,
+                "mm_from_edge": 10,
+                "speed": 11,
             },
         },
-        "dispense": {
-            "dispense_position": {
-                "offset": {
-                    "x": 0,
-                    "y": 0,
-                    "z": 3,
-                },
-                "position_reference": "well-bottom",
-            },
-            "push_out_by_volume": [(0, 0)],
-            "flow_rate_by_volume": [(0, 2.2)],
-            "correction_by_volume": [(0, 5)],
-            "delay": {
-                "enabled": True,
-                "duration": 20,
-            },
-            "mix": {
-                "enabled": True,
-                "repetitions": 3,
-                "volume": 10,
-            },
-            "submerge": {
-                "delay": {
-                    "enabled": True,
-                    "duration": 50,
-                },
-                "speed": 52,
-                "start_position": {
-                    "offset": {
-                        "x": 2,
-                        "y": 1,
-                        "z": -2,
-                    },
-                    "position_reference": "well-center",
-                },
-            },
-            "retract": {
-                "air_gap_by_volume": [(0, 0)],
-                "delay": {
-                    "enabled": True,
-                    "duration": 40,
-                },
-                "end_position": {
-                    "offset": {
-                        "x": 3,
-                        "y": -2,
-                        "z": -5,
-                    },
-                    "position_reference": "well-top",
-                },
-                "speed": 53,
-                "touch_tip": {
-                    "enabled": True,
-                    "z_offset": -3.4,
-                    "mm_from_edge": 3,
-                    "speed": 5,
-                },
-                "blowout": {
-                    "enabled": True,
-                    "location": "source",
-                    "flow_rate": 2.3,
-                },
+    },
+    "dispense": {
+        "dispense_position": {
+            "offset": {"x": 0, "y": 0, "z": 3},
+            "position_reference": "well-bottom",
+        },
+        "push_out_by_volume": [(0, 0)],
+        "flow_rate_by_volume": [(0, 2.2)],
+        "correction_by_volume": [(0, 5)],
+        "delay": {"enabled": True, "duration": 20},
+        "mix": {"enabled": True, "repetitions": 3, "volume": 10},
+        "submerge": {
+            "delay": {"enabled": True, "duration": 50},
+            "speed": 52,
+            "start_position": {
+                "offset": {"x": 2, "y": 1, "z": -2},
+                "position_reference": "well-center",
             },
         },
-    }},
-}
+        "retract": {
+            "air_gap_by_volume": [(0, 0)],
+            "delay": {"enabled": True, "duration": 40},
+            "end_position": {
+                "offset": {"x": 3, "y": -2, "z": -5},
+                "position_reference": "well-top",
+            },
+            "speed": 53,
+            "touch_tip": {
+                "enabled": True,
+                "z_offset": -3.4,
+                "mm_from_edge": 3,
+                "speed": 5,
+            },
+            "blowout": {"enabled": True, "location": "source", "flow_rate": 2.3},
+        },
+    },
+}}}
     `.trim()
     )
   })

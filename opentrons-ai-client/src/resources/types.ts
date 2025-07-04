@@ -1,5 +1,6 @@
 import type { FC } from 'react'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { Flags } from '../feature-flags/types'
 
 export type ProtocolFormat = 'Protocol Designer' | 'Python'
 
@@ -44,6 +45,7 @@ export interface CreatePrompt {
 
 export type UpdateOptions =
   | 'adapt_python_protocol'
+  | 'add_runtime_parameters'
   | 'change_labware'
   | 'change_pipettes'
   | 'other'
@@ -124,7 +126,4 @@ export interface PromptData {
   }
 }
 
-export interface FeatureFlags {
-  enablePrereleaseMode: boolean
-  enablePDProtocolGeneration: boolean
-}
+export type FeatureFlags = Flags

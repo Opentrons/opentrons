@@ -236,7 +236,7 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.dispense_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterDispenseSpeed =
-    hydratedFormData.aspirate_touchTip_speed ?? null
+    hydratedFormData.dispense_touchTip_speed ?? null
   const touchTipAfterDispenseMmFromEdge =
     hydratedFormData.dispense_touchTip_mmFromEdge ?? null
 
@@ -255,34 +255,28 @@ export const moveLiquidFormToArgs = (
   const aspirateDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_delay_seconds',
-    zPositionField: 'aspirate_mmFromBottom',
     checkboxField: 'aspirate_delay_checkbox',
   })
   const dispenseDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_delay_seconds',
-    zPositionField: 'dispense_mmFromBottom',
     checkboxField: 'dispense_delay_checkbox',
   })
   const aspirateSubmergeDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_submerge_delay_seconds',
-    zPositionField: 'aspirate_submerge_mmFromBottom',
   })
   const dispenseSubmergeDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_submerge_delay_seconds',
-    zPositionField: 'dispense_submerge_mmFromBottom',
   })
   const aspirateRetractDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'aspirate_retract_delay_seconds',
-    zPositionField: 'aspirate_retract_mmFromBottom',
   })
   const dispenseRetractDelay = getMoveLiquidDelayData({
     hydratedFormData,
     secondsField: 'dispense_retract_delay_seconds',
-    zPositionField: 'dispense_retract_mmFromBottom',
   })
   const blowoutLocation =
     (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||

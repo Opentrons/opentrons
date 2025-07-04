@@ -29,7 +29,7 @@ import {
 import { getDismissedHints } from '../../../../tutorial/selectors'
 import { MagnetModuleChangeContent } from '../../../molecules'
 import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
-import { useKitchen } from '../../Kitchen/hooks'
+import { useKitchen } from '../../Kitchen/useKitchen'
 import { getModuleOnSlot } from '../util'
 
 import type * as Components from '@opentrons/components'
@@ -39,7 +39,7 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../modules')
-vi.mock('../../Kitchen/hooks')
+vi.mock('../../Kitchen/useKitchen')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/actions/thunks')
 vi.mock('../../ConfirmDeleteEntityInUseModal')

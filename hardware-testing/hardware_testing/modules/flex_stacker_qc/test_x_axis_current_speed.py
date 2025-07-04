@@ -8,7 +8,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
+from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,

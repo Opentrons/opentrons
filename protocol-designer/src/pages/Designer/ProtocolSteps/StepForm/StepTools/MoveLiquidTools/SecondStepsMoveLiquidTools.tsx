@@ -20,7 +20,7 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
@@ -79,7 +79,7 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
 
@@ -261,6 +261,7 @@ export const SecondStepsMoveLiquidTools = ({
               labwareEntities,
               additionalEquipmentEntities,
               liquidHandlingAction: tab,
+              robotType,
             })
           }}
           onClose={() => {
@@ -317,6 +318,7 @@ export const SecondStepsMoveLiquidTools = ({
           <>
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix={tab}
               propsForFields={propsForFields}
               zField={`${tab}_mmFromBottom`}
@@ -333,10 +335,11 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {enableLiquidClasses && !isDestinationTrash ? (
+        {!isDestinationTrash ? (
           <>
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('submerge')}
               prefix={`${tab}_submerge`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
@@ -354,6 +357,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('retract')}
               prefix={`${tab}_retract`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
@@ -404,6 +408,7 @@ export const SecondStepsMoveLiquidTools = ({
                 >
                   {formData.conditioning_checkbox === true ? (
                     <InputStepFormField
+                      {...propsForFields.conditioning_volume}
                       title={t(
                         'form:step_edit_form.field.conditioning.conditioning_volume.label'
                       )}
@@ -412,7 +417,6 @@ export const SecondStepsMoveLiquidTools = ({
                         { min: 0, max: maxConditioningVolume }
                       )}
                       padding="0"
-                      {...propsForFields.conditioning_volume}
                       showTooltip={false}
                     />
                   ) : null}
@@ -531,6 +535,7 @@ export const SecondStepsMoveLiquidTools = ({
                   units={t('application:units.millimeter')}
                 />
                 <PositionField
+                  formData={formData}
                   prefix={tab}
                   propsForFields={propsForFields}
                   zField={`${tab}_touchTip_mmFromTop`}
@@ -566,14 +571,12 @@ export const SecondStepsMoveLiquidTools = ({
             ) : null}
           </CheckboxExpandStepFormField>
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )

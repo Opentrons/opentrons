@@ -8,9 +8,10 @@ import {
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
-  LegacyStyledText,
+  ListTable,
   Modal,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -18,52 +19,39 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  ABSORBANCE_READER_CUTOUTS,
-  ABSORBANCE_READER_V1,
-  ABSORBANCE_READER_V1_FIXTURE,
-  FLEX_STACKER_MODULE_V1,
-  FLEX_STACKER_V1_FIXTURE,
-  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-  getCutoutDisplayName,
+  getAADisplayName,
   getFixtureDisplayName,
-  HEATER_SHAKER_CUTOUTS,
-  HEATERSHAKER_MODULE_V1,
-  HEATERSHAKER_MODULE_V1_FIXTURE,
-  MAGNETIC_BLOCK_V1_FIXTURE,
+  replaceCutoutFixtureWithComboFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  SINGLE_LEFT_CUTOUTS,
-  SINGLE_RIGHT_CUTOUTS,
-  STAGING_AREA_CUTOUTS,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  TEMPERATURE_MODULE_CUTOUTS,
-  TEMPERATURE_MODULE_V2,
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  THERMOCYCLER_MODULE_CUTOUTS,
-  THERMOCYCLER_MODULE_V2,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
+import { getOptions } from './utils'
+
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutConfig,
+  CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
+const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
+const MODULE_IDENTIFY_TIME_MS = 10000
+
 interface AddFixtureModalProps {
   cutoutId: CutoutId
+  addressableAreaId: AddressableAreaNamesWithFakes
   closeModal: () => void
+  deckDef: DeckDefinition
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
@@ -76,14 +64,20 @@ type OptionStage =
 
 export function AddFixtureModal({
   cutoutId,
+  addressableAreaId,
   closeModal,
   providedFixtureOptions,
   isOnDevice = false,
+  deckDef,
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
+
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
   const unconfiguredMods =
     modulesData?.data.filter(
       attachedMod =>
@@ -103,16 +97,16 @@ export function AddFixtureModal({
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
 
   const modalHeader: OddModalHeaderBaseProps = {
-    title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(cutoutId),
+    title: t('add_to', {
+      slotName: getAADisplayName(addressableAreaId),
     }),
     hasExitIcon: providedFixtureOptions == null,
     onClick: closeModal,
   }
 
   const modalProps: ModalProps = {
-    title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(cutoutId),
+    title: t('add_to', {
+      slotName: getAADisplayName(addressableAreaId),
     }),
     onClose: closeModal,
     closeOnOutsideClick: true,
@@ -120,204 +114,14 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  let availableOptions: CutoutConfig[][] = []
-
-  if (providedFixtureOptions != null) {
-    availableOptions = providedFixtureOptions?.map(o => [
-      {
-        cutoutId,
-        cutoutFixtureId: o,
-        opentronsModuleSerialNumber: undefined,
-      },
-    ])
-  } else if (optionStage === 'fixtureOptions') {
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
-      SINGLE_LEFT_CUTOUTS.includes(cutoutId)
-    ) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          },
-        ],
-      ]
-    }
-    if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-          },
-        ],
-      ]
-    }
-  } else if (optionStage === 'moduleOptions') {
-    availableOptions = [
-      ...availableOptions,
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
-        },
-      ],
-    ]
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-      availableOptions = [
-        ...availableOptions,
-        [
-          {
-            cutoutId,
-            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          },
-        ],
-      ]
-    }
-    if (unconfiguredMods.length > 0) {
-      if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
-        const unconfiguredTCs = unconfiguredMods
-          .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
-          .map(mod => [
-            {
-              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
-              cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-            {
-              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
-              cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [...availableOptions, ...unconfiguredTCs]
-      }
-      if (
-        HEATER_SHAKER_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === HEATERSHAKER_MODULE_V1)
-      ) {
-        const unconfiguredHeaterShakers = unconfiguredMods
-          .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
-      }
-      if (
-        TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === TEMPERATURE_MODULE_V2)
-      ) {
-        const unconfiguredTemperatureModules = unconfiguredMods
-          .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [
-          ...availableOptions,
-          ...unconfiguredTemperatureModules,
-        ]
-      }
-      if (
-        ABSORBANCE_READER_CUTOUTS.includes(cutoutId) &&
-        unconfiguredMods.some(m => m.moduleModel === ABSORBANCE_READER_V1)
-      ) {
-        const unconfiguredAbsorbanceReaders = unconfiguredMods
-          .filter(mod => mod.moduleModel === ABSORBANCE_READER_V1)
-          .map(mod => [
-            {
-              cutoutId,
-              cutoutFixtureId: ABSORBANCE_READER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        availableOptions = [
-          ...availableOptions,
-          ...unconfiguredAbsorbanceReaders,
-        ]
-      }
-    }
-    if (
-      cutoutId === 'cutoutD3' &&
-      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-    ) {
-      const unconfiguredFlexStackers: CutoutConfig[][] = []
-      unconfiguredMods
-        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-        .forEach(mod => {
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        })
-      availableOptions.push(...unconfiguredFlexStackers)
-    } else if (
-      STAGING_AREA_CUTOUTS.includes(cutoutId) &&
-      unconfiguredMods.some(m => m.moduleModel === FLEX_STACKER_MODULE_V1)
-    ) {
-      const unconfiguredFlexStackers: CutoutConfig[][] = []
-      unconfiguredMods
-        .filter(mod => mod.moduleModel === FLEX_STACKER_MODULE_V1)
-        .forEach(mod => {
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-          unconfiguredFlexStackers.push([
-            {
-              cutoutId,
-              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-              opentronsModuleSerialNumber: mod.serialNumber,
-            },
-          ])
-        })
-      availableOptions = [...availableOptions, ...unconfiguredFlexStackers]
-    }
-  } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
-      {
-        cutoutId,
-        cutoutFixtureId: fixture,
-      },
-    ])
-  }
+  const availableOptions = getOptions(
+    cutoutId,
+    providedFixtureOptions,
+    unconfiguredMods,
+    optionStage,
+    addressableAreaId,
+    deckDef
+  )
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
@@ -327,7 +131,7 @@ export function AddFixtureModal({
           <FixtureOption
             key="fixturesOption"
             optionName="Fixtures"
-            buttonText={t('select_options')}
+            buttonText={t('add')}
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
@@ -337,7 +141,7 @@ export function AddFixtureModal({
         <FixtureOption
           key="modulesOption"
           optionName="Modules"
-          buttonText={t('select_options')}
+          buttonText={t('add')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}
@@ -345,35 +149,75 @@ export function AddFixtureModal({
         />
       </>
     )
-  } else if (
-    optionStage === 'fixtureOptions' &&
-    cutoutId === WASTE_CHUTE_CUTOUT
-  ) {
-    nextStageOptions = (
-      <>
-        <FixtureOption
-          key="wasteChuteStageOption"
-          optionName="Waste chute"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('wasteChuteOptions')
-          }}
-          isOnDevice={isOnDevice}
-        />
-      </>
-    )
   }
 
-  const handleAddFixture = (addedCutoutConfigs: CutoutConfig[]): void => {
-    const newDeckConfig = deckConfig.map(fixture => {
-      const replacementCutoutConfig = addedCutoutConfigs.find(
-        c => c.cutoutId === fixture.cutoutId
-      )
-      return replacementCutoutConfig ?? fixture
-    })
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
+  const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
 
+  const handleAddFixture = (
+    addedCutoutConfigs: CutoutConfigMap[],
+    fixtureSerialNumber?: string
+  ): void => {
+    const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
+      addedCutoutConfigs,
+      deckConfigWithAA,
+      cutoutId
+    )
+    const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
+      return (
+        addedCutoutConfigsWithCombo.find(
+          c => c.cutoutId === fixture.cutoutId
+        ) ?? fixture
+      )
+    }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
+
+    if (fixtureSerialNumber) {
+      const module =
+        unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
+        null
+      if (module !== null) {
+        sendIdentifyStacker(module, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+      }
+    }
     updateDeckConfiguration(newDeckConfig)
     closeModal()
+  }
+
+  const stackerIdentifyHandler = (module: AttachedModule): void => {
+    // Identify the stacker module
+    sendIdentifyStacker(module, true, 'blue')
+    // Ensure that the module reverts after a set time
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
+  }
+
+  const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
+    const module =
+      unconfiguredMods.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+    if (identifyInUse === null && module !== null) {
+      stackerIdentifyHandler(module)
+    } else if (
+      identifyInUse !== fixtureSerialNumber &&
+      identifyInUse !== null
+    ) {
+      const previousModule =
+        unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
+      if (previousModule !== null && module !== null) {
+        sendIdentifyStacker(previousModule, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+        stackerIdentifyHandler(module)
+      }
+    }
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
@@ -385,20 +229,45 @@ export function AddFixtureModal({
         ? `${usbPort.port}.${usbPort.hubPort}`
         : usbPort?.port
 
-    return (
-      <FixtureOption
-        key={cutoutConfigs[0].cutoutFixtureId}
-        optionName={getFixtureDisplayName(
-          cutoutConfigs[0].cutoutFixtureId,
-          portDisplay
-        )}
-        buttonText={t('add')}
-        onClickHandler={() => {
-          handleAddFixture(cutoutConfigs)
-        }}
-        isOnDevice={isOnDevice}
-      />
-    )
+    const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
+    if (
+      fixtureSerialNumber !== undefined &&
+      cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)
+    ) {
+      return (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs, fixtureSerialNumber)
+          }}
+          secondaryButtonText={t('identify')}
+          secondaryOnClickHandler={() => {
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
+          isOnDevice={isOnDevice}
+        />
+      )
+    } else {
+      return (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs)
+          }}
+          isOnDevice={isOnDevice}
+        />
+      )
+    }
   })
 
   return (
@@ -411,25 +280,25 @@ export function AddFixtureModal({
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText as="p">
+            <StyledText oddStyle="bodyTextRegular">
               {t('add_fixture_description')}
-            </LegacyStyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            </StyledText>
+            <ListTable>
               {fixtureOptions}
               {nextStageOptions}
-            </Flex>
+            </ListTable>
           </Flex>
         </OddModal>
       ) : (
         <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <LegacyStyledText as="p">
+            <StyledText desktopStyle="bodyDefaultRegular">
               {t('add_fixture_description')}
-            </LegacyStyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            </StyledText>
+            <ListTable>
               {fixtureOptions}
               {nextStageOptions}
-            </Flex>
+            </ListTable>
           </Flex>
           {optionStage === 'wasteChuteOptions' ? (
             <Btn
@@ -441,9 +310,9 @@ export function AddFixtureModal({
               marginTop="1.44rem"
               marginBottom="0.56rem"
             >
-              <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+              <StyledText css={GO_BACK_BUTTON_STYLE}>
                 {t('shared:go_back')}
-              </LegacyStyledText>
+              </StyledText>
             </Btn>
           ) : null}
         </Modal>

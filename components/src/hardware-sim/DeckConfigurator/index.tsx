@@ -2,7 +2,7 @@ import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  replaceStagingFixtureAndTransformCutoutFixturesToAA,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
 } from '@opentrons/shared-data'
@@ -24,6 +24,7 @@ import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
 import type { ReactNode } from 'react'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
@@ -33,10 +34,14 @@ export * from './constants'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
-  handleClickAdd: (cutoutId: CutoutId) => void
+  handleClickAdd: (
+    cutoutId: CutoutId,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
   handleClickRemove: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   lightFill?: string
   darkFill?: string
@@ -63,9 +68,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const deckConfigWithAA = replaceStagingFixtureAndTransformCutoutFixturesToAA(
-    deckConfig,
-    deckDef
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
   )
 
   const stagingAreaItems = filterAAByAreaType(
@@ -146,7 +150,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
-            addressableArea={addressableAreaId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -155,7 +159,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <EmptyConfigItem
           data-testid={addressableAreaId}
           key={addressableAreaId}
-          addressableArea={addressableAreaId}
+          addressableAreaId={addressableAreaId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
@@ -188,6 +192,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          addressableAreaId={addressableAreaId}
           selected={cutoutId === selectedCutoutId}
         />
       ))}
@@ -204,6 +209,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -221,6 +227,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -238,6 +245,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
             hasStagingArea={
               cutoutFixtureId ===
@@ -260,6 +268,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
               }
               fixtureLocation={cutoutId}
               cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
               selected={
                 selectedCutoutId != null &&
                 THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
@@ -282,6 +291,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             }
             fixtureLocation={cutoutId}
             cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
             selected={cutoutId === selectedCutoutId}
           />
         )
@@ -304,7 +314,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
               'wasteChuteRightAdapterNoCover',
             ].includes(cutoutFixtureId)}
             selected={cutoutId === selectedCutoutId}
-            addressableArea={addressableAreaId}
+            addressableAreaId={addressableAreaId}
           />
         )
       )}

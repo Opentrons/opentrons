@@ -38,6 +38,9 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
+AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP = 2
+
+
 @dataclass
 class LiquidAndAirGapPair:
     """Pairing of a liquid and air gap in a tip, with air gap below the liquid in a tip."""
@@ -188,7 +191,6 @@ class TransferComponentsExecutor:
             )
             tx_utils.raise_if_location_inside_liquid(
                 location=submerge_start_location,
-                well_location=self._target_location,
                 well_core=self._target_well,
                 location_check_descriptors=LocationCheckDescriptors(
                     location_type="submerge start",
@@ -227,7 +229,9 @@ class TransferComponentsExecutor:
             and self._target_well is not None
         )
         aspirate_props = self._transfer_properties.aspirate
-        correction_volume = aspirate_props.correction_by_volume.get_for_volume(volume)
+        correction_volume = aspirate_props.correction_by_volume.get_for_volume(
+            self._instrument.get_current_volume() + volume
+        )
         self._instrument.aspirate(
             location=self._target_location,
             well_core=None,
@@ -250,7 +254,7 @@ class TransferComponentsExecutor:
     ) -> None:
         """Dispense according to dispense properties and wait if enabled."""
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
-            volume
+            self._instrument.get_current_volume() - volume
         )
         self._instrument.dispense(
             location=self._target_location,
@@ -335,18 +339,23 @@ class TransferComponentsExecutor:
             - Touch tip to the sides at the specified speed (tip moves back to the center as part of touch tip)
             - Return back to the retract position
         4. Air gap
-            - Air gap volume depends on the amount of liquid in the pipette
-            So if total aspirated volume is 20, use the value for airGapByVolume[20]
-            Flow rate = min(aspirateFlowRate, (airGapByVolume)/sec)
+            - If the retract location is at or above the safe location of
+              AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP, then add the air gap at the
+              retract location (where the pipette is already assumed to be).
+            - If the retract location is below the safe location, then move to
+              the safe location and then add the air gap.
+            - Air gap volume depends on the amount of liquid in the pipette.
+              So, if the total aspirated volume is 20, use the value for airGapByVolume[20]
+              Flow rate = max(aspirateFlowRate, (airGapByVolume)/sec)
             - Use post-aspirate delay
 
         Args:
             volume: dispense volume
             add_air_gap: whether to add an air gap before moving away from the current well.
                          This value is True for all retractions, except when retracting
-                         during a multi-dispense.
+                         during a multi-dispense. Value of add_air_gap during multi-dispense
+                         will depend on whether a conditioning volume is used.
         """
-        # TODO: Raise error if retract is below the meniscus
         assert (
             isinstance(self._target_location, Location)
             and self._target_well is not None
@@ -364,7 +373,6 @@ class TransferComponentsExecutor:
         )
         tx_utils.raise_if_location_inside_liquid(
             location=retract_location,
-            well_location=self._target_location,
             well_core=self._target_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -412,6 +420,29 @@ class TransferComponentsExecutor:
         else:
             volume_for_air_gap = volume
         if add_air_gap:
+            # If we need to add air gap, move to a safe location above the well if
+            # the retract location is not already at or above this safe location
+            if (
+                retract_location.point.z
+                < self._target_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z
+            ):
+                self._instrument.move_to(
+                    location=Location(
+                        point=Point(
+                            retract_location.point.x,
+                            retract_location.point.y,
+                            self._target_well.get_top(
+                                AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP
+                            ).z,
+                        ),
+                        labware=retract_location.labware,
+                    ),
+                    well_core=self._target_well,
+                    force_direct=True,
+                    minimum_z_height=None,
+                    # Full speed because the tip will already be out of the liquid
+                    speed=None,
+                )
             self._add_air_gap(
                 air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                     volume_for_air_gap
@@ -451,7 +482,6 @@ class TransferComponentsExecutor:
         If target location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
         even if it is enabled.
         """
-        # TODO: Raise error if retract is below the meniscus
         retract_props = self._transfer_properties.dispense.retract
 
         retract_location: Union[Location, TrashBin, WasteChute]
@@ -469,7 +499,6 @@ class TransferComponentsExecutor:
             )
             tx_utils.raise_if_location_inside_liquid(
                 location=retract_location,
-                well_location=self._target_location,
                 well_core=self._target_well,
                 location_check_descriptors=LocationCheckDescriptors(
                     location_type="retract end",
@@ -513,11 +542,9 @@ class TransferComponentsExecutor:
         # when leaving the dispense well. If this will be the final air gap, i.e,
         # we won't be moving to a Trash or a Source for Blowout after this air gap,
         # then skip the final air gap if we have been told to do so.
-        self._do_touch_tip_and_air_gap(
+        self._do_touch_tip_and_air_gap_after_dispense(
             touch_tip_properties=retract_props.touch_tip,
-            location=retract_location
-            if isinstance(retract_location, Location)
-            else None,
+            location=retract_location,
             well=self._target_well,
             add_air_gap=False if is_final_air_gap and not add_final_air_gap else True,
         )
@@ -529,7 +556,7 @@ class TransferComponentsExecutor:
             # TODO: no-op touch tip if touch tip is enabled and blowout is in trash/ reservoir/ any labware with touch-tip disabled
             assert blowout_props.flow_rate is not None
             self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
-            touch_tip_and_air_gap_location: Optional[Location]
+            touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
                 if source_location is None or source_well is None:
                     raise RuntimeError(
@@ -553,9 +580,7 @@ class TransferComponentsExecutor:
                     well_core=None,
                     in_place=False,
                 )
-                touch_tip_and_air_gap_location = (
-                    trash_location if isinstance(trash_location, Location) else None
-                )
+                touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
                     # We have already established that trash location of `Location` type
                     # has its `labware` as `Well` type.
@@ -570,7 +595,7 @@ class TransferComponentsExecutor:
             self._tip_state.delete_air_gap(last_air_gap)
             self._tip_state.ready_to_aspirate = False
             # Do touch tip and air gap again after blowing out into source well or trash
-            self._do_touch_tip_and_air_gap(
+            self._do_touch_tip_and_air_gap_after_dispense(
                 touch_tip_properties=retract_props.touch_tip,
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
@@ -602,7 +627,6 @@ class TransferComponentsExecutor:
         that it handles air gaps differently based on the disposal volume, conditioning volume
         and whether we are moving to another dispense or going back to the source.
         """
-        # TODO: Raise error if retract is below the meniscus
         assert (
             isinstance(self._target_location, Location)
             and self._target_well is not None
@@ -622,7 +646,6 @@ class TransferComponentsExecutor:
         )
         tx_utils.raise_if_location_inside_liquid(
             location=retract_location,
-            well_location=self._target_location,
             well_core=self._target_well,
             location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
@@ -697,7 +720,7 @@ class TransferComponentsExecutor:
         # Add an air gap depending on conditioning volume + whether this is
         # the last step of a multi-dispense sequence + whether this is the last step
         # of the entire liquid distribution.
-        self._do_touch_tip_and_air_gap(
+        self._do_touch_tip_and_air_gap_after_dispense(
             touch_tip_properties=retract_props.touch_tip,
             location=retract_location,
             well=self._target_well,
@@ -711,7 +734,7 @@ class TransferComponentsExecutor:
         ):
             assert blowout_props.flow_rate is not None
             self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
-            touch_tip_and_air_gap_location: Optional[Location]
+            touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
                 if source_location is None or source_well is None:
                     raise RuntimeError(
@@ -735,9 +758,7 @@ class TransferComponentsExecutor:
                     well_core=None,
                     in_place=False,
                 )
-                touch_tip_and_air_gap_location = (
-                    trash_location if isinstance(trash_location, Location) else None
-                )
+                touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
                     # We have already established that trash location of `Location` type
                     # has its `labware` as `Well` type.
@@ -751,7 +772,7 @@ class TransferComponentsExecutor:
             self._tip_state.ready_to_aspirate = False
 
             # Do touch tip and air gap again after blowing out into source well or trash
-            self._do_touch_tip_and_air_gap(
+            self._do_touch_tip_and_air_gap_after_dispense(
                 touch_tip_properties=retract_props.touch_tip,
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
@@ -763,14 +784,25 @@ class TransferComponentsExecutor:
                 ),
             )
 
-    def _do_touch_tip_and_air_gap(
+    def _do_touch_tip_and_air_gap_after_dispense(  # noqa: C901
         self,
         touch_tip_properties: TouchTipProperties,
-        location: Optional[Location],
+        location: Union[Location, TrashBin, WasteChute],
         well: Optional[WellCore],
         add_air_gap: bool,
     ) -> None:
-        """Perform touch tip and air gap as part of post-dispense retract."""
+        """Perform touch tip and air gap as part of post-dispense retract.
+
+        If the retract location is at or above the safe location of
+        AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP, then add the air gap at the retract location
+        (where the pipette is already assumed to be at).
+
+        If the retract location is below the safe location, then move to the safe location
+        and then add the air gap.
+
+        Note: if the plunger needs to be adjusted to prepare for aspirate, it will be done
+        at the same location where the air gap will be added.
+        """
         if touch_tip_properties.enabled:
             assert (
                 touch_tip_properties.speed is not None
@@ -780,7 +812,7 @@ class TransferComponentsExecutor:
             # TODO:, check that when blow out is a non-dest-well,
             #  whether the touch tip params from transfer props should be used for
             #  both dest-well touch tip and non-dest-well touch tip.
-            if well is not None and location is not None:
+            if isinstance(location, Location) and well is not None:
                 try:
                     self._instrument.touch_tip(
                         location=location,
@@ -803,25 +835,69 @@ class TransferComponentsExecutor:
                     # Full speed because the tip will already be out of the liquid
                     speed=None,
                 )
+        if add_air_gap or not self._tip_state.ready_to_aspirate:
+            # If we need to move the plunger up either to prepare for aspirate or to add air gap,
+            # move to a safe location above the well if the retract location is not already
+            # at or above this safe location
+            if isinstance(location, Location):
+                assert well is not None  # For mypy purposes only
+                if (
+                    location.point.z
+                    < well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z
+                ):
+                    self._instrument.move_to(
+                        location=Location(
+                            point=Point(
+                                location.point.x,
+                                location.point.y,
+                                well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP).z,
+                            ),
+                            labware=location.labware,
+                        ),
+                        well_core=well,
+                        force_direct=True,
+                        minimum_z_height=None,
+                        speed=None,
+                    )
+            else:
+                if (
+                    location.offset.z
+                    < location.top(
+                        x=0, y=0, z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP
+                    ).offset.z
+                ):
+                    self._instrument.move_to(
+                        location=location.top(
+                            x=location.offset.x,
+                            y=location.offset.y,
+                            z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP,
+                        ),
+                        well_core=None,
+                        force_direct=True,
+                        minimum_z_height=None,
+                        speed=None,
+                    )
 
-        # TODO: check if it is okay to just do `prepare_to_aspirate` unconditionally
-        if not self._tip_state.ready_to_aspirate:
-            self._instrument.prepare_to_aspirate()
-            self._tip_state.ready_to_aspirate = True
-        if add_air_gap:
-            self._add_air_gap(
-                air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
-                    0
+            if not self._tip_state.ready_to_aspirate:
+                self._instrument.prepare_to_aspirate()
+                self._tip_state.ready_to_aspirate = True
+            if add_air_gap:
+                self._add_air_gap(
+                    air_gap_volume=self._transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
+                        0
+                    )
                 )
-            )
 
-    def _add_air_gap(self, air_gap_volume: float) -> None:
+    def _add_air_gap(
+        self,
+        air_gap_volume: float,
+    ) -> None:
         """Add an air gap."""
         if air_gap_volume == 0:
             return
         aspirate_props = self._transfer_properties.aspirate
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
-            air_gap_volume
+            self._instrument.get_current_volume() + air_gap_volume
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(
