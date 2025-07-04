@@ -3,7 +3,11 @@
 @import './styles/legacy-colors.module.css';
 @import './styles/legacy-typography.module.css';
 @import './styles/legacy-borders.module.css';
+
+@import './styles/borders.module.css';
+@import './styles/colors.module.css';
 @import './styles/spacing.module.css';
+@import './styles/typography.module.css';
 
 :global(*) {
   box-sizing: border-box;
