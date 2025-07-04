@@ -1,4 +1,4 @@
-import isIp from 'is-ip'
+import isIp = require('is-ip')
 import unionBy from 'lodash/unionBy'
 import { createSelector } from 'reselect'
 

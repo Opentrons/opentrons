@@ -19,7 +19,6 @@ export default defineConfig(
         commonjsOptions: {
           transformMixedEsModules: true,
           esmExternals: true,
-          exclude: [/node_modules/],
         },
         lib: {
           entry: {
@@ -28,6 +27,25 @@ export default defineConfig(
           },
 
           formats: ['cjs'],
+        },
+        rollupOptions: {
+          external: [
+            'electron',
+            /^node:/,
+            // Externalize problematic CommonJS modules
+            'mdns-js',
+            'is-ip',
+            'redux',
+            'reselect',
+            'lodash',
+            'lodash/unionBy',
+            'escape-string-regexp',
+            'stable',
+            'to-regex',
+          ],
+          output: {
+            format: 'cjs',
+          },
         },
       },
       optimizeDeps: {
