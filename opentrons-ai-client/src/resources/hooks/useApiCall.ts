@@ -2,8 +2,9 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAtom } from 'jotai'
 
-import type { AxiosRequestConfig } from 'axios'
 import { featureFlagsAtom } from '../atoms'
+
+import type { AxiosRequestConfig } from 'axios'
 
 interface UseApiCallResult<T> {
   data: T | null
