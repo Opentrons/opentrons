@@ -239,6 +239,19 @@ async def _test_direction(
     return aligned
 
 
+async def _move_plunger_as_cycle_settings() -> None:
+    await _home_plunger(api, mount)
+    plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top, _, bottom, _ = plunger_poses
+    for direction in ["down", "up"]:
+        # move the plunger
+        _plunger_target = {"down": bottom, "up": top + 1.0}[direction]
+        try:
+            await _move_plunger(api, mount, _plunger_target, CYCLING_SPEED, CYCLING_CURRENT, TEST_ACCELERATION)
+        except StallOrCollisionDetectedError as e:
+            print(e)
+            await _home_plunger(api, mount)
+
 async def _test_plunger(
     api: OT3API,
     mount: types.OT3Mount,
@@ -446,8 +459,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     continue_after_stall=continue_after_stall
                 )
 
-                await _home_plunger(api, mount)
-                await asyncio.sleep(0.5)
+                await _move_plunger_as_cycle_settings()
 
                 failed_cycles = await _cycle_plunger(
                     api, mount,
