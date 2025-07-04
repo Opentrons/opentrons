@@ -225,7 +225,6 @@ describe('Delay', () => {
         ...props.state,
         delayAspirate: {
           delayDuration: 15,
-          positionFromBottom: 55,
         },
       },
     }
@@ -263,7 +262,6 @@ describe('Delay', () => {
         ...props.state,
         delayDispense: {
           delayDuration: 20,
-          positionFromBottom: 84,
         },
       },
     }
