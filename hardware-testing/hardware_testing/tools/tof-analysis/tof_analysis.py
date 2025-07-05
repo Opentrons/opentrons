@@ -311,15 +311,80 @@ def test_baseline(baseline, df_path):
 
 
 def plot_baseline(args: argparse.Namespace) -> None:
-    """Plots the dataframe, baseline, or both in the same graph."""
+    """Plots the baseline."""
     axis_list = args.axis
     platform_list_x = args.platform_x
     platform_list_z = args.platform_z
+    figures: Dict[str, None | go.Figure] = {"x": None, "z": None}
+
+    axis_list = args.axis
+    stacker_list = args.stackers or []
+    labware_list = (
+        []
+        if "all" in args.labwares
+        else args.labwares
+        if args.labwares
+        else ["baseline"]
+    )
+    baseline_version = args.baseline_version
+    platform_list_x = args.platform_x
+    platform_list_z = args.platform_z
+    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
+    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
+    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
+    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
+    bin_count = len(bins_list)
+
+    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    if args.dataframe:
+        if not os.path.exists(args.dataframe):
+            sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
+
+        # Gather data
+        samples = 0
+        chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
+        for df in chunks:
+
+            # Filter out data
+            if axis_list:
+                df = df[df["Axis"].isin(axis_list)]
+            if stacker_list:
+                df = df[df["Stacker_SN"].isin(stacker_list)]
+            if labware_list:
+                df = df[df["Labware_Name"].isin(labware_list)]
+            for row in df.itertuples(index=False, name="data"):
+                axis = row.Axis
+                zone = row.Zone
+                platform = row.Platform_Position
+                stacker = row.Stacker_SN
+                labware = row.Labware_Name
+
+                ## Filter out specific rows
+                if axis == "x":
+                    if platform_list_x and platform not in platform_list_x:
+                        continue
+                    if zone_list_x and zone not in zone_list_x:
+                        continue
+                if axis == "z":
+                    if platform_list_z and platform not in platform_list_z:
+                        continue
+                    if zone_list_z and zone not in zone_list_z:
+                        continue
+
+                # Get the bins
+                axis = axis.upper()
+                start_index = df.columns.get_loc("Time") + 1
+                bins = list(row[start_index : start_index + bin_count])
+                measurements[axis][platform][zone].append({stacker: bins})
+                samples += 1
+
+            if samples > max_samples:
+                break
 
     # Create visibility masks
-    def get_visibility_mask(active_platform, total_traces):
+    def get_visibility_mask(trace_visibility_data, active_platform, total_traces):
         mask = [False] * total_traces
-        for i in trace_visibility[active_platform]:
+        for i in trace_visibility_data[active_platform]:
             mask[i] = True
         return mask
 
@@ -338,7 +403,8 @@ def plot_baseline(args: argparse.Namespace) -> None:
                 fig = go.Figure()
                 if axis.lower() not in axis_list:
                     continue
-                trace_visibility = {"extend": [], "retract": []}
+                trace_visibility_stackers = {"extend": [], "retract": []}
+                trace_visibility_baseline = {"extend": [], "retract": []}
                 for platform, baseline_str in data.items():
                     if axis == "X" and platform not in platform_list_x:
                         continue
@@ -348,6 +414,8 @@ def plot_baseline(args: argparse.Namespace) -> None:
                     print(
                         f"Plotting baseline V{baseline_version} for {axis} axis {platform}."
                     )
+
+                    # plot baselines
                     baseline = literal_eval(baseline_str)
                     for zone, bin in baseline.items():
                         bins, photons = zip(*enumerate(bin))
@@ -356,162 +424,186 @@ def plot_baseline(args: argparse.Namespace) -> None:
                                 x=bins,
                                 y=photons,
                                 mode="lines",
-                                name=f"Zone {zone}",
+                                name=f"Baseline Zone {zone}",
                                 visible=platform == "extend",
+                                line=dict(dash="dash", color="blue", width=2),
                             )
                         )
-                        trace_visibility[platform].append(len(fig.data) - 1)  # type: ignore
+                        trace_visibility_baseline[platform].append(len(fig.data) - 1)  # type: ignore
+                        trace_visibility_stackers[platform].append(len(fig.data) - 1)  # type: ignore
+
+                    # plot measurements
+                    if measurements:
+                        zones = measurements[axis][platform]
+                        for zone, meas_data in zones.items():
+                            for reading in meas_data:
+                                for stacker, bins in reading.items():
+                                    bin, photons = zip(*enumerate(bins))
+                                    fig.add_trace(
+                                        go.Scatter(
+                                            x=bin,
+                                            y=photons,
+                                            mode="lines",
+                                            name=f"Zone {zone}",
+                                            line=dict(width=0.3),
+                                            legendgroup=stacker,
+                                            legendgrouptitle=dict(text=stacker),
+                                            visible=platform == "extend",
+                                        )
+                                    )
+                                    trace_visibility_stackers[platform].append(len(fig.data) - 1)  # type: ignore
 
                 # Customize layout
                 total_traces = len(fig.data)  # type: ignore
-                retract = get_visibility_mask("retract", total_traces)
-                extend = get_visibility_mask("extend", total_traces)
+                buttons = [
+                    dict(
+                        label=label,
+                        method="update",
+                        args=[
+                            {
+                                "visible": get_visibility_mask(
+                                    trace_visibility_stackers, label, total_traces
+                                )
+                            },
+                            {},
+                        ],
+                    )
+                    for label, visibility in trace_visibility_stackers.items()
+                ]
                 fig.update_layout(
-                    title=f"TOF Sensor Baseline: {axis}",
+                    title=f"TOF Sensor Baseline: {labware_list} {axis}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
-                    legend_title="Zones",
                     template="plotly_white",
                     updatemenus=[
                         dict(
                             type="buttons",
                             direction="down",
                             showactive=True,
-                            buttons=[
-                                dict(
-                                    label="extend",
-                                    method="update",
-                                    args=[{"visible": extend}, {}],
-                                ),
-                                dict(
-                                    label="retract",
-                                    method="update",
-                                    args=[{"visible": retract}, {}],
-                                ),
-                            ],
+                            buttons=buttons,
                         )
                     ],
                 )
-                fig.show()
+                figures[axis] = fig
+                if show:
+                    fig.show()
 
-    return
+    #if plot_choice.lower() == "labware data":
+    #    file_csv = input("Path to labware csv: ")
+    #    axis = input("Which axis? z or x?: ")
+    #    try:
+    #        file_df = pd.read_csv(file_csv)
+    #    except:
+    #        print("Cannot read file")
 
-    if plot_choice.lower() == "labware data":
-        file_csv = input("Path to labware csv: ")
-        axis = input("Which axis? z or x?: ")
-        try:
-            file_df = pd.read_csv(file_csv)
-        except:
-            print("Cannot read file")
+    #    if axis == "z":
+    #        baseline_file = baseline_z
+    #        zone = "1"
+    #    elif axis == "x":
+    #        baseline_file = baseline_x
+    #        zone = "6"
+    #    try:
+    #        bfile = open(baseline_file)
+    #    except:
+    #        print("Could not find baseline")
+    #    baseline_dict = json.load(bfile)
+    #    bfile.close()
+    #    lab_data = process_data(file_df)
 
-        if axis == "z":
-            baseline_file = baseline_z
-            zone = "1"
-        elif axis == "x":
-            baseline_file = baseline_x
-            zone = "6"
-        try:
-            bfile = open(baseline_file)
-        except:
-            print("Could not find baseline")
-        baseline_dict = json.load(bfile)
-        bfile.close()
-        lab_data = process_data(file_df)
+    #    bins = [x for x in range(1, 129)]
+    #    fig = go.Figure()
+    #    zone_data = baseline_dict[zone]
+    #    fig.add_trace(
+    #        go.Scatter(
+    #            x=bins,
+    #            y=zone_data,
+    #            mode="lines",
+    #            name=f"Baseline {axis}",
+    #            line=dict(dash="dash"),
+    #        )
+    #    )
 
-        bins = [x for x in range(1, 129)]
-        fig = go.Figure()
-        zone_data = baseline_dict[zone]
-        fig.add_trace(
-            go.Scatter(
-                x=bins,
-                y=zone_data,
-                mode="lines",
-                name=f"Baseline {axis}",
-                line=dict(dash="dash"),
-            )
-        )
+    #    zone_data = lab_data[zone]
+    #    fig.add_trace(go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Labware"))
 
-        zone_data = lab_data[zone]
-        fig.add_trace(go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Labware"))
+    #    fig.update_layout(
+    #        title=f"Labware with Baseline",
+    #        xaxis_title="Bins",
+    #        yaxis_title="Photon Count",
+    #        legend_title="Zones",
+    #        template="plotly_white",
+    #    )
+    #    fig.show()
 
-        fig.update_layout(
-            title=f"Labware with Baseline",
-            xaxis_title="Bins",
-            yaxis_title="Photon Count",
-            legend_title="Zones",
-            template="plotly_white",
-        )
-        fig.show()
+    #elif plot_choice.lower() == "labware comparison":
+    #    labwares_files = [
+    #        baseline_labware.format(axis="x"),
+    #        baseline_labware.format(axis="z"),
+    #    ]
+    #    bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
+    #    for labware_data in labwares_files:
+    #        try:
+    #            file = open(labware_data, "r")
+    #        except:
+    #            raise
 
-    elif plot_choice.lower() == "labware comparison":
-        labwares_files = [
-            baseline_labware.format(axis="x"),
-            baseline_labware.format(axis="z"),
-        ]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for labware_data in labwares_files:
-            try:
-                file = open(labware_data, "r")
-            except:
-                raise
+    #        labwares_dict = json.load(file)
+    #        if "x" in labware_data.split("_")[-1]:
+    #            zone = "6"
+    #        elif "z" in labware_data.split("_")[-1]:
+    #            zone = "1"
 
-            labwares_dict = json.load(file)
-            if "x" in labware_data.split("_")[-1]:
-                zone = "6"
-            elif "z" in labware_data.split("_")[-1]:
-                zone = "1"
+    #        # Create line traces for each zone
+    #        fig = go.Figure()
 
-            # Create line traces for each zone
-            fig = go.Figure()
+    #        for labware in labwares_dict:
+    #            y_data = labwares_dict[labware][zone]
+    #            fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=labware))
 
-            for labware in labwares_dict:
-                y_data = labwares_dict[labware][zone]
-                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=labware))
+    #        # Customize layout
+    #        fig.update_layout(
+    #            title=f"TOF Labware Comparison: {labware_data}",
+    #            xaxis_title="Bins",
+    #            yaxis_title="Photon Count",
+    #            legend_title=f"Zone: {zone}",
+    #            template="plotly_white",
+    #        )
+    #        fig.show()
 
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Labware Comparison: {labware_data}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title=f"Zone: {zone}",
-                template="plotly_white",
-            )
-            fig.show()
+    #elif plot_choice.lower() == "stacker comparison":
+    #    stackers_files = [
+    #        baseline_stacker.format(axis="x"),
+    #        baseline_stacker.format(axis="z"),
+    #    ]
+    #    bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
+    #    for stacker_data in stackers_files:
+    #        try:
+    #            file = open(stacker_data, "r")
+    #        except:
+    #            raise
 
-    elif plot_choice.lower() == "stacker comparison":
-        stackers_files = [
-            baseline_stacker.format(axis="x"),
-            baseline_stacker.format(axis="z"),
-        ]
-        bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-        for stacker_data in stackers_files:
-            try:
-                file = open(stacker_data, "r")
-            except:
-                raise
+    #        stackers_dict = json.load(file)
+    #        if "x" in stacker_data.split("_")[-1]:
+    #            zone = "6"
+    #        elif "z" in stacker_data.split("_")[-1]:
+    #            zone = "1"
 
-            stackers_dict = json.load(file)
-            if "x" in stacker_data.split("_")[-1]:
-                zone = "6"
-            elif "z" in stacker_data.split("_")[-1]:
-                zone = "1"
+    #        # Create line traces for each zone
+    #        fig = go.Figure()
 
-            # Create line traces for each zone
-            fig = go.Figure()
+    #        for stacker in stackers_dict:
+    #            y_data = stackers_dict[stacker][zone]
+    #            fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=stacker))
 
-            for stacker in stackers_dict:
-                y_data = stackers_dict[stacker][zone]
-                fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=stacker))
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Stacker Comparison: {stacker_data}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title=f"Zone: {zone}",
-                template="plotly_white",
-            )
-            fig.show()
+    #        # Customize layout
+    #        fig.update_layout(
+    #            title=f"TOF Stacker Comparison: {stacker_data}",
+    #            xaxis_title="Bins",
+    #            yaxis_title="Photon Count",
+    #            legend_title=f"Zone: {zone}",
+    #            template="plotly_white",
+    #        )
+    #        fig.show()
 
 
 def generate_baseline(args: argparse.Namespace) -> None:
@@ -785,8 +877,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-l",
         "--labwares",
-        help="The list of labware to use, uses 'baseline' by default.",
-        default=["baseline"],
+        help="The list of labware to use, set to 'all' for all labware. Uses 'baseline' by default.",
+        default=[],
         nargs="+",
     )
     parser.add_argument(
