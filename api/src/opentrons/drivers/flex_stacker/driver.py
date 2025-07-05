@@ -25,12 +25,10 @@ from .types import (
     StackerInfo,
     HardwareRevision,
     MoveParams,
-    AxisParams,
     LimitSwitchStatus,
     LEDColor,
     StallGuardParams,
     TOFConfiguration,
-    TOFDetection,
     TOFMeasurement,
     TOFMeasurementFrame,
     TOFMeasurementResult,
@@ -49,6 +47,7 @@ FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 5
 FS_MOVE_TIMEOUT = 20
 FS_TOF_TIMEOUT = 20
+FS_TOF_FRAME_RETRIES = 1
 FS_TOF_INIT_TIMEOUT = 5
 FS_ACK = "OK\n"
 FS_ERROR_KEYWORD = "err"
@@ -60,109 +59,6 @@ GCODE_ROUNDING_PRECISION = 2
 MIN_DURATION_MS = 25  # 25ms
 MAX_DURATION_MS = 10000  # 10s
 MAX_REPS = 10
-
-# TOF Sensor
-TOF_FRAME_RETRIES = 1
-TOF_DETECTION_CONFIG = {
-    TOFSensor.X: {
-        Direction.EXTEND: TOFDetection(
-            TOFSensor.X,
-            zones=[5, 6, 7],
-            bins=list(range(25, 40)),
-            threshold=1000,
-        ),
-        Direction.RETRACT: TOFDetection(
-            TOFSensor.X,
-            zones=[5, 6, 7],
-            bins=list(range(17, 30)),
-            threshold=1000,
-        ),
-    },
-    TOFSensor.Z: {
-        Direction.EXTEND: TOFDetection(
-            TOFSensor.Z,
-            zones=[1, 2, 3],
-            bins=list(range(15, 60)),
-            threshold=1000,
-        ),
-        Direction.RETRACT: TOFDetection(
-            TOFSensor.Z,
-            zones=[1, 2, 3],
-            bins=list(range(15, 65)),
-            threshold=1000,
-        ),
-    },
-}
-
-
-# Stallguard defaults
-STALLGUARD_CONFIG = {
-    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
-}
-
-STACKER_MOTION_CONFIG = {
-    StackerAxis.X: {
-        "home": AxisParams(
-            run_current=1.5,  # mAmps
-            hold_current=0.75,
-            move_params=MoveParams(
-                max_speed=10.0,  # mm/s
-                acceleration=100.0,  # mm/s^2
-                max_speed_discont=40.0,  # mm/s
-            ),
-        ),
-        "move": AxisParams(
-            run_current=1.2,
-            hold_current=0.75,
-            move_params=MoveParams(
-                max_speed=200.0,
-                acceleration=1500.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-    },
-    StackerAxis.Z: {
-        "home": AxisParams(
-            run_current=1.5,
-            hold_current=1.5,
-            move_params=MoveParams(
-                max_speed=10.0,
-                acceleration=100.0,
-                max_speed_discont=25.0,
-            ),
-        ),
-        "move": AxisParams(
-            run_current=1.5,
-            hold_current=1.5,
-            move_params=MoveParams(
-                max_speed=150.0,
-                acceleration=500.0,
-                max_speed_discont=25.0,
-            ),
-        ),
-    },
-    StackerAxis.L: {
-        "home": AxisParams(
-            run_current=1.2,
-            hold_current=0.5,
-            move_params=MoveParams(
-                max_speed=100.0,
-                acceleration=800.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-        "move": AxisParams(
-            run_current=1.2,
-            hold_current=0.5,
-            move_params=MoveParams(
-                max_speed=100.0,
-                acceleration=800.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-    },
-}
 
 
 class FlexStackerDriver(AbstractFlexStackerDriver):
@@ -565,7 +461,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         data_len = 0
         next_frame_id = 0
         resend = False
-        retries = TOF_FRAME_RETRIES
+        retries = FS_TOF_FRAME_RETRIES
 
         # Cancel any ongoing measurements
         status = await self.get_tof_sensor_status(sensor)
@@ -590,7 +486,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
                 assert (
                     not data_len > start.total_bytes
                 ), f"Invalid number of bytes, expected {start.total_bytes} got {data_len}."
-                retries = TOF_FRAME_RETRIES
+                retries = FS_TOF_FRAME_RETRIES
                 next_frame_id += 1
                 resend = False
             except (ValueError, NoResponse):

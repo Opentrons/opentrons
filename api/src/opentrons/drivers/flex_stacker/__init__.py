@@ -1,5 +1,5 @@
 from .abstract import AbstractFlexStackerDriver
-from .driver import FlexStackerDriver, STACKER_MOTION_CONFIG, STALLGUARD_CONFIG
+from .driver import FlexStackerDriver
 from .simulator import SimulatingDriver
 from . import types as FlexStackerTypes
 from . import utils as FlexStackerUtils
@@ -10,6 +10,4 @@ __all__ = [
     "SimulatingDriver",
     "FlexStackerTypes",
     "FlexStackerUtils",
-    "STACKER_MOTION_CONFIG",
-    "STALLGUARD_CONFIG",
 ]

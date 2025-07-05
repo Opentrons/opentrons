@@ -2,9 +2,6 @@ import asyncio
 import pytest
 import mock
 from typing import AsyncGenerator
-from opentrons.drivers.flex_stacker.driver import (
-    STACKER_MOTION_CONFIG,
-)
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -22,6 +19,7 @@ from opentrons.hardware_control.modules.flex_stacker import (
     HOME_OFFSET_SM,
     PLATFORM_OFFSET,
     SIMULATING_POLL_PERIOD,
+    STACKER_MOTION_CONFIG,
     FlexStackerReader,
 )
 from opentrons.hardware_control.modules.types import PlatformState
