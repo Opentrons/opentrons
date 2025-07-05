@@ -221,5 +221,23 @@ module.exports = {
         'opentrons/no-margins-inline': 'warn',
       },
     },
+    {
+      files: ['**/*.tsx'],
+      excludedFiles: ['**/*.stories.tsx'],
+      rules: {
+        'react/forbid-dom-props': [
+          'warn',
+          {
+            forbid: [
+              {
+                propName: 'style',
+                message:
+                  'Inline styles are not allowed. Use CSS modules instead.',
+              },
+            ],
+          },
+        ],
+      },
+    },
   ],
 }
