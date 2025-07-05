@@ -6,17 +6,19 @@ Usage:
 
 """
 
-import argparse
-from collections import defaultdict
-from enum import Enum
-import json
-import sys
-from typing import Dict, List, Optional
-import pandas as pd
-import statistics
 import os
+import sys
+import argparse
 import traceback
 import plotly.graph_objects as go
+import pandas as pd
+import statistics
+import json
+
+from ast import literal_eval
+from collections import defaultdict
+from enum import Enum
+from typing import Dict, List, Optional
 
 
 global baseline_x, baseline_y
@@ -54,6 +56,15 @@ class Baseline(Enum):
     AXIS = "axis"
 
 
+def get_deviation(deviations: List[int], axis: str, platform: str) -> int:
+    index_map = {
+        ("X", "extend"): 0,
+        ("X", "retract"): 1,
+        ("Z", "extend"): 2,
+        ("Z", "retract"): 3,
+    }
+    return deviations[index_map.get((axis, platform), 0)]
+
 def create_baseline(
     histograms: Dict[int, List[List[int]]],
     zone_count: int = NUMBER_OF_ZONES,
@@ -71,6 +82,7 @@ def create_baseline(
     @param std: the standard deviation to use when calculating baseline, defaults to 6.
     @return: The baseline measurement.
     """
+    assert(deviation >= 0), f"Standard deviation cannot be negative, provided: {deviation}."
     baseline = defaultdict(list)
     if histograms:
         aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
@@ -130,7 +142,6 @@ def process_data(data_df):
                 mean = sum(list_vals) / len(list_vals)
                 bin_averages.append(mean)
         return_zones[zone] = bin_averages
-        # print(f'RETURN: {return_zones}')
     return return_zones
 
 
@@ -298,16 +309,15 @@ def test_baseline(baseline, df_path):
 
 def plot_baseline(args: argparse.Namespace) -> None:
     """Plots the dataframe, baseline, or both in the same graph."""
-    if len(args.axis) != 1:
-        sys.exit(f"ERROR: You can only plot one axis, provided: {args.axis}")
-    axis = StackerAxis(args.axis[0] or StackerAxis.X.name)
-    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
-    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
-    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
-    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
-    zone_count_x = len(zone_list_x)
-    zone_count_z = len(zone_list_z)
-    bin_count = len(bins_list)
+    axis_list = args.axis
+    platform_list_x = args.platform_x
+    platform_list_z = args.platform_z
+    # Create visibility masks
+    def get_visibility_mask(active_platform, total_traces):
+        mask = [False] * total_traces
+        for i in trace_visibility[active_platform]:
+            mask[i] = True
+        return mask
 
     baseline_list = args.baseline
     for baseline_path in baseline_list:
@@ -318,27 +328,54 @@ def plot_baseline(args: argparse.Namespace) -> None:
             definition = json.load(file)
             baseline = definition["uniqueModuleData"]["TOFSensorBaseline"]
             baseline_version = baseline.pop("version", 1)
-            print(f"Plotting baseline V{baseline_version}")
+            # Trace each zone
+            for axis, data in baseline.items():
+                fig = go.Figure()
+                if axis.lower() not in axis_list:
+                    continue
+                trace_visibility = {"extend": [], "retract": []}
+                for platform, baseline_str in data.items():
+                    if axis == 'X' and platform not in platform_list_x:
+                        continue
+                    if axis == 'Z' and platform not in platform_list_z:
+                        continue
 
-            # Create line traces for each zone
-            fig = go.Figure()
-            for zone, bins in baseline.items():
-                print(zone, bins)
-                return
-                zone_data = baseline_dict[zone]
-                fig.add_trace(
-                    go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Zone {zone}")
+                    print(f"Plotting baseline V{baseline_version} for {axis} axis {platform}.")
+                    baseline = literal_eval(baseline_str)
+                    for zone, bin in baseline.items():
+                        bins, photons = zip(*enumerate(bin))
+                        fig.add_trace(
+                            go.Scatter(x=bins, y=photons, mode="lines", name=f"Zone {zone}", visible=platform == "extend")
+                        )
+                        trace_visibility[platform].append(len(fig.data) - 1)
+
+                # Customize layout
+                total_traces = len(fig.data)
+                retract = get_visibility_mask("retract", total_traces)
+                extend =  get_visibility_mask("extend", total_traces)
+                fig.update_layout(
+                    title=f"TOF Sensor Baseline: {axis}",
+                    xaxis_title="Bins",
+                    yaxis_title="Photon Count",
+                    legend_title="Zones",
+                    template="plotly_white",
+                    updatemenus=[
+                    dict(
+                        type="buttons",
+                        direction="down",
+                        showactive=True,
+                        buttons=[
+                            dict(label="extend",
+                                 method="update",
+                                 args=[{"visible": extend}, {}]),
+                            dict(label="retract",
+                                 method="update",
+                                 args=[{"visible": retract}, {}])
+                        ]
+                    )
+                ]
                 )
-
-            # Customize layout
-            fig.update_layout(
-                title=f"TOF Sensor Baseline: {baseline}",
-                xaxis_title="Bins",
-                yaxis_title="Photon Count",
-                legend_title="Zones",
-                template="plotly_white",
-            )
-            fig.show()
+                fig.show()
 
     return
 
@@ -504,28 +541,36 @@ def generate_baseline(args: argparse.Namespace) -> None:
     stacker_list = args.stackers
     labware_list = args.labwares
     baseline_version = args.baseline_version
+    platform_list_x = args.platform_x
+    platform_list_z = args.platform_z
     zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
     zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
     bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
     max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
-    deviation = args.std or DEFAULT_STD
+    deviations = args.std or [DEFAULT_STD]*4
     zone_count_x = len(zone_list_x)
     zone_count_z = len(zone_list_z)
     bin_count = len(bins_list)
 
+    if len(deviations) > 4:
+        sys.exit(f"ERROR: --std cannot be greater than 4, provided {deviations}.")
+
     print(
-        f"\nGenerating baseline: LW={labware_list}, STD={deviation}, ZonesZ={zone_list_z}, ZonesX={zone_list_x}, Bins={bins_list}\n"
+        f"\nGenerating baseline: LW={labware_list}, STD={deviations},"
+        f" PlatX={platform_list_x}, PlatZ={platform_list_z} ZonesZ={zone_list_z},"
+        f" ZonesX={zone_list_x}, Bins={bins_list}\n"
     )
     # Gather data
     samples = 0
-    data = defaultdict(lambda: defaultdict(list))
+    data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
     for df in chunks:
         for row in df.itertuples(index=False, name="data"):
+            axis = row.Axis
             zone = row.Zone
             labware = row.Labware_Name
             stacker = row.Stacker_SN
-            axis = row.Axis
+            platform = row.Platform_Position
 
             # Filter out rows based on parameters
             if stacker_list and stacker not in stacker_list:
@@ -534,24 +579,37 @@ def generate_baseline(args: argparse.Namespace) -> None:
                 continue
             if axis_list and axis not in axis_list:
                 continue
-            if axis == 'x' and zone_list_x and zone not in zone_list_x:
-                continue
-            if axis == 'z' and zone_list_z and zone not in zone_list_z:
-                continue
+            if axis == 'x':
+                if platform_list_x and platform not in platform_list_x:
+                    continue
+                if zone_list_x and zone not in zone_list_x:
+                    continue
+            if axis == 'z':
+                if platform_list_z and platform not in platform_list_z:
+                    continue
+                if zone_list_z and zone not in zone_list_z:
+                    continue
 
             # Get the bins
+            axis = axis.upper()
             start_index = df.columns.get_loc("Time") + 1
             bins = list(row[start_index : start_index + bin_count])
-            data[axis][zone].append(bins)
+            data[axis][platform][zone].append(bins)
             samples += 1
 
         if samples > max_samples:
             break
 
     # Create a baseline for each axis
-    baseline_x = create_baseline(dict(data["x"]), zone_count_x, bin_count, deviation)
-    baseline_z = create_baseline(dict(data["z"]), zone_count_z, bin_count, deviation)
-    if not baseline_x and not baseline_z:
+    baselines = defaultdict(dict)
+    for axis, platform_data in data.items():
+        zone_count = zone_count_x if axis == 'X' else zone_count_z
+        for platform_pos, histograms in platform_data.items():
+            deviation = get_deviation(deviations, axis, platform_pos)
+            baseline = create_baseline(histograms, zone_count, bin_count, deviation)
+            baselines[axis][platform_pos] = baseline
+
+    if not baselines:
         sys.exit(f"ERROR: Error generating baselines.")
 
     # print or save to json file
@@ -567,36 +625,40 @@ def generate_baseline(args: argparse.Namespace) -> None:
             definition = json.load(file)
             unique_module_data = definition.get("uniqueModuleData", {})
             tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
-            baseline_version = baseline_version or tof_sensor_baseline.get("version", 1)
-            x_baseline = baseline_x or tof_sensor_baseline.get("X", "{}")
-            z_baseline = baseline_z or tof_sensor_baseline.get("Z", "{}")
-
-            definition.update(
-                {
-                    "uniqueModuleData": {
-                        "TOFSensorBaseline": {
-                            "version": baseline_version,
-                            "X": str(x_baseline),
-                            "Z": str(z_baseline),
-                        }
-                    }
+            # Convert old format to V1
+            if tof_sensor_baseline.get("version") is None:
+                x_baseline = tof_sensor_baseline.get("X", "{}")
+                z_baseline = tof_sensor_baseline.get("Z", "{}")
+                tof_sensor_baseline = {
+                    "version": 1,
+                    "X": {"extend": x_baseline, "retract": x_baseline},
+                    "Z": {"extend": z_baseline, "retract": z_baseline}
                 }
-            )
+
+            # Update baselines
+            baseline_version = baseline_version or tof_sensor_baseline['version']
+            for axis, data in baselines.items():
+                for platform, baseline in data.items():
+                    tof_sensor_baseline[axis][platform] = str(baseline)
+            definition.update({
+                "uniqueModuleData": {"TOFSensorBaseline": tof_sensor_baseline}
+            })
+
             # Save to json file
             file.seek(0)
             json.dump(definition, file, indent=2)
+            file.truncate()
 
     print(f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {samples} Samples ---------------\n")
     print(
         "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
     )
 
-    if baseline_x:
-        print("Baseline X:\n")
-        print(baseline_x, "\n")
-    if baseline_z:
-        print("Baseline Z:\n")
-        print(baseline_z, "\n")
+    for axis, data in baselines.items():
+        for platform, baseline in data.items():
+            deviation = get_deviation(deviations, axis, platform)
+            print(f"Baseline {axis} {platform} std={deviation}:\n")
+            print(baseline, "\n")
 
 
 def validate_something(args: argparse.Namespace) -> None:
@@ -685,12 +747,6 @@ if __name__ == "__main__":
         type=int,
     )
     parser.add_argument(
-        "--std",
-        help="Standard devition to use when creating a baseline.",
-        type=int,
-        default=DEFAULT_STD,
-    )
-    parser.add_argument(
         "-o",
         "--output-file",
         help="The output file of the generated baseline, prints to stdout if ommited.",
@@ -719,6 +775,27 @@ if __name__ == "__main__":
         "--bins",
         help="The list of bins to use, uses 0-127 if ommited.",
         type=int,
+        nargs="+",
+    )
+    parser.add_argument(
+        "--platform-x",
+        help="The X platform position (extend, retract, or both)",
+        default=['extend', 'retract'],
+        nargs="+",
+    )
+    parser.add_argument(
+        "--platform-z",
+        help="The Z platform position (extend, retract, or both)",
+        default=['extend', 'retract'],
+        nargs="+",
+    )
+    parser.add_argument(
+        "--std",
+        help="Standard devition to use when creating a baseline."
+        "This can be up to 4 values whose index correspond to each axis-platform combo."
+        "X-Extend, X-Retract, Z-Extend, Z-Retract.",
+        type=int,
+        default=[DEFAULT_STD]*4,
         nargs="+",
     )
     parser.add_argument(

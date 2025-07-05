@@ -68,22 +68,28 @@ TOF_DETECTION_CONFIG = {
         Direction.EXTEND: TOFDetection(
             TOFSensor.X,
             zones=[5, 6, 7],
-            bins=list(range(10, 40)),
-            threshold=5000,
+            bins=list(range(25, 40)),
+            threshold=1000,
         ),
         Direction.RETRACT: TOFDetection(
             TOFSensor.X,
             zones=[5, 6, 7],
-            bins=list(range(10, 25)),
-            threshold=15000,
+            bins=list(range(17, 30)),
+            threshold=1000,
         ),
     },
     TOFSensor.Z: {
         Direction.EXTEND: TOFDetection(
             TOFSensor.Z,
             zones=[1, 2, 3],
-            bins=list(range(10, 60)),
-            threshold=5000,
+            bins=list(range(15, 60)),
+            threshold=1000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(15, 65)),
+            threshold=1000,
         ),
     },
 }
@@ -91,8 +97,8 @@ TOF_DETECTION_CONFIG = {
 
 # Stallguard defaults
 STALLGUARD_CONFIG = {
-    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
+    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
 }
 
 STACKER_MOTION_CONFIG = {
