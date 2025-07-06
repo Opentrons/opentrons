@@ -409,12 +409,16 @@ export function getStackedItemsOnStartingDeck(
       ) {
         return acc
       } else {
+        const slotName =
+          getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
+            ? getStackerLocationFromSlotName(module.location.slotName)
+            : module.location.slotName
         const moduleOnDeck = {
           moduleModel: module.model,
           moduleId,
           moduleSlotName: module.location.slotName,
         }
-        return { ...acc, [module.location.slotName]: [moduleOnDeck] }
+        return { ...acc, [slotName]: [moduleOnDeck] }
       }
     },
     allLabwareOnDeck

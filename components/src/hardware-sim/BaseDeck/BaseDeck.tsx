@@ -283,60 +283,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       <>
-        {/* render modules, nested labware, and overlays */}
-        {singleLocationModules.map(
-          ({
-            moduleModel,
-            moduleLocation,
-            nestedLabwareDef,
-            nestedLabwareWellFill,
-            innerProps,
-            moduleChildren,
-            onLabwareClick,
-            highlightLabware,
-            highlightShadowLabware,
-          }) => {
-            const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
-              deckDef
-            )
-            const moduleDef = getModuleDef(moduleModel)
-            return slotPosition != null ? (
-              <Module
-                key={`${moduleModel} ${moduleLocation.slotName}`}
-                def={moduleDef}
-                x={slotPosition[0]}
-                y={slotPosition[1]}
-                orientation={inferModuleOrientationFromXCoordinate(
-                  slotPosition[0]
-                )}
-                innerProps={innerProps}
-                targetDeckId={deckDef.otId}
-                targetSlotId={moduleLocation.slotName}
-                childrenPositioningMode="offsetToSlot"
-              >
-                {nestedLabwareDef != null ? (
-                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
-                    <LabwareRender
-                      definition={nestedLabwareDef}
-                      positioningMode="offsetInSlot"
-                      onLabwareClick={onLabwareClick}
-                      wellFill={nestedLabwareWellFill}
-                      shouldRotateAdapterOrientation={
-                        inferModuleOrientationFromXCoordinate(
-                          slotPosition[0]
-                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                      }
-                      highlight={highlightLabware}
-                      highlightShadow={highlightShadowLabware}
-                    />
-                  </g>
-                ) : null}
-                {moduleChildren}
-              </Module>
-            ) : null
-          }
-        )}
         {stackerModules.map(
           ({
             moduleModel,
@@ -400,6 +346,60 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   {moduleChildren}
                 </Module>
               </>
+            ) : null
+          }
+        )}
+        {/* render modules, nested labware, and overlays */}
+        {singleLocationModules.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDef,
+            nestedLabwareWellFill,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+            highlightLabware,
+            highlightShadowLabware,
+          }) => {
+            const slotPosition = getPositionFromSlotId(
+              moduleLocation.slotName,
+              deckDef
+            )
+            const moduleDef = getModuleDef(moduleModel)
+            return slotPosition != null ? (
+              <Module
+                key={`${moduleModel} ${moduleLocation.slotName}`}
+                def={moduleDef}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                orientation={inferModuleOrientationFromXCoordinate(
+                  slotPosition[0]
+                )}
+                innerProps={innerProps}
+                targetDeckId={deckDef.otId}
+                targetSlotId={moduleLocation.slotName}
+                childrenPositioningMode="offsetToSlot"
+              >
+                {nestedLabwareDef != null ? (
+                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                    <LabwareRender
+                      definition={nestedLabwareDef}
+                      positioningMode="offsetInSlot"
+                      onLabwareClick={onLabwareClick}
+                      wellFill={nestedLabwareWellFill}
+                      shouldRotateAdapterOrientation={
+                        inferModuleOrientationFromXCoordinate(
+                          slotPosition[0]
+                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                      }
+                      highlight={highlightLabware}
+                      highlightShadow={highlightShadowLabware}
+                    />
+                  </g>
+                ) : null}
+                {moduleChildren}
+              </Module>
             ) : null
           }
         )}
