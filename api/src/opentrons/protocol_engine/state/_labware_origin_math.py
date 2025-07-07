@@ -102,7 +102,7 @@ def get_parent_placement_origin_to_lw_origin(
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
         # For compatibility with historical (buggy?) behavior,
         # we only consider it when the child labware is the topmost labware in a stackup.
-        parent_deck_item_origin_to_child_labware_origin = (
+        parent_deck_item_to_child_labware_offset = (
             Point.from_xyz_attrs(child_labware.cornerOffsetFromSlot)
             if is_topmost_labware
             else Point(0, 0, 0)
@@ -110,7 +110,7 @@ def get_parent_placement_origin_to_lw_origin(
 
         return (
             parent_deck_item_origin_to_child_labware_placement_origin
-            + parent_deck_item_origin_to_child_labware_origin
+            + parent_deck_item_to_child_labware_offset
         )
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
@@ -151,19 +151,9 @@ def get_parent_placement_origin_to_lw_origin(
             deck_definition=deck_definition, parent_deck_item=parent_deck_item
         )
 
-        # TODO(jh 06-27-25): This is temporary until we support well locating features. This helps keep the snapshot
-        #  testing more useful.
-        if _shim_is_tc_or_mag_block(parent_deck_item):
-            parent_deck_item_to_child_labware_feature_offset = Point(0, 0, 0)
-
-        parent_deck_item_origin_to_child_labware_origin = (
-            _child_back_left_bottom_position(child_labware) * -1
-        )
-
         return (
             parent_deck_item_origin_to_child_labware_placement_origin
             + parent_deck_item_to_child_labware_feature_offset
-            + parent_deck_item_origin_to_child_labware_origin
         )
 
 
@@ -342,8 +332,14 @@ def _parent_origin_to_mate_plane_bottom_center(
     slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
     assert slot_footprint_as_parent is not None
 
-    x = slot_footprint_as_parent["frontRight"]["x"] / 2
-    y = slot_footprint_as_parent["frontRight"]["y"] / 2
+    x = (
+        slot_footprint_as_parent["frontRight"]["x"]
+        + slot_footprint_as_parent["backLeft"]["x"]
+    ) / 2
+    y = (
+        slot_footprint_as_parent["frontRight"]["y"]
+        + slot_footprint_as_parent["backLeft"]["y"]
+    ) / 2
     z = slot_footprint_as_parent["z"]
 
     return Point(x, y, z)
@@ -370,8 +366,14 @@ def mate_plane_bottom_center_to_child_origin(
     slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
     assert slot_footprint_as_child is not None
 
-    x = slot_footprint_as_child["frontRight"]["x"] / 2
-    y = slot_footprint_as_child["frontRight"]["y"] / 2
+    x = (
+        slot_footprint_as_child["frontRight"]["x"]
+        + slot_footprint_as_child["backLeft"]["x"]
+    ) / 2
+    y = (
+        slot_footprint_as_child["frontRight"]["y"]
+        + slot_footprint_as_child["backLeft"]["y"]
+    ) / 2
     z = slot_footprint_as_child["z"]
 
     return Point(x, y, z) * -1
