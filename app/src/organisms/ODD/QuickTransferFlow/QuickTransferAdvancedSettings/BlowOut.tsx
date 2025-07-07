@@ -40,6 +40,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { ACTIONS } from '../constants'
 import { getMaxUiFlowRate, getPipetteName } from '../utils'
+import { getExtractTiprackTypeFromURI } from '../utils/getExtractTiprackTypeFromURI'
 
 import type { Dispatch } from 'react'
 import type { DeckConfiguration, SupportedTip } from '@opentrons/shared-data'
@@ -269,11 +270,9 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const liquidClassValuesForPipette = liquidClassDef?.byPipette?.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
-  const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
-    tipObject => {
-      const tiprackLoadName = tipObject.tiprack.split('/')[1]
-      return tiprackLoadName === currentTiprackLoadName
-    }
+  const liquidClassValuesForTip = getExtractTiprackTypeFromURI(
+    liquidClassValuesForPipette,
+    currentTiprackLoadName
   )
 
   const correctionVolume =
