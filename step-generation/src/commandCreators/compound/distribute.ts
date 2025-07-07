@@ -588,6 +588,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
         }) ?? 0
+      const delayAfterDispenseCommands =
+        dispenseDelay != null
+          ? [
+              curryWithoutPython(delay, {
+                seconds: dispenseDelay.seconds,
+              }),
+            ]
+          : []
       const voidDispenseAirGapCommand =
         dispenseAirGapVolume > 0 &&
         !changeTipNow &&
@@ -607,6 +615,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   : {}),
                 pushOut: 0,
               }),
+              ...delayAfterDispenseCommands,
             ]
           : []
 
@@ -690,14 +699,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ? [
               curryWithoutPython(delay, {
                 seconds: aspirateDelay.seconds,
-              }),
-            ]
-          : []
-      const delayAfterDispenseCommands =
-        dispenseDelay != null
-          ? [
-              curryWithoutPython(delay, {
-                seconds: dispenseDelay.seconds,
               }),
             ]
           : []
@@ -788,6 +789,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 volume: conditioningVolume,
                 flowRate: dispenseFlowRateUlSec,
                 correctionVolume: dispenseCorrectionVolumeForConditioningVolume,
+                pushOut: 0,
               }),
               ...delayAfterDispenseCommands,
             ]

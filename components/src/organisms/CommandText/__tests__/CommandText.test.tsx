@@ -217,7 +217,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )
       screen.getByText(
-        'Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
+        'Moving to X 0.00 Y 0.00 Z -24.00 relative to top of well A1 of NEST 1 Well Reservoir 195 mL in Slot 5'
       )
     }
   })
@@ -709,7 +709,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )
-    screen.getByText('Loading Volatile (80% ethanol) Liquid Class')
+    screen.getByText('Loading Volatile Liquid Class')
   })
   it('renders correct text for temperatureModule/setTargetTemperature', () => {
     const mockTemp = 20

@@ -596,6 +596,15 @@ export const transfer: CommandCreator<TransferArgs> = (
               byVolumeProperty: 'correctionByVolume',
               defaultValue: 0,
             }) ?? 0
+          const delayAfterDispenseCommands =
+            dispenseDelay != null
+              ? [
+                  curryWithoutPython(delay, {
+                    seconds: dispenseDelay.seconds,
+                  }),
+                ]
+              : []
+
           const voidDispenseAirGapCommand =
             dispenseAirGapVol > 0 &&
             !changeTipNow &&
@@ -611,7 +620,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
+                    pushOut: 0,
                   }),
+                  ...delayAfterDispenseCommands,
                 ]
               : []
           const preAspirateSubmergeCommands = [
@@ -785,14 +796,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []),
           ]
-          const delayAfterDispenseCommands =
-            dispenseDelay != null
-              ? [
-                  curryWithoutPython(delay, {
-                    seconds: dispenseDelay.seconds,
-                  }),
-                ]
-              : []
           const dispenseCorrectionVolumeForAspirateAirGap =
             getByVolumeValue({
               liquidClass,
