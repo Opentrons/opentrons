@@ -73,7 +73,7 @@ class AbstractWellCore(ABC):
         """Get the coordinate of the well's center."""
 
     @abstractmethod
-    def get_meniscus(self, z_offset: float) -> Union[Point, LiquidTrackingType]:
+    def get_meniscus(self) -> Union[Point, LiquidTrackingType]:
         """Get the coordinate of the well's meniscus."""
 
     @abstractmethod

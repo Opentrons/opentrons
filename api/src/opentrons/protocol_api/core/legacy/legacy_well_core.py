@@ -111,7 +111,7 @@ class LegacyWellCore(AbstractWellCore):
         """Get the coordinate of the well's center."""
         return self._geometry.center()
 
-    def get_meniscus(self, z_offset: float) -> Union[Point, SimulatedProbeResult]:
+    def get_meniscus(self) -> Union[Point, SimulatedProbeResult]:
         """Get the coordinate of the well's center."""
         raise APIVersionError(api_element="Getting a meniscus")
 
