@@ -265,7 +265,7 @@ def run(ctx: ProtocolContext) -> None:
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
             if step > 0:
                 aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
-                volume_dispensed += step_volume
+                volume_dispensed = round(volume_dispensed + step_volume, 5)
             height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
             corrected_height = height + tip_z_error
             trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
