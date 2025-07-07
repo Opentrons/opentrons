@@ -787,7 +787,13 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
-        "locatingFeaturesAsParent": {},
+        "features": {},
+        "extents": {
+            "total": {
+                "backLeftBottom": {"x": -5, "y": -10, "z": -15},
+                "frontRightTop": {"x": 15, "y": -20, "z": 30},
+            },
+        },
         "dimensions": {
             "bareOverallHeight": 84,
             "overLabwareHeight": 0,
@@ -955,7 +961,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=10, y=20, z=30),
                             ),
                             flowRateByVolume=[(1.0, 35.0), (10.0, 24.0), (50.0, 35.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             preWet=True,
                             mix=MixProperties(
                                 enable=True, params=MixParams(repetitions=1, volume=50)
@@ -1004,7 +1014,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=33, y=22, z=11),
                             ),
                             flowRateByVolume=[(1.0, 50.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             mix=MixProperties(
                                 enable=True, params=MixParams(repetitions=1, volume=50)
                             ),
@@ -1059,7 +1073,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=1, y=3, z=2),
                             ),
                             flowRateByVolume=[(50.0, 50.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             conditioningByVolume=[(1.0, 5.0), (45.0, 5.0), (50.0, 0.0)],
                             disposalByVolume=[(1.0, 5.0), (45.0, 5.0), (50.0, 0.0)],
                             delay=DelayProperties(

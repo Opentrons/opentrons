@@ -4,7 +4,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
@@ -22,7 +22,6 @@ import {
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
 import { SlotHover } from './SlotHover'
-import { getShowTCLid } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -70,7 +69,7 @@ export const DeckThumbnailDetails = (
           console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(model)
+        const moduleDef = getModuleDef(model)
         const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
           id,
           allLabware
@@ -127,8 +126,7 @@ export const DeckThumbnailDetails = (
       {allLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          allModules.some(m => labware.stack.includes(m.id)) ||
-          getShowTCLid(labware)
+          allModules.some(m => labware.stack.includes(m.id))
         ) {
           return null
         }

@@ -2,8 +2,9 @@ import { useFormContext } from 'react-hook-form'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { SidePanel } from '../index'
 
 vi.mock('react-hook-form')

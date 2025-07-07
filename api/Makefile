@@ -105,9 +105,16 @@ sdist:
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-.PHONY: test
-test:
+.PHONY: test-unit
+test-unit:
 	$(pytest) $(tests) $(test_opts)
+
+.PHONY: test-integration
+test-integration:
+	$(python) -m integration_testing.labware_stackup
+
+.PHONY: test
+test: test-unit test-integration
 
 .PHONY: test-cov
 test-cov:
@@ -115,17 +122,17 @@ test-cov:
 
 .PHONY: test-ot2
 test-ot2:
-	$(pytest) -m 'not ot3_only and not stackup_testing' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src tests
-	$(python) -m black --check src tests docs/v2/example_protocols
-	$(python) -m flake8 src tests
+	$(python) -m mypy src tests integration_testing
+	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
+	$(python) -m flake8 src tests integration_testing
 
 .PHONY: format
 format:
-	$(python) -m black src tests docs/v2/example_protocols
+	$(python) -m black src tests integration_testing docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

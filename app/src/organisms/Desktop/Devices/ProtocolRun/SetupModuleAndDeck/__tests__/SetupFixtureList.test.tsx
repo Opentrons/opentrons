@@ -36,7 +36,6 @@ const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ],
-    missingLabwareDisplayName: null,
   },
 ]
 
@@ -48,7 +47,6 @@ const mockNotConfiguredDeckConfigCompatibility: CutoutConfigAndCompatibility[] =
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ],
-    missingLabwareDisplayName: null,
   },
 ]
 
@@ -60,7 +58,6 @@ const mockConflictDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ],
-    missingLabwareDisplayName: null,
   },
 ]
 
@@ -135,7 +132,6 @@ describe('SetupFixtureList', () => {
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
           ],
-          missingLabwareDisplayName: null,
         },
       ],
       robotName: 'otie',

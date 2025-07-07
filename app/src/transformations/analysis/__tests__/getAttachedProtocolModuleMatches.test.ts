@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  getModuleDef2,
+  getModuleDef,
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -14,7 +14,7 @@ const temperatureProtocolModule = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: getModuleDef2('temperatureModuleV2'),
+  moduleDef: getModuleDef('temperatureModuleV2'),
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
@@ -27,7 +27,7 @@ const magneticProtocolModule = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: getModuleDef2('magneticModuleV2'),
+  moduleDef: getModuleDef('magneticModuleV2'),
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,

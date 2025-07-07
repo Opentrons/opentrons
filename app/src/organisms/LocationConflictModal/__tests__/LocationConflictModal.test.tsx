@@ -11,7 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 import {
   ot3StandardDeckV5,
-  SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -119,8 +119,7 @@ describe('LocationConflictModal', () => {
     props = {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB1',
-      requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-      missingLabwareDisplayName: 'a tiprack',
+      requiredFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
@@ -130,7 +129,7 @@ describe('LocationConflictModal', () => {
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
     screen.getAllByText('Trash bin')
-    screen.getByText('a tiprack')
+    screen.getByText('Left slot')
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))

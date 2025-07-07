@@ -10,7 +10,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from opentrons.drivers.flex_stacker.types import HardwareRevision
-from .driver import FlexStackerInterface as FlexStacker
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -26,9 +26,8 @@ async def test_gcode(stacker: FlexStacker, report: CSVReport) -> None:
     """Send and receive response for GCODE M115."""
     success = True
     info = await stacker._driver.get_device_info()
-    # TODO: update this with PVT/MP revisions
-    if info.hw != HardwareRevision.DVT:
-        ui.print_warning(f"Hardware Revision is {info.hw}, expected DVT")
+    if info.hw != HardwareRevision.PVT:
+        ui.print_warning(f"Hardware Revision is {info.hw}, expected PVT")
     report(
         "CONNECTIVITY",
         "usb-get-device-info",
@@ -39,7 +38,7 @@ async def test_gcode(stacker: FlexStacker, report: CSVReport) -> None:
 async def test_eeprom(stacker: FlexStacker, report: CSVReport) -> None:
     """Set serial number and make sure device info is updated accordingly."""
     success = True
-    if not stacker._simulating:
+    if not stacker.is_simulated:
         serial = input("SCAN device barcode: ")
     else:
         serial = "STACKER-SIMULATOR-SN"

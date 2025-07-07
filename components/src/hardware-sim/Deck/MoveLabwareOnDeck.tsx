@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import {
   getDeckDefFromRobotType,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
@@ -45,7 +45,7 @@ const getModulePosition = (
   const [modX, modY] = modPosition
 
   const deckSpecificAffineTransform =
-    getModuleDef2(loadedModule.model).slotTransforms?.[deckDef.otId]?.[
+    getModuleDef(loadedModule.model).slotTransforms?.[deckDef.otId]?.[
       modSlot.id
     ]?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
   const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(

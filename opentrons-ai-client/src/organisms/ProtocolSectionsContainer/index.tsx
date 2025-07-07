@@ -14,9 +14,10 @@ import {
 } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 
-import { Accordion } from '../../molecules/Accordion'
-import { ApplicationSection } from '../../organisms/ApplicationSection'
-import { createProtocolAtom } from '../../resources/atoms'
+import { Accordion } from '/ai-client/molecules/Accordion'
+import { ApplicationSection } from '/ai-client/organisms/ApplicationSection'
+import { createProtocolAtom } from '/ai-client/resources/atoms'
+
 import {
   InstrumentsSection,
   OPENTRONS_FLEX,

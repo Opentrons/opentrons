@@ -261,7 +261,16 @@ export interface AxisAlignedBoundingBox3D {
 
 export interface Extents {
   total: AxisAlignedBoundingBox3D
-  footprint: AxisAlignedBoundingBox2D
+}
+
+export interface SlotFootprintAsChildFeature {
+  z: number
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
+export interface LocatingFeatures {
+  slotFootprintAsChild?: SlotFootprintAsChildFeature
 }
 
 export type LabwareRoles =
@@ -300,6 +309,7 @@ export interface LabwareDefinition3 {
   namespace: string
   metadata: LabwareMetadata
   extents: Extents
+  features: LocatingFeatures
   parameters: LabwareParameters
   brand: LabwareBrand
   ordering: string[][]
@@ -885,7 +895,7 @@ export interface ByTipTypeSetting {
   singleDispense: SingleDispenseProperties
   multiDispense?: MultiDispenseProperties
 }
-interface ByPipetteSetting {
+export interface ByPipetteSetting {
   pipetteModel: string
   byTipType: ByTipTypeSetting[]
 }

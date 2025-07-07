@@ -57,7 +57,7 @@ export enum SetupContent {
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
-  NestDeepWell = 'NEST 96 Deep Well Plate 2mL',
+  NestDeepWell = 'NEST 96 Deep Well Plate 2 mL',
   Save = 'Save',
 }
 
@@ -603,7 +603,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds "NEST 96 Deep Well Plate 2mL".
+   * Adds "NEST 96 Deep Well Plate 2 mL".
    */
   AddNest96DeepWellPlate: (): StepThunk => ({
     call: () => {

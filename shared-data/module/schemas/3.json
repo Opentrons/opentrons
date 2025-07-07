@@ -51,6 +51,50 @@
           "description": "Attributes for the element"
         }
       }
+    },
+    "vector3D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "(-x, +y, -z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "(+x, -y, +z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
     }
   },
   "description": "Module specification",
@@ -61,7 +105,7 @@
     "model",
     "labwareOffset",
     "cornerOffsetFromSlot",
-    "locatingFeaturesAsParent",
+    "features",
     "dimensions",
     "calibrationPoint",
     "displayName",
@@ -94,11 +138,44 @@
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
-    "locatingFeaturesAsParent": {
+    "extents": {
+      "description": "The outer dimensions of the addressable area. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
-      "description": "Explict locating features when this module acts as the parent in a stackup.",
-      "required": [],
-      "properties": {}
+      "required": ["total"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "description": "The all-encompassing outer dimensions of the labware.",
+          "$ref": "#/definitions/axisAlignedBoundingBox3D"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Locating features when this labware is a part of a stackup.",
+      "required": ["slotFootprintAsChild"],
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero. Z-coordinate of the footprint plane.",
+              "type": "number"
+            }
+          }
+        }
+      }
     },
     "dimensions": {
       "type": "object",
@@ -218,7 +295,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A compatible module model (e.g. temperatureModuleV1)"
+        "description": "List of module models this model is compatible with (e.g. temperatureModuleV1)"
       }
     },
     "incompatibleWithDecks": {

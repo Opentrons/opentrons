@@ -23,29 +23,34 @@ import {
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
 
 import { getIsTouchTipField } from '../../../form-types'
-import { prefixMap } from '../../../resources/utils'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
-import { PERCENT_RANGE_TO_SHOW_WARNING, TOO_MANY_DECIMALS } from './constants'
-import { usePositionReference } from './hooks'
+import {
+  MoveLiquidPrefixToAction,
+  PERCENT_RANGE_TO_SHOW_WARNING,
+  TOO_MANY_DECIMALS,
+} from './constants'
+import { useDefaultPosition, usePositionReference } from './hooks'
 import { TipPositionSideView } from './TipPositionSideView'
 import { TipPositionTopView } from './TipPositionTopView'
+import { getIsTipInWell } from './utils'
 import * as utils from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
-import type { StepFieldName } from '../../../form-types'
+import type { FormData, StepFieldName } from '../../../form-types'
 import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 import type { MoveLiquidPrefixType } from '../../../resources/types'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
   name: StepFieldName
-  value: number | null
-  updateValue: (val?: number | null) => void
+  value: number
+  updateValue: (val: number) => void
 }
 export type PositionSpecs = Record<Offset, PositionSpec>
 
@@ -58,12 +63,16 @@ interface TipPositionModalProps {
   prefix: MoveLiquidPrefixType
   isIndeterminate?: boolean
   reference?: FieldProps | null
+  liquidClass?: string | null
+  // optional to support batch edit
+  formData?: FormData | null
 }
 
 export function TipPositionModal(
   props: TipPositionModalProps
 ): JSX.Element | null {
   const {
+    formData = null,
     isIndeterminate,
     specs,
     wellDepthMm,
@@ -92,8 +101,9 @@ export function TipPositionModal(
   const defaultMmFromBottom = utils.getDefaultMmFromEdge({
     name: zSpec.name,
   })
+  const defaultPosition = useDefaultPosition(formData, prefix)
 
-  const [zValue, setZValue] = useState<string | null>(
+  const [zValue, setZValue] = useState<string>(
     zSpec?.value == null
       ? String(
           referenceSpec?.value === POSITION_REFERENCE_BOTTOM
@@ -102,22 +112,31 @@ export function TipPositionModal(
         )
       : String(zSpec?.value)
   )
-  const [yValue, setYValue] = useState<string | null>(
-    ySpec?.value == null ? null : String(ySpec?.value)
+  const [yValue, setYValue] = useState<string>(
+    ySpec?.value == null ? '0' : String(ySpec?.value)
   )
-  const [xValue, setXValue] = useState<string | null>(
-    xSpec?.value == null ? null : String(xSpec?.value)
+  const [xValue, setXValue] = useState<string>(
+    xSpec?.value == null ? '0' : String(xSpec?.value)
   )
   const {
     positionReferenceDropdown,
     reference,
     setReference,
   } = usePositionReference({
-    initialReference: referenceSpec?.value as PositionReference,
+    initialReference: referenceSpec?.value,
     zValue: Number(zValue),
     updateZValue: setZValue,
     wellDepth: wellDepthMm,
   })
+
+  // submerge/retract in well warning
+  const isInWell =
+    zValue != null && zValue !== ''
+      ? getIsTipInWell(Number(zValue), reference, wellDepthMm)
+      : false
+  const isSubmergeOrRetract =
+    MoveLiquidPrefixToAction[prefix] === 'submerge' ||
+    MoveLiquidPrefixToAction[prefix] === 'retract'
 
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = useState<boolean>(true)
@@ -134,13 +153,19 @@ export function TipPositionModal(
         minMmFromBottom: utils.roundValue(wellDepthMm / 2, 'up'),
       }
     }
-    let [min, max]: [number, number] = [0, wellDepthMm]
+    let [min, max]: [number, number] = [
+      0,
+      wellDepthMm + SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    ]
     switch (reference) {
       case POSITION_REFERENCE_CENTER:
-        ;[min, max] = [-wellDepth / 2, wellDepth / 2]
+        ;[min, max] = [
+          -wellDepth / 2,
+          wellDepth / 2 + SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+        ]
         break
       case POSITION_REFERENCE_TOP:
-        ;[min, max] = [-wellDepth, 0]
+        ;[min, max] = [-wellDepth, 0 + SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM]
         break
       default:
         break
@@ -200,9 +225,9 @@ export function TipPositionModal(
 
   const handleDone = (): void => {
     if (!hasErrors) {
-      zSpec?.updateValue(zValue === null ? null : Number(zValue))
-      xSpec?.updateValue(xValue === null ? null : Number(xValue))
-      ySpec?.updateValue(yValue === null ? null : Number(yValue))
+      zSpec?.updateValue(Number(zValue))
+      xSpec?.updateValue(Number(xValue))
+      ySpec?.updateValue(Number(yValue))
       referenceSpec?.updateValue(reference)
       closeModal()
     }
@@ -214,7 +239,7 @@ export function TipPositionModal(
 
   const handleChange = (
     newValueRaw: string,
-    setValue: Dispatch<SetStateAction<string | null>>
+    setValue: Dispatch<SetStateAction<string>>
   ): void => {
     // if string, strip non-number characters from string and cast to number
     const newValue =
@@ -228,6 +253,14 @@ export function TipPositionModal(
       setValue(newValue)
     }
     setPristine(false)
+  }
+
+  const handleResetToDefault = (): void => {
+    setXValue(String(defaultPosition?.offset?.x ?? 0))
+    setYValue(String(defaultPosition?.offset?.y ?? 0))
+    setZValue(String(defaultPosition?.offset?.z ?? 0))
+    const reference = defaultPosition.origin
+    setReference(reference as PositionReference)
   }
 
   const isXValueNearEdge =
@@ -251,7 +284,9 @@ export function TipPositionModal(
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', { prefix: prefixMap[prefix] })}
+      title={t('shared:tip_position', {
+        prefix: MoveLiquidPrefixToAction[prefix],
+      })}
       onClose={handleCancel}
       footer={
         <Flex
@@ -259,15 +294,7 @@ export function TipPositionModal(
           padding={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
-          <Btn
-            onClick={() => {
-              setXValue('0')
-              setYValue('0')
-              setZValue('1')
-              setReference(POSITION_REFERENCE_BOTTOM)
-            }}
-            css={LINK_BUTTON_STYLE}
-          >
+          <Btn onClick={handleResetToDefault} css={LINK_BUTTON_STYLE}>
             {t('shared:reset_to_default')}
           </Btn>
           <Flex gridGap={SPACING.spacing8} justifyContent={JUSTIFY_END}>
@@ -285,8 +312,20 @@ export function TipPositionModal(
         {isXValueNearEdge || isYValueNearEdge || isZValueAtBottom ? (
           <Banner type="warning">
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('tip_position.warning')}
+              {t('tip_position.warning.close_to_edge')}
             </StyledText>
+          </Banner>
+        ) : null}
+        {isInWell && isSubmergeOrRetract ? (
+          <Banner type="warning">
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText desktopStyle="bodyDefaultSemiBold">
+                {t('tip_position.warning.submerge_retract_in_well.header')}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('tip_position.warning.submerge_retract_in_well.subtext')}
+              </StyledText>
+            </Flex>
           </Banner>
         ) : null}
         <Flex gridGap={SPACING.spacing40}>
@@ -361,7 +400,10 @@ export function TipPositionModal(
             gridGap={SPACING.spacing8}
             width="100%"
           >
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+            >
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t(`modal:tip_position.view.${view}`)}
               </StyledText>

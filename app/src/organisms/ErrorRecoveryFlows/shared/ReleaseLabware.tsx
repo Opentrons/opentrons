@@ -12,6 +12,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import stackerReleaseLatchAnimation from '/app/assets/videos/error-recovery/FlexStacker_ReleaseLatch.webm'
 import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
 import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
@@ -72,6 +73,12 @@ export function ReleaseLabware({
         return t('take_any_necessary_precautions')
     }
   }
+  const animationSrc =
+    route === STACKER_SHUTTLE_EMPTY_RETRY.ROUTE ||
+    route === STACKER_SHUTTLE_EMPTY_SKIP.ROUTE
+      ? stackerReleaseLatchAnimation
+      : gripperReleaseAnimation
+
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
@@ -95,10 +102,7 @@ export function ReleaseLabware({
         </Flex>
         <Flex css={ANIMATION_CONTAINER_STYLE}>
           <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
-            <source
-              src={gripperReleaseAnimation}
-              data-testid="gripper-animation"
-            />
+            <source src={animationSrc} data-testid="release-animation" />
           </AnimationVideo>
         </Flex>
       </TwoColumn>

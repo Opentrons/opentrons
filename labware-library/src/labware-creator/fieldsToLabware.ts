@@ -1,4 +1,4 @@
-import { createRegularLabware, getModuleDef2 } from '@opentrons/shared-data'
+import { createRegularLabware, getModuleDef } from '@opentrons/shared-data'
 
 import { DISPLAY_VOLUME_UNITS } from './fields'
 import { getIsCustomTubeRack } from './utils'
@@ -122,7 +122,7 @@ export function fieldsToLabware(
     })
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
-      const moduleDefinition = getModuleDef2(moduleModel as ModuleModel)
+      const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
       return (stackingOffsetWithModule[moduleModel] = {
         x: 0,
         y: 0,

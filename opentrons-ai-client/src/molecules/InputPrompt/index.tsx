@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SendButton } from '../../atoms/SendButton'
+import { SendButton } from '/ai-client/atoms/SendButton'
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -24,7 +24,7 @@ import {
   regenerateProtocolAtom,
   tokenAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
+} from '/ai-client/resources/atoms'
 import {
   LOCAL_CREATE_PROTOCOL_END_POINT,
   LOCAL_END_POINT,
@@ -35,11 +35,11 @@ import {
   STAGING_CREATE_PROTOCOL_END_POINT,
   STAGING_END_POINT,
   STAGING_UPDATE_PROTOCOL_END_POINT,
-} from '../../resources/constants'
-import { useApiCall } from '../../resources/hooks'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { calcTextAreaHeight } from '../../resources/utils'
-import { detectProtocolFormat } from '../../resources/utils/protocolFormat'
+} from '/ai-client/resources/constants'
+import { useApiCall } from '/ai-client/resources/hooks'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+import { calcTextAreaHeight } from '/ai-client/resources/utils'
+import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'

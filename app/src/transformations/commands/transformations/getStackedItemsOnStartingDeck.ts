@@ -273,9 +273,8 @@ export function getStackedItemsOnStartingDeck(
         if (cutoutId == null || Object.keys(acc).includes(location)) {
           return acc
         }
-        const lidsArray: LabwareInStack[] = command.result.labwareIds
-          .toReversed()
-          .map(lidId => {
+        const lidsArray: LabwareInStack[] =
+          command.result.labwareIds.toReversed().map(lidId => {
             return {
               labwareId: lidId,
               definitionUri: getLabwareDefURI(
@@ -284,7 +283,7 @@ export function getStackedItemsOnStartingDeck(
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
             }
-          })
+          }) ?? []
         stackFromCommand = command.result.stackLocationSequence.reduce<
           StackItem[]
         >((sequenceAcc, sequenceItem) => {
@@ -355,9 +354,8 @@ export function getStackedItemsOnStartingDeck(
           return { ...acc, offDeck: offDeckArray }
         } else {
           // reverse the order of this array so we add the labware in top to bottom
-          const labwareInHopper: StackItem[] = command.result.storedLabware
-            ?.toReversed()
-            .map(labwareGroup => {
+          const labwareInHopper: StackItem[] =
+            command.result.storedLabware?.toReversed().map(labwareGroup => {
               return {
                 definitionUri,
                 displayName,
@@ -365,7 +363,7 @@ export function getStackedItemsOnStartingDeck(
                 lidDisplayName,
                 lidId: labwareGroup.lidLabwareId ?? undefined,
               }
-            })
+            }) ?? []
           labwareInHopper.push({
             moduleModel: stackerModule.model,
             moduleId: command.params.moduleId,
