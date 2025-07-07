@@ -323,8 +323,8 @@ def run(ctx: ProtocolContext) -> None:
                 )
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
             probe_pipette.move_to(labware["A1"].top())
-            height = _get_height_of_liquid_in_well(
-                probe_pipette, labware["A1"], ctx.is_simulating()
+            height = round(_get_height_of_liquid_in_well(
+                probe_pipette, labware["A1"], ctx.is_simulating())
             )
             corrected_height = height + tip_z_error
             trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
