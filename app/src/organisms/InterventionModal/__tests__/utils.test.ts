@@ -144,8 +144,7 @@ describe('getRunLabwareRenderInfo', () => {
     )
     const labwareInfo = res[0]
     expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo.x).toEqual(0) // taken from deckDef fixture
-    expect(labwareInfo.y).toEqual(0)
+    expect(labwareInfo.labwareOrigin).toStrictEqual({ x: 0, y: 0, z: 0 }) // taken from deckDef fixture
     expect(labwareInfo.labwareDef.metadata.displayName).toEqual(
       'NEST 96 Well Plate 100 µL PCR Full Skirt'
     )
@@ -173,14 +172,16 @@ describe('getRunLabwareRenderInfo', () => {
       labware => labware.labwareId === 'mockLabwareID3'
     )
     expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo?.x).toEqual(0)
-    expect(labwareInfo?.y).toEqual(
-      ot2DeckDefV5.cornerOffsetFromOrigin[1] -
-        getSchema2Dimensions(mockLabwareDefinition).yDimension
-    )
+    expect(labwareInfo?.labwareOrigin).toStrictEqual({
+      x: 0,
+      y:
+        ot2DeckDefV5.cornerOffsetFromOrigin[1] -
+        getSchema2Dimensions(mockLabwareDefinition).yDimension,
+      z: 0,
+    })
   })
 
-  it('defaults labware x, y coordinates to 0,0 if slot position not found in deck definition', () => {
+  it('omits labware if slot position not found in deck definition', () => {
     const mockBadSlotLabware = {
       id: 'mockBadLabwareID',
       loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
@@ -195,8 +196,7 @@ describe('getRunLabwareRenderInfo', () => {
       ot2DeckDefV5 as any
     )
 
-    expect(res[0].x).toEqual(0)
-    expect(res[0].y).toEqual(0)
+    expect(res).toHaveLength(0)
   })
 })
 
