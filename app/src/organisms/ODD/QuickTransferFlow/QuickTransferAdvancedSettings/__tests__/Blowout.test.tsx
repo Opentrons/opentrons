@@ -261,7 +261,7 @@ describe('BlowOut', () => {
       type: 'SET_BLOW_OUT',
       blowOutSettings: {
         location: 'source_well',
-        speed: 2,
+        flowRate: 2,
       },
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({

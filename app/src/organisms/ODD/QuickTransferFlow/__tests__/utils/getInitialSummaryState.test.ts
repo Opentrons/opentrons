@@ -144,7 +144,7 @@ describe('getInitialSummaryState', () => {
       disposalVolume: 10,
       blowOutDispense: {
         location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
-        speed: 75,
+        flowRate: 75,
       },
     })
   })
