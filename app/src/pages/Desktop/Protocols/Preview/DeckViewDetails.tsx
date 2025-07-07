@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
@@ -125,7 +125,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                       desktopStyle="bodyLargeRegular"
                       color={COLORS.white}
                     >
-                      {getModuleDef2(moduleEntities[id].model).displayName}
+                      {getModuleDef(moduleEntities[id].model).displayName}
                     </StyledText>
                   </div>
                 ) : null}
