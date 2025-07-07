@@ -1,1 +1,16 @@
+# Add teams here to be notified automatically when a PR changes certain file paths,
+# but be mindful of the rate of false positives -- we want to avoid notification spam.
+
 /components @Opentrons/components-devs
+
+# Changes to nonspecific files in shared-data are probably probably changes to the
+# actual data (e.g. deck definitions) and thus affect everyone, so notify everyone.
+# This needs to come first so it can be overridden by more specific rules.
+/shared-data @Opentrons/js @Opentrons/py
+# If a file is definitely JS or Python, notify just that language's community.
+# If this happens to all the files in the PR, it will override the "notify everyone" rule above.
+/shared-data/js @Opentrons/js
+/shared-data/**/*.ts @Opentrons/js
+/shared-data/python @Opentrons/py
+/shared-data/python_tests @Opentrons/py
+/shared-data/**/*.py @Opentrons/py
