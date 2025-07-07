@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { animated, easings, useSpring } from '@react-spring/web'
+import { animated, easings, useSprings } from '@react-spring/web'
 import styled from 'styled-components'
 
 import {
@@ -199,25 +199,35 @@ export function MoveLabwareOnDeck(
 
   const shouldReset = usePositionChangeReset(initialPosition, finalPosition)
 
-  const springProps = useSpring({
-    reset: shouldReset,
-    config: { duration: 1000, easing: easings.easeInOutSine },
-    from: {
-      ...initialPosition,
-      splashOpacity: 0,
-      deckOpacity: 0,
-    },
-    to: [
-      { deckOpacity: 1 },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { ...finalPosition },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { deckOpacity: 0 },
-    ],
-    loop: true,
-  })
+  // We're using react-spring to animate 3 different components that are part of the
+  // same SVG. For some reason, if we do that with a single useSpring(), we get
+  // weird behavior like the animated props falling out of sync with each other.
+  // useSprings() (plural) appears to work reliably.
+  const [springs] = useSprings(
+    3,
+    () => ({
+      // Note: Anything dynamic in here needs to be included in the dependency array below.
+      reset: shouldReset,
+      config: { duration: 1000, easing: easings.easeInOutSine },
+      from: {
+        ...initialPosition,
+        splashOpacity: 0,
+        deckOpacity: 0,
+      },
+      to: [
+        { deckOpacity: 1 },
+        { splashOpacity: 1 },
+        { splashOpacity: 0 },
+        { ...finalPosition },
+        { splashOpacity: 1 },
+        { splashOpacity: 0 },
+        { deckOpacity: 0 },
+      ],
+      loop: true,
+    }),
+    [shouldReset] // Dependency array.
+  )
+  const [deckSpringProps, labwareSpringProps, splashSpringProps] = springs
 
   if (deckDef == null) {
     return null
@@ -228,18 +238,18 @@ export function MoveLabwareOnDeck(
       deckConfig={deckConfig}
       robotType={robotType}
       svgProps={{
-        style: { opacity: springProps.deckOpacity },
+        style: { opacity: deckSpringProps.deckOpacity },
         ...styleProps,
       }}
       animatedSVG
     >
       {backgroundItems}
-      <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
+      <AnimatedG style={{ x: labwareSpringProps.x, y: labwareSpringProps.y }}>
         <g
           transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
         >
           <LabwareRender definition={movedLabwareDef} highlight={true} />
-          <AnimatedG style={{ opacity: springProps.splashOpacity }}>
+          <AnimatedG style={{ opacity: splashSpringProps.splashOpacity }}>
             <path
               d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
               stroke={COLORS.blue50}
