@@ -757,8 +757,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 meniscus_tracking=location._meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
-            if well_location.volumeOffset and well_location.volumeOffset != 0:
-                raise ValueError("volume offset not supported with move_to")
+            # you can't specify meniscus with a volume offset that isn't operationVolume
+            if well_location.volumeOffset:
+                if (
+                    well_location.volumeOffset != 0
+                    and well_location.volumeOffset != "operationVolume"
+                ):
+                    raise ValueError(
+                        f"volume offset {well_location.volumeOffset} not supported with move_to"
+                    )
             if check_for_movement_conflicts:
                 pipette_movement_conflict.check_safe_for_pipette_movement(
                     engine_state=self._engine_client.state,
