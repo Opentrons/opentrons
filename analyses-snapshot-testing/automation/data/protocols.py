@@ -721,8 +721,8 @@ class Protocols:
     Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P1000S_Alex_tip_strategy_with_lc", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
-    Flex_S_v2_24_P1000S_PD_Happy: Protocol = Protocol(
-        file_stem="Flex_S_v2_24_P1000S_PD_Happy", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    Flex_S_v2_24_P1000S_PD_happy: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_P1000S_PD_happy", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P50_8ch_None_HappyPath_all3_liquid", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER

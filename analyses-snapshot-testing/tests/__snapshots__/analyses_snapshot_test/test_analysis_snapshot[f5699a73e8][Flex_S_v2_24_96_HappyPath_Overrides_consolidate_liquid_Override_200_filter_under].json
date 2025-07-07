@@ -71379,7 +71379,7 @@
             ],
             "correctionByVolume": [
               [
-                -7.4,
+                -8.9,
                 200.0
               ],
               [
@@ -71387,7 +71387,7 @@
                 50.0
               ],
               [
-                -1.5,
+                -0.25,
                 5.0
               ],
               [
@@ -71906,7 +71906,7 @@
       "key": "fb355d67e531f57c39301d7b37575345",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -4.656666666666666,
         "flowRate": 11.777777777777779,
         "pipetteId": "UUID",
         "volume": 10.0
@@ -71971,7 +71971,7 @@
       "key": "f280a07278b08989f9408b82f1b774f6",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -4.210000000000001,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -72038,7 +72038,7 @@
       "key": "370581f4e5c1faf9d65a8338576e9654",
       "notes": [],
       "params": {
-        "correctionVolume": -4.210000000000001,
+        "correctionVolume": -8.453333333333333,
         "flowRate": 95.0,
         "pipetteId": "UUID",
         "volume": 95.0
@@ -72118,7 +72118,7 @@
       "key": "3fcbd2e4b5c3ed5f06ad6952f5d37cf6",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -8.9,
         "flowRate": 11.777777777777779,
         "pipetteId": "UUID",
         "volume": 10.0
@@ -72183,7 +72183,7 @@
       "key": "a36496834ebc8736fa92df5d74f2da46",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -8.453333333333333,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -72250,7 +72250,7 @@
       "key": "e3b8bcf213fa8f965eaa0c13dff4498d",
       "notes": [],
       "params": {
-        "correctionVolume": -8.453333333333333,
+        "correctionVolume": 0.0,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -72396,7 +72396,7 @@
       "key": "c1421bb51b6e75e164d79db948bccd0e",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": 0.0,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -72605,7 +72605,7 @@
       "key": "a3e8956b9e434b332f358ebe40136988",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -4.656666666666666,
         "flowRate": 11.777777777777779,
         "pipetteId": "UUID",
         "volume": 10.0
@@ -72670,7 +72670,7 @@
       "key": "8494de9cc49ce7d4b977ca55cb787b4f",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -4.210000000000001,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -72737,7 +72737,7 @@
       "key": "f89d1185d99c912aaf3220241b420608",
       "notes": [],
       "params": {
-        "correctionVolume": -4.210000000000001,
+        "correctionVolume": 0.0,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -75225,11 +75225,11 @@
               ],
               [
                 -0.3,
-                5.0
+                50.0
               ],
               [
-                -0.3,
-                50.0
+                -0.2,
+                5.0
               ],
               [
                 0.0,
@@ -75774,7 +75774,7 @@
       "key": "f789e17bacbf75a06bd45d9569b55619",
       "notes": [],
       "params": {
-        "correctionVolume": -0.45,
+        "correctionVolume": -0.7666666666666666,
         "flowRate": 95.0,
         "pipetteId": "UUID",
         "volume": 95.0
@@ -75905,7 +75905,7 @@
       "key": "ba34d2bef19b65d84af814b8e6c0df62",
       "notes": [],
       "params": {
-        "correctionVolume": -0.7666666666666666,
+        "correctionVolume": 0.0,
         "flowRate": 50.0,
         "pipetteId": "UUID",
         "pushOut": 20.0,
@@ -76244,7 +76244,7 @@
       "key": "f09d83aa606a1e02eaa6279f6f3f4547",
       "notes": [],
       "params": {
-        "correctionVolume": -0.45,
+        "correctionVolume": 0.0,
         "flowRate": 50.0,
         "pipetteId": "UUID",
         "pushOut": 20.0,
@@ -77322,7 +77322,7 @@
         ],
         "correctionByVolume": [
           [
-            -7.4,
+            -8.9,
             200.0
           ],
           [
@@ -77330,7 +77330,7 @@
             50.0
           ],
           [
-            -1.5,
+            -0.25,
             5.0
           ],
           [
@@ -77700,11 +77700,11 @@
           ],
           [
             -0.3,
-            5.0
+            50.0
           ],
           [
-            -0.3,
-            50.0
+            -0.2,
+            5.0
           ],
           [
             0.0,

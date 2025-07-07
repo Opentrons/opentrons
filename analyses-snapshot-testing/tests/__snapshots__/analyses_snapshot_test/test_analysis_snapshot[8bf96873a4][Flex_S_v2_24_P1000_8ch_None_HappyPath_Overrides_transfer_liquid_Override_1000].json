@@ -6320,11 +6320,11 @@
                 1000.0
               ],
               [
-                -3.6,
+                -2.6,
                 100.0
               ],
               [
-                -1.9,
+                -0.9,
                 10.0
               ],
               [
@@ -6840,7 +6840,7 @@
       "key": "cee9e5fafbd8fd52f069d77da1085c9d",
       "notes": [],
       "params": {
-        "correctionVolume": -0.9377777777777778,
+        "correctionVolume": -5.461333333333334,
         "flowRate": 12.0,
         "pipetteId": "UUID",
         "volume": 12.0
@@ -6905,7 +6905,7 @@
       "key": "280bffbb82f7e2601b0ac80d21a35f1e",
       "notes": [],
       "params": {
-        "correctionVolume": -0.9377777777777778,
+        "correctionVolume": -5.066666666666666,
         "flowRate": 300.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -6972,7 +6972,7 @@
       "key": "bd22794bbf9db7eccdf285ca62f9b56d",
       "notes": [],
       "params": {
-        "correctionVolume": -5.066666666666666,
+        "correctionVolume": 0.0,
         "flowRate": 300.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -7257,10 +7257,6 @@
             ],
             "correctionByVolume": [
               [
-                -2.5,
-                1000.0
-              ],
-              [
                 -0.2,
                 10.0
               ],
@@ -7271,6 +7267,10 @@
               [
                 0.0,
                 0.0
+              ],
+              [
+                12,
+                1000.0
               ]
             ],
             "delay": {
@@ -7808,7 +7808,7 @@
       "key": "ecb0be6f6d4778b939b2f142c162750a",
       "notes": [],
       "params": {
-        "correctionVolume": 0.9083333333333333,
+        "correctionVolume": 0.0,
         "flowRate": 250.0,
         "pipetteId": "UUID",
         "pushOut": 35.0,
@@ -8441,11 +8441,11 @@
             1000.0
           ],
           [
-            -3.6,
+            -2.6,
             100.0
           ],
           [
-            -1.9,
+            -0.9,
             10.0
           ],
           [
@@ -8810,10 +8810,6 @@
         ],
         "correctionByVolume": [
           [
-            -2.5,
-            1000.0
-          ],
-          [
             -0.2,
             10.0
           ],
@@ -8824,6 +8820,10 @@
           [
             0.0,
             0.0
+          ],
+          [
+            12,
+            1000.0
           ]
         ],
         "delay": {

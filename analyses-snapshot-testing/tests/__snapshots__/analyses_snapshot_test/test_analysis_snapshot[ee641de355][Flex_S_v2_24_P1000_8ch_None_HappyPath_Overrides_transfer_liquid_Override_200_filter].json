@@ -6316,16 +6316,16 @@
             ],
             "correctionByVolume": [
               [
-                -7.4,
+                -4.9,
                 200.0
               ],
               [
-                -2.2,
-                50.0
+                -0.5,
+                5.0
               ],
               [
-                -1.5,
-                5.0
+                -0.2,
+                50.0
               ],
               [
                 0.0,
@@ -6840,7 +6840,7 @@
       "key": "cee9e5fafbd8fd52f069d77da1085c9d",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -1.7353333333333332,
         "flowRate": 11.777777777777779,
         "pipetteId": "UUID",
         "volume": 10.0
@@ -6905,7 +6905,7 @@
       "key": "280bffbb82f7e2601b0ac80d21a35f1e",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4666666666666667,
+        "correctionVolume": -1.422,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -6972,7 +6972,7 @@
       "key": "bd22794bbf9db7eccdf285ca62f9b56d",
       "notes": [],
       "params": {
-        "correctionVolume": -1.422,
+        "correctionVolume": 0.0,
         "flowRate": 100.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -7262,11 +7262,11 @@
               ],
               [
                 -0.3,
-                5.0
+                50.0
               ],
               [
-                -0.3,
-                50.0
+                -0.2,
+                5.0
               ],
               [
                 0.0,
@@ -7808,7 +7808,7 @@
       "key": "ecb0be6f6d4778b939b2f142c162750a",
       "notes": [],
       "params": {
-        "correctionVolume": -0.43,
+        "correctionVolume": 0.0,
         "flowRate": 50.0,
         "pipetteId": "UUID",
         "pushOut": 20.0,
@@ -8437,16 +8437,16 @@
         ],
         "correctionByVolume": [
           [
-            -7.4,
+            -4.9,
             200.0
           ],
           [
-            -2.2,
-            50.0
+            -0.5,
+            5.0
           ],
           [
-            -1.5,
-            5.0
+            -0.2,
+            50.0
           ],
           [
             0.0,
@@ -8815,11 +8815,11 @@
           ],
           [
             -0.3,
-            5.0
+            50.0
           ],
           [
-            -0.3,
-            50.0
+            -0.2,
+            5.0
           ],
           [
             0.0,

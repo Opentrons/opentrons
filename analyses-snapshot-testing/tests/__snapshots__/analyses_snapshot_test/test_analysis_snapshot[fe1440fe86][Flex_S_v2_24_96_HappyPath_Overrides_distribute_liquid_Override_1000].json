@@ -12306,11 +12306,11 @@
                 1000.0
               ],
               [
-                -3.6,
+                -2.6,
                 100.0
               ],
               [
-                -1.9,
+                -0.4,
                 10.0
               ],
               [
@@ -12829,7 +12829,7 @@
       "key": "8c0a49488c777a8db551cf4f8bd89ce7",
       "notes": [],
       "params": {
-        "correctionVolume": -0.05911330049261089,
+        "correctionVolume": -28.959715380405036,
         "flowRate": 10.0,
         "pipetteId": "UUID",
         "volume": 1.4778325123152722
@@ -12894,7 +12894,7 @@
       "key": "3fbb851b454738ddde805cf2fdc523bd",
       "notes": [],
       "params": {
-        "correctionVolume": -0.05911330049261089,
+        "correctionVolume": -28.911111111111115,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -12961,7 +12961,7 @@
       "key": "e7dd3437480ed57a97f2dc531abcdd4c",
       "notes": [],
       "params": {
-        "correctionVolume": -28.911111111111115,
+        "correctionVolume": 0.0,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -13107,7 +13107,7 @@
       "key": "476695a830639512d8d7ddca353154f5",
       "notes": [],
       "params": {
-        "correctionVolume": -0.4488888888888889,
+        "correctionVolume": 0.0,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -13316,7 +13316,7 @@
       "key": "aa6803e39e5b60a87109283c3301ade0",
       "notes": [],
       "params": {
-        "correctionVolume": -0.05911330049261089,
+        "correctionVolume": -28.959715380405036,
         "flowRate": 10.0,
         "pipetteId": "UUID",
         "volume": 1.4778325123152722
@@ -13381,7 +13381,7 @@
       "key": "c0c40a3307c4b9d10b91370c5e2ae075",
       "notes": [],
       "params": {
-        "correctionVolume": -0.05911330049261089,
+        "correctionVolume": -28.911111111111115,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -13448,7 +13448,7 @@
       "key": "d3a32797ec6e6e9f3c48330b7296e123",
       "notes": [],
       "params": {
-        "correctionVolume": -28.911111111111115,
+        "correctionVolume": 0.0,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -13737,10 +13737,6 @@
             ],
             "correctionByVolume": [
               [
-                -2.5,
-                1000.0
-              ],
-              [
                 -0.2,
                 10.0
               ],
@@ -13751,6 +13747,10 @@
               [
                 0.0,
                 0.0
+              ],
+              [
+                12,
+                1000.0
               ]
             ],
             "delay": {
@@ -13801,7 +13801,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 250.0,
+                  "flowRate": 224.0,
                   "location": "trash"
                 }
               },
@@ -13910,7 +13910,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 250.0,
+                  "flowRate": 224.0,
                   "location": "destination"
                 }
               },
@@ -14291,7 +14291,7 @@
       "key": "fcdc27d81dc8ed6e78bf8556e7c8f1e4",
       "notes": [],
       "params": {
-        "correctionVolume": 10.655555555555557,
+        "correctionVolume": 0.0,
         "flowRate": 250.0,
         "pipetteId": "UUID",
         "pushOut": 35.0,
@@ -14630,7 +14630,7 @@
       "key": "ea0b9d3f80ef446ec06605f5f22858dc",
       "notes": [],
       "params": {
-        "correctionVolume": 10.655555555555557,
+        "correctionVolume": 0.0,
         "flowRate": 250.0,
         "pipetteId": "UUID",
         "pushOut": 35.0,
@@ -16117,11 +16117,11 @@
             1000.0
           ],
           [
-            -3.6,
+            -2.6,
             100.0
           ],
           [
-            -1.9,
+            -0.4,
             10.0
           ],
           [
@@ -16490,10 +16490,6 @@
         ],
         "correctionByVolume": [
           [
-            -2.5,
-            1000.0
-          ],
-          [
             -0.2,
             10.0
           ],
@@ -16504,6 +16500,10 @@
           [
             0.0,
             0.0
+          ],
+          [
+            12,
+            1000.0
           ]
         ],
         "delay": {
@@ -16554,7 +16554,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 250.0,
+              "flowRate": 224.0,
               "location": "trash"
             }
           },
@@ -16663,7 +16663,7 @@
           "blowout": {
             "enable": false,
             "params": {
-              "flowRate": 250.0,
+              "flowRate": 224.0,
               "location": "destination"
             }
           },

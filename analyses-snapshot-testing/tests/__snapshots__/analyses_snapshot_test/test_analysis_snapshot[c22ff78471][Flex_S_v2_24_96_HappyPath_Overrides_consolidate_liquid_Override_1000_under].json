@@ -70952,11 +70952,11 @@
                 1000.0
               ],
               [
-                -3.6,
+                -2.6,
                 100.0
               ],
               [
-                -1.9,
+                -0.4,
                 10.0
               ],
               [
@@ -71475,7 +71475,7 @@
       "key": "863b55004811b7ac9ad3e19901ed0e34",
       "notes": [],
       "params": {
-        "correctionVolume": -0.29674876847290643,
+        "correctionVolume": -15.933771209633278,
         "flowRate": 10.0,
         "pipetteId": "UUID",
         "volume": 7.41871921182266
@@ -71540,7 +71540,7 @@
       "key": "c5fd6ec221e73eb492547d378b2702fa",
       "notes": [],
       "params": {
-        "correctionVolume": -0.29674876847290643,
+        "correctionVolume": -15.689777777777778,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -71607,7 +71607,7 @@
       "key": "95b42f74ceae0bcfaaaaea73e8096f15",
       "notes": [],
       "params": {
-        "correctionVolume": -15.689777777777778,
+        "correctionVolume": -32.068444444444445,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "volume": 498.0
@@ -71687,7 +71687,7 @@
       "key": "75fa7800a228d3b6c83c4e11ed488b98",
       "notes": [],
       "params": {
-        "correctionVolume": -0.002364532019704484,
+        "correctionVolume": -32.0703886152162,
         "flowRate": 10.0,
         "pipetteId": "UUID",
         "volume": 0.0591133004926121
@@ -71752,7 +71752,7 @@
       "key": "b6587c3ae016d82ae5221a04d01e7018",
       "notes": [],
       "params": {
-        "correctionVolume": -0.002364532019704484,
+        "correctionVolume": -32.068444444444445,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -71819,7 +71819,7 @@
       "key": "3c01d5b995fefbac599d75f280db5111",
       "notes": [],
       "params": {
-        "correctionVolume": -32.068444444444445,
+        "correctionVolume": 0.0,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "pushOut": 0.0,
@@ -74306,10 +74306,6 @@
             ],
             "correctionByVolume": [
               [
-                -2.5,
-                1000.0
-              ],
-              [
                 -0.2,
                 10.0
               ],
@@ -74320,6 +74316,10 @@
               [
                 0.0,
                 0.0
+              ],
+              [
+                12,
+                1000.0
               ]
             ],
             "delay": {
@@ -74370,7 +74370,7 @@
               "blowout": {
                 "enable": true,
                 "params": {
-                  "flowRate": 250.0,
+                  "flowRate": 224.0,
                   "location": "trash"
                 }
               },
@@ -74479,7 +74479,7 @@
               "blowout": {
                 "enable": false,
                 "params": {
-                  "flowRate": 250.0,
+                  "flowRate": 224.0,
                   "location": "destination"
                 }
               },
@@ -74860,7 +74860,7 @@
       "key": "39c2757046ed671acf193ad7f55c1459",
       "notes": [],
       "params": {
-        "correctionVolume": 5.250888888888889,
+        "correctionVolume": 11.946222222222223,
         "flowRate": 200.0,
         "pipetteId": "UUID",
         "volume": 498.0
@@ -74991,7 +74991,7 @@
       "key": "694051c424314d38861c0bdfab8d39c4",
       "notes": [],
       "params": {
-        "correctionVolume": 11.946222222222223,
+        "correctionVolume": 0.0,
         "flowRate": 250.0,
         "pipetteId": "UUID",
         "pushOut": 35.0,
@@ -76073,11 +76073,11 @@
             1000.0
           ],
           [
-            -3.6,
+            -2.6,
             100.0
           ],
           [
-            -1.9,
+            -0.4,
             10.0
           ],
           [
@@ -76446,10 +76446,6 @@
         ],
         "correctionByVolume": [
           [
-            -2.5,
-            1000.0
-          ],
-          [
             -0.2,
             10.0
           ],
@@ -76460,6 +76456,10 @@
           [
             0.0,
             0.0
+          ],
+          [
+            12,
+            1000.0
           ]
         ],
         "delay": {
@@ -76510,7 +76510,7 @@
           "blowout": {
             "enable": true,
             "params": {
-              "flowRate": 250.0,
+              "flowRate": 224.0,
               "location": "trash"
             }
           },
@@ -76619,7 +76619,7 @@
           "blowout": {
             "enable": false,
             "params": {
-              "flowRate": 250.0,
+              "flowRate": 224.0,
               "location": "destination"
             }
           },
