@@ -388,7 +388,7 @@ def load_liquid_dye(
         }
     for ul, well in src_wells_by_volume.items():
         liquid, trials = liquid_and_trials_by_volume[ul]
-        well_start_ul = critical_ul["dead"] + (ul * trials)
+        well_start_ul = critical_ul["dead"] + (ul * trials * pipette.channels)
         src_wells_by_volume[ul].load_liquid(liquid, well_start_ul)
     return src_wells_by_volume
 
