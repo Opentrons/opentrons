@@ -1,19 +1,20 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { QuickTransferAdvancedSettings } from '../../QuickTransferAdvancedSettings/'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
-import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
-import { TipPositionEntry } from '../../QuickTransferAdvancedSettings/TipPosition'
-import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
-import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
-import { TouchTip } from '../../QuickTransferAdvancedSettings/TouchTip'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
+import { QuickTransferAdvancedSettings } from '../../QuickTransferAdvancedSettings/'
 import { AirGap } from '../../QuickTransferAdvancedSettings/AirGap'
 import { BlowOut } from '../../QuickTransferAdvancedSettings/BlowOut'
+import { Delay } from '../../QuickTransferAdvancedSettings/Delay'
+import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
+import { Mix } from '../../QuickTransferAdvancedSettings/Mix'
+import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
+import { TipPositionEntry } from '../../QuickTransferAdvancedSettings/TipPosition'
+import { TouchTip } from '../../QuickTransferAdvancedSettings/TouchTip'
 
 import type { ComponentProps } from 'react'
 
@@ -223,7 +224,7 @@ describe('QuickTransferAdvancedSettings', () => {
         transferType: 'transfer',
         mixOnAspirate: {
           mixVolume: 15,
-          repititions: 25,
+          repetitions: 25,
         },
       },
     }
@@ -260,13 +261,12 @@ describe('QuickTransferAdvancedSettings', () => {
         ...props.state,
         delayAspirate: {
           delayDuration: 5,
-          positionFromBottom: 17,
         },
       },
     }
     render(props)
     const delayAspirate = screen.getAllByText('Delay')[0]
-    screen.getByText('5s, 17 mm from bottom')
+    screen.getByText('5s')
     fireEvent.click(delayAspirate)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })
@@ -280,7 +280,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const touchtipAspirate = screen.getAllByText('Touch tip')[0]
-    screen.getByText('8 mm from bottom')
+    screen.getByText('10 mm from the bottom')
     fireEvent.click(touchtipAspirate)
     expect(vi.mocked(TouchTip)).toHaveBeenCalled()
   })
@@ -333,7 +333,7 @@ describe('QuickTransferAdvancedSettings', () => {
         transferType: 'transfer',
         mixOnDispense: {
           mixVolume: 18,
-          repititions: 20,
+          repetitions: 20,
         },
       },
     }
@@ -370,13 +370,12 @@ describe('QuickTransferAdvancedSettings', () => {
         ...props.state,
         delayDispense: {
           delayDuration: 10,
-          positionFromBottom: 4,
         },
       },
     }
     render(props)
     const delayDispense = screen.getAllByText('Delay')[1]
-    screen.getByText('10s, 4 mm from bottom')
+    screen.getByText('10s')
     fireEvent.click(delayDispense)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })
@@ -390,7 +389,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const touchtipDispense = screen.getAllByText('Touch tip')[1]
-    screen.getByText('1 mm from bottom')
+    screen.getByText('10 mm from the bottom')
     fireEvent.click(touchtipDispense)
     expect(vi.mocked(TouchTip)).toHaveBeenCalled()
   })

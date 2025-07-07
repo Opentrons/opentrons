@@ -1,14 +1,14 @@
 import mqtt from 'mqtt'
 
-import { connectionStore } from './store'
+import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
 import {
+  deserializeExpectedMessages,
   sendDeserialized,
   sendDeserializedGenericError,
-  deserializeExpectedMessages,
 } from './deserialize'
-import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './notifyLog'
-import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
+import { connectionStore } from './store'
+import { unsubscribe } from './unsubscribe'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'

@@ -1,7 +1,8 @@
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useDrag, useDrop } from 'react-dnd'
 import { useEffect, useRef } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,8 +15,11 @@ import {
   TYPOGRAPHY,
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
+import { getTopLocationInStack } from '@opentrons/step-generation'
+
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
@@ -23,7 +27,7 @@ import { SlotOverlay } from './SlotOverlay'
 import type { DropTargetMonitor } from 'react-dnd'
 import type { LabwareOnDeck } from '../../../../step-forms'
 import type { ThunkDispatch } from '../../../../types'
-import type { SharedControlsType, DroppedItem } from '../types'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface LabwareControlsProps extends SharedControlsType {
   labwareOnDeck: LabwareOnDeck
@@ -45,7 +49,7 @@ export const LabwareControls = (
     setHover,
     setShowMenuListForId,
     isSelected,
-    tab,
+    terminalItemId,
     itemId,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -70,13 +74,17 @@ export const LabwareControls = (
       canDrop: (item: DroppedItem) => {
         const draggedLabware = item?.labwareOnDeck
         const isDifferentSlot =
-          draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
+          draggedLabware &&
+          getTopLocationInStack(draggedLabware.stack) !==
+            getTopLocationInStack(labwareOnDeck.stack)
         return isDifferentSlot && !swapBlocked
       },
       drop: (item: DroppedItem) => {
         const draggedLabware = item?.labwareOnDeck
         if (draggedLabware != null) {
-          dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
+          dispatch(
+            moveDeckItem(draggedLabware.stack[1], labwareOnDeck.stack[1])
+          )
         }
       },
       hover: () => {
@@ -105,15 +113,23 @@ export const LabwareControls = (
   }, [draggedLabware])
 
   const isBeingDragged =
-    draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
+    draggedLabware?.labwareOnDeck?.stack != null &&
+    getTopLocationInStack(draggedLabware?.labwareOnDeck?.stack) ===
+      getTopLocationInStack(labwareOnDeck.stack)
 
   drag(drop(ref))
 
-  if (tab === 'protocolSteps' || isSelected || slotPosition == null) {
+  if (
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
+    isSelected ||
+    slotPosition == null
+  ) {
     return null
   }
   const isLabwareSwapping =
-    draggedLabware?.labwareOnDeck?.slot !== labwareOnDeck.slot
+    draggedLabware?.labwareOnDeck?.stack != null &&
+    getTopLocationInStack(draggedLabware?.labwareOnDeck?.stack) !==
+      getTopLocationInStack(labwareOnDeck.stack)
   const [x, y] = slotPosition
   const width = labwareOnDeck.def.dimensions.xDimension
   const height = labwareOnDeck.def.dimensions.yDimension

@@ -1,8 +1,8 @@
 import {
+  FLEX_STANDARD_MODEL,
+  OT2_STANDARD_MODEL,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
-  OT2_STANDARD_MODEL,
-  FLEX_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 
 import type { RobotType } from '@opentrons/shared-data'

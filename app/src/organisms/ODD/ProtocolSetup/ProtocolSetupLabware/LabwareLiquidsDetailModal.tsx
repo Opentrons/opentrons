@@ -7,21 +7,25 @@ import {
   LabwareRender,
   SPACING,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
-
-import { OddModal } from '/app/molecules/OddModal'
-import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
 import {
-  getLiquidsByIdForLabware,
-  getDisabledWellFillFromLabwareId,
-  getWellGroupForLiquidId,
-  getDisabledWellGroupForLiquidId,
-} from '/app/transformations/analysis'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
-import type {
-  LabwareDefinition2,
-  CompletedProtocolAnalysis,
+  getLabwareViewBox,
+  parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
+
+import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { OddModal } from '/app/molecules/OddModal'
+import {
+  getDisabledWellFillFromLabwareId,
+  getDisabledWellGroupForLiquidId,
+  getLiquidsByIdForLabware,
+  getWellGroupForLiquidId,
+} from '/app/transformations/analysis'
+
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '/app/transformations/commands'
 
 interface LabwareLiquidsDetailModalProps {
   labwareId: string
@@ -29,7 +33,7 @@ interface LabwareLiquidsDetailModalProps {
   mostRecentAnalysis: CompletedProtocolAnalysis
   closeModal: () => void
   labwareByLiquidId: LabwareByLiquidId
-  labwareDefinition: LabwareDefinition2
+  labwareDefinition: LabwareDefinition
   stackPosition?: number
 }
 
@@ -71,11 +75,14 @@ export const LabwareLiquidsDetailModal = (
     selectedLiquidId
   )
 
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
+
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
   const disabledLiquidIds = liquidIds.filter(id => id !== selectedLiquidId)
   const labwareRender = (
     <LabwareRender
       definition={labwareDefinition}
+      positioningMode="passThrough"
       wellFill={wellFill}
       wellLabelOption="SHOW_LABEL_INSIDE"
       highlightedWells={
@@ -104,7 +111,7 @@ export const LabwareLiquidsDetailModal = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing32}>
         <Flex>
           <LabwareThumbnail
-            viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
           >
             {labwareRender}
           </LabwareThumbnail>

@@ -8,10 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { OddModal } from '/app/molecules/OddModal'
 
 export function CancelingRunModal(): JSX.Element {

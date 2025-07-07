@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getRun, getCommands, getProtocol } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+
+import { getCommands, getProtocol, getRun } from '@opentrons/api-client'
 import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
+
 import { useToaster } from '/app/organisms/ToasterOven'
+
 import { downloadFile } from '../utils'
+
 import type { IconProps } from '@opentrons/components'
 
 export function useDownloadRunLog(

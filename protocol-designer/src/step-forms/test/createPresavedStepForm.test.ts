@@ -1,20 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  fixtureP10SingleV2Specs,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
+
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
 } from '../../constants'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+
 import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'
@@ -64,12 +67,12 @@ beforeEach(() => {
       labware: {
         labwareOnMagModule: {
           ...labwareOnMagModule,
-          slot: 'someMagneticModuleId',
+          stack: ['labwareOnMagModule', 'someMagneticModuleId', '1'],
         },
       },
       tipRack: {
         ...tipRack,
-        slot: '6',
+        stack: ['tipRack', '6'],
       },
       modules: {
         someMagneticModuleId: {
@@ -130,6 +133,7 @@ describe('createPresavedStepForm', () => {
         pauseTemperature: null,
         stepDetails: '',
         stepName: 'pause',
+        stepNumber: 0,
       })
     })
   })
@@ -149,25 +153,23 @@ describe('createPresavedStepForm', () => {
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
-      aspirate_delay_mmFromBottom: null,
       aspirate_delay_seconds: '1',
       dispense_delay_checkbox: false,
       dispense_delay_seconds: '1',
-      dispense_delay_mmFromBottom: null,
       aspirate_flowRate: null,
       aspirate_labware: null,
       aspirate_mix_checkbox: false,
       aspirate_mix_times: null,
       aspirate_mix_volume: null,
       aspirate_mmFromBottom: null,
-      aspirate_position_reference: null,
-      aspirate_retract_position_reference: null,
+      aspirate_position_reference: 'well-bottom',
+      aspirate_retract_position_reference: 'well-top',
       aspirate_retract_delay_seconds: null,
       aspirate_retract_mmFromBottom: null,
       aspirate_retract_speed: null,
       aspirate_retract_x_position: 0,
       aspirate_retract_y_position: 0,
-      aspirate_submerge_position_reference: null,
+      aspirate_submerge_position_reference: 'well-top',
       aspirate_submerge_mmFromBottom: null,
       aspirate_submerge_x_position: 0,
       aspirate_submerge_y_position: 0,
@@ -193,14 +195,14 @@ describe('createPresavedStepForm', () => {
       dispense_mix_times: null,
       dispense_mix_volume: null,
       dispense_mmFromBottom: null,
-      dispense_position_reference: null,
+      dispense_position_reference: 'well-bottom',
       dispense_retract_delay_seconds: null,
-      dispense_retract_position_reference: null,
+      dispense_retract_position_reference: 'well-top',
       dispense_retract_mmFromBottom: null,
       dispense_retract_speed: null,
       dispense_retract_x_position: 0,
       dispense_retract_y_position: 0,
-      dispense_submerge_position_reference: null,
+      dispense_submerge_position_reference: 'well-top',
       dispense_submerge_mmFromBottom: null,
       dispense_submerge_x_position: 0,
       dispense_submerge_y_position: 0,
@@ -219,6 +221,8 @@ describe('createPresavedStepForm', () => {
       preWetTip: false,
       pushOut_checkbox: null,
       pushOut_volume: null,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
@@ -226,10 +230,10 @@ describe('createPresavedStepForm', () => {
       aspirate_y_position: 0,
       dispense_x_position: 0,
       dispense_y_position: 0,
-      blowout_z_offset: 0,
       blowout_flowRate: null,
       liquidClassesSupported: true,
-      liquidClass: null,
+      liquidClass: 'none',
+      stepNumber: 0,
     })
   })
   describe('mix step', () => {
@@ -239,6 +243,7 @@ describe('createPresavedStepForm', () => {
         id: stepId,
         pipette: 'leftPipetteId',
         stepType: 'mix',
+        stepNumber: 0,
         // default fields
         labware: null,
         nozzles: null,
@@ -271,6 +276,10 @@ describe('createPresavedStepForm', () => {
         tipRack: null,
         blowout_flowRate: null,
         liquidClassesSupported: true,
+        liquidClass: 'none',
+        pushOut_checkbox: null,
+        pushOut_volume: null,
+        mix_position_reference: 'well-bottom',
       })
     })
   })
@@ -280,11 +289,12 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
+      engageHeight: null,
       magnetAction: 'engage',
       // Default values
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=disengage, when the previous magnet step is an engage', () => {
@@ -297,8 +307,9 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'engage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
+          stepNumber: 0,
         },
       },
       orderedStepIds: ['prevStepId'],
@@ -310,8 +321,9 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'disengage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
@@ -324,7 +336,7 @@ describe('createPresavedStepForm', () => {
           moduleId: 'someMagneticModuleId',
           engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'disengage',
-          stepName: 'magnet',
+          stepName: 'magnetic module state',
           stepDetails: '',
         },
       },
@@ -337,8 +349,9 @@ describe('createPresavedStepForm', () => {
       moduleId: 'someMagneticModuleId',
       engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'engage',
-      stepName: 'magnet',
+      stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default temperature module when a Temperature step is added', () => {
@@ -350,8 +363,9 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature',
+      stepName: 'temperature module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   ;[true, false].forEach(timelineHasErrors => {
@@ -389,6 +403,7 @@ describe('createPresavedStepForm', () => {
               // TC Default fields (should all be ignored, robotState is used to populate the form)
               stepName: 'thermocycler',
               stepDetails: '',
+              stepNumber: 0,
               thermocyclerFormType: 'thermocyclerState',
               blockIsActive: false,
               blockTargetTemp: null,
@@ -427,6 +442,7 @@ describe('createPresavedStepForm', () => {
           profileTargetLidTemp: null,
           profileVolume: null,
           stepDetails: '',
+          stepNumber: 0,
           stepName: 'thermocycler',
           stepType: 'thermocycler',
           thermocyclerFormType: 'thermocyclerState',

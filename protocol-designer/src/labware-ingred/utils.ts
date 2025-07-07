@@ -1,6 +1,7 @@
 import {
   FIXED_TRASH_ID,
   FLEX_MODULE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   getAreSlotsAdjacent,
   getDeckDefFromRobotType,
   getIsLabwareAboveHeight,
@@ -12,12 +13,14 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
+
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { getStagingAreaAddressableAreas } from '../utils'
+
 import type {
-  RobotType,
   CutoutId,
   LabwareDefinition2,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../step-forms/types'
 import type { DeckSlot } from '../types'
@@ -39,7 +42,8 @@ export function getNextAvailableDeckSlot(
     .filter(module => module.slot)
     .map(mod => mod.slot)
   if (hasTC) {
-    moduleSlots = [...moduleSlots, '8', '10', '11']
+    //  encompass all TC slots for both robots since they're different
+    moduleSlots = [...moduleSlots, '8', '10', '11', 'A1']
   }
 
   return deckDef.locations.addressableAreas.find(slot => {
@@ -52,7 +56,7 @@ export function getNextAvailableDeckSlot(
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot.id
     )
-    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id)
+    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id, true)
     if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot.id)) {
       isSlotEmpty = false
     } else if (
@@ -63,7 +67,8 @@ export function getNextAvailableDeckSlot(
       isSlotEmpty = false
     } else if (
       moduleSlots.includes(slot.id) ||
-      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id)
+      FLEX_MODULE_ADDRESSABLE_AREAS.includes(slot.id) ||
+      FLEX_STACKER_ADDRESSABLE_AREAS.includes(slot.id)
     ) {
       isSlotEmpty = false
       //  return slot as full if slot is adjacent to heater-shaker for ot-2 and taller than 53mm

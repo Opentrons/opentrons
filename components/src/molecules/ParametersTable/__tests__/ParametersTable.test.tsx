@@ -1,6 +1,7 @@
-import { renderWithProviders } from '../../../testing/utils'
-import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
+
+import { renderWithProviders } from '../../../testing/utils'
 import { ParametersTable } from '../index'
 
 import type { ComponentProps } from 'react'

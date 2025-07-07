@@ -1,6 +1,8 @@
 import { useAtom } from 'jotai'
+
 import { trackEvent } from '../../analytics/mixpanel'
 import { mixpanelAtom } from '../atoms'
+
 import type { AnalyticsEvent } from '../types'
 
 /**

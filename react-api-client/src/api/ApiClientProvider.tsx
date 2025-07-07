@@ -1,5 +1,6 @@
-import type * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+
+import type * as React from 'react'
 
 const queryClient = new QueryClient({
   defaultOptions: {

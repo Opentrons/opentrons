@@ -1,7 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { useRef } from 'react'
 import { useDrop } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,18 +13,20 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+
 import { DND_TYPES } from '../../../../constants'
+import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { getLabwareIsCustom } from '../../../../utils/labwareModuleCompatibility'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
 import type { DropTargetMonitor } from 'react-dnd'
 import type { Dimensions } from '@opentrons/shared-data'
-import type { SharedControlsType, DroppedItem } from '../types'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface AdapterControlsProps extends SharedControlsType {
   slotBoundingBox: Dimensions
@@ -48,7 +51,7 @@ export const AdapterControls = (
     setShowMenuListForId,
     itemId,
     isSelected,
-    tab,
+    terminalItemId,
     swapBlocked,
   } = props
   const { t } = useTranslation(['deck', 'starting_deck_state'])
@@ -92,8 +95,9 @@ export const AdapterControls = (
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = droppedLabware.labwareOnDeck.slot
-          dispatch(moveDeckItem(droppedSlot, labwareId))
+          dispatch(
+            moveDeckItem(droppedLabware.labwareOnDeck.stack[1], labwareId)
+          )
         }
       },
       hover: () => {
@@ -112,7 +116,7 @@ export const AdapterControls = (
 
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
-    tab === 'protocolSteps' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected ||
     slotPosition == null
   ) {

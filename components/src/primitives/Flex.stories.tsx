@@ -1,8 +1,8 @@
-import { BORDERS, COLORS } from '../helix-design-system'
-import { SPACING } from '../ui-style-constants'
-import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
 import { LegacyStyledText } from '../atoms/StyledText'
+import { BORDERS, COLORS } from '../helix-design-system'
 import { Box, Flex as FlexComponent } from '../primitives'
+import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
+import { SPACING } from '../ui-style-constants'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

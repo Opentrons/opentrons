@@ -2,7 +2,6 @@ import type {
   LabwareDefinition2,
   LoadLabwareCreateCommand,
 } from '@opentrons/shared-data'
-
 import type { MoveLiquidPrefixType } from '../../../resources/types'
 
 export const getMigratedPositionFromTop = (

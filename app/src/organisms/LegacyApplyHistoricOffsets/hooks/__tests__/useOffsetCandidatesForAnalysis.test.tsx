@@ -1,19 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
+  fixtureTiprack300ul,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
-  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
-import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
-import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
+import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
+
 import type { FunctionComponent, ReactNode } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
@@ -22,7 +24,7 @@ vi.mock('@opentrons/shared-data')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/useNotifyDataReady')
 
-const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',

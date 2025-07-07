@@ -1,18 +1,18 @@
-import Mdns from 'mdns-js'
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import isEqual from 'lodash/isEqual'
+import Mdns from 'mdns-js'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
+import { createMdnsBrowser } from '..'
 import {
   mockBaseBrowser,
   mockBrowserService,
+  mockBrowserServiceWithoutTXT,
   mockBrowserServiceWithRobotModel,
   mockBrowserServiceWithSurpriseTXT,
-  mockBrowserServiceWithoutTXT,
 } from '../__fixtures__'
 import * as Ifaces from '../interfaces'
 import { repeatCall } from '../repeat-call'
-import { createMdnsBrowser } from '..'
 
 vi.mock('../interfaces')
 vi.mock('../repeat-call')

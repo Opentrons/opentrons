@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
@@ -12,20 +12,22 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
-import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 interface DelayProps {
   onBack: () => void
@@ -50,11 +52,6 @@ export function Delay(props: DelayProps): JSX.Element {
     kind === 'aspirate'
       ? state.delayAspirate?.delayDuration ?? null
       : state.delayDispense?.delayDuration ?? null
-  )
-  const [position, setPosition] = useState<number | null>(
-    kind === 'aspirate'
-      ? state.delayAspirate?.positionFromBottom ?? null
-      : state.delayDispense?.positionFromBottom ?? null
   )
 
   const action =
@@ -93,7 +90,7 @@ export function Delay(props: DelayProps): JSX.Element {
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
         onBack()
@@ -101,20 +98,17 @@ export function Delay(props: DelayProps): JSX.Element {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
-      setCurrentStep(3)
-    } else {
-      if (delayDuration != null && position != null) {
+      if (delayDuration != null) {
         dispatch({
           type: action,
           delaySettings: {
             delayDuration,
-            positionFromBottom: position,
           },
         })
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `Delay_${kind}`,
+            setting: `Delay_${kind}`,
           },
         })
       }
@@ -123,37 +117,7 @@ export function Delay(props: DelayProps): JSX.Element {
   }
 
   const setSaveOrContinueButtonText =
-    delayIsEnabled && currentStep < 3 ? t('shared:continue') : t('shared:save')
-
-  let wellHeight = 1
-  if (kind === 'aspirate') {
-    wellHeight = Math.max(
-      ...state.sourceWells.map(well =>
-        state.source != null ? state.source.wells[well].depth : 0
-      )
-    )
-  } else if (kind === 'dispense') {
-    const destLabwareDefinition =
-      state.destination === 'source' ? state.source : state.destination
-    wellHeight = Math.max(
-      ...state.destinationWells.map(well =>
-        destLabwareDefinition != null
-          ? destLabwareDefinition.wells[well].depth
-          : 0
-      )
-    )
-  }
-
-  // the maxiumum allowed position for delay is 2x the height of the well
-  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
-  const positionError =
-    position != null &&
-    (position < positionRange.min || position > positionRange.max)
-      ? t(`value_out_of_range`, {
-          min: positionRange.min,
-          max: positionRange.max,
-        })
-      : null
+    delayIsEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
   // allow a maximum of 10 digits for delay duration
   const durationRange = { min: 1, max: 9999999999 }
@@ -168,8 +132,6 @@ export function Delay(props: DelayProps): JSX.Element {
   let buttonIsDisabled = false
   if (currentStep === 2) {
     buttonIsDisabled = delayDuration == null || durationError != null
-  } else if (currentStep === 3) {
-    buttonIsDisabled = positionError != null || position == null
   }
 
   return createPortal(
@@ -242,47 +204,6 @@ export function Delay(props: DelayProps): JSX.Element {
               initialValue={String(delayDuration ?? '')}
               onChange={e => {
                 setDelayDuration(Number(e))
-              }}
-            />
-          </Flex>
-        </Flex>
-      ) : null}
-      {currentStep === 3 ? (
-        <Flex
-          alignSelf={ALIGN_CENTER}
-          gridGap={SPACING.spacing48}
-          paddingX={SPACING.spacing40}
-          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
-          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
-          alignItems={ALIGN_CENTER}
-          height="22rem"
-        >
-          <Flex
-            width="30.5rem"
-            height="100%"
-            gridGap={SPACING.spacing24}
-            flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing68}
-          >
-            <InputField
-              type="number"
-              value={position}
-              title={t('delay_position_mm')}
-              error={positionError}
-              readOnly
-            />
-          </Flex>
-          <Flex
-            paddingX={SPACING.spacing24}
-            height="21.25rem"
-            marginTop="7.75rem"
-            borderRadius="0"
-          >
-            <NumericalKeyboard
-              keyboardRef={keyboardRef}
-              initialValue={String(position ?? '')}
-              onChange={e => {
-                setPosition(Number(e))
               }}
             />
           </Flex>

@@ -1,25 +1,25 @@
 import { MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DeckConfigurator } from '@opentrons/components'
-import { renderWithProviders } from '/app/__testing-utils__'
-
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { DeckConfigurationEditor } from '..'
 import {
-  useNotifyDeckConfigurationQuery,
   useDeckConfigurationEditingTools,
+  useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
 
+import { DeckConfigurationEditor } from '..'
+
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
-import type * as Components from '@opentrons/components'
 import type { NavigateFunction } from 'react-router-dom'
+import type * as Components from '@opentrons/components'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 const mockUpdateDeckConfiguration = vi.fn()
 const mockGoBack = vi.fn()

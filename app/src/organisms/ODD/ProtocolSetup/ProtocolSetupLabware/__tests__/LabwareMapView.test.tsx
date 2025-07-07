@@ -1,22 +1,22 @@
 import { MemoryRouter } from 'react-router-dom'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
+import { fixtureTiprack300ul, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getLabwareRenderInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapView } from '../LabwareMapView'
 
 import type { ComponentProps } from 'react'
 import type {
-  getSimplestDeckConfigForProtocol,
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  getSimplestDeckConfigForProtocol,
+  LabwareDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -26,8 +26,6 @@ vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/redux/config')
-
-const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
@@ -57,10 +55,6 @@ const render = (props: ComponentProps<typeof LabwareMapView>) => {
 }
 
 describe('LabwareMapView', () => {
-  beforeEach(() => {
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
-  })
-
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -69,7 +63,7 @@ describe('LabwareMapView', () => {
     const mockLabwareOnDeck = [
       {
         labwareLocation: { slotName: 'C1' },
-        definition: fixtureTiprack300ul as LabwareDefinition2,
+        definition: fixtureTiprack300ul as LabwareDefinition,
         topLabwareId: '300_ul_tiprack_id',
         onLabwareClick: expect.any(Function),
         labwareChildren: null,
@@ -80,7 +74,7 @@ describe('LabwareMapView', () => {
         moduleModel: 'heaterShakerModuleV1' as ModuleModel,
         moduleLocation: { slotName: 'B1' },
         nestedLabwareDef: mockProtocolModuleInfo[0]
-          .nestedLabwareDef as LabwareDefinition2,
+          .nestedLabwareDef as LabwareDefinition,
         onLabwareClick: expect.any(Function),
         moduleChildren: null,
         innerProps: {},
@@ -95,22 +89,7 @@ describe('LabwareMapView', () => {
         modulesOnDeck: mockModulesOnDeck,
       })
       .thenReturn(<div>mock base deck</div>)
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({
-      '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
-        displayName: 'fresh tips',
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-        slotName: 'C1',
-      },
-    })
     render({
-      attachedProtocolModuleMatches: [
-        {
-          ...mockProtocolModuleInfo[0],
-        },
-      ],
       handleLabwareClick: vi.fn(),
       mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
       startingDeck: {

@@ -1,5 +1,5 @@
 import { RECOVERY_MAP } from '../constants'
-import { TwoColLwInfoAndDeck, SelectTips, SkipStepInfo } from '../shared'
+import { SelectTips, SkipStepInfo, TwoColLwInfoAndDeck } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'

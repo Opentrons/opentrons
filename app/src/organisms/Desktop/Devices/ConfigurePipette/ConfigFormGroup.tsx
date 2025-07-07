@@ -1,4 +1,5 @@
 import { Controller } from 'react-hook-form'
+
 import {
   CheckboxField,
   DIRECTION_COLUMN,
@@ -9,6 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import styles from './styles.module.css'
 
 import type { ReactNode } from 'react'

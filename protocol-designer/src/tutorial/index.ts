@@ -1,6 +1,7 @@
 import * as actions from './actions'
 import { rootReducer } from './reducers'
 import * as selectors from './selectors'
+
 import type { RootState } from './reducers'
 
 type HintKey =
@@ -9,7 +10,6 @@ type HintKey =
   | 'waste_chute_warning'
   // blocking hints
   | 'change_magnet_module_model'
-  | 'unused_hardware'
   | 'no_commands'
 
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
@@ -27,6 +27,7 @@ type HintKey =
 // | 'add_liquids_and_labware'
 // | 'deck_setup_explanation'
 // | 'module_without_labware'
+// | 'unused_hardware'
 
 export { actions, rootReducer, selectors }
 export type { RootState, HintKey }

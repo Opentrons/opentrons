@@ -1,20 +1,21 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useCreateProtocolMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { ANALYTICS_QUICK_TRANSFER_RUN_NOW } from '/app/redux/analytics'
-import { createQuickTransferFile } from '../utils'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { SummaryAndSettings } from '../SummaryAndSettings'
+import { ANALYTICS_QUICK_TRANSFER_RUN_NOW } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
+import { SummaryAndSettings } from '../SummaryAndSettings'
+import { createQuickTransferFile } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

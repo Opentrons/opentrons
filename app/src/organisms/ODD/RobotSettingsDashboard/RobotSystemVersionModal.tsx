@@ -5,12 +5,13 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  InlineNotification,
   OVERFLOW_AUTO,
   ReleaseNotes,
   SPACING,
 } from '@opentrons/components'
+
 import { SmallButton } from '/app/atoms/buttons'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsOEMMode } from '/app/resources/robot-settings'
 

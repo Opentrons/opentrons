@@ -1,4 +1,5 @@
-import { Box, BORDERS, SPACING } from '@opentrons/components'
+import { BORDERS, Box, SPACING } from '@opentrons/components'
+
 import type { StyleProps } from '@opentrons/components'
 
 export interface VisibleContainerProps extends StyleProps {

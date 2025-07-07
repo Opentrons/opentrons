@@ -1,11 +1,12 @@
 // hooks for components that depend on API state
-import { useReducer, useCallback, useRef, useState } from 'react'
+import { useCallback, useReducer, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
 
-import type { State, Action } from '../types'
 import { PENDING } from './constants'
 import { getRequestById } from './selectors'
+
+import type { Action, State } from '../types'
 import type { RequestState } from './types'
 
 type ActionWithRequestMeta = Action & {

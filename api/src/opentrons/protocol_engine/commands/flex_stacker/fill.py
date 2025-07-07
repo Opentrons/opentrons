@@ -12,13 +12,30 @@ from ...errors import (
     ErrorOccurrence,
 )
 from ...errors.exceptions import FlexStackerLabwarePoolNotYetDefinedError
-from ...state import update_types
-from ...types import StackerFillEmptyStrategy
-from opentrons.calibration_storage.helpers import uri_from_details
+from ...types import (
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
+    LabwareLocationSequence,
+    NotOnDeckLocationSequenceComponent,
+    SYSTEM_LOCATION,
+    InStackerHopperLocation,
+)
+from .common import (
+    INITIAL_STORED_LABWARE_DESCRIPTION,
+    build_ids_to_fill,
+    build_or_assign_labware_to_hopper,
+    labware_locations_for_group,
+    labware_location_base_sequence,
+    primary_location_sequences,
+    adapter_location_sequences_with_default,
+    lid_location_sequences_with_default,
+)
 
 if TYPE_CHECKING:
-    from ...state.state import StateView
-    from ...execution import RunControlHandler
+    from opentrons.protocol_engine.state.state import StateView
+    from opentrons.protocol_engine.execution import EquipmentHandler, RunControlHandler
+    from opentrons.protocol_engine.resources import ModelUtils
+
 
 FillCommandType = Literal["flexStacker/fill"]
 
@@ -54,17 +71,19 @@ class FillParams(BaseModel):
             "an outside observer; instead, use the count value from the results."
         ),
     )
+    labwareToStore: list[StackerStoredLabwareGroup] | None = Field(
+        None, description=INITIAL_STORED_LABWARE_DESCRIPTION
+    )
 
 
 class FillResult(BaseModel):
     """Result data from a stacker fill command."""
 
     count: int = Field(
-        ..., description="The new amount of labware stored in the stacker labware pool."
+        ..., description="The new amount of labware stored in the stacker."
     )
     primaryLabwareURI: str = Field(
-        ...,
-        description="The labware definition URI of the primary labware.",
+        ..., description="The labware definition URI of the primary labware."
     )
     adapterLabwareURI: str | SkipJsonSchema[None] = Field(
         None,
@@ -74,16 +93,65 @@ class FillResult(BaseModel):
         None,
         description="The labware definition URI of the lid labware.",
     )
+    storedLabware: list[StackerStoredLabwareGroup] | SkipJsonSchema[None] = Field(
+        None, description="The labware now stored in the stacker."
+    )
+    addedLabware: list[StackerStoredLabwareGroup] | SkipJsonSchema[None] = Field(
+        None, description="The labware just added to the stacker."
+    )
+    originalPrimaryLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The previous position of each primary labware, in the same order as storedLabware.",
+    )
+    originalAdapterLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The previous position of each adapter labware, in the same order as storedLabware. None if the pool does not specify an adapter.",
+    )
+    originalLidLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The previous position of each lid labware, in the same order as storedLabware. None if the pool does not specify a lid.",
+    )
+    newPrimaryLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The new position of each primary labware, in the same order as storedLabware.",
+    )
+    newAdapterLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The new position of each adapter labware, in the same order as storedLabware. None if the pool does not specify an adapter.",
+    )
+    newLidLabwareLocationSequences: (
+        list[LabwareLocationSequence] | SkipJsonSchema[None]
+    ) = Field(
+        None,
+        description="The new position of each lid labware, in the same order as storedLabware. None if the pool does not specify a lid labware.",
+    )
 
 
 class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
     """Implementation of a stacker fill command."""
 
     def __init__(
-        self, state_view: StateView, run_control: RunControlHandler, **kwargs: object
+        self,
+        state_view: StateView,
+        run_control: RunControlHandler,
+        model_utils: ModelUtils,
+        equipment: EquipmentHandler,
+        **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._run_control = run_control
+        self._model_utils = model_utils
+        self._equipment = equipment
 
     async def execute(self, params: FillParams) -> SuccessData[FillResult]:
         """Execute the stacker fill command."""
@@ -97,49 +165,98 @@ class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
                 message=f"The Flex Stacker in {location} has not been configured yet and cannot be filled."
             )
 
-        count = (
-            params.count if params.count is not None else stacker_state.max_pool_count
-        )
-        new_count = min(
-            stacker_state.max_pool_count, max(stacker_state.pool_count, count)
+        groups_to_load = build_ids_to_fill(
+            stacker_state.pool_adapter_definition is not None,
+            stacker_state.pool_lid_definition is not None,
+            params.labwareToStore,
+            params.count,
+            stacker_state.max_pool_count,
+            len(stacker_state.contained_labware_bottom_first),
+            self._model_utils,
         )
 
-        state_update = (
-            update_types.StateUpdate().update_flex_stacker_labware_pool_count(
-                params.moduleId, new_count
-            )
+        state_update, new_contained_labware = await build_or_assign_labware_to_hopper(
+            stacker_state.pool_primary_definition,
+            stacker_state.pool_adapter_definition,
+            stacker_state.pool_lid_definition,
+            params.moduleId,
+            groups_to_load,
+            stacker_state.get_contained_labware(),
+            self._equipment,
+            self._state_view,
         )
+        added_labware = [
+            labware
+            for labware in new_contained_labware
+            if labware not in stacker_state.contained_labware_bottom_first
+        ]
+
+        original_location_sequences = [
+            labware_locations_for_group(
+                group,
+                labware_location_base_sequence(
+                    group,
+                    self._state_view,
+                    [
+                        NotOnDeckLocationSequenceComponent(
+                            logicalLocationName=SYSTEM_LOCATION
+                        )
+                    ],
+                ),
+            )
+            for group in added_labware
+        ]
+        new_location_sequences = [
+            labware_locations_for_group(
+                group, [InStackerHopperLocation(moduleId=params.moduleId)]
+            )
+            for group in added_labware
+        ]
+
+        stacker_hw = self._equipment.get_module_hardware_api(
+            module_id=stacker_state.module_id
+        )
+        if stacker_hw:
+            stacker_hw.set_stacker_identify(True)
 
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
 
-        if stacker_state.pool_primary_definition is None:
-            raise FlexStackerLabwarePoolNotYetDefinedError(
-                "The Primary Labware must be defined in the stacker pool."
-            )
+        if stacker_hw:
+            stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
-            public=FillResult(
-                count=new_count,
-                primaryLabwareURI=uri_from_details(
-                    stacker_state.pool_primary_definition.namespace,
-                    stacker_state.pool_primary_definition.parameters.loadName,
-                    stacker_state.pool_primary_definition.version,
+            public=FillResult.model_construct(
+                count=len(new_contained_labware),
+                storedLabware=new_contained_labware,
+                addedLabware=added_labware,
+                primaryLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_primary_definition
                 ),
-                adapterLabwareURI=uri_from_details(
-                    stacker_state.pool_adapter_definition.namespace,
-                    stacker_state.pool_adapter_definition.parameters.loadName,
-                    stacker_state.pool_adapter_definition.version,
-                )
-                if stacker_state.pool_adapter_definition is not None
-                else None,
-                lidLabwareURI=uri_from_details(
-                    stacker_state.pool_lid_definition.namespace,
-                    stacker_state.pool_lid_definition.parameters.loadName,
-                    stacker_state.pool_lid_definition.version,
-                )
-                if stacker_state.pool_lid_definition is not None
-                else None,
+                adapterLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_adapter_definition
+                ),
+                lidLabwareURI=self._state_view.labware.get_uri_from_definition_unless_none(
+                    stacker_state.pool_lid_definition
+                ),
+                originalPrimaryLabwareLocationSequences=primary_location_sequences(
+                    original_location_sequences
+                ),
+                originalAdapterLabwareLocationSequences=adapter_location_sequences_with_default(
+                    original_location_sequences, stacker_state.pool_adapter_definition
+                ),
+                originalLidLabwareLocationSequences=lid_location_sequences_with_default(
+                    original_location_sequences, stacker_state.pool_lid_definition
+                ),
+                newPrimaryLabwareLocationSequences=primary_location_sequences(
+                    new_location_sequences
+                ),
+                newAdapterLabwareLocationSequences=adapter_location_sequences_with_default(
+                    new_location_sequences, stacker_state.pool_adapter_definition
+                ),
+                newLidLabwareLocationSequences=lid_location_sequences_with_default(
+                    new_location_sequences, stacker_state.pool_lid_definition
+                ),
             ),
             state_update=state_update,
         )

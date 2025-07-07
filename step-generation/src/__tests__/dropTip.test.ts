@@ -1,12 +1,14 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { dropTip } from '../commandCreators/atomic/dropTip'
 import {
-  makeStateArgsStandard,
+  DEFAULT_PIPETTE,
+  getSuccessResult,
   makeContext,
   makeState,
-  getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeStateArgsStandard,
 } from '../fixtures'
-import { dropTip } from '../commandCreators/atomic/dropTip'
+
 import type { InvariantContext, RobotState } from '../types'
 
 const mockDropTipLocation = 'mockLocation'
@@ -29,8 +31,14 @@ describe('dropTip', () => {
       },
     })
 
-    _robotState.tipState.pipettes.p300SingleId = args.singleHasTips
-    _robotState.tipState.pipettes.p300MultiId = args.multiHasTips
+    _robotState.tipState.pipettes.p300SingleId = {
+      hasTip: args.singleHasTips,
+      tiprackURI: 'tiprackId',
+    }
+    _robotState.tipState.pipettes.p300MultiId = {
+      hasTip: args.multiHasTips,
+      tiprackURI: 'tiprackId',
+    }
     return _robotState
   }
 

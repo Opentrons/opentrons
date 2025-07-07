@@ -1,16 +1,18 @@
 // PD-specific info about labware<>module compatibilty
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
-import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
+
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 
 const PLATE_READER_MAX_LABWARE_Z_MM = 16

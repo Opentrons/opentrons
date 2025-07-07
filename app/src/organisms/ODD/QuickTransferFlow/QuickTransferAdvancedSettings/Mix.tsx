@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
@@ -11,21 +11,23 @@ import {
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
 import { ACTIONS } from '../constants'
-import { i18n } from '/app/i18n'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 
 import type { Dispatch } from 'react'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
   FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
 } from '../types'
 
 interface MixProps {
@@ -54,8 +56,8 @@ export function Mix(props: MixProps): JSX.Element {
   )
   const [mixReps, setMixReps] = useState<number | null>(
     kind === 'aspirate'
-      ? state.mixOnAspirate?.repititions ?? null
-      : state.mixOnDispense?.repititions ?? null
+      ? state.mixOnAspirate?.repetitions ?? null
+      : state.mixOnDispense?.repetitions ?? null
   )
 
   const mixAction =
@@ -85,38 +87,44 @@ export function Mix(props: MixProps): JSX.Element {
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (currentStep === 1) {
-      if (!mixIsEnabled) {
-        dispatch({
-          type: mixAction,
-          mixSettings: undefined,
-        })
-        trackEventWithRobotSerial({
-          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
-          properties: {
-            setting: `Mix_${kind}`,
-          },
-        })
+    switch (currentStep) {
+      case 1:
+        if (!mixIsEnabled) {
+          dispatch({
+            type: mixAction,
+            mixSettings: undefined,
+          })
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+            properties: {
+              setting: `Mix_${kind}`,
+            },
+          })
+          onBack()
+        } else {
+          setCurrentStep(2)
+        }
+        break
+      case 2:
+        setCurrentStep(3)
+        break
+      case 3:
+        if (mixVolume != null && mixReps != null) {
+          dispatch({
+            type: mixAction,
+            mixSettings: { mixVolume, repetitions: mixReps },
+          })
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+            properties: {
+              setting: `Mix_${kind}`,
+            },
+          })
+        }
         onBack()
-      } else {
-        setCurrentStep(2)
-      }
-    } else if (currentStep === 2) {
-      setCurrentStep(3)
-    } else if (currentStep === 3) {
-      if (mixVolume != null && mixReps != null) {
-        dispatch({
-          type: mixAction,
-          mixSettings: { mixVolume, repititions: mixReps },
-        })
-        trackEventWithRobotSerial({
-          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
-          properties: {
-            setting: `Mix_${kind}`,
-          },
-        })
-      }
-      onBack()
+        break
+      default:
+        break
     }
   }
 
@@ -159,7 +167,7 @@ export function Mix(props: MixProps): JSX.Element {
         header={
           kind === 'aspirate'
             ? t('mix_before_aspirating')
-            : t('mix_before_dispensing')
+            : t('mix_after_dispensing')
         }
         buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
@@ -172,19 +180,25 @@ export function Mix(props: MixProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableMixDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={mixIsEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('mix_description')}
+          </StyledText>
+
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableMixDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={mixIsEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (

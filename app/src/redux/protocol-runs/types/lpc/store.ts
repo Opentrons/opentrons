@@ -1,11 +1,11 @@
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
 import type {
-  LPC_STEP,
   HANDLE_LW_SUBSTEP,
+  LPC_STEP,
 } from '/app/redux/protocol-runs/constants'
 import type { LPCLabwareInfo } from './labware'
 import type { LPCUiState } from './ui'
@@ -15,7 +15,7 @@ export interface LPCWizardState {
   activePipetteId: string
   labwareInfo: LPCLabwareInfo
   protocolData: CompletedProtocolAnalysis
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
   deckConfig: DeckConfiguration
   protocolName: string
   maintenanceRunId: string | null

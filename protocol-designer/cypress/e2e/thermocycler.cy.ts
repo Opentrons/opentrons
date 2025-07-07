@@ -1,3 +1,6 @@
+import { verifyImportProtocolPage } from '../support/Import'
+import { StepBuilder } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
 import {
   ThermocyclerEditor,
   ThermoProfile,
@@ -5,9 +8,6 @@ import {
   ThermoState,
   ThermoVerifications,
 } from '../support/Thermocycler'
-import { TestFilePath, getTestFile } from '../support/TestFiles'
-import { verifyImportProtocolPage } from '../support/Import'
-import { StepBuilder } from '../support/StepBuilder'
 import { TimelineSteps } from '../support/Timeline'
 
 describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
@@ -19,7 +19,6 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
     cy.contains('Edit protocol').click()
-    cy.contains('Protocol steps').click()
   })
 
   it('It should verify the working function of thermocycler set up', () => {
@@ -30,15 +29,15 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
     steps.add(ThermoVerifications.VerifyPartOne())
     steps.add(ThermocyclerEditor.SelectProfileOrState('state'))
     steps.add(ThermoVerifications.VerifyThermoState())
-    steps.add(ThermocyclerEditor.BlockTempOnOff('active'))
+    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
     steps.add(ThermoState.BlockTempInput('99'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('deactivate'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('active'))
+    steps.add(ThermocyclerEditor.BlockTempOnOff('off'))
+    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
     steps.add(ThermoState.BlockTempInput('15'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('active'))
+    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
     steps.add(ThermoState.LidTempInput('37'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('deactivate'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('active'))
+    steps.add(ThermocyclerEditor.LidTempOnOff('off'))
+    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
     steps.add(ThermoState.LidTempInput('110'))
     steps.add(ThermocyclerEditor.LidOpenClosed('closed'))
     steps.add(ThermocyclerEditor.LidOpenClosed('open'))
@@ -51,9 +50,9 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
     steps.add(ThermoVerifications.VerifyThermoProfile())
     steps.add(ThermoProfile.WellVolumeInput('99'))
     steps.add(ThermoProfile.LidTempInput('40'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('active'))
+    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
     steps.add(ThermoProfile.BlockTempHoldInput('90'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('active'))
+    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
     steps.add(ThermoProfile.LidTempHoldInput('40'))
     steps.add(ThermocyclerEditor.LidOpenClosed('open'))
     steps.add(ThermocyclerEditor.BackButton())

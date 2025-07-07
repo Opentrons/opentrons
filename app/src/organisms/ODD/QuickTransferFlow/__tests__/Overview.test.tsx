@@ -1,11 +1,16 @@
 import { screen } from '@testing-library/react'
-import { describe, it, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useFeatureFlag } from '/app/redux/config'
+
 import { Overview } from '../Overview'
 
 import type { ComponentProps } from 'react'
+
+vi.mock('/app/redux/config')
 
 const render = (props: ComponentProps<typeof Overview>) => {
   return renderWithProviders(<Overview {...props} />, {
@@ -39,8 +44,19 @@ describe('Overview', () => {
         } as any,
         transferType: 'transfer',
         volume: 25,
+        liquidClass: {
+          liquidClassName: 'dummyLiquidClass',
+          displayName: 'Dummy liquid class',
+          description: 'Dummy liquid class description',
+          schemaVersion: 0,
+          namespace: '',
+          byPipette: [],
+        },
       } as any,
     }
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('liquidClassesForQuickTransfer')
+      .thenReturn(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -115,4 +131,25 @@ describe('Overview', () => {
     render(props)
     screen.getByText('Dispense volume per well')
   })
+
+  it('should render correct items when liquid classes are enabled', () => {
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('liquidClassesForQuickTransfer')
+      .thenReturn(true)
+    render(props)
+    screen.getByText('Pipette')
+    screen.getByText('Pipette display name')
+    screen.getByText('Tip rack')
+    screen.getByText('Tip rack display name')
+    screen.getByText('Source labware')
+    screen.getByText('Source labware name')
+    screen.getByText('Destination labware')
+    screen.getByText('Destination labware name')
+    screen.getByText('Pipette path')
+    screen.getByText('Tip change frequency')
+    screen.getByText('Tip drop location')
+    screen.getByText('Liquid class')
+    screen.getByText('Dummy liquid class')
+  })
+  // ToDo(kk:04/03) add another test  later for the liquid class
 })

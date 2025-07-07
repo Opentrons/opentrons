@@ -1,16 +1,17 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { renderWithProviders } from '/app/__testing-utils__'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
-import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
+import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
 import { useIsFlex } from '/app/redux-resources/robots'
+
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 vi.mock('@opentrons/react-api-client')

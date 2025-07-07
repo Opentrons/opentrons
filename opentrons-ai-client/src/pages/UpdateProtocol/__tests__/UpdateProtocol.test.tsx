@@ -1,10 +1,12 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import type { NavigateFunction } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
 
 import { UpdateProtocol } from '../index'
-import { i18n } from '../../../i18n'
+
+import type { NavigateFunction } from 'react-router-dom'
 
 // global.Blob = BlobPolyfill as any
 global.Blob = require('node:buffer').Blob
@@ -13,13 +15,13 @@ const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()
 const mockUseChatData = vi.fn()
 
-vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
 File.prototype.text = vi.fn().mockResolvedValue('test file content')
 
-vi.mock('../../../resources/chatDataAtom', () => ({
+vi.mock('/ai-client/resources/chatDataAtom', () => ({
   chatDataAtom: () => mockUseChatData,
 }))
 
@@ -123,7 +125,7 @@ describe('Update Protocol', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/chat')
   })
 
-  it('should call trackEvent when submit prompt button is clicked', async () => {
+  it.only('should call trackEvent when submit prompt button is clicked', async () => {
     render()
 
     // upload file

@@ -1,8 +1,9 @@
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
 import { formatPyStr, uuid } from '../../utils'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+
 import type { AbsorbanceReaderReadCreateCommand } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const absorbanceReaderRead: CommandCreator<
   AbsorbanceReaderReadCreateCommand['params']

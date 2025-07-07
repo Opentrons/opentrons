@@ -1,7 +1,7 @@
 import type {
-  CutoutId,
-  CutoutFixtureId,
   AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
 } from '@opentrons/shared-data'
 
 export interface CutoutConfig {

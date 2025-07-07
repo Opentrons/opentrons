@@ -1,29 +1,35 @@
 import mapValues from 'lodash/mapValues'
+
 import { castField } from '../../../steplist/fieldLevel'
-import { mixFormToArgs } from './mixFormToArgs'
-import { pauseFormToArgs } from './pauseFormToArgs'
+import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
+import { commentFormToArgs } from './commentFormToArgs'
+import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
+import { mixFormToArgs } from './mixFormToArgs'
+import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
+import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
+import { pauseFormToArgs } from './pauseFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
-import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
-import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
-import { commentFormToArgs } from './commentFormToArgs'
-import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
-import type { CommandCreatorArgs } from '@opentrons/step-generation'
+
+import type {
+  CommandCreatorArgs,
+  InvariantContext,
+} from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
+  HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLabwareFormData,
   HydratedMoveLiquidFormData,
-  HydratedTemperatureFormData,
   HydratedPauseFormData,
+  HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
-  HydratedFormData,
 } from '../../../form-types'
+
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
@@ -31,11 +37,17 @@ type StepArgs = CommandCreatorArgs | null
 export const _castForm = (hydratedForm: HydratedFormData): any =>
   mapValues(hydratedForm, (value, name) => castField(name, value))
 
-export const stepFormToArgs = (hydratedForm: HydratedFormData): StepArgs => {
+export const stepFormToArgs = (
+  hydratedForm: HydratedFormData,
+  contextualState: InvariantContext
+): StepArgs => {
   const castForm = _castForm(hydratedForm)
   switch (castForm.stepType) {
     case 'moveLiquid': {
-      return moveLiquidFormToArgs(castForm as HydratedMoveLiquidFormData)
+      return moveLiquidFormToArgs(
+        castForm as HydratedMoveLiquidFormData,
+        contextualState
+      )
     }
 
     case 'pause':

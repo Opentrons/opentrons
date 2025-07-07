@@ -27,9 +27,7 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
-from opentrons_shared_data.pipette.types import (
-    PipetteName,
-)
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModelType
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     pipette_definition,
@@ -91,6 +89,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -171,7 +171,10 @@ def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
     @wraps(func)
     async def wrapper(self: Any, axis: Axis, *args: Any, **kwargs: Any) -> Any:
         async with contextlib.AsyncExitStack() as stack:
-            if axis == Axis.Z_R and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            if axis == Axis.Z_R and self.gantry_load in [
+                GantryLoad.HIGH_THROUGHPUT_1000,
+                GantryLoad.HIGH_THROUGHPUT_200,
+            ]:
                 await stack.enter_async_context(self._backend.restore_z_r_run_current())
             return await func(self, axis, *args, **kwargs)
 
@@ -244,6 +247,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -263,7 +267,8 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         if realmount == OT3Mount.GRIPPER or (
             realmount == OT3Mount.LEFT
-            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and self._gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
         ):
             ax = Axis.by_mount(realmount)
             if ax in self.engaged_axes.keys():
@@ -280,6 +285,14 @@ class OT3API(
         self._door_state = door_state
 
     @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
+
+    @property
     def gantry_load(self) -> GantryLoad:
         return self._gantry_load
 
@@ -291,11 +304,6 @@ class OT3API(
 
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
-
-    async def set_system_constraints_for_calibration(self) -> None:
-        self._backend.update_constraints_for_calibration_with_gantry_load(
-            self._gantry_load
-        )
 
     async def set_system_constraints_for_plunger_acceleration(
         self, mount: OT3Mount, acceleration: float
@@ -318,11 +326,16 @@ class OT3API(
         async with self._backend.grab_pressure(instrument.channels, mount):
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
         self.door_state = door_state
+        self.module_door_serial = module_serial
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
+            hw_event = DoorStateNotification(
+                new_state=door_state, module_serial=module_serial
+            )
             try:
                 cb(hw_event)
             except Exception:
@@ -575,13 +588,22 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -617,8 +639,11 @@ class OT3API(
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         if left:
             pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if pip.config.channels > 8:
-                return GantryLoad.HIGH_THROUGHPUT
+            if pip.config.channels == 96:
+                if pip.config.pipette_type == PipetteModelType.p1000:
+                    return GantryLoad.HIGH_THROUGHPUT_1000
+                else:
+                    return GantryLoad.HIGH_THROUGHPUT_200
         return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
@@ -912,14 +937,17 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+    async def _do_home_and_maybe_calibrate_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         gripper = self._gripper_handler.get_gripper()
         self._log.info("Homing gripper jaw.")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             gripper.default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        if not gripper.has_jaw_width_calibration:
+        if recalibrate_jaw_width or not gripper.has_jaw_width_calibration:
             self._log.info("Calibrating gripper jaw.")
             await self._grip(
                 duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
@@ -928,10 +956,13 @@ class OT3API(
             gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         """Home the jaw of the gripper."""
         try:
-            await self._do_home_and_maybe_calibrate_gripper_jaw()
+            await self._do_home_and_maybe_calibrate_gripper_jaw(recalibrate_jaw_width)
         except GripperNotPresentError:
             pass
 
@@ -952,7 +983,7 @@ class OT3API(
 
     async def home_gear_motors(self) -> None:
         homing_velocity = self._config.motion_settings.max_speed_discontinuity[
-            GantryLoad.HIGH_THROUGHPUT
+            self._gantry_load
         ][OT3AxisKind.Q]
 
         max_distance = self._backend.axis_bounds[Axis.Q][1]
@@ -1155,7 +1186,10 @@ class OT3API(
             z_ax: carriage_position[z_ax] + offset[2] + cp.z,
             plunger_ax: carriage_position[plunger_ax],
         }
-        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self._gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             effector_pos[Axis.Q] = self._backend.gear_motor_position or 0.0
 
         return effector_pos
@@ -1201,7 +1235,8 @@ class OT3API(
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
         if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and realmount == OT3Mount.RIGHT
         ):
             raise RuntimeError(
@@ -1326,7 +1361,8 @@ class OT3API(
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
         if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and realmount == OT3Mount.RIGHT
         ):
             raise RuntimeError(
@@ -1385,7 +1421,8 @@ class OT3API(
         # if 96-channel pipette is attached and not being moved, it should retract
         if (
             mount != OT3Mount.LEFT
-            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and self._gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and not self.is_idle_mount(OT3Mount.LEFT)
         ):
             await self.retract(OT3Mount.LEFT, 10)
@@ -1478,7 +1515,10 @@ class OT3API(
         self._log.info(f"Move: deck {target_position} becomes machine {machine_pos}")
         origin = await self._backend.update_position()
 
-        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self._gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             origin[Axis.Q] = self._backend.gear_motor_position or 0.0
 
         async with contextlib.AsyncExitStack() as stack:
@@ -1546,7 +1586,10 @@ class OT3API(
         enabled = await self._backend.is_motor_engaged(axis)
 
         if not enabled:
-            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            if axis == Axis.Z_L and self.gantry_load in [
+                GantryLoad.HIGH_THROUGHPUT_1000,
+                GantryLoad.HIGH_THROUGHPUT_200,
+            ]:
                 # we're here if the left mount has been idle and the brake is engaged
                 # we want to temporarily increase its hold current to prevent the z
                 # stage from dropping when switching off the ebrake
@@ -1655,7 +1698,10 @@ class OT3API(
             checked_axes = axes
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             checked_axes.append(Axis.Q)
         if skip:
             checked_axes = [ax for ax in checked_axes if ax not in skip]
@@ -1871,7 +1917,8 @@ class OT3API(
         instrument = self._pipette_handler.get_pipette(realmount)
 
         if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and instrument.nozzle_manager.current_configuration.configuration
             == top_types.NozzleConfigurationType.FULL
         ):
@@ -2234,10 +2281,10 @@ class OT3API(
         async with self._motion_lock:
             real_mount = OT3Mount.from_mount(mount)
             async with contextlib.AsyncExitStack() as stack:
-                if (
-                    real_mount == OT3Mount.LEFT
-                    and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-                ):
+                if real_mount == OT3Mount.LEFT and self._gantry_load in [
+                    GantryLoad.HIGH_THROUGHPUT_1000,
+                    GantryLoad.HIGH_THROUGHPUT_200,
+                ]:
                     await stack.enter_async_context(self._high_throughput_check_tip())
                 result = await self._backend.get_tip_status(
                     real_mount, follow_singular_sensor
@@ -2352,7 +2399,10 @@ class OT3API(
                 realmount, rate=1.0, check_current_vol=False
             )
 
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             spec = self._pipette_handler.plan_ht_drop_tip()
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
@@ -2786,9 +2836,12 @@ class OT3API(
             probe_settings = deepcopy(self.config.liquid_sense)
 
         # We need to significatly slow down the 96 channel liquid probe
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
-                GantryLoad.HIGH_THROUGHPUT
+                self.gantry_load
             ][OT3AxisKind.P]
             probe_settings.plunger_speed = min(
                 max_plunger_speed, probe_settings.plunger_speed

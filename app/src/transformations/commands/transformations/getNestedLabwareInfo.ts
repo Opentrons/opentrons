@@ -1,5 +1,5 @@
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   RunTimeCommand,
@@ -10,7 +10,7 @@ export interface NestedLabwareInfo {
   nestedLabwareDisplayName: string
   //    shared location between labware and adapter
   sharedSlotId: string
-  nestedLabwareDefinition?: LabwareDefinition2
+  nestedLabwareDefinition?: LabwareDefinition
   nestedLabwareNickName?: string
 }
 export function getNestedLabwareInfo(

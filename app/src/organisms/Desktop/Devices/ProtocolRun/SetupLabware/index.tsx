@@ -2,26 +2,27 @@ import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 
 import {
-  JUSTIFY_CENTER,
-  Flex,
-  SPACING,
-  PrimaryButton,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  PrimaryButton,
+  SPACING,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
-import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import {
-  useMostRecentCompletedAnalysis,
-  useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
-} from '/app/resources/runs'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { SetupLabwareMap } from './SetupLabwareMap'
+import {
+  useModuleRenderInfoForProtocolById,
+  useMostRecentCompletedAnalysis,
+  useRunHasStarted,
+} from '/app/resources/runs'
+
+import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { SetupLabwareList } from './SetupLabwareList'
+import { SetupLabwareMap } from './SetupLabwareMap'
 
 interface SetupLabwareProps {
   robotName: string

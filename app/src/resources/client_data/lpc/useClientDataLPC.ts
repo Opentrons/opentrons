@@ -2,8 +2,8 @@ import { useNotifyClientDataLPC } from './useNotifyClientDataLPC'
 
 import type { AxiosError } from 'axios'
 import type { ClientDataResponse } from '@opentrons/api-client'
-import type { ClientDataLPC } from './types'
 import type { QueryOptionsWithPolling } from '/app/resources/useNotifyDataReady'
+import type { ClientDataLPC } from './types'
 
 // Returns the client data store value associated with the runId, if any.
 export function useClientDataLPC(

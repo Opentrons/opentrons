@@ -1,25 +1,25 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
   JUSTIFY_END,
   Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
-  InputField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../molecules'
-import { capitalizeFirstLetter } from '../../../pages/Designer/ProtocolSteps/StepForm/utils'
-import { getMainPagePortalEl } from '../Portal'
 import { renameStep } from '../../../labware-ingred/actions'
+import { capitalizeFirstLetter } from '../../../pages/Designer/ProtocolSteps/StepForm/utils'
+import { TextAreaField } from '../../molecules'
+import { getMainPagePortalEl } from '../Portal'
 
 import type { FormData } from '../../../form-types'
 

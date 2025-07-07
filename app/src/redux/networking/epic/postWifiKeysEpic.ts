@@ -1,18 +1,18 @@
-import { ofType } from 'redux-observable'
 import omit from 'lodash/omit'
+import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-import { postWifiKeysSuccess, postWifiKeysFailure } from '../actions'
+import { postWifiKeysFailure, postWifiKeysSuccess } from '../actions'
 import { POST_WIFI_KEYS, WIFI_KEYS_PATH } from '../constants'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { PostWifiKeysAction, WifiKey } from '../types'
-import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiKeysAction> = action => {
   const { keyFile } = action.payload

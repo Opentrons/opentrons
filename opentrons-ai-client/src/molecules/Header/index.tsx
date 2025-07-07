@@ -1,23 +1,29 @@
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useAtom } from 'jotai'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  StyledText,
-  Link as LinkButton,
-  POSITION_ABSOLUTE,
-  TYPOGRAPHY,
-  COLORS,
-  POSITION_RELATIVE,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link as LinkButton,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAuth0 } from '@auth0/auth0-react'
-import { CLIENT_MAX_WIDTH } from '../../resources/constants'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { useAtom } from 'jotai'
+
+import { CLIENT_MAX_WIDTH } from '/ai-client/resources/constants'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
 import { displayExitConfirmModalAtom } from '../../resources/atoms'
+import { SettingsButton } from '../SettingsButton'
 
 const HeaderBar = styled(Flex)`
   position: ${POSITION_RELATIVE};
@@ -59,6 +65,8 @@ interface HeaderProps {
 export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const { logout } = useAuth0()
+  const navigate = useNavigate()
+  const location = useLocation()
   const trackEvent = useTrackEvent()
   const [, setDisplayExitConfirmModal] = useAtom(displayExitConfirmModalAtom)
 
@@ -72,6 +80,14 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
     trackEvent({ name: 'user-logout', properties: {} })
   }
 
+  function handleSettingsClick(): void {
+    if (location.pathname === '/settings') {
+      navigate(-1)
+    } else {
+      navigate('/settings')
+    }
+  }
+
   return (
     <HeaderBar>
       <HeaderBarContent>
@@ -79,9 +95,14 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
           <HeaderTitle>{t('opentrons')}</HeaderTitle>
           <HeaderGradientTitle>{t('ai')}</HeaderGradientTitle>
         </Flex>
-        <LogoutOrExitButton onClick={handleLoginOrExitClick}>
-          {isExitButton ? t('exit') : t('logout')}
-        </LogoutOrExitButton>
+        <Flex alignItems={ALIGN_CENTER}>
+          <LogoutOrExitButton onClick={handleLoginOrExitClick}>
+            {isExitButton ? t('exit') : t('logout')}
+          </LogoutOrExitButton>
+          <Box marginLeft={SPACING.spacing16}>
+            <SettingsButton onClick={handleSettingsClick} />
+          </Box>
+        </Flex>
       </HeaderBarContent>
     </HeaderBar>
   )

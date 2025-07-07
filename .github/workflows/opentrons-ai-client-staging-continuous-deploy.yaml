@@ -6,6 +6,7 @@ on:
       - edge
     paths:
       - 'opentrons-ai-client/**'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}

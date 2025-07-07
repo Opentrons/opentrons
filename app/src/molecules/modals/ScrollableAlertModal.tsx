@@ -2,6 +2,7 @@
 import omit from 'lodash/omit'
 
 import { AlertModal } from '@opentrons/components'
+
 import { BottomButtonBar } from './BottomButtonBar'
 import styles from './styles.module.css'
 

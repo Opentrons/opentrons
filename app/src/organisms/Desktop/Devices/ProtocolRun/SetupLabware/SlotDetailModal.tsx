@@ -1,31 +1,35 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
 import {
-  Box,
-  getWellFillFromLabwareId,
-  COLORS,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  DeckInfoLabel,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LabwareRender,
-  SPACING,
-  DeckInfoLabel,
-  Tag,
-  StyledText,
-  TYPOGRAPHY,
-  Modal,
   JUSTIFY_CENTER,
+  LabwareRender,
+  Modal,
+  SPACING,
+  StyledText,
+  Tag,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
-
-import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
-import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import {
+  getLabwareViewBox,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/shared-data'
+
+import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
+import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
+import {
+  getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
-  getDisabledWellGroupForLiquidId,
 } from '/app/transformations/analysis'
 import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
@@ -33,8 +37,11 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components/'
-import type { StackItem, LabwareInStack } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareInStack,
+  StackItem,
+} from '/app/transformations/commands'
 
 interface SlotDetailModalProps {
   closeModal: () => void
@@ -82,6 +89,7 @@ export const SlotDetailModal = (
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
 
   const commands = protocolData?.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
@@ -116,6 +124,7 @@ export const SlotDetailModal = (
   const labwareRender = (
     <LabwareRender
       definition={labwareDefinition}
+      positioningMode="passThrough"
       wellFill={wellFill}
       wellLabelOption="SHOW_LABEL_INSIDE"
       highlightedWells={
@@ -217,7 +226,7 @@ export const SlotDetailModal = (
               ) : null}
             </Flex>
             <LabwareThumbnail
-              viewBox={`${labwareDefinition.cornerOffsetFromSlot.x} ${labwareDefinition.cornerOffsetFromSlot.y} ${labwareDefinition.dimensions.xDimension} ${labwareDefinition.dimensions.yDimension}`}
+              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
               width={
                 selectedLiquidId != null && isVariedStack ? '20rem' : '29rem'
               }

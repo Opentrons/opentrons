@@ -1,8 +1,8 @@
 import { useMutation } from 'react-query'
 
 import {
-  RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
   createRunAction,
+  RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
 } from '@opentrons/api-client'
 
 import { useHost } from '../api'

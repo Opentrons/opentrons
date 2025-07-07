@@ -2,14 +2,15 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,19 +33,16 @@ export function LevelingVideo(props: {
   ).href
 
   return (
-    <video
+    <AnimationVideo
       css={css`
         width: 275px;
         max-height: 270px;
         margin-top: ${SPACING.spacing16};
         margin-left: ${SPACING.spacing16};
       `}
-      autoPlay={true}
-      loop={true}
-      controls={true}
     >
       <source src={video} />
-    </video>
+    </AnimationVideo>
   )
 }
 

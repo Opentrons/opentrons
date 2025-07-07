@@ -1,13 +1,15 @@
-import { useFormikContext } from 'formik'
 import cx from 'classnames'
+import { useFormikContext } from 'formik'
+
 import { PrimaryButton } from '@opentrons/components'
+
 import { Dropdown } from '../../components/Dropdown'
+import { labwareTypeAutofills, labwareTypeOptions } from '../../fields'
+import styles from '../../styles.module.css'
 import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
-import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.module.css'
 import type { LabwareFields } from '../../fields'
 
 interface Props {

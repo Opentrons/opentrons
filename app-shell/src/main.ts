@@ -1,26 +1,27 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
-import electronDebug from 'electron-debug'
 import dns from 'dns'
+import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
+import electronDebug from 'electron-debug'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
-import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
-import { initializeMenu } from './menu'
-import { createLogger } from './log'
-import { registerProtocolAnalysis } from './protocol-analysis'
+import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
-import { registerUpdate } from './update'
+import { createLogger } from './log'
+import { initializeMenu } from './menu'
+import { closeAllNotifyConnections, registerNotify } from './notifications'
+import { registerProtocolAnalysis } from './protocol-analysis'
+import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
 import { registerSystemInfo } from './system-info'
-import { registerProtocolStorage } from './protocol-storage'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
+import { registerUpdate } from './update'
 import { registerUsb } from './usb'
-import { registerNotify, closeAllNotifyConnections } from './notifications'
+
 import type { BrowserWindow } from 'electron'
-import type { Action, Dispatch, Logger } from './types'
 import type { LogEntry } from 'winston'
+import type { Action, Dispatch, Logger } from './types'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail

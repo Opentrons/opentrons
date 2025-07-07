@@ -1,11 +1,13 @@
 import { useRunCurrentState } from '@opentrons/react-api-client'
-import { useCurrentRunId } from '../../runs'
+
 import { useRobotControlCommands } from '/app/resources/maintenance_runs'
+
+import { useCurrentRunId } from '../../runs'
 
 import type {
   CreateCommand,
-  OnDeckLabwareLocation,
   ModuleLocation,
+  OnDeckLabwareLocation,
 } from '@opentrons/shared-data'
 import type { UseRobotControlCommandsProps } from '/app/resources/maintenance_runs'
 

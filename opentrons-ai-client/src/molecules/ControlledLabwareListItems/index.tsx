@@ -1,3 +1,6 @@
+import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,14 +10,14 @@ import {
   ListItemCustomize,
   SPACING,
 } from '@opentrons/components'
-import type { DropdownBorder } from '@opentrons/components'
-import { Controller, useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { LabwareDiagram } from '../../molecules/LabwareDiagram'
-import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
-import { LABWARES_FIELD_NAME } from '../../organisms/LabwareLiquidsSection'
-import { getOnlyLatestDefs } from '../../resources/utils'
+
+import { LabwareDiagram } from '/ai-client/molecules/LabwareDiagram'
+import { LABWARES_FIELD_NAME } from '/ai-client/organisms/LabwareLiquidsSection'
+import { getOnlyLatestDefs } from '/ai-client/resources/utils'
+
+import type { DropdownBorder } from '@opentrons/components'
+import type { DisplayLabware } from '/ai-client/organisms/LabwareLiquidsSection'
 
 export function ControlledLabwareListItems(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')

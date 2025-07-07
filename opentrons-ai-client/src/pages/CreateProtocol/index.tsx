@@ -1,8 +1,7 @@
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { useEffect, useRef, useState } from 'react'
-import { PromptPreview } from '../../molecules/PromptPreview'
-import { useForm, FormProvider } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 
 import {
@@ -12,28 +11,36 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { ResizeBar } from '/ai-client/atoms/ResizeBar'
+import { PromptPreview } from '/ai-client/molecules/PromptPreview'
+import {
+  ProtocolSectionsContainer,
+  TOTAL_STEPS,
+} from '/ai-client/organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
   chatHistoryAtom,
   createProtocolAtom,
   createProtocolChatAtom,
+  featureFlagsAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
-
-import { ProtocolSectionsContainer } from '../../organisms/ProtocolSectionsContainer'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import {
   generateChatPrompt,
   generatePromptPreviewData,
-} from '../../resources/utils/createProtocolUtils'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { ResizeBar } from '../../atoms/ResizeBar'
+} from '/ai-client/resources/utils/createProtocolUtils'
 
 import type { MouseEvent } from 'react'
-import type { DisplayModules } from '../../organisms/ModulesSection'
-import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
+import type { DisplayLabware } from '/ai-client/organisms/LabwareLiquidsSection'
+import type {
+  DisplayFixture,
+  DisplayModule,
+} from '/ai-client/organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
+  protocol_format: 'Protocol Designer' | 'Python'
   application: {
     scientificApplication: string
     otherApplication: string
@@ -46,13 +53,13 @@ export interface CreateProtocolFormData {
     rightPipette: string
     flexGripper: string
   }
-  modules: DisplayModules[]
+  modules: DisplayModule[]
+  fixtures: DisplayFixture[]
   labwares: DisplayLabware[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[] | string
 }
-
-const TOTAL_STEPS = 5
 
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -70,6 +77,8 @@ export function CreateProtocol(): JSX.Element | null {
   const [isResizing, setIsResizing] = useState(false)
   const [initialMouseX, setInitialMouseX] = useState(0)
   const [initialLeftWidth, setInitialLeftWidth] = useState(50)
+  const [featureFlags] = useAtom(featureFlagsAtom)
+  const isPdProtocolGenerationEnabled = featureFlags.enablePDProtocolGeneration
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -82,6 +91,7 @@ export function CreateProtocol(): JSX.Element | null {
       },
       instruments: {},
       modules: [],
+      fixtures: [],
       labwares: [],
       liquids: [''],
       steps: [''],
@@ -103,7 +113,6 @@ export function CreateProtocol(): JSX.Element | null {
       liquids: [],
       steps: [],
       fake: false,
-      fake_id: 0,
     })
     setUpdateProtocolChatAtom({
       prompt: '',
@@ -112,7 +121,6 @@ export function CreateProtocol(): JSX.Element | null {
       update_type: 'adapt_python_protocol',
       update_details: '',
       fake: false,
-      fake_id: 0,
     })
     setChatHistoryAtom([])
     setChatData([])
@@ -204,7 +212,8 @@ export function CreateProtocol(): JSX.Element | null {
     const chatPromptData = generateChatPrompt(
       methods.getValues(),
       t,
-      setCreateProtocolChatAtom
+      setCreateProtocolChatAtom,
+      isPdProtocolGenerationEnabled
     )
 
     trackEvent({
@@ -236,6 +245,7 @@ export function CreateProtocol(): JSX.Element | null {
         <div style={{ width: `${100 - leftWidth}%`, height: '100%' }}>
           <PromptPreview
             handleSubmit={handleSubmit}
+            // todo: fix this disabled logic
             isSubmitButtonEnabled={currentSection === TOTAL_STEPS}
             promptPreviewData={generatePromptPreviewData(methods.watch, t)}
           />

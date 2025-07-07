@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, NavLink } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -26,11 +26,12 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-
-import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
+
 import { NavigationMenu } from './NavigationMenu'
 
 import type { Dispatch, SetStateAction } from 'react'

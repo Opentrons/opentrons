@@ -1,9 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { ZTipPositionModal } from '../ZTipPositionModal'
 import { TipPositionZOnlyView } from '../TipPositionZOnlyView'
+import { ZTipPositionModal } from '../ZTipPositionModal'
 
 import type { ComponentProps } from 'react'
 
@@ -42,7 +43,7 @@ describe('ZTipPositionModal', () => {
   it('renders the custom option, caption, and visual', () => {
     render(props)
     expect(screen.getAllByRole('textbox', { name: '' })).toHaveLength(1)
-    screen.getByText('between -30 and 0')
+    screen.getByText('Must be between -30 and 0')
     screen.getByText('mock TipPositionZOnlyView')
   })
 })

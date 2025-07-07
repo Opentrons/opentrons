@@ -3,24 +3,27 @@ import mapKeys from 'lodash/mapKeys'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
+
 import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '../../utils'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
 import { getLoadLiquidCommands } from './utils/getLoadLiquidCommands'
+
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
-import type {
-  LoadPipetteCreateCommand,
-  LoadModuleCreateCommand,
-  LoadLabwareCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 const PD_VERSION = '6.0.0'

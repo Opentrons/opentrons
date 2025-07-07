@@ -1,9 +1,9 @@
 import styled from 'styled-components'
 
-import { styleProps, isntStyleProp } from './style-props'
+import { isntStyleProp, styleProps } from './style-props'
 
 import type { ComponentProps } from 'react'
-import type { StyleProps, PrimitiveComponent } from './types'
+import type { PrimitiveComponent, StyleProps } from './types'
 
 export interface SvgProps extends StyleProps {
   /** attach a width attribute to the <svg> element */

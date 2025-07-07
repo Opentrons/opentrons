@@ -1,6 +1,8 @@
-import uniqBy from 'lodash/uniqBy'
 import isEqual from 'lodash/isEqual'
+import uniqBy from 'lodash/uniqBy'
+
 import { IDENTITY_VECTOR } from '@opentrons/shared-data'
+
 import type { LabwareOffset } from '@opentrons/api-client'
 
 export function getCurrentOffsetForLabwareInLocation(

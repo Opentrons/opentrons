@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  Btn,
+  BasicButton,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -11,11 +11,10 @@ import {
   ListItem,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { actions as tutorialActions } from '../../../tutorial'
 import { actions as featureFlagActions } from '../../../feature-flags'
+import { actions as tutorialActions } from '../../../tutorial'
 import { ToggleButton } from '../../atoms/ToggleButton'
 
 import type { FlagTypes } from '../../../feature-flags'
@@ -69,19 +68,15 @@ export function UserSettings({
             </StyledText>
           </Flex>
         </Flex>
-        <Btn
-          disabled={!canClearHintDismissals}
-          textDecoration={
-            canClearHintDismissals ? TYPOGRAPHY.textDecorationUnderline : 'none'
-          }
+        <BasicButton
           onClick={() => dispatch(tutorialActions.clearAllHintDismissals())}
+          underLine={canClearHintDismissals}
+          isDisabled={!canClearHintDismissals}
         >
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {canClearHintDismissals
-              ? t('shared:reset')
-              : t('shared:no_hints_to_restore')}
-          </StyledText>
-        </Btn>
+          {canClearHintDismissals
+            ? t('shared:reset')
+            : t('shared:no_hints_to_restore')}
+        </BasicButton>
       </ListItem>
       {userFacingFlags.map(flag => (
         <ListItem

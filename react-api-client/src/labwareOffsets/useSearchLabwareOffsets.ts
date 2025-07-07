@@ -4,8 +4,8 @@ import { searchLabwareOffsets } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { AxiosError } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   HostConfig,
   SearchLabwareOffsetsRequest,

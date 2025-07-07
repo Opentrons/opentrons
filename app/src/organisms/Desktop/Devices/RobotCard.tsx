@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -12,38 +12,39 @@ import {
   Flex,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
 import {
   getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
-import {
-  useInstrumentsQuery,
-  usePipettesQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
 
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
-import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { ReachableBanner } from './ReachableBanner'
-import { RobotOverflowMenu } from './RobotOverflowMenu'
-import { RobotStatusHeader } from './RobotStatusHeader'
+import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
+import { ReachableBanner } from './ReachableBanner'
+import { RobotOverflowMenu } from './RobotOverflowMenu'
+import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'

@@ -1,5 +1,6 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { renderWithProviders } from '../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../assets/localization'
 import {
@@ -42,7 +43,6 @@ describe('TemperatureTools', () => {
         dirtyFields: [],
         focusedField: null,
       },
-      visibleFormErrors: [],
       toolboxStep: 1,
       propsForFields: {
         moduleId: {
@@ -89,7 +89,7 @@ describe('TemperatureTools', () => {
 
   it('renders a temperature module form with 1 module', () => {
     render(props)
-    screen.getByText('Module state')
+    screen.getByText('Heat or cool')
     screen.getByText('mock module')
   })
 })

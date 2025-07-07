@@ -1,13 +1,13 @@
 import {
-  SPAN7_8_10_11_SLOT,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
+  SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareDefinitionsByUri,
   ModuleDefinition,
 } from '@opentrons/shared-data'
@@ -17,7 +17,7 @@ export interface RunModuleInfo {
   x: number
   y: number
   moduleDef: ModuleDefinition
-  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDef: LabwareDefinition | null
   nestedLabwareId: string | null
 }
 
@@ -28,7 +28,7 @@ export function getRunModuleRenderInfo(
 ): RunModuleInfo[] {
   if (runData.modules.length > 0) {
     return runData.modules.reduce<RunModuleInfo[]>((acc, module) => {
-      const moduleDef = getModuleDef2(module.model)
+      const moduleDef = getModuleDef(module.model)
       const nestedLabware = runData.labware.find(
         labware =>
           typeof labware.location === 'object' &&

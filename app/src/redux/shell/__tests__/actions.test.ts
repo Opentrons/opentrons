@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { uiInitialized, notifySubscribeAction } from '../actions'
+import { notifySubscribeAction, uiInitialized } from '../actions'
 
 import type { NotifyTopic } from '../types'
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   BORDERS,
@@ -15,8 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
-  TOOLTIP_LEFT,
   Tooltip,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -24,6 +24,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
@@ -36,36 +37,38 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
-  useChainLiveCommands,
-  useRunCalibrationStatus,
-  useModuleRenderInfoForProtocolById,
-  useUnmatchedModulesForProtocol,
-} from '/app/resources/runs'
-import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import {
-  getModulePrepCommands,
+  getFlexStackerPrepCommands,
   getModuleImage,
 } from '/app/local-resources/modules'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import {
+  useChainLiveCommands,
+  useModuleRenderInfoForProtocolById,
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
+import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type {
-  ProtocolCalibrationStatus,
   ModuleRenderInfoForProtocol,
+  ProtocolCalibrationStatus,
 } from '/app/resources/runs'
 
 interface SetupModulesListProps {
@@ -88,6 +91,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+  const { chainLiveCommands } = useChainLiveCommands()
 
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
@@ -132,6 +136,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               }
               isFlex={isFlex}
               calibrationStatus={calibrationStatus}
+              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}
@@ -151,6 +156,10 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
+  chainLiveCommands: (
+    commands: ModulePrepCommandsType[],
+    continuePastCommandFailure: boolean
+  ) => Promise<CommandData[]>
   deckDef: DeckDefinition
   conflictedFixture: CutoutConfig | null
   robotName: string
@@ -163,6 +172,7 @@ export function ModulesListItem({
   attachedModuleMatch,
   isFlex,
   calibrationStatus,
+  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
@@ -181,22 +191,19 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
-  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
-  const [
-    prepCommandErrorMessage,
-    setPrepCommandErrorMessage,
-  ] = useState<string>('')
 
-  const handleCalibrateClick = (): void => {
-    if (attachedModuleMatch != null) {
-      chainLiveCommands(
-        getModulePrepCommands(attachedModuleMatch),
-        false
-      ).catch((e: Error) => {
-        setPrepCommandErrorMessage(e.message)
-      })
-    }
+  const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
+  }
+
+  const handleHomeStackerClick = (): void => {
+    if (attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
+      chainLiveCommands(
+        getFlexStackerPrepCommands(attachedModuleMatch),
+        // if the close latch command fails, we still want to home the shuttle
+        true
+      )
+    }
   }
 
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -260,22 +267,33 @@ export function ModulesListItem({
       textColor={COLORS.green60}
     />
   )
-
-  if (
+  const stackerNeedsHome =
+    attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
+      ? attachedModuleMatch?.data.platformState === 'unknown' ||
+        attachedModuleMatch?.data.platformState === 'retracted' ||
+        attachedModuleMatch?.data.latchState !== 'closed'
+      : false
+  const stackerShuttleMissing =
+    attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
+      ? attachedModuleMatch?.data.platformState === 'missing'
+      : false
+  const needsCalibration =
     isFlex &&
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
+    attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
-  ) {
+
+  if (needsCalibration) {
     renderModuleStatus = (
       <>
         <TertiaryButton
           {...targetProps}
-          onClick={handleCalibrateClick}
+          onClick={handleSetupModuleClick}
           width="max-content"
           disabled={!calibrationStatus?.complete || isModuleTooHot}
         >
-          {t('calibrate_now')}
+          {t('setup_now')}
         </TertiaryButton>
         {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
         isModuleTooHot ? (
@@ -284,6 +302,27 @@ export function ModulesListItem({
           </Tooltip>
         ) : null}
       </>
+    )
+  } else if (stackerNeedsHome) {
+    renderModuleStatus = (
+      <>
+        <TertiaryButton
+          {...targetProps}
+          onClick={handleHomeStackerClick}
+          width="max-content"
+        >
+          {t('home_stacker')}
+        </TertiaryButton>
+      </>
+    )
+  } else if (stackerShuttleMissing) {
+    renderModuleStatus = (
+      <StatusLabel
+        status={t('missing_shuttle')}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
+      />
     )
   } else if (attachedModuleMatch == null) {
     renderModuleStatus = (
@@ -323,10 +362,7 @@ export function ModulesListItem({
           closeFlow={() => {
             setShowModuleWizard(false)
           }}
-          isPrepCommandLoading={isCommandMutationLoading}
-          prepCommandErrorMessage={
-            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
-          }
+          robotName={robotName}
         />
       ) : null}
       <Box
@@ -343,7 +379,7 @@ export function ModulesListItem({
               setShowModuleSetupModal(null)
             }}
             moduleDisplayName={showModuleSetupModal}
-            isAbsorbanceReader={moduleModel === ABSORBANCE_READER_V1}
+            moduleModel={moduleModel}
           />
         ) : null}
         <Flex

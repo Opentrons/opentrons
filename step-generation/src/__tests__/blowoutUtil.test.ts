@@ -1,24 +1,26 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
-import {
-  blowoutLocationHelper,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { blowOutInWell } from '../commandCreators/atomic'
 import { blowOutInWasteChute } from '../commandCreators/compound'
-import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  TROUGH_LABWARE,
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
-  makeContext,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
   getInitialRobotStateStandard,
+  makeContext,
+  SOURCE_LABWARE,
+  TROUGH_LABWARE,
 } from '../fixtures'
-import type { RobotState, InvariantContext } from '../types'
+import {
+  blowoutLocationHelper,
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../utils'
+import { curryCommandCreator } from '../utils/curryCommandCreator'
+
 import type { BlowoutParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/curryCommandCreator')
 
@@ -76,11 +78,11 @@ describe('blowoutLocationHelper', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
           location: 'cutoutD3',
+          pythonName: 'mock_waste_chute',
         },
       },
     }

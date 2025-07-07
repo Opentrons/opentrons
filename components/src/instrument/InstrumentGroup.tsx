@@ -1,5 +1,5 @@
-import { InstrumentInfo } from './InstrumentInfo'
 import styles from './instrument.module.css'
+import { InstrumentInfo } from './InstrumentInfo'
 
 import type { InstrumentInfoProps } from './InstrumentInfo'
 

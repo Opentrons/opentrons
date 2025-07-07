@@ -126,7 +126,8 @@
               "areaType",
               "offsetFromCutoutFixture",
               "boundingBox",
-              "displayName"
+              "displayName",
+              "features"
             ],
             "properties": {
               "id": {
@@ -166,6 +167,12 @@
               "displayName": {
                 "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
+              },
+              "features": {
+                "type": "object",
+                "description": "Locating features when this addressable area is a part of a stackup.",
+                "required": [],
+                "properties": {}
               },
               "compatibleModuleTypes": {
                 "description": "OT-2 Only parameter. An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",

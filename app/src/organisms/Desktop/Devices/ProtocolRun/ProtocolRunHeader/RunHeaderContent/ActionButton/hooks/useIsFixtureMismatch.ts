@@ -1,9 +1,9 @@
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   getIsFixtureMismatch,
   useDeckConfigurationCompatibility,
 } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 export function useIsFixtureMismatch(
   runId: string,

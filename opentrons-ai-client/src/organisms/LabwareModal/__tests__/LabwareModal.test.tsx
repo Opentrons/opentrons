@@ -1,10 +1,13 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import type { DisplayLabware } from '..'
-import { LabwareModal } from '..'
 import { FormProvider, useForm } from 'react-hook-form'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+
+import { LabwareModal } from '..'
+import { i18n } from '../../../i18n'
+
+import type { DisplayLabware } from '..'
 
 let displaModalValue = false
 const setDisplayModalMock = vi.fn()
@@ -191,7 +194,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
       ).toBeInTheDocument()
     })
   })
@@ -219,7 +222,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
       ).toBeInTheDocument()
     })
 
@@ -230,7 +233,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
       ).toBeInTheDocument()
     })
   })

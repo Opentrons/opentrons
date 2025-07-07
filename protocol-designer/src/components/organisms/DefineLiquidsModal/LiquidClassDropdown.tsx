@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { Controller } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
@@ -15,7 +15,7 @@ interface LiquidClassDropdownProps {
   control: Control<Ingredient, any>
   setValue: UseFormSetValue<Ingredient>
   liquidClassOptions: Array<{ name: string; value: string }>
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export function LiquidClassDropdown({

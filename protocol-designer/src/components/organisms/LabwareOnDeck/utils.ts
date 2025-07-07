@@ -1,9 +1,12 @@
 import reduce from 'lodash/reduce'
+
+import { AIR } from '@opentrons/step-generation'
+
 import {
   MIXED_WELL_COLOR,
   swatchColors,
 } from '../DefineLiquidsModal/swatchColors'
-import { AIR } from '@opentrons/step-generation'
+
 import type { WellFill } from '@opentrons/components'
 import type {
   ContentsByWell,

@@ -1,15 +1,16 @@
-import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest'
 import { act, renderHook, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { mockRecoveryContentProps } from '../__fixtures__'
+import { RECOVERY_MAP } from '../constants'
 import {
   RecoveryInProgress,
-  useGripperRelease,
-  GRIPPER_RELEASE_COUNTDOWN_S,
+  RELEASE_COUNTDOWN_S,
+  useReleaseLabware,
 } from '../RecoveryInProgress'
-import { RECOVERY_MAP } from '../constants'
 
 import type { ComponentProps } from 'react'
 
@@ -28,6 +29,7 @@ describe('RecoveryInProgress', () => {
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
+    ROBOT_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   let props: ComponentProps<typeof RecoveryInProgress>
 
@@ -41,6 +43,7 @@ describe('RecoveryInProgress', () => {
       recoveryCommands: {
         releaseGripperJaws: vi.fn(() => Promise.resolve()),
         homeExceptPlungers: vi.fn(() => Promise.resolve()),
+        releaseLabwareLatch: vi.fn(() => Promise.resolve()),
       } as any,
       routeUpdateActions: {
         handleMotionRouting: vi.fn(() => Promise.resolve()),
@@ -134,6 +137,19 @@ describe('RecoveryInProgress', () => {
     screen.getByText('Gripper will release labware in 3 seconds')
   })
 
+  it(`renders appropriate copy when the route is ${ROBOT_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        route: ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
+        step: ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
+      },
+    }
+    render(props)
+
+    screen.getByText('Latch will release labware in 3 seconds')
+  })
+
   it('updates countdown for gripper release', () => {
     vi.useFakeTimers()
     props = {
@@ -154,14 +170,40 @@ describe('RecoveryInProgress', () => {
     screen.getByText('Gripper will release labware in 2 seconds')
 
     act(() => {
-      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000 - 1000)
+      vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000 - 1000)
     })
 
     screen.getByText('Gripper releasing labware')
   })
+
+  it('updates countdown for labware release', () => {
+    vi.useFakeTimers()
+    props = {
+      ...props,
+      recoveryMap: {
+        route: ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
+        step: ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
+      },
+    }
+    render(props)
+
+    screen.getByText('Latch will release labware in 3 seconds')
+
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+
+    screen.getByText('Latch will release labware in 2 seconds')
+
+    act(() => {
+      vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000 - 1000)
+    })
+
+    screen.getByText('Latch releasing labware')
+  })
 })
 
-describe('useGripperRelease', () => {
+describe('useReleaseLabware', () => {
   const mockProps = {
     recoveryMap: {
       route: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
@@ -169,6 +211,7 @@ describe('useGripperRelease', () => {
     },
     recoveryCommands: {
       releaseGripperJaws: vi.fn().mockResolvedValue(undefined),
+      releaseLabwareLatch: vi.fn().mockResolvedValue(undefined),
       homeExceptPlungers: vi.fn().mockResolvedValue(undefined),
     },
     routeUpdateActions: {
@@ -192,7 +235,7 @@ describe('useGripperRelease', () => {
   })
 
   it('counts down from 3 seconds', () => {
-    const { result } = renderHook(() => useGripperRelease(mockProps))
+    const { result } = renderHook(() => useReleaseLabware(mockProps))
 
     expect(result.current).toBe(3)
 
@@ -203,7 +246,7 @@ describe('useGripperRelease', () => {
     expect(result.current).toBe(2)
 
     act(() => {
-      vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000 - 1000)
+      vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000 - 1000)
     })
 
     expect(result.current).toBe(0)
@@ -213,32 +256,48 @@ describe('useGripperRelease', () => {
     it.each([
       {
         recoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
         nextStep: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.STEPS.MANUAL_MOVE,
       },
       {
         recoveryOption: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
         nextStep: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
+      },
+      {
+        recoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
+        nextStep: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.REENGAGE_LATCH,
+      },
+      {
+        recoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
+        nextStep: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
       },
     ])(
       'executes the full sequence of commands for $recoveryOption',
-      async ({ recoveryOption, nextStep }) => {
+      async ({ recoveryOption, nextStep, currentRoute }) => {
         const props = {
           ...mockProps,
           currentRecoveryOptionUtils: {
             selectedRecoveryOption: recoveryOption,
           },
           doorStatusUtils: { isDoorOpen: false },
+          recoveryMap: {
+            route: currentRoute,
+          },
         }
 
-        renderHook(() => useGripperRelease(props))
+        renderHook(() => useReleaseLabware(props))
 
         act(() => {
-          vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
+          vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000)
         })
         await vi.runAllTimersAsync()
 
         const {
           releaseGripperJaws,
+          releaseLabwareLatch,
           homeExceptPlungers,
         } = props.recoveryCommands
         const {
@@ -246,7 +305,15 @@ describe('useGripperRelease', () => {
           proceedToRouteAndStep,
         } = props.routeUpdateActions
 
-        expect(releaseGripperJaws).toHaveBeenCalledTimes(1)
+        switch (recoveryOption) {
+          case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+          case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+            expect(releaseLabwareLatch).toHaveBeenCalledTimes(1)
+            break
+          default:
+            expect(releaseGripperJaws).toHaveBeenCalledTimes(1)
+            break
+        }
         expect(handleMotionRouting).toHaveBeenNthCalledWith(1, true)
         expect(homeExceptPlungers).toHaveBeenCalledTimes(1)
         expect(handleMotionRouting).toHaveBeenNthCalledWith(2, false)
@@ -290,10 +357,10 @@ describe('useGripperRelease', () => {
             proceedToRouteAndStep,
           } = props.routeUpdateActions
 
-          renderHook(() => useGripperRelease(props))
+          renderHook(() => useReleaseLabware(props))
 
           act(() => {
-            vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
+            vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000)
           })
           await vi.runAllTimersAsync()
 
@@ -317,10 +384,10 @@ describe('useGripperRelease', () => {
         doorStatusUtils: { isDoorOpen: true },
       }
 
-      renderHook(() => useGripperRelease(props))
+      renderHook(() => useReleaseLabware(props))
 
       act(() => {
-        vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
+        vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000)
       })
       await vi.runAllTimersAsync()
 
@@ -338,10 +405,10 @@ describe('useGripperRelease', () => {
         doorStatusUtils: { isDoorOpen: false },
       }
 
-      renderHook(() => useGripperRelease(props))
+      renderHook(() => useReleaseLabware(props))
 
       act(() => {
-        vi.advanceTimersByTime(GRIPPER_RELEASE_COUNTDOWN_S * 1000)
+        vi.advanceTimersByTime(RELEASE_COUNTDOWN_S * 1000)
       })
       await vi.runAllTimersAsync()
 

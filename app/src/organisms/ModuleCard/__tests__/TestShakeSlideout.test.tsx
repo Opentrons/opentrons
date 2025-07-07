@@ -7,9 +7,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+
 import { useLatchControls } from '../hooks'
-import { TestShakeSlideout } from '../TestShakeSlideout'
 import { ModuleSetupModal } from '../ModuleSetupModal'
+import { TestShakeSlideout } from '../TestShakeSlideout'
 
 import type { ComponentProps } from 'react'
 

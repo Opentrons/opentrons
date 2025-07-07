@@ -1,9 +1,9 @@
 import type {
   Link,
-  Submenu,
   ProtocolLinks,
-  SupportLinks,
   SalesLinks,
+  Submenu,
+  SupportLinks,
 } from './types'
 
 export const aboutLinkProps: Submenu = {

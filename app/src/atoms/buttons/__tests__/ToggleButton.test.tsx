@@ -1,6 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS, SIZE_2 } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { ToggleButton } from '..'

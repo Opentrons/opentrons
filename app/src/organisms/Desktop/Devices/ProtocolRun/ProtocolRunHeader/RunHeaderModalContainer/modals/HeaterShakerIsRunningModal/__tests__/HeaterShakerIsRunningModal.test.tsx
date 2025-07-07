@@ -1,15 +1,16 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import { useAttachedModules } from '/app/resources/modules'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
+import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
 import type { ComponentProps } from 'react'
 import type * as ReactApiClient from '@opentrons/react-api-client'

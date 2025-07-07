@@ -1,8 +1,9 @@
 import {
-  navigateToUrl,
   fileHelper,
+  navigateToUrl,
   wellBottomImageLocator,
 } from '../../support/e2e'
+
 const fileHolder = fileHelper('testpro_10_reservoir_250ul')
 
 context('Reservoirs', () => {
@@ -42,19 +43,19 @@ context('Reservoirs', () => {
 
       cy.get("input[name='footprintXDimension']").type('150').blur()
       cy.contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintXDimension']").clear().type('127').blur()
       cy.contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition.'
       ).should('not.exist')
       cy.get("input[name='footprintYDimension']").type('150').blur()
       cy.contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition'
       ).should('exist')
       cy.get("input[name='footprintYDimension']").clear().type('85').blur()
       cy.contains(
-        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
+        'Your labware is too large to fit in a single slot properly. Please contact Opentrons Support to request a custom labware definition'
       ).should('not.exist')
 
       // verify height

@@ -1,21 +1,21 @@
 // Render labware definition to SVG. XY is in robot coordinates.
-import { memo, Fragment } from 'react'
-import styled from 'styled-components'
+import { Fragment, memo } from 'react'
 import flatMap from 'lodash/flatMap'
+import styled from 'styled-components'
 
-import { LabwareOutline } from './LabwareOutline'
-import { Well } from './Well'
-import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
 import { COLORS } from '../../../helix-design-system'
+import { LabwareOutline } from './LabwareOutline'
+import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
+import { Well } from './Well'
 
-import type { MemoExoticComponent } from 'react'
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { WellMouseEvent, WellStroke } from './types'
 import type { CSSProperties } from 'styled-components'
+import type { MemoExoticComponent } from 'react'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
+import type { WellMouseEvent, WellStroke } from './types'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
   /** adds a drop shadow to the highlight border */

@@ -3,7 +3,10 @@ import re
 import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import NoResponse
+from opentrons.drivers.asyncio.communication.errors import (
+    NoResponse,
+    TaskNotReady,
+)
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
@@ -27,6 +30,7 @@ from .types import (
     LEDColor,
     StallGuardParams,
     TOFConfiguration,
+    TOFDetection,
     TOFMeasurement,
     TOFMeasurementFrame,
     TOFMeasurementResult,
@@ -35,17 +39,21 @@ from .types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from .utils import validate_histogram_frame
+from .utils import (
+    NUMBER_OF_BINS,
+    validate_histogram_frame,
+)
 
 
 FS_BAUDRATE = 115200
-DEFAULT_FS_TIMEOUT = 1
+DEFAULT_FS_TIMEOUT = 5
 FS_MOVE_TIMEOUT = 20
 FS_TOF_TIMEOUT = 20
+FS_TOF_INIT_TIMEOUT = 5
 FS_ACK = "OK\n"
 FS_ERROR_KEYWORD = "err"
 FS_ASYNC_ERROR_ACK = "async"
-DEFAULT_COMMAND_RETRIES = 0
+DEFAULT_COMMAND_RETRIES = 2
 GCODE_ROUNDING_PRECISION = 2
 
 # LED animation range values
@@ -55,7 +63,31 @@ MAX_REPS = 10
 
 # TOF Sensor
 TOF_FRAME_RETRIES = 1
-NUMBER_OF_BINS = 128
+TOF_DETECTION_CONFIG = {
+    TOFSensor.X: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(10, 40)),
+            threshold=5000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(10, 25)),
+            threshold=15000,
+        ),
+    },
+    TOFSensor.Z: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(10, 60)),
+            threshold=5000,
+        ),
+    },
+}
+
 
 # Stallguard defaults
 STALLGUARD_CONFIG = {
@@ -75,7 +107,7 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=1.0,
+            run_current=1.2,
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=200.0,
@@ -87,7 +119,7 @@ STACKER_MOTION_CONFIG = {
     StackerAxis.Z: {
         "home": AxisParams(
             run_current=1.5,
-            hold_current=1.8,
+            hold_current=1.5,
             move_params=MoveParams(
                 max_speed=10.0,
                 acceleration=100.0,
@@ -96,7 +128,7 @@ STACKER_MOTION_CONFIG = {
         ),
         "move": AxisParams(
             run_current=1.5,
-            hold_current=0.5,
+            hold_current=1.5,
             move_params=MoveParams(
                 max_speed=150.0,
                 acceleration=500.0,
@@ -106,8 +138,8 @@ STACKER_MOTION_CONFIG = {
     },
     StackerAxis.L: {
         "home": AxisParams(
-            run_current=0.8,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,
@@ -115,8 +147,8 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=0.6,
-            hold_current=0.15,
+            run_current=1.2,
+            hold_current=0.5,
             move_params=MoveParams(
                 max_speed=100.0,
                 acceleration=800.0,
@@ -592,7 +624,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             msb = data[ch + 20]
             # combine lsb, mid, and msb bytes to generate bin count for the ch
             bins[ch] = [
-                (msb[b] << 16) | (mid[b] << 8) | lsb[b] for b in range(NUMBER_OF_BINS)
+                float((msb[b] << 16) | (mid[b] << 8) | lsb[b])
+                for b in range(NUMBER_OF_BINS)
             ]
         return TOFMeasurementResult(start.sensor, start.kind, bins)
 
@@ -640,10 +673,18 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
 
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        response = await self._connection.send_command(
-            GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name)
-        )
-        return self.parse_tof_sensor_status(response)
+        # This can fail early because the TOF sensor task cannot respond to messages
+        # while the TOF sensors are initializing.
+        try:
+            response = await self._connection.send_command(
+                GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name),
+                timeout=FS_TOF_INIT_TIMEOUT,
+            )
+            return self.parse_tof_sensor_status(response)
+        except (TaskNotReady):
+            return TOFSensorStatus(
+                sensor, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
+            )
 
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""

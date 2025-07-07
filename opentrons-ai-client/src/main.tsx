@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
 import { Auth0Provider } from '@auth0/auth0-react'
 
+import { App } from './App'
 import { GlobalStyle } from './atoms/GlobalStyle'
 import { i18n } from './i18n'
-import { App } from './App'
 import {
   AUTH0_DOMAIN,
+  LOCAL_AUTH0_CLIENT_ID,
   LOCAL_AUTH0_DOMAIN,
   PROD_AUTH0_CLIENT_ID,
   STAGING_AUTH0_CLIENT_ID,
-  LOCAL_AUTH0_CLIENT_ID,
 } from './resources/constants'
 
 const rootElement = document.getElementById('root')

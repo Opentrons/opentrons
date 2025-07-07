@@ -1,6 +1,8 @@
 import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
+
 import { selectors as stepFormSelectors } from '../step-forms'
+
 import type { FormWarning } from '../steplist'
 import type { BaseState, Selector } from '../types'
 import type { RootState, WarningType } from './reducers'

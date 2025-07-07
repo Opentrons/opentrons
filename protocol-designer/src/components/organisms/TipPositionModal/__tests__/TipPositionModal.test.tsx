@@ -1,13 +1,25 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { TipPositionModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
+import { getRobotType } from '../../../../file-data/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+  getPipetteEntities,
+} from '../../../../step-forms/selectors'
 import { TipPositionSideView } from '../TipPositionSideView'
-import { TipPositionModal } from '..'
 
 import type { ComponentProps } from 'react'
+import type { MoveLiquidPrefixType } from '../../../../resources/types'
 
 vi.mock('../TipPositionSideView')
+vi.mock('../../../../file-data/selectors')
+vi.mock('../../../../step-forms/selectors')
 const render = (props: ComponentProps<typeof TipPositionModal>) => {
   return renderWithProviders(<TipPositionModal {...props} />, {
     i18nInstance: i18n,
@@ -22,7 +34,15 @@ describe('TipPositionModal', () => {
   let props: ComponentProps<typeof TipPositionModal>
 
   beforeEach(() => {
+    vi.mocked(getPipetteEntities).mockReturnValue({})
+    vi.mocked(getLabwareEntities).mockReturnValue({})
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     props = {
+      formData: {
+        stepType: 'moveLiquid',
+        id: 'mockFormId',
+      },
       prefix: 'aspirate',
       closeModal: vi.fn(),
       wellDepthMm: 50,
@@ -32,7 +52,7 @@ describe('TipPositionModal', () => {
       specs: {
         z: {
           name: 'aspirate_mmFromBottom',
-          value: null,
+          value: 0,
           updateValue: mockUpdateZSpec,
         },
         y: {
@@ -76,14 +96,35 @@ describe('TipPositionModal', () => {
       'Tip position is close to the edge of the well and may cause collisions.'
     )
   })
+  describe('submerge/retract in well warning', () => {
+    const prefixes = [
+      'aspirate_submerge',
+      'dispense_submerge',
+      'aspirate_retract',
+      'dispense_retract',
+    ] as MoveLiquidPrefixType[]
+    prefixes.forEach(prefix => {
+      it(`renders the banner if the prefix is ${prefix} and the z value is inside the well`, () => {
+        props.prefix = prefix
+        props.specs.z.value = -1
+        props.specs.y.value = 0
+        props.specs.x.value = 0
+        render(props)
+        screen.getByText('The tip position may be inside the liquid')
+        screen.getByText(
+          'The tip must be above the ending height of the liquid for a valid transfer command'
+        )
+      })
+    })
+  })
   it('renders the captions, and visual', () => {
     render(props)
     screen.getByText('X position')
-    screen.getByText('between -5.1 and 5.1')
+    screen.getByText('Must be between -5.1 and 5.1')
     screen.getByText('Y position')
-    screen.getByText('between -5.2 and 5.2')
+    screen.getByText('Must be between -5.2 and 5.2')
     screen.getByText('Z position')
-    screen.getByText('between 0 and 50')
+    screen.getByText('Must be between 0 and 52')
     screen.getByText('mock TipPositionSideView')
   })
   it('renders a custom input field and clicks on it, calling the mock updates', () => {

@@ -1,31 +1,32 @@
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
-import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
-import { selectors as dismissSelectors } from '../../../../dismiss'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import {
-  actions as stepsActions,
-  getHoveredStepId,
-  getHoveredSubstep,
-  getMultiSelectItemIds,
-  getSelectedStepId,
-  getMultiSelectLastSelected,
-  getIsMultiSelectMode,
-} from '../../../../ui/steps'
-import { selectors as fileDataSelectors } from '../../../../file-data'
+
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '../../../../components/organisms'
+import { selectors as dismissSelectors } from '../../../../dismiss'
+import { selectors as fileDataSelectors } from '../../../../file-data'
 import { stepIconsByType } from '../../../../form-types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { getOrderedStepIds } from '../../../../step-forms/selectors'
+import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
+import {
+  getHoveredStepId,
+  getHoveredSubstep,
+  getIsMultiSelectMode,
+  getMultiSelectItemIds,
+  getMultiSelectLastSelected,
+  getSelectedStepId,
+  actions as stepsActions,
+} from '../../../../ui/steps'
 import {
   hoverOnStep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
-import { getOrderedStepIds } from '../../../../step-forms/selectors'
 import { StepContainer } from './StepContainer'
 import {
   getMetaSelectedSteps,
@@ -34,15 +35,15 @@ import {
   nonePressed,
 } from './utils'
 
-import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { Dispatch, MouseEvent, SetStateAction } from 'react'
+import type { DeleteModalType } from '../../../../components/organisms'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState, ThunkAction } from '../../../../types'
 import type {
   HoverOnStepAction,
   SelectMultipleStepsAction,
 } from '../../../../ui/steps'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState, ThunkAction } from '../../../../types'
-import type { DeleteModalType } from '../../../../components/organisms'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -197,7 +198,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
 
   return (
     <>
-      {/* TODO: update this modal */}
       {showConfirmationDoubleClick && (
         <ConfirmDeleteModal
           modalType={getModalType()}
@@ -205,7 +205,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
           onCancelClick={cancelDoubleClick}
         />
       )}
-      {/* TODO: update this modal */}
       {showConfirmation && (
         <ConfirmDeleteModal
           modalType={getModalType()}

@@ -1,4 +1,4 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { StatusBarAnimation } from '../../js/types'
 
 export type IncidentalCreateCommand =

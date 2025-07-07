@@ -1,6 +1,7 @@
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
 import { getLabwareName } from '../getLabwareName'
+
 import type {
   LiquidProbeRunTimeCommand,
   RunTimeCommand,

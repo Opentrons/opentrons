@@ -1,11 +1,14 @@
 import { Field } from 'formik'
+
 import { RadioGroup } from '@opentrons/components'
+
 import { reportFieldEdit } from '../analyticsUtils'
-import { getIsHidden } from '../formSelectors'
 import { getLabel } from '../fields'
-import type { LabwareFields } from '../fields'
-import type { RadioGroupProps } from '@opentrons/components'
+import { getIsHidden } from '../formSelectors'
 import fieldStyles from './fieldStyles.module.css'
+
+import type { RadioGroupProps } from '@opentrons/components'
+import type { LabwareFields } from '../fields'
 
 interface Props {
   name: keyof LabwareFields

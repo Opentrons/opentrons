@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-import { Controller, useForm } from 'react-hook-form'
-import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
+
 import {
   Btn,
   COLORS,
@@ -22,17 +22,22 @@ import {
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
+import {
+  FLEX_ROBOT_TYPE,
+  getSortedLiquidClassDefs,
+} from '@opentrons/shared-data'
+
+import { getRobotType } from '../../../file-data/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { TextAreaField } from '../../molecules'
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
-import { swatchColors } from './swatchColors'
-import { LiquidColorPicker } from './LiquidColorPicker'
 import { LiquidClassDropdown } from './LiquidClassDropdown'
+import { LiquidColorPicker } from './LiquidColorPicker'
+import { swatchColors } from './swatchColors'
 
-import type { Ingredient } from '@opentrons/step-generation'
 import type { ThunkDispatch } from 'redux-thunk'
+import type { Ingredient } from '@opentrons/step-generation'
 import type { BaseState } from '../../../types'
 
 const liquidEditFormSchema: any = Yup.object().shape({
@@ -67,7 +72,7 @@ export function DefineLiquidsModal(
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const robotType = useSelector(getRobotType)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
@@ -233,7 +238,7 @@ export function DefineLiquidsModal(
                     height="4.75rem"
                   />
                 </Flex>
-                {enableLiquidClasses ? (
+                {robotType === FLEX_ROBOT_TYPE ? (
                   <LiquidClassDropdown
                     control={control}
                     setValue={setValue}

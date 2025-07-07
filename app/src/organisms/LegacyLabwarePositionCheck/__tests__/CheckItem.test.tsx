@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -10,12 +10,13 @@ import {
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/config')
 vi.mock('../../Desktop/Devices/hooks')

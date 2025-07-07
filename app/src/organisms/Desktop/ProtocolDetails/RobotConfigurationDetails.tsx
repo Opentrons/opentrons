@@ -14,20 +14,21 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_USB_MODULE_FIXTURES,
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_FIXTURES,
+  MAGNETIC_BLOCK_TYPE,
   SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
-  FLEX_USB_MODULE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { Divider } from '/app/atoms/structure'
+
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 

@@ -21,7 +21,7 @@ import type {
   LocationSequenceComponent,
   ModuleModel,
   RobotType,
-  Coordinates,
+  Vector3D,
 } from '@opentrons/shared-data'
 import type { ResolvedOffsetSource } from '/app/redux/protocol-runs'
 
@@ -35,7 +35,7 @@ interface LPCLocationSequenceAnalytic {
 interface ReportSaveOffsetToRunRecordParams {
   uri: string
   locationDetails: LegacyLabwareOffsetLocation
-  vector: Coordinates
+  vector: Vector3D
   slot: string
 }
 

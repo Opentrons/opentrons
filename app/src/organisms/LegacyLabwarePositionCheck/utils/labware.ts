@@ -1,14 +1,17 @@
 import reduce from 'lodash/reduce'
+
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   getIsTiprack,
-  getTiprackVolume,
   getLabwareDefURI,
+  getTiprackVolume,
 } from '@opentrons/shared-data'
+
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocation,
   LoadLabwareRunTimeCommand,
   PickUpTipRunTimeCommand,
@@ -49,7 +52,7 @@ interface Labware {
 
 export const getTiprackIdsInOrder = (
   labware: Labware,
-  labwareDefinitions: Record<string, LabwareDefinition2>,
+  labwareDefinitions: Record<string, LabwareDefinition>,
   commands: RunTimeCommand[]
 ): string[] => {
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
@@ -259,7 +262,7 @@ export const getAllUniqLocationsForLabware = (
 export function getLabwareDef(
   labwareId: string,
   protocolData: CompletedProtocolAnalysis
-): LabwareDefinition2 | undefined {
+): LabwareDefinition | undefined {
   const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
     ?.definitionUri
   const labwareDefinitions = getLabwareDefinitionsFromCommands(

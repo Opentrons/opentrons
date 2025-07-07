@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,

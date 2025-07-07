@@ -1,5 +1,6 @@
-import type { FailedCommandBySource } from '/app/organisms/ErrorRecoveryFlows/hooks'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../constants'
+
+import type { FailedCommandBySource } from '/app/organisms/ErrorRecoveryFlows/hooks'
 import type { ErrorKind } from '../types'
 
 /**
@@ -48,6 +49,14 @@ export function getErrorKind(
         return ERROR_KINDS.GRIPPER_ERROR
       case DEFINED_ERROR_TYPES.STALL_OR_COLLISION:
         return ERROR_KINDS.STALL_OR_COLLISION
+      case DEFINED_ERROR_TYPES.STACKER_STALL:
+        return ERROR_KINDS.STACKER_STALLED
+      case DEFINED_ERROR_TYPES.HOPPER_LABWARE_MISSING:
+        return ERROR_KINDS.STACKER_HOPPER_EMPTY
+      case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_MISSING:
+        return ERROR_KINDS.STACKER_SHUTTLE_MISSING
+      case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY:
+        return ERROR_KINDS.STACKER_SHUTTLE_EMPTY
       default: {
         console.error(`Unhandled error type ${errorType}`)
         return ERROR_KINDS.GENERAL_ERROR

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import {
   BORDERS,
   COLORS,
@@ -13,20 +14,22 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
+
 import { MediumButton } from '/app/atoms/buttons'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
+import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
+import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import type { ComponentProps, MouseEventHandler } from 'react'
 import type { InstrumentData } from '@opentrons/api-client'
-import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
+import type { PipetteMount } from '@opentrons/shared-data'
+
 interface InstrumentInfoProps {
   // NOTE: instrument will only be null while
   // in the middle of detach wizard which occludes

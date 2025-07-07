@@ -1,21 +1,24 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { FormAlerts } from '../FormAlerts'
-import { i18n } from '../../../../assets/localization'
+
 import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../assets/localization'
+import {
+  dismissFormWarning,
+  dismissTimelineWarning,
+} from '../../../../dismiss/actions'
+import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import {
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
   getHydratedUnsavedForm,
 } from '../../../../step-forms/selectors'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../../../ui/steps'
-import {
-  dismissFormWarning,
-  dismissTimelineWarning,
-} from '../../../../dismiss/actions'
+import { FormAlerts } from '../FormAlerts'
 
 import type { ComponentProps } from 'react'
 
@@ -70,6 +73,7 @@ describe('FormAlerts', () => {
         type: 'TIP_POSITIONED_LOW_IN_TUBE',
         title: 'mockTitle',
         dependentFields: [],
+        location: 'form',
       },
     ])
     render(props)

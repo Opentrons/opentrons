@@ -1,9 +1,10 @@
-import { vi, it, describe, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { FileCard } from '../FileCard'
 
 import type { ComponentProps } from 'react'

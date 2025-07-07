@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { TYPOGRAPHY, SPACING, BORDERS, COLORS } from '@opentrons/components'
 
 import { createSnippet } from './createSnippet'
 
@@ -11,10 +11,10 @@ import type {
   LegacyLabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type {
-  RunTimeCommand,
   LoadedLabware,
   LoadedModule,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 export interface LabwareOffsetSnippetProps {

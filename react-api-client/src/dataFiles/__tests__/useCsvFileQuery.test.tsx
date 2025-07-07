@@ -1,11 +1,13 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
-import { getCsvFile } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useCsvFileQuery } from '..'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getCsvFile } from '@opentrons/api-client'
+
+import { useCsvFileQuery } from '..'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
 import type {
   CsvFileData,
   CsvFileDataResponse,

@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns'
+
 /**
  * formats a string if it is in ISO 8601 date format
  * @param {string} timestamp ISO date string

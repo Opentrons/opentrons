@@ -1,37 +1,42 @@
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  getModuleDisplayName,
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-  getCutoutFixturesForModuleModel,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_CENTER_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
-  SINGLE_SLOT_FIXTURES,
-} from '@opentrons/shared-data'
+
 import {
   Banner,
   DeckConfigurator,
+  LegacyStyledText,
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  getCutoutFixturesForModuleModel,
+  getDeckDefFromRobotType,
+  getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
+  getModuleDisplayName,
+  SINGLE_CENTER_CUTOUTS,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_SLOT_FIXTURES,
+} from '@opentrons/shared-data'
+
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import type { ModuleCalibrationWizardStepProps } from './types'
+
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
-  CutoutConfig,
-  DeckConfiguration,
   CutoutFixtureId,
   CutoutId,
+  DeckConfiguration,
 } from '@opentrons/shared-data'
+import type { ModuleSetupWizardStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -41,42 +46,40 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
-  availableSlotNames: string[]
-  occupiedCutouts: CutoutConfig[]
+interface SelectLocationProps extends ModuleSetupWizardStepProps {
   deckConfig: DeckConfiguration
-  configuredFixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
+  createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
 }
-export const SelectLocation = (
-  props: SelectLocationProps
-): JSX.Element | null => {
+export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const {
     proceed,
     attachedModule,
     deckConfig,
-    configuredFixtureIdByCutoutId,
     isLoadedInRun,
+    createMaintenanceRun,
+    maintenanceRunId,
+    setErrorMessage,
   } = props
+
+  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
+    attachedModule,
+    deckConfig
+  )
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
+    if (maintenanceRunId == null) {
+      createMaintenanceRun({}).catch(error => {
+        setErrorMessage(error.message as string)
+      })
+    }
     proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  )
-  const bodyText = (
-    <>
-      <LegacyStyledText css={BODY_STYLE}>
-        {t('select_the_slot', { module: moduleName })}
-      </LegacyStyledText>
-      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-        {t('module_secured')}
-      </Banner>
-    </>
   )
 
   const moduleFixtures = getCutoutFixturesForModuleModel(
@@ -187,7 +190,16 @@ export const SelectLocation = (
           height="250px"
         />
       }
-      bodyText={bodyText}
+      bodyText={
+        <>
+          <LegacyStyledText css={BODY_STYLE}>
+            {t('select_the_slot', { module: moduleName })}
+          </LegacyStyledText>
+          <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+            {t('module_secured')}
+          </Banner>
+        </>
+      }
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
       proceedIsDisabled={cutoutConfig == null}

@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -5,19 +8,17 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '/app/redux/config'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/creating-labware-offsets'

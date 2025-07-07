@@ -14,25 +14,27 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
+  useModuleCalibrationStatus,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
+
 import {
   getFallbackRobotSerialNumber,
   isValidRunAgainStatus,
 } from '../../utils'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
+import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
 import type { RunHeaderContentProps } from '..'
+
 export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {

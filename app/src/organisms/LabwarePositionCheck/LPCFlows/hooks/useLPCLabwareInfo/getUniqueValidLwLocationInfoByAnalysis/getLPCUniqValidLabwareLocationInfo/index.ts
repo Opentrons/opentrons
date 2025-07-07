@@ -1,11 +1,11 @@
 import { appendUniqValidLocCombo } from './appendUniqValidLocCombo'
+import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
 import { getLoadLabwareLocationCombo } from './getLoadLabwareLocationCombo'
 import { getMoveLabwareLocationCombo } from './getMoveLabwareLocationCombo'
-import { scanAllCommandsForAllLwUrisByLwId } from './getAllPossibleLwURIsInRun'
 
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
   LabwareLocationSequence,
 } from '@opentrons/shared-data'
 import type { LabwareLocationInfo } from '/app/redux/protocol-runs'
@@ -18,7 +18,7 @@ export interface LabwareLocationInfoWithLocSeq extends LabwareLocationInfo {
 // See helper utilities for what constitutes "unique" and "valid".
 export function getLPCUniqValidLabwareLocationInfo(
   protocolData: CompletedProtocolAnalysis | null,
-  lwDefs: LabwareDefinition2[]
+  lwDefs: LabwareDefinition[]
 ): LabwareLocationInfo[] {
   const { commands, labware, modules = [] } = protocolData ?? {
     labware: [],

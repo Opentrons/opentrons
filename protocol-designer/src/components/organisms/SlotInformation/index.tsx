@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -20,8 +21,9 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+
 import { useDeckSetupWindowBreakPoint } from '../../../pages/Designer/DeckSetup/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -31,7 +33,6 @@ interface SlotInformationProps {
   robotType: RobotType
   liquids?: string[]
   labwares?: string[]
-  adapters?: string[]
   modules?: string[]
   fixtures?: string[]
 }
@@ -41,13 +42,10 @@ export const SlotInformation: FC<SlotInformationProps> = ({
   robotType,
   liquids = [],
   labwares = [],
-  adapters = [],
   modules = [],
   fixtures = [],
 }) => {
   const { t } = useTranslation('shared')
-  const breakPointSize = useDeckSetupWindowBreakPoint()
-  const pathLocation = useLocation()
   const isOffDeck = location === 'offDeck'
   const tcDisplayLocation =
     robotType === FLEX_ROBOT_TYPE
@@ -63,11 +61,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing12}
-      maxWidth={
-        pathLocation.pathname === '/designer' && !isOffDeck
-          ? '23.4375rem'
-          : '100%'
-      }
+      maxWidth="100%"
       width="100%"
     >
       <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -80,19 +74,12 @@ export const SlotInformation: FC<SlotInformationProps> = ({
         {liquids.length > 1 ? (
           <ListItem type="default" width="max-content">
             <ListItemDescriptor
-              changeFlexDirection={
-                breakPointSize === 'medium' &&
-                pathLocation.pathname === '/designer'
-              }
+              changeFlexDirection={false}
               type="default"
               content={
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  textAlign={
-                    breakPointSize === 'medium'
-                      ? TYPOGRAPHY.textAlignLeft
-                      : TYPOGRAPHY.textAlignRight
-                  }
+                  textAlign={TYPOGRAPHY.textAlignRight}
                   css={LINE_CLAMP_TEXT_STYLE(2, true)}
                 >
                   {liquids.join(', ')}
@@ -105,9 +92,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
           <StackInfoList title={t('liquid')} items={liquids} />
         )}
         <StackInfoList title={t('labware')} items={labwares} />
-        {adapters.length > 0 ? (
-          <StackInfoList title={t('labware')} items={adapters} />
-        ) : null}
+
         {isOffDeck ? null : (
           <StackInfoList title={t('module')} items={modules} />
         )}
@@ -125,18 +110,33 @@ interface StackInfoListProps {
 }
 
 function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
+  const countMap = items.reduce((acc: Record<string, number>, item) => {
+    acc[item] = (acc[item] || 0) + 1
+    return acc
+  }, {})
+
+  //  remove duplicates from the items array and include the acount
+  const reducedItems = Object.entries(countMap).map(([item, count]) => ({
+    item,
+    count,
+  }))
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gridGap={SPACING.spacing4}
     >
-      {items.length > 0 ? (
-        items.map((item, index) => (
+      {reducedItems.length > 0 ? (
+        reducedItems.map((item, index) => (
           <StackInfo
             key={`${title}_${index}`}
             title={title}
-            stackInformation={item}
+            stackInformation={
+              item.count > 1
+                ? `${item.item} (amount: ${item.count})`
+                : item.item
+            }
           />
         ))
       ) : (

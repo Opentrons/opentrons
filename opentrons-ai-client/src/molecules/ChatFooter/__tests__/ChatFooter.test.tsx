@@ -1,8 +1,10 @@
-import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { InputPrompt } from '../../InputPrompt'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+import { InputPrompt } from '/ai-client/molecules/InputPrompt'
+
 import { ChatFooter } from '../index'
 
 vi.mock('../../InputPrompt')

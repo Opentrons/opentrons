@@ -1,8 +1,9 @@
 import type {
-  EngageMagnetArgs,
   DisengageMagnetArgs,
+  EngageMagnetArgs,
 } from '@opentrons/step-generation'
 import type { HydratedMagnetFormData } from '../../../form-types'
+
 type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 export const magnetFormToArgs = (
   hydratedFormData: HydratedMagnetFormData

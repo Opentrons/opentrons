@@ -1,11 +1,11 @@
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -49,6 +49,7 @@ export default defineConfig({
         '../components/src/index.module.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
+      '/ai-client/': path.resolve('./src/') + '/',
     },
   },
 })

@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import * as PipetteOffset from '../pipette-offset'
 import * as PipetteOffsetFixtures from '../pipette-offset/__fixtures__'
+import { calibrationReducer } from '../reducer'
 import * as TipLength from '../tip-length'
 import * as TipLengthFixtures from '../tip-length/__fixtures__'
-import * as Actions from '../actions'
-import { calibrationReducer } from '../reducer'
 
 describe('calibration reducer', () => {
   it('should handle a FETCH_CALIBRATION_STATUS_SUCCESS', () => {

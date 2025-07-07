@@ -1,25 +1,27 @@
-import startCase from 'lodash/startCase'
-import mapValues from 'lodash/mapValues'
+import { useForm } from 'react-hook-form'
 import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
+import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
-import { useForm } from 'react-hook-form'
+import startCase from 'lodash/startCase'
+
 import { Box, OVERFLOW_AUTO } from '@opentrons/components'
-import { ConfigFormResetButton } from './ConfigFormResetButton'
+
 import {
   ConfigFormGroup,
-  FormColumn,
   ConfigQuirkGroup,
+  FormColumn,
 } from './ConfigFormGroup'
+import { ConfigFormResetButton } from './ConfigFormResetButton'
 
 import type { FieldError, Resolver } from 'react-hook-form'
-import type { FormValues } from './ConfigFormGroup'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
 } from '@opentrons/api-client'
+import type { FormValues } from './ConfigFormGroup'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string

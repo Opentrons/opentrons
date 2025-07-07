@@ -8,7 +8,6 @@ React components for Opentrons' applications. Visit the [Opentrons Components Li
 
 ```javascript
 import { PrimaryButton } from '@opentrons/components'
-
 export default function CowButton(props) {
   return <PrimaryButton onClick={() => console.log('🐄')} />
 }

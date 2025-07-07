@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
+import { DropdownStepFormField } from '../../../../../components/molecules'
+import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
 } from '../../../../../step-forms/selectors'
 import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
-import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
-import { DropdownStepFormField } from '../../../../../components/molecules'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 

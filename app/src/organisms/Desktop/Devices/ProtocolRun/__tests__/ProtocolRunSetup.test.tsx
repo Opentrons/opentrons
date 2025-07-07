@@ -1,54 +1,53 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   getSimplestDeckConfigForProtocol,
+  simple_v4 as noModulesProtocol,
   parseAllRequiredModuleModels,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import {
+  getMissingSetupSteps,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
+import * as ReduxRuns from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import {
-  useMostRecentCompletedAnalysis,
-  useRunCalibrationStatus,
-  useRunPipetteInfoByMount,
-  useNotifyRunQuery,
-  useRunHasStarted,
-  useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
   useProtocolAnalysisErrors,
+  useRunCalibrationStatus,
+  useRunHasStarted,
+  useRunPipetteInfoByMount,
+  useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import {
-  getMissingSetupSteps,
-  selectIsAnyNecessaryDefaultOffsetMissing,
-  selectAreOffsetsApplied,
-  selectTotalCountLocationSpecificOffsets,
-} from '/app/redux/protocol-runs'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 
-import { SetupLabware } from '../SetupLabware'
-import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import * as ReduxRuns from '/app/redux/protocol-runs'
-
-import type { State } from '/app/redux/types'
+import { SetupLabware } from '../SetupLabware'
+import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
+import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 import type * as SharedData from '@opentrons/shared-data'
+import type { State } from '/app/redux/types'
 
 vi.mock('../SetupLabware')
 vi.mock('../SetupRobotCalibration')
@@ -333,7 +332,7 @@ describe('ProtocolRunSetup', () => {
       expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
-    it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+    it('renders action needed if modules need to be calibrated, homed, etc.', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -341,7 +340,7 @@ describe('ProtocolRunSetup', () => {
 
       render()
       screen.getByText('Deck Hardware')
-      screen.getByText('Calibration needed')
+      screen.getByText('Action needed')
     })
 
     it('does not render calibration element if robot is OT-2', () => {
@@ -377,7 +376,6 @@ describe('ProtocolRunSetup', () => {
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           ],
-          missingLabwareDisplayName: null,
         },
       ])
       vi.mocked(getRequiredDeckConfig).mockReturnValue([

@@ -1,7 +1,7 @@
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 
@@ -20,46 +20,42 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import {
+  EditInstrumentsModal,
+  EditProtocolMetadataModal,
+} from '../../components/organisms'
+import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
+import {
+  getEnableJsonExport,
+  getEnableTimelineScrubber,
+} from '../../feature-flags/selectors'
+import { selectors as fileSelectors } from '../../file-data'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { actions as loadFileActions } from '../../load-file'
+import { useProtocolExportHandler } from '../../resources/hooks'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getLiquidEntities,
 } from '../../step-forms/selectors'
-import { selectors as fileSelectors } from '../../file-data'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { actions as loadFileActions } from '../../load-file'
-import {
-  getEnablePythonExport,
-  getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
-import { EndUserAgreementFooter } from '../../components/molecules'
-import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
-import {
-  EditProtocolMetadataModal,
-  EditInstrumentsModal,
-} from '../../components/organisms'
-import { getWarningContent } from './UnusedModalContent'
-import { ProtocolMetadata } from './ProtocolMetadata'
+import { HardwareInfo } from './HardwareInfo'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
-import { StepsInfo } from './StepsInfo'
-import { StartingDeck } from './StartingDeck'
-import {
-  getUnusedEntities,
-  getUnusedStagingAreas,
-  getUnusedTrash,
-} from './utils'
+import { ProtocolMetadata } from './ProtocolMetadata'
 import { ScrubberContainer } from './ScrubberContainer'
+import { StartingDeck } from './StartingDeck'
+import { StepsInfo } from './StepsInfo'
+
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'
 
-const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
+export const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLabware',
   'loadModule',
   'loadPipette',
@@ -85,12 +81,9 @@ export function ProtocolOverview(): JSX.Element {
     showEditInstrumentsModal,
     setShowEditInstrumentsModal,
   ] = useState<boolean>(false)
-  const enablePythonExport = useSelector(getEnablePythonExport)
+  const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
-    false
-  )
-  const [showExportWarningModal, setShowExportWarningModal] = useState<boolean>(
     false
   )
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -99,11 +92,13 @@ export function ProtocolOverview(): JSX.Element {
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
+  const { timeline } = useSelector(fileSelectors.getRobotStateTimeline)
+  const hasCommands = timeline.length > 0
+
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
     false
   )
-  const fileData = useSelector(fileSelectors.createFile)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -124,48 +119,15 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const nonLoadCommands =
-    fileData?.commands.filter(
-      command => !LOAD_COMMANDS.includes(command.commandType)
-    ) ?? []
-  const gripperInUse =
-    fileData?.commands.find(
-      command =>
-        (command.commandType === 'moveLabware' &&
-          command.params.strategy === 'usingGripper') ||
-        command.commandType === 'absorbanceReader/closeLid' ||
-        command.commandType === 'absorbanceReader/openLid'
-    ) != null
-  const noCommands = fileData != null ? nonLoadCommands.length === 0 : true
-  const modulesWithoutStep = getUnusedEntities(
-    modulesOnDeck,
-    savedStepForms,
-    'moduleId',
-    robotType
-  )
-  const pipettesWithoutStep = getUnusedEntities(
-    initialDeckSetup.pipettes,
-    savedStepForms,
-    'pipette',
-    robotType
-  )
-  const isGripperAttached = Object.values(additionalEquipment).some(
-    equipment => equipment?.name === 'gripper'
-  )
-  const gripperWithoutStep = isGripperAttached && !gripperInUse
-
-  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    additionalEquipmentOnDeck,
-    fileData?.commands
-  )
-  const fixtureWithoutStep: Fixture = {
-    trashBin: trashBinUnused,
-    wasteChute: wasteChuteUnused,
-    stagingAreaSlots: getUnusedStagingAreas(
-      additionalEquipmentOnDeck,
-      fileData?.commands
-    ),
-  }
+  const {
+    handleExportClick,
+    exportWarningModalElement,
+  } = useProtocolExportHandler({
+    hasCommands,
+    onConfirmExport: () => {
+      dispatch(loadFileActions.saveProtocolFile())
+    },
+  })
 
   const pipettesOnDeck = Object.values(pipettes)
   const {
@@ -185,39 +147,6 @@ export function ProtocolOverview(): JSX.Element {
     },
   ]
 
-  const hasWarning =
-    noCommands ||
-    modulesWithoutStep.length > 0 ||
-    pipettesWithoutStep.length > 0 ||
-    gripperWithoutStep ||
-    fixtureWithoutStep.trashBin ||
-    fixtureWithoutStep.wasteChute ||
-    fixtureWithoutStep.stagingAreaSlots.length > 0
-
-  const warning = hasWarning
-    ? getWarningContent({
-        noCommands,
-        pipettesWithoutStep,
-        modulesWithoutStep,
-        gripperWithoutStep,
-        fixtureWithoutStep,
-        t,
-      })
-    : null
-
-  const exportWarningModal = useBlockingHint({
-    hintKey: warning?.hintKey ?? null,
-    enabled: showExportWarningModal,
-    content: warning?.content,
-    handleCancel: () => {
-      setShowExportWarningModal(false)
-    },
-    handleContinue: () => {
-      setShowExportWarningModal(false)
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
-
   return (
     <Fragment>
       {showEditMetadataModal ? (
@@ -234,7 +163,7 @@ export function ProtocolOverview(): JSX.Element {
           }}
         />
       ) : null}
-      {exportWarningModal}
+      {exportWarningModalElement}
       {showMaterialsListModal ? (
         <MaterialsListModal
           hardware={Object.values(modulesOnDeck)}
@@ -291,19 +220,17 @@ export function ProtocolOverview(): JSX.Element {
             />
             <LargeButton
               buttonText={t('export_protocol')}
-              onClick={() => {
-                setShowExportWarningModal(true)
-              }}
+              onClick={handleExportClick}
               iconName="arrow-right"
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
-            {enablePythonExport ? (
+            {enableJsonExport ? (
               <LargeButton
                 buttonType="stroke"
-                buttonText="Export Python"
+                buttonText="Export JSON"
                 onClick={() => {
-                  dispatch(loadFileActions.savePythonProtocolFile())
+                  dispatch(loadFileActions.saveJSONProtocolFile())
                 }}
                 whiteSpace={NO_WRAP}
                 height="3.5rem"
@@ -331,6 +258,11 @@ export function ProtocolOverview(): JSX.Element {
               pipettesOnDeck={pipettesOnDeck}
               additionalEquipment={additionalEquipment}
               setShowEditInstrumentsModal={setShowEditInstrumentsModal}
+            />
+            <HardwareInfo
+              robotType={robotType}
+              modules={Object.values(modulesOnDeck)}
+              additionalEquipment={additionalEquipmentOnDeck}
             />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}

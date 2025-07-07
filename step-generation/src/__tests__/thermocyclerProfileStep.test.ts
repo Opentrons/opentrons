@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../fixtures'
+
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ThermocyclerModuleState,
@@ -52,13 +55,6 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/runProfile',
           key: expect.any(String),
           params: {
@@ -80,13 +76,6 @@ describe('thermocyclerProfileStep', () => {
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {
@@ -153,13 +142,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {
@@ -234,13 +216,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           },
         },
         {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/deactivateLid',
           key: expect.any(String),
           params: {
@@ -303,13 +278,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {

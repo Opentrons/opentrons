@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  CELSIUS,
-  getModuleDisplayName,
-  TEMP_LID_MAX,
-  TEMP_LID_MIN,
-  TEMP_BLOCK_MAX,
-  TEMP_MIN,
-} from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -18,9 +10,18 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_BLOCK_MAX,
+  TEMP_LID_MAX,
+  TEMP_LID_MIN,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {

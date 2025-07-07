@@ -4,7 +4,7 @@
  * @param {HTMLElement | null} node - HTMLElement to monitor for scrolling.
  * @returns {boolean} - A boolean indicating whether the HTMLElement is being scrolled.
  */
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const useScrolling = (node: HTMLElement | null): boolean => {
   const [isScrolling, setIsScrolling] = useState<boolean>(false)

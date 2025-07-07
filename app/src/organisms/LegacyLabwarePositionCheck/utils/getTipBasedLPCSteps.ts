@@ -1,26 +1,29 @@
 import { isEqual } from 'lodash'
-import { SECTIONS } from '../constants'
+
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
-  getLabwareDefURI,
-  getIsTiprack,
   FIXED_TRASH_ID,
+  getIsTiprack,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
+
 import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
+import { SECTIONS } from '../constants'
+
 import type {
-  LabwarePositionCheckStep,
-  CheckTipRacksStep,
-  PickUpTipStep,
-  CheckLabwareStep,
-  ReturnTipStep,
-} from '../types'
-import type {
-  RunTimeCommand,
-  ProtocolAnalysisOutput,
   PickUpTipRunTimeCommand,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type {
+  CheckLabwareStep,
+  CheckTipRacksStep,
+  LabwarePositionCheckStep,
+  PickUpTipStep,
+  ReturnTipStep,
+} from '../types'
 
 interface LPCArgs {
   primaryPipetteId: string

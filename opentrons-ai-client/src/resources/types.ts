@@ -1,4 +1,8 @@
 import type { FC } from 'react'
+import type { ProtocolFile } from '@opentrons/shared-data'
+import type { Flags } from '../feature-flags/types'
+
+export type ProtocolFormat = 'Protocol Designer' | 'Python'
 
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
@@ -12,6 +16,10 @@ export interface ChatData {
   fake?: boolean
   /** uuid to map the chat prompt request to the response from the LLM */
   requestId: string
+  /** structured JSON protocol content */
+  protocol_content?: ProtocolFile
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface CreatePrompt {
@@ -24,15 +32,20 @@ export interface CreatePrompt {
   mounts: string[]
   flexGripper: boolean
   modules: string[]
+  fixtures: string[]
   labware: string[]
   liquids: string[]
+  runtime_parameters?: string
   steps: string[]
   fake?: boolean
-  fake_id?: number
+  fake_key?: string
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export type UpdateOptions =
   | 'adapt_python_protocol'
+  | 'add_runtime_parameters'
   | 'change_labware'
   | 'change_pipettes'
   | 'other'
@@ -45,7 +58,8 @@ export interface UpdatePrompt {
   update_type: UpdateOptions
   update_details: string
   fake: boolean
-  fake_id: number
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface Chat {
@@ -53,6 +67,10 @@ export interface Chat {
   role: Role
   /** content ChatGPT API return or user prompt */
   content: string
+  /** structured protocol content */
+  protocol_content?: string
+  /** The format of the protocol */
+  protocol_format?: ProtocolFormat
 }
 
 export interface RouteProps {
@@ -107,3 +125,5 @@ export interface PromptData {
     }
   }
 }
+
+export type FeatureFlags = Flags

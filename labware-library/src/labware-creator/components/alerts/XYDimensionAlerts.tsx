@@ -1,11 +1,7 @@
 import { AlertItem } from '@opentrons/components'
-import {
-  SUGGESTED_X,
-  SUGGESTED_Y,
-  LINK_CUSTOM_LABWARE_FORM,
-  SUGGESTED_XY_RANGE,
-} from '../../fields'
-import { LinkOut } from '../LinkOut'
+
+import { SUGGESTED_X, SUGGESTED_XY_RANGE, SUGGESTED_Y } from '../../fields'
+
 import type { FormikTouched } from 'formik'
 import type { LabwareFields } from '../../fields'
 
@@ -13,8 +9,7 @@ const xyMessage = (
   <div>
     Our recommended footprint for labware is {SUGGESTED_X} by {SUGGESTED_Y} +/-
     1mm. If you can fit your labware snugly into a single slot on the deck
-    continue through the form. If not please request custom labware via{' '}
-    <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut>.
+    continue through the form. If not please contact Opentrons Support.
   </div>
 )
 

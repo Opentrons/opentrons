@@ -14,6 +14,10 @@ from typing import (
 )
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
+from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
@@ -124,6 +128,8 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
+    labwareInterfaceXDimension: Optional[float] = None
+    labwareInterfaceYDimension: Optional[float] = None
     lidHeight: Optional[float] = None
     maxStackerFillHeight: Optional[float] = None
     maxStackerRetrievableHeight: Optional[float] = None
@@ -140,6 +146,9 @@ class ModuleCalibrationPoint(BaseModel):
 
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
 # schema that it's sourced from. We already do that for labware definitions and JSON protocols.
+
+
+# See underlying JSON schema for documentation.
 class ModuleDefinition(BaseModel):
     """A module definition conforming to module definition schema v3."""
 
@@ -157,28 +166,21 @@ class ModuleDefinition(BaseModel):
     # because robot-server has been storing and loading these bad fields in its database.
     otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
 
-    moduleType: ModuleType = Field(
-        ...,
-        description="Module type (Temperature/Magnetic/Thermocycler)",
-    )
+    moduleType: ModuleType = Field(...)
 
-    model: ModuleModel = Field(..., description="Model name of the module")
+    model: ModuleModel = Field(...)
 
-    labwareOffset: LabwareOffsetVector = Field(
-        ...,
-        description="Labware offset in x, y, z.",
-    )
+    labwareOffset: LabwareOffsetVector = Field(...)
 
-    dimensions: ModuleDimensions = Field(..., description="Module dimension")
+    dimensions: ModuleDimensions = Field(...)
 
     calibrationPoint: ModuleCalibrationPoint = Field(
         ...,
-        description="Calibration point of module.",
     )
 
-    displayName: str = Field(..., description="Display name.")
+    displayName: str = Field(...)
 
-    quirks: List[str] = Field(..., description="Module quirks")
+    quirks: List[str] = Field(...)
 
     # In releases prior to https://github.com/Opentrons/opentrons/pull/11873 (v6.3.0),
     # the matrices in slotTransforms were 3x3.
@@ -189,16 +191,21 @@ class ModuleDefinition(BaseModel):
     # We can fix this once Jira RSS-221 is resolved.
     slotTransforms: Dict[str, Any] = Field(
         ...,
-        description="Dictionary of transforms for each slot.",
     )
 
     compatibleWith: List[ModuleModel] = Field(
         ...,
-        description="List of module models this model is compatible with.",
     )
     gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
         default_factory=dict,
-        description="Offsets to use for labware movement using gripper",
+    )
+
+    features: LocatingFeatures = Field(
+        ...,
+    )
+
+    extents: Extents = Field(
+        ...,
     )
 
 
@@ -253,38 +260,6 @@ class ModuleOffsetVector(BaseModel):
     y: float
     z: float
 
-    def __add__(self, other: Any) -> ModuleOffsetVector:
-        """Adds two vectors together."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
-        )
-
-    def __radd__(self, other: Any) -> ModuleOffsetVector:
-        """Adds two vectors together, the other way."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=other.x + self.x, y=other.y + self.y, z=other.z + self.z
-        )
-
-    def __sub__(self, other: Any) -> ModuleOffsetVector:
-        """Subtracts two vectors."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
-        )
-
-    def __rsub__(self, other: Any) -> ModuleOffsetVector:
-        """Subtracts two vectors, the other way."""
-        if not isinstance(other, (LabwareOffsetVector, ModuleOffsetVector)):
-            return NotImplemented
-        return ModuleOffsetVector(
-            x=other.x - self.x, y=other.y - self.y, z=other.z - self.z
-        )
-
 
 @dataclass
 class ModuleOffsetData:
@@ -299,3 +274,30 @@ class StackerFillEmptyStrategy(str, Enum):
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
+
+
+class StackerStoredLabwareGroup(BaseModel):
+    """Represents one group of labware stored in a stacker hopper."""
+
+    primaryLabwareId: str
+    adapterLabwareId: str | SkipJsonSchema[None] = None
+    lidLabwareId: str | SkipJsonSchema[None] = None
+
+
+@dataclass
+class StackerPoolDefinition:
+    """Represents an internal configuraiton of stored labware."""
+
+    primaryLabwareDefinition: LabwareDefinition
+    adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
+    lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
+
+
+class IdentifyColor(str, Enum):
+    """Module identify color."""
+
+    WHITE = "white"
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+    YELLOW = "yellow"

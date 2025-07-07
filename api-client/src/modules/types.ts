@@ -1,18 +1,17 @@
 import type {
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
-  MagneticModuleModel,
-  HeaterShakerModuleModel,
-  AbsorbanceReaderModel,
-  FlexStackerModuleModel,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
   ABSORBANCE_READER_TYPE,
+  AbsorbanceReaderModel,
   FLEX_STACKER_MODULE_TYPE,
+  FlexStackerModuleModel,
+  HEATERSHAKER_MODULE_TYPE,
+  HeaterShakerModuleModel,
+  MAGNETIC_MODULE_TYPE,
+  MagneticModuleModel,
+  TEMPERATURE_MODULE_TYPE,
+  TemperatureModuleModel,
+  THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
-
 import type * as ApiTypes from './api-types'
 
 export * from './api-types'

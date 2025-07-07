@@ -1,9 +1,11 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LEFT } from '@opentrons/shared-data'
+
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { LevelPipette } from '../LevelPipette'
 
 import type { ComponentProps } from 'react'

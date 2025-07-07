@@ -1,20 +1,22 @@
-import { createStore } from 'redux'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import { legacy_createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
+import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
-import { getDiscoverableRobotByName } from '/app/redux/discovery'
-import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
 
-import type { ComponentProps } from 'react'
+import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
+
 import type { Store } from 'redux'
+import type { ComponentProps } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-update')
@@ -31,7 +33,7 @@ describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
   let store: Store<State>
   beforeEach(() => {
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     props = {
       robotName: 'test robot',

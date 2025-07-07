@@ -1,5 +1,6 @@
 import StreamZip from 'node-stream-zip'
 import Semver from 'semver'
+
 import { createLogger } from '../../log'
 import { REASONABLE_VERSION_FILE_SIZE_B, VERSION_FILENAME } from '../constants'
 

@@ -48,7 +48,6 @@ from .ot3utils import (
     moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
-    get_system_constraints_for_calibration,
     get_system_constraints_for_plunger_acceleration,
 )
 from .tip_presence_manager import TipPresenceManager
@@ -145,6 +144,11 @@ from opentrons.hardware_control.types import (
     PipetteSensorType,
     PipetteSensorData,
     PipetteSensorResponseQueue,
+    StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+    HepaFanState,
+    HepaUVState,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -210,7 +214,6 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
@@ -223,6 +226,8 @@ from opentrons_hardware.sensors.sensor_types import (
 from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.utils import send_evo_dispense_count_increase
+
+from .. import modules
 
 log = logging.getLogger(__name__)
 
@@ -402,19 +407,6 @@ class OT3Controller(FlexBackend):
     def get_pressure_sensor_available(self, pipette_axis: Axis) -> bool:
         pip_node = axis_to_node(pipette_axis)
         return self._pressure_sensor_available[pip_node]
-
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._move_manager.update_constraints(
-            get_system_constraints_for_calibration(
-                self._configuration.motion_settings, gantry_load
-            )
-        )
-        log.debug(
-            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
-        )
 
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._move_manager.update_constraints(
@@ -907,12 +899,15 @@ class OT3Controller(FlexBackend):
         async with self._monitor_overpressure(checked_moving_pipettes):
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
-        if Axis.Q in checked_axes:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-                    Axis.to_kind(Axis.Q)
-                ],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity[
+                    gantry_load
+                ][Axis.to_kind(Axis.Q)],
             )
 
         for position in positions:
@@ -1651,14 +1646,28 @@ class OT3Controller(FlexBackend):
         door_open = await get_door_state(self._usb_messenger)
         return DoorState.OPEN if door_open else DoorState.CLOSED
 
-    def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
+    def add_door_state_listener(
+        self, callback: Callable[[DoorState, str | None], None]
+    ) -> None:
+        def _module_door_listener(door_state: DoorState) -> None:
+            module_serial: str | None = None
+            for module in self.module_controls.available_modules:
+                # Systematically handle doored modules
+                if (
+                    module.MODULE_TYPE == modules.types.ModuleType.FLEX_STACKER
+                    and module.hopper_door_state == modules.types.HopperDoorState.OPENED
+                ):
+                    module_serial = module.serial_number
+                    break
+            callback(door_state, module_serial)
+
         def _door_listener(msg: BinaryMessageDefinition) -> None:
             door_state = (
                 DoorState.OPEN
                 if cast(DoorSwitchStateInfo, msg).door_open.value
                 else DoorState.CLOSED
             )
-            callback(door_state)
+            _module_door_listener(door_state)
 
         if self._usb_messenger is not None:
             self._usb_messenger.add_listener(
@@ -1708,8 +1717,17 @@ class OT3Controller(FlexBackend):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._status_bar_controller.set_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._status_bar_controller.get_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._status_bar_controller.get_current_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        remove_cb = self._status_bar_controller.add_listener(listener)
+        return remove_cb
 
     @property
     def estop_status(self) -> EstopOverallStatus:

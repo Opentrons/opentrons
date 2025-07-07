@@ -6,15 +6,16 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
 import type { MouseEventHandler } from 'react'
+
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (

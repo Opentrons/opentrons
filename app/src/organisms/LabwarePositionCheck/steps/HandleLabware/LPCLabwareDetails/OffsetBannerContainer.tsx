@@ -1,5 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { InlineNotification } from '@opentrons/components'
 
 import {
   selectIsAnyOffsetHardCoded,
@@ -8,7 +10,6 @@ import {
   selectShowDefaultOffsetInfoBanner,
   toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 

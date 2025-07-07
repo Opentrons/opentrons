@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { act, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { act, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,26 +8,27 @@ import {
   MockLPCContentContainer,
   mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
-  selectWorkingOffsetsByUri,
-  selectIsDefaultOffsetAbsent,
-  selectStepInfo,
-  goBackEditOffsetSubstep,
   applyWorkingOffsets,
+  goBackEditOffsetSubstep,
   selectIsAnyOffsetHardCoded,
+  selectIsDefaultOffsetAbsent,
+  selectSelectedLwDisplayName,
+  selectSelectedLwOverview,
   selectSnackbarStatus,
+  selectStepInfo,
+  selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import {
-  useLPCToasts,
-  useLPCSnackbars,
-} from '/app/organisms/LabwarePositionCheck/hooks'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+import type { InlineNotification } from '@opentrons/components'
 
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset',
@@ -46,17 +47,22 @@ vi.mock(
 vi.mock('../OffsetBannerContainer', () => ({
   OffsetBannerContainer: () => <div>MOCK_OFFSET_BANNER_CONTAINER</div>,
 }))
-vi.mock('/app/atoms/InlineNotification', () => ({
-  InlineNotification: vi.fn(({ type, heading, message }) => (
-    <div
-      data-testid="inline-notification"
-      data-type={type}
-      data-heading={heading}
-    >
-      {message}
-    </div>
-  )),
-}))
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(({ type, heading, message }) => (
+      <div
+        data-testid="inline-notification"
+        data-type={type}
+        data-heading={heading}
+      >
+        {message}
+      </div>
+    )),
+  }
+})
+
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets',
   () => ({

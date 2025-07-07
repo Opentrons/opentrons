@@ -1,21 +1,22 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { renderHook, waitFor } from '@testing-library/react'
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook, waitFor } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { hash } from '/app/redux/analytics/hash'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useProtocolMetadata } from '/app/resources/protocols'
+import { useProtocolDetailsForRun, useRunTimestamps } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
-import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
-import type { FunctionComponent, ReactNode } from 'react'
+import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
+
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/analytics/hash')
 vi.mock('/app/redux/protocol-storage')
@@ -25,7 +26,7 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/commands')
 
 let wrapper: FunctionComponent<{ children: ReactNode }>
-let store: Store<any> = createStore(vi.fn(), {})
+let store: Store<any> = legacy_createStore(vi.fn(), {})
 
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
@@ -72,7 +73,7 @@ const ROBOT_PROTOCOL_ANALYSIS = {
 
 describe('useProtocolRunAnalyticsData hook', () => {
   beforeEach(() => {
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>

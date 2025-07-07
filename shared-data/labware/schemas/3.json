@@ -51,7 +51,20 @@
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
     },
-    "vector": {
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "vector3D": {
       "type": "object",
       "additionalProperties": false,
       "required": ["x", "y", "z"],
@@ -67,16 +80,46 @@
         }
       }
     },
+    "axisAlignedBoundingBox2D": {
+      "type": "object",
+      "required": ["backLeft", "frontRight"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeft": {
+          "description": "(-x, +y) relative to the labware origin.",
+          "$ref": "#/definitions/vector2D"
+        },
+        "frontRight": {
+          "description": "(+x, -y) relative to the labware origin.",
+          "$ref": "#/definitions/vector2D"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "(-x, +y, -z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "(+x, -y, +z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
+    },
     "pickUpAndDropOffsets": {
       "type": "object",
       "required": ["pickUpOffset", "dropOffset"],
       "properties": {
         "pickUpOffset": {
-          "$ref": "#/definitions/vector",
+          "$ref": "#/definitions/vector3D",
           "description": "Offset added to calculate pick-up coordinates."
         },
         "dropOffset": {
-          "$ref": "#/definitions/vector",
+          "$ref": "#/definitions/vector3D",
           "description": "Offset added to calculate drop coordinates."
         }
       }
@@ -164,15 +207,16 @@
           "$ref": "#/definitions/positiveNumber"
         },
         "x": {
-          "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
+          "description": "x location of center-bottom of well in reference to the labware origin",
           "$ref": "#/definitions/positiveNumber"
         },
         "y": {
-          "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
-          "$ref": "#/definitions/positiveNumber"
+          "description": "y location of center-bottom of well in reference to the labware origin",
+          "type": "number",
+          "maximum": 0
         },
         "z": {
-          "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
+          "description": "z location of center-bottom of well in reference to the labware origin",
           "$ref": "#/definitions/positiveNumber"
         },
         "geometryDefinitionId": {
@@ -450,9 +494,9 @@
     "metadata",
     "brand",
     "parameters",
-    "cornerOffsetFromSlot",
     "ordering",
-    "dimensions",
+    "extents",
+    "features",
     "wells",
     "groups"
   ],
@@ -570,24 +614,42 @@
         }
       }
     },
-    "cornerOffsetFromSlot": {
-      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
-      "$ref": "#/definitions/vector"
-    },
-    "dimensions": {
+    "extents": {
+      "description": "The outer dimensions of the labware. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
+      "required": ["total"],
       "additionalProperties": false,
-      "description": "Outer dimensions of a labware",
-      "required": ["xDimension", "yDimension", "zDimension"],
       "properties": {
-        "yDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "zDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "xDimension": {
-          "$ref": "#/definitions/positiveNumber"
+        "total": {
+          "description": "The all-encompassing outer dimensions of the labware.",
+          "$ref": "#/definitions/axisAlignedBoundingBox3D"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Locating features when this labware is a part of a stackup.",
+      "required": [],
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "additionalProperties": false,
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
+              "type": "number"
+            }
+          }
         }
       }
     },
@@ -663,14 +725,14 @@
       "type": "object",
       "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
       "additionalProperties": {
-        "$ref": "#/definitions/vector"
+        "$ref": "#/definitions/vector3D"
       }
     },
     "stackingOffsetWithModule": {
       "type": "object",
       "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
       "additionalProperties": {
-        "$ref": "#/definitions/vector"
+        "$ref": "#/definitions/vector3D"
       }
     },
     "gripperOffsets": {

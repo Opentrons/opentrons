@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
+
 import {
+  useRecoveryAnalytics,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
-  useRecoveryAnalytics,
 } from '/app/redux-resources/analytics'
-import { useIsRunCurrent, useRunStatus } from '/app/resources/runs'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { useIsRunCurrent, useRunStatus } from '/app/resources/runs'
 
 import { isTerminalRunStatus } from '../utils'
 

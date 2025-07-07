@@ -1,4 +1,5 @@
-import { uuid, formatPyStr, PROTOCOL_CONTEXT_NAME } from '../../utils'
+import { formatPyStr, PROTOCOL_CONTEXT_NAME, uuid } from '../../utils'
+
 import type { CommentParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 

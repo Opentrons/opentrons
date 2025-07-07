@@ -1,30 +1,31 @@
-import { renderHook } from '@testing-library/react'
-import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
-import { createStore } from 'redux'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getLoadedLabwareDefinitionsByUri,
   simple_v6 as _uncastedSimpleV6Protocol,
+  getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
-import { RUN_ID_1 } from '..//__fixtures__'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useLPCDisabledReason } from '../useLPCDisabledReason'
-import { useUnmatchedModulesForProtocol } from '../useUnmatchedModulesForProtocol'
-import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-import { useRunHasStarted } from '../useRunHasStarted'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   getIsFixtureMismatch,
   useDeckConfigurationCompatibility,
 } from '/app/resources/deck_configuration'
 
-import type { FunctionComponent, ReactNode } from 'react'
+import { RUN_ID_1 } from '..//__fixtures__'
+import { useLPCDisabledReason } from '../useLPCDisabledReason'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
+import { useRunHasStarted } from '../useRunHasStarted'
+import { useUnmatchedModulesForProtocol } from '../useUnmatchedModulesForProtocol'
+
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
@@ -46,7 +47,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   const wrapper: FunctionComponent<{ children: ReactNode }> = ({
     children,
   }) => (

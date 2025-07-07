@@ -1,15 +1,9 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
+
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { actions } from '../../../../steplist'
-import { actions as stepsActions } from '../../../../ui/steps'
-import {
-  getHydratedForm,
-  selectors as stepFormSelectors,
-} from '../../../../step-forms'
 import {
   AutoAddPauseUntilTempStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
@@ -17,19 +11,24 @@ import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../../../../components/organisms'
-import { maskField } from '../../../../steplist/fieldLevel'
+import {
+  getHydratedForm,
+  selectors as stepFormSelectors,
+} from '../../../../step-forms'
 import { getInvariantContext } from '../../../../step-forms/selectors'
-import { getDirtyFields, makeSingleEditFieldProps } from './utils'
+import { actions } from '../../../../steplist'
+import { actions as stepsActions } from '../../../../ui/steps'
 import { StepFormToolbox } from './StepFormToolbox'
+import { getDirtyFields } from './utils'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../../types'
 import type {
   FormData,
   StepFieldName,
   StepIdType,
 } from '../../../../form-types'
+import type { BaseState, ThunkDispatch } from '../../../../types'
 
 interface StateProps {
   canSave: boolean
@@ -46,7 +45,6 @@ interface DispatchProps {
   saveSetTempFormWithAddedPauseUntilTemp: () => void
   saveHeaterShakerFormWithAddedPauseUntilTemp: () => void
   saveStepForm: () => void
-  handleChangeFormInput: (name: string, value: unknown) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -56,7 +54,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     deleteStep,
     formData,
     formHasChanges,
-    handleChangeFormInput,
     handleClose,
     isNewStep,
     isPristineSetTempForm,
@@ -66,7 +63,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
   } = props
-  const { t } = useTranslation('tooltip')
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
@@ -127,13 +123,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     focus: setFocusedField,
     blur: handleBlur,
   }
-  const propsForFields = makeSingleEditFieldProps(
-    focusHandlers,
-    formData,
-    handleChangeFormInput,
-    hydratedForm,
-    t
-  )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {
     handleSave = confirmAddPauseUntilTempStep
@@ -143,9 +132,9 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   ) {
     handleSave = confirmAddPauseUntilHeaterShakerTempStep
   }
+
   return (
     <>
-      {/* TODO: update these modals to match new modal design */}
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
@@ -190,7 +179,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           formData,
           handleClose: confirmClose,
           handleSave,
-          propsForFields,
+          hydratedForm,
         }}
       />
     </>
@@ -223,14 +212,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
   const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
-  const handleChangeFormInput = (name: string, value: unknown): void => {
-    const maskedValue = maskField(name, value)
-    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
-  }
-
   return {
     deleteStep,
-    handleChangeFormInput,
     handleClose,
     saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,

@@ -1,18 +1,19 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import {
   i18n,
-  US_ENGLISH_DISPLAY_NAME,
-  US_ENGLISH,
-  SIMPLIFIED_CHINESE_DISPLAY_NAME,
   SIMPLIFIED_CHINESE,
+  SIMPLIFIED_CHINESE_DISPLAY_NAME,
+  US_ENGLISH,
+  US_ENGLISH_DISPLAY_NAME,
 } from '/app/i18n'
-import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
-import { renderWithProviders } from '/app/__testing-utils__'
 
 import { LanguageSetting } from '../LanguageSetting'
 

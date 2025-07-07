@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -9,9 +10,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
+import { DropdownStepFormField } from '../../../../../components/molecules'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { getTiprackOptions } from '../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../components/molecules'
+
 import type { FieldProps } from '../types'
 
 interface TiprackFieldProps extends FieldProps {
@@ -36,7 +39,10 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   useEffect(() => {
     //  if default value is not included in the pipette's tiprack uris then
     //  change it so it is
-    if (!defaultTiprackUris.includes(value as string)) {
+    if (
+      !defaultTiprackUris.includes(value as string) &&
+      defaultTiprackUris.length > 0
+    ) {
       updateValue(defaultTiprackUris[0])
     }
   }, [defaultTiprackUris, value, updateValue])
@@ -50,6 +56,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
           value={String(value) != null ? String(value) : null}
           title={t('tiprack')}
           tooltipContent={hasMissingTiprack ? 'missing_tiprack' : null}
+          width="100%"
         />
       ) : (
         <Flex

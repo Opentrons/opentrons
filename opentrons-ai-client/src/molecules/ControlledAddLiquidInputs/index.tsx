@@ -1,17 +1,19 @@
+import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
-  Flex,
   ALIGN_CENTER,
-  SPACING,
+  COLORS,
+  Flex,
   InputField,
   Link,
-  TYPOGRAPHY,
-  COLORS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { Controller, useFormContext } from 'react-hook-form'
-import { css } from 'styled-components'
-import { LIQUIDS_FIELD_NAME } from '../../organisms/LabwareLiquidsSection'
-import { useTranslation } from 'react-i18next'
+
+import { LIQUIDS_FIELD_NAME } from '/ai-client/organisms/LabwareLiquidsSection'
 
 export function ControlledAddLiquidInputs(): JSX.Element {
   const { t } = useTranslation('create_protocol')

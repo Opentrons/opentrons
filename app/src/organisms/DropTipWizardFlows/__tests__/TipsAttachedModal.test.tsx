@@ -1,19 +1,20 @@
 import NiceModal from '@ebay/nice-modal-react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
-import { handleTipsAttachedModal } from '../TipsAttachedModal'
-import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '/app/resources/runs'
+
 import { useDropTipWizardFlows } from '..'
+import { handleTipsAttachedModal } from '../TipsAttachedModal'
 
 import type { Mock } from 'vitest'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')

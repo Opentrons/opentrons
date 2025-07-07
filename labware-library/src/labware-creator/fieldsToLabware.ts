@@ -1,18 +1,18 @@
-import { createRegularLabware, getModuleDef2 } from '@opentrons/shared-data'
+import { createRegularLabware, getModuleDef } from '@opentrons/shared-data'
 
 import { DISPLAY_VOLUME_UNITS } from './fields'
 import { getIsCustomTubeRack } from './utils'
 
-import type { ProcessedLabwareFields } from './fields'
 import type {
-  LabwareWellGroup,
   //   createIrregularLabware,
   LabwareDefinition2,
   LabwareDisplayCategory,
-  LabwareWellProperties,
   LabwareOffset,
+  LabwareWellGroup,
+  LabwareWellProperties,
   ModuleModel,
 } from '@opentrons/shared-data'
+import type { ProcessedLabwareFields } from './fields'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
@@ -122,7 +122,7 @@ export function fieldsToLabware(
     })
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
-      const moduleDefinition = getModuleDef2(moduleModel as ModuleModel)
+      const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
       return (stackingOffsetWithModule[moduleModel] = {
         x: 0,
         y: 0,

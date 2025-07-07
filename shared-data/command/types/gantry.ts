@@ -1,12 +1,12 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { WellLocation } from './support'
 import type {
-  Coordinates,
+  GantryMount,
   MotorAxes,
   MotorAxis,
-  GantryMount,
+  Vector3D,
 } from '../../js/types'
+import type { WellLocation } from './support'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -44,7 +44,7 @@ export interface MoveRelativeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveRelativeCreateCommand {
   result?: {
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
@@ -56,7 +56,7 @@ export interface SavePositionRunTimeCommand
     SavePositionCreateCommand {
   result?: {
     positionId: string
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface HomeCreateCommand extends CommonCommandCreateInfo {
@@ -129,6 +129,7 @@ export interface MoveToWellParams {
   wellLocation?: WellLocation
   minimumZHeight?: number
   forceDirect?: boolean
+  speed?: number
 }
 
 interface MoveToCoordinatesParams {

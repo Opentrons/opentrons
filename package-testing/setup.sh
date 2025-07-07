@@ -18,7 +18,7 @@ echo "Activating virtual environment..."
 source "$VENV_DIR/bin/activate"
 
 echo "Installing packages..."
-pip install -U ../shared-data/python ../api # add ../hardware here to validate the below check
+pip install -U ../shared-data ../api # add ../hardware here to validate the below check
 
 echo "Validate opentrons-hardware is not installed..."
 if pip list 2>/dev/null | grep -q "opentrons-hardware"; then

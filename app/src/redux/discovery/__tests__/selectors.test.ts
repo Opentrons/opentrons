@@ -1,27 +1,25 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
+  mockHealthErrorStringResponse,
+  mockHealthFetchErrorResponse,
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
   mockOT2HealthResponse,
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-  mockHealthErrorStringResponse,
-  mockHealthFetchErrorResponse,
 } from '../../../../../discovery-client/src/fixtures'
-
 import {
-  HEALTH_STATUS_OK,
-  HEALTH_STATUS_NOT_OK,
-  HEALTH_STATUS_UNREACHABLE,
   CONNECTABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
+  HEALTH_STATUS_UNREACHABLE,
   REACHABLE,
-  UNREACHABLE,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
+  UNREACHABLE,
 } from '../constants'
-
 import * as discovery from '../selectors'
 
 import type { State } from '../../types'

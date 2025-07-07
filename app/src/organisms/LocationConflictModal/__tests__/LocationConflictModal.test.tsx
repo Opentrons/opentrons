@@ -1,24 +1,28 @@
 import { MemoryRouter } from 'react-router-dom'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
-import {
-  SINGLE_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  ot3StandardDeckV5,
-} from '@opentrons/shared-data'
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+import {
+  ot3StandardDeckV5,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+} from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { useCloseCurrentRun } from '/app/resources/runs'
-import { LocationConflictModal } from '../LocationConflictModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useCloseCurrentRun } from '/app/resources/runs'
+
+import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -115,8 +119,7 @@ describe('LocationConflictModal', () => {
     props = {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB1',
-      requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-      missingLabwareDisplayName: 'a tiprack',
+      requiredFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
@@ -126,7 +129,7 @@ describe('LocationConflictModal', () => {
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
     screen.getAllByText('Trash bin')
-    screen.getByText('a tiprack')
+    screen.getByText('Left slot')
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))

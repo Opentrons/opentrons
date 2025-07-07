@@ -178,7 +178,6 @@ stages:
                   moduleId: magneticModuleId
                 result:
                   moduleId: magneticModuleId
-                  definition: !anydict
                   model: magneticModuleV2
                   serialNumber: !anystr
                 notes: []
@@ -196,7 +195,6 @@ stages:
                   moduleId: temperatureModuleId
                 result:
                   moduleId: temperatureModuleId
-                  definition: !anydict
                   model: temperatureModuleV2
                   serialNumber: !anystr
                 notes: []

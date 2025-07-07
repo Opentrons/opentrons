@@ -38,6 +38,7 @@ sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==6.1.0"
 types-paho-mqtt = "==1.6.0.20240106"
 pyusb = "==1.2.1"
+build = "~=1.2.0"
 
 [packages]
 anyio = "==3.7.1"
@@ -53,12 +54,11 @@ systemd-python = { version = "==234", markers="sys_platform == 'linux'" }
 idna = "==3.3"
 click = "==8.1.2"
 numpy = "==1.22.3"
-zipp = "==3.5.0"
 # breaking changes above this version of sqlalchemy
 sqlalchemy = "==1.4.51"
 opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+opentrons-shared-data = { editable = true, path = "../shared-data" }
 server-utils = {editable = true, path = "./../server-utils"}
 performance-metrics = {editable = true, path = "../performance-metrics" }
 robot-server = { editable = true, path = "."}
@@ -67,3 +67,6 @@ pydantic-settings = "==2.4.0"
 # versions above 0.18.1 require a version of triomphe that requires a version of
 # rust too new for openembedded
 rpds-py = "==0.18.1"
+# transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
+# is not safe to have installed when another project is being built.
+zipp = "==3.21.0"

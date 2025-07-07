@@ -2,40 +2,45 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+  useErrorRecoveryPolicy,
+  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
-  useResumeRunFromRecoveryAssumingFalsePositiveMutation,
 } from '@opentrons/react-api-client'
 
+import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
-import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
-import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 
-import type {
-  CreateCommand,
-  LoadedLabware,
-  MoveToCoordinatesCreateCommand,
-  AspirateInPlaceRunTimeCommand,
-  BlowoutInPlaceRunTimeCommand,
-  DispenseInPlaceRunTimeCommand,
-  DropTipInPlaceRunTimeCommand,
-  PrepareToAspirateRunTimeCommand,
-  MoveLabwareParams,
-} from '@opentrons/shared-data'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
+
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
+import type {
+  AspirateInPlaceRunTimeCommand,
+  BlowoutInPlaceRunTimeCommand,
+  CreateCommand,
+  DispenseInPlaceRunTimeCommand,
+  DropTipInPlaceRunTimeCommand,
+  LoadedLabware,
+  MoveLabwareParams,
+  MoveToCoordinatesCreateCommand,
+  PrepareToAspirateRunTimeCommand,
+  RunCommandError,
+  RunCommandErrorOverpressure,
+  RunCommandErrorTipPhysicallyAttached,
+} from '@opentrons/shared-data'
+import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
+import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
+import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
-import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
-import type { RecoveryToasts } from './useRecoveryToasts'
-import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
-import type { ErrorRecoveryFlowsProps } from '..'
+import type { RecoveryToasts } from './useRecoveryToasts'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
-import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
+import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -67,11 +72,19 @@ export interface UseRecoveryCommandsResult {
   /* A non-terminal recovery command */
   releaseGripperJaws: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
+  releaseLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
+  closeLabwareLatch: () => Promise<CommandData[]>
+  /* A non-terminal recovery command */
   homeExceptPlungers: () => Promise<CommandData[]>
   /* A non-terminal recovery command */
   moveLabwareWithoutPause: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   homeAll: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  homeShuttle: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  manualRetrieve: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -89,10 +102,6 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const { chainRunCommands } = useChainRunCommands(
-    runId,
-    unvalidatedFailedCommand?.id
-  )
   const {
     mutateAsync: resumeRunFromRecovery,
   } = useResumeRunFromRecoveryMutation()
@@ -101,6 +110,12 @@ export function useRecoveryCommands({
   } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+  const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
+  const { chainRunCommands } = useChainRunCommands(
+    runId,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
   const { makeSuccessToast } = recoveryToastUtils
 
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
@@ -110,7 +125,6 @@ export function useRecoveryCommands({
 
     return Promise.reject(new Error(`Could not execute command: ${e}`))
   }
-
   // TODO(jh, 11-21-24): Some commands return a 200 with an error body. We should catch these and propagate the error.
   const chainRunRecoveryCommands = useCallback(
     (
@@ -139,43 +153,82 @@ export function useRecoveryCommands({
       'prepareToAspirate',
     ] as const
 
-    const RETRY_ERROR_TYPES = [
-      DEFINED_ERROR_TYPES.OVERPRESSURE,
-      DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED,
-    ] as const
-
     const isInPlace = (
-      failedCommand: FailedCommand
+      failedCommand: FailedCommand | null
     ): failedCommand is InPlaceCommand =>
+      unvalidatedFailedCommand != null &&
       IN_PLACE_COMMAND_TYPES.includes(
         (failedCommand as InPlaceCommand).commandType
       )
 
-    return unvalidatedFailedCommand != null
-      ? isInPlace(unvalidatedFailedCommand)
-        ? unvalidatedFailedCommand.error?.isDefined &&
-          RETRY_ERROR_TYPES.includes(
-            unvalidatedFailedCommand.error?.errorType
-          ) &&
-          // Paranoia: this value comes from the wire and may be unevenly implemented
-          typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(
-            0
-          ) === 'number'
-          ? {
-              commandType: 'moveToCoordinates',
-              intent: 'fixit',
-              params: {
-                pipetteId: unvalidatedFailedCommand.params?.pipetteId,
-                coordinates: {
-                  x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
-                  y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
-                  z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
-                },
-              },
-            }
-          : null
-        : null
+    const isTargetedError = (
+      error?: RunCommandError | null
+    ): error is
+      | RunCommandErrorOverpressure
+      | RunCommandErrorTipPhysicallyAttached =>
+      error != null &&
+      error.isDefined &&
+      (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||
+        error.errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED)
+
+    return isInPlace(unvalidatedFailedCommand) &&
+      isTargetedError(unvalidatedFailedCommand.error) &&
+      // Paranoia: this value comes from the wire and may be unevenly implemented
+      typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(0) ===
+        'number'
+      ? {
+          commandType: 'moveToCoordinates',
+          intent: 'fixit',
+          params: {
+            pipetteId: unvalidatedFailedCommand.params?.pipetteId,
+            coordinates: {
+              x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
+              y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
+              z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
+            },
+          },
+        }
       : null
+  }
+
+  const buildOpenLatch = (
+    failedCommand: FailedCommand | null
+  ): CreateCommand | null => {
+    if (failedCommand == null) {
+      return null
+    }
+    const storeOrRetriveFailedCommandParams = failedCommand.params
+    const moduleId =
+      'moduleId' in storeOrRetriveFailedCommandParams
+        ? storeOrRetriveFailedCommandParams.moduleId
+        : ''
+    return {
+      commandType: 'unsafe/flexStacker/openLatch',
+      params: {
+        moduleId: moduleId,
+      },
+      intent: 'fixit',
+    }
+  }
+
+  const buildCloseLatch = (
+    failedCommand: FailedCommand | null
+  ): CreateCommand | null => {
+    if (failedCommand == null) {
+      return null
+    }
+    const storeOrRetriveFailedCommandParams = failedCommand.params
+    const moduleId =
+      'moduleId' in storeOrRetriveFailedCommandParams
+        ? storeOrRetriveFailedCommandParams.moduleId
+        : ''
+    return {
+      commandType: 'unsafe/flexStacker/closeLatch',
+      params: {
+        moduleId: moduleId,
+      },
+      intent: 'fixit',
+    }
   }
 
   const retryFailedCommand = useCallback((): Promise<CommandData[]> => {
@@ -313,6 +366,28 @@ export function useRecoveryCommands({
     return chainRunRecoveryCommands([RELEASE_GRIPPER_JAW])
   }, [chainRunRecoveryCommands])
 
+  const releaseLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    const buildOpenLatchCommand = buildOpenLatch(unvalidatedFailedCommand)
+    if (buildOpenLatchCommand == null) {
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of open latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildOpenLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
+  const closeLabwareLatch = useCallback((): Promise<CommandData[]> => {
+    const buildCloseLatchCommand = buildCloseLatch(unvalidatedFailedCommand)
+    if (buildCloseLatchCommand == null) {
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of close latch command')
+      )
+    } else {
+      return chainRunRecoveryCommands([buildCloseLatchCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const homeExceptPlungers = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_EXCEPT_PLUNGERS])
   }, [chainRunRecoveryCommands])
@@ -320,6 +395,26 @@ export function useRecoveryCommands({
   const homeAll = useCallback((): Promise<CommandData[]> => {
     return chainRunRecoveryCommands([HOME_ALL])
   }, [chainRunRecoveryCommands])
+
+  const homeShuttle = useCallback((): Promise<CommandData[]> => {
+    const homeShuttleCommand = buildHomeShuttle(unvalidatedFailedCommand)
+    if (homeShuttleCommand == null) {
+      return Promise.reject(new Error('Invalid use of home shuttle command'))
+    } else {
+      return chainRunRecoveryCommands([homeShuttleCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
+  const manualRetrieve = useCallback((): Promise<CommandData[]> => {
+    const manualRetrieveCommand = buildManualRetrieve(unvalidatedFailedCommand)
+    if (manualRetrieveCommand == null) {
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of manual retrieve command')
+      )
+    } else {
+      return chainRunRecoveryCommands([manualRetrieveCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
@@ -346,6 +441,10 @@ export function useRecoveryCommands({
     skipFailedCommand,
     ignoreErrorKindThisRun,
     homeAll,
+    homeShuttle,
+    manualRetrieve,
+    closeLabwareLatch,
+    releaseLabwareLatch,
   }
 }
 
@@ -357,6 +456,9 @@ export function isAssumeFalsePositiveResumeKind(
   switch (errorKind) {
     case ERROR_KINDS.TIP_NOT_DETECTED:
     case ERROR_KINDS.TIP_DROP_FAILED:
+    case ERROR_KINDS.STACKER_STALLED:
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return true
     default:
       return false
@@ -391,6 +493,46 @@ export const HOME_EXCEPT_PLUNGERS: CreateCommand = {
 export const HOME_ALL: CreateCommand = {
   commandType: 'home',
   params: {},
+}
+
+const buildHomeShuttle = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'unsafe/flexStacker/prepareShuttle',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildManualRetrieve = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeOrRetriveFailedCommandParams = failedCommand.params
+  const moduleId =
+    'moduleId' in storeOrRetriveFailedCommandParams
+      ? storeOrRetriveFailedCommandParams.moduleId
+      : ''
+  return {
+    commandType: 'unsafe/flexStacker/manualRetrieve',
+    params: {
+      moduleId: moduleId,
+    },
+    intent: 'fixit',
+  }
 }
 
 const buildMoveLabwareWithoutPause = (

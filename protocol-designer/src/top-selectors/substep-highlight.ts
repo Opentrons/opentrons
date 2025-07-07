@@ -1,23 +1,26 @@
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { COLUMN, SINGLE, getWellNamePerMultiTip } from '@opentrons/shared-data'
+import { createSelector } from 'reselect'
+
+import { COLUMN, getWellNamePerMultiTip, SINGLE } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
-import { selectors as stepFormSelectors } from '../step-forms'
+
 import { selectors as fileDataSelectors } from '../file-data'
+import { selectors as stepFormSelectors } from '../step-forms'
 import {
   getHoveredStepId,
   getHoveredSubstep,
   getSelectedStepId,
 } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
+
 import type { WellGroup } from '@opentrons/components'
 import type {
-  NozzleConfigurationStyle,
   CreateCommand,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../types'
+import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type { SubstepItemData } from '../steplist/types'
+import type { Selector } from '../types'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
@@ -110,10 +113,7 @@ function _getSelectedWellsForStep(
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
       let channels = pipetteSpec.channels
-      if (
-        stepArgs.commandCreatorFnName === 'mix' ||
-        stepArgs.commandCreatorFnName === 'transfer'
-      ) {
+      if ('nozzles' in stepArgs) {
         if (stepArgs.nozzles === COLUMN) {
           channels = 8
         } else if (stepArgs.nozzles === SINGLE) {

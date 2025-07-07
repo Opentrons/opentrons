@@ -1,21 +1,21 @@
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of, from } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
-import mapValues from 'lodash/mapValues'
-import toString from 'lodash/toString'
-import omitBy from 'lodash/omitBy'
 import inRange from 'lodash/inRange'
-import type { AxiosError } from 'axios'
+import mapValues from 'lodash/mapValues'
+import omitBy from 'lodash/omitBy'
+import toString from 'lodash/toString'
+import { from, of } from 'rxjs'
+import { catchError, map, switchMap } from 'rxjs/operators'
 
 import { OPENTRONS_USB } from '../discovery'
 import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
+import type { AxiosError } from 'axios'
 import type { Observable } from 'rxjs'
 import type {
-  RobotHost,
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from './types'
 
 const checkEmpty = (val: unknown): boolean => val == null || val === ''

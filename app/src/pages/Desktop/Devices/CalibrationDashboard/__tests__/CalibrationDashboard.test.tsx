@@ -1,19 +1,19 @@
-import { vi, describe, it, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { CalibrationDashboard } from '..'
-
 import { useCalibrationTaskList } from '/app/organisms/Desktop/Devices/hooks'
-import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
-import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
-import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '/app/organisms/Desktop/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useAttachedPipettes } from '/app/resources/instruments'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
+import { CalibrationDashboard } from '..'
+import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
+import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
+import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/hooks')

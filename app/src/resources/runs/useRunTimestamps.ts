@@ -1,17 +1,19 @@
 import last from 'lodash/last'
+
 import {
-  RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
-  RUN_STATUS_STOPPED,
+  RUN_ACTION_TYPE_PLAY,
+  RUN_ACTION_TYPE_STOP,
   RUN_STATUS_FAILED,
   RUN_STATUS_FINISHING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+
 import { DEFAULT_RUN_QUERY_REFETCH_INTERVAL } from './constants'
-import { useRunCommands } from './useRunCommands'
 import { useNotifyRunQuery } from './useNotifyRunQuery'
+import { useRunCommands } from './useRunCommands'
 import { useRunStatus } from './useRunStatus'
 
 export interface RunTimestamps {

@@ -6,6 +6,8 @@ for modules
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
+from opentrons_shared_data.labware.types import LocatingFeatures, Extents
+
 SchemaV1 = Literal["1"]
 SchemaV2 = Literal["2"]
 SchemaV3 = Literal["3"]
@@ -99,6 +101,11 @@ class GripperOffsets(TypedDict):
     dropOffset: NamedOffset
 
 
+class TOFSensorBaseline(TypedDict):
+    X: Dict[int, List[float]]
+    Z: Dict[int, List[float]]
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -108,6 +115,8 @@ ModuleDefinitionV3 = TypedDict(
         "model": ModuleModel,
         "labwareOffset": ModuleLabwareOffset,
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
+        "features": LocatingFeatures,
+        "extents": Extents,
         "dimensions": ModuleDimensions,
         "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
         "config": Dict[str, int],
@@ -115,6 +124,7 @@ ModuleDefinitionV3 = TypedDict(
         "quirks": List[str],
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
+        "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
         "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],

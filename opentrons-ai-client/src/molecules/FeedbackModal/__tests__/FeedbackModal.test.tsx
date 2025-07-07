@@ -1,18 +1,27 @@
-import { FeedbackModal } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { feedbackModalAtom } from '/ai-client/resources/atoms'
+
+import { FeedbackModal } from '..'
 import { i18n } from '../../../i18n'
-import { feedbackModalAtom } from '../../../resources/atoms'
 
 const mockUseTrackEvent = vi.fn()
+const mockCallApi = vi.fn().mockResolvedValue({})
 
-vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
+}))
+
+vi.mock('/ai-client/resources/hooks', () => ({
+  useApiCall: () => ({
+    callApi: mockCallApi,
+  }),
 }))
 
 const initialValues: Array<[any, any]> = [[feedbackModalAtom, true]]
@@ -25,6 +34,10 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 }
 
 describe('FeedbackModal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should render Feedback modal', () => {
     render()
     screen.getByText('Send feedback to Opentrons')
@@ -56,6 +69,12 @@ describe('FeedbackModal', () => {
 
     fireEvent.click(sendFeedbackButton)
 
+    // First wait for the API call to be made
+    await waitFor(() => {
+      expect(mockCallApi).toHaveBeenCalled()
+    })
+
+    // Then wait for the tracking event to be triggered
     await waitFor(() => {
       expect(mockUseTrackEvent).toHaveBeenCalledWith({
         name: 'feedback-sent',

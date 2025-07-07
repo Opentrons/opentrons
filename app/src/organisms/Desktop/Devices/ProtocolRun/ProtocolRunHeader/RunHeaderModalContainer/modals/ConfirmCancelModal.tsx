@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
+import {
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+} from '@opentrons/api-client'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -10,16 +14,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   Link,
   Modal,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'

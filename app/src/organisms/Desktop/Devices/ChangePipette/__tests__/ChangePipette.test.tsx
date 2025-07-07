@@ -1,24 +1,25 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getHasCalibrationBlock } from '/app/redux/config'
-import { getMovementStatus } from '/app/redux/robot-controls'
-import { getCalibrationForPipette } from '/app/redux/calibration'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { getCalibrationForPipette } from '/app/redux/calibration'
+import { getHasCalibrationBlock } from '/app/redux/config'
 import {
   getRequestById,
   SUCCESS,
   useDispatchApiRequests,
 } from '/app/redux/robot-api'
+import { getMovementStatus } from '/app/redux/robot-controls'
 import { useAttachedPipettes } from '/app/resources/instruments'
-import { PipetteSelection } from '../PipetteSelection'
-import { ExitModal } from '../ExitModal'
-import { ConfirmPipette } from '../ConfirmPipette'
+
 import { ChangePipette } from '..'
+import { ConfirmPipette } from '../ConfirmPipette'
+import { ExitModal } from '../ExitModal'
+import { PipetteSelection } from '../PipetteSelection'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

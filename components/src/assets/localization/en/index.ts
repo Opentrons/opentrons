@@ -1,3 +1,4 @@
+import deck_configuration from './deck_configuration.json'
 import protocol_command_text from './protocol_command_text.json'
 
 // i18n files needed for unit testing. this is the quick fix for now until we figure out
@@ -5,4 +6,5 @@ import protocol_command_text from './protocol_command_text.json'
 // translation across multiple projects
 export const en = {
   protocol_command_text,
+  deck_configuration,
 }

@@ -4,16 +4,23 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getLabwareHasQuirk,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
-import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
+
 import { LabwareOnDeck } from '../../components/organisms'
+import {
+  getSlotIdsBlockedBySpanningForThermocycler,
+  getSlotIsEmpty,
+} from '../../step-forms'
+import {
+  getStagingAreaAddressableAreas,
+  getTopmostLabwareOnModuleFromStack,
+} from '../../utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -22,11 +29,7 @@ import type {
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  InitialDeckSetup,
-  ModuleOnDeck,
-  LabwareOnDeck as LabwareOnDeckType,
-} from '../../step-forms'
+import type { InitialDeckSetup, ModuleOnDeck } from '../../step-forms'
 
 interface DeckSetupDetailsProps {
   initialDeckSetup: InitialDeckSetup
@@ -53,29 +56,24 @@ export const DeckThumbnailDetails = (
     robotType
   )
 
-  const allLabware: LabwareOnDeckType[] = Object.keys(
-    initialDeckSetup.labware
-  ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
-    const labware = initialDeckSetup.labware[labwareId]
-    return getLabwareHasQuirk(labware.def, 'fixedTrash')
-      ? acc
-      : [...acc, labware]
-  }, [])
-
+  const allLabware = Object.values(initialDeckSetup.labware)
   const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
 
   return (
     <>
       {/* all modules */}
-      {allModules.map(({ id, slot, model, type, moduleState }) => {
+      {allModules.map(({ id, slot, model, moduleState }) => {
         const slotId = slot
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
           console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(model)
-        const labwareLoadedOnModule = allLabware.find(lw => lw.slot === id)
+        const moduleDef = getModuleDef(model)
+        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+          id,
+          allLabware
+        )
         return (
           <Fragment key={id}>
             <Module
@@ -94,12 +92,14 @@ export const DeckThumbnailDetails = (
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
             >
-              {labwareLoadedOnModule != null ? (
+              {labwareLoadedOnModuleId != null ? (
                 <>
                   <LabwareOnDeck
                     x={0}
                     y={0}
-                    labwareOnDeck={labwareLoadedOnModule}
+                    labwareOnDeck={
+                      initialDeckSetup.labware[labwareLoadedOnModuleId]
+                    }
                   />
                   <SlotHover
                     robotType={robotType}
@@ -109,8 +109,7 @@ export const DeckThumbnailDetails = (
                     slotId={slotId}
                   />
                 </>
-              ) : null}
-              {labwareLoadedOnModule == null ? (
+              ) : (
                 <SlotHover
                   robotType={robotType}
                   hover={hover}
@@ -118,7 +117,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              ) : null}
+              )}
             </Module>
           </Fragment>
         )
@@ -126,71 +125,20 @@ export const DeckThumbnailDetails = (
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (
-          labware.slot === 'offDeck' ||
-          allModules.some(m => m.id === labware.slot) ||
-          allLabware.some(lab => lab.id === labware.slot)
-        )
-          return null
-
-        const slotPosition = getPositionFromSlotId(labware.slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(
-          labware.slot,
-          deckDef
-        )?.boundingBox
-        if (slotPosition == null || slotBoundingBox == null) {
-          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
-          return null
-        }
-        return (
-          <Fragment key={labware.id}>
-            <LabwareOnDeck
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              labwareOnDeck={labware}
-            />
-            <SlotHover
-              robotType={robotType}
-              hover={hover}
-              setHover={setHover}
-              slotPosition={slotPosition}
-              slotId={labware.slot}
-            />
-          </Fragment>
-        )
-      })}
-
-      {/* all nested labwares on deck  */}
-      {allLabware.map(labware => {
-        if (
-          allModules.some(m => m.id === labware.slot) ||
-          labware.slot === 'offDeck'
-        )
-          return null
-        if (
-          deckDef.locations.addressableAreas.some(
-            addressableArea => addressableArea.id === labware.slot
-          )
+          getSlotInLocationStack(labware.stack) === 'offDeck' ||
+          allModules.some(m => labware.stack.includes(m.id))
         ) {
           return null
         }
-        const slotForOnTheDeck = allLabware.find(lab => lab.id === labware.slot)
-          ?.slot
-        const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
-          ?.slot
-        let slotPosition = null
-        if (slotForOnMod != null) {
-          slotPosition = getPositionFromSlotId(slotForOnMod, deckDef)
-        } else if (slotForOnTheDeck != null) {
-          slotPosition = getPositionFromSlotId(slotForOnTheDeck, deckDef)
-        }
-        if (slotPosition == null) {
-          console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
+        const slot = getSlotInLocationStack(labware.stack)
+
+        const slotPosition = getPositionFromSlotId(slot, deckDef)
+        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
+          ?.boundingBox
+        if (slotPosition == null || slotBoundingBox == null) {
+          console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
         }
-        const slotOnDeck =
-          slotForOnTheDeck != null
-            ? allModules.find(module => module.id === slotForOnTheDeck)?.slot
-            : null
         return (
           <Fragment key={labware.id}>
             <LabwareOnDeck
@@ -203,7 +151,7 @@ export const DeckThumbnailDetails = (
               hover={hover}
               setHover={setHover}
               slotPosition={slotPosition}
-              slotId={slotOnDeck ?? ''}
+              slotId={slot}
             />
           </Fragment>
         )
@@ -220,7 +168,8 @@ export const DeckThumbnailDetails = (
             stagingAreaAddressableAreas.includes(addressableArea.id)
           return (
             addressableAreas &&
-            !slotIdsBlockedBySpanning.includes(addressableArea.id)
+            !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
+            getSlotIsEmpty(initialDeckSetup, addressableArea.id, false)
           )
         })
         .map(addressableArea => {

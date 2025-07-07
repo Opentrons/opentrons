@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
+
 import { cleanup } from '@testing-library/react'
-import { vi, afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 
 vi.mock('protocol-designer/src/labware-defs/utils')
 vi.mock('electron-store')

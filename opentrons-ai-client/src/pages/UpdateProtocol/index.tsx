@@ -1,49 +1,42 @@
+import { useEffect, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { CSSTransition } from 'react-transition-group'
+import { useAtom } from 'jotai'
 import styled from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DropdownMenu,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   LargeButton,
-  StyledText,
   Link as LinkComponent,
-  DropdownMenu,
+  StyledText,
 } from '@opentrons/components'
-import type { DropdownOption } from '@opentrons/components'
-import type { UpdateOptions } from '../../resources/types'
-import { UploadInput } from '../../molecules/UploadInput'
-import { useEffect, useState } from 'react'
-import type { ChangeEvent } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { FileUpload } from '../../molecules/FileUpload'
-import { useNavigate } from 'react-router-dom'
+
+import { TextAreaField } from '/ai-client/atoms/TextAreaField'
+import { FileUpload } from '/ai-client/molecules/FileUpload'
+import { UploadInput } from '/ai-client/molecules/UploadInput'
 import {
+  chatDataAtom,
   chatHistoryAtom,
   createProtocolChatAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
-  chatDataAtom,
-} from '../../resources/atoms'
-import { CSSTransition } from 'react-transition-group'
-import { useAtom } from 'jotai'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
-import { TextAreaField } from '../../atoms/TextAreaField'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
+import type { ChangeEvent } from 'react'
+import type { DropdownOption } from '@opentrons/components'
+import type { UpdateOptions } from '/ai-client/resources/types'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
 }
-
-const updateOptions: UpdateOptionsDropdown[] = [
-  {
-    name: 'Adapt Python protocol from OT-2 to Flex',
-    value: 'adapt_python_protocol',
-  },
-  { name: 'Change labware', value: 'change_labware' },
-  { name: 'Change pipettes', value: 'change_pipettes' },
-  { name: 'Other', value: 'other' },
-]
 
 const FadeWrapper = styled.div`
   &.fade-enter {
@@ -101,9 +94,7 @@ const isValidProtocolFileName = (protocolFileName: string): boolean => {
 export function UpdateProtocol(): JSX.Element {
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
-  const { t }: { t: (key: string) => string } = useTranslation(
-    'protocol_generator'
-  )
+  const { t } = useTranslation('protocol_generator')
   const [headerState, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
   const [updateType, setUpdateType] = useState<DropdownOption | null>(null)
   const [detailsValue, setDetailsValue] = useState<string>('')
@@ -114,7 +105,21 @@ export function UpdateProtocol(): JSX.Element {
   const [fileValue, setFile] = useState<File | null>(null)
   const [pythonText, setPythonTextValue] = useState<string>('')
   const [errorText, setErrorText] = useState<string | null>(null)
+  const progressIncrement = 1 / 3
 
+  const updateOptions: UpdateOptionsDropdown[] = [
+    {
+      name: t('update_option_adapt_python_protocol'),
+      value: 'adapt_python_protocol',
+    },
+    {
+      name: t('update_option_add_runtime_parameters'),
+      value: 'add_runtime_parameters',
+    },
+    { name: t('update_option_change_labware'), value: 'change_labware' },
+    { name: t('update_option_change_pipettes'), value: 'change_pipettes' },
+    { name: t('update_option_other'), value: 'other' },
+  ]
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
   useEffect(() => {
     setCreateProtocolChatAtom({
@@ -130,7 +135,6 @@ export function UpdateProtocol(): JSX.Element {
       liquids: [],
       steps: [],
       fake: false,
-      fake_id: 0,
     })
     setUpdateProtocolChatAtom({
       prompt: '',
@@ -139,24 +143,29 @@ export function UpdateProtocol(): JSX.Element {
       update_type: 'adapt_python_protocol',
       update_details: '',
       fake: false,
-      fake_id: 0,
     })
     setChatHistoryAtom([])
     setChatData([])
-  }, [])
+  }, [
+    setCreateProtocolChatAtom,
+    setUpdateProtocolChatAtom,
+    setChatHistoryAtom,
+    setChatData,
+  ])
 
   useEffect(() => {
     let progress = 0.0
     if (updateType !== null) {
-      progress += 0.33
+      progress += progressIncrement
     }
 
     if (detailsValue !== '') {
-      progress += 0.33
+      progress += progressIncrement
     }
 
+    // File upload is required for all update options
     if (pythonText !== '' && fileValue !== null && errorText === null) {
-      progress += 0.34
+      progress += progressIncrement
     }
 
     setHeaderWithMeterAtom({
@@ -170,6 +179,7 @@ export function UpdateProtocol(): JSX.Element {
     errorText,
     fileValue,
     setHeaderWithMeterAtom,
+    progressIncrement,
   ])
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>): void => {
@@ -180,36 +190,47 @@ export function UpdateProtocol(): JSX.Element {
     file: File & { name: string }
   ): Promise<void> => {
     if (isValidProtocolFileName(file.name)) {
-      const text = await file.text().catch(error => {
+      const text = await file.text().catch((error: unknown) => {
         console.error('Error reading file:', error)
-        setErrorText(t('python_file_read_error'))
+        setErrorText(String(t('python_file_read_error')))
+        return undefined
       })
 
       if (typeof text === 'string' && text !== '') {
         setErrorText(null)
         setPythonTextValue(text)
       } else {
-        setErrorText(t('file_length_error'))
+        setErrorText(String(t('file_length_error')))
       }
 
       setFile(file)
     } else {
-      setErrorText(t('python_file_type_error'))
+      setErrorText(String(t('python_file_type_error')))
       setFile(file)
     }
   }
 
+  function handleUpdateTypeSelect(value: string): void {
+    const selectedOption = updateOptions.find(option => option.value === value)
+    if (selectedOption != null) {
+      setUpdateType(selectedOption)
+    }
+  }
+
   function processDataAndNavigateToChat(): void {
-    const introText = t('modify_intro')
+    // Format the prompt for all update types
     const originalCodeText =
-      t('modify_python_code') + `\`\`\`python\n` + pythonText + `\n\`\`\`\n\n`
-    const updateTypeText =
-      t('modify_type_of_update') + updateType?.value + `\n\n`
-    const detailsText = t('modify_details_of_change') + detailsValue + '\n'
-
-    const chatPrompt = `${introText}${originalCodeText}${updateTypeText}${detailsText}`
-
-    console.log(chatPrompt)
+      pythonText !== ''
+        ? t('modify_python_code') +
+          `\`\`\`python\n` +
+          pythonText +
+          `\n\`\`\`\n\n`
+        : ''
+    const updateTypeText = `${t('modify_type_of_update')}${
+      updateType?.name
+    }\n\n`
+    const detailsText = `${t('modify_details_of_change')}${detailsValue}\n`
+    const chatPrompt = `${originalCodeText}${updateTypeText}${detailsText}`
 
     setUpdateProtocolChatAtom({
       prompt: chatPrompt,
@@ -218,7 +239,6 @@ export function UpdateProtocol(): JSX.Element {
       update_type: (updateType?.value ?? 'other') as UpdateOptions,
       update_details: detailsValue,
       fake: false,
-      fake_id: 0,
     })
 
     trackEvent({
@@ -314,15 +334,10 @@ export function UpdateProtocol(): JSX.Element {
             currentOption={
               updateType ?? {
                 value: '',
-                name: 'Select an option',
+                name: t('update_option_select'),
               }
             }
-            onClick={value => {
-              const selectedOption = updateOptions.find(v => v.value === value)
-              if (selectedOption != null) {
-                setUpdateType(selectedOption)
-              }
-            }}
+            onClick={handleUpdateTypeSelect}
           />
         </Flex>
         <BodyText>{t('provide_details_of_changes')}</BodyText>
@@ -338,6 +353,7 @@ export function UpdateProtocol(): JSX.Element {
           justifyContent={JUSTIFY_END}
         >
           <LargeButton
+            // TODO: fix this disabled increment logic
             disabled={headerState.progress !== 1.0}
             buttonText={t('submit_prompt')}
             onClick={processDataAndNavigateToChat}

@@ -10,8 +10,8 @@ import {
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
-import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { DropTipFooterButtons } from '/app/organisms/DropTipWizardFlows/shared'
 
 import type { ModuleLocation } from '@opentrons/shared-data'

@@ -1,12 +1,14 @@
 import { useFormikContext } from 'formik'
+
+import { Flex } from '@opentrons/components'
+
+import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
 import { getIsOpentronsTubeRack } from '../../utils/getIsOpentronsTubeRack'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.module.css'
-import { Flex } from '@opentrons/components'
 import type { LabwareFields } from '../../fields'
 
 interface Props {

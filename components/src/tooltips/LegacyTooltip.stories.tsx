@@ -1,19 +1,20 @@
-import type * as React from 'react'
-import { LegacyTooltip } from './LegacyTooltip'
-import { useTooltip } from './useTooltip'
-import { useHoverTooltip } from './useHoverTooltip'
 import {
-  Box,
-  Flex,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  SIZE_4,
-  SIZE_3,
+  Box,
   C_LIGHT_GRAY,
   C_MED_GRAY,
+  Flex,
+  JUSTIFY_CENTER,
+  SIZE_3,
+  SIZE_4,
 } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
+import { LegacyTooltip } from './LegacyTooltip'
+import { useHoverTooltip } from './useHoverTooltip'
+import { useTooltip } from './useTooltip'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'Library/Atoms/LegacyTooltip',

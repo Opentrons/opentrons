@@ -1,9 +1,9 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
@@ -13,19 +13,20 @@ import {
   parseRequiredModulesEntity,
 } from '@opentrons/shared-data'
 
-import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
+import { useNotifyRunQuery } from '/app/resources/runs'
+
 import {
   LABWARE_ENTITY,
   MODULE_ENTITY,
   PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'
@@ -44,7 +45,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('/app/resources/runs')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 const modifiedStoredProtocolData = {
   ...storedProtocolData,

@@ -1,18 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MoveLabwareOnDeck } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
-import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
-import { RECOVERY_MAP } from '../../constants'
-import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
-import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
 
-import type { ComponentProps } from 'react'
+import { RECOVERY_MAP } from '../../constants'
+import { getSlotNameAndLwLocFrom } from '../../hooks/useDeckMapUtils'
+import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
+import { TwoColLwInfoAndDeck } from '../TwoColLwInfoAndDeck'
+
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
@@ -25,6 +26,7 @@ vi.mock('../LeftColumnLabwareInfo')
 vi.mock('../../hooks/useDeckMapUtils')
 
 let mockProceedNextStep: Mock
+let mockManualRetrieve: Mock
 
 const render = (props: ComponentProps<typeof TwoColLwInfoAndDeck>) => {
   return renderWithProviders(<TwoColLwInfoAndDeck {...props} />, {
@@ -37,7 +39,7 @@ describe('TwoColLwInfoAndDeck', () => {
 
   beforeEach(() => {
     mockProceedNextStep = vi.fn()
-
+    mockManualRetrieve = vi.fn().mockResolvedValue(undefined)
     props = {
       routeUpdateActions: {
         proceedNextStep: mockProceedNextStep,
@@ -69,6 +71,14 @@ describe('TwoColLwInfoAndDeck', () => {
         selectedRecoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
       },
       isOnDevice: true,
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step:
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
+      },
+      recoveryCommands: {
+        manualRetrieve: mockManualRetrieve,
+      },
     } as any
 
     vi.mocked(LeftColumnLabwareInfo).mockReturnValue(

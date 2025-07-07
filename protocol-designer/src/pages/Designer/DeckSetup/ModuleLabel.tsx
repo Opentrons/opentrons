@@ -1,15 +1,18 @@
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { DeckLabelSet } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
+  getModuleDef,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
-  getModuleDef2,
 } from '@opentrons/shared-data'
+
 import { getRobotType } from '../../../file-data/selectors'
+
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -50,7 +53,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     }
   }, [labwareInfos])
 
-  const def = getModuleDef2(moduleModel)
+  const def = getModuleDef(moduleModel)
   const slotTransformKey =
     robotType === FLEX_ROBOT_TYPE ? FLEX_STANDARD_DECKID : OT2_STANDARD_DECKID
   const cornerOffsetsFromSlotFromTransform =

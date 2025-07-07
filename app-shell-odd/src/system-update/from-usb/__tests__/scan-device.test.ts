@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { getVersionFromZipIfValid as _getVersionFromZipIfValid } from '../scan-zip'
 import { getLatestMassStorageUpdateFile } from '../scan-device'
+import { getVersionFromZipIfValid as _getVersionFromZipIfValid } from '../scan-zip'
+
 vi.mock('../../../log')
 vi.mock('../scan-zip')
 const getVersionFromZipIfValid = vi.mocked(_getVersionFromZipIfValid)

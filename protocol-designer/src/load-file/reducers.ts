@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { FileUploadMessage, LoadFileAction } from './types'
 import type { FileUploadMessageAction } from './actions'
+import type { FileUploadMessage, LoadFileAction } from './types'
+
 // Keep track of file upload errors / messages
 type FileUploadMessageState = FileUploadMessage | null | undefined
 
@@ -30,22 +32,16 @@ const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
 
 // NOTE: whenever we add or change any of the action types that indicate
 // "changes to the protocol", those action types need to be updated here.
-const unsavedChanges = (
-  state: boolean = false,
-  action: {
-    type: string
-    payload: any
-  }
-): boolean => {
+const unsavedChanges = (state: boolean = false, action: Action): boolean => {
   switch (action.type) {
     case 'LOAD_FILE': {
-      return action.payload.didMigrate // no unsaved changes unless migration happened
+      return (action as LoadFileAction).payload.didMigrate // no unsaved changes unless migration happened
     }
 
     case 'SAVE_PROTOCOL_FILE':
       return false
 
-    case 'CREATE_NEW_PROTOCOL':
+    case 'TOGGLE_NEW_PROTOCOL_MODAL':
     case 'DISMISS_FORM_WARNING':
     case 'DISMISS_TIMELINE_WARNING':
     case 'CREATE_CONTAINER':
@@ -66,7 +62,6 @@ const unsavedChanges = (
     case 'REPLACE_CUSTOM_LABWARE_DEF':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
-    case 'EDIT_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_DECK_FIXTURE':
     case 'CREATE_DECK_FIXTURE':

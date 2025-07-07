@@ -1,24 +1,26 @@
 import type { Mount } from '@opentrons/components'
 import type {
-  ModuleType,
-  ModuleModel,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
+  CutoutId,
+  FlexModuleCutoutFixtureId,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-  ABSORBANCE_READER_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
   NozzleConfigurationStyle,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { DeckSlot } from '../types'
-
 import type {
-  TemperatureStatus,
+  AdditionalEquipmentEntity,
+  LabwareEntity,
   ModuleEntity,
   PipetteEntity,
-  LabwareEntity,
-  AdditionalEquipmentEntity,
+  TemperatureStatus,
 } from '@opentrons/step-generation'
+import type { DeckSlot } from '../types'
+
 export interface FormPipette {
   pipetteName?: string | null
   tiprackDefURI?: string[] | null
@@ -32,6 +34,8 @@ export interface FormModule {
   model: ModuleModel
   type: ModuleType
   slot: DeckSlot
+  cutoutFixtureId: FlexModuleCutoutFixtureId | null
+  cutoutId: CutoutId | null
 }
 export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
@@ -102,7 +106,7 @@ export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareByI
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
 }
 export interface PipetteTemporalProperties {
   mount: Mount

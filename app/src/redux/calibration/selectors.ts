@@ -1,8 +1,8 @@
 import type { State } from '../types'
 import type {
   CalibrationStatus,
-  DeckCalibrationStatus,
   DeckCalibrationData,
+  DeckCalibrationStatus,
 } from './types'
 
 export const getCalibrationStatus = (

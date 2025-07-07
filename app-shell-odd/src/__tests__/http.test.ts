@@ -1,6 +1,6 @@
-import fetch from 'node-fetch'
 import isError from 'lodash/isError'
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import fetch from 'node-fetch'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_API_VERSION } from '../constants'
 import * as Http from '../http'

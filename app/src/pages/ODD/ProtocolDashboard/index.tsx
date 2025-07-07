@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -23,16 +23,17 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '/app/redux/config'
-import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
-import { sortProtocols } from './utils'
-import { ProtocolCard } from './ProtocolCard'
-import { NoProtocols } from './NoProtocols'
-import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import type { Dispatch } from '/app/redux/types'
-import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
+import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
+import { NoProtocols } from './NoProtocols'
+import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
+import { ProtocolCard } from './ProtocolCard'
+import { sortProtocols } from './utils'
+
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()

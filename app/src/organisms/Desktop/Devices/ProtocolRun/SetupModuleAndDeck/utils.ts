@@ -1,6 +1,7 @@
 import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
@@ -11,20 +12,23 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.png'
+import trashBin from '/app/assets/images/flex_trash_bin.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
-import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
 import stagingAreaMagneticBlockGen1 from '/app/assets/images/staging_area_magnetic_block_gen_1.png'
-import trashBin from '/app/assets/images/flex_trash_bin.png'
 import stagingArea from '/app/assets/images/staging_area_slot.png'
-import wasteChute from '/app/assets/images/waste_chute.png'
+import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.png'
+import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
 import wasteChuteStagingArea from '/app/assets/images/waste_chute_with_staging_area.png'
+import wasteChute from '/app/assets/images/waste_chute.png'
 
 import type { CutoutFixtureId } from '@opentrons/shared-data'
 
 export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+  if (SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)) {
+    // TODO: replace with image for single slot fixtures once we get final renders
+    return stagingArea
+  } else if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return stagingArea
   } else if (WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)) {
     return wasteChute

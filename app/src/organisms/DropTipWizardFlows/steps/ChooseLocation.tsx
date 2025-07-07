@@ -1,16 +1,16 @@
-import { useState, useLayoutEffect, useCallback } from 'react'
+import { useCallback, useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
-  RESPONSIVENESS,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
+  RadioButton,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  RadioButton,
-  OVERFLOW_AUTO,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
@@ -19,14 +19,14 @@ import { DropTipFooterButtons } from '../shared'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { AddressableAreaName } from '@opentrons/shared-data'
 import type {
+  DropTipBlowoutLocationDetails,
+  DropTipBlowoutSlotName,
+} from '../hooks'
+import type {
   DropTipModalStyle,
   DropTipWizardContainerProps,
   ValidDropTipBlowoutLocation,
 } from '../types'
-import type {
-  DropTipBlowoutLocationDetails,
-  DropTipBlowoutSlotName,
-} from '../hooks'
 import type { UseConfirmPositionResult } from './ConfirmPosition'
 
 interface ChooseLocationProps extends DropTipWizardContainerProps {

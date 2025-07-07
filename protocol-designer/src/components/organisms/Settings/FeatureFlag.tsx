@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  ListItem,
   SPACING,
   StyledText,
-  ListItem,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms/ToggleButton'
 import { actions as featureFlagActions } from '../../../feature-flags'
+import { ToggleButton } from '../../atoms/ToggleButton'
 
 import type { FlagTypes } from '../../../feature-flags'
 

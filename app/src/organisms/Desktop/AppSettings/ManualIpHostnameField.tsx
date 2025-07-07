@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'

@@ -1,24 +1,12 @@
 import last from 'lodash/last'
-import pick from 'lodash/pick'
-import {
-  getWellsForTips,
-  getNextRobotStateAndWarningsSingleCommand,
-  getCutoutIdByAddressableArea,
-} from '@opentrons/step-generation'
-import {
-  FLEX_ROBOT_TYPE,
-  ALL,
-  COLUMN,
-  OT2_ROBOT_TYPE,
-  SINGLE,
-} from '@opentrons/shared-data'
 
-import type { Channels } from '@opentrons/components'
-import type {
-  AddressableAreaName,
-  CreateCommand,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import {
+  getNextRobotStateAndWarningsSingleCommand,
+  getWellsForTips,
+} from '@opentrons/step-generation'
+
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -26,13 +14,7 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
-
-const wasteChuteddressableAreaNamesPipette = [
-  '1ChannelWasteChute',
-  '8ChannelWasteChute',
-  '96ChannelWasteChute',
-]
+import type { SourceDestData, SubstepTimelineFrame, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -55,35 +37,23 @@ const _createNextTimelineFrame = (args: {
   nextFrame: CommandsAndWarnings
   volume: number
   wellInfo: SourceDestData
-}): Partial<{
-  command: CreateCommand
-  index: number
-  nextFrame: CommandsAndWarnings
-  volume: number
-  wellInfo: SourceDestData
-}> => {
-  // TODO(IL, 2020-02-24): is there a cleaner way to create newTimelineFrame
-  // and keep TS happy about computed properties?
+}): SubstepTimelineFrame => {
+  const { volume, wellInfo } = args
+
   const _newTimelineFrameKeys = {
-    volume: args.volume,
+    volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
-  const command = args.command
-  const isAirGapCommand =
-    'meta' in command && command.meta != null && 'isAirGap' in command.meta
 
   const newTimelineFrame =
-    args.command.commandType === 'aspirate' ||
     args.command.commandType === 'aspirateInPlace'
       ? {
           ..._newTimelineFrameKeys,
-          source: args.wellInfo,
-          isAirGap: isAirGapCommand,
+          source: wellInfo,
         }
       : {
           ..._newTimelineFrameKeys,
-          dest: args.wellInfo,
-          isAirGap: isAirGapCommand,
+          dest: wellInfo,
         }
   return newTimelineFrame
 }
@@ -99,320 +69,243 @@ export const substepTimelineSingleChannel = (
   initialRobotState: RobotState
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
-  // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
-  if (nextFrame.errors) return []
-  // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
-  const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
-    (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
-      const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
-        command,
-        invariantContext,
-        acc.prevRobotState
-      ).robotState
-      if (
-        command.commandType === 'aspirate' ||
-        command.commandType === 'dispense'
-      ) {
-        if ('meta' in command && command?.meta?.isAirGap) {
-          return acc
+
+  if ('commands' in nextFrame) {
+    const timeline: SubstepTimelineAcc = nextFrame.commands.reduce<SubstepTimelineAcc>(
+      (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
+        const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
+          command,
+          invariantContext,
+          acc.prevRobotState
+        ).robotState
+
+        const { labwareEntities, wasteChuteEntities } = invariantContext
+        const { pipettes, liquidState } = acc.prevRobotState
+
+        if (
+          command.commandType === 'dispenseInPlace' ||
+          command.commandType === 'aspirateInPlace'
+        ) {
+          if (
+            'meta' in command &&
+            command.meta != null &&
+            'isAirGap' in command.meta
+          ) {
+            return {
+              ...acc,
+              timeline: acc.timeline,
+              prevRobotState: nextRobotState,
+            }
+          }
+          const { volume, pipetteId } = command.params
+          const pipetteEntity = pipettes[pipetteId]
+          const entityId = pipetteEntity.entityId ?? ''
+          const wellName = pipetteEntity.wellName ?? ''
+          const isMoveToWell = labwareEntities[entityId] != null
+
+          if (isMoveToWell) {
+            const { id: labwareId } = invariantContext.labwareEntities[entityId]
+
+            const wellInfo = {
+              labwareId,
+              wells: [wellName],
+              preIngreds:
+                acc.prevRobotState.liquidState.labware[labwareId][wellName],
+              postIngreds:
+                nextRobotState.liquidState.labware[labwareId][wellName],
+            }
+
+            return {
+              ...acc,
+              prevRobotState: nextRobotState,
+              timeline: [
+                ...acc.timeline,
+                _createNextTimelineFrame({
+                  volume,
+                  index,
+                  nextFrame,
+                  command,
+                  wellInfo,
+                }),
+              ],
+            }
+          } else {
+            const isWasteChute = wasteChuteEntities[entityId] != null
+            const wellInfo = {
+              additionalEquipmentId: entityId,
+              wells: [],
+              preIngreds: isWasteChute
+                ? liquidState.wasteChute[entityId]
+                : liquidState.trashBins[entityId],
+              postIngreds: isWasteChute
+                ? nextRobotState.liquidState.wasteChute[entityId]
+                : nextRobotState.liquidState.trashBins[entityId],
+            }
+
+            return {
+              ...acc,
+              prevRobotState: nextRobotState,
+              timeline: [
+                ...acc.timeline,
+                _createNextTimelineFrame({
+                  volume,
+                  index,
+                  nextFrame,
+                  command,
+                  wellInfo,
+                }),
+              ],
+            }
+          }
+        } else {
+          return {
+            timeline: acc.timeline,
+            errors: null,
+            prevRobotState: nextRobotState,
+          }
         }
-        const { volume, wellName, labwareId } = command.params
-
-        const wellInfo = {
-          labwareId,
-          wells: [wellName],
-          preIngreds:
-            acc.prevRobotState.liquidState.labware[labwareId][wellName],
-          postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
-        }
-
-        return {
-          ...acc,
-          timeline: [
-            ...acc.timeline,
-            _createNextTimelineFrame({
-              volume,
-              index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
-              nextFrame,
-              command,
-              wellInfo,
-            }),
-          ],
-          prevRobotState: nextRobotState,
-        }
-      } else if (
-        command.commandType === 'dispenseInPlace' ||
-        command.commandType === 'aspirateInPlace'
-      ) {
-        const { volume } = command.params
-        const prevCommand =
-          'commands' in nextFrame ? nextFrame.commands[index - 1] : null
-
-        const moveToAddressableAreaCommand =
-          prevCommand?.commandType === 'moveToAddressableArea'
-            ? prevCommand
-            : null
-        if (moveToAddressableAreaCommand == null) {
-          console.error(
-            `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
-          )
-        }
-        const trashCutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-          'fixedTrash'
-            ? 'fixedTrashSlot'
-            : 'trashBinAdapter'
-
-        const cutoutFixture = wasteChuteddressableAreaNamesPipette.includes(
-          moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
-        )
-          ? 'wasteChuteRightAdapterNoCover'
-          : trashCutoutFixture
-
-        const cutoutId = getCutoutIdByAddressableArea(
-          moveToAddressableAreaCommand?.params
-            .addressableAreaName as AddressableAreaName,
-          cutoutFixture,
-          trashCutoutFixture === 'fixedTrashSlot'
-            ? OT2_ROBOT_TYPE
-            : FLEX_ROBOT_TYPE
-        )
-        const additionalEquipmentId = Object.entries(
-          invariantContext.additionalEquipmentEntities
-        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
-
-        if (additionalEquipmentId == null) {
-          console.error(
-            `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
-          )
-        }
-
-        const wellInfo = {
-          additionalEquipmentId,
-          wells: [],
-          preIngreds:
-            acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-          postIngreds:
-            nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-        }
-
-        return {
-          ...acc,
-          timeline: [
-            ...acc.timeline,
-            _createNextTimelineFrame({
-              volume,
-              index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
-              nextFrame,
-              command,
-              wellInfo,
-            }),
-          ],
-          prevRobotState: nextRobotState,
-        }
-      } else {
-        return { ...acc, prevRobotState: nextRobotState }
+      },
+      {
+        timeline: [],
+        errors: null,
+        prevRobotState: initialRobotState,
       }
-    },
-    {
-      timeline: [],
-      errors: null,
-      prevRobotState: initialRobotState,
-    }
-  )
-  return timeline.timeline
+    )
+    return timeline.timeline
+  } else {
+    return []
+  }
 }
 // timeline for multi-channel substep context
 export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
-  initialRobotState: RobotState,
-  channels: Channels,
-  nozzles: NozzleConfigurationStyle | null
+  initialRobotState: RobotState
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
-  // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
-  if (nextFrame.errors) return []
-  // @ts-expect-error(sa, 2021-6-14): after type narrowing this expect error should not be necessary
-  const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
-    (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
-      const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
-        command,
-        invariantContext,
-        acc.prevRobotState
-      ).robotState
 
-      if (
-        command.commandType === 'aspirate' ||
-        command.commandType === 'dispense'
-      ) {
-        if ('meta' in command && command?.meta?.isAirGap) {
-          return acc
-        }
-        const { volume, wellName, labwareId } = command.params
-        const labwareDef =
-          invariantContext.labwareEntities[labwareId] != null
-            ? invariantContext.labwareEntities[labwareId].def
-            : null
+  if ('commands' in nextFrame) {
+    const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
+      (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
+        const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
+          command,
+          invariantContext,
+          acc.prevRobotState
+        ).robotState
 
-        let numChannels = channels
-        if (nozzles === ALL && channels !== 8) {
-          numChannels = 96
-        } else if (nozzles === COLUMN) {
-          numChannels = 8
-        } else if (nozzles === SINGLE) {
-          numChannels = 1
-        }
-        const wellsForTips =
-          numChannels &&
-          labwareDef &&
-          getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
+        const {
+          labwareEntities,
+          pipetteEntities,
+          wasteChuteEntities,
+        } = invariantContext
+        const { pipettes, liquidState } = acc.prevRobotState
 
-        const wellInfo = {
-          labwareId,
-          wells: wellsForTips || [],
-          preIngreds: wellsForTips
-            ? pick(
-                acc.prevRobotState.liquidState.labware[labwareId],
-                wellsForTips
+        if (
+          command.commandType === 'dispenseInPlace' ||
+          command.commandType === 'aspirateInPlace'
+        ) {
+          if (
+            'meta' in command &&
+            command.meta != null &&
+            'isAirGap' in command.meta
+          ) {
+            return {
+              errors: null,
+              timeline: acc.timeline,
+              prevRobotState: nextRobotState,
+            }
+          }
+
+          const { volume, pipetteId } = command.params
+          const pipetteEntity = pipettes[pipetteId]
+          const entityId = pipetteEntity.entityId ?? ''
+          const wellName = pipetteEntity.wellName ?? ''
+          const isMoveToWell = labwareEntities[entityId] != null
+          const channels = pipetteEntities[pipetteId].spec.channels
+          const nozzles = pipetteEntity.nozzles
+
+          let numChannels = channels
+          if (nozzles === ALL && channels === 96) {
+            numChannels = 96
+          } else if (nozzles === COLUMN) {
+            numChannels = 8
+          } else if (nozzles === SINGLE) {
+            numChannels = 1
+          }
+          if (isMoveToWell) {
+            const {
+              def: labwareDef,
+              id: labwareId,
+            } = invariantContext.labwareEntities[entityId]
+            const wellsForTips =
+              numChannels &&
+              labwareDef &&
+              getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
+
+            const newTimelineEntries: SubstepTimelineFrame[] = []
+            for (const well of wellsForTips) {
+              const wellInfo = {
+                labwareId,
+                wells: [well],
+                preIngreds: liquidState.labware[labwareId][well],
+                postIngreds:
+                  nextRobotState.liquidState.labware[labwareId][well],
+              }
+
+              newTimelineEntries.push(
+                _createNextTimelineFrame({
+                  volume,
+                  index,
+                  nextFrame,
+                  command,
+                  wellInfo,
+                })
               )
-            : {},
-          postIngreds: wellsForTips
-            ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
-            : {},
+            }
+            return {
+              ...acc,
+              timeline: [...acc.timeline, ...newTimelineEntries],
+              prevRobotState: nextRobotState,
+            }
+          } else {
+            const isWasteChute = wasteChuteEntities[entityId] != null
+            const wellInfo = {
+              additionalEquipmentId: entityId,
+              wells: [],
+              preIngreds: isWasteChute
+                ? liquidState.wasteChute[entityId]
+                : liquidState.trashBins[entityId],
+              postIngreds: isWasteChute
+                ? nextRobotState.liquidState.wasteChute[entityId]
+                : nextRobotState.liquidState.trashBins[entityId],
+            }
+
+            return {
+              ...acc,
+              timeline: [
+                ...acc.timeline,
+                _createNextTimelineFrame({
+                  volume,
+                  index,
+                  nextFrame,
+                  command,
+                  wellInfo,
+                }),
+              ],
+              prevRobotState: nextRobotState,
+            }
+          }
         }
-
-        return {
-          ...acc,
-          timeline: [
-            ...acc.timeline,
-            _createNextTimelineFrame({
-              volume,
-              index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
-              nextFrame,
-              command,
-              wellInfo,
-            }),
-          ],
-          prevRobotState: nextRobotState,
-        }
-      } else if (
-        command.commandType === 'dispenseInPlace' ||
-        command.commandType === 'aspirateInPlace'
-      ) {
-        const { volume } = command.params
-        const prevCommand =
-          'commands' in nextFrame ? nextFrame.commands[index - 1] : null
-
-        const moveToAddressableAreaCommand =
-          prevCommand?.commandType === 'moveToAddressableArea'
-            ? prevCommand
-            : null
-        if (moveToAddressableAreaCommand == null) {
-          console.error(
-            `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
-          )
-        }
-        const trashCutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-          'fixedTrash'
-            ? 'fixedTrashSlot'
-            : 'trashBinAdapter'
-
-        const cutoutFixture =
-          wasteChuteddressableAreaNamesPipette.includes(
-            moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
-          ) ||
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '96ChannelWasteChute'
-            ? 'wasteChuteRightAdapterNoCover'
-            : trashCutoutFixture
-
-        const cutoutId = getCutoutIdByAddressableArea(
-          moveToAddressableAreaCommand?.params
-            .addressableAreaName as AddressableAreaName,
-          cutoutFixture,
-          trashCutoutFixture === 'fixedTrashSlot'
-            ? OT2_ROBOT_TYPE
-            : FLEX_ROBOT_TYPE
-        )
-        const additionalEquipmentId = Object.entries(
-          invariantContext.additionalEquipmentEntities
-        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
-
-        if (additionalEquipmentId == null) {
-          console.error(
-            `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
-          )
-        }
-
-        const wellInfo = {
-          additionalEquipmentId,
-          wells: [],
-          preIngreds:
-            acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-          postIngreds:
-            nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-        }
-
-        return {
-          ...acc,
-          timeline: [
-            ...acc.timeline,
-            _createNextTimelineFrame({
-              volume,
-              index,
-              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
-              nextFrame,
-              command,
-              wellInfo,
-            }),
-          ],
-          prevRobotState: nextRobotState,
-        }
-      } else {
         return { ...acc, prevRobotState: nextRobotState }
+      },
+      {
+        timeline: [],
+        errors: null,
+        prevRobotState: initialRobotState,
       }
-    },
-    {
-      timeline: [],
-      errors: null,
-      prevRobotState: initialRobotState,
-    }
-  )
-  return timeline.timeline
-}
-export const substepTimeline = (
-  commandCreator: CurriedCommandCreator,
-  invariantContext: InvariantContext,
-  initialRobotState: RobotState,
-  channels: Channels,
-  nozzles: NozzleConfigurationStyle | null
-): SubstepTimelineFrame[] => {
-  if (channels === 1) {
-    return substepTimelineSingleChannel(
-      commandCreator,
-      invariantContext,
-      initialRobotState
     )
+    return timeline.timeline
   } else {
-    return substepTimelineMultiChannel(
-      commandCreator,
-      invariantContext,
-      initialRobotState,
-      channels,
-      nozzles
-    )
+    return []
   }
 }

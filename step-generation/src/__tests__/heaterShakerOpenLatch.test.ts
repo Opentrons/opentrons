@@ -1,20 +1,23 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+
 import {
+  fixtureTiprack1000ul as _fixtureTiprack1000ul,
   getLabwareDefURI,
   getPipetteSpecsV2,
-  fixtureTiprack1000ul as _fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
+
 import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
-import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
 import {
+  DEFAULT_PIPETTE,
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
-  DEFAULT_PIPETTE,
 } from '../fixtures'
-import type { InvariantContext, RobotState } from '../types'
+import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 

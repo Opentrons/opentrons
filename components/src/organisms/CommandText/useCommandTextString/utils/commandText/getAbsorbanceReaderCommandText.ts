@@ -1,7 +1,7 @@
 import type {
-  AbsorbanceReaderOpenLidRunTimeCommand,
   AbsorbanceReaderCloseLidRunTimeCommand,
   AbsorbanceReaderInitializeRunTimeCommand,
+  AbsorbanceReaderOpenLidRunTimeCommand,
   AbsorbanceReaderReadRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'

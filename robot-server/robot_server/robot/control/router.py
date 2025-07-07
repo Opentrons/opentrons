@@ -97,6 +97,7 @@ async def get_door_status(
             data=DoorStatusModel.model_construct(
                 status=DoorState.from_hw_physical_status(hardware.door_state),
                 doorRequiredClosedForProtocol=door_required,
+                moduleSerial=hardware.module_door_serial,
             )
         )
     )

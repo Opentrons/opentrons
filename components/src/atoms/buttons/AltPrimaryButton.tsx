@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
+import { PrimaryButton } from '../..'
 import { COLORS } from '../../helix-design-system'
 import { styleProps } from '../../primitives'
-import { PrimaryButton } from '../..'
 
 export const AltPrimaryButton = styled(PrimaryButton)`
   background-color: ${COLORS.grey30};

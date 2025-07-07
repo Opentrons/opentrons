@@ -1,15 +1,17 @@
-import { combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import type { Reducer } from 'redux'
-import type { Action } from '../types'
 import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
 
 type HintReducerState = HintKey[]
-const hints = handleActions<HintReducerState>(
+
+const hints = handleActions<HintReducerState, AddHintAction>(
   {
     //  @ts-expect-error
     ADD_HINT: (
@@ -18,7 +20,7 @@ const hints = handleActions<HintReducerState>(
     ): HintReducerState => uniq([...state, action.payload.hintKey]),
   },
   []
-)
+) as Reducer<HintReducerState, Action>
 export type DismissedHintReducerState = Record<
   HintKey,
   {

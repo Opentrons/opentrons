@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -18,10 +19,13 @@ import {
   StyledText,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { Divider } from '/app/atoms/structure'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/atoms/structure'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
+
 import type { MouseEventHandler } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
@@ -61,7 +65,7 @@ export const ProtocolLabwareDetails = (props: {
           {labwareAndLidDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
-              namespace={labware.labwareDef.namespace}
+              isStandard={getLabwareDefIsStandard(labware.labwareDef)}
               displayName={labware.labwareDef.metadata.displayName}
               quantity={labware.quantity}
               labware={{ definition: labware.labwareDef }}
@@ -78,7 +82,7 @@ export const ProtocolLabwareDetails = (props: {
 }
 
 interface ProtocolLabwareDetailItemProps {
-  namespace: string
+  isStandard: boolean
   displayName: string
   quantity: number
   lidDisplayName?: string
@@ -89,7 +93,7 @@ export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
 ): JSX.Element => {
   const { t } = useTranslation('protocol_details')
-  const { namespace, displayName, quantity, labware, lidDisplayName } = props
+  const { isStandard, displayName, quantity, labware, lidDisplayName } = props
   return (
     <>
       <Divider width="100%" />
@@ -104,7 +108,7 @@ export const ProtocolLabwareDetailItem = (
           width="66%"
           marginRight={SPACING.spacing20}
         >
-          {namespace === 'opentrons' ? (
+          {isStandard ? (
             <Icon
               color={COLORS.blue50}
               name="check-decagram"

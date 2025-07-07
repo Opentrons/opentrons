@@ -1,6 +1,6 @@
-import { useState, useReducer, useEffect, Fragment, useRef } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { Fragment, useEffect, useReducer, useRef, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -33,34 +33,35 @@ import {
   TYPOGRAPHY,
   useTooltip,
 } from '@opentrons/components'
-
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
+
+import { ToggleButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { UploadInput } from '/app/molecules/UploadInput'
 import {
   getConnectableRobots,
   getReachableRobots,
-  getUnreachableRobots,
   getScanning,
-  startDiscovery,
+  getUnreachableRobots,
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
+  startDiscovery,
 } from '/app/redux/discovery'
-import { Slideout } from '/app/atoms/Slideout'
-import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
-import { ToggleButton } from '/app/atoms/buttons'
+
 import { AvailableRobotOption } from './AvailableRobotOption'
-import { UploadInput } from '/app/molecules/UploadInput'
 import { FileCard } from './FileCard'
 
-import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
+import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '/app/atoms/Slideout'
 import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import type { State, Dispatch } from '/app/redux/types'
 import type { Robot } from '/app/redux/discovery/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};

@@ -1,5 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Box,
   COLORS,
@@ -8,22 +9,22 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
+
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+
 import type { StepFormProps } from '../../types'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData, visibleFormErrors } = props
+  const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
   const dispatch = useDispatch()
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
     <Flex
@@ -41,6 +42,8 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         onExit={() => {
           dispatch(hoverSelection({ id: null, text: null }))
         }}
+        width="100%"
+        tooltipContent={null}
       />
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
       <Flex
@@ -49,7 +52,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         paddingX={SPACING.spacing16}
       >
         <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('protocol_steps:heater_shaker_settings')}
+          {t('protocol_steps:heater_shaker_state')}
         </StyledText>
         <ToggleExpandStepFormField
           {...propsForFields.targetHeaterShakerTemperature}
@@ -69,10 +72,6 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           offLabel={t(
             'form:step_edit_form.field.heaterShaker.temperature.toggleOff'
           )}
-          formLevelError={getFormLevelError(
-            'targetHeaterShakerTemperature',
-            mappedErrorsToField
-          )}
         />
         <ToggleExpandStepFormField
           {...propsForFields.targetSpeed}
@@ -86,7 +85,6 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           offLabel={t(
             'form:step_edit_form.field.heaterShaker.shaker.toggleOff'
           )}
-          formLevelError={getFormLevelError('targetSpeed', mappedErrorsToField)}
         />
         <ToggleStepFormField
           isDisabled={propsForFields.latchOpen.disabled}
@@ -113,10 +111,6 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           isSelected={formData.heaterShakerSetTimer === true}
           units={t('application:units.time')}
           toggleElement="checkbox"
-          formLevelError={getFormLevelError(
-            'heaterShakerTimer',
-            mappedErrorsToField
-          )}
         />
       </Flex>
     </Flex>

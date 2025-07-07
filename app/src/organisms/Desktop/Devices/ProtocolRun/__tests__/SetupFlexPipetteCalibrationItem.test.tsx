@@ -1,15 +1,16 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '/app/resources/runs/__fixtures__'
+
+import { SetupFlexPipetteCalibrationItem } from '../SetupFlexPipetteCalibrationItem'
 
 import type { ComponentProps } from 'react'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

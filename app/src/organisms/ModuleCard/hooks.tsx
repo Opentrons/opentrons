@@ -1,11 +1,12 @@
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
+
 import {
   MenuItem,
   NO_WRAP,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -13,11 +14,11 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
 } from '/app/resources/runs'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -30,8 +31,8 @@ import type {
   TCDeactivateLidCreateCommand,
   TCOpenLidCreateCommand,
   TemperatureModuleDeactivateCreateCommand,
+  UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-
 import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
@@ -189,6 +190,18 @@ export function useModuleOverflowMenu(
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
   )
+  const setupBtn = (
+    <MenuItem
+      key={`setup_${String(module.moduleModel)}`}
+      data-testid={`setup_${String(module.moduleModel)}`}
+      onClick={() => {
+        handleInstructionsClick()
+      }}
+      whiteSpace={NO_WRAP}
+    >
+      {t('overflow_menu_setup_instructions')}
+    </MenuItem>
+  )
   const testShakeBtn =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
@@ -302,6 +315,20 @@ export function useModuleOverflowMenu(
           `error setting thermocycler module status with command type ${lidCommand.commandType}: ${e.message}`
         )
       })
+  }
+
+  const homeShuttleCommand: UnsafeFlexStackerPrepareShuttleCreateCommand = {
+    commandType: 'unsafe/flexStacker/prepareShuttle',
+    params: {
+      moduleId: module.id,
+    },
+  }
+  const homeShuttle = (): void => {
+    createLiveCommand({
+      command: homeShuttleCommand,
+    }).catch((e: Error) => {
+      console.error(`error homing flex stacker shuttle: ${e.message}`)
+    })
   }
 
   const sendBlockTempCommand =
@@ -438,11 +465,11 @@ export function useModuleOverflowMenu(
     ],
     flexStackerModuleType: [
       {
-        setSetting: t('overflow_menu_about'),
+        setSetting: t('overflow_menu_home_shuttle'),
         isSecondary: false,
-        isSettingDisabled: false,
-        menuButtons: [],
-        onClick: handleAboutClick,
+        isSettingDisabled: isDisabled,
+        menuButtons: [aboutModuleBtn, setupBtn],
+        onClick: homeShuttle,
       },
     ],
   }

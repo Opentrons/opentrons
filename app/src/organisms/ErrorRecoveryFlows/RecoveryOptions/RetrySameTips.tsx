@@ -1,6 +1,7 @@
+import { RetryWithSameTips } from '/app/organisms/ErrorRecoveryFlows/shared'
+
 import { RECOVERY_MAP } from '../constants'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
-import { RetryWithSameTips } from '/app/organisms/ErrorRecoveryFlows/shared'
 
 import type { RecoveryContentProps } from '../types'
 

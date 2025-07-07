@@ -1,22 +1,22 @@
-import semver from 'semver'
 import { createSelector } from 'reselect'
+import semver from 'semver'
 
 import {
-  HEALTH_STATUS_OK,
-  getViewableRobots,
   getRobotApiVersion,
   getRobotByName,
+  getViewableRobots,
+  HEALTH_STATUS_OK,
 } from '../discovery'
 import * as Constants from './constants'
 
-import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
+import type { State } from '../types'
 import type {
+  RobotSystemType,
   RobotUpdateInfo,
   RobotUpdateSession,
-  RobotUpdateType,
-  RobotSystemType,
   RobotUpdateTarget,
+  RobotUpdateType,
 } from './types'
 
 export const getRobotUpdateTarget: (

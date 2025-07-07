@@ -1,6 +1,7 @@
 import uniqBy from 'lodash/uniqBy'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 
 const WELL_TYPE_BY_CATEGORY = {
   tubeRack: 'tube',

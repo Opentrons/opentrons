@@ -1,11 +1,12 @@
+import path from 'path'
 import Ajv from 'ajv'
-import { describe, expect, it, beforeAll } from 'vitest'
-import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
+import glob from 'glob'
+import { beforeAll, describe, expect, it } from 'vitest'
+
 import moduleSpecsV1 from '../../module/definitions/1.json'
+import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'
 import moduleSpecsSchemaV3 from '../../module/schemas/3.json'
-import path from 'path'
-import glob from 'glob'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validateModuleSpecsV1 = ajv.compile(moduleSpecsSchemaV1)
@@ -57,6 +58,14 @@ describe('validate all module specs with schema', () => {
 
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
+    })
+
+    // TODO(jh, 05-16-25): After adding all locating features, remove the skip.
+    it.skip(`validates expected features for ${filename}`, () => {
+      switch (filename) {
+        default:
+          expect(moduleDef.features).toEqual({})
+      }
     })
   })
 

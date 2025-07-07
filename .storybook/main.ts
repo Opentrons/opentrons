@@ -4,6 +4,10 @@ module.exports = {
     '../app/**/*.stories.@(js|jsx|ts|tsx)',
     '../protocol-designer/**/*.stories.@(js|jsx|ts|tsx)',
     '../opentrons-ai-client/**/*.stories.@(js|jsx|ts|tsx)',
+    '../components/**/*.mdx',
+    '../app/**/*.mdx',
+    '../protocol-designer/**/*.mdx',
+    '../opentrons-ai-client/**/*.mdx',
   ],
 
   addons: [

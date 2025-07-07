@@ -3,36 +3,36 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  TYPOGRAPHY,
-  LegacyStyledText,
-  Flex,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
+  InlineNotification,
+  LegacyStyledText,
   RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  selectIsSelectedLwTipRack,
-  selectSelectedLwOverview,
-  OFFSET_KIND_DEFAULT,
-  selectLwDisplayName,
-  getFlexSlotNameOnly,
-  selectActivePipetteChannelCount,
-} from '/app/redux/protocol-runs'
-import { UnorderedList } from '/app/molecules/UnorderedList'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
+import { UnorderedList } from '/app/molecules/UnorderedList'
+import {
+  getFlexSlotNameOnly,
+  OFFSET_KIND_DEFAULT,
+  selectActivePipetteChannelCount,
+  selectIsSelectedLwTipRack,
+  selectLwDisplayName,
+  selectSelectedLwOverview,
+} from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
-  LPCWizardState,
-  SelectedLwOverview,
-  OffsetLocationDetails,
   LabwareStackupDetail,
+  LPCWizardState,
+  OffsetLocationDetails,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 export function PlaceItemInstruction(
   props: EditOffsetContentProps

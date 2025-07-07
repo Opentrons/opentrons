@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { Btn, Icon, COLORS, Flex } from '@opentrons/components'
+import { Btn, COLORS, Flex, Icon } from '@opentrons/components'
 
 import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
@@ -58,6 +58,7 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
       size={size ?? '2rem'}
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
+      data-testid={`ToggleButton_${label ?? 'label'}`}
     >
       <Flex>
         <Icon name={iconName} size="2rem" />

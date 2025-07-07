@@ -1,12 +1,12 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { InlineNotification } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
-import { InlineNotification } from '/app/atoms/InlineNotification'
-import { OffsetBannerContainer } from '../OffsetBannerContainer'
 import {
   selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,
@@ -14,6 +14,8 @@ import {
   selectShowDefaultOffsetInfoBanner,
   toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
+
+import { OffsetBannerContainer } from '../OffsetBannerContainer'
 
 import type { ComponentProps } from 'react'
 
@@ -36,6 +38,13 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectShowDefaultOffsetInfoBanner: vi.fn(),
   toggleDefaultOffsetInfoBanner: vi.fn(),
 }))
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InlineNotification>()
+  return {
+    ...actual,
+    InlineNotification: vi.fn(),
+  }
+})
 
 const render = (props: ComponentProps<typeof OffsetBannerContainer>) => {
   const mockState = {

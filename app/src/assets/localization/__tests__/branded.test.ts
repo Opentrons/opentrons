@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
+import { resources } from '..'
 import {
   ANONYMOUS_RESOURCE,
   BRANDED_RESOURCE,
 } from '../../../LocalizationProvider'
-import { resources } from '..'
 
 describe('branded copy', () => {
   it('branded and anonymous resources contain the same translation keys', () => {

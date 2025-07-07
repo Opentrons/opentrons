@@ -1,7 +1,10 @@
 """ opentrons_shared_data.module: functions and types for module defs """
+
 import json
+from ast import literal_eval
 from pathlib import Path
 from typing import Union, cast, overload
+from functools import lru_cache
 
 from ..load import load_shared_data
 from .types import (
@@ -12,7 +15,9 @@ from .types import (
     ModuleDefinitionV1,
     ModuleDefinitionV3,
     ModuleModel,
+    TOFSensorBaseline,
 )
+
 
 OLD_TC_GEN2_LABWARE_OFFSET = {"x": 0, "y": 68.06, "z": 98.26}
 
@@ -38,7 +43,7 @@ of a thermocycler on a Flex.
 
 
 class ModuleNotFoundError(KeyError):
-    def __init__(self, version: str, model_or_loadname: str):
+    def __init__(self, version: str, model_or_loadname: str) -> None:
         super().__init__(model_or_loadname)
         self.requested_version = version
         self.requested_module = model_or_loadname
@@ -92,3 +97,18 @@ def load_definition(
         except FileNotFoundError:
             raise ModuleNotFoundError(version, model_or_loadname)
         return cast(ModuleDefinitionV3, json.loads(data))
+
+
+@lru_cache
+def load_tof_baseline_data(
+    model_or_loadname: Union[str, ModuleModel],
+) -> TOFSensorBaseline:
+    try:
+        definition = load_definition("3", model_or_loadname)
+        baseline = definition.get("uniqueModuleData", {})["TOFSensorBaseline"]
+        # The baseline is stored as string, so convert to dict
+        baseline["X"] = literal_eval(baseline["X"])
+        baseline["Z"] = literal_eval(baseline["Z"])
+        return cast(TOFSensorBaseline, baseline)
+    except (KeyError, ValueError):
+        raise ModuleNotFoundError("3", model_or_loadname)

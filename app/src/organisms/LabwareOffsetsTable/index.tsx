@@ -3,19 +3,20 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  ListTable,
-  ListAccordion,
-  StyledText,
-  RESPONSIVENESS,
-  Flex,
-  SPACING,
   COLORS,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  ListAccordion,
+  ListTable,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { selectAllLabwareInfoAndDefaultStatusSorted } from '/app/redux/protocol-runs'
-import { AccordionHeader } from './AccordionHeader'
+
 import { AccordionChildren } from './AccordionChildren'
+import { AccordionHeader } from './AccordionHeader'
 
 import type { ListAccordionProps } from '@opentrons/components'
 

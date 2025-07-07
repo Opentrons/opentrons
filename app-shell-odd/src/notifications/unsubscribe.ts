@@ -1,5 +1,5 @@
-import { connectionStore } from './store'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 

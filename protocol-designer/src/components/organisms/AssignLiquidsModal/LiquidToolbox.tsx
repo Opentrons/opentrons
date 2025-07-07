@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
 import {
   Banner,
   Btn,
@@ -19,24 +20,24 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLiquidEntities } from '../../../step-forms/selectors'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import * as fieldProcessors from '../../../steplist/fieldLevel/processing'
+
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { getLiquidClassDisplayName } from '../../../liquid-defs/utils'
-import { getSelectedWells } from '../../../well-selection/selectors'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import {
   removeWellsContents,
   setWellContents,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { getLiquidClassDisplayName } from '../../../liquid-defs/utils'
+import { getLiquidEntities } from '../../../step-forms/selectors'
+import * as fieldProcessors from '../../../steplist/fieldLevel/processing'
+import * as wellContentsSelectors from '../../../top-selectors/well-contents'
+import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { deselectAllWells } from '../../../well-selection/actions'
-import { DefineLiquidsModal } from '../DefineLiquidsModal'
+import { getSelectedWells } from '../../../well-selection/selectors'
+import { LINK_BUTTON_STYLE } from '../../atoms'
 import { LiquidCard } from './LiquidCard'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { ContentsByWell } from '../../../labware-ingred/types'
 
@@ -57,14 +58,18 @@ interface ToolboxFormValues {
   volume?: string | null
 }
 interface LiquidToolboxProps {
-  onClose: () => void
+  showBadFormState: boolean
+  setShowBadFormState: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
-export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
-  const { onClose } = props
+export function LiquidToolbox({
+  showBadFormState,
+  setShowBadFormState,
+  setDefineLiquidModal,
+}: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
-  const [showDefineLiquidModal, setDefineLiquidModal] = useState<boolean>(false)
-  const [showBadFormState, setShowBadFormState] = useState<boolean>(false)
+  const navigate = useNavigate()
   const liquids = useSelector(getLiquidEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
@@ -249,34 +254,29 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
       }
     })
     .filter(Boolean)
+
+  const handleConfirmClick = (): void => {
+    if (selectedWells.length > 0) {
+      setShowBadFormState(true)
+      return
+    }
+    dispatch(deselectAllWells())
+    navigate('/designer')
+  }
+
   return (
     <>
-      {showDefineLiquidModal ? (
-        <DefineLiquidsModal
-          onClose={() => {
-            setDefineLiquidModal(false)
-          }}
-        />
-      ) : null}
-
       <Toolbox
         title={
           <StyledText desktopStyle="bodyLargeSemiBold">
             {labwareDisplayName}
           </StyledText>
         }
-        confirmButtonText={t('shared:done')}
-        onConfirmClick={() => {
-          if (selectedWells.length > 0) {
-            setShowBadFormState(true)
-            return
-          }
-          dispatch(deselectAllWells())
-          onClose()
-        }}
         onCloseClick={handleClearAllWells}
         height="100%"
         width="21.875rem"
+        confirmButtonText={t('shared:done')}
+        onConfirmClick={handleConfirmClick}
         closeButton={
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('clear_wells')}

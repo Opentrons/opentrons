@@ -1,24 +1,27 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
+} from '@opentrons/shared-data'
 import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
-import {
-  fixtureP10SingleV2Specs,
-  fixtureP300SingleV2Specs,
-} from '@opentrons/shared-data'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  PipetteEntities,
   LabwareEntities,
+  PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../../form-types'
 
@@ -184,14 +187,9 @@ describe('path should update...', () => {
                 volume: '1',
               }
             )
-            const pathPatch =
-              path === expectedPath ? {} : { path: expectedPath }
 
-            const volumeChangeExpected = { volume, ...pathPatch }
-            const airGapChangeExpected = {
-              aspirate_airGap_volume,
-              ...pathPatch,
-            }
+            const volumeChangeExpected = { volume }
+            const airGapChangeExpected = { aspirate_airGap_volume }
             expect(airGapChange).toMatchObject(airGapChangeExpected)
             expect(volumeChange).toMatchObject(volumeChangeExpected)
           })
@@ -255,6 +253,8 @@ describe('disposal volume should update...', () => {
       path: 'single',
       disposalVolume_checkbox: false,
       disposalVolume_volume: null,
+      conditioning_volume: null,
+      conditioning_checkbox: false,
     })
   })
 
@@ -367,6 +367,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
+        preWetTip: false,
       })
     })
   })

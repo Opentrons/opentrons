@@ -1,12 +1,13 @@
 import * as React from 'react'
+
+import { CustomizeExpandButton, StyledText } from '../..'
 import { STYLE_PROPS } from '../../primitives'
+import { ListButton as ListButtonComponent } from './index'
 import {
   ListButtonAccordion,
   ListButtonAccordionContainer,
-  ListButtonRadioButton,
 } from './ListButtonChildren/index'
-import { StyledText } from '../..'
-import { ListButton as ListButtonComponent } from './index'
+
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ListButtonComponent> = {
@@ -56,8 +57,11 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
       >
         <ListButtonAccordionContainer id="mainAccordionContainer">
           <>
-            <ListButtonRadioButton
+            <CustomizeExpandButton
+              enableStackingFF={false}
               key="buttonNested"
+              allowInputField={false}
+              loadName="mockloadname0"
               isSelected={buttonValue === 'radio button nested'}
               buttonValue="radio button nested"
               buttonText="Radio button, click to expand nested accordion"
@@ -76,7 +80,10 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                   isExpanded={buttonValue === 'radio button nested'}
                 >
                   <>
-                    <ListButtonRadioButton
+                    <CustomizeExpandButton
+                      enableStackingFF={false}
+                      allowInputField={false}
+                      loadName="mockloadname1"
                       isSelected={nestedButtonValue === 'radio button1'}
                       buttonValue="radio button1"
                       buttonText="nested button"
@@ -90,7 +97,10 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                       </StyledText>
                     ) : null}
                   </>
-                  <ListButtonRadioButton
+                  <CustomizeExpandButton
+                    enableStackingFF={false}
+                    allowInputField={false}
+                    loadName="mockloadname2"
                     isSelected={nestedButtonValue === 'radio button2'}
                     buttonValue="radio button2"
                     buttonText="nested button 2"
@@ -98,7 +108,10 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
                       setNestedButtonValue('radio button2')
                     }}
                   />
-                  <ListButtonRadioButton
+                  <CustomizeExpandButton
+                    enableStackingFF={false}
+                    allowInputField={false}
+                    loadName="mockloadname3"
                     isSelected={nestedButtonValue === 'radio button3'}
                     buttonValue="radio button3"
                     buttonText="nested button 3"
@@ -111,8 +124,11 @@ const Template = (args: ListButtonComponentProps): JSX.Element => {
             ) : null}
           </>
           <>
-            <ListButtonRadioButton
+            <CustomizeExpandButton
+              enableStackingFF={false}
               key="buttonNonNested"
+              allowInputField={false}
+              loadName="mockloadname4"
               isSelected={buttonValue === 'radio button non nest'}
               buttonValue="radio button non nest"
               buttonText="Radio button without nested"

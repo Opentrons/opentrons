@@ -14,7 +14,12 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
-from .flex_stacker.common import FlexStackerStallOrCollisionError
+from .flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+    FlexStackerHopperError,
+    FlexStackerLabwareRetrieveError,
+)
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -402,6 +407,14 @@ from .unseal_pipette_from_tip import (
     UnsealPipetteFromTipCommandType,
 )
 
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 Command = Annotated[
     Union[
         AirGapInPlace,
@@ -426,6 +439,7 @@ Command = Annotated[
         LoadLiquid,
         LoadLiquidClass,
         LoadModule,
+        IdentifyModule,
         LoadPipette,
         LoadLidStack,
         LoadLid,
@@ -482,9 +496,6 @@ Command = Annotated[
         flex_stacker.SetStoredLabware,
         flex_stacker.Fill,
         flex_stacker.Empty,
-        flex_stacker.CloseLatch,
-        flex_stacker.OpenLatch,
-        flex_stacker.PrepareShuttle,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -495,6 +506,10 @@ Command = Annotated[
         unsafe.UnsafeEngageAxes,
         unsafe.UnsafeUngripLabware,
         unsafe.UnsafePlaceLabware,
+        unsafe.UnsafeFlexStackerManualRetrieve,
+        unsafe.UnsafeFlexStackerCloseLatch,
+        unsafe.UnsafeFlexStackerOpenLatch,
+        unsafe.UnsafeFlexStackerPrepareShuttle,
         robot.MoveTo,
         robot.MoveAxesRelative,
         robot.MoveAxesTo,
@@ -529,6 +544,7 @@ CommandParams = Union[
     LoadLiquidParams,
     LoadLiquidClassParams,
     LoadModuleParams,
+    IdentifyModuleParams,
     LoadPipetteParams,
     MoveLabwareParams,
     MoveRelativeParams,
@@ -583,9 +599,6 @@ CommandParams = Union[
     flex_stacker.SetStoredLabwareParams,
     flex_stacker.FillParams,
     flex_stacker.EmptyParams,
-    flex_stacker.CloseLatchParams,
-    flex_stacker.OpenLatchParams,
-    flex_stacker.PrepareShuttleParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -596,6 +609,10 @@ CommandParams = Union[
     unsafe.UnsafeEngageAxesParams,
     unsafe.UnsafeUngripLabwareParams,
     unsafe.UnsafePlaceLabwareParams,
+    unsafe.UnsafeFlexStackerManualRetrieveParams,
+    unsafe.UnsafeFlexStackerCloseLatchParams,
+    unsafe.UnsafeFlexStackerOpenLatchParams,
+    unsafe.UnsafeFlexStackerPrepareShuttleParams,
     robot.MoveAxesRelativeParams,
     robot.MoveAxesToParams,
     robot.MoveToParams,
@@ -626,6 +643,7 @@ CommandType = Union[
     LoadLiquidCommandType,
     LoadLiquidClassCommandType,
     LoadModuleCommandType,
+    IdentifyModuleCommandType,
     LoadPipetteCommandType,
     LoadLidStackCommandType,
     LoadLidCommandType,
@@ -682,9 +700,6 @@ CommandType = Union[
     flex_stacker.SetStoredLabwareCommandType,
     flex_stacker.FillCommandType,
     flex_stacker.EmptyCommandType,
-    flex_stacker.CloseLatchCommandType,
-    flex_stacker.OpenLatchCommandType,
-    flex_stacker.PrepareShuttleCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -695,6 +710,10 @@ CommandType = Union[
     unsafe.UnsafeEngageAxesCommandType,
     unsafe.UnsafeUngripLabwareCommandType,
     unsafe.UnsafePlaceLabwareCommandType,
+    unsafe.UnsafeFlexStackerManualRetrieveCommandType,
+    unsafe.UnsafeFlexStackerCloseLatchCommandType,
+    unsafe.UnsafeFlexStackerOpenLatchCommandType,
+    unsafe.UnsafeFlexStackerPrepareShuttleCommandType,
     robot.MoveAxesRelativeCommandType,
     robot.MoveAxesToCommandType,
     robot.MoveToCommandType,
@@ -726,6 +745,7 @@ CommandCreate = Annotated[
         LoadLiquidCreate,
         LoadLiquidClassCreate,
         LoadModuleCreate,
+        IdentifyModuleCreate,
         LoadPipetteCreate,
         LoadLidStackCreate,
         LoadLidCreate,
@@ -782,9 +802,6 @@ CommandCreate = Annotated[
         flex_stacker.SetStoredLabwareCreate,
         flex_stacker.FillCreate,
         flex_stacker.EmptyCreate,
-        flex_stacker.CloseLatchCreate,
-        flex_stacker.OpenLatchCreate,
-        flex_stacker.PrepareShuttleCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -795,6 +812,10 @@ CommandCreate = Annotated[
         unsafe.UnsafeEngageAxesCreate,
         unsafe.UnsafeUngripLabwareCreate,
         unsafe.UnsafePlaceLabwareCreate,
+        unsafe.UnsafeFlexStackerManualRetrieveCreate,
+        unsafe.UnsafeFlexStackerCloseLatchCreate,
+        unsafe.UnsafeFlexStackerOpenLatchCreate,
+        unsafe.UnsafeFlexStackerPrepareShuttleCreate,
         robot.MoveAxesRelativeCreate,
         robot.MoveAxesToCreate,
         robot.MoveToCreate,
@@ -834,6 +855,7 @@ CommandResult = Union[
     LoadLiquidResult,
     LoadLiquidClassResult,
     LoadModuleResult,
+    IdentifyModuleResult,
     LoadPipetteResult,
     LoadLidStackResult,
     LoadLidResult,
@@ -890,9 +912,6 @@ CommandResult = Union[
     flex_stacker.SetStoredLabwareResult,
     flex_stacker.FillResult,
     flex_stacker.EmptyResult,
-    flex_stacker.CloseLatchResult,
-    flex_stacker.OpenLatchResult,
-    flex_stacker.PrepareShuttleResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -903,6 +922,10 @@ CommandResult = Union[
     unsafe.UnsafeEngageAxesResult,
     unsafe.UnsafeUngripLabwareResult,
     unsafe.UnsafePlaceLabwareResult,
+    unsafe.UnsafeFlexStackerManualRetrieveResult,
+    unsafe.UnsafeFlexStackerCloseLatchResult,
+    unsafe.UnsafeFlexStackerOpenLatchResult,
+    unsafe.UnsafeFlexStackerPrepareShuttleResult,
     robot.MoveAxesRelativeResult,
     robot.MoveAxesToResult,
     robot.MoveToResult,
@@ -920,6 +943,9 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerShuttleError],
+    DefinedErrorData[FlexStackerHopperError],
+    DefinedErrorData[FlexStackerLabwareRetrieveError],
 ]
 
 

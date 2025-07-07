@@ -1,6 +1,8 @@
 import mixpanel from 'mixpanel-browser'
+
 import { getIsProduction } from '../networking/opentronsWebApi'
 import { getHasOptedIn } from './selectors'
+
 import type { BaseState } from '../types'
 
 export type AnalyticsEvent =

@@ -15,25 +15,26 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '/app/redux/config'
+import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+
 import { ErrorRecoveryWizard, useERWizard } from './ErrorRecoveryWizard'
-import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
-import { RecoveryTakeover } from './RecoveryTakeover'
 import {
   useCurrentlyRecoveringFrom,
   useERUtils,
   useRecoveryTakeover,
   useRetainedFailedCommandBySource,
 } from './hooks'
-import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import { RecoverySplash, useRecoverySplash } from './RecoverySplash'
+import { RecoveryTakeover } from './RecoveryTakeover'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { FailedCommand } from './types'
 import type { RunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
+import type { FailedCommand } from './types'
 
 const VALID_ER_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_AWAITING_RECOVERY,

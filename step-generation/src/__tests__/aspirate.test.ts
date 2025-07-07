@@ -1,37 +1,40 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, vi, it, expect, afterEach } from 'vitest'
-import { expectTimelineError } from '../__utils__/testMatchers'
-import { aspirate } from '../commandCreators/atomic/aspirate'
+
 import {
-  OT2_ROBOT_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
+  OT2_ROBOT_TYPE,
   fixtureTiprack10ul as tip10,
   fixtureTiprack1000ul as tip1000,
 } from '@opentrons/shared-data'
 
+import { expectTimelineError } from '../__utils__/testMatchers'
+import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
-  pipetteIntoHeaterShakerLatchOpen,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
+  getErrorResult,
+  getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
+  SOURCE_LABWARE,
 } from '../fixtures'
+import {
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
 import type {
-  LabwareDefinition2,
   AspDispAirgapParams,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../'
 
@@ -100,10 +103,10 @@ describe('aspirate', () => {
     ])
     expect(getSuccessResult(result).python).toBe(
       `
-mockPythonName.aspirate(
+mock_pipette.aspirate(
     volume=50,
-    location=mockPythonName["A1"].bottom(z=5),
-    rate=6 / mockPythonName.flow_rate.aspirate,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
 )`.trimStart()
     )
   })
@@ -428,7 +431,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
       .thenReturn(true)
@@ -457,7 +460,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
       .thenReturn(true)
 
@@ -485,7 +488,7 @@ mockPythonName.aspirate(
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         OT2_ROBOT_TYPE
       )
       .thenReturn(true)
@@ -514,7 +517,7 @@ mockPythonName.aspirate(
     when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )

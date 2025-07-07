@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { SPACING } from '../../../ui-style-constants'
-import { renderWithProviders } from '../../../testing/utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { Chip } from '..'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING } from '../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 
@@ -212,6 +213,24 @@ describe('Chip Touchscreen', () => {
   //   const icon = screen.getByLabelText('icon_mockInfo')
   //   expect(icon).toHaveStyle(`width: 1.25rem`)
   // })
+  it('renders a pulsing icon when pulseIcon is true', () => {
+    props = { text: 'mockPulse', type: 'info', pulseIcon: true }
+    render(props)
+    const animate = screen.getByTestId('Chip_info_icon_animate')
+    expect(animate).toHaveAttribute('attributeName', 'fill')
+    expect(animate).toHaveAttribute('values', `${COLORS.blue60}; transparent`)
+    expect(animate).toHaveAttribute('dur', '1s')
+    expect(animate).toHaveAttribute('calcMode', 'discrete')
+    expect(animate).toHaveAttribute('repeatCount', 'indefinite')
+  })
+
+  it('does not render a pulsing icon when pulseIcon is false', () => {
+    props = { text: 'mockNoPulse', type: 'info', pulseIcon: false }
+    render(props)
+    expect(
+      screen.queryByTestId('Chip_info_icon_animate')
+    ).not.toBeInTheDocument()
+  })
 })
 
 describe('Chip Web', () => {
@@ -426,5 +445,24 @@ describe('Chip Web', () => {
     expect(chip).toHaveStyle(`padding: ${SPACING.spacing4} ${SPACING.spacing6}`)
     const icon = screen.getByLabelText('icon_mockInfo')
     expect(icon).toHaveStyle(`width: 0.75rem`)
+  })
+
+  it('renders a pulsing icon when pulseIcon is true', () => {
+    props = { text: 'mockPulse', type: 'success', pulseIcon: true }
+    render(props)
+    const animate = screen.getByTestId('Chip_success_icon_animate')
+    expect(animate).toHaveAttribute('attributeName', 'fill')
+    expect(animate).toHaveAttribute('values', `${COLORS.green60}; transparent`)
+    expect(animate).toHaveAttribute('dur', '1s')
+    expect(animate).toHaveAttribute('calcMode', 'discrete')
+    expect(animate).toHaveAttribute('repeatCount', 'indefinite')
+  })
+
+  it('does not render a pulsing icon when pulseIcon is false', () => {
+    props = { text: 'mockNoPulse', type: 'success', pulseIcon: false }
+    render(props)
+    expect(
+      screen.queryByTestId('Chip_success_icon_animate')
+    ).not.toBeInTheDocument()
   })
 })

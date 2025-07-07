@@ -3,14 +3,13 @@ import isEqual from 'lodash/isEqual'
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
-
 import * as Store from './store'
 
 import type {
+  Address,
   DiscoveryClient,
   DiscoveryClientConfig,
   DiscoveryClientOptions,
-  Address,
   DiscoveryClientRobot,
 } from './types'
 
@@ -18,7 +17,7 @@ export function createDiscoveryClient(
   options: DiscoveryClientOptions
 ): DiscoveryClient {
   const { onListChange, logger, enableMDNS = true } = options
-  const { getState, dispatch, subscribe } = Store.createStore()
+  const { getState, dispatch, subscribe } = Store.legacy_createStore()
   const getAddresses = (): Address[] => Store.getAddresses(getState())
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
   let unsubscribe: (() => void) | null = null

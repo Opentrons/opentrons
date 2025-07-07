@@ -570,13 +570,13 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
-        :param aspirate_flow_rate: The flow rate for each aspirate in the mix, in µL/s.
+        :param aspirate_flow_rate: The absolute flow rate for each aspirate in the mix, in µL/s.
                                    If this is specified, ``rate`` must not be set.
-        :param dispense_flow_rate: The flow rate for each dispense in the mix, in µL/s.
+        :param dispense_flow_rate: The absolute flow rate for each dispense in the mix, in µL/s.
                                    If this is specified, ``rate`` must not be set.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
-        :param final_push_out: How much to push out after the final mix repetition. The
+        :param final_push_out: How much volume to push out after the final mix repetition. The
                                pipette will not push out after earlier repetitions. If
                                not specified or ``None``, the pipette will push out the
                                default non-zero amount. See :ref:`push-out-dispense`.
@@ -1851,7 +1851,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1891,7 +1891,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.transfer_with_liquid_class(
+            last_tip_location = self._core.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -1910,7 +1910,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
     @requires_version(2, 24)
@@ -1979,7 +1991,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2024,7 +2036,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.distribute_with_liquid_class(
+            last_tip_location = self._core.distribute_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=(
@@ -2046,7 +2058,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
     @requires_version(2, 24)
@@ -2116,7 +2140,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2163,7 +2187,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.consolidate_with_liquid_class(
+            last_tip_location = self._core.consolidate_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -2182,7 +2206,19 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
     @requires_version(2, 0)
@@ -2762,6 +2798,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
 
+    @publisher.publish(command=cmds.configure_for_volume)
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
         """Configure a pipette to handle a specific volume of liquid, measured in µL.
@@ -2856,6 +2893,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @publisher.publish(command=cmds.configure_nozzle_layout)
     @requires_version(2, 16)
     def configure_nozzle_layout(
         self,

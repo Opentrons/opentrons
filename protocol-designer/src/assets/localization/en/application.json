@@ -49,7 +49,7 @@
   "select": "Select",
   "selected": "Selected",
   "source": "Source",
-  "temperature": "Temperature (˚C)",
+  "temperature": "Temperature (°C)",
   "time": "Time",
   "units": {
     "cycles": "cycles",
@@ -63,6 +63,7 @@
     "minutes": "m",
     "rpm": "rpm",
     "seconds": "s",
+    "seconds_long": "seconds",
     "time": "mm:ss",
     "time_hms": "hh:mm:ss",
     "times": "x"

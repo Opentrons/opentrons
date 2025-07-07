@@ -1,7 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ChildNavigation } from '..'
 
 import type { ComponentProps } from 'react'

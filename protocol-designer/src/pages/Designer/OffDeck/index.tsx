@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -9,100 +9,91 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LabwareRender,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   RobotCoordsForeignDiv,
   RobotWorkSpace,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
+
+import { LiquidButton } from '../../../components/molecules'
+import { LabwareOnDeck } from '../../../components/organisms'
+import {
+  editSlotInfo,
+  selectZoomedIntoSlot,
+} from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
-import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '../../../ui/steps'
+import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
-import type { DeckSetupTabType } from '../types'
 
-const STANDARD_X_WIDTH = '127.76px'
-const STANDARD_Y_HEIGHT = '85.48px'
+import type { Dispatch, SetStateAction } from 'react'
+import type { ThunkDispatch } from '../../../types'
 
-export function OffDeck(props: DeckSetupTabType): JSX.Element {
-  const { tab } = props
+const STANDARD_X_WIDTH = 127.76
+const STANDARD_Y_HEIGHT = 85.48
+const SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL = 0.8
+
+interface OffDeckProps {
+  setOverflowMenu: Dispatch<SetStateAction<boolean>>
+}
+export function OffDeck(props: OffDeckProps): JSX.Element {
+  const { setOverflowMenu } = props
   const { t, i18n } = useTranslation('starting_deck_state')
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-  const dispatch = useDispatch()
+  const terminalItemId = useSelector(getSelectedTerminalItemId)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const { selectedLabwareDefUri, selectedSlot } = selectedSlotInfo
-
-  const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getOnlyLatestDefs()
-
-  const hoveredLabwareDef =
-    hoveredLabware != null
-      ? defs[hoveredLabware] ?? customLabwareDefs[hoveredLabware] ?? null
+  const { selectedSlot } = selectedSlotInfo
+  const zoomedInLabwareOnDeck =
+    selectedSlot?.slot != null
+      ? activeDeckSetup.labware[selectedSlot.slot]
       : null
-  const offDeckLabware =
-    selectedLabwareDefUri != null ? defs[selectedLabwareDefUri] ?? null : null
 
   let labware = (
     <RobotWorkSpace
       key="emptyState"
-      viewBox={`-25 -32 182.5142857143 122.1142857143`}
+      viewBox={`-15 -22 ${
+        STANDARD_X_WIDTH / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+      } ${STANDARD_Y_HEIGHT / SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL}`}
     >
       {() => (
         <RobotCoordsForeignDiv>
           <Box
             backgroundColor={COLORS.grey40}
             borderRadius={BORDERS.borderRadius8}
-            width={STANDARD_X_WIDTH}
-            height={STANDARD_Y_HEIGHT}
+            width={`${STANDARD_X_WIDTH}px`}
+            height={`${STANDARD_Y_HEIGHT}px`}
           />
         </RobotCoordsForeignDiv>
       )}
     </RobotWorkSpace>
   )
-  if (hoveredLabwareDef != null && hoveredLabwareDef !== offDeckLabware) {
+  if (zoomedInLabwareOnDeck != null) {
     labware = (
       <RobotWorkSpace
-        key={hoveredLabwareDef.parameters.loadName}
-        viewBox={`-25 -32 ${hoveredLabwareDef.dimensions.xDimension / 0.7} ${
-          hoveredLabwareDef.dimensions.yDimension / 0.7
+        key={zoomedInLabwareOnDeck.def.parameters.loadName}
+        viewBox={`-15 -22 ${
+          zoomedInLabwareOnDeck.def.dimensions.xDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
+        } ${
+          zoomedInLabwareOnDeck.def.dimensions.yDimension /
+          SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL
         }`}
       >
         {() => (
           <>
-            <LabwareRender definition={hoveredLabwareDef} />
-            <LabwareLabel
-              isLast={true}
-              isSelected={false}
-              labwareDef={hoveredLabwareDef}
-              position={[0, 0, 0]}
-            />
-          </>
-        )}
-      </RobotWorkSpace>
-    )
-  } else if (offDeckLabware != null) {
-    const def = offDeckLabware
-    labware = (
-      <RobotWorkSpace
-        key={def.parameters.loadName}
-        viewBox={`-25 -32 ${def.dimensions.xDimension / 0.7} ${
-          def.dimensions.yDimension / 0.7
-        }`}
-      >
-        {() => (
-          <>
-            <LabwareRender definition={def} />
-
+            <LabwareOnDeck labwareOnDeck={zoomedInLabwareOnDeck} x={0} y={0} />
             <LabwareLabel
               isLast={true}
               isSelected={true}
-              labwareDef={def}
+              labwareDef={zoomedInLabwareOnDeck.def}
               position={[0, 0, 0]}
+              showModuleIcon={false}
             />
           </>
         )}
@@ -112,13 +103,25 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
 
   return (
     <Flex width="100%" height="100%">
-      {selectedSlot.slot === 'offDeck' ? (
+      {zoomedInLabwareOnDeck != null || selectedSlot.slot === 'offDeck' ? (
         <Flex
           alignItems={ALIGN_CENTER}
           width="100%"
           padding={SPACING.spacing12}
           gridGap={SPACING.spacing12}
+          position={POSITION_RELATIVE}
         >
+          <Flex
+            position={POSITION_ABSOLUTE}
+            top={SPACING.spacing12}
+            right="24rem"
+          >
+            <LiquidButton
+              showLiquidOverflowMenu={() => {
+                setOverflowMenu(true)
+              }}
+            />
+          </Flex>
           <Flex justifyContent={JUSTIFY_CENTER} width="100%">
             <Flex
               width="39.4275rem"
@@ -144,21 +147,15 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
                     {i18n.format(t('off_deck_labware'), 'upperCase')}
                   </StyledText>
                 </Flex>
-                <Flex
-                  width="510.84px"
-                  height="342px"
-                  alignItems="center"
-                  justifyContent="center"
-                >
+                <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
                   {labware}
                 </Flex>
               </Flex>
             </Flex>
           </Flex>
-          <DeckSetupTools
+
+          <DeckSetupToolbox
             position={POSITION_RELATIVE}
-            onDeckProps={null}
-            setHoveredLabware={setHoveredLabware}
             onCloseClick={() => {
               dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
             }}
@@ -166,9 +163,18 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
         </Flex>
       ) : (
         <OffDeckDetails
-          tab={tab}
-          addLabware={() => {
-            dispatch(selectZoomedIntoSlot({ slot: 'offDeck', cutout: null }))
+          terminalItemId={terminalItemId}
+          addLabware={id => {
+            //  if id is null then you are creating a new labware on an empty off-deck slot
+            dispatch(
+              selectZoomedIntoSlot({ slot: id ?? 'offDeck', cutout: null })
+            )
+            dispatch(
+              editSlotInfo({
+                labwareDefURI:
+                  id != null ? activeDeckSetup.labware[id].labwareDefURI : null,
+              })
+            )
           }}
         />
       )}

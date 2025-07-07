@@ -1,14 +1,12 @@
 import type {
-  RobotApiRequestMeta,
   RobotApiErrorResponse,
+  RobotApiRequestMeta,
 } from '../../robot-api/types'
-
 import type { AllPipetteOffsetCalibrations } from '../api-types'
-
 import type {
   FETCH_PIPETTE_OFFSET_CALIBRATIONS,
-  FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS,
   FETCH_PIPETTE_OFFSET_CALIBRATIONS_FAILURE,
+  FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS,
 } from './constants'
 
 export interface FetchPipetteOffsetCalibrationsAction {

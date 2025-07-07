@@ -1,14 +1,15 @@
-import type * as React from 'react'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
+
 import { EstopMissingModal } from '.'
 
+import type { Meta, Story } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Organisms/EstopMissingModal',
@@ -22,7 +23,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

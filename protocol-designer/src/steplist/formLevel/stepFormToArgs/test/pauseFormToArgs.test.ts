@@ -1,15 +1,18 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'
+
 import type { HydratedPauseFormData } from '../../../../form-types'
 
 describe('pauseFormToArgs', () => {
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TEMP,
@@ -31,6 +34,7 @@ describe('pauseFormToArgs', () => {
   })
   it('returns delay command creator when form specifies pause until resume', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_RESUME,
@@ -54,6 +58,7 @@ describe('pauseFormToArgs', () => {
 
   it('returns delay command creator when form specifies pause until time', () => {
     const formData: HydratedPauseFormData = {
+      stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TIME,

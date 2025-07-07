@@ -1,21 +1,22 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { screen, fireEvent } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
-import { useDeckCalibrationData } from '../../hooks'
-import { useRunHasStarted } from '/app/resources/runs'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { useDashboardCalibrateTipLength } from '/app/pages/Desktop/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
+import { useRunHasStarted } from '/app/resources/runs'
+
+import { useDeckCalibrationData } from '../../hooks'
+import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components/src/hooks')
 vi.mock('/app/organisms/RunTimeControl/hooks')
@@ -37,7 +38,7 @@ describe('SetupTipLengthCalibrationButton', () => {
     robotName = ROBOT_NAME,
     runId = RUN_ID,
     hasCalibrated = false,
-    tipRackDefinition = fixtureTiprack300ul as LabwareDefinition2,
+    tipRackDefinition = fixtureTiprack300ul as LabwareDefinition,
     isExtendedPipOffset = false,
   }: Partial<ComponentProps<typeof SetupTipLengthCalibrationButton>> = {}) => {
     return renderWithProviders(

@@ -1,5 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,6 +14,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getMainPagePortalEl } from '../Portal'
 
 // Note: We decided not to use this component for the release.

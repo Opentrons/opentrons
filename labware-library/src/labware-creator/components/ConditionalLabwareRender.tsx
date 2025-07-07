@@ -1,7 +1,9 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import isEqual from 'lodash/isEqual'
+
 import {
-  LabwareRender,
   LabwareOutline,
+  LabwareRender,
   RobotCoordsForeignDiv,
   RobotWorkSpace,
 } from '@opentrons/components'
@@ -9,81 +11,119 @@ import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
+
 import styles from './ConditionalLabwareRender.module.css'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface Props {
   definition: LabwareDefinition2 | null
 }
 
-const calculateViewBox = (args: {
-  bBox: DOMRect | undefined
-  xDim: number
-  yDim: number
-}): string => {
-  const { bBox, xDim, yDim } = args
-
+const calculateViewBox = (bBox: DOMRect): string => {
   // by-eye margin to make sure there is no visual clipping
   const MARGIN = 5
 
   // calculate viewBox such that SVG is zoomed and panned with the bBox fully in view,
   // in a "zoom to fit" manner, plus some visual margin to prevent clipping
-  return `${(bBox?.x ?? 0) - MARGIN} ${(bBox?.y ?? 0) - MARGIN} ${
-    xDim + MARGIN * 2
-  } ${yDim + MARGIN * 2}`
+  const x = bBox.x - MARGIN
+  const y = bBox.y - MARGIN
+  const xDimension = bBox.width + MARGIN * 2
+  const yDimension = bBox.height + MARGIN * 2
+  return `${x} ${y} ${xDimension} ${yDimension}`
+}
+
+const areBBoxesEqual = (a: DOMRect | null, b: DOMRect | null): boolean => {
+  // isEqual appears to always return false for native DOMRects/SVGRects,
+  // so we need to break them down into primitives.
+  return isEqual(
+    {
+      x: a?.x,
+      y: a?.y,
+      width: a?.width,
+      height: a?.height,
+    },
+    {
+      x: b?.x,
+      y: b?.y,
+      width: b?.width,
+      height: b?.height,
+    }
+  )
 }
 
 export const ConditionalLabwareRender = (props: Props): JSX.Element => {
   const { definition } = props
+  return definition === null ? (
+    <Placeholder />
+  ) : (
+    <PopulatedPreview definition={definition} />
+  )
+}
+
+const PopulatedPreview = (props: {
+  definition: LabwareDefinition2
+}): JSX.Element => {
+  const { definition } = props
   const gRef = useRef<SVGGElement>(null)
-  const [bBox, updateBBox] = useState<DOMRect | undefined>(
-    gRef.current ? gRef.current.getBBox() : undefined
+  const [bBox, updateBBox] = useState<DOMRect | null>(
+    gRef.current?.getBBox() ?? null
   )
 
   // In order to implement "zoom to fit", we're calculating the desired viewBox based on getBBox of the child.
   // So we have to actually render the child to get its bounding box. After that, we re-calculate the viewBox.
   // Once the viewBox is re-calculated, we use setState to force a re-render.
-  const nextBBox = gRef.current?.getBBox()
   useLayoutEffect((): void => {
-    if (
-      nextBBox != null &&
-      (nextBBox.width !== bBox?.width || nextBBox.height !== bBox?.height)
-    ) {
+    const nextBBox = gRef.current?.getBBox() ?? null
+    if (!areBBoxesEqual(bBox, nextBBox)) {
       updateBBox(nextBBox)
     }
-  }, [bBox?.height, bBox?.width, nextBBox])
-
-  const xDim =
-    definition != null
-      ? bBox?.width ?? definition.dimensions.xDimension
-      : DEFAULT_X_DIMENSION
-  const yDim =
-    definition != null
-      ? bBox?.height ?? definition.dimensions.yDimension
-      : DEFAULT_Y_DIMENSION
+  }, [
+    bBox,
+    // This dep array needs to include anything that can affect the contents of the rendered SVG.
+    definition,
+  ])
 
   return (
-    <RobotWorkSpace viewBox={calculateViewBox({ bBox, xDim, yDim })}>
-      {() =>
-        definition != null ? (
-          <LabwareRender definition={definition} gRef={gRef} />
-        ) : (
-          <>
-            <LabwareOutline />
-            <RobotCoordsForeignDiv
-              x={0}
-              y={0}
-              width={xDim}
-              height={yDim}
-              innerDivProps={{ className: styles.error_text_wrapper }}
-            >
-              <div className={styles.error_text}>
-                Add missing info to see labware preview
-              </div>
-            </RobotCoordsForeignDiv>
-          </>
-        )
+    <RobotWorkSpace
+      viewBox={
+        // If we haven't calculated a zoom-to-fit viewBox yet, we can use any arbitrary
+        // value. Our useLayoutEffect will ensure it gets replaced with a real value
+        // before the user sees it.
+        bBox == null ? '0 0 0 0' : calculateViewBox(bBox)
       }
+    >
+      {() => <LabwareRender definition={definition} gRef={gRef} />}
+    </RobotWorkSpace>
+  )
+}
+
+const Placeholder = (): JSX.Element => {
+  return (
+    <RobotWorkSpace
+      viewBox={`0 0 ${DEFAULT_X_DIMENSION} ${DEFAULT_Y_DIMENSION}`}
+    >
+      {() => (
+        <>
+          <LabwareOutline
+            minX={0}
+            minY={0}
+            width={DEFAULT_X_DIMENSION}
+            height={DEFAULT_Y_DIMENSION}
+          />
+          <RobotCoordsForeignDiv
+            x={0}
+            y={0}
+            width={DEFAULT_X_DIMENSION}
+            height={DEFAULT_Y_DIMENSION}
+            innerDivProps={{ className: styles.error_text_wrapper }}
+          >
+            <div className={styles.error_text}>
+              Add missing info to see labware preview
+            </div>
+          </RobotCoordsForeignDiv>
+        </>
+      )}
     </RobotWorkSpace>
   )
 }

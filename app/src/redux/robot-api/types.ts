@@ -1,4 +1,4 @@
-import type { PENDING, SUCCESS, FAILURE } from './constants'
+import type { FAILURE, PENDING, SUCCESS } from './constants'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 

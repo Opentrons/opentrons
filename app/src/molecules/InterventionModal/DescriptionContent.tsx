@@ -1,11 +1,11 @@
 import {
-  Flex,
-  SPACING,
   DIRECTION_COLUMN,
-  StyledText,
+  Flex,
+  InlineNotification,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 
 interface NotificationProps {
   notificationHeader?: string

@@ -2,14 +2,14 @@
 import { useState } from 'react'
 
 import { useDropTipCommandErrors } from '.'
-import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
-import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipCommands } from './useDropTipCommands'
+import { useDropTipCreateCommands } from './useDropTipCreateCommands'
+import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 
 import type { SetRobotErrorDetailsParams } from '.'
-import type { UseDropTipCommandsResult } from './useDropTipCommands'
-import type { ErrorDetails, IssuedCommandsType } from '../types'
 import type { DropTipWizardFlowsProps } from '..'
+import type { ErrorDetails, IssuedCommandsType } from '../types'
+import type { UseDropTipCommandsResult } from './useDropTipCommands'
 
 export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
   issuedCommandsType: IssuedCommandsType

@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   commandSchemaV8,
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
-  protocolSchemaV8,
   OT2_ROBOT_TYPE,
+  protocolSchemaV8,
 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
@@ -14,23 +15,25 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+
 import {
-  createFile,
-  createPythonFile,
-  getLabwareDefinitionsInUse,
-} from '../selectors'
-import {
-  fileMetadata,
   dismissedWarnings,
+  fileMetadata,
   ingredients,
   ingredLocations,
+  labwareDefsByURI,
   labwareEntities,
   labwareNicknamesById,
-  labwareDefsByURI,
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import {
+  createFile,
+  createJSONFile,
+  getLabwareDefinitionsInUse,
+} from '../selectors'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
@@ -70,15 +73,33 @@ describe('createFile selector', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
+
+  // The labware in the fixtures have namespace "fixture", which makes them
+  // custom labware. Change their namespace to "opentrons" so that they're
+  // treated as standard labware.
+  const labwareEntitiesOpentrons = {
+    ...labwareEntities,
+    tiprackId: {
+      ...labwareEntities.tiprackId,
+      def: { ...labwareEntities.tiprackId.def, namespace: 'opentrons' },
+    },
+    plateId: {
+      ...labwareEntities.plateId,
+      def: { ...labwareEntities.plateId.def, namespace: 'opentrons' },
+    },
+    // We'll leave labwareEntities['fixedTrash'] with the "fixture" namespace,
+    // to demonstrate what custom labware loading looks like.
+  }
+
   const entities = {
     moduleEntities: v7Fixture.moduleEntities,
-    labwareEntities,
+    labwareEntities: labwareEntitiesOpentrons,
     pipetteEntities,
     liquidEntities: ingredients,
   }
   it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createFile.resultFunc(
+    const result = createJSONFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
@@ -102,21 +123,24 @@ describe('createFile selector', () => {
 
   it('should return a valid Python protocol file', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createPythonFile.resultFunc(
+    const result = createFile.resultFunc(
       fileMetadata,
-      OT2_ROBOT_TYPE,
-      entities,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
+      OT2_ROBOT_TYPE,
+      dismissedWarnings,
       ingredLocations,
-      labwareNicknamesById
+      v7Fixture.savedStepForms,
+      v7Fixture.orderedStepIds,
+      labwareNicknamesById,
+      entities
     )
     // This is just a quick smoke test to make sure createPythonFile() produces
     // something that looks like a Python file. The individual sections of the
     // generated Python will be tested in separate unit tests.
-    expect(result).toBe(
+    expect(result.pythonProtocol).toBe(
       `
-from contextlib import nullcontext as pd_step
+import json
 from opentrons import protocol_api, types
 
 metadata = {
@@ -128,33 +152,26 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.23",
-}
+requirements = {"robotType": "OT-2", "apiLevel": "2.24"}
 
-def run(protocol: protocol_api.ProtocolContext):
+def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
-    mock_python_name_1 = protocol.load_labware(
-        "fixture_trash",
+    mock_python_name_1 = protocol.load_labware_from_definition(
+        CUSTOM_LABWARE["fixture/fixture_trash/1"],
         location="12",
         label="Trash",
-        namespace="fixture",
-        version=1,
     )
     mock_python_name_2 = protocol.load_labware(
         "fixture_tiprack_10_ul",
         location="1",
         label="Opentrons 96 Tip Rack 10 µL",
-        namespace="fixture",
-        version=1,
+        namespace="opentrons",
     )
     mock_python_name_3 = protocol.load_labware(
         "fixture_96_plate",
         location="7",
         label="NEST 96 Well Plate 100 µL PCR Full Skirt",
-        namespace="fixture",
-        version=1,
+        namespace="opentrons",
     )
 
     # Load Pipettes:
@@ -164,8 +181,117 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # Step 1:
     pass
+
+CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"schemaVersion":2,"version":1,"namespace":"fixture","metadata":{"displayCategory":"trash","displayVolumeUnits":"L","displayName":"Tall Fixed Trash","tags":["trash","opentrons","tall"]},"dimensions":{"xDimension":172.86,"yDimension":165.86,"zDimension":82},"parameters":{"format":"trash","isTiprack":false,"loadName":"fixture_trash","isMagneticModuleCompatible":false,"quirks":["fixedTrash","centerMultichannelOnWells","touchTipDisabled"]},"wells":{"A1":{"shape":"rectangular","yDimension":165.67,"xDimension":107.11,"totalLiquidVolume":1100000,"depth":77,"x":82.84,"y":53.56,"z":5}},"brand":{"brand":"Opentrons"},"groups":[{"wells":["A1"],"metadata":{}}],"cornerOffsetFromSlot":{"x":0,"y":0,"z":0}}}""")
 `.trimStart()
     )
+
+    expect(result.designerApplication).toEqual({
+      designerApplication: {
+        data: {
+          dismissedWarnings: {
+            form: [],
+            timeline: [],
+          },
+          ingredLocations: {},
+          ingredients: {},
+          labware: {
+            fixedTrash: {
+              displayName: 'Trash',
+              labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+            },
+            plateId: {
+              displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+              labwareDefURI:
+                'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+            },
+            tiprackId: {
+              displayName: 'Opentrons 96 Tip Rack 10 µL',
+              labwareDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+            },
+          },
+          modules: {},
+          orderedStepIds: ['moveLiquidStepId'],
+          pipetteTiprackAssignments: {
+            pipetteId: ['opentrons/opentrons_96_tiprack_10ul/1'],
+          },
+          pipettes: {
+            pipetteId: {
+              pipetteName: 'p10_single',
+            },
+          },
+          savedStepForms: {
+            __INITIAL_DECK_SETUP_STEP__: {
+              id: '__INITIAL_DECK_SETUP_STEP__',
+              labwareLocationUpdate: {
+                fixedTrash: '12',
+                plateId: '1',
+                tiprackId: '2',
+              },
+              moduleLocationUpdate: {},
+              pipetteLocationUpdate: {
+                pipetteId: 'left',
+              },
+              stepType: 'manualIntervention',
+            },
+            moveLiquidStepId: {
+              aspirate_airGap_checkbox: true,
+              aspirate_airGap_volume: '1',
+              aspirate_delay_checkbox: true,
+              aspirate_delay_mmFromBottom: '1',
+              aspirate_delay_seconds: '1',
+              aspirate_flowRate: null,
+              aspirate_labwareId: 'plateId',
+              aspirate_mix_checkbox: false,
+              aspirate_mix_times: null,
+              aspirate_mix_volume: null,
+              aspirate_mmFromBottom: '1',
+              aspirate_touchTip_checkbox: false,
+              aspirate_wellOrder_first: 't2b',
+              aspirate_wellOrder_second: 'l2r',
+              aspirate_wells: ['A1', 'B1'],
+              aspirate_wells_grouped: false,
+              blowout_checkbox: false,
+              blowout_location: 'fixedTrash',
+              changeTip: 'always',
+              dispense_delay_checkbox: false,
+              dispense_delay_mmFromBottom: '0.5',
+              dispense_delay_seconds: '1',
+              dispense_flowRate: null,
+              dispense_labwareId: 'plateId',
+              dispense_mix_checkbox: false,
+              dispense_mix_times: null,
+              dispense_mix_volume: null,
+              dispense_mmFromBottom: '0.5',
+              dispense_touchTip_checkbox: false,
+              dispense_wellOrder_first: 't2b',
+              dispense_wellOrder_second: 'l2r',
+              dispense_wells: ['A12', 'B12'],
+              disposalVolume_checkbox: true,
+              disposalVolume_volume: '1',
+              id: 'moveLiquidStepId',
+              path: 'single',
+              pipetteId: 'pipetteId',
+              preWetTip: false,
+              stepDetails: '',
+              stepName: 'transfer',
+              stepType: 'moveLiquid',
+              volume: '5',
+            },
+          },
+        },
+        version: '8.5.0',
+        name: 'opentrons/protocol-designer',
+      },
+      robot: { model: OT2_ROBOT_TYPE },
+      metadata: {
+        author: 'The Author',
+        created: 1582667312515,
+        description: 'Protocol description',
+        protocolName: 'Test Protocol',
+        source: 'Protocol Designer',
+      },
+    })
   })
 })
 

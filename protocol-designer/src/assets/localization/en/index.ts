@@ -3,14 +3,14 @@ import application from './application.json'
 import button from './button.json'
 import card from './card.json'
 import context_menu from './context_menu.json'
-import create_new_protocol from './create_new_protocol.json'
+import deck_configuration from './deck_configuration.json'
 import deck from './deck.json'
 import feature_flags from './feature_flags.json'
 import form from './form.json'
 import liquids from './liquids.json'
 import modal from './modal.json'
 import modules from './modules.json'
-import nav from './nav.json'
+import onboarding from './onboarding.json'
 import protocol_command_text from './protocol_command_text.json'
 import protocol_overview from './protocol_overview.json'
 import protocol_steps from './protocol_steps.json'
@@ -25,14 +25,14 @@ export const en = {
   button,
   card,
   context_menu,
-  create_new_protocol,
   deck,
+  deck_configuration,
   feature_flags,
   form,
   liquids,
   modal,
   modules,
-  nav,
+  onboarding,
   protocol_command_text,
   protocol_overview,
   protocol_steps,

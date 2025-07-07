@@ -1,5 +1,6 @@
 // top subdomain nav bar component
 import { Link } from 'react-router-dom'
+
 import styles from './styles.module.css'
 
 interface LinkItem {

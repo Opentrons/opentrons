@@ -1,16 +1,16 @@
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type {
+  OFFSETS_CONFLICT,
+  OFFSETS_FROM_DATABASE,
+  OFFSETS_FROM_RUN_RECORD,
+  OFFSETS_PENDING_SELECTION,
+  OFFSETS_SOURCE_INITIALIZING,
+} from '/app/redux/protocol-runs'
+import type {
   DefaultOffsetDetails,
   LocationSpecificOffsetDetails,
   OffsetLocationDetails,
 } from './offsets'
-import type {
-  OFFSETS_FROM_RUN_RECORD,
-  OFFSETS_FROM_DATABASE,
-  OFFSETS_CONFLICT,
-  OFFSETS_SOURCE_INITIALIZING,
-  OFFSETS_PENDING_SELECTION,
-} from '/app/redux/protocol-runs'
 
 export interface LPCLabwareInfo {
   // Whether the user has confirmed offsets should be applied to the run.

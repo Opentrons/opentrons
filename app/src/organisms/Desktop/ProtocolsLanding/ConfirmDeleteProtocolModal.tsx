@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -6,10 +7,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  Link,
-  SPACING,
-  Modal,
   LegacyStyledText,
+  Link,
+  Modal,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

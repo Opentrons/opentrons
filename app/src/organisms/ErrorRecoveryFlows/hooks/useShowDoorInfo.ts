@@ -41,7 +41,6 @@ export function useShowDoorInfo(
 
 function isDoorPermittedOpen(recoveryMap: IRecoveryMap): boolean {
   const { route, step } = recoveryMap
-
   if (route in RECOVERY_MAP_METADATA) {
     const routeConfig = RECOVERY_MAP_METADATA[route]
 

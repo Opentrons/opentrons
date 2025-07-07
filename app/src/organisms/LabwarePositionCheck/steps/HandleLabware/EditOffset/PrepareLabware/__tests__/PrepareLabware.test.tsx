@@ -1,14 +1,14 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  mockSelectedLwOverview,
-  mockActivePipette,
-  MockLPCContentContainer,
-} from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  mockActivePipette,
+  MockLPCContentContainer,
+  mockSelectedLwOverview,
+} from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { PrepareLabware } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/PrepareLabware'
 import {
   selectActivePipette,
@@ -17,8 +17,8 @@ import {
   setInitialPosition,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -20,22 +21,23 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCsvFileQuery } from '@opentrons/react-api-client'
 import {
-  FLEX_STACKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  TC_MODULE_LOCATION_OT2,
-  TC_MODULE_LOCATION_OT3,
   getLabwareDefURI,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useCsvFileQuery } from '@opentrons/react-api-client'
-import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { useDeckCalibrationData } from './hooks'
+
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
+import { DownloadCsvFileLink } from './DownloadCsvFileLink'
+import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -268,14 +270,7 @@ export function HistoricalProtocolRunDrawer(
                   <DeckInfoLabel deckLabel={slotName} />
                   {offset.locationSequence?.some(
                     seq => seq.kind === 'onLabware'
-                  ) && (
-                    <DeckInfoLabel
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]
-                      }
-                      key="stacked-icon"
-                    />
-                  )}
+                  ) && <DeckInfoLabel iconName="stacked" key="stacked-icon" />}
                   {offset.location.moduleModel && (
                     <DeckInfoLabel
                       iconName={

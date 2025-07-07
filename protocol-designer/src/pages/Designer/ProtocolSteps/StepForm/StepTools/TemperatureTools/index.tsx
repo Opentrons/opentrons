@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Box,
   COLORS,
@@ -7,22 +8,21 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
 } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 
 import type { StepFormProps } from '../../types'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, formData, visibleFormErrors } = props
+  const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
   const dispatch = useDispatch()
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
     <Flex
@@ -33,6 +33,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
       <DropdownStepFormField
         {...propsForFields.moduleId}
         tooltipContent={null}
+        width="100%"
         options={moduleLabwareOptions}
         title={t('protocol_steps:module')}
         onEnter={(id: string) => {
@@ -48,17 +49,12 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
           {...propsForFields.targetTemperature}
           toggleValue={propsForFields.setTemperature.value}
           toggleUpdateValue={propsForFields.setTemperature.updateValue}
-          title={t('form:step_edit_form.moduleState')}
+          title={t('form:step_edit_form.heat_or_cool')}
           fieldTitle={t('form:step_edit_form.field.temperature.setTemperature')}
           units={t('units.degrees')}
           isSelected={formData.setTemperature === 'true'}
           onLabel={t('form:step_edit_form.field.temperature.toggleOn')}
           offLabel={t('form:step_edit_form.field.temperature.toggleOff')}
-          formLevelError={getFormLevelError(
-            'targetTemperature',
-            mappedErrorsToField
-          )}
-          caption={t('form:step_edit_form.field.temperature.caption')}
         />
       </Flex>
     </Flex>

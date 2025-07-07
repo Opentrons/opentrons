@@ -1,15 +1,15 @@
 import type { useCreateCommandMutation } from '@opentrons/react-api-client'
-import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
+import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
 import type {
-  SECTIONS,
   GRIPPER_FLOW_TYPES,
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
+  SECTIONS,
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
-  SUCCESSFULLY_DETACHED,
   SUCCESSFULLY_CALIBRATED,
+  SUCCESSFULLY_DETACHED,
 } from './constants'
 
 export type GripperWizardStep =
@@ -55,7 +55,7 @@ export interface SuccessStep {
 
 export interface RegisterJawOffsetAction {
   jaw: 'front' | 'rear'
-  offset: Coordinates | null
+  offset: Vector3D | null
 }
 
 type CreateCommandMutate = ReturnType<

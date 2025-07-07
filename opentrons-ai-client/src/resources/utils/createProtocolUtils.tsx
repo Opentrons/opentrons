@@ -1,20 +1,37 @@
+import startCase from 'lodash/startCase'
+
 import {
+  getFlexNameConversion,
   getLabwareDisplayName,
   getPipetteSpecsV2,
+  splitLabwareDefURI,
 } from '@opentrons/shared-data'
-import type { PipetteName } from '@opentrons/shared-data'
+
 import { OTHER } from '../../organisms/ApplicationSection'
 import {
-  TWO_PIPETTES,
-  OPENTRONS_OT2,
-  OPENTRONS_FLEX,
   FLEX_GRIPPER,
   NO_PIPETTES,
+  OPENTRONS_FLEX,
+  OPENTRONS_OT2,
+  ROBOT_FIELD_NAME,
+  TWO_PIPETTES,
 } from '../../organisms/InstrumentsSection'
-import type { UseFormWatch } from 'react-hook-form'
-import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
+import { PROTOCOL_FORMAT, PYTHON } from '../constants'
 import { getOnlyLatestDefs } from './labware'
+
+import type { UseFormWatch } from 'react-hook-form'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
 import type { CreatePrompt } from '../types'
+
+export function generatePromptPreviewProtocolFormatItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { protocol_format = 'Python' } = watch()
+
+  return [protocol_format]
+}
 
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,
@@ -85,6 +102,19 @@ export function generatePromptPreviewModulesItems(
   return items.filter(Boolean)
 }
 
+export function generatePromptPreviewFixtureItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { fixtures } = watch()
+
+  if (fixtures === undefined || fixtures?.length === 0) return []
+
+  const items = fixtures?.map(fixture => fixture.name)
+
+  return items.filter(Boolean)
+}
+
 export function generatePromptPreviewLabwareLiquidsItems(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -97,9 +127,7 @@ export function generatePromptPreviewLabwareLiquidsItems(
   // Add all labware items
   labwares?.forEach(labware => {
     items.push(
-      `${labware.count} x ${
-        getLabwareDisplayName(defs[labware.labwareURI]) as string
-      }`
+      `${labware.count} x ${getLabwareDisplayName(defs[labware.labwareURI])}`
     )
   })
 
@@ -211,6 +239,26 @@ export function generatePromptPreviewStepsItems(
   return steps.filter(Boolean)
 }
 
+export function generatePromptPreviewRuntimeParametersItems(
+  watch: UseFormWatch<CreateProtocolFormData>,
+  t: any
+): string[] {
+  const { runtime_parameters } = watch()
+  const protocolFormat = watch(PROTOCOL_FORMAT)
+  const robotType = watch(ROBOT_FIELD_NAME)
+
+  // Only show in preview if Protocol is Python and robot is Flex
+  if (
+    protocolFormat !== PYTHON ||
+    robotType !== OPENTRONS_FLEX ||
+    !runtime_parameters
+  ) {
+    return []
+  }
+
+  return [runtime_parameters].filter(Boolean)
+}
+
 export function generatePromptPreviewData(
   watch: UseFormWatch<CreateProtocolFormData>,
   t: any
@@ -219,6 +267,10 @@ export function generatePromptPreviewData(
   items: string[]
 }> {
   return [
+    {
+      title: t('protocol_format_title'),
+      items: generatePromptPreviewProtocolFormatItems(watch, t),
+    },
     {
       title: t('application_title'),
       items: generatePromptPreviewApplicationItems(watch, t),
@@ -232,8 +284,16 @@ export function generatePromptPreviewData(
       items: generatePromptPreviewModulesItems(watch, t),
     },
     {
+      title: t('fixtures_title'),
+      items: generatePromptPreviewFixtureItems(watch, t),
+    },
+    {
       title: t('labware_liquids_title'),
       items: generatePromptPreviewLabwareLiquidsItems(watch, t),
+    },
+    {
+      title: t('runtime_parameters_title'),
+      items: generatePromptPreviewRuntimeParametersItems(watch, t),
     },
     {
       title: t('steps_title'),
@@ -247,28 +307,66 @@ export function generateChatPrompt(
   t: any,
   setCreateProtocolChatAtom: (
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
-  ) => void
+  ) => void,
+  isPdProtocolGenerationEnabled: boolean = false
 ): string {
-  const defs = getOnlyLatestDefs()
-
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
     values.application.scientificApplication
   )}`
   const description = `- ${values.application.description}`
+
+  // we need to do this nonsense to convert pipette names to api load names
+  // this data does not yet live in  pipette defs, but hopefully aill within 6 months
+  // of writing this comment. https://opentrons.atlassian.net/browse/EXEC-1426
+  let leftPipetteApiLoadName: string | null = null
+  let rightPipetteApiLoadName: string | null = null
+
+  const leftPipetteName = values.instruments.leftPipette
+  const rightPipetteName = values.instruments.rightPipette
+
+  if (leftPipetteName && leftPipetteName !== NO_PIPETTES) {
+    const leftPipetteSpecs = getPipetteSpecsV2(leftPipetteName as PipetteName)
+    if (leftPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        leftPipetteApiLoadName = getFlexNameConversion(leftPipetteSpecs)
+      }
+    }
+  }
+  if (rightPipetteName && rightPipetteName !== NO_PIPETTES) {
+    const rightPipetteSpecs = getPipetteSpecsV2(rightPipetteName as PipetteName)
+    if (rightPipetteSpecs != null) {
+      // Only convert to Flex name if the robot is Flex
+      if (values.instruments.robot === OPENTRONS_FLEX) {
+        rightPipetteApiLoadName = getFlexNameConversion(rightPipetteSpecs)
+      }
+    }
+  }
+  const leftPipettePromptName =
+    leftPipetteApiLoadName ?? values.instruments.leftPipette
+  const rightPipettePromptName =
+    rightPipetteApiLoadName ?? values.instruments.rightPipette
+
+  const mounts: string[] =
+    values.instruments.pipettes === TWO_PIPETTES
+      ? [
+          values.instruments.leftPipette !== NO_PIPETTES
+            ? `left pipette ${leftPipettePromptName}`
+            : '',
+          values.instruments.rightPipette !== NO_PIPETTES
+            ? `right pipette ${rightPipettePromptName}`
+            : '',
+        ].filter(Boolean)
+      : [values.instruments.pipettes]
+
   const pipetteMounts =
     values.instruments.pipettes === TWO_PIPETTES
       ? [
           values.instruments.leftPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.leftPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_left')}`,
+            `- ${leftPipettePromptName} ${t('mounted_left')}`,
           values.instruments.rightPipette !== NO_PIPETTES &&
-            `- ${
-              getPipetteSpecsV2(values.instruments.rightPipette as PipetteName)
-                ?.displayName
-            } ${t('mounted_right')}`,
+            `- ${rightPipettePromptName} ${t('mounted_right')}`,
         ]
           .filter(Boolean)
           .join('\n')
@@ -278,48 +376,74 @@ export function generateChatPrompt(
     values.instruments.robot === OPENTRONS_FLEX
       ? `\n- ${t('with_flex_gripper')}`
       : ''
+
   const modules = values.modules
     .map(
       module =>
-        `- ${module.name}${
-          module.adapter?.name != null ? ` with ${module.adapter.name}` : ''
+        `- ${module.model}${
+          module.adapter?.name != null ? ` with ${module.adapter.value}` : ''
         }`
     )
     .join('\n')
+
+  const fixtures = values.fixtures
+    .map(fixture => `- ${fixture.name}`)
+    .join('\n')
+
   const labwares = values.labwares
     .map(
       labware =>
-        `- ${getLabwareDisplayName(defs[labware.labwareURI])} x ${
+        `- ${splitLabwareDefURI(labware.labwareURI).loadName} x ${
           labware.count
         }`
     )
     .join('\n')
+
   const liquids = values.liquids.map(liquid => `- ${liquid}`).join('\n')
+
   const steps = Array.isArray(values.steps)
     ? values.steps.map(step => `- ${step}`).join('\n')
     : values.steps
 
-  const prompt = `${t('create_protocol_prompt_robot', { robotType })}\n${t(
-    'application_title'
-  )}:\n${scientificApplication}\n\n${t('description')}:\n${description}\n\n${t(
-    'pipette_mounts'
-  )}:\n\n${pipetteMounts}${flexGripper}\n\n${t(
-    'modules_title'
-  )}:\n${modules}\n\n${t('labware_section_title')}:\n${labwares}\n\n${t(
-    'liquid_section_title'
-  )}:\n${liquids}\n\n${t('steps_section_title')}:\n${steps}\n`
+  const moduleSection =
+    values.modules.length > 0 ? `\n\n${t('modules_title')}:\n${modules}` : ''
 
-  const mounts: string[] =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${values.instruments.leftPipette}`
-            : '',
-          values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${values.instruments.rightPipette}`
-            : '',
-        ].filter(Boolean)
-      : [values.instruments.pipettes]
+  const fixtureSection =
+    values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
+
+  const runtimeParametersSection =
+    values.protocol_format === PYTHON &&
+    values.instruments.robot === OPENTRONS_FLEX &&
+    values.runtime_parameters
+      ? `\n\n${t(
+          'runtime_parameters_title'
+        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+      : ''
+
+  const prompt = `${
+    values.protocol_format === PYTHON
+      ? t('create_protocol_prompt_robot', { robotType }) + '\n'
+      : t('create_protocol_pd_prompt_robot', {
+          format: startCase(values.protocol_format),
+          robotType,
+        }) + '\n'
+  }
+
+
+${t('application_title')}:\n${scientificApplication}
+
+${t('description')}:\n${description}
+
+${t(
+  'pipette_mounts'
+)}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
+
+\n${t('labware_section_title')}:\n${labwares}
+
+\n${t('liquid_section_title')}:\n${liquids}${runtimeParametersSection}
+
+\n${t('steps_section_title')}:\n${steps}
+`
 
   setCreateProtocolChatAtom({
     prompt,
@@ -340,13 +464,21 @@ export function generateChatPrompt(
             : ''
         }`
     ),
+    fixtures: values.fixtures.map(fixture => fixture.name),
     labware: values.labwares.map(
       labware => `${labware.labwareURI}, quantity: ${labware.count}`
     ),
     liquids: values.liquids,
+    runtime_parameters: values.runtime_parameters,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake: false,
-    fake_id: 0,
+    fake:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer',
+    fake_key:
+      !isPdProtocolGenerationEnabled &&
+      values.protocol_format === 'Protocol Designer'
+        ? 'pd serial diliution'
+        : undefined,
   })
 
   return prompt

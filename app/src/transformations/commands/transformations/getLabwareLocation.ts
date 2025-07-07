@@ -1,6 +1,6 @@
 import type {
-  LoadLabwareRunTimeCommand,
   LabwareLocation,
+  LoadLabwareRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 

@@ -1,22 +1,22 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
-  PROTOCOL_ID,
-  PROTOCOL_ANALYSIS,
-  NULL_PROTOCOL_ANALYSIS,
-} from '../__fixtures__'
-
-import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
+
+import {
+  NULL_PROTOCOL_ANALYSIS,
+  PROTOCOL_ANALYSIS,
+  PROTOCOL_ID,
+} from '../__fixtures__'
 import { useRequiredProtocolLabware } from '../useRequiredProtocolLabware'
 
 import type { UseQueryResult } from 'react-query'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Protocol } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -52,10 +52,6 @@ describe('useRequiredProtocolLabware', () => {
   it('should return LabwareSetupItem array', () => {
     const { result } = renderHook(() => useRequiredProtocolLabware(PROTOCOL_ID))
     expect(result.current.length).toBe(1)
-    expect(result.current[0].labwareDef.metadata.displayName).toEqual(
-      '300ul Tiprack FIXTURE'
-    )
-    expect(result.current[0].labwareDef.dimensions.xDimension).toBe(127.76)
     expect(result.current[0].labwareDef.metadata.displayName).toEqual(
       '300ul Tiprack FIXTURE'
     )

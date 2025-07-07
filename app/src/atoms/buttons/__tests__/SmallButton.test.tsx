@@ -1,10 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, BORDERS } from '@opentrons/components'
+
+import { BORDERS, COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { SmallButton } from '../SmallButton'
-import { renderWithProviders } from '/app/__testing-utils__'
 
 import type { ComponentProps } from 'react'
 

@@ -1,21 +1,24 @@
-import type * as React from 'react'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
+
 import {
   DIRECTION_COLUMN,
   Flex,
-  PrimaryButton,
-  SPACING,
   LegacyStyledText,
   ModalShell,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
+
 import { Skeleton } from '/app/atoms/Skeleton'
-import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '/app/redux/config/reducer'
+
+import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
 
+import type { Meta, Story } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type * as React from 'react'
 
 const dummyConfig = {
   config: {
@@ -23,7 +26,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

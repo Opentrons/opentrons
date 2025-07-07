@@ -1,23 +1,24 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
+import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  StyledText,
-  SPACING,
-  ALIGN_CENTER,
   JUSTIFY_END,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
+import { RECOVERY_MAP } from './constants'
 import {
-  RecoverySingleColumnContentWrapper,
   RecoveryFooterButtons,
+  RecoverySingleColumnContentWrapper,
 } from './shared'
 
 import type { RecoveryContentProps } from './types'
@@ -28,16 +29,21 @@ import type { RecoveryContentProps } from './types'
 // to this component. This is commonly done when the route & step itself allows the user to keep the door open, but some
 // action on that route & step is about to occur that requires the door to be closed. In this case, once the door event
 // has been satisfied, manually route back to the previous route & step.
+// in case you need a custom "close the robot door" use RecoveryDoorOpenSpecial compnent with allowDoorOpen metadata set to true
 export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,
   routeUpdateActions,
+  recoveryMap,
+  recoveryCommands,
+  currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element {
   const {
     resumeRecovery,
     isResumeRecoveryLoading,
   } = recoveryActionMutationUtils
   const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
+  const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
@@ -47,6 +53,54 @@ export function RecoveryDoorOpen({
         void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
       }
     })
+  }
+
+  const buildSubtext = (): string => {
+    switch (selectedRecoveryOption) {
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+        return t('stacker_door_open_robot_home')
+      default:
+        return t('close_the_robot_door')
+    }
+  }
+
+  const buildTitleText = (): string => {
+    switch (selectedRecoveryOption) {
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+        return t('close_robot_and_stacker_door')
+      default:
+        return t('robot_door_is_open')
+    }
+  }
+
+  const buildPrimaryButtonText = (): string => {
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+        return t('continue')
+      default:
+        return t('resume')
+    }
   }
 
   return (
@@ -69,20 +123,20 @@ export function RecoveryDoorOpen({
             desktopStyle="headingSmallBold"
             oddStyle="level3HeaderBold"
           >
-            {t('robot_door_is_open')}
+            {buildTitleText()}
           </StyledText>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             oddStyle="level4HeaderRegular"
           >
-            {t('close_the_robot_door')}
+            {buildSubtext()}
           </StyledText>
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_END}>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryOnClick}
-          primaryBtnTextOverride={t('resume')}
+          primaryBtnTextOverride={buildPrimaryButtonText()}
           primaryBtnDisabled={
             runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
           }

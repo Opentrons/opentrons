@@ -1,21 +1,21 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
 
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { vi } from 'vitest'
 import { render } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
+import { vi } from 'vitest'
 
+import type { RenderOptions, RenderResult } from '@testing-library/react'
+import type { Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
   PropsWithChildren,
   ReactElement,
 } from 'react'
-import type { RenderResult, RenderOptions } from '@testing-library/react'
-import type { PreloadedState, Store } from 'redux'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State
@@ -29,10 +29,7 @@ export function renderWithProviders<State>(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {}, i18nInstance = null } = options || {}
 
-  const store: Store<State> = createStore(
-    vi.fn(),
-    initialState as PreloadedState<State>
-  )
+  const store: Store<State> = legacy_createStore(vi.fn(), initialState)
   store.dispatch = vi.fn()
   store.getState = vi.fn(() => initialState) as () => State
 

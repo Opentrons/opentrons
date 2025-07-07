@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
 import { useIsDoorOpen } from '../../../hooks'
-import { useIsFixtureMismatch } from './useIsFixtureMismatch'
 import {
   isCancellableStatus,
   isDisabledStatus,
   isStartRunStatus,
 } from '../../../utils'
+import { useIsFixtureMismatch } from './useIsFixtureMismatch'
 
 import type { BaseActionButtonProps } from '..'
+import type { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
   isCurrentRun: boolean
@@ -49,7 +50,7 @@ export function useActionBtnDisabledUtils(
     isPlayRunActionLoading,
     isPauseRunActionLoading,
   } = protocolRunControls
-  const isDoorOpen = useIsDoorOpen(robotName)
+  const doorStatus = useIsDoorOpen(robotName)
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
 
@@ -64,13 +65,13 @@ export function useActionBtnDisabledUtils(
     isFixtureMismatch ||
     isDisabledStatus(runStatus) ||
     isRobotOnWrongVersionOfSoftware ||
-    (isDoorOpen &&
+    (doorStatus.isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
       isCancellableStatus(runStatus))
 
   const disabledReason = useDisabledReason({
     ...props,
-    isDoorOpen,
+    doorStatus,
     isFixtureMismatch,
     isResetRunLoading,
   })
@@ -81,7 +82,7 @@ export function useActionBtnDisabledUtils(
 }
 
 type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
-  isDoorOpen: boolean
+  doorStatus: DoorResult
   isFixtureMismatch: boolean
   isResetRunLoading: boolean
   isClosingCurrentRun: boolean
@@ -95,7 +96,7 @@ function useDisabledReason({
   isValidRunAgain,
   isOtherRunCurrent,
   isRobotOnWrongVersionOfSoftware,
-  isDoorOpen,
+  doorStatus,
   runStatus,
   isResetRunLoading,
   isClosingCurrentRun,
@@ -112,7 +113,13 @@ function useDisabledReason({
     return t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     return t('shared:a_software_update_is_available')
-  } else if (isDoorOpen && isStartRunStatus(runStatus)) {
+  } else if (
+    doorStatus.isDoorOpen &&
+    doorStatus.moduleDoorLocation !== null &&
+    isStartRunStatus(runStatus)
+  ) {
+    return t('close_stacker_door')
+  } else if (doorStatus.isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
   } else if (isClosingCurrentRun) {
     return t('shared:robot_is_busy')

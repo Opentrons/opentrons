@@ -1,17 +1,19 @@
 import {
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  OT2_ROBOT_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
-  uuid,
   getCutoutIdByAddressableArea,
   GRIPPER_LOCATION,
+  uuid,
 } from '@opentrons/step-generation'
+
 import { getUnoccupiedSlotForTrash } from '../../../step-forms'
+
 import type {
   AddressableAreaName,
   CreateCommand,

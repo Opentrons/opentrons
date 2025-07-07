@@ -1,26 +1,29 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { BaseDeck } from '@opentrons/components'
 import {
+  useCreateLiveCommandMutation,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
 import { ProtocolSetupDeckConfiguration } from '..'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type { Modules } from '@opentrons/api-client'
 import type {
+  AddressableAreaNamesWithFakes,
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')
@@ -56,11 +59,13 @@ const render = (
 
 describe('ProtocolSetupDeckConfiguration', () => {
   let props: ComponentProps<typeof ProtocolSetupDeckConfiguration>
+  const mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
       runId: 'mockRunId',
+      addressableAreaId: 'D3' as AddressableAreaNamesWithFakes,
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],
     }
@@ -77,6 +82,10 @@ describe('ProtocolSetupDeckConfiguration', () => {
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
+    mockCreateLiveCommand.mockResolvedValue(null)
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
 
   afterEach(() => {

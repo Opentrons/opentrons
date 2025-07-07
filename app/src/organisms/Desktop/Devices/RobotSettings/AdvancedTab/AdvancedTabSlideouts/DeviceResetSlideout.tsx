@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep'
 
 import {
@@ -14,39 +14,40 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import {
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { UNREACHABLE } from '/app/redux/discovery'
 import {
-  getResetConfigOptions,
   fetchResetConfigOptions,
+  getResetConfigOptions,
 } from '/app/redux/robot-admin'
-import {
-  useTrackEvent,
-  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '/app/redux/analytics'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
+
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../../hooks'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { MouseEventHandler } from 'react'
-import type { State, Dispatch } from '/app/redux/types'
 import type {
   ResetConfigOption,
   ResetConfigRequest,
 } from '/app/redux/robot-admin/types'
+import type { Dispatch, State } from '/app/redux/types'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean

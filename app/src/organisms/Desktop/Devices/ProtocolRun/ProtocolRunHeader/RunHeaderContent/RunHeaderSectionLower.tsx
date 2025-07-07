@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -11,17 +12,17 @@ import {
   SecondaryButton,
   SPACING,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { formatTimestamp } from '/app/transformations/runs'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
   EMPTY_TIMESTAMP,
-  useRunTimestamps,
   useCloseCurrentRun,
+  useRunTimestamps,
 } from '/app/resources/runs'
-import { LabeledValue } from './LabeledValue'
+import { formatTimestamp } from '/app/transformations/runs'
+
 import { isCancellableStatus } from '../utils'
+import { LabeledValue } from './LabeledValue'
 
 import type { RunHeaderContentProps } from '.'
 

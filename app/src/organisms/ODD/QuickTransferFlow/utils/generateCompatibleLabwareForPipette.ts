@@ -1,5 +1,7 @@
-import { makeWellSetHelpers, getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, makeWellSetHelpers } from '@opentrons/shared-data'
+
 import { getAllDefinitions as getAllLatestDefValues } from '/app/local-resources/labware'
+
 import { QUICK_TRANSFER_INCOMPATIBLE_LABWARE } from '../constants'
 
 import type { PipetteV2Specs, WellSetHelpers } from '@opentrons/shared-data'

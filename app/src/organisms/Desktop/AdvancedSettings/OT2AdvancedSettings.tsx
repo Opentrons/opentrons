@@ -1,15 +1,16 @@
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   RadioGroup,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,

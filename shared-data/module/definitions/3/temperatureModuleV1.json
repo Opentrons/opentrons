@@ -7,6 +7,19 @@
     "y": -0.15,
     "z": 80.09
   },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 128,
+        "y": -86
+      }
+    }
+  },
   "dimensions": {
     "bareOverallHeight": 84,
     "overLabwareHeight": 0,
@@ -16,6 +29,20 @@
     "footprintYDimension": 86,
     "labwareInterfaceXDimension": 128,
     "labwareInterfaceYDimension": 86
+  },
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": -68.5,
+        "y": 1.8,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.5,
+        "y": -89.2,
+        "z": 84
+      }
+    }
   },
   "cornerOffsetFromSlot": {
     "x": -68.5,
@@ -36,6 +63,7 @@
   "slotTransforms": {},
   "compatibleWith": ["temperatureModuleV2"],
   "incompatibleWithDecks": ["ot3_standard"],
+  "uniqueModuleData": {},
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

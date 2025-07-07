@@ -1,15 +1,16 @@
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { i18n } from '/app/i18n'
 import { I18nextProvider } from 'react-i18next'
-import { getAllDefs } from '/app/local-resources/labware/utils/getAllDefs'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { i18n } from '/app/i18n'
+import { useAllLabware } from '/app/local-resources/labware'
+import { getAllDefs } from '/app/local-resources/labware/utils/getAllDefs'
 import {
-  getValidCustomLabware,
   getAddLabwareFailure,
   getAddNewLabwareName,
+  getValidCustomLabware,
 } from '/app/redux/custom-labware'
 import {
   mockDefinition,
@@ -17,18 +18,17 @@ import {
 } from '/app/redux/custom-labware/__fixtures__'
 
 import { useLabwareFailure, useNewLabwareName } from '../hooks'
-import { useAllLabware } from '/app/local-resources/labware'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { FailedLabwareFile } from '/app/redux/custom-labware/types'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/local-resources/labware/utils/getAllDefs')
 
 describe('useAllLabware hook', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     vi.mocked(getAllDefs).mockReturnValue([mockDefinition])
     vi.mocked(getValidCustomLabware).mockReturnValue([mockValidLabware])
@@ -112,7 +112,7 @@ describe('useAllLabware hook', () => {
 })
 
 describe('useLabwareFailure hook', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     vi.mocked(getAddLabwareFailure).mockReturnValue({
       file: {
@@ -205,7 +205,7 @@ describe('useLabwareFailure hook', () => {
 })
 
 describe('useNewLabwareName hook', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     vi.mocked(getAddNewLabwareName).mockReturnValue({
       filename: 'mock_filename',

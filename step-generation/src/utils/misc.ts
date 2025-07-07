@@ -2,60 +2,71 @@ import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+
 import {
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMmFromBottom,
   getWellNamePerMultiTip,
-  WASTE_CHUTE_CUTOUT,
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  getDeckDefFromRobotType,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
-  FLEX_ROBOT_TYPE,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators } from './index'
+
 import {
   delay,
   dispense,
   moveToAddressableArea,
   moveToWell,
 } from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
   airGapInTrash,
-  blowOutInTrash,
-  dispenseInTrash,
-  airGapInWell,
   airGapInWasteChute,
+  airGapInWell,
+  blowOutInTrash,
   blowOutInWasteChute,
+  dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
 import { ZERO_OFFSET } from '../constants'
-import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
+import { reduceCommandCreators } from './index'
+
 import type {
   AddressableAreaName,
-  LabwareDefinition2,
   BlowoutParams,
-  PipetteChannels,
-  NozzleConfigurationStyle,
   CutoutFixtureId,
-  RobotType,
   CutoutId,
+  LabwareDefinition2,
+  PipetteChannels,
+  PipetteV2Specs,
+  PositionReference,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  LabwareTemporalProperties,
   LocationLiquidState,
+  PathOption,
   PipetteEntity,
   RobotState,
   SourceAndDest,
+  TrashBinEntities,
+  TrashBinEntity,
+  WasteChuteEntities,
+  WasteChuteEntity,
 } from '../types'
+
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -142,18 +153,47 @@ export function getTrashBinAddressableAreaName(
   return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
 }
 
+export function getTrashLocationFromAddressableAreaName(
+  addressableAreaName: AddressableAreaName
+): CutoutId | null {
+  if (addressableAreaName === 'fixedTrash') {
+    return 'cutout12' as CutoutId
+  }
+
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const cutouts =
+    deckDef.cutoutFixtures.find(
+      cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+    )?.providesAddressableAreas ?? null
+
+  if (cutouts == null) {
+    console.error('Could not find trashBinAdapter cutouts for Flex')
+    return null
+  }
+
+  for (const [cutoutId, areas] of Object.entries(cutouts)) {
+    if (areas.includes(addressableAreaName)) {
+      return cutoutId as CutoutId
+    }
+  }
+
+  console.error(
+    `Could not find trashLocation for addressableAreaName ${addressableAreaName}`
+  )
+  return null
+}
+
 export function getTrashOrLabware(
   labwareEntities: LabwareEntities,
-  additionalEquipmentEntities: AdditionalEquipmentEntities,
+  wasteChuteEntities: WasteChuteEntities,
+  trashBinEntities: TrashBinEntities,
   destinationId: string
 ): trashOrLabware {
   if (labwareEntities[destinationId] != null) {
     return 'labware'
-  } else if (
-    additionalEquipmentEntities[destinationId]?.name === 'wasteChute'
-  ) {
+  } else if (wasteChuteEntities[destinationId] != null) {
     return 'wasteChute'
-  } else if (additionalEquipmentEntities[destinationId]?.name === 'trashBin') {
+  } else if (trashBinEntities[destinationId] != null) {
     return 'trashBin'
   } else {
     console.error(
@@ -276,6 +316,7 @@ export function mergeLiquid(
     ),
   }
 }
+
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
   channels: 1 | 8 | 96,
@@ -341,12 +382,18 @@ export const blowoutLocationHelper = (args: {
     invariantContext,
   } = args
   if (!blowoutLocation) return []
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destLabwareId
   )
+
   let labware: LabwareEntity | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
@@ -380,24 +427,18 @@ export const blowoutLocationHelper = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const wasteChute = Object.values(additionalEquipmentEntities).find(
-      ae => ae.name === 'wasteChute'
-    )
     return [
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
         flowRate,
-        wasteChuteId: wasteChute?.id as string,
+        wasteChuteId: Object.keys(wasteChuteEntities)[0] as string,
       }),
     ]
   } else {
-    const trashBin = Object.values(additionalEquipmentEntities).find(
-      ae => ae.name === 'trashBin'
-    )
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashId: trashBin?.id as string,
+        trashId: Object.keys(trashBinEntities)[0] as string,
         flowRate,
       }),
     ]
@@ -409,7 +450,8 @@ export function createEmptyLiquidState(
   const {
     labwareEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
   } = invariantContext
   return {
     pipettes: reduce(
@@ -427,17 +469,17 @@ export function createEmptyLiquidState(
       },
       {}
     ),
-    additionalEquipment: reduce(
-      additionalEquipmentEntities,
-      (acc, additionalEquipment: AdditionalEquipmentEntity, id: string) => {
-        if (
-          additionalEquipment.name === 'wasteChute' ||
-          additionalEquipment.name === 'trashBin'
-        ) {
-          return { ...acc, [id]: {} }
-        } else {
-          return acc
-        }
+    trashBins: reduce(
+      trashBinEntities,
+      (acc, trashBin: TrashBinEntity, id: string) => {
+        return { ...acc, [id]: {} }
+      },
+      {}
+    ),
+    wasteChute: reduce(
+      wasteChuteEntities,
+      (acc, wasteChute: WasteChuteEntity, id: string) => {
+        return { ...acc, [id]: {} }
       },
       {}
     ),
@@ -508,7 +550,9 @@ export function makeInitialRobotState(args: {
       pipettes: reduce(
         pipetteLocations,
         (acc, pipetteTemporalProperties, id) =>
-          pipetteTemporalProperties.mount ? { ...acc, [id]: false } : acc,
+          pipetteTemporalProperties.mount
+            ? { ...acc, [id]: { hasTip: false, tiprackURI: null } }
+            : acc,
         {}
       ),
       tipracks: reduce(
@@ -523,16 +567,6 @@ export function makeInitialRobotState(args: {
       ),
     },
   }
-}
-
-export const getHasWasteChute = (
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): boolean => {
-  return Object.values(additionalEquipmentEntities).some(
-    additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
-      additionalEquipmentEntity.name === 'wasteChute'
-  )
 }
 
 export const getTiprackHasTips = (
@@ -565,7 +599,6 @@ interface DispenseLocationHelperArgs {
   flowRate: number
   xOffset: number
   yOffset: number
-  nozzles: NozzleConfigurationStyle | null
   tipRack: string
   offsetFromBottomMm?: number
   well?: string
@@ -585,12 +618,16 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     xOffset,
     yOffset,
     tipRack,
-    nozzles,
   } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -616,7 +653,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
           },
         },
         tipRack,
-        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -625,7 +661,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        wasteChuteId: additionalEquipmentEntities[destinationId].id,
+        wasteChuteId: wasteChuteEntities[destinationId].id,
       }),
     ]
   } else {
@@ -634,7 +670,66 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        trashId: additionalEquipmentEntities[destinationId].id,
+        trashId: trashBinEntities[destinationId].id,
+      }),
+    ]
+  }
+
+  return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+interface MoveHelperArgs {
+  //  destinationId is either labware or addressableAreaName for waste chute
+  destinationId: string
+  pipetteId: string
+  zOffset: number
+  well?: string
+}
+export const moveHelper: CommandCreator<MoveHelperArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const { destinationId, pipetteId, zOffset, well } = args
+  const {
+    labwareEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+  } = invariantContext
+  const trashOrLabware = getTrashOrLabware(
+    labwareEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+    destinationId
+  )
+
+  let commands: CurriedCommandCreator[] = []
+  if (trashOrLabware === 'labware' && well != null) {
+    commands = [
+      curryCommandCreator(moveToWell, {
+        pipetteId: pipetteId,
+        labwareId: destinationId,
+        wellName: well,
+        wellLocation: {
+          origin: 'bottom',
+          offset: { x: 0, y: 0, z: zOffset },
+        },
+      }),
+    ]
+  } else if (trashOrLabware === 'wasteChute') {
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        fixtureId: wasteChuteEntities[destinationId].id,
+        offset: { x: 0, y: 0, z: 0 },
+      }),
+    ]
+  } else {
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        fixtureId: trashBinEntities[destinationId].id,
+        offset: ZERO_OFFSET,
       }),
     ]
   }
@@ -668,10 +763,15 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
     sourceWell,
     volume,
   } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -703,7 +803,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         pipetteId,
         volume,
         flowRate,
-        wasteChuteId: additionalEquipmentEntities[destinationId].id,
+        wasteChuteId: wasteChuteEntities[destinationId].id,
       }),
     ]
   } else {
@@ -712,7 +812,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         pipetteId,
         volume,
         flowRate,
-        trashId: additionalEquipmentEntities[destinationId].id,
+        trashId: trashBinEntities[destinationId].id,
       }),
     ]
   }
@@ -734,10 +834,15 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   prevRobotState
 ) => {
   const { pipetteId, destinationId, well, zOffset, seconds } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -783,4 +888,302 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+export const getSlotInLocationStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown slot'
+  } else {
+    return stack[stack.length - 1]
+  }
+}
+
+export const getTopLocationInStack = (stack?: string[]): string => {
+  if (stack == null) {
+    console.error('expected to find stack but could not')
+    return 'unknown top location'
+  } else {
+    return stack[0]
+  }
+}
+
+export const getModuleIdFromRobotStateStack = (
+  modules: RobotState['modules'],
+  stack?: string[]
+): string | null => {
+  return stack?.find(id => modules[id] != null) ?? null
+}
+
+export const getFullStackFromLabwares = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  slot: string
+): string[] => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getTopmostLabwareOnModuleFromStackRobotState = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  }
+): string => {
+  return Object.values(labware)
+    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+}
+
+const _getTotalVolumeForMultiDispense = (
+  targetVol: number,
+  conditioningByVolume: Array<[number, number]>,
+  disposalByVolume: Array<[number, number]>,
+  includeConditioning: boolean = true
+): number => {
+  const interpolatedConditioningVolume =
+    linearInterpolate(targetVol, conditioningByVolume) ?? 0
+  const interpolatedDisposalVolume =
+    linearInterpolate(targetVol, disposalByVolume) ?? 0
+  return (
+    targetVol +
+    (includeConditioning ? interpolatedConditioningVolume : 0) +
+    interpolatedDisposalVolume
+  )
+}
+
+export interface ReferenceVolumes {
+  pushOut: number
+  airGap: ValueByLiquidHandlingType
+  correction: ValueByLiquidHandlingType
+  flowRate: ValueByLiquidHandlingType
+  conditioning?: number
+  disposal?: number
+}
+
+interface ValueByLiquidHandlingType {
+  aspirate: number
+  dispense: number
+}
+export const getTransferPlanAndReferenceVolumes = (args: {
+  pipetteSpecs: PipetteV2Specs
+  tiprackDefinition: LabwareDefinition2 | null
+  volume: number
+  path: PathOption
+  numDispenseWells: number
+  aspirateAirGapByVolume: Array<[number, number]>
+  conditioningByVolume: Array<[number, number]> | null
+  disposalByVolume: Array<[number, number]> | null
+}): {
+  referenceVolumes: ReferenceVolumes
+  multiWellHandling: {
+    isSupported: boolean
+    numWellsToFitInTip?: number
+  }
+} => {
+  const {
+    path,
+    volume,
+    pipetteSpecs,
+    tiprackDefinition,
+    conditioningByVolume,
+    disposalByVolume,
+    numDispenseWells,
+    aspirateAirGapByVolume,
+  } = args
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    volume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const maxWorkingVolumePipette = isInLowVolumeMode
+    ? liquids.lowVolumeDefault.maxVolume
+    : liquids.default.maxVolume
+  const maxWorkingVolumeTip = tiprackDefinition?.wells.A1.totalLiquidVolume
+  const maxWorkingVolume =
+    maxWorkingVolumeTip == null
+      ? maxWorkingVolumePipette
+      : Math.min(maxWorkingVolumePipette, maxWorkingVolumeTip)
+  const minVolumeForMultiAspirateDispense = volume * 2
+  const conditioningVolumeForMultiAspirateDispense =
+    conditioningByVolume != null
+      ? linearInterpolate(
+          minVolumeForMultiAspirateDispense,
+          conditioningByVolume
+        ) ?? 0
+      : 0
+  const isMultiDispenseAvailable =
+    conditioningByVolume != null &&
+    disposalByVolume != null &&
+    maxWorkingVolume >=
+      minVolumeForMultiAspirateDispense +
+        conditioningVolumeForMultiAspirateDispense +
+        (linearInterpolate(
+          minVolumeForMultiAspirateDispense,
+          disposalByVolume
+        ) ?? 0) +
+        // don't take air gap into account if conditioning volume is present
+        (conditioningVolumeForMultiAspirateDispense === 0
+          ? linearInterpolate(
+              minVolumeForMultiAspirateDispense,
+              aspirateAirGapByVolume
+            ) ?? 0
+          : 0)
+  const isMultiAspirateAvailable =
+    maxWorkingVolume > minVolumeForMultiAspirateDispense
+
+  // early return if multiAspirate/multiDispense cannot be accommodated
+  if (
+    path === 'single' ||
+    (path === 'multiDispense' && !isMultiDispenseAvailable) ||
+    (path === 'multiAspirate' && !isMultiAspirateAvailable)
+  ) {
+    const aspirateAirGapAtSpecifiedVolume =
+      linearInterpolate(volume, aspirateAirGapByVolume) ?? 0
+    // split if target volume + air gap volume > maxWorkingVolume
+    const numAspirations = Math.ceil(
+      (volume + aspirateAirGapAtSpecifiedVolume) / maxWorkingVolume
+    )
+    const volumePerAspiration = volume / numAspirations
+    return {
+      referenceVolumes: {
+        airGap: {
+          aspirate: volumePerAspiration,
+          dispense: 0,
+        },
+        correction: {
+          aspirate: volumePerAspiration,
+          dispense: volumePerAspiration,
+        },
+        pushOut: volumePerAspiration,
+        flowRate: {
+          aspirate: volumePerAspiration,
+          dispense: volumePerAspiration,
+        },
+      },
+      multiWellHandling: {
+        isSupported: false,
+      },
+    }
+  }
+
+  if (path === 'multiDispense') {
+    let totalVolumeForMultiDispense: number = 0
+    let numDestinationsPerAspiration: number = 0
+    for (let i = 0; i < numDispenseWells; i++) {
+      const next = _getTotalVolumeForMultiDispense(
+        (i + 1) * volume,
+        conditioningByVolume ?? [],
+        disposalByVolume ?? []
+      )
+      if (next > maxWorkingVolume) {
+        break
+      } else {
+        totalVolumeForMultiDispense = (i + 1) * volume
+        numDestinationsPerAspiration += 1
+      }
+    }
+    return {
+      referenceVolumes: {
+        airGap: {
+          aspirate: _getTotalVolumeForMultiDispense(
+            totalVolumeForMultiDispense,
+            conditioningByVolume ?? [],
+            disposalByVolume ?? [],
+            false
+          ),
+          dispense: _getTotalVolumeForMultiDispense(
+            // here, we interpolate the post-dispense air gap volume based on the total volume in the tip
+            // after the first dispense
+            (numDestinationsPerAspiration - 1) * volume,
+            conditioningByVolume ?? [],
+            disposalByVolume ?? [],
+            false
+          ),
+        },
+        correction: {
+          aspirate: _getTotalVolumeForMultiDispense(
+            totalVolumeForMultiDispense,
+            conditioningByVolume ?? [],
+            disposalByVolume ?? []
+          ),
+          dispense: volume,
+        },
+        flowRate: {
+          aspirate: _getTotalVolumeForMultiDispense(
+            totalVolumeForMultiDispense,
+            conditioningByVolume ?? [],
+            disposalByVolume ?? []
+          ),
+          dispense: volume,
+        },
+        pushOut: volume,
+        conditioning: totalVolumeForMultiDispense,
+        disposal: totalVolumeForMultiDispense,
+      },
+      multiWellHandling: {
+        isSupported: true,
+        numWellsToFitInTip: numDestinationsPerAspiration,
+      },
+    }
+  }
+  // path is valid multiAspirate
+  const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
+  const volumeTotalAspiration = maxSourcesPerAspiration * volume
+  return {
+    referenceVolumes: {
+      airGap: {
+        // here, we interpolate the post-aspirate air gap volume based on the total volume in the tip
+        // after the final aspiration
+        aspirate: volumeTotalAspiration,
+        dispense: 0,
+      },
+      pushOut: volumeTotalAspiration,
+      correction: {
+        aspirate: volumeTotalAspiration,
+        dispense: volumeTotalAspiration,
+      },
+      flowRate: {
+        aspirate: volume,
+        dispense: volumeTotalAspiration,
+      },
+    },
+    multiWellHandling: {
+      isSupported: true,
+      numWellsToFitInTip: maxSourcesPerAspiration,
+    },
+  }
+}
+
+export const getIsRetractSafeForAirGap = (args: {
+  retractZOffset: number
+  retractPositionReference: PositionReference
+  labwareEntities: LabwareEntities
+  labwareId: string
+  well: string | null
+}): boolean => {
+  const {
+    retractZOffset,
+    retractPositionReference,
+    labwareId,
+    labwareEntities,
+    well,
+  } = args
+  if (well == null) {
+    return false
+  }
+  const wellDepth = labwareEntities[labwareId]?.def.wells[well]?.depth
+  if (wellDepth == null) {
+    return false
+  }
+  const retractMmFromBottom = getMmFromBottom(
+    retractZOffset,
+    retractPositionReference,
+    wellDepth
+  )
+  if (retractMmFromBottom == null) {
+    return false
+  }
+  const retractZOffsetFromTop = retractMmFromBottom - wellDepth
+  return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
 }

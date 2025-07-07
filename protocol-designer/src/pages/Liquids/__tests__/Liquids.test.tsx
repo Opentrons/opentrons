@@ -1,21 +1,19 @@
-import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import {
-  AssignLiquidsModal,
-  DesignerNavigation,
-} from '../../../components/organisms'
-import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { Liquids } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { AssignLiquidsModal } from '../../../components/organisms'
+import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../Designer/LiquidsOverflowMenu')
+vi.mock('../../../components/organisms/LiquidsOverflowMenu')
 vi.mock('../../../components/organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('react-router-dom', async importOriginal => {
@@ -45,9 +43,6 @@ describe('Liquids', () => {
     vi.mocked(AssignLiquidsModal).mockReturnValue(
       <div>mock AssignLiquidsModal</div>
     )
-    vi.mocked(DesignerNavigation).mockReturnValue(
-      <div>mock DesignerNavigation</div>
-    )
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
     )
@@ -58,9 +53,8 @@ describe('Liquids', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 
-  it('renders nav and assign liquids modal', () => {
+  it('renders assign liquids modal', () => {
     render()
-    screen.getByText('mock DesignerNavigation')
     screen.getByText('mock AssignLiquidsModal')
   })
 })

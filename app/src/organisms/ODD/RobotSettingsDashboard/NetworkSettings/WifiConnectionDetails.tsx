@@ -13,16 +13,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { NetworkDetailsModal } from './NetworkDetailsModal'
-import { DisplayWifiList } from '../../NetworkSettings'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getNetworkInterfaces } from '/app/redux/networking'
 import { useWifiList } from '/app/resources/networking/hooks'
+
+import { DisplayWifiList } from '../../NetworkSettings'
+import { NetworkDetailsModal } from './NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'

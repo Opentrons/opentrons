@@ -8,16 +8,16 @@ import {
 import { OFFSET_KIND_DEFAULT } from '/app/redux/protocol-runs'
 
 import type {
+  FlexAddressableAreaName,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
+import type {
   DefaultOffsetDetails,
   LabwareLocationInfo,
   LabwareModuleStackupDetails,
   LocationSpecificOffsetDetails,
 } from '/app/redux/protocol-runs'
 import type { GetLPCLabwareInfoForURI } from '.'
-import type {
-  FlexAddressableAreaName,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
 
 interface GetDefaultOffsetDetailsForLabwareParams
   extends GetLPCLabwareInfoForURI {
@@ -128,7 +128,7 @@ function getRequiresAdapterId(
   return requiresAdapter(matchingDef)
 }
 
-function requiresAdapter(def: LabwareDefinition2 | null): boolean {
+function requiresAdapter(def: LabwareDefinition | null): boolean {
   return def?.parameters.quirks?.includes('stackingOnly') ?? false
 }
 

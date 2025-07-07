@@ -1,33 +1,31 @@
-import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   absorbanceReaderCollision,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  uuid,
-  getIsSafePipetteMovement,
   formatPyStr,
   formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  getSlotInLocationStack,
   indentPyLines,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
-import type {
-  CreateCommand,
-  DispenseParams,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
-import type { Point } from '../../utils'
+
+import type { CreateCommand, DispenseParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
-  nozzles: NozzleConfigurationStyle | null
   tipRack: string
   isAirGap?: boolean
 }
@@ -45,8 +43,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     flowRate,
     isAirGap,
     wellLocation,
-    nozzles,
-    tipRack,
+    pushOut,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -55,11 +52,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
@@ -80,7 +73,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     errors.push(errorCreators.modulePipetteCollisionDanger())
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
@@ -98,14 +91,17 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId]?.slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
@@ -118,17 +114,18 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
 
   if (
     isMultiChannelPipette &&
-    nozzles !== ALL &&
-    !getIsSafePipetteMovement(
-      nozzles,
-      prevRobotState,
+    !getIsSafePipetteMovement({
+      robotState: prevRobotState,
       invariantContext,
       pipetteId,
       labwareId,
-      tipRack,
-      (wellLocation?.offset as Point) ?? { x: 0, y: 0, z: 0 },
-      wellName
-    )
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())
   }
@@ -227,8 +224,7 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
         wellName,
         wellLocation,
         flowRate,
-        //  pushOut will always be undefined in step-generation for now
-        //  since there is no easy way to allow users to  for it in PD
+        ...(pushOut != null ? { pushOut } : {}),
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },
@@ -243,9 +239,9 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     `location=${labwarePythonName}[${formatPyStr(
       wellName
     )}]${formatPyWellLocation(wellLocation)}`,
-    // rate= is a ratio in the PAPI, and we have no good way to figure out what
-    // flowrate the PAPI has set the pipette to, so we just have to emit a division:
-    `rate=${flowRate} / ${pipettePythonName}.flow_rate.dispense`,
+    `flow_rate=${flowRate}`,
+    // only pass push_out if it is not null
+    ...(pushOut != null ? [`push_out=${pushOut}`] : []),
     // PAPI has no way to indicate that we're dispensing air, so we don't do anything
     // with the isAirGap parameter.
   ]

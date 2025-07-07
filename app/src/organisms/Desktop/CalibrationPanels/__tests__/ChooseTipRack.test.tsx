@@ -1,21 +1,22 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
-import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import { Select } from '/app/atoms/SelectField/Select'
+import { i18n } from '/app/i18n'
 import {
   getCalibrationForPipette,
-  getTipLengthForPipetteAndTiprack,
   getTipLengthCalibrations,
+  getTipLengthForPipetteAndTiprack,
 } from '/app/redux/calibration'
 import { getCustomTipRackDefinitions } from '/app/redux/custom-labware'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
+import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
+
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import type { ComponentProps } from 'react'

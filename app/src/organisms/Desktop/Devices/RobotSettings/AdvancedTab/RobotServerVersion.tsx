@@ -1,5 +1,6 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -7,17 +8,19 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '/app/atoms/buttons'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotApiVersion } from '/app/redux/discovery'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 
 import type { State } from '/app/redux/types'
 

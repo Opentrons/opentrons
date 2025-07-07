@@ -13,7 +13,7 @@ ARG CACHEBUST=1
 RUN git clone --branch $ANALYSIS_REF --depth 1 https://github.com/Opentrons/opentrons .
 
 # Install packages from local directories
-RUN python -m pip install -U ./shared-data/python
+RUN python -m pip install -U ./shared-data
 RUN python -m pip install -U ./hardware[flex]
 RUN python -m pip install -U ./api
 RUN python -m pip install -U pandas==1.4.3

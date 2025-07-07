@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { UserSettings } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { actions as tutorialActions } from '../../../../tutorial'
 import { actions as featureFlagActions } from '../../../../feature-flags'
-import { UserSettings } from '..'
+import { actions as tutorialActions } from '../../../../tutorial'
 
 import type { ComponentProps } from 'react'
 

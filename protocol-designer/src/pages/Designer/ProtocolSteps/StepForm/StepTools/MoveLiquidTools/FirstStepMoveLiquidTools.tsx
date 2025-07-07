@@ -1,18 +1,23 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { Flex, Divider, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Divider,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
+
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import {
-  getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
-
 import {
   ChangeTipField,
   DropTipField,
@@ -27,20 +32,17 @@ import {
   WellSelectionField,
 } from '../../PipetteFields'
 
-import type { FieldPropsByName } from '../../types'
 import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
+import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
-  visibleFormErrors: StepFormErrors
 }
 
 export function FirstStepMoveLiquidTools({
   propsForFields,
   formData,
-  visibleFormErrors,
 }: FirstStepMoveLiquidToolsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const labwares = useSelector(getLabwareEntities)
@@ -66,7 +68,6 @@ export function FirstStepMoveLiquidTools({
       ?.name === 'wasteChute' ||
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'trashBin'
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
     <Flex
@@ -89,13 +90,7 @@ export function FirstStepMoveLiquidTools({
       <TiprackField {...tipRack} pipetteId={pipette.value} />
       <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-        <LabwareField
-          {...propsForFields.aspirate_labware}
-          errorToShow={getFormLevelError(
-            'aspirate_labware',
-            mappedErrorsToField
-          )}
-        />
+        <LabwareField {...propsForFields.aspirate_labware} />
         <WellSelectionField
           {...propsForFields.aspirate_wells}
           labwareId={
@@ -109,23 +104,12 @@ export function FirstStepMoveLiquidTools({
               ? propsForFields.nozzles.value
               : null
           }
-          hasFormError={
-            visibleFormErrors?.some(error =>
-              error.dependentFields.includes('aspirate_wells')
-            ) ?? false
-          }
-          errorToShow={getFormLevelError('aspirate_wells', mappedErrorsToField)}
+          hasFormError={propsForFields.aspirate_wells.errorToShow != null}
         />
       </Flex>
       <Divider marginY="0" />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-        <LabwareField
-          {...propsForFields.dispense_labware}
-          errorToShow={getFormLevelError(
-            'dispense_labware',
-            mappedErrorsToField
-          )}
-        />
+        <LabwareField {...propsForFields.dispense_labware} />
         {isDisposalLocation ? null : (
           <WellSelectionField
             {...propsForFields.dispense_wells}
@@ -140,23 +124,12 @@ export function FirstStepMoveLiquidTools({
                 ? propsForFields.nozzles.value
                 : null
             }
-            hasFormError={
-              visibleFormErrors?.some(error =>
-                error.dependentFields.includes('dispense_wells')
-              ) ?? false
-            }
-            errorToShow={getFormLevelError(
-              'dispense_wells',
-              mappedErrorsToField
-            )}
+            hasFormError={propsForFields.dispense_wells.errorToShow != null}
           />
         )}
       </Flex>
       <Divider marginY="0" />
-      <VolumeField
-        {...propsForFields.volume}
-        errorToShow={getFormLevelError('volume', mappedErrorsToField)}
-      />
+      <VolumeField {...propsForFields.volume} />
       <Divider marginY="0" />
       <PathField
         {...propsForFields.path}
@@ -172,15 +145,30 @@ export function FirstStepMoveLiquidTools({
         title={t('pipette_path')}
       />
       <Divider marginY="0" />
-      <ChangeTipField
-        {...propsForFields.changeTip}
-        aspirateWells={formData.aspirate_wells}
-        dispenseWells={formData.dispense_wells}
-        path={formData.path}
-        stepType={formData.stepType}
-        isDisposalLocation={isDisposalLocation}
-        tooltipContent={null}
-      />
+      <Flex
+        paddingX={SPACING.spacing16}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('tip_management')}
+        </StyledText>
+        <ChangeTipField
+          {...propsForFields.changeTip}
+          aspirateWells={formData.aspirate_wells}
+          dispenseWells={formData.dispense_wells}
+          path={formData.path}
+          stepType={formData.stepType}
+          isDisposalLocation={isDisposalLocation}
+          tooltipContent={null}
+          padding="0"
+        />
+        <DropTipField
+          {...propsForFields.dropTip_location}
+          tooltipContent={null}
+          padding="0"
+        />
+      </Flex>
       {enableReturnTip ? (
         <>
           <Divider marginY="0" />
@@ -201,11 +189,6 @@ export function FirstStepMoveLiquidTools({
           ) : null}
         </>
       ) : null}
-      <Divider marginY="0" />
-      <DropTipField
-        {...propsForFields.dropTip_location}
-        tooltipContent={null}
-      />
       {userSelectedDropTipLocation && enableReturnTip ? (
         <>
           <Divider marginY="0" />

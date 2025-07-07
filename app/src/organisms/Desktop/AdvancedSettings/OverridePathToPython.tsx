@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -8,23 +8,23 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  Link,
+  SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
+import {
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { getPathToPythonOverride, resetConfigValue } from '/app/redux/config'
 import {
-  openPythonInterpreterDirectory,
   changePythonPathOverrideConfig,
+  openPythonInterpreterDirectory,
 } from '/app/redux/protocol-analysis'
-import {
-  useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-} from '/app/redux/analytics'
 
 import type { MouseEventHandler } from 'react'
 import type { Dispatch } from '/app/redux/types'

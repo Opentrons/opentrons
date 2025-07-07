@@ -1,12 +1,15 @@
 import * as React from 'react'
+
 import {
   Flex,
-  PrimaryButton,
   LegacyStyledText,
+  PrimaryButton,
   VIEWPORT,
 } from '@opentrons/components'
+
 import { BackgroundOverlay } from './index'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'ODD/Molecules/BackgroundOverlay',

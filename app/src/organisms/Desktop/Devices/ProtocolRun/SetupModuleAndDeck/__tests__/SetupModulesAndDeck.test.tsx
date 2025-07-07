@@ -1,23 +1,25 @@
-import { when } from 'vitest-when'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
 import {
-  useRunHasStarted,
   useModuleCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { useIsFlex } from '/app/redux-resources/robots'
+
 import { SetupModuleAndDeck } from '../index'
+import { SetupFixtureList } from '../SetupFixtureList'
 import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
-import { SetupFixtureList } from '../SetupFixtureList'
 
 import type { ComponentProps } from 'react'
 
@@ -126,7 +128,6 @@ describe('SetupModuleAndDeck', () => {
         cutoutFixtureId: 'trashBinAdapter',
         requiredAddressableAreas: ['movableTrashA1'],
         compatibleCutoutFixtureIds: ['trashBinAdapter'],
-        missingLabwareDisplayName: null,
       },
     ])
     render(props)

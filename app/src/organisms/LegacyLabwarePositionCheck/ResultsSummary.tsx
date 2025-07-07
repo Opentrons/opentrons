@@ -1,16 +1,9 @@
 import { Fragment } from 'react'
-import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
-import {
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getModuleType,
-  IDENTITY_VECTOR,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
@@ -18,38 +11,48 @@ import {
   COLORS,
   DeckInfoLabel,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
+  getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
-  getLabwareDefinitionsFromCommands,
-  DIRECTION_ROW,
 } from '@opentrons/components'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleType,
+  IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+
+import { SmallButton } from '/app/atoms/buttons'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '/app/redux/config'
-import { SmallButton } from '/app/atoms/buttons'
-import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
-import type {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { TFunction } from 'i18next'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetCreateData,
 } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
-import type { TFunction } from 'i18next'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/creating-labware-offsets'
@@ -228,7 +231,7 @@ const ScrollContainer = styled(Flex)`
 
 interface OffsetTableProps {
   offsets: LegacyLabwareOffsetCreateData[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 const OffsetTable = (props: OffsetTableProps): JSX.Element => {
