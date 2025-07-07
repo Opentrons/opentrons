@@ -44,7 +44,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["steps", "volume", "corrected-height", "tip-z-error", "height"]
+CSV_HEADER = ["steps", "volume", "height", "tip-z-error", "cheight"]
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -56,7 +56,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Quick Mode",
         variable_name="quick_mode",
         description="If true, dial indicator is not used and tips are reused.",
-        default=False,
+        default=True,
     )
 
     parameters.add_bool(
@@ -248,23 +248,27 @@ def run(ctx: ProtocolContext) -> None:
             # Measure source liquid height
             if step == 0:
                 src_height = liq_pipette.measure_liquid_height(src_well["A1"])
-                height = corrected_height = 0
+                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
+                corrected_height = height + tip_z_error
+                volume_dispensed = 0
             else:
                 aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
+                volume_dispensed = volume_dispensed + step_volume
                 height = _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating())
-                corrected_height = round(height + tip_z_error, 5)
+                corrected_height = height + tip_z_error
                 # Stop if height exceeds well depth
-                ctx.comment("well depth: " + str(labware["A1"].depth))
-                if corrected_height >= labware["A1"].depth:
-                    return
+                #ctx.comment("well depth: " + str(labware["A1"].depth))
+                #if corrected_height >= labware["A1"].depth:
+                    #return
 
             # Log data
             trial_data = [
                 step,
                 volume_dispensed,
+                height,
+                round(tip_z_error, 5),
                 corrected_height,
-                tip_z_error
+
             ]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
@@ -274,26 +278,27 @@ def run(ctx: ProtocolContext) -> None:
     else:
         probe_pipette.pick_up_tip(probing_rack)
         liq_pipette.pick_up_tip(liquid_rack)
-        tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
+        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial),5)
 
         for step in range(STEPS):
             if step == 0:
-                height = _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating())
-                corrected_height = round(height + tip_z_error, 5)
+                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
+                corrected_height = height + tip_z_error
+                volume_dispensed = 0
             else: 
                 aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
-                height = _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating())
-                corrected_height = round(height + tip_z_error, 5)
+                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
+                corrected_height = height + tip_z_error
                 # Stop if height exceeds well depth
-                if corrected_height < 0 and not step == 0: #theres gotta be a better way to see when the height passes the well depth
-                    return
+                #if corrected_height < 0 and not step == 0: #theres gotta be a better way to see when the height passes the well depth
+                    #return
             trial_data = [
                 step,
                 volume_dispensed,
-                corrected_height,
-                tip_z_error,
                 height,
+                tip_z_error,
+                corrected_height
             ]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
