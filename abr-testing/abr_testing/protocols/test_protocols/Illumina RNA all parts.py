@@ -232,12 +232,12 @@ def run(protocol: ProtocolContext) -> None:
             )
         # ================ Add the first labware in the position ================
         sample_plate_3 = protocol.load_labware(
-            "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
             "A2",
             "Sample Plate 2",
         )
         sample_plate_2 = sample_plate_3.load_labware(
-            "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt"
+            "opentrons_96_wellplate_200ul_pcr_full_skirt"
         )
         # =======================================================================
         stacker_200_1: FlexStackerContext = protocol.load_module(
@@ -267,9 +267,7 @@ def run(protocol: ProtocolContext) -> None:
             lid="opentrons_flex_tiprack_lid",
             count=6,
         )
-        lids = protocol.load_lid_stack(
-            "custom_opentrons_tough_pcr_auto_sealing_lid", "B3", 5
-        )
+        lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "B3", 5)
 
         # ========== THIRD ROW ===========
         stacker_50_1: FlexStackerContext = protocol.load_module(
