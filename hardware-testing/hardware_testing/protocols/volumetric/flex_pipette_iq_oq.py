@@ -117,9 +117,9 @@ NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {
 # TODO: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
     "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "reader_stage": "A4",
-    "plate":        "B1",   "dye_0":    "B2",   "tips_1":   "B3",   "tips_2":       "B4",
+    "stack_start":  "B1",   "dye_2":    "B2",   "tips_1":   "B3",   "tips_2":       "B4",
     "stack_end":    "C1",   "dye_1":    "C2",   "tips_0":   "C3",   "tips_3":       "C4",
-    "stack_start":  "D1",   "dye_2":    "D2",   "chute":    "D3",   "tips_4":       "D4",
+    "plate":        "D1",   "dye_0":    "D2",   "chute":    "D3",   "tips_4":       "D4",
 }
 # fmt: on
 
@@ -536,6 +536,7 @@ def run(ctx: ProtocolContext) -> None:
         file.write(f"tips,{ctx.params.tips}\n")
         file.write(f"liquid,{ctx.params.liquid}\n")
         file.write(f"external_reader,{ctx.params.external_reader}\n")
+        file.write(f"test_reader,{ctx.params.test_reader}\n")
         file.write(f"meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
 
     def filename() -> str:
