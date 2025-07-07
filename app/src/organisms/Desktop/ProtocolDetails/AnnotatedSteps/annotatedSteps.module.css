@@ -1,0 +1,105 @@
+.annotated_group_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.annotated_group_header {
+  display: flex;
+  cursor: pointer;
+  padding: 0 16px 0 16px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #dedede;
+  flex-shrink: 0;
+}
+
+.annotated_group_expanded {
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+
+  /* TODO: make max height dynamic based on amount of space left */
+  max-height: 300px;
+  border-bottom: 1px solid #dedede;
+  overflow-y: auto;
+  gap: 4px;
+}
+
+.annotated_group_expanded::-webkit-scrollbar {
+  display: none;
+}
+
+.individual_command_container {
+  gap: 8px;
+  display: flex;
+  padding: 0 16px 0 16px;
+}
+
+.individual_command_wrap {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  color: #16212d;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  background-color: #e9e9e9;
+  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+}
+
+.individual_command_wrap_highlighted {
+  background-color: #f4def7;
+}
+
+.individual_command {
+  align-items: center;
+  gap: 8px;
+  display: flex;
+}
+
+.annotated_steps_container {
+  flex-direction: column;
+  overflow-y: auto;
+  display: flex;
+}
+
+.annotated_steps_container::-webkit-scrollbar {
+  display: none;
+}
+
+.annotated_steps_wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.annotated_steps_error_container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  flex-direction: column;
+}
+
+.annoted_steps_error_header {
+  gap: 4px;
+  display: flex;
+  width: 100%;
+  background-color: #fce9e9;
+  border-radius: 4px;
+  padding: 8px;
+  align-items: center;
+  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+}
+
+.annoted_steps_final_command {
+  width: 100%;
+  display: flex;
+  background-color: #e9e9e9;
+  border-radius: 4px;
+  padding: 8px;
+  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+}
