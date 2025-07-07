@@ -101,7 +101,7 @@ export function getInitialSummaryState(
       path === 'multiDispense'
         ? {
             location: trashConfigCutout,
-            speed: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+            flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
           }
         : undefined,
     tipPositionAspirate: 1,

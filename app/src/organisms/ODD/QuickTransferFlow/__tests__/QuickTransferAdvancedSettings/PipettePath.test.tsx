@@ -159,7 +159,7 @@ describe('PipettePath', () => {
         disposalVolume: 20,
         blowOutDispense: {
           location: 'source_well',
-          speed: 10,
+          flowRate: 10,
         },
       },
     }
@@ -191,7 +191,7 @@ describe('PipettePath', () => {
         disposalVolume: 20,
         blowOutDispense: {
           location: 'source_well',
-          speed: 10,
+          flowRate: 10,
         },
       },
     }
@@ -224,7 +224,7 @@ describe('PipettePath', () => {
         disposalVolume: 20,
         blowOutDispense: {
           location: 'source_well',
-          speed: 10,
+          flowRate: 10,
         },
       },
     }

@@ -104,7 +104,7 @@ export interface QuickTransferSummaryState {
   disposalVolume?: number
   blowOutDispense?: {
     location?: BlowOutLocation
-    speed: number
+    flowRate?: number
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
@@ -240,7 +240,7 @@ interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
   blowOutSettings?: {
     location?: BlowOutLocation
-    speed: number
+    flowRate?: number
   }
 }
 interface SetAirGapDispense {

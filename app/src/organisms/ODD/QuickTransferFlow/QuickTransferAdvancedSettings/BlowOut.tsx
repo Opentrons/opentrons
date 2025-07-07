@@ -124,7 +124,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOutDispense?.location as BlowOutLocation | undefined)
   const [speed, setSpeed] = useState<number | null>(
-    (state.blowOutDispense?.speed as number) ?? null
+    (state.blowOutDispense?.flowRate as number) ?? null
   )
 
   const enableBlowOutDisplayItems = [
@@ -160,7 +160,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           type: ACTIONS.SET_BLOW_OUT,
           blowOutSettings: {
             location: undefined,
-            speed: 0,
+            flowRate: 0,
           },
         })
         trackEventWithRobotSerial({
@@ -182,7 +182,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         type: ACTIONS.SET_BLOW_OUT,
         blowOutSettings: {
           location: blowOutLocation,
-          speed: speed ?? 1,
+          flowRate: speed ?? 1,
         },
       })
       trackEventWithRobotSerial({

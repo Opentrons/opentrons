@@ -142,7 +142,7 @@ export function quickTransferSummaryReducer(
           disposalVolume: action.disposalVolume,
           blowOutDispense: {
             location: action.blowOutLocation,
-            speed: state.dispenseFlowRate,
+            flowRate: state.dispenseFlowRate,
           },
         }
       } else {

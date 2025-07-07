@@ -168,7 +168,7 @@ describe('QuickTransferAdvancedSettings', () => {
         path: 'multiDispense',
         blowOutDispense: {
           location: 'dest_well',
-          speed: 2,
+          flowRate: 2,
         },
         disposalVolume: 40,
       },
@@ -436,7 +436,7 @@ describe('QuickTransferAdvancedSettings', () => {
         transferType: 'transfer',
         blowOutDispense: {
           location: 'source_well',
-          speed: 2,
+          flowRate: 2,
         },
       },
     }
@@ -456,7 +456,7 @@ describe('QuickTransferAdvancedSettings', () => {
             cutoutId: 'cutoutA3',
             cutoutFixtureId: 'trashBinAdapter',
           },
-          speed: 2,
+          flowRate: 2,
         },
       },
     }
@@ -473,7 +473,7 @@ describe('QuickTransferAdvancedSettings', () => {
         ...props.state,
         blowOutDispense: {
           location: 'source_well',
-          speed: 2,
+          flowRate: 2,
         },
         transferType: 'distribute',
       },
