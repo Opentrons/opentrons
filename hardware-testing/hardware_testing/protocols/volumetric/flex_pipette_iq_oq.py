@@ -464,6 +464,9 @@ def shake_and_read_plate(
         plate_dest = plate_in_stack
     ctx.move_labware(plate, plate_dest, use_gripper=True)
 
+    # NOTE: keep reader closed by default, for sterility
+    reader.close_lid()
+
     return result
 
 
