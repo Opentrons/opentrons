@@ -488,7 +488,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                 if show:
                     fig.show()
 
-    #if plot_choice.lower() == "labware data":
+    # if plot_choice.lower() == "labware data":
     #    file_csv = input("Path to labware csv: ")
     #    axis = input("Which axis? z or x?: ")
     #    try:
@@ -535,7 +535,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
     #    )
     #    fig.show()
 
-    #elif plot_choice.lower() == "labware comparison":
+    # elif plot_choice.lower() == "labware comparison":
     #    labwares_files = [
     #        baseline_labware.format(axis="x"),
     #        baseline_labware.format(axis="z"),
@@ -570,7 +570,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
     #        )
     #        fig.show()
 
-    #elif plot_choice.lower() == "stacker comparison":
+    # elif plot_choice.lower() == "stacker comparison":
     #    stackers_files = [
     #        baseline_stacker.format(axis="x"),
     #        baseline_stacker.format(axis="z"),
