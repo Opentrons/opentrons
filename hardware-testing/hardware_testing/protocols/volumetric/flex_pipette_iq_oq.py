@@ -183,6 +183,11 @@ def add_parameters(params: ParameterContext) -> None:
         variable_name="pipette_at_liquid_meniscus",
         default=False,
     )
+    params.add_bool(
+        display_name="include_baseline",
+        variable_name="include_baseline",
+        default=False,
+    )
 
 
 def get_trials(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[int]:
@@ -284,7 +289,9 @@ def load_most_labware(
         res.load_empty(res.wells())
 
     # empty plates
-    num_plates_needed = ceil(num_wells_needed / 96) + 1  # NOTE: 1x extra for baseline
+    num_plates_needed = ceil(num_wells_needed / 96)
+    if ctx.params.include_baseline:
+        num_plates_needed += 1  # NOTE: 1x extra for baseline
     plates: List[Labware] = []
     for i in range(num_plates_needed):
         if i == 0:
@@ -326,7 +333,7 @@ def load_liquid_diluent(
         ]
     )
     # NOTE: adding more for the baseline reading at the end
-    if not ctx.params.external_reader:
+    if not ctx.params.external_reader and ctx.params.include_baseline:
         total_diluent_aspirated_ul += DYE_READER_IDEAL_UL * 96
     if not total_diluent_aspirated_ul:
         return
@@ -691,7 +698,7 @@ def run(ctx: ProtocolContext) -> None:
             _on_plate_done()
 
     # BASELINE
-    if plate_reader:
+    if plate_reader and ctx.params.include_baseline:
         plate = plates[0]
         ul_in_this_plate.append(0.0)  # NOTE: marking baseline as being 0.0uL
         heater_shaker.open_labware_latch()
