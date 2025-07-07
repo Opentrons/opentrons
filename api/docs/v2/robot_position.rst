@@ -62,7 +62,7 @@ This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activi
 
 .. warning::
 
-    Negative ``z`` arguments to ``Well.bottom()`` will cause the pipette tip to collide with the bottom of the well. Collisions may bend the tip (affecting liquid handling) and the pipette may be higher than expected on the z-axis until it picks up another tip.
+    Negative ``z`` arguments to ``Well.bottom()`` will cause the pipette tip to collide with the bottom of the well. Collisions may bend the tip (affecting liquid handling) and the pipette may be higher than expected on the z-axis until it picks up another tip. Use caution when changing the `z` height, including pipetting at a liquid meniscus, especially in reservoir wells.
     
     Flex can detect collisions, and even gentle contact may trigger an overpressure error and cause the protocol to fail. Avoid ``z`` values less than 1, if possible.
     
