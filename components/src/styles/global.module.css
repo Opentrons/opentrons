@@ -1,7 +1,7 @@
 /* this is global CSS for the components package and all other opentrons projects */
-
 :root {
   /* colors */
+
   /* currently we follow the order of colors.ts file */
 
   /* green */
@@ -75,11 +75,11 @@
   --black-90: #16212d;
   --black-80: #24313f;
   --black-70: #39495b;
-  --white: #ffffff;
+  --white: #fff;
   --blue-50: #006cfa;
 
   /* semi-opaques */
-  --transparent-white-80: #ffffffcc;
+  --transparent-white-80: #fffc;
   --transparent-white-50: #ffffff80;
   --transparent-black-80: #16212d80;
 
@@ -89,7 +89,7 @@
   --flex-40: #aae3fc;
 
   /* extras */
-  --transparent: #00000000;
+  --transparent: #0000;
 
   /* spacing */
   --spacing-2: 0.125rem; /* 2px */
@@ -148,6 +148,7 @@
   --line-height-12: 0.75rem; /* 12px */
 
   /* font-weight */
+
   /* this might be removed. that depends on what StyledText looks like */
   --font-weight-bold: 700;
   --font-weight-semi-bold: 600;
