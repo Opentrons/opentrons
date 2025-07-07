@@ -186,7 +186,6 @@ export function QuickTransferAdvancedSettings(
         state.delayAspirate !== undefined
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -269,7 +268,6 @@ export function QuickTransferAdvancedSettings(
         state.delayDispense !== undefined
           ? t('delay_value', {
               delay: state.delayDispense.delayDuration,
-              position: state.delayDispense.positionFromBottom,
             })
           : '',
       enabled: true,
