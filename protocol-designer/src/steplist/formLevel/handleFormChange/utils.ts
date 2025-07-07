@@ -428,6 +428,8 @@ const getSubmergeRetractFields = (args: {
     isConditioningVolumeEnabled = false,
   } = args
 
+  console.log('additionalEquipmentEntities', additionalEquipmentEntities)
+
   // all common submerge and retract fields
   const { delay, speed } = submergeRetractLookup
   const { positionReference, offset } =
@@ -494,15 +496,12 @@ const getNoLiquidClassValuesMoveLiquid = (
   }
   const volume = Number(rawVolume)
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
-  console.log('referenceLiquidClass', referenceLiquidClass)
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
-  console.log('liquidClassValuesForPipette', liquidClassValuesForPipette)
   const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
     tipObject => tipObject.tiprack === tiprack
   )
-  console.log('liquidClassValuesForTip', liquidClassValuesForTip)
   if (robotType === OT2_ROBOT_TYPE) {
     const zSpeedOT2 =
       CHANNELS_MAPPED_TO_MAX_SPEED[OT2_ROBOT_TYPE][pipetteSpecs.channels].z

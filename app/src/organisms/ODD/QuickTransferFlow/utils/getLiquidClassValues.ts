@@ -1,15 +1,20 @@
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getLabwareDefURI,
+  GLYCEROL_LIQUID_CLASS_NAME,
   linearInterpolate,
+  NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
+import { getTransferPlanAndReferenceVolumes } from './getTransferPlanAndReferenceVolumes'
+
 import type {
-  PipetteV2Specs,
+  LiquidHandlingPropertyByVolume,
   PositionReference,
   Vector3D,
 } from '@opentrons/shared-data'
@@ -24,7 +29,7 @@ export const setLiquidClassValues = (
 
   // const liquidClassDefaultValues: QuickTransferSummaryState = {}
 
-  if (state.liquidClass.liquidClassName === 'none') {
+  if (state.liquidClass.liquidClassName === NONE_LIQUID_CLASS_NAME) {
     // none getNoLiquidClassValues
     return getNoLiquidClassValues(
       state,
@@ -82,72 +87,58 @@ const getNoLiquidClassValues = (
     (singleDispense.pushOutByVolume as Array<[number, number]>) ?? 0
   )
 
-  const aspirateOffsetFields = getOffsetFields(
-    aspirate.aspiratePosition.offset,
-    'aspirate'
-  )
-  const dispenseOffsetFields = getOffsetFields(
-    dispense.dispensePosition.offset,
-    'dispense'
-  )
-
-  const aspiratePositionReferenceFields = getPositionReferenceFields(
-    aspirate.aspiratePosition.positionReference,
-    'aspirate'
-  )
-  const dispensePositionReferenceFields = getPositionReferenceFields(
-    dispense.dispensePosition.positionReference,
-    'dispense'
-  )
-
-  const aspirateFields = {
-    ...aspirateFlowRateFields,
-    ...aspirateOffsetFields,
-    ...aspiratePositionReferenceFields,
-    aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-    aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
-    aspirate_submerge_x_position: 0,
-    aspirate_submerge_y_position: 0,
-    aspirate_submerge_speed: aspirate.submerge.speed,
-    aspirate_retract_speed: aspirate.retract.speed,
-    aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-    aspirate_retract_position_reference: POSITION_REFERENCE_TOP,
-    aspirate_retract_x_position: 0,
-    aspirate_retract_y_position: 0,
-    aspirate_touchTip_speed: aspirate.retract.touchTip.params?.speed,
-    aspirate_touchTip_mmFromEdge: aspirate.retract.touchTip.params?.mmFromEdge,
-    aspirate_touchTip_mmFromTop: aspirate.retract.touchTip.params?.zOffset,
+  const aspirateState = {
+    aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate,
+    tipPositionAspirate: aspirate.aspiratePosition.positionReference,
+    submergeAspirate: {
+      speed: aspirate.submerge.speed,
+      positionFromBottom: POSITION_REFERENCE_TOP,
+    },
+    preWetTip: aspirate.preWet,
+    mixOnAspirate: {
+      mixVolume: aspirate.mix.params?.volume,
+      repetitions: aspirate.mix.params?.repetitions,
+    },
+    delayAspirate: {
+      delayDuration: aspirate.delay.params?.duration,
+    },
+    retractAspirate: {
+      speed: aspirate.retract.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    touchTipAspirate: aspirate.retract.touchTip.params?.mmFromEdge,
+    touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
   }
 
-  const dispenseFields = {
-    ...dispenseFlowRateFields,
-    ...dispenseOffsetFields,
-    ...dispensePositionReferenceFields,
-    dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-    dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
-    dispense_submerge_x_position: 0,
-    dispense_submerge_y_position: 0,
-    dispense_submerge_speed: dispense.submerge.speed,
-    dispense_retract_speed: dispense.retract.speed,
-    dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-    dispense_retract_position_reference: POSITION_REFERENCE_TOP,
-    dispense_retract_x_position: 0,
-    dispense_retract_y_position: 0,
-    pushOut_checkbox: pushOutVolume > 0,
-    pushOut_volume: pushOutVolume,
-    dispense_touchTip_speed: dispense.retract.touchTip.params?.speed,
-    dispense_touchTip_mmFromEdge: dispense.retract.touchTip.params?.mmFromEdge,
-    dispense_touchTip_mmFromTop: dispense.retract.touchTip.params?.zOffset,
+  const dispenseState = {
+    dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate,
+    tipPositionDispense: dispense.dispensePosition.positionReference,
+    submergeDispense: {
+      speed: dispense.submerge.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    delayDispense: {
+      delayDuration: dispense.delay.params?.duration,
+    },
+    pushOut: pushOutVolume != null && pushOutVolume > 0,
+    retractDispense: {
+      speed: dispense.retract.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    // ToDo will be updated when the blowout pr is merged
+    blowOut: singleDispense.retract.blowout?.params?.location ?? null,
+    touchTipDispense: dispense.retract.touchTip.params?.mmFromEdge,
+    touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
   }
   if (liquidHandlingAction === 'aspirate') {
     return {
       ...state,
-      ...aspirateFields,
+      ...aspirateState,
     }
   } else {
     return {
       ...state,
-      ...dispenseFields,
+      ...dispenseState,
     }
   }
 }
@@ -190,9 +181,149 @@ const getPositionReferenceFields = (
  * getLiquidClassValues
  * this function returns the values of liquid class
  */
+
 const getLiquidClassValues = (
   state: QuickTransferSummaryState,
-  convertedPipetteName: string,
-  liquidHandlingAction: 'aspirate' | 'dispense',
-  pipetteSpecs: PipetteV2Specs
-): QuickTransferSummaryState => {}
+  liquidHandlingAction: 'aspirate' | 'dispense'
+): QuickTransferSummaryState => {
+  const {
+    tipRack,
+    path,
+    pipette: pipetteSpecs,
+    volume,
+    destinationWells,
+    delayAspirate,
+    delayDispense,
+  } = state
+
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassMap = new Map<string, string>([
+    ['water', WATER_LIQUID_CLASS_NAME],
+    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
+    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
+  ])
+  const selectedLiquidClass = liquidClassMap.get(
+    state.liquidClass?.liquidClassName ?? 'none'
+  )
+  const liquidClassDef =
+    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
+  const convertedPipetteName =
+    state.pipette != null ? getFlexNameConversion(state.pipette) : null
+
+  const { loadName: currentTiprackLoadName } = state.tipRack.parameters
+  const tipTypeSettings = liquidClassDef?.byPipette
+    ?.find(({ pipetteModel }) => convertedPipetteName === pipetteModel)
+    ?.byTipType.find(tipObject => {
+      const tiprackLoadName = tipObject.tiprack.split('/')[1]
+      return tiprackLoadName === currentTiprackLoadName
+    })
+
+  // const dispenseType =
+  //   state.path === 'multiDispense' ? 'multiDispense' : 'singleDispense'
+  // const liquidHandlingType =
+  //   liquidHandlingAction === 'aspirate' ? 'aspirate' : dispenseType
+
+  // const liquidClassValues = tipTypeSettings?.[liquidHandlingType]
+
+  // if (liquidClassValues == null) {
+  //   return state
+  // }
+
+  const { aspirate, singleDispense, multiDispense } = tipTypeSettings ?? {}
+
+  const dispense =
+    multiDispense != null && path === 'multiDispense'
+      ? multiDispense
+      : singleDispense
+
+  const {
+    conditioningByVolume: rawConditioningByVolume = [],
+    disposalByVolume: rawDisposalByVolume = [],
+  } = multiDispense ?? {}
+  const conditioningByVolume = rawConditioningByVolume as Array<
+    [number, number]
+  >
+  const disposalByVolume = rawDisposalByVolume as Array<[number, number]>
+  const maxWorkingVolumeTip = tipRack.wells.A1.totalLiquidVolume
+  const aspirateAirGapByVolume = aspirate?.retract.airGapByVolume as Array<
+    [number, number]
+  >
+  const numDispenseWells = destinationWells.length
+  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
+    pipetteSpecs,
+    maxWorkingVolumeTip,
+    volume,
+    path,
+    numDispenseWells,
+    aspirateAirGapByVolume,
+    conditioningByVolume,
+    disposalByVolume,
+  }).referenceVolumes
+
+  const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
+
+  const aspirateState = {
+    aspirateFlowRate: flowRate.aspirate,
+    tipPositionAspirate: aspirate?.aspiratePosition.positionReference,
+    submergeAspirate: {
+      speed: aspirate?.submerge.speed,
+      positionFromBottom: POSITION_REFERENCE_TOP,
+    },
+    preWetTip: aspirate?.preWet,
+    mixOnAspirate: {
+      mixVolume: aspirate?.mix.params?.volume,
+      repetitions: aspirate?.mix.params?.repetitions,
+    },
+    delayAspirate: {
+      delayDuration: aspirate?.delay.params?.duration,
+    },
+    retractAspirate: {
+      speed: aspirate?.retract.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    touchTipAspirate: aspirate?.retract.touchTip.params?.mmFromEdge,
+    touchTipAspirateSpeed: aspirate?.retract.touchTip.params?.speed,
+    airGapAspirate: airGap.aspirate,
+    conditionAspirate: conditioning ?? 0,
+  }
+
+  const dispenseState = {
+    dispenseFlowRate: flowRate.dispense,
+    tipPositionDispense: dispense?.dispensePosition.positionReference,
+    submergeDispense: {
+      speed: dispense?.submerge.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    delayDispense: {
+      delayDuration: dispense?.delay.params?.duration,
+    },
+    pushOut: pushOut > 0,
+    retractDispense: {
+      speed: dispense?.retract.speed,
+      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+    },
+    // ToDo will be updated when the blowout pr is merged
+    blowOut: singleDispense?.retract.blowout?.params?.location ?? null,
+    touchTipDispense: dispense?.retract.touchTip.params?.mmFromEdge,
+    touchTipDispenseSpeed: dispense?.retract.touchTip.params?.speed,
+    airGapDispense: airGap.dispense,
+    disposalVolumeDispenseSettings: {
+      volume: disposal,
+      blowOutLocation:
+        singleDispense?.retract.blowout?.params?.location ?? null,
+      flowRate: flowRate.dispense,
+    },
+  }
+
+  if (liquidHandlingAction === 'aspirate') {
+    return {
+      ...state,
+      ...aspirateState,
+    }
+  } else {
+    return {
+      ...state,
+      ...dispenseState,
+    }
+  }
+}
