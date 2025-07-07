@@ -27,6 +27,12 @@ assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
 
 READER_ABSORBANCE = 450
 
+SHAKER_CONFIG_BY_LIQUID: Dict[str, Tuple[int, int]] = {
+    "glycerol_50": (1500, 60),
+    "water": (1250, 60),
+    "ethanol_80": (1000, 60),
+}
+
 # TODO: (sigler) test using Buonoy at low volumes
 DYE_READER_IDEAL_UL = 200.0
 DYE_SHAKER_MAX_UL = 200.0
@@ -433,8 +439,9 @@ def shake_and_read_plate(
 
     # SHAKE FOR 60 SECONDS
     shaker.close_labware_latch()
-    shaker.set_and_wait_for_shake_speed(1500)
-    ctx.delay(seconds=60)
+    shake_rpm, shake_seconds = SHAKER_CONFIG_BY_LIQUID[ctx.params.liquid]
+    shaker.set_and_wait_for_shake_speed(rpm=shake_rpm)
+    ctx.delay(seconds=shake_seconds)
     shaker.deactivate_shaker()
     shaker.open_labware_latch()
 
