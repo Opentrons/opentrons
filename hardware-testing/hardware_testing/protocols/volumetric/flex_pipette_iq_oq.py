@@ -707,12 +707,11 @@ def run(ctx: ProtocolContext) -> None:
         pip_for_dil.pick_up_tip(diluent_tips)
         if not diluent_probed:
             pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
-        num_transfers = 12 if pip_for_dil.channels == 8 else 1
-        pip_for_dil.transfer_with_liquid_class(
+        pip_for_dil.distribute_with_liquid_class(
             test_class,
             DYE_READER_IDEAL_UL,
-            [reservoir_diluent["A1"]] * num_transfers,
-            plate.wells(),
+            reservoir_diluent["A1"],
+            plate.columns(),
             new_tip="never",
         )
         pip_for_dil.drop_tip()
