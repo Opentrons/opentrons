@@ -248,12 +248,10 @@ export function TwoColLwInfoAndDeck(
                       key={labwareId}
                       transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
                     >
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender
-                          definition={labwareDef}
-                          positioningMode="passThrough"
-                        />
-                      ) : null}
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>

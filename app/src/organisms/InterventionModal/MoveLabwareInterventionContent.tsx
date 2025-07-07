@@ -232,13 +232,10 @@ export function MoveLabwareInterventionContent({
                         key={labwareId}
                         transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
                       >
-                        {labwareDef != null &&
-                        labwareId !== command.params.labwareId ? (
-                          <LabwareRender
-                            definition={labwareDef}
-                            positioningMode="passThrough"
-                          />
-                        ) : null}
+                        <LabwareRender
+                          definition={labwareDef}
+                          positioningMode="passThrough"
+                        />
                       </g>
                     ))}
                 </>
