@@ -225,6 +225,7 @@ module.exports = {
       files: ['**/*.tsx'],
       excludedFiles: ['**/*.stories.tsx'],
       rules: {
+        // TODO: Switch this rule to 'error' once the CSS modules migration is complete.
         'react/forbid-dom-props': [
           'warn',
           {
