@@ -97,7 +97,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.gravimetric import helpers, report, tips  # noqa: E402
+from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -137,6 +137,9 @@ class FixtureSettings:
     blank_trials: int
     submerge_depth: float
     isolate_volumes: bool
+    extra: bool
+    labware_on_scale: str
+    slot_scale: str
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -190,6 +193,7 @@ class FixtureSettings:
         volumes_to_test_1000ul = [
             float(volume) for volume in lookup_key("volumes_to_test_1000ul", csv_params)
         ]
+        extra = bool(lookup_key("is_extra", csv_params)[0] == "TRUE")
 
         volumes = {
             20: volumes_to_test_20ul,
@@ -311,6 +315,9 @@ class FixtureSettings:
             blank_trials=blank_trials,
             submerge_depth=submerge_depth,
             isolate_volumes=False,
+            extra=extra,
+            labware_on_scale=labware_on_scale,
+            slot_scale=slot_scale,
         )
 
     def validate_settings(self) -> bool:
@@ -320,6 +327,40 @@ class FixtureSettings:
         # - Tips fit on the given pipette
 
         return True
+
+
+def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
+    old_style = config.GravimetricConfig(
+        name=fixture_settings.name,
+        pipette_volume=fixture_settings.pipette_volume,
+        pipette_channels=fixture_settings.pipette_channels,
+        pipette_mount=fixture_settings.mount,
+        tip_volume=fixture_settings.tip_sizes[0],
+        trials=fixture_settings.trials,
+        slots_tiprack=[
+            DeckSlotName.from_primitive(slot).as_int()
+            for slot in fixture_settings.tips[fixture_settings.tip_sizes[0]]
+        ],
+        increment=fixture_settings.increment,
+        return_tip=fixture_settings.return_tip,
+        mix=False,
+        user_volumes=False,
+        kind=config.ConfigType.gravimetric,
+        extra=fixture_settings.extra,
+        jog=False,
+        same_tip=False,
+        ignore_fail=True,
+        mode="",
+        labware_on_scale=fixture_settings.labware_on_scale,
+        slot_scale=DeckSlotName.from_primitive(fixture_settings.slot_scale).as_int(),
+        blank=True,
+        gantry_speed=config.GANTRY_MAX_SPEED,
+        scale_delay=fixture_settings.scale_delay,
+        isolate_channels=[],
+        isolate_volumes=[],
+        liquid=fixture_settings.liquid_name,
+    )
+    report.store_config_gm(fixture_settings.test_report, old_style)
 
 
 def _get_tips_for_test_single_multi(
@@ -934,6 +975,7 @@ def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
     try:
+        _store_config_as_old_style(fixture_settings)
         _run(ctx, fixture_settings)
     finally:
         if fixture_settings.recorder is not None:
