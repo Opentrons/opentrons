@@ -102,7 +102,10 @@ export interface QuickTransferSummaryState {
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
@@ -235,7 +238,10 @@ interface SetTouchTipDispense {
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
-  location?: BlowOutLocation
+  blowOutSettings?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
 }
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
