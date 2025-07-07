@@ -206,7 +206,7 @@ def _get_tip_z_error(ctx: ProtocolContext, pipette: InstrumentContext, dial: Lab
 def _get_height_of_liquid_in_well(pipette: InstrumentContext, well: Well, simulating: bool) -> float:
     if pipette.detect_liquid_presence(well) and not simulating:
         return pipette.measure_liquid_height(well)
-    return 0.0
+    return 99.0
 
 
 def aspirate_and_dispense(liq_pipette, src_well, labware, step_volume):
@@ -228,84 +228,48 @@ def run(ctx: ProtocolContext) -> None:
     ) = _setup(ctx)
 
     _store_dial_baseline(ctx, probe_pipette, dial)
-    volume_dispensed = 0
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    if probe_pipette.has_tip:
-        probe_pipette.drop_tip()
-    if liq_pipette.has_tip:
-        liq_pipette.drop_tip()
-
-    if not quick_mode:
-        for step in range(STEPS):
-            # Pick up new tips
+    def pick_up_tips():
+        if not probe_pipette.has_tip:
             probe_pipette.pick_up_tip(probing_rack)
+        if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip(liquid_rack)
 
-            # Measure tip z error at the start of the step
-            tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-
-            # Measure source liquid height
-            if step == 0:
-                src_height = liq_pipette.measure_liquid_height(src_well["A1"])
-                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
-                corrected_height = height + tip_z_error
-                volume_dispensed = 0
-            else:
-                aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
-                volume_dispensed = volume_dispensed + step_volume
-                height = _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating())
-                corrected_height = height + tip_z_error
-                # Stop if height exceeds well depth
-                #ctx.comment("well depth: " + str(labware["A1"].depth))
-                #if corrected_height >= labware["A1"].depth:
-                    #return
-
-            # Log data
-            trial_data = [
-                step,
-                volume_dispensed,
-                height,
-                round(tip_z_error, 5),
-                corrected_height,
-
-            ]
-            _write_line_to_csv(ctx, [str(d) for d in trial_data])
-
+    def drop_tips():
+        if probe_pipette.has_tip:
             probe_pipette.drop_tip()
+        if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    else:
-        probe_pipette.pick_up_tip(probing_rack)
-        liq_pipette.pick_up_tip(liquid_rack)
-        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial),5)
+    drop_tips()  # Ensure no tips at start
 
+    if quick_mode:
+        pick_up_tips()
+        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+        volume_dispensed = 0
         for step in range(STEPS):
-            if step == 0:
-                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
-                corrected_height = height + tip_z_error
-                volume_dispensed = 0
-            else: 
+            if step > 0:
                 aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
-                height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
-                corrected_height = height + tip_z_error
-                # Stop if height exceeds well depth
-                #if corrected_height < 0 and not step == 0: #theres gotta be a better way to see when the height passes the well depth
-                    #return
-            trial_data = [
-                step,
-                volume_dispensed,
-                height,
-                tip_z_error,
-                corrected_height
-            ]
+            probe_pipette.move_to(labware["A1"].top())
+            height = _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating())
+            corrected_height = height + tip_z_error
+            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
+        drop_tips()
+    else:
+        volume_dispensed = 0
+        for step in range(STEPS):
+            pick_up_tips()
+            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+            if step > 0:
+                aspirate_and_dispense(liq_pipette, src_well, labware, step_volume)
+                volume_dispensed += step_volume
+            height = round(_get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()), 5)
+            corrected_height = height + tip_z_error
+            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
+            _write_line_to_csv(ctx, [str(d) for d in trial_data])
+            drop_tips()
 
-        liq_pipette.drop_tip()
-        probe_pipette.drop_tip()
-
-    if liq_pipette.has_tip:
-        liq_pipette.drop_tip()
-    if probe_pipette.has_tip:
-        probe_pipette.drop_tip()
+    drop_tips()  # Ensure no tips at end
