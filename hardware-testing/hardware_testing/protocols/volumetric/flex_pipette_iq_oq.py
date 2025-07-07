@@ -169,8 +169,13 @@ def add_parameters(params: ParameterContext) -> None:
         ],
     )
     params.add_bool(
-        display_name="use_artel",
-        variable_name="use_artel",
+        display_name="test_reader",
+        variable_name="test_reader",
+        default=False,
+    )
+    params.add_bool(
+        display_name="external_reader",
+        variable_name="external_reader",
         default=False,
     )
     params.add_bool(
@@ -180,7 +185,15 @@ def add_parameters(params: ParameterContext) -> None:
     )
 
 
+def get_trials(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[int]:
+    if ctx.params.test_reader:
+        return [int(96 / pipette.channels)]
+    return TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+
+
 def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
+    if ctx.params.test_reader:
+        return [200.0]
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
     # NOTE: limiting pipettes (eg: 96ch) to only test <=250uL
@@ -303,7 +316,7 @@ def load_liquid_diluent(
     def _round_up_to(multiple_of: int = 1, value: int = 1):
         return ((value + (multiple_of - 1)) // multiple_of) * multiple_of
 
-    trials = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+    trials = get_trials(ctx, pipette, tip_ul)
     if pipette.channels == 1:
         trials = [_round_up_to(multiple_of=8, value=t) for t in trials]
     total_diluent_aspirated_ul = sum(
@@ -344,7 +357,7 @@ def load_liquid_dye(
     are loaded into consecutive wells in the reservoir.
     """
     reservoir_cfg = DYE_RESERVOIRS_BY_CHANNELS_AND_TIP[(pipette.channels, tip_ul)]
-    trials_list = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+    trials_list = get_trials(ctx, pipette, tip_ul)
     liquid_and_trials_by_volume = {
         v: (ctx.define_liquid(
             name=f"{name}_{min(v, v / ceil(v / DYE_SHAKER_MAX_UL))}ul",
@@ -449,7 +462,7 @@ def run(ctx: ProtocolContext) -> None:
     heater_shaker.open_labware_latch()
     adapter = heater_shaker.load_adapter("opentrons_universal_flat_adapter")
     plate_reader = None
-    if not ctx.params.use_artel:
+    if not ctx.params.external_reader:
         plate_reader = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
         plate_reader.close_lid()
         plate_reader.initialize(mode="single", wavelengths=[READER_ABSORBANCE])
@@ -466,7 +479,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # LOAD LABWARE & TIP-RACKS
     tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
-    trials_list = TRIALS_BY_PIPETTE_BY_TIP[test_pip.name][tip_ul]
+    trials_list = get_trials(ctx, test_pip, tip_ul)
     volumes = get_volumes(ctx, test_pip, tip_ul)
     reservoir_diluent, reservoirs_dye, plates = load_most_labware(
         ctx, test_pip, tip_ul, volumes, trials_list
@@ -519,7 +532,7 @@ def run(ctx: ProtocolContext) -> None:
         file.write(f"model,{ctx.params.pipette}\n")
         file.write(f"tips,{ctx.params.tips}\n")
         file.write(f"liquid,{ctx.params.liquid}\n")
-        file.write(f"use_artel,{ctx.params.use_artel}\n")
+        file.write(f"external_reader,{ctx.params.external_reader}\n")
         file.write(f"meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
 
     def filename() -> str:
