@@ -143,7 +143,7 @@ def load_firmware_manifest(
     opentrons_firmware = firmware_manifest or _FIRMWARE_MANIFEST_PATH
     try:
         with open(opentrons_firmware, "r") as fh:
-            manifest = json.load(fh)
+            manifest = json.load(fh, cls=json.JSONDecoder)
     except (json.JSONDecodeError, FileNotFoundError) as e:
         log.error(f"Could not load manifest file {opentrons_firmware} {e}")
         return opentrons_manifest

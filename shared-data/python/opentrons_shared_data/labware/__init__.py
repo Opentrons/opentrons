@@ -30,9 +30,10 @@ def load_definition(
 
 def load_definition(loadname: str, version: int, schema: int = 2) -> LabwareDefinition:
     return json.loads(
-        load_shared_data(f"labware/definitions/{schema}/{loadname}/{version}.json")
+        load_shared_data(f"labware/definitions/{schema}/{loadname}/{version}.json"),
+        cls=json.JSONDecoder,
     )
 
 
 def load_schema() -> Schema:
-    return json.loads(load_shared_data("labware/schemas/2.json"))
+    return json.loads(load_shared_data("labware/schemas/2.json"), cls=json.JSONDecoder)

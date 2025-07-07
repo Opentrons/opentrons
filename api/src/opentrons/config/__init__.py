@@ -22,6 +22,7 @@ OT_API_ROBOT_CONFIG_FILE variable.
 This module's interface to the rest of the system are the IS_* attributes and
 the CONFIG attribute.
 """
+
 import enum
 import os
 import json
@@ -82,7 +83,7 @@ if IS_ROBOT:
     else:
         try:
             with open("/etc/VERSION.json") as vj:
-                contents = json.load(vj)
+                contents = json.load(vj, cls=json.JSONDecoder)
             OT_SYSTEM_VERSION = contents["buildroot_version"]
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
@@ -368,7 +369,7 @@ def _load_with_overrides(base: Path) -> Dict[str, str]:
     overrides = _get_environ_overrides()
     try:
         with (base / _CONFIG_FILENAME).open() as file:
-            index = json.load(file)
+            index = json.load(file, cls=json.JSONDecoder)
     except (OSError, json.JSONDecodeError):
         should_write = True
         index = generate_config_index(overrides)
@@ -442,7 +443,7 @@ def _legacy_index() -> Optional[Dict[str, str]]:
         if index.exists():
             try:
                 with open(index) as file:
-                    return cast(Dict[str, str], json.load(file))
+                    return cast(Dict[str, str], json.load(file, cls=json.JSONDecoder))
             except (OSError, json.JSONDecodeError):
                 return None
     return None

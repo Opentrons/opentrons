@@ -63,7 +63,7 @@ def _get_configuration_dictionary(
             / model.value
             / f"{version.major}_{version.minor}.json"
         )
-    return json.loads(load_shared_data(config_path))
+    return json.loads(load_shared_data(config_path), cls=json.JSONDecoder)
 
 
 @lru_cache(maxsize=None)

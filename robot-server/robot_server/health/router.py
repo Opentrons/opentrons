@@ -51,7 +51,7 @@ class ComponentVersions:
 async def _get_version() -> Dict[str, str]:
     try:
         with open(VERSION_PATH, "r") as version_file:
-            return cast(Dict[str, str], json.load(version_file))
+            return cast(Dict[str, str], json.load(version_file, cls=json.JSONDecoder))
     except FileNotFoundError:
         _log.warning(f"{VERSION_PATH} does not exist - is this a dev server?")
         return {}

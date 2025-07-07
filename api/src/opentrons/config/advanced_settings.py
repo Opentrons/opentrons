@@ -297,7 +297,7 @@ def _clean_id(_id: str) -> str:
 def _read_json_file(path: Union[str, "Path"]) -> Dict[str, Any]:
     try:
         with open(path, "r") as fd:
-            data = json.load(fd)
+            data = json.load(fd, cls=json.JSONDecoder)
     except FileNotFoundError:
         data = {}
     except json.JSONDecodeError as e:

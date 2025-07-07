@@ -300,12 +300,12 @@ async def create_protocol(  # noqa: C901
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.
     parsed_rtp_values = (
-        json.loads(run_time_parameter_values)
+        json.loads(run_time_parameter_values, cls=json.JSONDecoder)
         if isinstance(run_time_parameter_values, str)
         else {}
     )
     parsed_rtp_files = (
-        json.loads(run_time_parameter_files)
+        json.loads(run_time_parameter_files, cls=json.JSONDecoder)
         if isinstance(run_time_parameter_files, str)
         else {}
     )

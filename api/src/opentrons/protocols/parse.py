@@ -196,7 +196,7 @@ def _parse_json(
     protocol_contents: Union[str, bytes], filename: Optional[str] = None
 ) -> JsonProtocol:
     """Parse a protocol known or at least suspected to be json"""
-    protocol_json = json.loads(protocol_contents)
+    protocol_json = json.loads(protocol_contents, cls=json.JSONDecoder)
     version, validated = validate_json(protocol_json)
     return JsonProtocol(
         text=protocol_contents,

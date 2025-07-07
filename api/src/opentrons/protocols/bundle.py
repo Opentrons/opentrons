@@ -59,7 +59,7 @@ def extract_bundle(bundle: ZipFile) -> BundleContents:  # noqa: C901
 
         with bundle.open(zipInfo) as f:
             if rootpath == LABWARE_DIR and filepath.suffix == ".json":
-                labware_def = json.loads(f.read().decode("utf-8"))
+                labware_def = json.loads(f.read().decode("utf-8"), cls=json.JSONDecoder)
                 labware_key = uri_from_definition(labware_def)
                 if labware_key in bundled_labware:
                     raise RuntimeError(f"Conflicting labware in bundle: {labware_key}")

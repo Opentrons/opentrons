@@ -19,7 +19,7 @@ def load(
     for fi in Path(
         get_shared_data_root() / "robot" / "definitions" / f"{version}"
     ).iterdir():
-        defn = json.load(fi.open("r"))
+        defn = json.load(fi.open("r"), cls=json.JSONDecoder)
         if defn["robotType"] == robot_type:
             return cast(RobotDefinition, defn)
     raise KeyError(robot_type)
