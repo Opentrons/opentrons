@@ -23,7 +23,6 @@ import {
   DISPLAY_FLEX,
   DISPLAY_GRID,
   Flex,
-  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_END,
