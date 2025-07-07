@@ -62,9 +62,11 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     children,
     selectedCutoutId,
     darkFill = COLORS.black90,
-    editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
+    editableCutoutIds,
     height = '455px',
   } = props
+
+  console.log("editableCutoutIds help!!!: ", editableCutoutIds)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
@@ -158,6 +160,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {emptySlotLikeItems.map(({ cutoutId, addressableAreaId }) => (
         <EmptyConfigItem
           data-testid={addressableAreaId}
+          editableCutoutIds={editableCutoutIds ?? []}
           key={addressableAreaId}
           addressableAreaId={addressableAreaId}
           deckDefinition={deckDef}

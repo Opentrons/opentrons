@@ -30,6 +30,7 @@ interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableAreaId: AddressableAreaNamesWithFakes
+  editableCutoutIds: CutoutId[]
   handleClickAdd: (
     fixtureLocation: CutoutId,
     addressableArea: AddressableAreaNamesWithFakes
@@ -42,8 +43,11 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     handleClickAdd,
     fixtureLocation,
     addressableAreaId,
+    editableCutoutIds
+
   } = props
 
+  console.log("addressableAreaId: ", addressableAreaId)
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
@@ -85,8 +89,11 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
           handleClickAdd(fixtureLocation, addressableAreaId)
         }}
         data-testid={addressableAreaId}
+        disabled={!editableCutoutIds.includes(fixtureLocation)}
       >
+        {editableCutoutIds.includes(fixtureLocation) && 
         <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
+}
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -117,6 +124,14 @@ const EMPTY_CONFIG_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.blue35};
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey35};
+    box-shadow: none;
+    border-color: transparent
   }
 
   &:focus-visible {
