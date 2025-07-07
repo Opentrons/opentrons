@@ -26,6 +26,7 @@ import {
   FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
@@ -84,12 +85,6 @@ import type {
   StoredProtocolData,
 } from '/app/redux/protocol-storage'
 import type { Dispatch, State } from '/app/redux/types'
-
-const GRID_STYLE = css`
-  display: ${DISPLAY_GRID};
-  width: 100%;
-  grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
-`
 
 const TWO_COL_GRID_STYLE = css`
   display: ${DISPLAY_GRID};
@@ -471,7 +466,15 @@ export function ProtocolDetails(
               >
                 {protocolDisplayName}
               </LegacyStyledText>
-              <Flex css={GRID_STYLE}>
+              <Flex
+                display={DISPLAY_GRID}
+                width="100%"
+                gridTemplateColumns={
+                  enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE
+                    ? '25.5% 25.5% 25.5% 22.9%'
+                    : '26.6% 26.6% 26.6% 20.2%'
+                }
+              >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
@@ -511,13 +514,7 @@ export function ProtocolDetails(
                       : lastAnalyzed}
                   </LegacyStyledText>
                 </Flex>
-                <Flex
-                  css={css`
-                    display: flex;
-                    justify-self: end;
-                    grid-gap: 4px;
-                  `}
-                >
+                <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
                   {/* TODO: add OT-2 support */}
                   {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
                     <SecondaryButton
@@ -528,7 +525,6 @@ export function ProtocolDetails(
                     </SecondaryButton>
                   ) : null}
                   <PrimaryButton
-                    width={FLEX_MAX_CONTENT}
                     onClick={() => {
                       handleRunProtocolButtonClick()
                     }}
