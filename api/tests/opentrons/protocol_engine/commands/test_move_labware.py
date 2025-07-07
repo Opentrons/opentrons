@@ -33,7 +33,6 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    LabwareMovementOffsetData,
     DeckType,
     AddressableAreaLocation,
     OnAddressableAreaLocationSequenceComponent,
@@ -340,10 +339,10 @@ async def test_gripper_move_labware_implementation(
             labware_id="my-cool-labware-id",
             current_location=sentinel.from_location_validated_for_gripper,
             new_location=sentinel.new_location_validated_for_gripper,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=pick_up_offset,
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            user_pick_up_offset=Point(
+                pick_up_offset.x, pick_up_offset.y, pick_up_offset.z
             ),
+            user_drop_offset=Point(),
             post_drop_slide_offset=None,
         ),
     )
@@ -442,10 +441,8 @@ async def test_gripper_error(
             labware_id=labware_id,
             current_location=origin_location,
             new_location=new_location,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            ),
+            user_pick_up_offset=Point(),
+            user_drop_offset=Point(),
             post_drop_slide_offset=None,
         )
     ).then_raise(underlying_exception)
@@ -634,10 +631,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             labware_id="my-cool-labware-id",
             current_location=from_location,
             new_location=new_location,
-            user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            ),
+            user_pick_up_offset=Point(1, 2, 3),
+            user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
         ),
     )

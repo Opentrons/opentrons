@@ -127,7 +127,10 @@ module.exports = {
       },
     },
     {
-      files: ['./app/src/**/*.@(ts|tsx)'],
+      files: [
+        './app/src/**/*.@(ts|tsx)',
+        './opentrons-ai-client/src/**/*.@(ts|tsx)',
+      ],
       rules: {
         'import/no-absolute-path': 'off',
         '@eslint-react/no-nested-component-definitions': 'error',

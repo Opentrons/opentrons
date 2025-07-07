@@ -277,8 +277,7 @@ export function ProtocolRunSetup({
         completeText: isFlex
           ? t('modules_and_fixtures_ready')
           : t('modules_ready'),
-        incompleteText:
-          isFlex && hasModules ? t('calibration_needed') : t('action_needed'),
+        incompleteText: t('action_needed'),
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,

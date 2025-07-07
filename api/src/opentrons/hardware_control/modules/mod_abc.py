@@ -239,3 +239,7 @@ class AbstractModule(abc.ABC):
     async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
         pass
+
+    def cleanup_persistent(self) -> None:
+        """Reset any persistent data on the module that should not exist outside of a run."""
+        pass

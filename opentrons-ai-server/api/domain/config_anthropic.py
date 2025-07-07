@@ -112,6 +112,7 @@ Follow these instructions to handle the user's prompt:
 
       ```python
       from opentrons import protocol_api
+      from opentrons.protocol_api import COLUMN, ALL, SINGLE # for 96-channel-pipette
 
       metadata = {{
           'protocolName': '[Protocol name]',
@@ -144,6 +145,7 @@ Follow these instructions to handle the user's prompt:
 
           # Load pipettes
           [Pipette loading code with comments]
+          [For 96-channel pipette, loading FULL 96-tip pickup requires adapter.]
 
           # For Flex protocols using API version 2.16 or later, load trash bin
           trash = protocol.load_trash_bin('A3')
@@ -268,7 +270,8 @@ Follow these instructions to handle the user's prompt:
    as a reference to generate a basic protocol. For serial dilution please refer to <source>serial_dilution_examples.md</source>.
 
 
-8. Remember to use only the information provided in the <document></document>. Do not introduce any external information or assumptions.
+8. Remember to use the information provided in order: first look at <relevant_file_content> then <document></document>.
+Do not introduce any external information or assumptions.
 
 Here are the inputs you will work with:
 
@@ -342,3 +345,34 @@ Now, please analyze the user's query and provide your response following these g
 
 9. No need to start your response with "I'll help you" or anything like that.
 10. Please write like a proper instruction, coming from the document exactly as it is."""
+
+PROMPT_FIND_RELEVANT_DOCS = """Your task is to analyze the API documentation structure and determine
+which documentation files are most relevant to the user's query.
+
+Here is the user's query:
+<user_query>
+{USER_QUERY}
+</user_query>
+
+Based on the documentation structure provided, identify which files would be most relevant for answering this query.
+Consider the <about> sections for each file to understand their content.
+
+Instructions:
+- Analyze the query to identify key concepts (e.g., modules, pipettes, labware, specific robot types)
+- Match these concepts with the appropriate documentation files based on their <about> descriptions
+- List the complete file paths as they appear in the documentation structure (e.g., docs/v2/new_modules.rst)
+- If a query involves multiple concepts, include all relevant files
+- Be selective - only include files that directly relate to the query
+- Format your response with <relevant_files> tags
+- Make sure you get relevant doc only from docs
+
+Format your response exactly like this:
+<relevant_files>
+docs/v2/new_modules.rst,
+docs/v2/new_pipette.rst,
+docs/v2/index.rst,
+docs/v2/example_protocols/dilution_tutorial_flex.py
+</relevant_files>
+
+Important: Use the exact file paths as shown in the documentation structure, separated by commas.
+"""

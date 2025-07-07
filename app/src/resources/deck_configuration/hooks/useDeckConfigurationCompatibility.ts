@@ -4,11 +4,7 @@ import {
   getCutoutFixturesForCutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
-  getLabwareDisplayName,
-  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
-
-import { getInitialAndMovedLabwareInSlots } from '/app/transformations/analysis'
 
 import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQuery'
 
@@ -22,10 +18,16 @@ import type {
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
+/**
+ * For a protocol analysis and specified robot, this hook returnsan object
+ * per item in the deck configuration that contains the currently configured cutoutId
+ * and cutoutFixtureId as well as the addressable areas that the location needs to provide
+ * for that protocol to run, and a list of compatible cutout fixture ids that can
+ * provide those addressable areas.
+ */
+
 export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
-  // the missing on-deck labware display name for a single slot cutout
-  missingLabwareDisplayName: string | null
 }
 export function useDeckConfigurationCompatibility(
   robotType: RobotType,
@@ -37,26 +39,30 @@ export function useDeckConfigurationCompatibility(
     }).data ?? []
   if (robotType !== FLEX_ROBOT_TYPE) return []
   const deckDef = getDeckDefFromRobotType(robotType)
+
   const allAddressableAreas =
     protocolAnalysis != null
       ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
-  const labwareInSlots =
-    protocolAnalysis != null
-      ? getInitialAndMovedLabwareInSlots(protocolAnalysis)
-      : []
 
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
+      // this grabs all fixtures that could mount to the provided cutout ids
       const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(
         cutoutId,
         deckDef.cutoutFixtures
       )
+      // this filters down the list of addressable areas used in the protocol to
+      // find any that have a cutout id that matches the cutoutId in the current
+      // iteration of this reduce loop
       const requiredAddressableAreasForCutoutId = allAddressableAreas.filter(
         aa =>
           getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
           cutoutId
       )
+      // filtering the list of fixtures that can mount to this cutout id
+      // to only include ones that provides every addressable area in the
+      // required list requiredAddressableAreasForCutoutId
       const compatibleCutoutFixtureIds = fixturesThatMountToCutoutId
         .filter(cf =>
           requiredAddressableAreasForCutoutId.every(aa =>
@@ -65,28 +71,10 @@ export function useDeckConfigurationCompatibility(
         )
         .map(cf => cf.id)
 
-      // get the on-deck labware name for a missing single-slot addressable area
-      const missingSingleSlotLabware =
-        cutoutFixtureId != null &&
-        // fixture mismatch
-        !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
-        compatibleCutoutFixtureIds[0] != null &&
-        // compatible fixture is single-slot
-        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
-          ? labwareInSlots.find(
-              ({ location }) =>
-                // match the addressable area to an on-deck labware
-                requiredAddressableAreasForCutoutId[0] === location.slotName
-            )
-          : null
-
-      const missingLabwareDisplayName =
-        missingSingleSlotLabware != null
-          ? missingSingleSlotLabware.labwareNickName ??
-            getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
-            null
-          : null
-
+      // for each cutoutId in the current deck config, we'll return an object
+      // that contains the current cutoutFixtureId, requiredAddressableAreas for that location that are used
+      // in the protocol, and a list of compatibleCutoutFixtureIds that provide those addressable areas
+      // this is the object that will be used to determine if the current deck config is compatible with the protocol
       return [
         ...acc,
         {
@@ -94,7 +82,6 @@ export function useDeckConfigurationCompatibility(
           cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
           compatibleCutoutFixtureIds,
-          missingLabwareDisplayName,
         },
       ]
     },

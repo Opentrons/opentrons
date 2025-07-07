@@ -21,6 +21,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -30,9 +31,11 @@ interface MagneticBlockItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   hasStagingArea?: boolean
   selected?: boolean
@@ -46,6 +49,7 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
     fixtureLocation,
     handleClickRemove,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -72,6 +76,11 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={width}
@@ -84,13 +93,7 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

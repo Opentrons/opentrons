@@ -318,6 +318,7 @@ export const SecondStepsMoveLiquidTools = ({
           <>
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix={tab}
               propsForFields={propsForFields}
               zField={`${tab}_mmFromBottom`}
@@ -338,6 +339,7 @@ export const SecondStepsMoveLiquidTools = ({
           <>
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('submerge')}
               prefix={`${tab}_submerge`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
@@ -355,6 +357,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('retract')}
               prefix={`${tab}_retract`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
@@ -405,6 +408,7 @@ export const SecondStepsMoveLiquidTools = ({
                 >
                   {formData.conditioning_checkbox === true ? (
                     <InputStepFormField
+                      {...propsForFields.conditioning_volume}
                       title={t(
                         'form:step_edit_form.field.conditioning.conditioning_volume.label'
                       )}
@@ -413,7 +417,6 @@ export const SecondStepsMoveLiquidTools = ({
                         { min: 0, max: maxConditioningVolume }
                       )}
                       padding="0"
-                      {...propsForFields.conditioning_volume}
                       showTooltip={false}
                     />
                   ) : null}
@@ -532,6 +535,7 @@ export const SecondStepsMoveLiquidTools = ({
                   units={t('application:units.millimeter')}
                 />
                 <PositionField
+                  formData={formData}
                   prefix={tab}
                   propsForFields={propsForFields}
                   zField={`${tab}_touchTip_mmFromTop`}

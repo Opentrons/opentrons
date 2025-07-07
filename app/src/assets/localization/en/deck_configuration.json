@@ -8,5 +8,9 @@
   "temperature": "Temperature",
   "thermocycler": "Thermocycler",
   "trash_bin": "Trash bin",
-  "waste": "Waste"
+  "waste": "Waste",
+  "magnetic_block": "Magnetic block",
+  "waste_chute": "Waste chute",
+  "staging_area_slot": "Staging area slot",
+  "module_in_port": "{{moduleName}} in  USB-{{usbPortNumber}}"
 }
