@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getModuleDef2 } from '@opentrons/shared-data'
+import { getModuleDef } from '@opentrons/shared-data'
 
 import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 
@@ -11,7 +11,7 @@ const temperatureProtocolModule = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: getModuleDef2('temperatureModuleV2'),
+  moduleDef: getModuleDef('temperatureModuleV2'),
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
@@ -24,7 +24,7 @@ const magneticProtocolModule = {
   x: 0,
   y: 0,
   z: 0,
-  moduleDef: getModuleDef2('magneticModuleV2'),
+  moduleDef: getModuleDef('magneticModuleV2'),
   nestedLabwareDef: null,
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,

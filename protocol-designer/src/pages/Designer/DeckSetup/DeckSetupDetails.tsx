@@ -5,7 +5,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
@@ -199,7 +199,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
-        const moduleDef = getModuleDef2(moduleOnDeck.model)
+        const moduleDef = getModuleDef(moduleOnDeck.model)
 
         const getModuleInnerProps = (
           moduleState: ModuleTemporalProperties['moduleState']
