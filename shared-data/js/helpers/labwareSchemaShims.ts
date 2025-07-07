@@ -1,10 +1,22 @@
 /** Compatibility shims to ease transitioning between with labware schemas 2 and 3. */
 
+import {
+  getAddressableAreaFromSlotId,
+  getPositionFromSlotId,
+} from '../fixtures'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from './matrixMath'
-import { getVectorInverse, getVectorSum, IDENTITY_VECTOR } from './vectorMath'
+import { pairsFromArray } from './pairsFromArray'
+import {
+  coordinateTupleToVector3D,
+  getVectorDifference,
+  getVectorInverse,
+  getVectorSum,
+  IDENTITY_VECTOR,
+} from './vectorMath'
 
 import type {
   AddressableArea,
+  DeckDefinition,
   LabwareDefinition,
   LabwareDefinition2,
   ModuleDefinition,
@@ -63,6 +75,202 @@ export function getLabwareViewBox(
       yDimension: maxY - minY,
     }
   }
+}
+
+/** Logically specifies where a labware is located. */
+interface ComputeLabwareOriginInput {
+  /** The underlying deck. */
+  deckDefinition: DeckDefinition
+
+  /**
+   * The underlying slot. If this is a Flex and the labware is on a module, this should
+   * be the slot that the module replaces.
+   */
+  slotId: string
+
+  /**
+   * The definition of the module underneath the labware, if there is one.
+   * This should be specified even if it's only transitively underneath the labware,
+   * like slot -> module -> adapter -> labware in question.
+   */
+  moduleDefinition?: ModuleDefinition
+
+  /** The labware and all the labware underneath it. */
+  labwareDefinitionsBottomToTop: LabwareDefinition[]
+}
+
+/**
+ * Computes the absolute deck coordinates of a labware.
+ * Returns null if there was some internal error.
+ */
+export function computeLabwareOrigin({
+  deckDefinition,
+  slotId,
+  moduleDefinition,
+  labwareDefinitionsBottomToTop,
+}: ComputeLabwareOriginInput): Vector3D | null {
+  const stack = getLabwareStackAsArray({
+    deckDefinition,
+    slotId,
+    moduleDefinition,
+    labwareDefinitionsBottomToTop,
+  })
+
+  if (stack == null) {
+    console.warn(
+      "Can't compute labware position. This is probably a bug in the call site, like passing in a nonexistent slot ID.",
+      {
+        deckDefinition,
+        slotId,
+        moduleDefinition,
+        labwareDefinitionsBottomToTop,
+      }
+    )
+    return null
+  }
+
+  const absolutePosition = getVectorSum(
+    IDENTITY_VECTOR,
+    ...stack.map(e => e.offset)
+  )
+  return absolutePosition
+}
+
+/**
+ * Translate the args of `computeLabwarePosition()`, which should be optimized for
+ * safety and ergonomics, into something that's easier for us to sum up.
+ */
+function getLabwareStackAsArray({
+  deckDefinition,
+  slotId,
+  moduleDefinition,
+  labwareDefinitionsBottomToTop,
+}: {
+  deckDefinition: DeckDefinition
+  slotId: string
+  moduleDefinition?: ModuleDefinition
+  labwareDefinitionsBottomToTop: LabwareDefinition[]
+}): LabwareStackElement[] | null {
+  if (labwareDefinitionsBottomToTop.length === 0) {
+    return []
+  }
+
+  const result: LabwareStackElement[] = []
+
+  if (moduleDefinition == null) {
+    // The bottom of the stack is a labware in a deck slot.
+    const slotAddressableArea = getAddressableAreaFromSlotId(
+      slotId,
+      deckDefinition
+    )
+    const slotPositionTuple = getPositionFromSlotId(slotId, deckDefinition)
+    if (slotAddressableArea == null || slotPositionTuple == null) {
+      return null
+    }
+    const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
+    result.push({
+      debugMetadata: {
+        type: 'rootDeckSlot',
+        slotId,
+      },
+      offset: slotPosition,
+    })
+    result.push({
+      debugMetadata: {
+        type: 'deckSlotToLabware',
+        parentSlotId: slotId,
+        childLabwareDefinition: labwareDefinitionsBottomToTop[0],
+      },
+      offset: getDeckSlotOriginToLabwareOrigin(
+        slotAddressableArea,
+        labwareDefinitionsBottomToTop[0]
+      ),
+    })
+  } else {
+    // The bottom of the stack is a labware in a module in a deck slot.
+    const slotPositionTuple = getPositionFromSlotId(slotId, deckDefinition)
+    if (slotPositionTuple == null) {
+      return null
+    }
+    const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
+    result.push({
+      debugMetadata: {
+        type: 'rootModule',
+        parentSlotId: slotId,
+        moduleDefinition,
+      },
+      // Modules don't really have an origin of their own that's separate from the
+      // origin of their parent deck slot.
+      offset: slotPosition,
+    })
+    result.push({
+      debugMetadata: {
+        type: 'moduleToLabware',
+        parentModuleDefinition: moduleDefinition,
+        childLabwareDefinition: labwareDefinitionsBottomToTop[0],
+      },
+      offset: getModuleParentOriginToLabwareOrigin(
+        deckDefinition.otId,
+        slotId,
+        moduleDefinition,
+        labwareDefinitionsBottomToTop[0]
+      ),
+    })
+  }
+
+  for (const [
+    parentLabwareDefinition,
+    childLabwareDefinition,
+  ] of pairsFromArray(labwareDefinitionsBottomToTop)) {
+    result.push({
+      debugMetadata: {
+        type: 'labwareToLabware',
+        parentLabwareDefinition,
+        childLabwareDefinition,
+      },
+      offset: getLabwareOriginToLabwareOrigin(
+        parentLabwareDefinition,
+        childLabwareDefinition
+      ),
+    })
+  }
+
+  return result
+}
+
+interface LabwareStackElement {
+  /** Offset from parent (below) to child (above). */
+  offset: Vector3D
+
+  /**
+   * Human-readable metadata for the benefit of throwing in a console.log() or whatever.
+   * Code should not consume this.
+   */
+  debugMetadata:
+    | {
+        type: 'rootDeckSlot'
+        slotId: string
+      }
+    | {
+        type: 'rootModule'
+        parentSlotId: string
+        moduleDefinition: ModuleDefinition
+      }
+    | {
+        type: 'deckSlotToLabware'
+        parentSlotId: string
+        childLabwareDefinition: LabwareDefinition
+      }
+    | {
+        type: 'moduleToLabware'
+        parentModuleDefinition: ModuleDefinition
+        childLabwareDefinition: LabwareDefinition
+      }
+    | {
+        type: 'labwareToLabware'
+        parentLabwareDefinition: LabwareDefinition
+        childLabwareDefinition: LabwareDefinition
+      }
 }
 
 /**
@@ -170,6 +378,29 @@ export function getModuleParentOriginToLabwareOrigin(
       return moduleParentOriginToLabwareOrigin
     }
   }
+}
+
+/**
+ * Given a labware -> labware stackup, compute the offset from the parent (bottom)
+ * labware's origin to the child (top) labware's origin.
+ */
+export function getLabwareOriginToLabwareOrigin(
+  parentDefinition: LabwareDefinition,
+  childDefinition: LabwareDefinition
+): Vector3D {
+  // todo(mm, 2025-07-03): When stackingOffsetWithLabware is removed from labware schema
+  // 3 and replaced with locating features, use those here.
+  const base = {
+    x: 0,
+    y: 0,
+    z: getSchema2Dimensions(parentDefinition).zDimension,
+  }
+  const adjustment =
+    childDefinition.stackingOffsetWithLabware?.[
+      parentDefinition.parameters.loadName
+    ] ?? IDENTITY_VECTOR
+  const total = getVectorDifference(base, adjustment)
+  return total
 }
 
 /**
