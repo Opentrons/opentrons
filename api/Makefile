@@ -111,7 +111,7 @@ test-unit:
 
 .PHONY: test-integration
 test-integration:
-	$(python) -m integration_testing.labware_stackup $(test_opts)
+	$(python) -m integration_testing.labware_stackup
 
 .PHONY: test
 test: test-unit test-integration

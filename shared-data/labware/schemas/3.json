@@ -650,7 +650,8 @@
             },
             "springDirectionalForce": {
               "description": "Applicable when the labware contains a spring that influences its position when placed on a parent deck item.",
-              "type": "string"
+              "type": "string",
+              "enum": ["backLeftBottom"]
             }
           }
         },
@@ -668,12 +669,13 @@
               "$ref": "#/definitions/vector2D"
             },
             "z": {
-              "description": "The z-offset from the bottom of the labware to the plane on which a child deck item resides.",
+              "description": "The z-offset from this labware's origin to the plane on which a child deck item resides.",
               "type": "number"
             },
             "springDirectionalForce": {
               "description": "Applicable when the labware contains a spring that influences the positioning of a child deck item.",
-              "type": "string"
+              "type": "string",
+              "enum": ["backLeftBottom"]
             }
           }
         }

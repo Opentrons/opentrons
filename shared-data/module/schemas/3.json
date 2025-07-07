@@ -174,7 +174,8 @@
             },
             "springDirectionalForce": {
               "description": "Applicable when the module contains a spring that influences its position when placed on a parent deck item.",
-              "type": "string"
+              "type": "string",
+              "enum": ["backLeftBottom"]
             }
           }
         },
@@ -197,7 +198,8 @@
             },
             "springDirectionalForce": {
               "description": "Applicable when the module contains a spring that influences a child deck item.",
-              "type": "string"
+              "type": "string",
+              "enum": ["backLeftBottom"]
             }
           }
         }

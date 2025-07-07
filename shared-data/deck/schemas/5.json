@@ -205,7 +205,8 @@
                       },
                       "springDirectionalForce": {
                         "description": "Applicable when the addressable area contains a spring that influences a child deck item.",
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["backLeftBottom"]
                       }
                     }
                   }
