@@ -95,7 +95,6 @@ export function useDispenseSettingsConfig({
         state.delayDispense !== undefined
           ? t('delay_value', {
               delay: state.delayDispense.delayDuration,
-              position: state.delayDispense.positionFromBottom,
             })
           : '',
       enabled: true,

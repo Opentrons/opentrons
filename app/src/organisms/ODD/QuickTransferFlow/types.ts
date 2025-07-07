@@ -79,7 +79,6 @@ export interface QuickTransferSummaryState {
   }
   delayAspirate?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipAspirate?: number
   touchTipAspirateSpeed?: number
@@ -99,7 +98,6 @@ export interface QuickTransferSummaryState {
   }
   delayDispense?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
@@ -194,7 +192,6 @@ interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipAspirate {
@@ -232,7 +229,6 @@ interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipDispense {

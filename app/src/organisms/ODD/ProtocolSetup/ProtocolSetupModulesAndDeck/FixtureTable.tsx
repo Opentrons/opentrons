@@ -26,6 +26,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -119,9 +120,12 @@ export function FixtureTable({
         return fixtureCompatibility.requiredAddressableAreas.every(raa =>
           FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
         ) ||
-          fixtureCompatibility.requiredAddressableAreas.some(raa =>
+          (fixtureCompatibility.requiredAddressableAreas.some(raa =>
             FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa)
-          ) ? null : (
+          ) &&
+            !fixtureCompatibility.requiredAddressableAreas.some(raa =>
+              WASTE_CHUTE_ADDRESSABLE_AREAS.includes(raa)
+            )) ? null : (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}

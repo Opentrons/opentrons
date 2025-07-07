@@ -264,13 +264,12 @@ describe('QuickTransferAdvancedSettings', () => {
         ...props.state,
         delayAspirate: {
           delayDuration: 5,
-          positionFromBottom: 17,
         },
       },
     }
     render(props)
     const delayAspirate = screen.getAllByText('Delay')[0]
-    screen.getByText('5s, 17 mm from bottom')
+    screen.getByText('5s')
     fireEvent.click(delayAspirate)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })
@@ -374,13 +373,12 @@ describe('QuickTransferAdvancedSettings', () => {
         ...props.state,
         delayDispense: {
           delayDuration: 10,
-          positionFromBottom: 4,
         },
       },
     }
     render(props)
     const delayDispense = screen.getAllByText('Delay')[1]
-    screen.getByText('10s, 4 mm from bottom')
+    screen.getByText('10s')
     fireEvent.click(delayDispense)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })

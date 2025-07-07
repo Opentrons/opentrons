@@ -19,8 +19,9 @@ import {
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { ListButtonCheckbox } from '../../atoms/ListButtonCheckbox/ListButtonCheckbox'
-import { getOnlyLatestDefs } from '../../resources/utils'
+import { ListButtonCheckbox } from '/ai-client/atoms/ListButtonCheckbox/ListButtonCheckbox'
+import { getOnlyLatestDefs } from '/ai-client/resources/utils'
+
 import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
 
 import type { ChangeEvent } from 'react'

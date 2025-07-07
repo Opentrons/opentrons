@@ -1,3 +1,4 @@
+import first from 'lodash/first'
 import floor from 'lodash/floor'
 import min from 'lodash/min'
 
@@ -40,6 +41,18 @@ const getMigratedBlowoutFlowRate = (
     ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
     : null
 
+const getMigratedBlowoutLocation = (
+  form: FormData,
+  firstTrashBinOrWasteChuteId: string | null
+): string | null => {
+  const { blowout_checkbox, blowout_location, disposalVolume_checkbox } = form
+  const doesBlowoutNeedMigration =
+    (blowout_checkbox === true || disposalVolume_checkbox === true) &&
+    blowout_location == null
+  return doesBlowoutNeedMigration && firstTrashBinOrWasteChuteId != null
+    ? firstTrashBinOrWasteChuteId
+    : blowout_location
+}
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
@@ -68,6 +81,31 @@ export const migrateFile = (
     return acc
   }, {})
 
+  const initialDeckSetupStep = Object.values(savedStepForms).find(
+    form => form.id === '__INITIAL_DECK_SETUP_STEP__'
+  )
+  const firstTrashBinOrWasteChuteId =
+    first([
+      ...Object.keys(
+        (initialDeckSetupStep?.trashBinLocationUpdate as Record<
+          string,
+          string
+        >) ?? {}
+      ),
+      ...Object.keys(
+        (initialDeckSetupStep?.wasteChuteLocationUpdate as Record<
+          string,
+          string
+        >) ?? {}
+      ),
+    ]) ?? null
+
+  if (firstTrashBinOrWasteChuteId == null) {
+    console.error(
+      'No trash bin or waste chute found in the initial deck setup step. Protocol file may have been corrupted.'
+    )
+  }
+
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
   ).reduce((acc, form) => {
@@ -82,6 +120,7 @@ export const migrateFile = (
         liquidClass,
         aspirate_touchTip_checkbox,
         dispense_touchTip_checkbox,
+        blowout_location,
         // intentionally destructure but do not pass these deprecated fields
         aspirate_delay_mmFromBottom,
         dispense_delay_mmFromBottom,
@@ -104,6 +143,10 @@ export const migrateFile = (
               'touchTipDisabled'
             )
 
+      const migratedBlowoutLocation = getMigratedBlowoutLocation(
+        form,
+        firstTrashBinOrWasteChuteId
+      )
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
         loadLabwareCommands,
@@ -216,6 +259,7 @@ export const migrateFile = (
           ...(migratedBlowoutFlowRate != null
             ? { blowout_flowRate: migratedBlowoutFlowRate }
             : {}),
+          blowout_location: migratedBlowoutLocation,
         },
       }
     }
@@ -266,6 +310,12 @@ export const migrateFile = (
           pipetteSpecs,
           tipRackDef
         )
+
+        const migratedBlowoutLocation = getMigratedBlowoutLocation(
+          form,
+          firstTrashBinOrWasteChuteId
+        )
+
         return {
           ...acc,
           [id]: {
@@ -291,6 +341,7 @@ export const migrateFile = (
             ...(migratedBlowoutFlowRate != null
               ? { blowout_flowRate: migratedBlowoutFlowRate }
               : {}),
+            blowout_location: migratedBlowoutLocation,
           },
         }
       }

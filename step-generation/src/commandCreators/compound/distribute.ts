@@ -35,7 +35,7 @@ import {
 } from '../../utils'
 import {
   getCustomLiquidClassProperties,
-  getPythonLiquidClassName,
+  getLiquidClassName,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -385,7 +385,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
     ...(liquidClass != null
-      ? [`base_liquid_class=${getPythonLiquidClassName(liquidClass)}`]
+      ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
@@ -588,6 +588,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
         }) ?? 0
+      const delayAfterDispenseCommands =
+        dispenseDelay != null
+          ? [
+              curryWithoutPython(delay, {
+                seconds: dispenseDelay.seconds,
+              }),
+            ]
+          : []
       const voidDispenseAirGapCommand =
         dispenseAirGapVolume > 0 &&
         !changeTipNow &&
@@ -607,6 +615,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   : {}),
                 pushOut: 0,
               }),
+              ...delayAfterDispenseCommands,
             ]
           : []
 
@@ -690,14 +699,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ? [
               curryWithoutPython(delay, {
                 seconds: aspirateDelay.seconds,
-              }),
-            ]
-          : []
-      const delayAfterDispenseCommands =
-        dispenseDelay != null
-          ? [
-              curryWithoutPython(delay, {
-                seconds: dispenseDelay.seconds,
               }),
             ]
           : []
@@ -788,6 +789,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 volume: conditioningVolume,
                 flowRate: dispenseFlowRateUlSec,
                 correctionVolume: dispenseCorrectionVolumeForConditioningVolume,
+                pushOut: 0,
               }),
               ...delayAfterDispenseCommands,
             ]
@@ -859,7 +861,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
           const isDispenseRetractSafeForAirGap = getIsRetractSafeForAirGap({
             retractZOffset: dispenseRetractZOffset,
-            retractPositionReference: dispensePositionReference,
+            retractPositionReference: dispenseRetractPositionReference,
             labwareId: destLabware,
             labwareEntities,
             well: destinationWell,

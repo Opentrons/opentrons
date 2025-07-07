@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Module } from '@opentrons/components'
 import {
   getAllLabwareDefs,
-  getModuleDef2,
+  getModuleDef,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -107,7 +107,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
             x={slotPosition[0]}
             y={slotPosition[1]}
-            def={getModuleDef2(selectedModuleModel)}
+            def={getModuleDef(selectedModuleModel)}
             orientation={orientation}
           >
             <>

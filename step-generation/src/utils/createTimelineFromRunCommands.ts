@@ -1,4 +1,4 @@
-import { getModuleDef2 } from '@opentrons/shared-data'
+import { getModuleDef } from '@opentrons/shared-data'
 
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
@@ -40,7 +40,7 @@ export function getResultingTimelineFrameFromRunCommands(
   const moduleLocations = commands.reduce<RobotState['modules']>(
     (acc, command) => {
       if (command.commandType === 'loadModule' && command.result != null) {
-        const moduleType = getModuleDef2(command.params.model).moduleType
+        const moduleType = getModuleDef(command.params.model).moduleType
         return {
           ...acc,
           [command.result.moduleId]: {

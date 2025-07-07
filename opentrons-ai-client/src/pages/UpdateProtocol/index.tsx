@@ -18,21 +18,21 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../atoms/TextAreaField'
-import { FileUpload } from '../../molecules/FileUpload'
-import { UploadInput } from '../../molecules/UploadInput'
+import { TextAreaField } from '/ai-client/atoms/TextAreaField'
+import { FileUpload } from '/ai-client/molecules/FileUpload'
+import { UploadInput } from '/ai-client/molecules/UploadInput'
 import {
   chatDataAtom,
   chatHistoryAtom,
   createProtocolChatAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { ChangeEvent } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { UpdateOptions } from '../../resources/types'
+import type { UpdateOptions } from '/ai-client/resources/types'
 
 interface UpdateOptionsDropdown extends DropdownOption {
   value: UpdateOptions
