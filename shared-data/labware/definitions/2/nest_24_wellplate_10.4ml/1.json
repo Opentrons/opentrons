@@ -8,11 +8,11 @@
     ["A6", "B6", "C6", "D6"]
   ],
   "brand": {
-    "brand": "Nest",
-    "brandId": []
+    "brand": "NEST",
+    "brandId": ["504361"]
   },
   "metadata": {
-    "displayName": "Nest 24 Wellplate 10.4 mL",
+    "displayName": "NEST 24 Wellplate 10.4 mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "mL",
     "tags": []
@@ -304,7 +304,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "nest_24_wellplate_10.4ml"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {

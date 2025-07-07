@@ -14,11 +14,11 @@
     ["A12"]
   ],
   "brand": {
-    "brand": "Nest",
-    "brandId": []
+    "brand": "NEST",
+    "brandId": ["360262"]
   },
   "metadata": {
-    "displayName": "Nest 12 Reservoir 22 mL",
+    "displayName": "NEST 12 Well Reservoir 22 mL",
     "displayCategory": "reservoir",
     "displayVolumeUnits": "mL",
     "tags": []
