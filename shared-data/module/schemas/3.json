@@ -152,8 +152,8 @@
     },
     "features": {
       "type": "object",
-      "description": "Locating features when this labware is a part of a stackup.",
-      "required": ["slotFootprintAsChild"],
+      "description": "Locating features when this module is a part of a stackup.",
+      "required": [],
       "properties": {
         "slotFootprintAsChild": {
           "description": "The 3D plane of the module that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
