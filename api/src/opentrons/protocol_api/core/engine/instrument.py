@@ -754,6 +754,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 absolute_point=location.point,
                 location_type=WellLocationFunction.LIQUID_HANDLING,
+                meniscus_tracking=location._meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
             if well_location.volumeOffset and well_location.volumeOffset != 0:
