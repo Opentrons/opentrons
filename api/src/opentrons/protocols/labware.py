@@ -159,13 +159,21 @@ def verify_definition(  # noqa: C901
     :returns: The parsed and validated definition
     """
     schemata_by_version = {
-        2: json.loads(load_shared_data("labware/schemas/2.json").decode("utf-8")),
-        3: json.loads(load_shared_data("labware/schemas/3.json").decode("utf-8")),
+        2: json.loads(
+            load_shared_data("labware/schemas/2.json").decode("utf-8"),
+            cls=json.JSONDecoder,
+        ),
+        3: json.loads(
+            load_shared_data("labware/schemas/3.json").decode("utf-8"),
+            cls=json.JSONDecoder,
+        ),
     }
 
     try:
         parsed_json: object = (
-            json.loads(contents) if isinstance(contents, (str, bytes)) else contents
+            json.loads(contents, cls=json.JSONDecoder)
+            if isinstance(contents, (str, bytes))
+            else contents
         )
     except json.JSONDecodeError as e:
         raise NotALabwareError("invalid-json", [e]) from e
@@ -277,7 +285,7 @@ def _get_standard_labware_definition(
 
     try:
         with open(def_path, "rb") as f:
-            labware_def = json.loads(f.read().decode("utf-8"))
+            labware_def = json.loads(f.read().decode("utf-8"), cls=json.JSONDecoder)
     except FileNotFoundError:
         raise FileNotFoundError(
             f'Labware "{load_name}" not found with version {checked_version} '

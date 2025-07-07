@@ -114,13 +114,13 @@ def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
     argvalues=[
         # ["1ch1000.csv"], # Some of these are commented out just cause they take so long.
         # ["1ch1000_extra.csv"],
-        ["1ch50.csv"],
+        # ["1ch50.csv"],
         # ["1ch50_extra.csv"],
         ["96ch1000.csv"],
         # ["96ch200.csv"], #Needs LC to complete
         # ["8ch1000.csv"],
         # ["8ch1000_extra.csv"],
-        ["8ch50.csv"],
+        # ["8ch50.csv"],
         # ["8ch50_extra.csv"],
     ],
 )

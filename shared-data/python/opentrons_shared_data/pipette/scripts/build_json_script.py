@@ -258,7 +258,7 @@ def save_to_file(
         # data in the pydantic model so we need to convert it
         # back to a dictionary before saving to file.
         json_basemodel = data.json(by_alias=True)
-        dict_basemodel = json.loads(json_basemodel)
+        dict_basemodel = json.loads(json_basemodel, cls=json.JSONDecoder)
         dict_basemodel["$otSharedSchema"] = schema_path
         filepath.write_text(
             json.dumps(dict_basemodel, ensure_ascii=False), encoding="utf-8"
@@ -299,7 +299,7 @@ def fill_blowout_configs(
             volume_path = Path(pipette_type / volume)
             for general_file_version in volume_path.glob(f"{str(pipette_gen)}_*.json"):
                 with open(general_file_version, "r") as file:
-                    general_config_dict = json.load(file)
+                    general_config_dict = json.load(file, cls=json.JSONDecoder)
                 general_config_dict["shaftDiameter"] = round(shaft_diameter, 3)
                 general_config_dict["shaftULperMM"] = round(ul_per_mm, 3)
 

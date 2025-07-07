@@ -47,7 +47,7 @@ class PrimitiveParameterResource:
         parameter_val_str = sql_row.parameter_value
         assert isinstance(parameter_val_str, str)
 
-        parameter_value = json.loads(sql_row.parameter_value)
+        parameter_value = json.loads(sql_row.parameter_value, cls=json.JSONDecoder)
 
         return cls(
             analysis_id=analysis_id,

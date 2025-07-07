@@ -63,7 +63,7 @@ class ModuleNotFoundError(KeyError):
 
 def load_schema(version: SchemaVersions) -> ModuleSchema:
     path = Path("module") / "schemas" / f"{version}.json"
-    return cast(ModuleSchema, json.loads(load_shared_data(path)))
+    return cast(ModuleSchema, json.loads(load_shared_data(path), cls=json.JSONDecoder))
 
 
 @overload
@@ -85,7 +85,7 @@ def load_definition(
 ) -> Union[ModuleDefinitionV1, ModuleDefinitionV3]:
     if version == "1":
         path = Path("module") / "definitions" / "1.json"
-        data = json.loads(load_shared_data(path))
+        data = json.loads(load_shared_data(path), cls=json.JSONDecoder)
         try:
             return cast(ModuleDefinitionV1, data[model_or_loadname])
         except KeyError:
@@ -96,7 +96,7 @@ def load_definition(
             data = load_shared_data(path)
         except FileNotFoundError:
             raise ModuleNotFoundError(version, model_or_loadname)
-        return cast(ModuleDefinitionV3, json.loads(data))
+        return cast(ModuleDefinitionV3, json.loads(data, cls=json.JSONDecoder))
 
 
 @lru_cache
@@ -112,3 +112,4 @@ def load_tof_baseline_data(
         return cast(TOFSensorBaseline, baseline)
     except (KeyError, ValueError):
         raise ModuleNotFoundError("3", model_or_loadname)
+        return cast(ModuleDefinitionV3, json.loads(data, cls=json.JSONDecoder))

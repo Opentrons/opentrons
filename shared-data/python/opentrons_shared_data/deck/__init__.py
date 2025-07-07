@@ -62,13 +62,17 @@ def load(name: str) -> "DeckDefinitionV5":
 
 def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> "DeckDefinition":
     return json.loads(  # type: ignore[no-any-return]
-        load_shared_data(f"deck/definitions/{version}/{name}.json")
+        load_shared_data(f"deck/definitions/{version}/{name}.json"),
+        cls=json.JSONDecoder,
     )
 
 
 def load_schema(version: int) -> "DeckSchema":
     return cast(
-        "DeckSchema", json.loads(load_shared_data(f"deck/schemas/{version}.json"))
+        "DeckSchema",
+        json.loads(
+            load_shared_data(f"deck/schemas/{version}.json"), cls=json.JSONDecoder
+        ),
     )
 
 

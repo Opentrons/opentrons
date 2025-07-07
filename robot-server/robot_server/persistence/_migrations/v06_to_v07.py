@@ -68,7 +68,7 @@ def _migrate_command_table_with_new_command_intent_col(
         sqlite_rowid
     )
     for row in dest_transaction.execute(select_commands).all():
-        data = json.loads(row.command)
+        data = json.loads(row.command, cls=json.JSONDecoder)
         new_command_intent = (
             # Account for the `intent` prop of the old command JSON being omitted or `null`.
             # We convert either case to the SQL string "protocol".

@@ -38,7 +38,9 @@ def load_schema_string(version: str) -> str:
     """Get the string containing the command JSON schema for the given version string."""
     path = Path("command") / "schemas" / f"{version}.json"
     try:
-        return json.dumps(json.loads(load_shared_data(path)), indent=2)
+        return json.dumps(
+            json.loads(load_shared_data(path), cls=json.JSONDecoder), indent=2
+        )
     except OSError as ose:
         raise InvalidProtocolData(
             message=f"Command schema version {version} is not available",
@@ -70,7 +72,7 @@ def _schema_id_from_file(schema_file_name: str) -> str:
             detail={"type": "bad-schema-name", "schema-kind": "command"},
         )
     try:
-        schema_content = json.load(open(schema_file_name))
+        schema_content = json.load(open(schema_file_name), cls=json.JSONDecoder)
     except json.JSONDecodeError as jde:
         raise InvalidStoredData(
             message=f"Command schema {schema_file_name} is not valid json",

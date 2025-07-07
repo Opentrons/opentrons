@@ -24,14 +24,14 @@ class InvalidGripperDefinition(Exception):
 def generate_schema() -> str:
     """Create schema."""
     raw_json_schema = GripperDefinition.schema_json()
-    schema_as_dict = json.loads(raw_json_schema)
+    schema_as_dict = json.loads(raw_json_schema, cls=json.JSONDecoder)
     return json.dumps(schema_as_dict, indent=2)
 
 
 def load_schema(version: Literal[1]) -> GripperSchema:
     """Load gripper schema."""
     path = Path("gripper") / "schemas" / f"{version}.json"
-    return cast(GripperSchema, json.loads(load_shared_data(path)))
+    return cast(GripperSchema, json.loads(load_shared_data(path), cls=json.JSONDecoder))
 
 
 def _load_definition_data(path: Path) -> Any:
@@ -45,7 +45,9 @@ def load_definition(
     """Load gripper definition based on schema version and gripper model."""
     try:
         path = Path("gripper") / "definitions" / f"{version}" / f"{model.value}.json"
-        return GripperDefinition.model_validate(json.loads(load_shared_data(path)))
+        return GripperDefinition.model_validate(
+            json.loads(load_shared_data(path), cls=json.JSONDecoder)
+        )
     except FileNotFoundError:
         raise InvalidGripperDefinition(
             f"Gripper model {model} definition in schema version {version} does not exist."

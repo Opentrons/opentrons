@@ -199,7 +199,7 @@ def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path) -> None:
 def load_simulator_setup(path: Path) -> SimulatorSetup:
     """Load a simulator setup from a file."""
     with path.open() as f:
-        obj = json.load(f)
+        obj = json.load(f, cls=json.JSONDecoder)
 
     if "machine" not in obj:
         warn(

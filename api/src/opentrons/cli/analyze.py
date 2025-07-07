@@ -221,7 +221,9 @@ def _get_runtime_parameter_values(
 ) -> PrimitiveRunTimeParamValuesType:
     rtp_values = {}
     try:
-        for variable_name, value in json.loads(serialized_rtp_values).items():
+        for variable_name, value in json.loads(
+            serialized_rtp_values, cls=json.JSONDecoder
+        ).items():
             if not isinstance(value, (bool, int, float, str)):
                 raise click.BadParameter(
                     f"Runtime parameter '{value}' is not of allowed type boolean, integer, float or string",
@@ -239,7 +241,9 @@ def _get_runtime_parameter_paths(serialized_rtp_files: str) -> CSVRuntimeParamPa
     try:
         return {
             variable_name: Path(path_string)
-            for variable_name, path_string in json.loads(serialized_rtp_files).items()
+            for variable_name, path_string in json.loads(
+                serialized_rtp_files, cls=json.JSONDecoder
+            ).items()
         }
     except json.JSONDecodeError as error:
         raise click.BadParameter(

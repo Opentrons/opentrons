@@ -31,7 +31,9 @@ def _convert_tip_length_model_to_dict(
     # add encoders when converting to a dict.
     dict_of_tip_lengths = {}
     for key, item in to_dict.items():
-        dict_of_tip_lengths[key] = json.loads(item.model_dump_json())
+        dict_of_tip_lengths[key] = json.loads(
+            item.model_dump_json(), cls=json.JSONDecoder
+        )
     return dict_of_tip_lengths
 
 
@@ -138,7 +140,7 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
         with open(custom_tiprack_path, "rb") as f:
             return typing.cast(
                 "LabwareDefinition2",
-                json.loads(f.read().decode("utf-8")),
+                json.loads(f.read().decode("utf-8"), cls=json.JSONDecoder),
             )
     except FileNotFoundError:
         raise FileNotFoundError(

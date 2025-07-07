@@ -10,7 +10,7 @@ from ..load import load_shared_data
 
 
 CATEGORIES: Dict[str, Dict[str, str]] = json.loads(
-    load_shared_data("errors/definitions/1/errors.json")
+    load_shared_data("errors/definitions/1/errors.json"), cls=json.JSONDecoder
 )["categories"]
 
 

@@ -53,7 +53,7 @@ async def _extract_from_labware_file(path: Path) -> LabwareDefinition:
 async def _extract_from_json_protocol_file(path: Path) -> List[LabwareDefinition]:
     def extract_sync(path: Path) -> List[LabwareDefinition]:
         with path.open("rb") as file:
-            json_contents = json.load(file)
+            json_contents = json.load(file, cls=json.JSONDecoder)
             # Rely on the file conforming to one of our JSON protocol schemas 3 to 7,
             # which require this labwareDefinitions key.
             unvalidated_definitions = json_contents["labwareDefinitions"].values()

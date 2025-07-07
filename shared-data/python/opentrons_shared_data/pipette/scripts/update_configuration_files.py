@@ -342,7 +342,8 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
     value_to_update = json.loads(
         input(
             f"Please select what you would like to update {configuration_to_update[-1]} to for {built_model}\n"
-        )
+        ),
+        cls=json.JSONDecoder,
     )
 
     model_version = convert_pipette_model(built_model)
@@ -378,7 +379,8 @@ def _update_all_models(configuration_to_update: List[str]) -> None:
                 value_to_update = json.loads(
                     input(
                         f"Please select what you would like to update {configuration_to_update} to for {built_model}\n"
-                    )
+                    ),
+                    cls=json.JSONDecoder,
                 )
 
                 model_version = convert_pipette_model(built_model)

@@ -82,7 +82,7 @@ if IS_ROBOT:
     else:
         try:
             with open("/etc/VERSION.json") as vj:
-                contents = json.load(vj)
+                contents = json.load(vj, cls=json.JSONDecoder)
             OT_SYSTEM_VERSION = contents["buildroot_version"]
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
@@ -350,7 +350,7 @@ def load_and_migrate() -> Dict[str, Path]:
 
     This function does most of its work on the actual robot. It will move
     all settings files from wherever they happen to be to the proper
-    place. On non-robots, this mostly just loads. In addition, it writes
+    place. On non-robots, this mostly just  . In addition, it writes
     a default config and makes sure all directories required exist (though
     the files in them may not).
     """
@@ -368,7 +368,7 @@ def _load_with_overrides(base: Path) -> Dict[str, str]:
     overrides = _get_environ_overrides()
     try:
         with (base / _CONFIG_FILENAME).open() as file:
-            index = json.load(file)
+            index = json.load(file, cls=json.JSONDecoder)
     except (OSError, json.JSONDecodeError):
         should_write = True
         index = generate_config_index(overrides)
@@ -442,14 +442,14 @@ def _legacy_index() -> Optional[Dict[str, str]]:
         if index.exists():
             try:
                 with open(index) as file:
-                    return cast(Dict[str, str], json.load(file))
+                    return cast(Dict[str, str], json.load(file, cls=json.JSONDecoder))
             except (OSError, json.JSONDecodeError):
                 return None
     return None
 
 
 def _erase_old_indices() -> None:
-    """Remove old index files so they don't pollute future loads.
+    """Remove old index files so they don't pollute future  .
 
     This method should only be called on a robot.
     """

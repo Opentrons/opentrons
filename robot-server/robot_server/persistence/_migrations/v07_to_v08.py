@@ -74,7 +74,7 @@ def _migrate_command_table_with_new_command_error_col_and_command_status(
     select_commands = sqlalchemy.select(commands_table)
     commands_to_update = []
     for row in dest_transaction.execute(select_commands).all():
-        data = json.loads(row.command)
+        data = json.loads(row.command, cls=json.JSONDecoder)
         new_command_error = (
             # Account for the `error` prop of the old command JSON being omitted or `null`.
             # We convert either case to SQL `null`.

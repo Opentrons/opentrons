@@ -143,7 +143,7 @@ def _clear_file(filename: Union[str, Path]) -> None:
 def _load_json(filename: Union[str, Path]) -> Dict[str, Any]:
     try:
         with open(filename, "r") as file:
-            res = json.load(file)
+            res = json.load(file, cls=json.JSONDecoder)
     except FileNotFoundError:
         log.warning("{0} not found. Loading defaults".format(filename))
         res = {}
