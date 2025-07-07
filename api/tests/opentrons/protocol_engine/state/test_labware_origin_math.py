@@ -417,7 +417,7 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         parent_definition=_ADDRESSABLE_AREA,
         is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
-        expected_total_offset=Point(x=10, y=20, z=0),
+        expected_total_offset=Point(x=0, y=0, z=0),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
@@ -426,21 +426,21 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         labware_location=AddressableAreaLocation(
             addressableAreaName="test_area_with_parent"
         ),
-        expected_total_offset=Point(x=35.0, y=-30.0, z=5),
+        expected_total_offset=Point(x=35.0, y=30.0, z=10),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE,
         is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="parent-labware-v3"),
-        expected_total_offset=Point(x=20.0, y=-45.0, z=0),
+        expected_total_offset=Point(x=20.0, y=15, z=5),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_LW_V3,
         is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="labware-v3-basic"),
-        expected_total_offset=Point(x=0, y=-60, z=995),
+        expected_total_offset=Point(x=0, y=0, z=1000),
     ),
 ]
 

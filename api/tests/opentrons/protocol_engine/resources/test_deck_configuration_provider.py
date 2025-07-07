@@ -302,8 +302,8 @@ def test_get_potential_cutout_fixtures_raises(
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 features=LocatingFeatures(
                     slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 0},
-                        frontRight={"x": 128, "y": -86},
+                        backLeft={"x": 0, "y": 86},
+                        frontRight={"x": 128, "y": 0},
                         z=0,
                         springDirectionalForce="backLeftBottom",
                     )
@@ -332,8 +332,8 @@ def test_get_potential_cutout_fixtures_raises(
                 ],
                 features=LocatingFeatures(
                     slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 0},
-                        frontRight={"x": 128, "y": -86},
+                        backLeft={"x": 0, "y": 86},
+                        frontRight={"x": 128, "y": 0},
                         z=0,
                         springDirectionalForce="backLeftBottom",
                     )
@@ -353,8 +353,8 @@ def test_get_potential_cutout_fixtures_raises(
                 compatible_module_types=[],
                 features=LocatingFeatures(
                     slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 0},
-                        frontRight={"x": 128, "y": -86},
+                        backLeft={"x": 0, "y": 86},
+                        frontRight={"x": 128, "y": 0},
                         z=0,
                         springDirectionalForce="backLeftBottom",
                     )
