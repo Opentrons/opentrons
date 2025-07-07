@@ -193,7 +193,7 @@ def get_trials(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) 
 
 def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
     if ctx.params.test_reader:
-        return [200.0]
+        return [DYE_READER_IDEAL_UL]
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
     # NOTE: limiting pipettes (eg: 96ch) to only test <=250uL
@@ -325,6 +325,9 @@ def load_liquid_diluent(
             for v, t in zip(volumes, trials)
         ]
     )
+    # NOTE: adding more for the baseline reading at the end
+    if not ctx.params.external_reader:
+        total_diluent_aspirated_ul += DYE_READER_IDEAL_UL * 96
     if not total_diluent_aspirated_ul:
         return
     critical_ul = CRITICAL_UL_BY_LABWARE[reservoir.load_name]
@@ -694,6 +697,8 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(plate, adapter, use_gripper=True)
         heater_shaker.close_labware_latch()
         pip_for_dil.pick_up_tip(diluent_tips)
+        if not diluent_probed:
+            pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
         num_transfers = 12 if pip_for_dil.channels == 8 else 1
         pip_for_dil.transfer_with_liquid_class(
             test_class,
