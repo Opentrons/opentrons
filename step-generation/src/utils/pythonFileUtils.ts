@@ -364,7 +364,7 @@ export function getLoadLiquids(
       const pythonWells =
         formattedWells.length < 8
           ? formattedWells.join(', ')
-          : `\n${indentedWells}\n${INDENT}`
+          : `\n${indentedWells}\n`
 
       const loadLiquidArgs = [
         `wells=[${pythonWells}],\n` +
