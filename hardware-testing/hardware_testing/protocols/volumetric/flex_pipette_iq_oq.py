@@ -175,8 +175,8 @@ def add_parameters(params: ParameterContext) -> None:
         ],
     )
     params.add_bool(
-        display_name="test_reader",
-        variable_name="test_reader",
+        display_name="just_fill_plate_200ul",
+        variable_name="just_fill_plate_200ul",
         default=False,
     )
     params.add_bool(
@@ -197,13 +197,13 @@ def add_parameters(params: ParameterContext) -> None:
 
 
 def get_trials(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[int]:
-    if ctx.params.test_reader:
+    if ctx.params.just_fill_plate_200ul:
         return [int(96 / pipette.channels)]
     return TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
 
 
 def get_volumes(ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float) -> List[float]:
-    if ctx.params.test_reader:
+    if ctx.params.just_fill_plate_200ul:
         return [DYE_READER_IDEAL_UL]
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
@@ -536,6 +536,8 @@ def run(ctx: ProtocolContext) -> None:
 
     time_str = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
     results_filename = f"flex_pipette_iq_oq_RESULTS_{time_str}.csv"
+    if ctx.is_simulating():
+        results_filename = "SIM_" + results_filename
     results_directory = infer_config_base_dir() / "flex_pipette_iq_oq"
     results_filepath = results_directory / results_filename
     results_directory.mkdir(parents=True, exist_ok=True)
@@ -549,9 +551,10 @@ def run(ctx: ProtocolContext) -> None:
         file.write(f"model,{ctx.params.pipette}\n")
         file.write(f"tips,{ctx.params.tips}\n")
         file.write(f"liquid,{ctx.params.liquid}\n")
+        file.write(f"just_fill_plate_200ul,{ctx.params.just_fill_plate_200ul}\n")
         file.write(f"external_reader,{ctx.params.external_reader}\n")
-        file.write(f"test_reader,{ctx.params.test_reader}\n")
-        file.write(f"meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
+        file.write(f"pipette_at_liquid_meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
+        file.write(f"include_baseline,{ctx.params.include_baseline}\n")
 
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
