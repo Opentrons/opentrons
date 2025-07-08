@@ -1,4 +1,4 @@
-import { getModuleDef2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
+import { getModuleDef, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { C_MED_LIGHT_GRAY } from '../../../styles'
@@ -17,7 +17,7 @@ export interface ThermocyclerVizProps {
 
 export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
   const { lidMotorState, blockTargetTemp, model } = props
-  const def = getModuleDef2(model)
+  const def = getModuleDef(model)
   if (lidMotorState === 'unknown') {
     // just a rectangle if we don't know the state of the lid
     return (

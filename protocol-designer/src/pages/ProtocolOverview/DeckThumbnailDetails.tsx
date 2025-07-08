@@ -4,7 +4,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
@@ -69,7 +69,7 @@ export const DeckThumbnailDetails = (
           console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(model)
+        const moduleDef = getModuleDef(model)
         const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
           id,
           allLabware
