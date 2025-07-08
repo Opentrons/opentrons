@@ -51,6 +51,7 @@ interface DeckConfiguratorProps {
   additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
   height?: string
   selectedCutoutId?: CutoutId
+  moduleModel?: string
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -64,6 +65,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     darkFill = COLORS.black90,
     editableCutoutIds,
     height = '455px',
+    moduleModel
   } = props
 
   console.log("editableCutoutIds help!!!: ", editableCutoutIds)
@@ -166,6 +168,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
+          moduleModel={moduleModel}
         />
       ))}
       {wasteChuteItems.map(

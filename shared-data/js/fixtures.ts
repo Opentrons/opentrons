@@ -1056,6 +1056,9 @@ export const getMainAAForAFixture = (
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
       const singleSlotId = getAAWithFakesFromVSId(vsId)
+      console.log("aa: ", aa)
+      console.log("vsId: ", vsId)
+      console.log("addressableAreaId; ", addressableAreaId)
       return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
