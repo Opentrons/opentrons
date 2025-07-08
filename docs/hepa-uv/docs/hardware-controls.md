@@ -6,6 +6,8 @@ title: "HEPA/UV Module: Hardware Controls"
 
 Separate on/off buttons on the front of the HEPA/UV Module control the fan and UV lights. You can operate these systems simultaneously or independently of each other.
 
+![HEPA/UV Module button controls](images/uv-buttons.png "HEPA/UV Module button controls")
+
 See the following table for the information on how to operate the HEPA and UV systems.
 
 | Function | Operation |

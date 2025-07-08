@@ -2,7 +2,6 @@ site_name: hepa-uv
 
 nav:
   - Home: index.md
-  - Product and Manufacturer Description: product-and-manufacturer-description.md
   - Safety Information and Regulatory Compliance: safety-information-and-regulatory-compliance.md
   - Product Specifications: product-specifications.md
   - HEPA Specifications: hepa-specifications.md

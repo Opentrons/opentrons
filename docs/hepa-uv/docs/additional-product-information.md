@@ -14,6 +14,12 @@ Opentrons Support can help you with questions about our products and services. I
 
 Please have the serial number available when contacting support. You can find the serial number on the back of the module near the power cable.
 
+## Manufacturer Description
+
+Opentrons Labworks Inc  
+45-18 Ct Square W  
+Long Island City, NY 11101
+
 ---
 
 **Post-sales service & contacting Opentrons**

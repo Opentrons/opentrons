@@ -1,17 +1,13 @@
-# Welcome to MkDocs
+---
+title: "HEPA/UV Module Instruction Manual"
+---
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+# HEPA/UV Module Instruction Manual
 
-## Commands
+![HEPA/UV Module hero image](images/hepa-uv-hero.png "HEPA/UV Module hero image")
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+## Product Description
 
-## Project layout
+The Opentrons Flex HEPA/UV Module is a positive-pressure clean air and ultraviolet (UV) disinfectant accessory for the Flex liquid handling robot. It contains a mesh pre-filter, a HEPA filter, and two UV lights. Running the module’s filtration and lighting for 15 minutes creates an ISO-5 clean bench environment within the Flex enclosure.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Review this guide for information about the features of the HEPA/UV Module, including installation, maintenance, and warranty information.
