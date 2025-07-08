@@ -757,7 +757,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 meniscus_tracking=location._meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
-            # you can't specify meniscus with a volume offset that isn't operationVolume
+            # specifying a static volume offset isn't implemented yet
+            # well locations at this point will be default have been assigned a
+            # volume offset of operationVolume
             if well_location.volumeOffset:
                 if (
                     well_location.volumeOffset != 0
