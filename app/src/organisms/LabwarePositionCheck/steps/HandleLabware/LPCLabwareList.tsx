@@ -50,19 +50,26 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
 
   const primaryButtonProps = (): Pick<
     LPCContentContainerProps,
-    'onClickButton' | 'buttonText'
+    | 'onClickButton'
+    | 'desktopFooterBtnCopy'
+    | 'desktopHeaderBtnCopy'
+    | 'oddHeaderBtnCopy'
   > => {
     if (isOnDevice) {
       return {
-        buttonText: t('exit'),
+        oddHeaderBtnCopy: t('save_and_exit'),
         onClickButton: props.commandUtils.headerCommands.handleNavToDetachProbe,
+        desktopHeaderBtnCopy: '',
+        desktopFooterBtnCopy: '',
       }
     } else {
       return {
-        buttonText: t('continue'),
+        desktopHeaderBtnCopy: t('save_and_exit'),
+        desktopFooterBtnCopy: t('continue'),
         onClickButton: () => {
           handlePrimaryOnClick(selectedUri)
         },
+        oddHeaderBtnCopy: '',
       }
     }
   }
@@ -71,7 +78,6 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('exit')}
       {...primaryButtonProps()}
       containerStyle={isOnDevice ? undefined : DESKTOP_CONTAINER_STYLE}
       contentStyle={isOnDevice ? undefined : DESKTOP_CONTENT_CONTAINER_STYLE}
