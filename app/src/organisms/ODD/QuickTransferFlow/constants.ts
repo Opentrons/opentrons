@@ -67,7 +67,7 @@ export const SINGLE_CHANNEL_COMPATIBLE_LABWARE = [
   'opentrons/nest_12_reservoir_22ml/2',
   'opentrons/nest_1_reservoir_195ml/3',
   'opentrons/nest_1_reservoir_290ml/3',
-  'opentrons/nest_24_reservoir_10.4ml/2',
+  'opentrons/nest_24_wellplate_10.4ml/2',
   'opentrons/nest_8_reservoir_22ml/2',
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/4',
   'opentrons/nest_96_wellplate_200ul_flat/4',
