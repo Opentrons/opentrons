@@ -15,8 +15,8 @@ import { getTransferPlanAndReferenceVolumes } from './getTransferPlanAndReferenc
 
 import type {
   LiquidHandlingPropertyByVolume,
-  PositionReference,
-  Vector3D,
+  // PositionReference,
+  // Vector3D,
 } from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from '../types'
 
@@ -38,6 +38,11 @@ export const setLiquidClassValues = (
     )
   } else {
     // liquid class getLiquidClassValues
+    return getLiquidClassValues(
+      state,
+      convertedPipetteName,
+      liquidHandlingAction
+    )
   }
 
   // return liquidClassDefaultValues
@@ -125,8 +130,10 @@ const getNoLiquidClassValues = (
       speed: dispense.retract.speed,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
-    // ToDo will be updated when the blowout pr is merged
-    blowOut: singleDispense.retract.blowout?.params?.location ?? null,
+    blowOutDispense: {
+      location: singleDispense.retract.blowout?.params?.location ?? null,
+      flowRate: singleDispense.retract.blowout?.params?.flowRate ?? 1,
+    },
     touchTipDispense: dispense.retract.touchTip.params?.mmFromEdge,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
   }
@@ -146,7 +153,7 @@ const getNoLiquidClassValues = (
 const getFlowRateFields = (
   volume: number,
   flowRateByVolume: LiquidHandlingPropertyByVolume,
-  liquidHandlingAction: LiquidHandlingTab
+  liquidHandlingAction: 'aspirate' | 'dispense'
 ): Record<string, number | null> => {
   const interpolatedFlowRate = linearInterpolate(
     volume,
@@ -157,25 +164,25 @@ const getFlowRateFields = (
   }
 }
 
-const getOffsetFields = (
-  offset: Vector3D,
-  prefix: string
-): Record<string, number> => {
-  return {
-    [`${prefix}_x_position`]: offset.x,
-    [`${prefix}_y_position`]: offset.y,
-    [`${prefix}_mmFromBottom`]: offset.z,
-  }
-}
+// const getOffsetFields = (
+//   offset: Vector3D,
+//   prefix: string
+// ): Record<string, number> => {
+//   return {
+//     [`${prefix}_x_position`]: offset.x,
+//     [`${prefix}_y_position`]: offset.y,
+//     [`${prefix}_mmFromBottom`]: offset.z,
+//   }
+// }
 
-const getPositionReferenceFields = (
-  positionReference: PositionReference,
-  prefix: string
-): Record<string, PositionReference> => {
-  return {
-    [`${prefix}_position_reference`]: positionReference,
-  }
-}
+// const getPositionReferenceFields = (
+//   positionReference: PositionReference,
+//   prefix: string
+// ): Record<string, PositionReference> => {
+//   return {
+//     [`${prefix}_position_reference`]: positionReference,
+//   }
+// }
 
 /**
  * getLiquidClassValues
@@ -184,6 +191,7 @@ const getPositionReferenceFields = (
 
 const getLiquidClassValues = (
   state: QuickTransferSummaryState,
+  convertedPipetteName: string,
   liquidHandlingAction: 'aspirate' | 'dispense'
 ): QuickTransferSummaryState => {
   const {
@@ -192,8 +200,8 @@ const getLiquidClassValues = (
     pipette: pipetteSpecs,
     volume,
     destinationWells,
-    delayAspirate,
-    delayDispense,
+    // delayAspirate,
+    // delayDispense,
   } = state
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
@@ -207,8 +215,6 @@ const getLiquidClassValues = (
   )
   const liquidClassDef =
     allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
-  const convertedPipetteName =
-    state.pipette != null ? getFlexNameConversion(state.pipette) : null
 
   const { loadName: currentTiprackLoadName } = state.tipRack.parameters
   const tipTypeSettings = liquidClassDef?.byPipette
