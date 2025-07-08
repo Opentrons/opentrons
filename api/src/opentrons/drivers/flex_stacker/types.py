@@ -134,7 +134,7 @@ class Direction(Enum):
 
     def __str__(self) -> str:
         """Convert to tag for clear logging."""
-        return "negative" if self == Direction.RETRACT else "positive"
+        return "retract" if self == Direction.RETRACT else "extend"
 
     def opposite(self) -> "Direction":
         """Get opposite direction."""

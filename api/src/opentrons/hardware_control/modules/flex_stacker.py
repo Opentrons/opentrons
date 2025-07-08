@@ -640,9 +640,7 @@ class FlexStacker(mod_abc.AbstractModule):
         to validate this method.
         """
         sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
-        # The TOF Detection configs are the same for the Z sensor
-        direction = Direction.EXTEND if sensor == TOFSensor.Z else direction
-        baseline = load_tof_baseline_data(self.model())[sensor.value]
+        baseline = load_tof_baseline_data(self.model())[sensor.value][str(direction)]
         config = TOF_DETECTION_CONFIG[sensor][direction]
 
         # Take a histogram reading and determine if labware was detected

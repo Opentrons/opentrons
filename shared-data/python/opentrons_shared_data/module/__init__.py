@@ -5,6 +5,7 @@ from ast import literal_eval
 from pathlib import Path
 from typing import Union, cast, overload
 from functools import lru_cache
+from itertools import product
 
 from ..load import load_shared_data
 from .types import (
@@ -106,9 +107,11 @@ def load_tof_baseline_data(
     try:
         definition = load_definition("3", model_or_loadname)
         baseline = definition.get("uniqueModuleData", {})["TOFSensorBaseline"]
+        baseline['version'] = baseline.get('version', 1)
         # The baseline is stored as string, so convert to dict
-        baseline["X"] = literal_eval(baseline["X"])
-        baseline["Z"] = literal_eval(baseline["Z"])
+        for axis, platform in product(["X", "Z"], ["extend", "retract"]):
+            values = literal_eval(baseline[axis][platform])
+            baseline[axis][platform] = values
         return cast(TOFSensorBaseline, baseline)
     except (KeyError, ValueError):
         raise ModuleNotFoundError("3", model_or_loadname)
