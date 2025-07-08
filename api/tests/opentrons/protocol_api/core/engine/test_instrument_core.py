@@ -2425,7 +2425,7 @@ def test_remove_air_gap_during_transfer_with_liquid_class(
     """It should remove air gap by calling dispense and delay with liquid class props."""
     test_transfer_props = decoy.mock(cls=TransferProperties)
     air_gap_correction_by_vol = 0.321
-    current_volume = 0.654
+    current_volume = 3.21
 
     test_transfer_props.dispense.delay.duration = 321
     test_transfer_props.dispense.delay.enabled = True
