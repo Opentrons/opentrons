@@ -83,7 +83,8 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
-  const disableButton = !editableCutoutIds.includes(fixtureLocation) || !isAllowedOnSlot 
+  const disableButton =
+    !editableCutoutIds.includes(fixtureLocation) || !isAllowedOnSlot
 
   return (
     <RobotCoordsForeignObject

@@ -18,6 +18,8 @@ import {
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
+  replaceCutoutFixtureWithComboFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -32,6 +34,8 @@ import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
+  AddressableAreaNamesWithFakes,
+  CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -62,6 +66,9 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     setErrorMessage,
   } = props
 
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
     attachedModule,
     deckConfig
@@ -90,15 +97,15 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     (acc, { mayMountTo }) => [...acc, ...mayMountTo],
     []
   )
-  console.log('configuredFixtureIdByCutoutId: ', configuredFixtureIdByCutoutId)
-  console.log('deckConfig: ', deckConfig)
+
+  console.log('moduleFixtures: ', moduleFixtures)
+
   const editableCutoutIds = deckConfig.reduce<CutoutId[]>(
     (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
       const isCurrentConfiguration =
         Object.values(configuredFixtureIdByCutoutId).includes(
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
-      console.log('isCurrentConfiguration: ', isCurrentConfiguration)
       if (
         // in run setup, module calibration only available when module location is already correctly configured
         !isLoadedInRun &&
@@ -106,23 +113,40 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         (isCurrentConfiguration ||
           SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))
       ) {
-        console.log('add to acc: ', cutoutId)
         return [...acc, cutoutId]
       }
       return acc
     },
     []
   )
-  console.log('editableCutoutIds: ', editableCutoutIds)
 
-  const handleAddFixture = (anchorCutoutId: CutoutId): void => {
+  const handleAddFixture = (
+    anchorCutoutId: CutoutId,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ): void => {
     const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
       anchorCutoutId,
       moduleFixtures
     )
+
+    console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
+
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       updateDeckConfiguration(
         deckConfig.map(cc => {
+          const addedCutoutConfigs: CutoutConfigMap[] = [
+            {
+              addressableAreaId,
+              cutoutFixtureId: moduleFixtures[0],
+              cutoutId: anchorCutoutId,
+            },
+          ]
+          const replacmentFixture = replaceCutoutFixtureWithComboFixture(
+            addedCutoutConfigs,
+            deckConfigWithAA,
+            anchorCutoutId
+          )
+          console.log('replacmentFixture: ', replacmentFixture)
           if (cc.cutoutId in configuredFixtureIdByCutoutId) {
             let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
             if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {

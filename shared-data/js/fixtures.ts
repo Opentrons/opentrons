@@ -1087,7 +1087,10 @@ export const isModuleAllowedOnAA = (
         ),
       }
     })
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId) && moduleModel === FLEX_STACKER_MODULE_V1) {
+    if (
+      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) &&
+      moduleModel === FLEX_STACKER_MODULE_V1
+    ) {
       const item = aaWithSlotLikeId?.find(
         aaItem =>
           FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
