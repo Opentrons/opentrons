@@ -10,7 +10,9 @@ from opentrons.protocol_api import (
     LiquidClass,
 )
 from opentrons.types import Point
+from typing import Union
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 ###########################################
 #  VARIABLES - START
@@ -137,10 +139,10 @@ def _setup(
 
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
-    src_well = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
+    src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
-    src_well["A1"].load_liquid(ethanol_liq, src_well["A1"].max_volume - 1000)
+    src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
 
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
@@ -166,6 +168,10 @@ def _setup(
         _write_line_to_csv(ctx, ["step vol", str(step_volume)])
         _write_line_to_csv(ctx, ["steps", str(STEPS)])
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
+        # Record LPC
+        lpc = str(labware._core.get_calibrated_offset())
+        lpc_line = ["LPC Offset", labware.load_name, lpc]
+        _write_line_to_csv(ctx, lpc_line)
 
     return (
         liq_pipette,
@@ -173,7 +179,7 @@ def _setup(
         probing_rack,
         liquid_rack,
         labware,
-        src_well,
+        src,
         dial,
         step_volume,
         quick_mode,
@@ -244,8 +250,10 @@ def _get_tip_z_error(
 def _get_height_of_liquid_in_well(
     pipette: InstrumentContext, well: Well, simulating: bool
 ) -> float:
-    def extract_float(result) -> float:
-        return result.height if hasattr(result, "height") else float(result)
+    def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
+        if isinstance(result, SimulatedProbeResult):
+            return result.net_liquid_exchanged_after_probe
+        return float(result)
 
     try:
         if pipette.detect_liquid_presence(well) and not simulating:
@@ -259,13 +267,19 @@ def _get_height_of_liquid_in_well(
 
 
 def aspirate_and_dispense(
-    liq_pipette, src_well, labware, step_volume, ethanol, quick_mode
-):
+    liq_pipette: InstrumentContext,
+    src: Labware,
+    labware: Labware,
+    step_volume: float,
+    ethanol: LiquidClass,
+    quick_mode: bool,
+) -> None:
+    """Transfer ethanol with liquid class and meniscus relative behavior."""
     if quick_mode:
         liq_pipette.transfer_with_liquid_class(
             ethanol,
             step_volume,
-            src_well["A1"],
+            src["A1"],
             labware["A1"],
             new_tip="never",
             return_tip=True,
@@ -274,7 +288,7 @@ def aspirate_and_dispense(
         liq_pipette.transfer_with_liquid_class(
             ethanol,
             step_volume,
-            src_well["A1"],
+            src["A1"],
             labware["A1"],
             new_tip="always",
             return_tip=False,
@@ -282,13 +296,14 @@ def aspirate_and_dispense(
 
 
 def run(ctx: ProtocolContext) -> None:
+    """Protocol."""
     (
         liq_pipette,
         probe_pipette,
         probing_rack,
         liquid_rack,
         labware,
-        src_well,
+        src,
         dial,
         step_volume,
         quick_mode,
@@ -298,13 +313,15 @@ def run(ctx: ProtocolContext) -> None:
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    def pick_up_tips():
+    def pick_up_tips() -> None:
+        """Each pipette picks up a tip."""
         if not probe_pipette.has_tip:
             probe_pipette.pick_up_tip(probing_rack)
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip(liquid_rack)
 
-    def drop_tips():
+    def drop_tips() -> None:
+        """Each pipette drops a tip."""
         if probe_pipette.has_tip:
             probe_pipette.drop_tip()
         if liq_pipette.has_tip:
@@ -319,7 +336,7 @@ def run(ctx: ProtocolContext) -> None:
         for step in range(STEPS):
             if step > 0:
                 aspirate_and_dispense(
-                    liq_pipette, src_well, labware, step_volume, ethanol, quick_mode
+                    liq_pipette, src, labware, step_volume, ethanol, quick_mode
                 )
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
             probe_pipette.move_to(labware["A1"].top())
@@ -339,7 +356,7 @@ def run(ctx: ProtocolContext) -> None:
                 if liq_pipette.has_tip:
                     liq_pipette.drop_tip()
                 aspirate_and_dispense(
-                    liq_pipette, src_well, labware, step_volume, ethanol, False
+                    liq_pipette, src, labware, step_volume, ethanol, False
                 )
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
             height = round(
