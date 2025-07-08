@@ -25,6 +25,8 @@ requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 assert str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"], \
     f"api level: {requirements['apiLevel']}"
 
+CSV_SEPARATOR = "\t"
+
 READER_ABSORBANCE = 450
 
 SHAKER_CONFIG_BY_LIQUID: Dict[str, Tuple[int, int]] = {
@@ -548,16 +550,16 @@ def run(ctx: ProtocolContext) -> None:
         file.write("==================\n")
         file.write("FLEX-PIPETTE-IQ-OQ\n")
         file.write("==================\n")
-        file.write(f"simulation,{ctx.is_simulating()}\n")
-        file.write(f"time,{time_str}\n")
-        file.write(f"pipette_sn,{pip_sn}\n")
-        file.write(f"model,{ctx.params.pipette}\n")
-        file.write(f"tips,{ctx.params.tips}\n")
-        file.write(f"liquid,{ctx.params.liquid}\n")
-        file.write(f"just_fill_plate_200ul,{ctx.params.just_fill_plate_200ul}\n")
-        file.write(f"external_reader,{ctx.params.external_reader}\n")
-        file.write(f"pipette_at_liquid_meniscus,{ctx.params.pipette_at_liquid_meniscus}\n")
-        file.write(f"include_baseline,{ctx.params.include_baseline}\n")
+        file.write(f"simulation{CSV_SEPARATOR}{ctx.is_simulating()}\n")
+        file.write(f"time{CSV_SEPARATOR}{time_str}\n")
+        file.write(f"pipette_sn{CSV_SEPARATOR}{pip_sn}\n")
+        file.write(f"model{CSV_SEPARATOR}{ctx.params.pipette}\n")
+        file.write(f"tips{CSV_SEPARATOR}{ctx.params.tips}\n")
+        file.write(f"liquid{CSV_SEPARATOR}{ctx.params.liquid}\n")
+        file.write(f"just_fill_plate_200ul{CSV_SEPARATOR}{ctx.params.just_fill_plate_200ul}\n")
+        file.write(f"external_reader{CSV_SEPARATOR}{ctx.params.external_reader}\n")
+        file.write(f"pipette_at_liquid_meniscus{CSV_SEPARATOR}{ctx.params.pipette_at_liquid_meniscus}\n")
+        file.write(f"include_baseline{CSV_SEPARATOR}{ctx.params.include_baseline}\n")
 
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
@@ -581,16 +583,17 @@ def run(ctx: ProtocolContext) -> None:
             _f.write("==================\n")
             _f.write(f"VOLUME: {test_volume} uL\n")
             _f.write("==================\n")
-            _f.write(",1,2,3,4,5,6,7,8,9,10,11,12\n")
+            cols_as_str = CSV_SEPARATOR.join([str(c + 1) for c in range(12)])
+            _f.write(f"{CSV_SEPARATOR}{cols_as_str}\n")
             for col in "ABCDEFGH":
                 csv_row = f"{col}"
                 for row in range(12):
                     w_name = f"{col}{row + 1}"
                     val_str = str(results[w_name]) if w_name in results else ""
-                    csv_row += f",{val_str}"
+                    csv_row += f"{CSV_SEPARATOR}{val_str}"
                 _f.write(csv_row + "\n")
-            _f.write(f"CV,{cv}\n")
-            _f.write(f"AVG,{avg}\n")
+            _f.write(f"CV{CSV_SEPARATOR}{cv}\n")
+            _f.write(f"AVG{CSV_SEPARATOR}{avg}\n")
             ctx.comment(f"RESULT: {test_volume} uL %CV = {cv}%")
 
     def _on_plate_done() -> None:
