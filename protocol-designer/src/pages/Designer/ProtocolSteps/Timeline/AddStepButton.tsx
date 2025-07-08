@@ -234,7 +234,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 const STEP_OVERFLOW_MENU_STYLE = css`
   position: ${POSITION_ABSOLUTE};
   z-index: 5;
-  right: -8.05rem;
+  right: -6.5rem;
   white-space: ${NO_WRAP};
   bottom: 1rem;
   border-radius: ${BORDERS.borderRadius8};
