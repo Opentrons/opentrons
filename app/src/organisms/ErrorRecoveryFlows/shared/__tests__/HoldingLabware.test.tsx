@@ -193,7 +193,7 @@ describe('HoldingLabware', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
       )
     })
   })

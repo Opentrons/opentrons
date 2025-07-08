@@ -79,7 +79,6 @@ export interface QuickTransferSummaryState {
   }
   delayAspirate?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipAspirate?: number
   touchTipAspirateSpeed?: number
@@ -99,12 +98,14 @@ export interface QuickTransferSummaryState {
   }
   delayDispense?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
@@ -191,7 +192,6 @@ interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipAspirate {
@@ -229,7 +229,6 @@ interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipDispense {
@@ -239,7 +238,10 @@ interface SetTouchTipDispense {
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
-  location?: BlowOutLocation
+  blowOutSettings?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
 }
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
