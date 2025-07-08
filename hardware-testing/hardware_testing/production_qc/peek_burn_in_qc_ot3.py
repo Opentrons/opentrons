@@ -241,6 +241,10 @@ async def _test_direction(
 
 async def _move_plunger_as_cycle_settings(api: OT3API,
     mount: types.OT3Mount) -> None:
+    ui.print_header("Move plunger as "
+                    f"CURRENT = {CYCLING_CURRENT}: "
+                    f"SPEED = {CYCLING_SPEED}: "
+                )
     await _home_plunger(api, mount)
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
     top, _, bottom, _ = plunger_poses
