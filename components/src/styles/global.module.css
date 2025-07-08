@@ -6,16 +6,17 @@
 
   /* green */
   --green-60: #03683e;
-  --green-50: #04aa65;
-  --green-40: #91e2c0;
   --green-35: #afedd3;
-  --green-30: #c4f6e0;
   --green-20: #e8f7ed;
-
-  /* green for touchscreens */
+  --green-50-non-touchscreen: #04aa65;
   --green-50-touchscreen: #1ca850;
+  --green-50: var(--green-50-non-touchscreen);
+  --green-40-non-touchscreen: #91e2c0;
   --green-40-touchscreen: #8ef3a8;
+  --green-40: var(--green-40-non-touchscreen);
+  --green-30-non-touchscreen: #c4f6e0;
   --green-30-touchscreen: #8afbab;
+  --green-30: var(--green-30-non-touchscreen);
 
   /* red */
   --red-60: #941313;
@@ -35,22 +36,27 @@
   --yellow-20: #fdf3e2;
 
   /* purple */
-  --purple-60: #562566;
-  --purple-55: #713187;
-  --purple-50: #893ba4;
-  --purple-40: #cea4df;
-  --purple-35: #dbbce7;
-  --purple-30: #e6d5ec;
-  --purple-20: #f1e8f5;
-
-  /* purple for touchscreens */
+  --purple-60-non-touchscreen: #562566;
   --purple-60-touchscreen: #612367;
+  --purple-60: var(--purple-60-non-touchscreen);
+  --purple-55-non-touchscreen: #713187;
   --purple-55-touchscreen: #822e89;
+  --purple-55: var(--purple-55-non-touchscreen);
+  --purple-50-non-touchscreen: #893ba4;
   --purple-50-touchscreen: #9e39a8;
+  --purple-50: var(--purple-50-non-touchscreen);
+  --purple-40-non-touchscreen: #cea4df;
   --purple-40-touchscreen: #e2a9ea;
+  --purple-40: var(--purple-40-non-touchscreen);
+  --purple-35-non-touchscreen: #dbbce7;
   --purple-35-touchscreen: #ecc2f2;
+  --purple-35: var(--purple-35-non-touchscreen);
+  --purple-30-non-touchscreen: #e6d5ec;
   --purple-30-touchscreen: #f4def7;
+  --purple-30: var(--purple-30-non-touchscreen);
+  --purple-20-non-touchscreen: #f1e8f5;
   --purple-20-touchscreen: #fff3fe;
+  --purple-20: var(--purple-20-non-touchscreen);
 
   /* blue */
   --blue-60: #004196;
@@ -154,4 +160,20 @@
   --font-weight-semi-bold: 600;
   --font-weight-regular: 400;
   --font-weight-light: 300;
+}
+
+.enable_touchscreen_colors {
+  /* green */
+  --green-50: var(--green-50-touchscreen);
+  --green-40: var(--green-40-touchscreen);
+  --green-30: var(--green-30-touchscreen);
+
+  /* purple */
+  --purple-60: var(--purple-60-touchscreen);
+  --purple-55: var(--purple-55-touchscreen);
+  --purple-50: var(--purple-50-touchscreen);
+  --purple-40: var(--purple-40-touchscreen);
+  --purple-35: var(--purple-35-touchscreen);
+  --purple-30: var(--purple-30-touchscreen);
+  --purple-20: var(--purple-20-touchscreen);
 }
