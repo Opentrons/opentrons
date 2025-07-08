@@ -7,6 +7,9 @@
   "style": "src/index.module.css",
   "main": "src/index.ts",
   "module": "src/index.ts",
+  "exports": {
+    "./styles": "./src/styles/global.module.css"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"

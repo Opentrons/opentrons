@@ -87,7 +87,9 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
         <LPCContentContainer
           {...props}
           header={selectedLwName}
-          buttonText={t('save')}
+          oddHeaderBtnCopy={t('save')}
+          desktopFooterBtnCopy={t('save')}
+          desktopHeaderBtnCopy={t('exit')}
           onClickButton={onHeaderSave}
           onClickBack={onHeaderGoBack}
           buttonIsDisabled={!doWorkingOffsetsExist}

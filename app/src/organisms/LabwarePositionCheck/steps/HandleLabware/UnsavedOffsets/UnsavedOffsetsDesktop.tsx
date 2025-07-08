@@ -48,7 +48,9 @@ export function UnsavedOffsetsDesktop(
         text: t('cancel'),
         onClick: toggleShowUnsavedOffsetsDesktop,
       }}
-      buttonText={t('confirm')}
+      oddHeaderBtnCopy={t('confirm')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('confirm')}
       onClickButton={onGoBack}
     >
       <Flex css={CONTAINER_STYLE}>
