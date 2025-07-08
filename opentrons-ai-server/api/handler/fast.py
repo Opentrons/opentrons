@@ -209,13 +209,14 @@ def _generate_llm_response(
     model_type: str,
     user_id: str,
     prompt: str,
+    enable_analytics: bool,
     history: Optional[List[Any]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM based on context."""
     # Wrap all LLM calls with the appropriate tracing context
-    with get_tracing_context():
+    with get_tracing_context(enable_analytics):
         if "openai" in model_type.lower():
             return openai.predict(prompt=prompt, chat_completion_message_params=history)
 
@@ -325,6 +326,7 @@ async def create_chat_completion(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
+            enable_analytics=enable_analytics,
             history=body.history,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
@@ -392,7 +394,12 @@ async def create_protocol(
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
         response = _generate_llm_response(
-            model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.prompt,
+            enable_analytics=enable_analytics,
+            protocol_format=protocol_format,
+            protocol_action="create",
         )
 
         # Special handling for Protocol Designer with null response
@@ -448,7 +455,13 @@ async def update_protocol(
         if fake_response:
             return fake_response
 
-        response = _generate_llm_response(model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_action="update")
+        response = _generate_llm_response(
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.prompt,
+            enable_analytics=enable_analytics,
+            protocol_action="update",
+        )
 
         # Handle empty response specifically for update protocol
         if response is None or response == "":

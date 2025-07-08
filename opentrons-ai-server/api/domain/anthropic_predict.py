@@ -20,32 +20,33 @@ from api.settings import Settings
 MessageType = Literal["create", "update"]
 
 
-# Global variable to track Weave state
+# Global variable to track Weave initialization
 _weave_initialized = False
-_analytics_enabled = False
 
 
+@tracer.wrap()
 def setup_weave_analytics(enable_analytics: bool) -> None:
-    """Setup Weave and set analytics preference for this request."""
-    global _weave_initialized, _analytics_enabled
+    """Setup Weave initialization only (thread-safe, request-agnostic)."""
+    global _weave_initialized
 
-    # Update analytics preference
-    _analytics_enabled = enable_analytics
     logger.debug(f"Analytics {'enabled' if enable_analytics else 'disabled'} for this request")
 
     # Initialize Weave on first call (regardless of analytics preference)
     if not _weave_initialized:
         try:
             weave.init("test-purpose-july-setttings")
-            _weave_initialized = True
-            logger.info("Weave initialized")
+            logger.info("Weave initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Weave: {e}")
+        finally:
+            # Mark as initialized regardless of success/failure to prevent retries
+            _weave_initialized = True
 
 
-def get_tracing_context() -> ContextManager[None]:
-    """Get context manager that controls Weave tracing based on current analytics preference."""
-    return set_tracing_enabled(_analytics_enabled)
+@tracer.wrap()
+def get_tracing_context(enable_analytics: bool) -> ContextManager[None]:
+    """Get context manager that controls Weave tracing for this specific request."""
+    return set_tracing_enabled(enable_analytics)
 
 
 settings: Settings = Settings()
@@ -372,6 +373,7 @@ class AnthropicPredict:
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
+    @tracer.wrap()
     def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
         """
         Safely navigate nested dictionaries using a sequence of keys.
