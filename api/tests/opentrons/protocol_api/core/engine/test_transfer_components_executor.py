@@ -476,6 +476,32 @@ def test_dispense_and_wait_skips_delay(
     )
 
 
+def test_dispense_and_wait_raises_if_tip_volume_less_than_dispense_vol(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """Should raise a useful error if trying to dispense more than liquid present in tip."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(50)
+
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 2, 3), labware=None),
+        target_well=decoy.mock(cls=WellCore),
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    with pytest.raises(
+        RuntimeError, match="Cannot dispense 51uL when the tip has only 50uL."
+    ):
+        subject.dispense_and_wait(
+            dispense_properties=sample_transfer_props.dispense,
+            volume=51,
+            push_out_override=123,
+        )
+
+
 def test_dispense_into_trash_and_wait(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,

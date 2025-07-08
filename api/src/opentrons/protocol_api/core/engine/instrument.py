@@ -30,6 +30,9 @@ from opentrons.protocols.advanced_control.transfers.common import (
     NoLiquidClassPropertyError,
 )
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    check_current_volume_before_dispensing,
+)
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
     DeckPoint,
@@ -2143,9 +2146,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Remove an air gap that was previously added during a transfer."""
         if last_air_gap == 0:
             return
-
+        current_vol = self.get_current_volume()
+        check_current_volume_before_dispensing(
+            current_volume=current_vol, dispense_volume=last_air_gap
+        )
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            self.get_current_volume() - last_air_gap
+            current_vol - last_air_gap
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(
