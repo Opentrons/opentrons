@@ -326,6 +326,7 @@ class CSVReport:
         run_id: Optional[str] = None,
         start_time: Optional[float] = None,
         validate_meta_data: bool = True,
+        dont_write_to_disk: bool = False,
     ) -> None:
         """CSV Report init."""
         self._test_name = test_name
@@ -342,6 +343,7 @@ class CSVReport:
         self(META_DATA_TITLE, META_DATA_TEST_RUN_ID, [self._run_id])
         _now = datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")
         self(META_DATA_TITLE, META_DATA_TEST_TIME_UTC, [_now])
+        self._dont_write_to_disk = dont_write_to_disk
 
     def __call__(self, *args: Any) -> None:
         """CSV Report call."""
@@ -479,6 +481,8 @@ class CSVReport:
 
     def save_to_disk(self) -> Path:
         """CSV Report save to disk."""
+        if self._dont_write_to_disk:
+            return
         if not self._file_name:
             raise RuntimeError("must set tag of report using `Report.set_tag()`")
         _report_str = str(self)
