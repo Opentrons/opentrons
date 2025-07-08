@@ -34,7 +34,7 @@ def setup_weave_analytics(enable_analytics: bool) -> None:
     # Initialize Weave on first call (regardless of analytics preference)
     if not _weave_initialized:
         try:
-            weave.init("test-purpose-july-setttings")
+            weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
             logger.info("Weave initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Weave: {e}")
