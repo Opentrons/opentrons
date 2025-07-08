@@ -25,6 +25,7 @@ from opentrons.protocol_engine.errors import TouchTipDisabledError
 from opentrons.types import Location, Point, Mount
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
+    check_current_volume_before_dispensing,
 )
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
@@ -254,16 +255,9 @@ class TransferComponentsExecutor:
     ) -> None:
         """Dispense according to dispense properties and wait if enabled."""
         current_vol = self._instrument.get_current_volume()
-        if current_vol < volume:
-            # Although this should never happen, we can get into an unexpected state
-            # following error recovery and not have the expected amount of liquid in the tip.
-            # If this happens, we want to raise a useful error so the user can understand
-            # the cause of the problem. If we don't make this check for current volume,
-            # an unhelpful error gets raised when `.get_for_volume(...)` encounters
-            # a negative volume.
-            raise RuntimeError(
-                f"Cannot dispense {volume}uL when the tip has only {current_vol}uL."
-            )
+        check_current_volume_before_dispensing(
+            current_volume=current_vol, dispense_volume=volume
+        )
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
             current_vol - volume
         )
