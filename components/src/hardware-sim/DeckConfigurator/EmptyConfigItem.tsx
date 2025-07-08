@@ -1,3 +1,4 @@
+import { iteratee } from 'lodash'
 import { css } from 'styled-components'
 
 import {
@@ -8,6 +9,7 @@ import {
   getDeckDefFromRobotType,
   getMainAAForAFixture,
   getVisualSlotIdFromAAId,
+  isModuleAllowedOnAA,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
@@ -33,7 +35,6 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
-import { iteratee } from 'lodash'
 
 interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
@@ -54,24 +55,19 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     fixtureLocation,
     addressableAreaId,
     editableCutoutIds,
-    moduleModel
+    moduleModel,
   } = props
 
-  console.log("addressableAreaId: ", addressableAreaId)
+  console.log('addressableAreaId: ', addressableAreaId)
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
-  let slotLikeId = ''
-  if (moduleModel)
-  {
-    const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
-    const aaMatchForModule = getMainAAForAFixture(fixtureLocation, fixtureId[0], addressableAreaId)
-    const vsSlot = getVisualSlotIdFromAAId(aaMatchForModule)
-    slotLikeId = getAAWithFakesFromVSId(vsSlot) ?? ''
-    console.log("slotLikeId: ", slotLikeId)
-    console.log("aaMatchForModule: ", aaMatchForModule)
-  }
+  const isAllowedOnSlot = isModuleAllowedOnAA(
+    moduleModel,
+    fixtureLocation,
+    addressableAreaId
+  )
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
@@ -94,9 +90,6 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
     : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
-  console.log("slotLikeId: ", slotLikeId, "addressableAreaId: ", addressableAreaId)
-  //I need to look for slots it may mount to 
-  const disableButton = slotLikeId !== addressableAreaId && !editableCutoutIds.includes(fixtureLocation)
 
   return (
     <RobotCoordsForeignObject
@@ -113,11 +106,11 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
           handleClickAdd(fixtureLocation, addressableAreaId)
         }}
         data-testid={addressableAreaId}
-        disabled={disableButton}
+        disabled={!isAllowedOnSlot}
       >
-        {!disableButton && 
-        <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
-}
+        {isAllowedOnSlot && (
+          <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
+        )}
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -155,7 +148,7 @@ const EMPTY_CONFIG_STYLE = css`
     background-color: ${COLORS.grey35};
     color: ${COLORS.grey35};
     box-shadow: none;
-    border-color: transparent
+    border-color: transparent;
   }
 
   &:focus-visible {

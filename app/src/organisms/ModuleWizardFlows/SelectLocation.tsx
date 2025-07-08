@@ -90,33 +90,30 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     (acc, { mayMountTo }) => [...acc, ...mayMountTo],
     []
   )
-  console.log("configuredFixtureIdByCutoutId: ", configuredFixtureIdByCutoutId)
-  console.log("deckConfig: ", deckConfig)
+  console.log('configuredFixtureIdByCutoutId: ', configuredFixtureIdByCutoutId)
+  console.log('deckConfig: ', deckConfig)
   const editableCutoutIds = deckConfig.reduce<CutoutId[]>(
     (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
       const isCurrentConfiguration =
         Object.values(configuredFixtureIdByCutoutId).includes(
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
-        console.log("isCurrentConfiguration: ", isCurrentConfiguration)
+      console.log('isCurrentConfiguration: ', isCurrentConfiguration)
       if (
         // in run setup, module calibration only available when module location is already correctly configured
         !isLoadedInRun &&
-        mayMountToCutoutIds.includes(cutoutId) 
-        //&&
-        // (isCurrentConfiguration 
-        //   ||
-        //   SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-        // )
+        mayMountToCutoutIds.includes(cutoutId) &&
+        (isCurrentConfiguration ||
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))
       ) {
-        console.log("add to acc: ", cutoutId)
+        console.log('add to acc: ', cutoutId)
         return [...acc, cutoutId]
       }
       return acc
     },
     []
   )
-  console.log("editableCutoutIds: ", editableCutoutIds)
+  console.log('editableCutoutIds: ', editableCutoutIds)
 
   const handleAddFixture = (anchorCutoutId: CutoutId): void => {
     const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(

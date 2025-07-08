@@ -65,10 +65,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     darkFill = COLORS.black90,
     editableCutoutIds,
     height = '455px',
-    moduleModel
+    moduleModel,
   } = props
 
-  console.log("editableCutoutIds help!!!: ", editableCutoutIds)
+  console.log('editableCutoutIds help!!!: ', editableCutoutIds)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 

@@ -1056,12 +1056,41 @@ export const getMainAAForAFixture = (
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
       const singleSlotId = getAAWithFakesFromVSId(vsId)
-      console.log("aa: ", aa)
-      console.log("vsId: ", vsId)
-      console.log("addressableAreaId; ", addressableAreaId)
+      console.log('aa: ', aa)
+      console.log('vsId: ', vsId)
+      console.log('addressableAreaId; ', addressableAreaId)
       return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
+  }
+}
+
+export const isModuleAllowedOnAA = (
+  moduleModel?: ModuleModel,
+  cutoutId: CutoutId,
+  aa: AddressableAreaNamesWithFakes
+): boolean => {
+  if (moduleModel) {
+    console.log('in in')
+    const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
+    const aaForFixture = getAAWithFakesFromCutoutFixtureId(
+      cutoutId,
+      fixtureId[0],
+      getDeckDefFromRobotType('OT-3 Standard')
+    )
+    const aaWithSlotLikeId = aaForFixture?.map(item => {
+      return {
+        aa: item,
+        slotLikeId: getAAWithFakesFromVSId(
+          getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
+        ),
+      }
+    })
+    console.log('aa: ', aa)
+    console.log('aaWithSlotLikeId: ', aaWithSlotLikeId)
+    return aaWithSlotLikeId?.some(item => item.slotLikeId == aa) ?? false
+  } else {
+    return true
   }
 }
 
