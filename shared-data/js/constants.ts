@@ -301,6 +301,19 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+// fake AA
+export const FAKE_D4_ADDRESSABLE_AREA: 'fakeD4' = 'fakeD4'
+export const FAKE_C4_ADDRESSABLE_AREA: 'fakeC4' = 'fakeC4'
+export const FAKE_B4_ADDRESSABLE_AREA: 'fakeB4' = 'fakeB4'
+export const FAKE_A4_ADDRESSABLE_AREA: 'fakeA4' = 'fakeA4'
+
+export const FAKE_AA = [
+  FAKE_A4_ADDRESSABLE_AREA,
+  FAKE_C4_ADDRESSABLE_AREA,
+  FAKE_B4_ADDRESSABLE_AREA,
+  FAKE_A4_ADDRESSABLE_AREA,
+]
+
 export type FlexFakeAddressableAreaName =
   | 'fakeA4'
   | 'fakeB4'
@@ -509,6 +522,11 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
   ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] = [
+  ...FLEX_STAGING_ADDRESSABLE_AREAS,
+  ...FAKE_AA,
 ]
 
 export const ADDRESSABLE_AREA_1: '1' = '1'

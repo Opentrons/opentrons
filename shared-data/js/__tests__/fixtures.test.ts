@@ -28,6 +28,7 @@ import {
   getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
   isFixtureInUsbModules,
+  isModuleAllowedOnAA,
   replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
@@ -555,5 +556,22 @@ describe('getVisualSlotIdFromAAId', () => {
   it('should get VSD3 for D3', () => {
     const vs = getVisualSlotIdFromAAId('D3')
     expect(vs).toEqual('VSD3')
+  })
+})
+
+describe('isModuleAllowedOnAA', () => {
+  it('should return false for flexStackerModuleV1D4 and D3', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'flexStackerModuleV1')
+    expect(vs).toEqual(false)
+  })
+
+  it('should return true for flexStackerModuleV1D4 and fakeD4', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4', 'flexStackerModuleV1')
+    expect(vs).toEqual(true)
+  })
+
+  it('should return true for no module input and fakeD4', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4')
+    expect(vs).toEqual(true)
   })
 })

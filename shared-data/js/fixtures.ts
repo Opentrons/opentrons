@@ -1,7 +1,10 @@
 import isEqual from 'lodash/isEqual'
 
 import {
+  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_STACKER_FIXTURES,
+  FLEX_STAGING_ADDRESSABLE_AREAS,
+  FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1066,18 +1069,18 @@ export const getMainAAForAFixture = (
 }
 
 export const isModuleAllowedOnAA = (
-  moduleModel?: ModuleModel,
   cutoutId: CutoutId,
-  aa: AddressableAreaNamesWithFakes
+  aa: AddressableAreaNamesWithFakes,
+  moduleModel?: ModuleModel
 ): boolean => {
   if (moduleModel) {
-    console.log('in in')
     const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
     const aaForFixture = getAAWithFakesFromCutoutFixtureId(
       cutoutId,
       fixtureId[0],
       getDeckDefFromRobotType('OT-3 Standard')
     )
+    console.log('aa: ', aa)
     const aaWithSlotLikeId = aaForFixture?.map(item => {
       return {
         aa: item,
@@ -1086,8 +1089,14 @@ export const isModuleAllowedOnAA = (
         ),
       }
     })
-    console.log('aa: ', aa)
-    console.log('aaWithSlotLikeId: ', aaWithSlotLikeId)
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      const item = aaWithSlotLikeId?.find(
+        aaItem =>
+          FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
+          aa === aaItem.slotLikeId
+      )
+      return item === undefined ? false : true
+    }
     return aaWithSlotLikeId?.some(item => item.slotLikeId == aa) ?? false
   } else {
     return true
