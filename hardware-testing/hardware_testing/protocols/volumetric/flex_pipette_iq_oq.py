@@ -109,18 +109,20 @@ VOLUMES_BY_TIP_RACK = {
 TRIALS_BY_PIPETTE_BY_TIP = {
     "flex_1channel_50": {50: [12, 12, 12]},
     "flex_8channel_50": {50: [12, 12, 12]},
-    "flex_1channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 3]},
-    "flex_8channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 3]},
+    "flex_1channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 12]},
+    "flex_8channel_1000": {50: [12, 12, 12], 200: [12, 12, 12], 1000: [12, 12, 2]},
     "flex_96channel_1000": {50: [1, 1, 1], 200: [1, 1, 1], 1000: [1, 1, 1]},
 }
 
+# FIXME: this protocol isn't setup to use multiple plates per a single test volume
+#        this means each test volume must be dispensed entirely to a single plate
+#        this needs to be fixed in order it to support more trials for 1000uL dispenses
 ENABLE_MULTI_DISPENSE_BY_CHANNELS = {1: True, 8: True, 96: False}
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {1: 1, 8: 5, 96: 5}
 
 # fmt: off
-# FIXME: create plate stack, to reduce number of slots in use (and increase plates)
-# TODO: discuss with SW how to handle more tip-racks from off-deck (eg: stacker)
+# TODO: handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
     "tips_diluent": "A1",   "diluent":  "A2",   "reader":   "A3",   "reader_stage": "A4",
     "stack_start":  "B1",   "dye_2":    "B2",   "tips_1":   "B3",   "tips_2":       "B4",
@@ -578,18 +580,16 @@ def run(ctx: ProtocolContext) -> None:
             )
             _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
-    # TEST EACH VOLUME
+    # VARIABLES TO KEEP TRACK OF TEST STATE
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
-    diluent_probed = (
-        False  # NOTE: diluent is a 1-well reservoir, so only needs to be probed once
-    )
+    diluent_probed = False
 
-    def filename() -> str:
+    def _reader_filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
         return f"{test_pip.name}_t{tip_ul}_{ul_sub_string}ul"
 
-    def _save_results_to_csv(test_volume: float, abs_values: Dict[str, float]) -> None:
+    def _save_to_test_report(test_volume: float, abs_values: Dict[str, float]) -> None:
         if test_volume == 0:  # NOTE: diluent step, so read all wells
             results = abs_values
         else:
@@ -620,7 +620,7 @@ def run(ctx: ProtocolContext) -> None:
             _f.write(f"AVG{CSV_SEPARATOR}{avg}\n")
             ctx.comment(f"RESULT: {test_volume} uL %CV = {cv}%")
 
-    def _on_plate_done() -> None:
+    def _process_the_current_plate() -> None:
         nonlocal plate, ul_in_this_plate
         heater_shaker.open_labware_latch()
         if not plate_reader:
@@ -628,10 +628,10 @@ def run(ctx: ProtocolContext) -> None:
             ctx.move_labware(plate, OFF_DECK, use_gripper=False)  # HUMAN
         else:
             _absorbance_values = shake_and_read_plate(
-                ctx, plate, heater_shaker, plate_reader, filename()
+                ctx, plate, heater_shaker, plate_reader, _reader_filename()
             )
             for vol in ul_in_this_plate:
-                _save_results_to_csv(vol, _absorbance_values)
+                _save_to_test_report(vol, _absorbance_values)
         plate = None
         ul_in_this_plate = []
 
@@ -653,7 +653,7 @@ def run(ctx: ProtocolContext) -> None:
             new_tip="never",
         )
         pip_for_dil.drop_tip()
-        _on_plate_done()
+        _process_the_current_plate()
 
     # TEST EACH VOLUME
     for ul_idx, ul in enumerate(volumes):
@@ -661,7 +661,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # SHAKE/READ the CURRENT PLATE
         if plate and dest_wells[0] not in plate.wells():
-            _on_plate_done()
+            _process_the_current_plate()
 
         # REPLACE EMPTY TIP-RACKS
         locations_to_replace_by_hand = []
@@ -765,7 +765,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # Transfer & SHAKE/READ the FINAL PLATE
         if ul_idx == len(volumes) - 1:
-            _on_plate_done()
+            _process_the_current_plate()
 
     # DISPLAY RESULTS as COMMENTS
     with open(results_filepath, "r") as _f:
