@@ -265,6 +265,7 @@ class FixtureSettings:
             trials=trials,
             name=name,
             run_id=run_id,
+            dont_write_to_disk=bool(os.getenv('RUNNING_ON_VERDIN')) and simulating,
         )
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
