@@ -486,6 +486,44 @@ def run(ctx: ProtocolContext) -> None:
     """Run."""
     trash = ctx.load_waste_chute()
 
+    # LOAD PIPETTES
+    test_pip = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
+    diluent_pipette: Optional[InstrumentContext] = None
+    if test_pip.channels != 96:
+        diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
+    pip_for_dil: InstrumentContext = diluent_pipette if diluent_pipette else test_pip
+    # NOTE: important to store the pipette serial number when testing
+    pip_sn = (
+        test_pip.hw_pipette["pipette_id"] if not ctx.is_simulating() else "simulation"
+    )
+
+    # CREATE TEST-REPORT
+    time_str = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    results_filename = f"flex_pipette_iq_oq_RESULTS_{time_str}.csv"
+    if ctx.is_simulating():
+        results_filename = "SIM_" + results_filename
+    results_directory = infer_config_base_dir() / "flex_pipette_iq_oq"
+    results_filepath = results_directory / results_filename
+    results_directory.mkdir(parents=True, exist_ok=True)
+    with open(results_filepath, "w+") as file:
+        file.write("==================\n")
+        file.write("FLEX-PIPETTE-IQ-OQ\n")
+        file.write("==================\n")
+        file.write(f"simulation{CSV_SEPARATOR}{ctx.is_simulating()}\n")
+        file.write(f"time{CSV_SEPARATOR}{time_str}\n")
+        file.write(f"pipette_sn{CSV_SEPARATOR}{pip_sn}\n")
+        file.write(f"model{CSV_SEPARATOR}{ctx.params.pipette}\n")
+        file.write(f"tips{CSV_SEPARATOR}{ctx.params.tips}\n")
+        file.write(f"liquid{CSV_SEPARATOR}{ctx.params.liquid}\n")
+        file.write(
+            f"just_fill_plate_200ul{CSV_SEPARATOR}{ctx.params.just_fill_plate_200ul}\n"
+        )
+        file.write(f"external_reader{CSV_SEPARATOR}{ctx.params.external_reader}\n")
+        file.write(
+            f"pipette_at_liquid_meniscus{CSV_SEPARATOR}{ctx.params.pipette_at_liquid_meniscus}\n"
+        )
+        file.write(f"include_baseline{CSV_SEPARATOR}{ctx.params.include_baseline}\n")
+
     # LOAD MODULES
     heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
     heater_shaker.close_labware_latch()
@@ -498,16 +536,6 @@ def run(ctx: ProtocolContext) -> None:
         plate_reader = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
         plate_reader.close_lid()
         plate_reader.initialize(mode="single", wavelengths=[READER_ABSORBANCE])
-
-    # LOAD PIPETTES
-    test_pip = ctx.load_instrument(ctx.params.pipette, "left")  # type: ignore[attr-defined]
-    diluent_pipette: Optional[InstrumentContext] = None
-    if test_pip.channels != 96:
-        diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")
-    pip_for_dil: InstrumentContext = diluent_pipette if diluent_pipette else test_pip
-    pip_sn = (
-        test_pip.hw_pipette["pipette_id"] if not ctx.is_simulating() else "simulation"
-    )
 
     # LOAD LABWARE & TIP-RACKS
     tip_ul = int(str(ctx.params.tips).split("_")[-1].replace("ul", ""))
@@ -556,32 +584,6 @@ def run(ctx: ProtocolContext) -> None:
     diluent_probed = (
         False  # NOTE: diluent is a 1-well reservoir, so only needs to be probed once
     )
-
-    time_str = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    results_filename = f"flex_pipette_iq_oq_RESULTS_{time_str}.csv"
-    if ctx.is_simulating():
-        results_filename = "SIM_" + results_filename
-    results_directory = infer_config_base_dir() / "flex_pipette_iq_oq"
-    results_filepath = results_directory / results_filename
-    results_directory.mkdir(parents=True, exist_ok=True)
-    with open(results_filepath, "w+") as file:
-        file.write("==================\n")
-        file.write("FLEX-PIPETTE-IQ-OQ\n")
-        file.write("==================\n")
-        file.write(f"simulation{CSV_SEPARATOR}{ctx.is_simulating()}\n")
-        file.write(f"time{CSV_SEPARATOR}{time_str}\n")
-        file.write(f"pipette_sn{CSV_SEPARATOR}{pip_sn}\n")
-        file.write(f"model{CSV_SEPARATOR}{ctx.params.pipette}\n")
-        file.write(f"tips{CSV_SEPARATOR}{ctx.params.tips}\n")
-        file.write(f"liquid{CSV_SEPARATOR}{ctx.params.liquid}\n")
-        file.write(
-            f"just_fill_plate_200ul{CSV_SEPARATOR}{ctx.params.just_fill_plate_200ul}\n"
-        )
-        file.write(f"external_reader{CSV_SEPARATOR}{ctx.params.external_reader}\n")
-        file.write(
-            f"pipette_at_liquid_meniscus{CSV_SEPARATOR}{ctx.params.pipette_at_liquid_meniscus}\n"
-        )
-        file.write(f"include_baseline{CSV_SEPARATOR}{ctx.params.include_baseline}\n")
 
     def filename() -> str:
         ul_sub_string = "ul_".join([str(old_ul) for old_ul in ul_in_this_plate])
