@@ -5,7 +5,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getFixedTrashLabwareDefinition,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
@@ -279,7 +279,7 @@ export const getRunCurrentModulesInfo = ({
   } else {
     return runRecord.data.modules.reduce<RunCurrentModuleInfo[]>(
       (acc, module) => {
-        const moduleDef = getModuleDef2(module.model)
+        const moduleDef = getModuleDef(module.model)
 
         // Get the labware that is placed on top of the module.
         const nestedLabware = runRecord.data.labware.find(

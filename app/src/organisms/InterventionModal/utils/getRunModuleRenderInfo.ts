@@ -1,5 +1,5 @@
 import {
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
@@ -28,7 +28,7 @@ export function getRunModuleRenderInfo(
 ): RunModuleInfo[] {
   if (runData.modules.length > 0) {
     return runData.modules.reduce<RunModuleInfo[]>((acc, module) => {
-      const moduleDef = getModuleDef2(module.model)
+      const moduleDef = getModuleDef(module.model)
       const nestedLabware = runData.labware.find(
         labware =>
           typeof labware.location === 'object' &&
