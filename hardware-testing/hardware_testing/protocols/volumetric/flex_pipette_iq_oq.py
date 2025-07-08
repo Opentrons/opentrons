@@ -426,7 +426,7 @@ def gather_dest_wells(
 ) -> Dict[float, List[Well]]:
     # GATHER TARGET WELLS
     if ctx.params.include_baseline:
-        plate_to_use = plates[1:]  # NOTE: first plate is used for baseline
+        plate_to_use = plates[:-1]  # NOTE: first plate is used for baseline
     else:
         plate_to_use = plates
     all_columns = [c for p in reversed(plate_to_use) for c in p.columns()]
@@ -637,7 +637,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # BASELINE
     if ctx.params.include_baseline:
-        plate = plates[0]
+        plate = plates.pop(-1)
         ul_in_this_plate.append(0.0)  # NOTE: marking baseline as being 0.0uL
         heater_shaker.open_labware_latch()
         ctx.move_labware(plate, adapter, use_gripper=True)
@@ -690,7 +690,7 @@ def run(ctx: ProtocolContext) -> None:
             plate = plates.pop(-1)
             assert (
                 dest_wells[0] in plate.wells()
-            ), f"dest well {dest_wells[0]} not in {plate} on top of {plate.parent}"
+            ), f"dest well {dest_wells[0]} not in plate for {ul} uL"
             ctx.move_labware(plate, adapter, use_gripper=True)
             heater_shaker.close_labware_latch()
 
