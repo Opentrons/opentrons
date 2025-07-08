@@ -16,7 +16,10 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../constants'
+import {
+  CHANNELS_MAPPED_TO_MAX_SPEED,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
+} from '../../../constants'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import {
   canPipetteUseLabware,
@@ -651,6 +654,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...aspirateFlowRateFields,
     ...aspirateOffsetFields,
     ...aspiratePositionReferenceFields,
+    aspirate_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
     aspirate_submerge_x_position: 0,
@@ -669,6 +673,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
+    dispense_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
     dispense_submerge_x_position: 0,
