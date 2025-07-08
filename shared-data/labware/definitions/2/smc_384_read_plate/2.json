@@ -5075,7 +5075,7 @@
     "loadName": "smc_384_read_plate"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,

@@ -358,10 +358,10 @@
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "nest_24_wellplate_10400ul"
+        "loadName": "nest_24_wellplate_10.4ml"
     },
     "namespace": "opentrons",
-    "version": 1,
+    "version": 2,
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {
         "x": 0,
