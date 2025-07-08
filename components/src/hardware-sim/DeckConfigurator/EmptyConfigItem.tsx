@@ -1,16 +1,8 @@
-import { iteratee } from 'lodash'
 import { css } from 'styled-components'
 
 import {
   getAALocationForCutoutAndFixtureId,
-  getAAWithFakesFromCutoutFixtureId,
-  getAAWithFakesFromVSId,
-  getCutoutFixtureIdsForModuleModel,
-  getDeckDefFromRobotType,
-  getMainAAForAFixture,
-  getVisualSlotIdFromAAId,
   isModuleAllowedOnAA,
-  MODULE_FIXTURES_BY_MODEL,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
 
@@ -91,6 +83,8 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const disableButton = !editableCutoutIds.includes(fixtureLocation) || !isAllowedOnSlot 
+
   return (
     <RobotCoordsForeignObject
       width={width}
@@ -106,9 +100,9 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
           handleClickAdd(fixtureLocation, addressableAreaId)
         }}
         data-testid={addressableAreaId}
-        disabled={!isAllowedOnSlot}
+        disabled={disableButton}
       >
-        {isAllowedOnSlot && (
+        {!disableButton && (
           <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
         )}
       </Btn>

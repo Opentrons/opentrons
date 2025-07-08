@@ -1,9 +1,7 @@
 import isEqual from 'lodash/isEqual'
 
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_STACKER_FIXTURES,
-  FLEX_STAGING_ADDRESSABLE_AREAS,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
@@ -1089,7 +1087,7 @@ export const isModuleAllowedOnAA = (
         ),
       }
     })
-    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId) && moduleModel === FLEX_STACKER_MODULE_V1) {
       const item = aaWithSlotLikeId?.find(
         aaItem =>
           FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
@@ -1097,7 +1095,7 @@ export const isModuleAllowedOnAA = (
       )
       return item === undefined ? false : true
     }
-    return aaWithSlotLikeId?.some(item => item.slotLikeId == aa) ?? false
+    return aaWithSlotLikeId?.some(item => item.slotLikeId === aa) ?? false
   } else {
     return true
   }

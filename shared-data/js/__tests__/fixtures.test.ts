@@ -574,4 +574,9 @@ describe('isModuleAllowedOnAA', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4')
     expect(vs).toEqual(true)
   })
+
+  it('should return true for tempModule on D3', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
+    expect(vs).toEqual(true)
+  })
 })
