@@ -128,7 +128,7 @@ Using Liquid Classes
 
 You'll use a :ref:`liquid class definition <liquid-class-definitions>` in your protocol to optimize transfer behavior based on liquid properties, along with your chosen Flex pipettes and tips. 
 
-This section covers selecting a liquid class and using the :py:meth:`.InstrumentContext.transfer_with_liquid_class` method. For more details, including using the :py:meth:`.InstrumentContext.distribute_with_liquid_class` and :py:meth:`.InstrumentContext.consolidate_with_liquid_class` methods, see :ref:`v2-complex-commands`. 
+This section covers selecting a liquid class and using the :py:meth:`~.InstrumentContext.transfer_with_liquid_class` method. For more details, including using the :py:meth:`~.InstrumentContext.distribute_with_liquid_class` and :py:meth:`~.InstrumentContext.consolidate_with_liquid_class` methods, see :ref:`v2-complex-commands`. 
 
 Start by definining the tips, trash, pipette, and labware used in your transfers. Then, use :py:meth:`.ProtocolContext.get_liquid_class` to select an Opentrons-verified liquid class and save its results to a variable. ``get_liquid_class()`` takes into account the pipette and tip racks in your protocol and only loads the relevant portion of the liquid class definition. 
 
