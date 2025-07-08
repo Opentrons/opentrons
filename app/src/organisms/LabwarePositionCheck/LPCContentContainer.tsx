@@ -59,11 +59,11 @@ export type LPCContentContainerProps = LPCWizardContentProps &
     children: JSX.Element
     /* The ODD view header. The desktop header is hard-coded. */
     header: string
-    /* The copy for the desktop header button. */
+    /* The copy for the ODD header button. */
     oddHeaderBtnCopy: string
     /* The copy for the desktop header button. */
     desktopHeaderBtnCopy: string
-    /* The copy  for the desktop footer button. */
+    /* The copy for the desktop footer button. */
     desktopFooterBtnCopy: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
