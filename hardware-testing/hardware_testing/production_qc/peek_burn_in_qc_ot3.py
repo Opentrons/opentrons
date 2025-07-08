@@ -239,7 +239,8 @@ async def _test_direction(
     return aligned
 
 
-async def _move_plunger_as_cycle_settings() -> None:
+async def _move_plunger_as_cycle_settings(api: OT3API,
+    mount: types.OT3Mount) -> None:
     await _home_plunger(api, mount)
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
     top, _, bottom, _ = plunger_poses
@@ -459,7 +460,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     continue_after_stall=continue_after_stall
                 )
 
-                await _move_plunger_as_cycle_settings()
+                await _move_plunger_as_cycle_settings(api,mount)
 
                 failed_cycles = await _cycle_plunger(
                     api, mount,
