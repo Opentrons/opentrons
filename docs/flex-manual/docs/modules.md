@@ -119,7 +119,7 @@ At any time, you can view and manage your module calibration data in the Opentro
 The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The plate reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
 
 !!!note
-    The plate reader may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
+    The Opentrons Flex Absorbance Plate Reader Module may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
 
 #### Measurement capabilities
 
