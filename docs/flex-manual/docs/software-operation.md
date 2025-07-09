@@ -702,11 +702,11 @@ Flex *will not* retain information about more than 20 runs on the robot. Proceed
 
 ## Command Line Operation Over SSH
 
-You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you run protocols directly from the command line or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
+You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
 !!!Note
     - SSH keys are required before you can connect to Flex and issue commands from a terminal.
-    - If you're unable to use a Wi-Fi network for SSH, see Hardwired SSH Connections below.
+    - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
 
 ### Creating SSH Keys
 
@@ -750,7 +750,7 @@ To make an SSH connection:
 
 1. Type the passphrase you set when creating the SSH key.
 
-When an SSH connection is successful, the terminal command prompt changes to `root@Flex` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
+When an SSH connection is successful, the terminal command prompt changes to `root@` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
 
 ### Hardwired SSH Connections
 
@@ -767,16 +767,16 @@ When disconnected from a network, your Flex will assign itself an IP address and
 
 #### Finding the Robot's IP Address
 
-You can get the IP address range and subnet mask from the robot after connecting it to your computer and checking the Opentrons App. These instructions will help you get started:
+You can get the IP address range and subnet mask from the robot by connecting it to your computer and checking the Opentrons App:
 
-1. Disconnect the robot's Ethernet cable from the wall jack and connect it to your computer.
+1. If the robot is connected by Ethernet cable to a switch or wall jack, disconnect it. Then establish a physical Ethernet connection to your computer, as described above.
 
 1. Launch the Opentrons App.
 
-1. Click the Devices tab and find your robot.
+1. Click the **Devices** tab and find your robot.
 
     !!!note
-        If your robot appears as inactive or inaccessible in the app, wait a few moments. Flex will configure itself and eventually become available again. If this does not happen, turn the power off, wait a few seconds, turn the power back on, and check the app again after the robot boots up.
+        If your robot appears as inactive or inaccessible in the app, wait a few moments. Flex will configure itself and eventually become available again. If this does not happen, turn the robot's power off, wait a few seconds, turn the power back on, and check the app again after the robot boots up.
 
 1. After locating your robot in the app, click the three-dot menu (⋮), select **Robot settings**, and then click the **Networking** tab.
 
