@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
+  MODULE_AA_TYPE_BY_MODEL,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1030,6 +1031,13 @@ export const getAAsToFixtureIdFromDeckDefWithFakes = (
     CutoutFixtureIdsWithFakes,
     AddressableAreaNamesWithFakes[]
   >
+}
+
+export const getAAForModuleFixture = (cutoutId: CutoutId,fixtureId: CutoutFixtureIdsWithFakes, moduleModel: ModuleModel): AddressableAreaNamesWithFakes => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
+  const aaItem = aaList?.find(aa => getAAByAAId(aa, deckDef).areaType === MODULE_AA_TYPE_BY_MODEL[moduleModel])
+  return aaItem
 }
 
 /**

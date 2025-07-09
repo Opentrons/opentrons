@@ -659,6 +659,17 @@ export const MODULE_FIXTURES_BY_MODEL: {
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
 }
 
+export const MODULE_AA_TYPE_BY_MODEL: {
+  [moduleModel in ModuleModel]?: AreaType
+} = {
+  [HEATERSHAKER_MODULE_V1]: 'heaterShaker',
+  [TEMPERATURE_MODULE_V2]: 'temperatureModule',
+  [MAGNETIC_BLOCK_V1]: 'magneticBlock',
+  [THERMOCYCLER_MODULE_V2]: 'thermocycler',
+  [ABSORBANCE_READER_V1]: 'absorbanceReader',
+  [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+}
+
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,

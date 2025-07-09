@@ -14,9 +14,11 @@ import {
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getAAForModuleFixture,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
+  getMainAAForAFixture,
   getModuleDisplayName,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
@@ -132,11 +134,13 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
 
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
+      const mainAA = getAAForModuleFixture(anchorCutoutId, moduleFixtures[0].id, attachedModule.moduleModel)
+      console.log("mainAA: ", mainAA)
       updateDeckConfiguration(
         deckConfig.map(cc => {
           const addedCutoutConfigs: CutoutConfigMap[] = [
             {
-              addressableAreaId,
+              addressableAreaId: mainAA,
               cutoutFixtureId: moduleFixtures[0],
               cutoutId: anchorCutoutId,
             },

@@ -19,6 +19,7 @@ import {
 } from '..'
 import {
   getAAComboFixtureDisplayName,
+  getAAForModuleFixture,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutFixtureReplacementIfNeeded,
@@ -578,5 +579,18 @@ describe('isModuleAllowedOnAA', () => {
   it('should return true for tempModule on D3', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
     expect(vs).toEqual(true)
+  })
+})
+
+
+describe('getAAForModuleFixture', () => {
+  it('should return temp module aa', () => {
+    const result = getAAForModuleFixture('cutoutB3', 'temperatureModuleV2', 'temperatureModuleV2')
+    expect(result).toEqual('temperatureModuleV2B3')
+  })
+
+  it('should return stacker module aa', () => {
+    const result = getAAForModuleFixture('cutoutB3', 'flexStackerModuleV1', 'flexStackerModuleV1')
+    expect(result).toEqual('flexStackerModuleV1B4')
   })
 })
