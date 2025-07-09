@@ -55,7 +55,7 @@ const getMigratedBlowoutLocation = (
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, robot } = appData
+  const { designerApplication, robot, labwareDefinitions } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
@@ -67,7 +67,13 @@ export const migrateFile = (
   } = designerApplication.data
   const { model: robotType } = robot
 
-  const allLabwareDefsByURI = getAllLabwareDefs()
+  const allLabwareDefsByURI =
+    //  read the labware definitions key first
+    //  otherwise map to all labware defs as a fallback
+    //  for OpentronsAI
+    Object.values(labwareDefinitions).length > 0
+      ? labwareDefinitions
+      : getAllLabwareDefs()
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
