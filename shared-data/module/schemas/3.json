@@ -137,7 +137,10 @@
       "type": "string",
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
-    "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "labwareOffset": {
+      "$ref": "#/definitions/coordinates",
+      "description": "The offset from the left-front-bottom corner of the slot holding this module, to the left-front-bottom corner of the labware interface atop this module."
+    },
     "extents": {
       "description": "The outer dimensions of the addressable area. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",

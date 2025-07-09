@@ -20,7 +20,7 @@ export type UseHeaterShakerConfirmationModalResult =
     }
 
 export function useHeaterShakerConfirmationModal(
-  handleProceedToRunClick: () => void
+  handleProceedToRunClick: () => Promise<void>
 ): UseHeaterShakerConfirmationModalResult {
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
     getIsHeaterShakerAttached

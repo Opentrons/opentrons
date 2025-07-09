@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -12,14 +11,14 @@ import {
   TOOLTIP_BOTTOM,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck/LPCFlows'
-import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  useApplyOffsets,
+  useLPCAnalytics,
+} from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
-  selectLabwareOffsetsToAddToRun,
   selectTotalCountNonHardCodedLSOffsets,
 } from '/app/redux/protocol-runs'
 import { useLPCDisabledReason } from '/app/resources/runs'
@@ -40,7 +39,6 @@ export function LPCSetupFlexBtns({
   hasMissingCalForFlex,
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { makeSnackbar } = useToaster()
   const { reportApplyOffsets } = useLPCAnalytics({
     runId,
     robotType: FLEX_ROBOT_TYPE,
@@ -66,10 +64,6 @@ export function LPCSetupFlexBtns({
 
   const anyOffsetsToLpc =
     useSelector(selectTotalCountNonHardCodedLSOffsets(runId)) === 0
-  const lwOffsetsForRun = useSelector(selectLabwareOffsetsToAddToRun(runId))
-  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
-
-  const [isApplyOffsets, setIsApplyingOffsets] = useState(false)
 
   const isApplyOffsetsBtnDisabled =
     offsetsConfirmed ||
@@ -101,23 +95,12 @@ export function LPCSetupFlexBtns({
     }
   }
 
+  const { applyOffsets } = useApplyOffsets(runId)
   const onApplyOffsets = (): void => {
-    if (!isApplyOffsets && lwOffsetsForRun != null) {
-      setIsApplyingOffsets(true)
-      Promise.all(
-        lwOffsetsForRun.map(data => createLabwareOffset({ runId, data }))
-      )
-        .then(() => {
-          setOffsetsConfirmed(true)
-          reportApplyOffsets()
-        })
-        .catch(() => {
-          makeSnackbar(t('failed_to_apply_offsets') as string)
-        })
-        .finally(() => {
-          setIsApplyingOffsets(false)
-        })
-    }
+    void applyOffsets().then(() => {
+      setOffsetsConfirmed(true)
+      reportApplyOffsets()
+    })
   }
 
   return (
@@ -140,7 +123,6 @@ export function LPCSetupFlexBtns({
         id="LPC_setOffsetsConfirmed"
         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
         {...confirmOffsetsTargetProps}
-        disabled={isApplyOffsetsBtnDisabled}
       >
         {t('apply_offsets')}
       </PrimaryButton>

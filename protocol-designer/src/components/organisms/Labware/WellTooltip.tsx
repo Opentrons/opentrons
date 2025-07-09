@@ -17,6 +17,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { swatchColors } from '@opentrons/step-generation'
 
 import { getMainPagePortalEl } from '..'
 import { selectors } from '../../../labware-ingred/selectors'
@@ -24,7 +25,6 @@ import {
   formatPercentage,
   formatVolume,
 } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
-import { swatchColors } from '../DefineLiquidsModal/swatchColors'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'

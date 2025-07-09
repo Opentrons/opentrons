@@ -45,7 +45,6 @@ class TargetProtocol:
     host_analysis_file: Path
     container_analysis_file: Path
     tag: str
-    custom_labware_paths: List[str]
     analysis_execution_time: Optional[float] = None
     command_exit_code: Optional[int] = None
     command_output: Optional[str] = None
@@ -167,22 +166,12 @@ def container_analysis_path(protocol_file: Path, tag: str) -> Path:
     return Path(CONTAINER_RESULTS, f"{protocol_file.stem}_{tag}_{ANALYSIS_SUFFIX}")
 
 
-def protocol_custom_labware_paths_in_container(protocol: Protocol) -> List[str]:
-    if not HOST_LABWARE.is_dir() or protocol.custom_labware is None:
-        return []
-
-    return [
-        str(os.path.join(CONTAINER_LABWARE, f"{file}.json"))
-        for file in protocol.custom_labware
-        if f"{file}.json" in os.listdir(HOST_LABWARE)
-    ]
-
-
 def analyze(protocol: TargetProtocol, container: docker.models.containers.Container) -> bool:
-    command = (
-        f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} "
-        f"{protocol.container_protocol_file} {' '.join(protocol.custom_labware_paths)}"
-    )
+    # Gather all labware JSON files in the container labware directory
+    labware_files = list(Path(CONTAINER_LABWARE).glob("*.json"))
+    # Build the command with all relevant file paths
+    all_files = [str(protocol.container_protocol_file)] + [str(lw) for lw in labware_files]
+    command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} " + " ".join(all_files)
     start_time = time.time()
     result = None
     exit_code = None
@@ -263,7 +252,6 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> List[Tar
                 host_analysis_file,
                 container_analysis_file,
                 tag,
-                protocol_custom_labware_paths_in_container(test_protocol),
             )
         )
     instance_count = get_container_instances(len(protocols_to_process))
