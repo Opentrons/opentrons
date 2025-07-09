@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
-import { css } from 'styled-components'
+import last from 'lodash/last'
 
 import {
   ALIGN_CENTER,
@@ -66,9 +65,13 @@ import type { BaseState } from '../../../../types'
 
 interface AddStepButtonProps {
   hasText: boolean
+  sidebarWidth: number
 }
 
-export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
+export function AddStepButton({
+  hasText,
+  sidebarWidth,
+}: AddStepButtonProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
   const enableComment = useSelector(getEnableComment)
   const { makeSnackbar } = useKitchen()
@@ -197,7 +200,15 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 
       {showStepOverflowMenu ? (
         <Flex
-          css={STEP_OVERFLOW_MENU_STYLE}
+          position={POSITION_ABSOLUTE}
+          zIndex={5}
+          left={sidebarWidth - 4} // 4 is the position over the toolbox
+          whiteSpace={NO_WRAP}
+          bottom="1rem"
+          borderRadius={BORDERS.borderRadius8}
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+          backgroundColor={COLORS.white}
+          flexDirection={DIRECTION_COLUMN}
           ref={overflowWrapperRef}
           onClick={(e: MouseEvent) => {
             e.preventDefault()
@@ -230,15 +241,3 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     </>
   )
 }
-
-const STEP_OVERFLOW_MENU_STYLE = css`
-  position: ${POSITION_ABSOLUTE};
-  z-index: 5;
-  right: -6.5rem;
-  white-space: ${NO_WRAP};
-  bottom: 1rem;
-  border-radius: ${BORDERS.borderRadius8};
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-  background-color: ${COLORS.white};
-  flex-direction: ${DIRECTION_COLUMN};
-`
