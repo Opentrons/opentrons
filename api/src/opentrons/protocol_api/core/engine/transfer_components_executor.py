@@ -25,6 +25,7 @@ from opentrons.protocol_engine.errors import TouchTipDisabledError
 from opentrons.types import Location, Point, Mount
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
+    check_current_volume_before_dispensing,
 )
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
@@ -253,8 +254,12 @@ class TransferComponentsExecutor:
         push_out_override: Optional[float],
     ) -> None:
         """Dispense according to dispense properties and wait if enabled."""
+        current_vol = self._instrument.get_current_volume()
+        check_current_volume_before_dispensing(
+            current_volume=current_vol, dispense_volume=volume
+        )
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
-            self._instrument.get_current_volume() - volume
+            current_vol - volume
         )
         self._instrument.dispense(
             location=self._target_location,

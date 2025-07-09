@@ -58,9 +58,6 @@ describe('Render StackerShuttleLwInfo', () => {
 
     clickButtonLabeled('Continue')
     await waitFor(() => {
-      expect(mockManualRetrieve).toHaveBeenCalled()
-    })
-    await waitFor(() => {
       expect(mockProceedNextStep).toHaveBeenCalled()
     })
   })
@@ -80,6 +77,9 @@ describe('Render StackerShuttleLwInfo', () => {
     expect(LeftColumnLabwareInfo).toHaveBeenCalledWith(
       expect.objectContaining({
         title: 'Load labware onto labware shuttle',
+        type: 'location',
+        layout: 'stacked',
+        showQuantity: false,
       }),
       expect.anything()
     )

@@ -185,22 +185,45 @@ export const getLabwareCompatibleWithAdapter = (
   }
 }
 
-export const getStackerDefinition = (
+const getStackerDefinitionsFromLoadName = (
   defs: LabwareDefByDefURI,
-  loadName?: string
-): string | null => {
-  if (loadName == null || loadName === 'opentrons_flex_deck_riser') {
-    return null
-  }
-
+  loadName: string
+): string[] | null => {
   const labwareDefURI = Object.entries(defs)
     .filter(([, { compatibleParentLabware }]) =>
       compatibleParentLabware?.includes(loadName)
     )
     .reverse()
-    .map(([labwareDefUri]) => labwareDefUri)[0]
+    .map(([labwareDefUri]) => labwareDefUri)
 
   return labwareDefURI
+}
+
+const CATEGORIES_WITH_NO_LID = [
+  'lid',
+  'tubeRack',
+  'tipRack',
+  'adapter',
+  'aluminumBlock',
+]
+export const getStackerDefinitions = (
+  defs: LabwareDefByDefURI,
+  universalLidURI?: string,
+  loadName?: string,
+  category?: string
+): string[] => {
+  if (loadName == null || loadName === 'opentrons_flex_deck_riser') {
+    return []
+  }
+  const universalLid =
+    category != null && !CATEGORIES_WITH_NO_LID.includes(category)
+      ? universalLidURI
+      : null
+  const supportedDef = getStackerDefinitionsFromLoadName(defs, loadName)
+  return [
+    ...(supportedDef != null ? supportedDef : []),
+    ...(universalLid != null ? [universalLid] : []),
+  ]
 }
 interface DeckErrorsProps {
   modules: InitialDeckSetup['modules']

@@ -895,7 +895,7 @@ export interface ByTipTypeSetting {
   singleDispense: SingleDispenseProperties
   multiDispense?: MultiDispenseProperties
 }
-interface ByPipetteSetting {
+export interface ByPipetteSetting {
   pipetteModel: string
   byTipType: ByTipTypeSetting[]
 }
