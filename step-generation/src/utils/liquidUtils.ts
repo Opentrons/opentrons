@@ -20,15 +20,15 @@ export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
 
 export type ContentsByWell = Record<string, WellContents> | null
 
-function _wellContentsForWell(
+const _wellContentsForWell = (
   liquidVolState: LocationLiquidState,
-  well: string
-): WellContents {
+  wellName: string
+): WellContents => {
   const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
     groupId => liquidVolState[groupId] && liquidVolState[groupId].volume > 0
   )
   return {
-    wellName: well,
+    wellName,
     groupIds: ingredGroupIdsWithContent,
     ingreds: omitBy(
       liquidVolState,
@@ -37,10 +37,10 @@ function _wellContentsForWell(
   }
 }
 
-export function _wellContentsForLabware(
+export const _wellContentsForLabware = (
   labwareLiquids: SingleLabwareLiquidState,
   labwareDef: LabwareDefinition2
-): ContentsByWell {
+): ContentsByWell => {
   const allWellsForContainer = getAllWellsForLabware(labwareDef)
   return reduce(
     allWellsForContainer,

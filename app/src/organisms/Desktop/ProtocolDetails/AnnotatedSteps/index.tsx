@@ -32,7 +32,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     currentCommandIndex,
     groupedCommands,
     setSelectedCommand,
-    handlePause
+    handlePause,
   } = props
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
@@ -107,17 +107,17 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         {analysis?.errors.length > 0 ? (
           <div className={styles.annotated_steps_error_container}>
             {analysis?.errors.map(error => (
-              <div className={styles.annoted_steps_error_header} key={error.id}>
+              <div
+                className={styles.annotated_steps_error_header}
+                key={error.id}
+              >
                 <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {error.detail}
                 </StyledText>
               </div>
             ))}
-            <div
-              className={styles.annoted_steps_final_command}
-              key="final_command"
-            >
+            <div className={styles.annotated_steps_final_command}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 Unable to show steps past errors
               </StyledText>

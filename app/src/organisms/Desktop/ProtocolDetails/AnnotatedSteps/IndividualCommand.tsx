@@ -45,19 +45,21 @@ export function IndividualCommand({
     }
   }, [isHighlighted])
 
+  const commandWrapStyle = clsx(styles.individual_command_wrap, {
+    [styles.individual_command_wrap_highlighted]: isHighlighted,
+  })
+
+  const individualCommandContainerStyle = clsx(
+    styles.individual_command_container,
+    {
+      [styles.rogue_individual_command_container]: fromGroup,
+    }
+  )
+
   return (
-    <div
-      className={clsx(
-        styles.individual_command_container,
-        fromGroup && styles.rogue_individual_command_container
-      )}
-      ref={commandRef}
-    >
+    <div className={individualCommandContainerStyle} ref={commandRef}>
       <div
-        className={clsx(
-          styles.individual_command_wrap,
-          isHighlighted && styles.individual_command_wrap_highlighted
-        )}
+        className={commandWrapStyle}
         onClick={() => {
           setSelectedCommand?.(command.id)
         }}

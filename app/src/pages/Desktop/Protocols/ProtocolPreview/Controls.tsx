@@ -65,7 +65,7 @@ export function Controls(props: ControlsProps): JSX.Element {
           <div className={styles.all_controls_info}>
             <div className={styles.controls_info}>
               <div className={styles.heading_text}>{protocolName}</div>
-              <div className={styles.max_content}>
+              <div className={styles.max_content_size}>
                 {numErrors === 0 ? (
                   <Chip type="success" chipSize="small" text="No errors" />
                 ) : (

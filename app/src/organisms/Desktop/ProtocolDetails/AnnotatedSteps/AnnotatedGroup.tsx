@@ -39,7 +39,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   }, [subCommands])
 
   return (
-    <div className={styles.annoted_group_container}>
+    <div className={styles.annotated_group_container}>
       <div
         onClick={() => {
           setIsExpanded(!isExpanded)
