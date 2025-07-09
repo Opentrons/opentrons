@@ -6,7 +6,6 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
     ParameterContext,
-    OFF_DECK,
 )
 from opentrons.types import Point, Dict
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
@@ -17,33 +16,6 @@ requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 ###########################################
 #  VARIABLES - START
 ###########################################
-# TODO: use runtime-variables instead of constants
-
-# NOTE: The volumes below were calculated using Solidworks
-#       models, they are the nominal volume inside the well
-#       at both 3mm from bottom and 3mm from top.
-# FIXME: replace this with actual Opentrons API software
-#        volume estimations. No need for us to include Solidworks
-#        in this testing loop.
-
-
-def create_dict_of_heights_for_labware(
-    protocol: ProtocolContext,
-) -> Dict[str, List[float | SimulatedProbeResult]]:
-    """Create a dictionary of labware and their heights."""
-    volumes_dict = {}
-    labware = protocol.params.labware_type  # type: ignore[attr-defined]
-    if requirements["apiLevel"] == "2.24":
-        labware_loaded = protocol.load_labware(labware, OFF_DECK)
-        well = labware_loaded["A1"]
-        volumes_dict[labware] = [
-            well.volume_from_height(height=3),
-            well.volume_from_height(height=well.depth / 2),
-            well.volume_from_height(height=well.depth - 3),
-            0.0,
-        ]
-    return volumes_dict
-
 
 SAME_TIP = True  # this is fine when using Ethanol (b/c it evaporates)
 RETURN_TIP = False
@@ -71,8 +43,14 @@ def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     from hardware_testing import protocols
 
+    parameters.add_int(
+        variable_name="labware_version",
+        display_name="Labware Version",
+        maximum=10,
+        minimum=1,
+        default=2,
+    )
     protocols.create_pipette_parameters(parameters)
-    # protocols.create_labware_parameters(parameters)
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
@@ -86,7 +64,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="nest_24_wellplate_10.4ml",
     )
-    protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
     parameters.add_float(
         variable_name="volume_3mm_from_bottom",
@@ -146,7 +123,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="calculate_height_from_api",
         display_name="Calculate height from API",
         description="Calculate height from API.",
-        default=False,
+        default=True,
     )
     parameters.add_bool(
         variable_name="pause_to_check_well",
@@ -191,7 +168,6 @@ def _setup(
     Labware,
     Labware,
     int,
-    int,
     bool,
     Dict[str, List[float | SimulatedProbeResult]],
     bool,
@@ -202,20 +178,19 @@ def _setup(
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
     num_trials: int = ctx.params.num_of_trials  # type: ignore[attr-defined]
     LABWARE = ctx.params.labware_type  # type: ignore[attr-defined]
-    tube_volume: int = ctx.params.tube_volume  # type: ignore[attr-defined]
     volume_3mm_from_bottom = ctx.params.volume_3mm_from_bottom  # type: ignore[attr-defined]
     volume_3mm_from_top = ctx.params.volume_3mm_from_top  # type: ignore[attr-defined]
     volume_of_middle = ctx.params.volume_of_middle  # type: ignore[attr-defined]
+    middle_height_bool = ctx.params.measure_middle_height  # type: ignore[attr-defined]
     pause_to_check_well = ctx.params.pause_to_check_well  # type: ignore[attr-defined]
-    VOLUMES_3MM_TOP_BOTTOM = create_dict_of_heights_for_labware(ctx)
     volumes = [volume_3mm_from_bottom, volume_3mm_from_top, volume_of_middle]
     volumes_testing = []
+    VOLUMES_3MM_TOP_BOTTOM = {}
     for volume in volumes:
         if volume > 0 and LABWARE not in VOLUMES_3MM_TOP_BOTTOM:
             volumes_testing.append(volume)
     VOLUMES_3MM_TOP_BOTTOM[LABWARE] = volumes_testing
-
-    labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE)
+    labware: Labware = ctx.load_labware(LABWARE, SLOT_LABWARE, version=ctx.params.labware_version)  # type: ignore[attr-defined]
     labware.load_empty(labware.wells())
     labware_max_volume = labware["A1"].max_volume
     print(f"Labware max volume: {labware_max_volume}")
@@ -246,28 +221,18 @@ def _setup(
 
     liquid_pip_channels = liquid_pipette.channels
 
-    if tube_volume == 15:
-        # Replace volumes with 15 ml volumes
-        VOLUMES_3MM_TOP_BOTTOM["opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"] = [
-            17.3,
-            7090.6,
-            16077.5,
-            0.0,
-        ]
-        VOLUMES_3MM_TOP_BOTTOM["opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"] = [
-            42.2,
-            15956.6,
-            0.0,
-        ]
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     calculate_height_from_api = ctx.params.calculate_height_from_api  # type: ignore[attr-defined]
     if calculate_height_from_api:
         labware_depth = labware["A1"].depth
         volumes_raw = [
             labware["A1"].volume_from_height(height=3),
-            labware["A1"].volume_from_height(height=labware_depth / 2),
             labware["A1"].volume_from_height(height=labware_depth - 3),
         ]
+        if middle_height_bool:
+            volumes_raw.append(
+                labware["A1"].volume_from_height(height=labware_depth / 2)
+            )
         for vol in volumes_raw:
             if isinstance(vol, float):
                 volumes.append(round(vol, 1))
@@ -275,8 +240,7 @@ def _setup(
         print(
             f"Using volumes found by API:\n"
             f"  - 3 mm from bottom: {volumes[0]:.1f} µL\n"
-            f"  - Middle:           {volumes[1]:.1f} µL\n"
-            f"  - 3 mm from top:    {volumes[2]:.1f} µL"
+            f"  - 3 mm from top:    {volumes[1]:.1f} µL"
         )
     total_volume_to_aspirate = 0.0
     for one_vols in volumes:
@@ -318,7 +282,6 @@ def _setup(
         labware,
         reservoir,
         dial,
-        tube_volume,
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
@@ -336,27 +299,11 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
 
 
 def _get_test_wells(
-    labware: Labware, channels: int, tube_volume: int, total_test_wells: int
+    labware: Labware, channels: int, total_test_wells: int
 ) -> List[Well]:
     well_names = []
     try:
-        if tube_volume == 15:
-            print("cHANGING LABWARE WELLS")
-
-            TEST_WELLS[channels]["opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"] = [
-                "A1",
-                "B1",
-                "C1",
-                "A2",
-                "B2",
-                "C2",
-            ]
-            TEST_WELLS[channels][
-                "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
-            ] = ["A1", "B1", "C1", "A2", "B2", "C2"]
-            well_names = TEST_WELLS[channels][labware.load_name]
-        else:
-            well_names = TEST_WELLS[channels][labware.load_name]
+        well_names = TEST_WELLS[channels][labware.load_name]
     except KeyError:
         well_names = [
             str(well_name).split(" ")[0].replace(" ", "")
@@ -576,7 +523,6 @@ def run(
         labware,
         reservoir,
         dial,
-        tube_volume,
         num_trials,
         liquid_pipette_probe_every_time,
         VOLUMES_3MM_TOP_BOTTOM,
@@ -586,9 +532,7 @@ def run(
     test_tips_probe = _get_test_tips(probe_rack, channels=channels_probe)
     volumes = VOLUMES_3MM_TOP_BOTTOM[labware.load_name]
     total_test_wells = len(volumes) * num_trials
-    test_wells = _get_test_wells(
-        labware, channels=1, tube_volume=tube_volume, total_test_wells=total_test_wells
-    )
+    test_wells = _get_test_wells(labware, channels=1, total_test_wells=total_test_wells)
     stuff_lengths = len(test_tips_probe), len(test_wells)
 
     assert min(stuff_lengths) >= num_trials * len(volumes), f"{stuff_lengths}"
