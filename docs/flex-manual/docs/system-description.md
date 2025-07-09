@@ -567,7 +567,7 @@ In the stopped state, Flex and connected hardware will behave as follows:
         </tr>
         <tr>
             <td><strong>Status light</strong></td>
-            <td>The light turns yellow.</td>
+            <td>The light turns red.</td>
         </tr>
         <tr>
             <td><strong>Touchscreen</strong></td>
