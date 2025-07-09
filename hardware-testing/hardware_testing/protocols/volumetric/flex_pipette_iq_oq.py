@@ -164,7 +164,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_str(
         display_name="tips",
         variable_name="tips",
-        default=_racks[2],
+        default=_racks[0],
         choices=[
             {"display_name": r.replace("opentrons_flex_96_", ""), "value": r}
             for r in _racks
@@ -193,7 +193,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_bool(
         display_name="pipette_at_liquid_meniscus",
         variable_name="pipette_at_liquid_meniscus",
-        default=False,
+        default=True,
     )
     params.add_bool(
         display_name="include_baseline",
@@ -203,7 +203,7 @@ def add_parameters(params: ParameterContext) -> None:
     params.add_str(
         display_name="ul_ranges_to_test",
         variable_name="ul_ranges_to_test",
-        default="low-mid-high",
+        default="low,mid,high",
         choices=[
             {"display_name": "low,mid,high", "value": "low,mid,high"},
             {"display_name": "low,mid", "value": "low,mid"},
@@ -221,7 +221,16 @@ def get_trials(
 ) -> List[int]:
     if ctx.params.just_fill_plate_200ul:
         return [int(96 / pipette.channels)]
-    return TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+
+    trials_per_range = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
+    trials_to_test: List[int] = []
+    if "low" in ctx.params.ul_ranges_to_test:
+        trials_to_test.append(trials_per_range[0])
+    if "mid" in ctx.params.ul_ranges_to_test:
+        trials_to_test.append(trials_per_range[1])
+    if "high" in ctx.params.ul_ranges_to_test:
+        trials_to_test.append(trials_per_range[2])
+    return trials_to_test
 
 
 def get_volumes(
@@ -743,6 +752,7 @@ def run(ctx: ProtocolContext) -> None:
                 #        however probing >=2x times requires LLD support in liquid-classes.
                 pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
                 diluent_probed = True
+            pip_for_dil.configure_for_volume(dil_ul)
             pip_for_dil.transfer_with_liquid_class(
                 test_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
@@ -773,6 +783,7 @@ def run(ctx: ProtocolContext) -> None:
         # TRANSFER DYE TO PLATE
         if ul <= DYE_SHAKER_MAX_UL:
             list_of_the_same_src_well = [src_well] * len(dst_wells_organized_by_channel)
+            test_pip.configure_for_volume(ul)
             test_pip.transfer_with_liquid_class(
                 test_class,
                 ul,
@@ -781,6 +792,7 @@ def run(ctx: ProtocolContext) -> None:
                 new_tip="always",
             )
         else:
+            test_pip.configure_for_volume(tip_ul)
             dist_vol = ul / ceil(ul / DYE_SHAKER_MAX_UL)
             test_pip.distribute_with_liquid_class(
                 test_class,
