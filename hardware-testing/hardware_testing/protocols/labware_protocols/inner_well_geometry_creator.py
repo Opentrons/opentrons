@@ -83,7 +83,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
         ],
-        default="nest_24_wellplate_10.4ml",
+        default="corning_24_wellplate_3.4ml_flat",
     )
 
     parameters.add_float(
@@ -342,6 +342,7 @@ def run(ctx: ProtocolContext) -> None:
                             5,
                         )
                     except PipetteLiquidNotFoundError:
+                        ctx.comment("Didn't find liquid, trying again")
                         height = round(
                             _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
                             5,
@@ -359,11 +360,11 @@ def run(ctx: ProtocolContext) -> None:
         drop_tips()
 
     else:
+        pick_up_tips()
+        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+        src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+        drop_tips()
         for step in range(STEPS):
-            drop_tips()
-            pick_up_tips()
-            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-
             if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
@@ -385,6 +386,7 @@ def run(ctx: ProtocolContext) -> None:
                             5,
                         )
                     except PipetteLiquidNotFoundError:
+                        ctx.comment("Didn't find liquid, trying again")
                         height = round(
                             _get_height_of_liquid_in_well(
                                 probe_pipette, labware["A1"], ctx.is_simulating()
@@ -393,8 +395,9 @@ def run(ctx: ProtocolContext) -> None:
                         )
                 except PipetteLiquidNotFoundError:
                     height = 99.0
+                
+                drop_tips()
             else:
-                src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
                 height = 0.0
                 volume_dispensed = 0.0
                 
