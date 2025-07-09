@@ -18,7 +18,7 @@ import json
 from ast import literal_eval
 from collections import defaultdict
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 global baseline_x, baseline_y
@@ -67,7 +67,7 @@ def get_deviation(deviations: List[int], axis: str, platform: str) -> int:
 
 
 def create_baseline(
-    histograms: Dict[int, List[List[int]]],
+    histograms: Dict[int, List[Dict[str, List[int]]]],
     zone_count: int = NUMBER_OF_ZONES,
     bin_count: int = NUMBER_OF_BINS,
     deviation: int = DEFAULT_STD,
@@ -91,8 +91,9 @@ def create_baseline(
         aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
         # Iterate through the histograms and create a map of zones to bin value
         # per index of each histogram.
-        for zone, bin_list in histograms.items():
-            for bins in bin_list:
+        for zone, zone_info in histograms.items():
+            for bins_data in zone_info:
+                bins = list(bins_data.values())[0]
                 assert (
                     len(bins) == bin_count
                 ), f"Invalid number of bins in zone {zone}, got {len(bins)} expected: {bin_count}."
@@ -148,8 +149,7 @@ def process_data(data_df):
     return return_zones
 
 
-def sense_labware(axis, data_df):
-    # print(df)
+def sense_labware(axis, platform, data_df):
     raw_data = process_data(data_df)
     baseline_zones = {}
     baseline_file = baseline_z
@@ -310,138 +310,133 @@ def test_baseline(baseline, df_path):
     plot_tests(hashes_lab, 1, axis)
 
 
-def plot_baseline(args: argparse.Namespace) -> None:
-    """Plots the baseline."""
-    axis_list = args.axis
-    platform_list_x = args.platform_x
-    platform_list_z = args.platform_z
-    figures: Dict[str, None | go.Figure] = {"x": None, "z": None}
+def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
+    return {
+        "axis_list": args.axis,
+        "stacker_list": args.stackers or [],
+        "labware_list": [] if "all" in args.labwares else args.labwares or ["baseline"],
+        "platform_list_x": args.platform_x,
+        "platform_list_z": args.platform_z,
+        "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
+        "zone_list_z": args.zones_z or list(range(NUMBER_OF_ZONES)),
+        "bins_list": args.bins or list(range(NUMBER_OF_BINS)),
+        "max_samples": args.max_samples or DEFAULT_MAX_SAMPLES,
+        "baseline_version": getattr(args, "baseline_version", None),
+        "output_file": getattr(args, "output_file", None),
+        "std": getattr(args, "std", [DEFAULT_STD] * 4),
+    }
 
-    axis_list = args.axis
-    stacker_list = args.stackers or []
-    labware_list = (
-        []
-        if "all" in args.labwares
-        else args.labwares
-        if args.labwares
-        else ["baseline"]
-    )
-    baseline_version = args.baseline_version
-    platform_list_x = args.platform_x
-    platform_list_z = args.platform_z
-    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
-    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
-    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
-    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
-    bin_count = len(bins_list)
 
+def is_valid_row(axis, platform, zone, config):
+    for a in ["x", "z"]:
+        if axis.lower() == a:
+            platform_list = config[f"platform_list_{a}"]
+            zone_list = config[f"zone_list_{a}"]
+            return (not platform_list or platform in platform_list) and (
+                not zone_list or zone in zone_list
+            )
+    return True
+
+
+def read_filtered_data(filepath: str, config: dict, return_dict_format=False):
+    if not os.path.exists(filepath):
+        sys.exit(f"ERROR: Invalid dataframe file provided - {filepath}")
+
+    samples = 0
+    bin_count = len(config["bins_list"])
     measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    if args.dataframe:
-        if not os.path.exists(args.dataframe):
-            sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
 
-        # Gather data
-        samples = 0
-        chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
-        for df in chunks:
+    for df in pd.read_csv(filepath, chunksize=CHUNK_SIZE):
+        df = df[df["Axis"].isin(config["axis_list"])]
+        if config["stacker_list"]:
+            df = df[df["Stacker_SN"].isin(config["stacker_list"])]
+        if config["labware_list"]:
+            df = df[df["Labware_Name"].isin(config["labware_list"])]
 
-            # Filter out data
-            if axis_list:
-                df = df[df["Axis"].isin(axis_list)]
-            if stacker_list:
-                df = df[df["Stacker_SN"].isin(stacker_list)]
-            if labware_list:
-                df = df[df["Labware_Name"].isin(labware_list)]
-            for row in df.itertuples(index=False, name="data"):
-                axis = row.Axis
-                zone = row.Zone
-                platform = row.Platform_Position
-                stacker = row.Stacker_SN
-                labware = row.Labware_Name
+        start_index = df.columns.get_loc("Time") + 1
+        for row in df.itertuples(index=False, name="data"):
+            axis = row.Axis
+            zone = row.Zone
+            platform = row.Platform_Position
+            stacker = row.Stacker_SN
 
-                ## Filter out specific rows
-                if axis == "x":
-                    if platform_list_x and platform not in platform_list_x:
-                        continue
-                    if zone_list_x and zone not in zone_list_x:
-                        continue
-                if axis == "z":
-                    if platform_list_z and platform not in platform_list_z:
-                        continue
-                    if zone_list_z and zone not in zone_list_z:
-                        continue
+            if not is_valid_row(axis, platform, zone, config):
+                continue
 
-                # Get the bins
-                axis = axis.upper()
-                start_index = df.columns.get_loc("Time") + 1
-                bins = list(row[start_index : start_index + bin_count])
-                measurements[axis][platform][zone].append({stacker: bins})
-                samples += 1
+            axis_upper = axis.upper()
+            bins = list(row[start_index : start_index + bin_count])
+            measurements[axis_upper][platform][zone].append({stacker: bins})
 
-            if samples > max_samples:
-                break
+            samples += 1
+            if samples > config["max_samples"]:
+                return measurements, samples
 
-    # Create visibility masks
-    def get_visibility_mask(trace_visibility_data, active_platform, total_traces):
-        mask = [False] * total_traces
-        for i in trace_visibility_data[active_platform]:
+    return measurements, samples
+
+
+def plot_baseline(args: argparse.Namespace) -> None:
+    """Plots the baseline and dataframe."""
+
+    def get_visibility_mask(visibility_dict, key, total):
+        mask = [False] * total
+        for i in visibility_dict[key]:
             mask[i] = True
         return mask
 
-    baseline_list = args.baseline
-    for baseline_path in baseline_list:
+    config = parse_common_args(args)
+    measurements, samples = read_filtered_data(args.dataframe, config)
+    for baseline_path in args.baseline:
         if not os.path.exists(baseline_path):
             sys.exit(f"ERROR: Invalid baseline file provided - {baseline_path}")
 
-        # Read the baseline and trace the zones
         with open(baseline_path, "r") as file:
             definition = json.load(file)
-            baseline = definition["uniqueModuleData"]["TOFSensorBaseline"]
-            baseline_version = baseline.pop("version", 1)
-            # Trace each zone
-            for axis, data in baseline.items():
-                fig = go.Figure()
-                if axis.lower() not in axis_list:
+            baseline_data = definition["uniqueModuleData"]["TOFSensorBaseline"]
+            version = baseline_data.pop("version", config["baseline_version"])
+
+            for axis, data in baseline_data.items():
+                if axis.lower() not in config["axis_list"]:
                     continue
-                trace_visibility_stackers = {"extend": [], "retract": []}
-                trace_visibility_baseline = {"extend": [], "retract": []}
+
+                fig = go.Figure()
+                trace_visibility = defaultdict(list)
+                zone_visibility = defaultdict(list)
                 for platform, baseline_str in data.items():
-                    if axis == "X" and platform not in platform_list_x:
-                        continue
-                    if axis == "Z" and platform not in platform_list_z:
-                        continue
-
                     print(
-                        f"Plotting baseline V{baseline_version} for {axis} axis {platform}."
+                        f"Plotting baseline V{version} for {axis} axis {platform} from {samples} samples"
                     )
-
-                    # plot baselines
                     baseline = literal_eval(baseline_str)
                     for zone, bin in baseline.items():
+                        if not is_valid_row(axis, platform, zone, config):
+                            continue
+
                         bins, photons = zip(*enumerate(bin))
                         fig.add_trace(
                             go.Scatter(
                                 x=bins,
                                 y=photons,
                                 mode="lines",
-                                name=f"Baseline Zone {zone}",
+                                name=f"Baseline Zone {zone} {platform}",
                                 visible=platform == "extend",
                                 line=dict(dash="dash", color="blue", width=2),
                             )
                         )
-                        trace_visibility_baseline[platform].append(len(fig.data) - 1)  # type: ignore
-                        trace_visibility_stackers[platform].append(len(fig.data) - 1)  # type: ignore
+                        idx = len(fig.data) - 1  # type: ignore
+                        trace_visibility[platform].append(idx)
+                        zone_visibility[zone].append(idx)
 
-                    # plot measurements
                     if measurements:
-                        zones = measurements[axis][platform]
-                        for zone, meas_data in zones.items():
-                            for reading in meas_data:
-                                for stacker, bins in reading.items():
-                                    bin, photons = zip(*enumerate(bins))
+                        for zone, entries in (
+                            measurements.get(axis, {}).get(platform, {}).items()
+                        ):
+                            if not is_valid_row(axis, platform, zone, config):
+                                continue
+                            for entry in entries:
+                                for stacker, bin in entry.items():
+                                    bins, photons = zip(*enumerate(bin))
                                     fig.add_trace(
                                         go.Scatter(
-                                            x=bin,
+                                            x=bins,
                                             y=photons,
                                             mode="lines",
                                             name=f"Zone {zone}",
@@ -451,27 +446,45 @@ def plot_baseline(args: argparse.Namespace) -> None:
                                             visible=platform == "extend",
                                         )
                                     )
-                                    trace_visibility_stackers[platform].append(len(fig.data) - 1)  # type: ignore
+                                    idx = len(fig.data) - 1  # type: ignore
+                                    trace_visibility[platform].append(idx)
+                                    zone_visibility[zone].append(idx)
 
-                # Customize layout
-                total_traces = len(fig.data)  # type: ignore
+                total = len(fig.data)  # type: ignore
                 buttons = [
-                    dict(
-                        label=label,
-                        method="update",
-                        args=[
-                            {
-                                "visible": get_visibility_mask(
-                                    trace_visibility_stackers, label, total_traces
-                                )
-                            },
-                            {},
-                        ],
-                    )
-                    for label, visibility in trace_visibility_stackers.items()
+                    *[
+                        dict(
+                            label=key,
+                            method="update",
+                            args=[
+                                {
+                                    "visible": get_visibility_mask(
+                                        trace_visibility, key, total
+                                    )
+                                },
+                                {},
+                            ],
+                        )
+                        for key in trace_visibility
+                    ],
+                    *[
+                        dict(
+                            label=f"Zone {z}",
+                            method="update",
+                            args=[
+                                {
+                                    "visible": get_visibility_mask(
+                                        zone_visibility, z, total
+                                    )
+                                },
+                                {},
+                            ],
+                        )
+                        for z in zone_visibility
+                    ],
                 ]
                 fig.update_layout(
-                    title=f"TOF Sensor Baseline: {labware_list} {axis}",
+                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
                     template="plotly_white",
@@ -484,211 +497,43 @@ def plot_baseline(args: argparse.Namespace) -> None:
                         )
                     ],
                 )
-                figures[axis] = fig
-                if show:
-                    fig.show()
-
-    # if plot_choice.lower() == "labware data":
-    #    file_csv = input("Path to labware csv: ")
-    #    axis = input("Which axis? z or x?: ")
-    #    try:
-    #        file_df = pd.read_csv(file_csv)
-    #    except:
-    #        print("Cannot read file")
-
-    #    if axis == "z":
-    #        baseline_file = baseline_z
-    #        zone = "1"
-    #    elif axis == "x":
-    #        baseline_file = baseline_x
-    #        zone = "6"
-    #    try:
-    #        bfile = open(baseline_file)
-    #    except:
-    #        print("Could not find baseline")
-    #    baseline_dict = json.load(bfile)
-    #    bfile.close()
-    #    lab_data = process_data(file_df)
-
-    #    bins = [x for x in range(1, 129)]
-    #    fig = go.Figure()
-    #    zone_data = baseline_dict[zone]
-    #    fig.add_trace(
-    #        go.Scatter(
-    #            x=bins,
-    #            y=zone_data,
-    #            mode="lines",
-    #            name=f"Baseline {axis}",
-    #            line=dict(dash="dash"),
-    #        )
-    #    )
-
-    #    zone_data = lab_data[zone]
-    #    fig.add_trace(go.Scatter(x=bins, y=zone_data, mode="lines", name=f"Labware"))
-
-    #    fig.update_layout(
-    #        title=f"Labware with Baseline",
-    #        xaxis_title="Bins",
-    #        yaxis_title="Photon Count",
-    #        legend_title="Zones",
-    #        template="plotly_white",
-    #    )
-    #    fig.show()
-
-    # elif plot_choice.lower() == "labware comparison":
-    #    labwares_files = [
-    #        baseline_labware.format(axis="x"),
-    #        baseline_labware.format(axis="z"),
-    #    ]
-    #    bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-    #    for labware_data in labwares_files:
-    #        try:
-    #            file = open(labware_data, "r")
-    #        except:
-    #            raise
-
-    #        labwares_dict = json.load(file)
-    #        if "x" in labware_data.split("_")[-1]:
-    #            zone = "6"
-    #        elif "z" in labware_data.split("_")[-1]:
-    #            zone = "1"
-
-    #        # Create line traces for each zone
-    #        fig = go.Figure()
-
-    #        for labware in labwares_dict:
-    #            y_data = labwares_dict[labware][zone]
-    #            fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=labware))
-
-    #        # Customize layout
-    #        fig.update_layout(
-    #            title=f"TOF Labware Comparison: {labware_data}",
-    #            xaxis_title="Bins",
-    #            yaxis_title="Photon Count",
-    #            legend_title=f"Zone: {zone}",
-    #            template="plotly_white",
-    #        )
-    #        fig.show()
-
-    # elif plot_choice.lower() == "stacker comparison":
-    #    stackers_files = [
-    #        baseline_stacker.format(axis="x"),
-    #        baseline_stacker.format(axis="z"),
-    #    ]
-    #    bins = list(range(1, 129))  # X-axis: Bin numbers (1 to 128)
-    #    for stacker_data in stackers_files:
-    #        try:
-    #            file = open(stacker_data, "r")
-    #        except:
-    #            raise
-
-    #        stackers_dict = json.load(file)
-    #        if "x" in stacker_data.split("_")[-1]:
-    #            zone = "6"
-    #        elif "z" in stacker_data.split("_")[-1]:
-    #            zone = "1"
-
-    #        # Create line traces for each zone
-    #        fig = go.Figure()
-
-    #        for stacker in stackers_dict:
-    #            y_data = stackers_dict[stacker][zone]
-    #            fig.add_trace(go.Scatter(x=bins, y=y_data, mode="lines", name=stacker))
-
-    #        # Customize layout
-    #        fig.update_layout(
-    #            title=f"TOF Stacker Comparison: {stacker_data}",
-    #            xaxis_title="Bins",
-    #            yaxis_title="Photon Count",
-    #            legend_title=f"Zone: {zone}",
-    #            template="plotly_white",
-    #        )
-    #        fig.show()
+                fig.show()
 
 
 def generate_baseline(args: argparse.Namespace) -> None:
     """Generates a new baseline given the dataframe."""
-    if not os.path.exists(args.dataframe):
-        sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
+    config = parse_common_args(args)
+    histograms, samples = read_filtered_data(args.dataframe, config)
 
-    axis_list = args.axis
-    stacker_list = args.stackers or []
-    labware_list = args.labwares or []
-    baseline_version = args.baseline_version
-    platform_list_x = args.platform_x
-    platform_list_z = args.platform_z
-    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
-    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
-    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
-    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
-    deviations = args.std or [DEFAULT_STD] * 4
-    zone_count_x = len(zone_list_x)
-    zone_count_z = len(zone_list_z)
-    bin_count = len(bins_list)
-
+    deviations = config["std"]
     if len(deviations) > 4:
         sys.exit(f"ERROR: --std cannot be greater than 4, provided {deviations}.")
 
+    zone_count_x = len(config["zone_list_x"])
+    zone_count_z = len(config["zone_list_z"])
+    bin_count = len(config["bins_list"])
+
     print(
-        f"\nGenerating baseline: LW={labware_list}, STD={deviations},"
-        f" PlatX={platform_list_x}, PlatZ={platform_list_z} ZonesZ={zone_list_z},"
-        f" ZonesX={zone_list_x}, Bins={bins_list}\n"
+        f"\nGenerating baseline: LW={config['labware_list']}, STD={deviations},"
+        f" PlatX={config['platform_list_x']}, PlatZ={config['platform_list_z']},"
+        f" ZonesX={config['zone_list_x']}, ZonesZ={config['zone_list_z']}, Bins={config['bins_list']}\n"
     )
-    # Gather data
-    samples = 0
-    data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
-    for df in chunks:
 
-        # Filter out data
-        if axis_list:
-            df = df[df["Axis"].isin(axis_list)]
-        if stacker_list:
-            df = df[df["Stacker_SN"].isin(stacker_list)]
-        if labware_list:
-            df = df[df["Labware_Name"].isin(labware_list)]
-        for row in df.itertuples(index=False, name="data"):
-            axis = row.Axis
-            zone = row.Zone
-            platform = row.Platform_Position
-
-            ## Filter out specific rows
-            if axis == "x":
-                if platform_list_x and platform not in platform_list_x:
-                    continue
-                if zone_list_x and zone not in zone_list_x:
-                    continue
-            if axis == "z":
-                if platform_list_z and platform not in platform_list_z:
-                    continue
-                if zone_list_z and zone not in zone_list_z:
-                    continue
-
-            # Get the bins
-            axis = axis.upper()
-            start_index = df.columns.get_loc("Time") + 1
-            bins = list(row[start_index : start_index + bin_count])
-            data[axis][platform][zone].append(bins)
-            samples += 1
-
-        if samples > max_samples:
-            break
-
-    # Create a baseline for each axis
     baselines = defaultdict(dict)
-    for axis, platform_data in data.items():
+    for axis, platform_data in histograms.items():
         zone_count = zone_count_x if axis == "X" else zone_count_z
-        for platform_pos, histograms in platform_data.items():
-            deviation = get_deviation(deviations, axis, platform_pos)
-            baseline = create_baseline(histograms, zone_count, bin_count, deviation)
-            baselines[axis][platform_pos] = baseline
+        for platform, zone_data in platform_data.items():
+            deviation = get_deviation(deviations, axis, platform)
+            baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
+            baselines[axis][platform] = baseline
 
     if not baselines:
-        sys.exit(f"ERROR: Error generating baselines.")
+        sys.exit("ERROR: No baseline data was generated.")
 
-    # print or save to json file
-    output_file = args.output_file
-    if output_file is not None:
+    output_file = config["output_file"]
+    baseline_version = config["baseline_version"]
+
+    if output_file:
         if not os.path.exists(output_file):
             print(f"Creating {output_file}")
             with open(output_file, "w", encoding="utf-8") as f:
@@ -699,7 +544,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             definition = json.load(file)
             unique_module_data = definition.get("uniqueModuleData", {})
             tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
-            # Convert old format to V1
+
             if tof_sensor_baseline.get("version") is None:
                 x_baseline = tof_sensor_baseline.get("X", "{}")
                 z_baseline = tof_sensor_baseline.get("Z", "{}")
@@ -709,16 +554,14 @@ def generate_baseline(args: argparse.Namespace) -> None:
                     "Z": {"extend": z_baseline, "retract": z_baseline},
                 }
 
-            # Update baselines
             baseline_version = baseline_version or tof_sensor_baseline["version"]
+
             for axis, data in baselines.items():
                 for platform, baseline in data.items():
                     tof_sensor_baseline[axis][platform] = str(baseline)
-            definition.update(
-                {"uniqueModuleData": {"TOFSensorBaseline": tof_sensor_baseline}}
-            )
 
-            # Save to json file
+            definition["uniqueModuleData"] = {"TOFSensorBaseline": tof_sensor_baseline}
+
             file.seek(0)
             json.dump(definition, file, indent=2)
             file.truncate()
@@ -747,6 +590,73 @@ def validate_something(args: argparse.Namespace) -> None:
         axis = "X-Axis"
     elif axis == "z":
         axis = "Z-Axis"
+
+    if not os.path.exists(args.dataframe):
+        sys.exit(f"ERROR: Invalid dataframe file provided - {args.dataframe}")
+
+    axis_list = args.axis
+    stacker_list = args.stackers or []
+    labware_list = args.labwares or []
+    baseline_version = args.baseline_version
+    platform_list_x = args.platform_x
+    platform_list_z = args.platform_z
+    zone_list_x = args.zones_x or list(range(0, NUMBER_OF_ZONES))
+    zone_list_z = args.zones_z or list(range(0, NUMBER_OF_ZONES))
+    bins_list = args.bins or list(range(0, NUMBER_OF_BINS))
+    max_samples = args.max_samples or DEFAULT_MAX_SAMPLES
+    deviations = args.std or [DEFAULT_STD] * 4
+    zone_count_x = len(zone_list_x)
+    zone_count_z = len(zone_list_z)
+    bin_count = len(bins_list)
+
+    # Gather data
+    samples = 0
+    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    chunks = pd.read_csv(args.dataframe, chunksize=CHUNK_SIZE)
+    for df in chunks:
+
+        # Filter out data
+        if axis_list:
+            df = df[df["Axis"].isin(axis_list)]
+        if stacker_list:
+            df = df[df["Stacker_SN"].isin(stacker_list)]
+        if labware_list:
+            df = df[df["Labware_Name"].isin(labware_list)]
+        for row in df.itertuples(index=False, name="data"):
+            axis = row.Axis
+            zone = row.Zone
+            platform = row.Platform_Position
+            stacker = row.Stacker_SN
+            labware = row.Labware_Name
+
+            ## Filter out specific rows
+            if axis == "x":
+                if platform_list_x and platform not in platform_list_x:
+                    continue
+                if zone_list_x and zone not in zone_list_x:
+                    continue
+            if axis == "z":
+                if platform_list_z and platform not in platform_list_z:
+                    continue
+                if zone_list_z and zone not in zone_list_z:
+                    continue
+
+            # Get the bins
+            axis = axis.upper()
+            start_index = df.columns.get_loc("Time") + 1
+            bins = list(row[start_index : start_index + bin_count])
+            measurements[axis][platform][zone].append({stacker: bins})
+
+            values_df = pd.DataFrame(bins)
+            result = sense_labware(axis, platform, values_df)
+            print(
+                f"Labware: {labware}\n\nStacker\n\n{stacker}{axis}{platform}\n\nRESULT: {result}\n\n"
+            )
+            samples += 1
+
+        if samples > max_samples:
+            break
+
     df = pd.read_csv(dataframe_path, header=None)
     for i, entry in enumerate(df.itertuples()):
         if i == 0:
