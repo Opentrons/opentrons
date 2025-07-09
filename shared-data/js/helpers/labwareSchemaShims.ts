@@ -1,11 +1,14 @@
 /** Compatibility shims to ease transitioning between with labware schemas 2 and 3. */
 
+import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from './matrixMath'
 import { getVectorInverse, getVectorSum, IDENTITY_VECTOR } from './vectorMath'
 
 import type {
   AddressableArea,
   LabwareDefinition,
   LabwareDefinition2,
+  ModuleDefinition,
+  SlotTransforms,
   Vector3D,
 } from '../types'
 
@@ -111,6 +114,103 @@ export function getDeckSlotOriginToLabwareOrigin(
 }
 
 /**
+ * Given a stackup like:
+ *
+ * deck slot --> module --> labware
+ *
+ * This computes the offset from the deck slot's origin (its front-left / -x,-y corner)
+ * to the labware's origin (varies depending on the labware).
+ *
+ * This is currently how it works even for Flex modules, even though they are not really
+ * "in a slot." The slot in this case is the slot that the module replaces.
+ *
+ * The API is like this for transitional reasons. Ideally, we would have one function
+ * to go slot->module and a second function to go module->labware.
+ */
+export function getModuleParentOriginToLabwareOrigin(
+  deckId: string,
+  slotId: string | null,
+  moduleDefinition: ModuleDefinition,
+  labwareDefinition: LabwareDefinition
+): Vector3D {
+  switch (labwareDefinition.schemaVersion) {
+    case 2: {
+      const offsetDefinedByModule = getModuleParentOriginToChildSlotOrigin(
+        deckId,
+        slotId,
+        moduleDefinition
+      )
+      const offsetDefinedByLabware =
+        labwareDefinition.stackingOffsetWithModule?.[moduleDefinition.model] ??
+        IDENTITY_VECTOR
+      return getVectorSum(offsetDefinedByModule, offsetDefinedByLabware)
+    }
+    case 3: {
+      // todo(mm, 2025-07-02): Reconcile with the backend and compute the offset
+      // based on locatingFeatures. As a first-pass approximation, this currently just
+      // puts the front-left-bottom of the labware at the front-left of the module's
+      // child slot, which is the traditional behavior with labware schema 2.
+      const moduleParentOriginToLabwareFrontLeftBottom = getModuleParentOriginToChildSlotOrigin(
+        deckId,
+        slotId,
+        moduleDefinition
+      )
+      const labwareOriginToLabwareFrontLeftBottom = {
+        x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
+        y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,
+        z: labwareDefinition.features.slotFootprintAsChild?.z ?? 0,
+      }
+      const labwareFrontLeftBottomToLabwareOrigin = getVectorInverse(
+        labwareOriginToLabwareFrontLeftBottom
+      )
+      const moduleParentOriginToLabwareOrigin = getVectorSum(
+        moduleParentOriginToLabwareFrontLeftBottom,
+        labwareFrontLeftBottomToLabwareOrigin
+      )
+      return moduleParentOriginToLabwareOrigin
+    }
+  }
+}
+
+/**
+ * Given a module, computes the offset from the origin (front-left, -x,-y corner) of the
+ * deck slot that the module is in, to the origin (again, front-left, -x,-y corner) of
+ * the slot atop that module.
+ *
+ * On a Flex, modules are not really "in deck slots". There, "the deck slot that the
+ * module is in" means "the deck slot that the module replaces."
+ *
+ * @deprecated We are trying to move away from the idea that modules always have slots
+ *  atop them and that things should be positioned relative to those slots' -x,-y
+ *  corners. That idea is especially untrue for things like the Thermocycler and
+ *  Heater-Shaker. You probably want `getModuleParentOriginToLabwareOrigin()` instead,
+ *  which is higher-level and can model different ways that a labware can mate with a
+ *  module. This is exported to support things like UI controls that want to cover
+ *  a module's "labware area" and whose implementations assume the traditional
+ *  slot -x,-y corner idea.
+ */
+export function getModuleParentOriginToChildSlotOrigin(
+  deckId: string,
+  slotId: string | null,
+  moduleDefinition: ModuleDefinition
+): Vector3D {
+  const transformsForLocation = getSlotTransformsFromModuleDefinition(
+    moduleDefinition,
+    deckId,
+    slotId
+  )
+  const labwareOffsetTransform =
+    transformsForLocation.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
+  const [[x], [y], [z]] = multiplyMatrices(labwareOffsetTransform, [
+    [moduleDefinition.labwareOffset.x],
+    [moduleDefinition.labwareOffset.y],
+    [moduleDefinition.labwareOffset.z],
+    [1],
+  ])
+  return { x, y, z }
+}
+
+/**
  * Return the offset from a labware's back-left-bottom (-x, +y, -z) corner to its origin.
  *
  * This is a lower-level helper for the rare cases where we want to position a labware
@@ -178,4 +278,17 @@ export function getSchema2CornerOffsetFromSlot(
       z: 56,
     }
   }
+}
+
+type ModuleTransformsForDeck = NonNullable<SlotTransforms[string]>
+type ModuleTransformsForSlot = NonNullable<ModuleTransformsForDeck[string]>
+function getSlotTransformsFromModuleDefinition(
+  moduleDefinition: ModuleDefinition,
+  targetDeckId: string,
+  targetSlotId: string | null
+): ModuleTransformsForSlot {
+  const transformsForDeck = moduleDefinition.slotTransforms[targetDeckId] ?? {}
+  const transformsForSlot =
+    targetSlotId == null ? {} : transformsForDeck[targetSlotId] ?? {}
+  return transformsForSlot
 }
