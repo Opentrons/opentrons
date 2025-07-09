@@ -18,7 +18,4 @@ On the Flex, you can also customize fixtures, including the waste chute, trash b
 | Waste Chute | <ul><li>Only 1 waste chute</li><li>Slot D3</li></ul> | Not compatible |
 | Staging area | <ul><li>Up to 4 staging areas</li><li>Slots A3-D3</li></ul> | Not compatible |
 
-
-[//]: # (can the second table be the same width as the first? playing with individual column widths doesn't extend the entire table)
-
 You can create additional space on the Flex deck by adding as many as four staging areas to slots A3-D3. This creates an additional row of slots (A4-D4). 
