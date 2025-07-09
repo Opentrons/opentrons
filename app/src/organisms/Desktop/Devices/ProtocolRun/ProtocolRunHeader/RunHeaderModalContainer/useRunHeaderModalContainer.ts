@@ -1,7 +1,10 @@
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
+import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
@@ -12,7 +15,11 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
+import {
+  OFFSETS_CONFLICT,
+  selectAreOffsetsApplied,
+  selectOffsetSource,
+} from '/app/redux/protocol-runs'
 import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
 import { getFallbackRobotSerialNumber } from '../utils'
@@ -93,8 +100,10 @@ export function useRunHeaderModalContainer({
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
   const isThisRunCurrent = runId === useCurrentRunId()
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
-  function handleProceedToRunClick(): void {
+  function proceedToRun(): void {
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -105,6 +114,15 @@ export function useRunHeaderModalContainer({
       properties: robotAnalyticsData ?? {},
     })
     protocolRunControls.play()
+  }
+
+  function handleProceedToRunClick(): Promise<void> {
+    if (robotType === FLEX_ROBOT_TYPE && !flexOffsetsApplied) {
+      return applyOffsets().then(proceedToRun)
+    } else {
+      proceedToRun()
+      return Promise.resolve()
+    }
   }
 
   const confirmCancelModalUtils = useConfirmCancelModal()
@@ -128,6 +146,7 @@ export function useRunHeaderModalContainer({
     runStatus,
     runId,
     handleProceedToRunClick,
+    isRunStarting: isApplyingOffsets,
   })
 
   const dropTipUtils = useRunHeaderDropTip({
