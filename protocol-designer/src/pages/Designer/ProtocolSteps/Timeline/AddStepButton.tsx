@@ -200,15 +200,7 @@ export function AddStepButton({
 
       {showStepOverflowMenu ? (
         <Flex
-          position={POSITION_ABSOLUTE}
-          zIndex={5}
-          left={sidebarWidth - 4} // 4 is the position over the toolbox
-          whiteSpace={NO_WRAP}
-          bottom="1rem"
-          borderRadius={BORDERS.borderRadius8}
-          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-          backgroundColor={COLORS.white}
-          flexDirection={DIRECTION_COLUMN}
+          css={STEP_OVERFLOW_MENU_STYLE}
           ref={overflowWrapperRef}
           onClick={(e: MouseEvent) => {
             e.preventDefault()
@@ -241,3 +233,15 @@ export function AddStepButton({
     </>
   )
 }
+
+const STEP_OVERFLOW_MENU_STYLE = css`
+  position: ${POSITION_ABSOLUTE};
+  z-index: 5;
+  right: -8.05rem;
+  white-space: ${NO_WRAP};
+  bottom: 1rem;
+  border-radius: ${BORDERS.borderRadius8};
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+  background-color: ${COLORS.white};
+  flex-direction: ${DIRECTION_COLUMN};
+`
