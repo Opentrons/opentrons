@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import os
 import sys
 from time import time
+import importlib
+import copy
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -24,7 +26,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
-from opentrons.config import infer_config_base_dir
+from opentrons.config import infer_config_base_dir, IS_ROBOT
 from opentrons.types import Point, DeckSlotName
 
 metadata = {"protocolName": "Gravimetric QC"}
@@ -56,8 +58,8 @@ def _download_and_extract(version_str: str, base_dir: str) -> None:
         ver_file.write(version_str)
 
 
-if os.getenv("RUNNING_ON_VERDIN") is None:
-    # we're simulating
+if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
+    # we're simulating or there is not a vaild hardware-testing yet
     base_dir = str(infer_config_base_dir())
     release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
     version_file_path = os.path.join(base_dir, "hardware_testing", "VERSION.txt")
@@ -101,6 +103,22 @@ from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
+fast_simulate_measurement = MeasurementData(
+    grams_average=10,
+    grams_cv=1.0,
+    grams_min=9.9,
+    samples_start_time=10,
+    grams_max=10.1,
+    samples_duration=10,
+    samples_count=10,
+    celsius_pipette=25,
+    humidity_pipette=50,
+    celsius_air=25,
+    humidity_air=50,
+    pascals_air=1000,
+    celsius_liquid=25,
+)
+
 
 @dataclass
 class FixtureSettings:
@@ -140,6 +158,7 @@ class FixtureSettings:
     extra: bool
     labware_on_scale: str
     slot_scale: str
+    fast_simulate: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -231,6 +250,22 @@ class FixtureSettings:
         else:
             pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
         run_id = create_run_id()
+        fast_simulate = IS_ROBOT and simulating
+        test_report = report.create_csv_test_report(
+            volumes=volumes_flat,
+            pipette_channels=pipette_channels,
+            increment=increment,
+            trials=trials,
+            name=name,
+            run_id=run_id,
+            dont_write_to_disk=fast_simulate,
+        )
+        os.makedirs(f"{test_report.parent}", exist_ok=True)
+        set_output_file(f"{test_report.parent}/run_output.txt")
+        print_info(str(importlib.util.find_spec("hardware_testing")))
+        print_info(f"Running on bot {IS_ROBOT}")
+        print_info(f"Fast simulate {fast_simulate}")
+        print_info(str(os.environ))
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
@@ -258,26 +293,22 @@ class FixtureSettings:
         git_description = get_git_description()
         operator_name = "unused"
 
-        test_report = report.create_csv_test_report(
-            volumes=volumes_flat,
-            pipette_channels=pipette_channels,
-            increment=increment,
-            trials=trials,
-            name=name,
-            run_id=run_id,
-            dont_write_to_disk=bool(os.getenv('RUNNING_ON_VERDIN')) and simulating,
-        )
-        os.makedirs(f"{test_report.parent}", exist_ok=True)
-        set_output_file(f"{test_report.parent}/run_output.txt")
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
         test_report.set_firmware(fw_version)
+        t50_str = f"{ctx.params.cavity_50}{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
+        t200_str = f"{ctx.params.cavity_200}{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
+        t1000_str = f"{ctx.params.cavity_1000}{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
         report.store_serial_numbers(
             test_report,
             robot=robot_serial,
             pipette=pipette_tag,
-            tips={"tips_50ul": ctx.params.tip_batch},  # type: ignore [attr-defined]
+            tips={
+                "tips_50ul": t50_str,
+                "tips_200ul": t200_str,
+                "tips_1000ul": t1000_str,
+            },
             scale=recorder.serial_number,
             environment=env_serial,
             liquid=liquid_name,
@@ -319,6 +350,7 @@ class FixtureSettings:
             extra=extra,
             labware_on_scale=labware_on_scale,
             slot_scale=slot_scale,
+            fast_simulate=fast_simulate,
         )
 
     def validate_settings(self) -> bool:
@@ -457,22 +489,14 @@ def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
     parameters.add_csv_file("QC test profile", "qc_test_profile")
 
-    parameters.add_int(
-        display_name="Tip Batch",
-        variable_name="tip_batch",
-        minimum=10000000,
-        maximum=99999999,
-        default=20250101,
-        description="Date portion of tip batch.",
-    )
-
     parameters.add_str(
-        display_name="Tip Cavity",
-        variable_name="cavity",
-        default="A",
+        display_name="Tip Cavity for 50ul tips",
+        variable_name="cavity_50",
+        default="Unused",
         choices=[
             {"display_name": name, "value": name}
             for name in [
+                "Unused",
                 "A",
                 "B",
                 "C",
@@ -492,6 +516,91 @@ def add_parameters(parameters: ParameterContext) -> None:
             ]
         ],
         description="Set the target temperature for the pre-heat",
+    )
+
+    parameters.add_int(
+        display_name="Tip Batch for 50ul tips",
+        variable_name="tip_batch_50",
+        minimum=10000000,
+        maximum=99999999,
+        default=20250101,
+        description="Date portion of tip batch.",
+    )
+
+    parameters.add_str(
+        display_name="Tip Cavity for 200ul tips",
+        variable_name="cavity_200",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J",
+                "K",
+                "L",
+                "M",
+                "N",
+                "O",
+                "P",
+            ]
+        ],
+        description="Set the target temperature for the pre-heat",
+    )
+
+    parameters.add_int(
+        display_name="Tip Batch for 200ul tips",
+        variable_name="tip_batch_200",
+        minimum=10000000,
+        maximum=99999999,
+        default=20250101,
+        description="Date portion of tip batch.",
+    )
+
+    parameters.add_str(
+        display_name="Tip Cavity for 1000ul tips",
+        variable_name="cavity_1000",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J",
+                "K",
+                "L",
+                "M",
+                "N",
+                "O",
+                "P",
+            ]
+        ],
+        description="Set the target temperature for the pre-heat",
+    )
+
+    parameters.add_int(
+        display_name="Tip Batch for 1000ul tips",
+        variable_name="tip_batch_1000",
+        minimum=10000000,
+        maximum=99999999,
+        default=20250101,
+        description="Date portion of tip batch.",
     )
 
 
@@ -546,6 +655,18 @@ def retract_and_wait(
     blank: bool = False,
 ) -> MeasurementData:
     """Retract away from the scale and record the weight."""
+    if fixture_settings.fast_simulate:
+        # just simulate the physical movement and return to speed up the analysis
+        fixture_settings.pipette._retract()
+        return_val = copy.deepcopy(fast_simulate_measurement)
+        if not blank:
+            if mode == MeasurementType.ASPIRATE:
+                return_val.grams_average += volume * -0.001
+            elif mode == MeasurementType.DISPENSE:
+                return_val.grams_average += volume * 0.001
+        print_info(f"mode {mode} {return_val.grams_average}")
+        return return_val
+
     m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
     fixture_settings.pipette._retract()
     if fixture_settings.recorder and not blank and fixture_settings.ctx.is_simulating():
@@ -869,6 +990,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         )
                         - avg_asp_evap
                     )
+                    print_info(
+                        f"change: {asp_with_evap} {measurements[volume][-1][0]} {measurements[volume][-1][1]}"
+                    )
                     disp_with_evap = (
                         calculate_change_in_volume(
                             measurements[volume][-1][1],
@@ -983,3 +1107,4 @@ def run(ctx: ProtocolContext) -> None:
             print_info("ending recording")
             fixture_settings.recorder.stop()
             fixture_settings.recorder.deactivate()
+            set_output_file(None)
