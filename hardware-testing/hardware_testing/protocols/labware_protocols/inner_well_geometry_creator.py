@@ -315,40 +315,92 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    drop_tips()  # Ensure no tips at start
+    drop_tips()
 
-    for step in range(STEPS):
-        if step == 0:
-            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-            pick_up_tips()
-            if not quick_mode:
-                tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-            src_height = _get_height_of_liquid_in_well(
-                liq_pipette, src["A1"], ctx.is_simulating()
-            )
-            height = 0.0
-            volume_dispensed = 0.0
-        else:
-            if not quick_mode:
-                drop_tips()
-                pick_up_tips()
-                tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+    if quick_mode:
+        pick_up_tips()
+        tip_z_error = 0.0
+        src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+        height = 0.0
+        volume_dispensed = 0.0
+
+        for step in range(STEPS):
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
                 step_volume,
                 src["A1"],
                 labware["A1"],
-                new_tip="always" if not quick_mode else "never",
+                new_tip="never",
                 return_tip=False,
             )
+
             volume_dispensed = round(volume_dispensed + step_volume, 5)
-            height = _get_height_of_liquid_in_well(
-                probe_pipette, labware["A1"], ctx.is_simulating()
+
+            try:
+                try:
+                    height = round(
+                        _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                        5,
+                    )
+                except PipetteLiquidNotFoundError:
+                    height = round(
+                        _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                        5,
+                    )
+            except PipetteLiquidNotFoundError:
+                height = 99.0
+
+            corrected_height = height + tip_z_error
+            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
+            _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+        drop_tips()
+
+    else:
+        for step in range(STEPS):
+            drop_tips()
+            pick_up_tips()
+            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+
+            if step == 0:
+                src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+                height = 0.0
+                volume_dispensed = 0.0
+            else:
+                liq_pipette.transfer_with_liquid_class(
+                    ethanol,
+                    step_volume,
+                    src["A1"],
+                    labware["A1"],
+                    new_tip="always",
+                    return_tip=False,
                 )
 
-        corrected_height = height + tip_z_error
-        trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
-        _write_line_to_csv(ctx, [str(d) for d in trial_data])
+                volume_dispensed = round(volume_dispensed + step_volume, 5)
 
-    drop_tips()
+                try:
+                    try:
+                        height = round(
+                            _get_height_of_liquid_in_well(
+                                probe_pipette, labware["A1"], ctx.is_simulating()
+                            ),
+                            5,
+                        )
+                    except PipetteLiquidNotFoundError:
+                        height = round(
+                            _get_height_of_liquid_in_well(
+                                probe_pipette, labware["A1"], ctx.is_simulating()
+                            ),
+                            5,
+                        )
+                except PipetteLiquidNotFoundError:
+                    height = 99.0
+
+            corrected_height = height + tip_z_error
+            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
+            _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+        drop_tips()
+
+
 
