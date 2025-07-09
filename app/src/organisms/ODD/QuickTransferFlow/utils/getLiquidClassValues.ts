@@ -6,7 +6,6 @@ import {
   GLYCEROL_LIQUID_CLASS_NAME,
   linearInterpolate,
   NONE_LIQUID_CLASS_NAME,
-  POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
@@ -27,8 +26,6 @@ export const setLiquidClassValues = (
   const { pipette } = state
   const convertedPipetteName = getFlexNameConversion(pipette)
 
-  // const liquidClassDefaultValues: QuickTransferSummaryState = {}
-
   if (state.liquidClass.liquidClassName === NONE_LIQUID_CLASS_NAME) {
     // none getNoLiquidClassValues
     return getNoLiquidClassValues(
@@ -37,15 +34,30 @@ export const setLiquidClassValues = (
       liquidHandlingAction
     )
   } else {
-    // liquid class getLiquidClassValues
     return getLiquidClassValues(
       state,
       convertedPipetteName,
       liquidHandlingAction
     )
   }
+}
 
-  // return liquidClassDefaultValues
+const convertBlowoutLocation = (
+  location: string | undefined,
+  state: QuickTransferSummaryState
+): BlowOutLocation | undefined => {
+  if (!location) return undefined
+
+  switch (location) {
+    case 'source':
+      return 'source_well'
+    case 'destination':
+      return 'dest_well'
+    case 'trash':
+      return state.dropTipLocation
+    default:
+      return undefined
+  }
 }
 
 /**
@@ -93,48 +105,53 @@ const getNoLiquidClassValues = (
   )
 
   const aspirateState = {
-    aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate,
-    tipPositionAspirate: aspirate.aspiratePosition.positionReference,
+    aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
+    tipPositionAspirate: aspirate.aspiratePosition.offset.z,
     submergeAspirate: {
       speed: aspirate.submerge.speed,
       positionFromBottom: aspirate.submerge.startPosition.offset.z,
     },
     preWetTip: aspirate.preWet,
     mixOnAspirate: {
-      mixVolume: aspirate.mix.params?.volume,
-      repetitions: aspirate.mix.params?.repetitions,
+      mixVolume: aspirate.mix.params?.volume ?? 0,
+      repetitions: aspirate.mix.params?.repetitions ?? 0,
     },
     delayAspirate: {
-      delayDuration: aspirate.delay.params?.duration,
+      delayDuration: aspirate.delay.params?.duration ?? 0,
     },
     retractAspirate: {
-      speed: aspirate.retract.speed,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      speed: aspirate.retract.speed ?? 0,
+      positionFromBottom: aspirate.retract.endPosition.offset.z ?? 0,
     },
-    touchTipAspirate: aspirate.retract.touchTip.params?.mmFromEdge,
+    touchTipAspirate: aspirate.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
   }
 
   const dispenseState = {
-    dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate,
-    tipPositionDispense: dispense.dispensePosition.positionReference,
+    dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
+    tipPositionDispense: dispense.dispensePosition.offset.z,
     submergeDispense: {
       speed: dispense.submerge.speed,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
-    delayDispense: {
-      delayDuration: dispense.delay.params?.duration,
-    },
+    delayDispense: !dispense.delay.enable
+      ? undefined
+      : {
+          delayDuration: dispense.delay.params?.duration ?? 0,
+        },
     pushOut: pushOutVolume != null && pushOutVolume > 0,
     retractDispense: {
       speed: dispense.retract.speed,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
     blowOutDispense: {
-      location: singleDispense.retract.blowout?.params?.location ?? null,
-      flowRate: singleDispense.retract.blowout?.params?.flowRate ?? 1,
+      location: convertBlowoutLocation(
+        dispense.retract.blowout?.params?.location,
+        state
+      ),
+      flowRate: dispense.retract.blowout?.params?.flowRate ?? 0,
     },
-    touchTipDispense: dispense.retract.touchTip.params?.mmFromEdge,
+    touchTipDispense: dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
   }
   if (liquidHandlingAction === 'aspirate') {
@@ -164,26 +181,6 @@ const getFlowRateFields = (
   }
 }
 
-// const getOffsetFields = (
-//   offset: Vector3D,
-//   prefix: string
-// ): Record<string, number> => {
-//   return {
-//     [`${prefix}_x_position`]: offset.x,
-//     [`${prefix}_y_position`]: offset.y,
-//     [`${prefix}_mmFromBottom`]: offset.z,
-//   }
-// }
-
-// const getPositionReferenceFields = (
-//   positionReference: PositionReference,
-//   prefix: string
-// ): Record<string, PositionReference> => {
-//   return {
-//     [`${prefix}_position_reference`]: positionReference,
-//   }
-// }
-
 /**
  * getLiquidClassValues
  * this function returns the values of liquid class
@@ -200,8 +197,6 @@ const getLiquidClassValues = (
     pipette: pipetteSpecs,
     volume,
     destinationWells,
-    // delayAspirate,
-    // delayDispense,
   } = state
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
@@ -223,17 +218,6 @@ const getLiquidClassValues = (
       const tiprackLoadName = tipObject.tiprack.split('/')[1]
       return tiprackLoadName === currentTiprackLoadName
     })
-
-  // const dispenseType =
-  //   state.path === 'multiDispense' ? 'multiDispense' : 'singleDispense'
-  // const liquidHandlingType =
-  //   liquidHandlingAction === 'aspirate' ? 'aspirate' : dispenseType
-
-  // const liquidClassValues = tipTypeSettings?.[liquidHandlingType]
-
-  // if (liquidClassValues == null) {
-  //   return state
-  // }
 
   const { aspirate, singleDispense, multiDispense } = tipTypeSettings ?? {}
 
@@ -268,23 +252,6 @@ const getLiquidClassValues = (
 
   const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
 
-  const convertBlowoutLocation = (
-    location: string | undefined
-  ): BlowOutLocation | undefined => {
-    if (!location) return undefined
-
-    switch (location) {
-      case 'source':
-        return 'source_well'
-      case 'destination':
-        return 'dest_well'
-      case 'trash':
-        return state.dropTipLocation
-      default:
-        return undefined
-    }
-  }
-
   const aspirateState = {
     aspirateFlowRate: flowRate.aspirate,
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
@@ -313,7 +280,7 @@ const getLiquidClassValues = (
     touchTipAspirate:
       aspirate?.retract.touchTip.enable === false
         ? undefined
-        : aspirate?.retract.touchTip.params?.mmFromEdge,
+        : aspirate?.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed:
       aspirate?.retract.touchTip.enable === false
         ? undefined
@@ -352,14 +319,15 @@ const getLiquidClassValues = (
         ? undefined
         : {
             location: convertBlowoutLocation(
-              dispense?.retract.blowout?.params?.location
+              dispense?.retract.blowout?.params?.location,
+              state
             ),
             flowRate: dispense?.retract.blowout?.params?.flowRate ?? 0,
           },
     touchTipDispense:
       dispense?.retract.touchTip.enable === false
         ? undefined
-        : dispense?.retract.touchTip.params?.mmFromEdge,
+        : dispense?.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed:
       dispense?.retract.touchTip.enable === false
         ? undefined
@@ -368,8 +336,10 @@ const getLiquidClassValues = (
     disposalVolumeDispenseSettings: {
       volume: disposal ?? 0,
       blowOutLocation:
-        convertBlowoutLocation(dispense?.retract.blowout?.params?.location) ??
-        state.dropTipLocation,
+        convertBlowoutLocation(
+          dispense?.retract.blowout?.params?.location,
+          state
+        ) ?? state.dropTipLocation,
 
       flowRate: flowRate.dispense,
     },
