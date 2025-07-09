@@ -1,4 +1,4 @@
-import { min } from 'lodash'
+import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 
