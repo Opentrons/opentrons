@@ -15,6 +15,7 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 import { LabwareSlotDetails } from './LabwareSlotDetails'
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
+import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
 import { TrashSlotDetails } from './TrashSlotDetails'
 
 import type {
@@ -137,6 +138,11 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
         ) : null}
         {isTrashOnSlot ? (
           <TrashSlotDetails trashBinEntities={trashBinEntities} />
+        ) : null}
+        {moduleOnSlot == null &&
+        topMostLabwareOnSlot == null &&
+        !isTrashOnSlot ? (
+          <SlotDetailsEmptyState />
         ) : null}
       </div>
     </div>

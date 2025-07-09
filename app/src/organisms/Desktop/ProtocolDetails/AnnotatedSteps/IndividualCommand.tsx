@@ -21,6 +21,7 @@ interface IndividualCommandProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   isHighlighted: boolean
   allRunDefs: LabwareDefinition[]
+  fromGroup: boolean
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 export function IndividualCommand({
@@ -29,6 +30,7 @@ export function IndividualCommand({
   isHighlighted,
   allRunDefs,
   setSelectedCommand,
+  fromGroup,
 }: IndividualCommandProps): JSX.Element {
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
@@ -44,7 +46,13 @@ export function IndividualCommand({
   }, [isHighlighted])
 
   return (
-    <div className={styles.individual_command_container} ref={commandRef}>
+    <div
+      className={clsx(
+        styles.individual_command_container,
+        fromGroup && styles.rogue_individual_command_container
+      )}
+      ref={commandRef}
+    >
       <div
         className={clsx(
           styles.individual_command_wrap,

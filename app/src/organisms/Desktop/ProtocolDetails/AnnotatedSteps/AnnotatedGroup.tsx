@@ -19,6 +19,7 @@ interface AnnotatedGroupProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {
@@ -27,6 +28,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     analysis,
     allRunDefs,
     setSelectedCommand,
+    handlePause,
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -41,6 +43,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
       <div
         onClick={() => {
           setIsExpanded(!isExpanded)
+          handlePause?.()
         }}
         className={styles.annotated_group_header}
       >
@@ -58,6 +61,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         <div className={styles.annotated_group_expanded}>
           {subCommands.map((subCommand, index) => (
             <IndividualCommand
+              fromGroup={false}
               key={`${subCommand.command.id}_${index}`}
               command={subCommand.command}
               analysis={analysis}

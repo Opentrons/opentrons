@@ -23,6 +23,7 @@ interface AnnotatedStepsProps {
   groupedCommands: GroupedCommands | null
   currentCommandIndex?: number
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
@@ -31,6 +32,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     currentCommandIndex,
     groupedCommands,
     setSelectedCommand,
+    handlePause
   } = props
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
@@ -77,9 +79,11 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   subCommands={group.subCommands}
                   allRunDefs={allRunDefs}
                   setSelectedCommand={setSelectedCommand}
+                  handlePause={handlePause}
                 />
               ) : (
                 <IndividualCommand
+                  fromGroup={true}
                   key={group.command.id}
                   command={group.command}
                   isHighlighted={group.isHighlighted}
@@ -91,6 +95,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             )
           : analysis.commands.map((command, index) => (
               <IndividualCommand
+                fromGroup={false}
                 key={`individual_${command.id}`}
                 command={command}
                 isHighlighted={index === currentCommandIndex}

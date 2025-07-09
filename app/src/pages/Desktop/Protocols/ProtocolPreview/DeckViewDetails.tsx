@@ -227,7 +227,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 fixtureBaseColor={
                   selectedSlot === addressableArea.id ||
                   hoveredSlot === addressableArea.id
-                    ? COLORS.grey40
+                    ? '#E6D5EC'
                     : COLORS.transparent
                 }
               />

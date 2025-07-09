@@ -35,7 +35,12 @@
 .individual_command_container {
   gap: 8px;
   display: flex;
-  padding: 0 16px 0 16px;
+  padding: 0 12px 0 12px;
+}
+
+.rogue_individual_command_container {
+  border-bottom: 1px solid #dedede;
+  padding-bottom: 4px;
 }
 
 .individual_command_wrap {

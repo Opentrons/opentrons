@@ -13,6 +13,7 @@ interface CommandStepsProps {
   analysis: ProtocolAnalysisOutput
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   percentComplete: number
+  handlePause: () => void
   currentCommandIndex?: number
 }
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
@@ -21,13 +22,14 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     groupedCommands,
     analysis,
     setSelectedCommand,
+    handlePause,
     percentComplete,
   } = props
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>
         <div className={styles.command_step_header}>
-          <StyledText desktopStyle="bodyDefaultRegular">Timeline</StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">Timeline</StyledText>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             color={COLORS.grey60}
@@ -40,6 +42,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             analysis={analysis}
             groupedCommands={groupedCommands}
             setSelectedCommand={setSelectedCommand}
+            handlePause={handlePause}
           />
         </div>
       </div>

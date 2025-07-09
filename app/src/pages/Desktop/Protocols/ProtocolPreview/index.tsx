@@ -16,7 +16,7 @@ import { PreviewContainer } from './PreviewContainer'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function Preview(): JSX.Element {
+export function ProtocolPreview(): JSX.Element {
   const { protocolKey } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams

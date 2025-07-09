@@ -53,7 +53,7 @@
 }
 
 .controls_container {
-  padding: 16px;
+  padding: 0 16px;
   background-color: white;
   width: 100%;
   border-radius: 8px;
@@ -64,6 +64,7 @@
 }
 
 .range_input {
+  display: block;
   appearance: none;
   width: 100%;
   height: 4px;
@@ -75,14 +76,13 @@
 .range_input::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background:
-    linear-gradient(
-      to right,
-      #006cfa 0%,
-      #006cfa var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    #006cfa 0%,
+    #006cfa var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 /* Hide thumb initially */
@@ -105,7 +105,7 @@
 }
 
 .deck_view_container {
-  width: 500px;
+  width: 556px;
   height: 100%;
   padding: 28px 32px;
   gap: 20px;
@@ -139,23 +139,32 @@
 
 .command_step_groups {
   overflow-y: scroll;
-  height: 62vh;
+  height: calc(
+    100vh - 248px
+  ); /* 248px is height of the controls container + timeline header */
 }
 
 .slot_details {
   background-color: white;
   border-radius: 8px;
-  height: 70vh;
+  height: 100vh;
   overflow-y: scroll;
 }
 
 .preview_container {
   display: flex;
-  height: 70vh;
+  height: calc(100vh - 170px); /* 170px is height of the controls container */
+  padding-bottom: 16px;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* fills the viewport */
 }
 
 .deck_view_padding {
-  padding: 0 16px;
+  padding: 0 12px;
 }
 
 .align_deck_modules {
@@ -169,7 +178,7 @@
 }
 
 .slot_details_active_step {
-  padding: 0 16px 16px 16px;
+  padding: 0 12px 12px 12px;
   grid-gap: 8px;
   display: flex;
   flex-direction: column;
@@ -328,4 +337,15 @@
   width: 100%;
   justify-content: center;
   padding: 6px;
+}
+
+.empty_state_box {
+  width: 100%;
+  height: 8.330625rem;
+  background-color: #f3f3f3;
+  border-radius: 4px;
+}
+
+.empty_state_box_container {
+  padding: 0 12px;
 }

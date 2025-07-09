@@ -28,8 +28,8 @@ import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
-import { Preview } from '/app/pages/Desktop/Protocols/Preview'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
+import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -80,7 +80,7 @@ export const DesktopApp = (): JSX.Element => {
       path: '/protocols/:protocolKey',
     },
     {
-      Component: Preview,
+      Component: ProtocolPreview,
       name: 'Preview',
       path: '/protocols/:protocolKey/preview',
     },

@@ -112,7 +112,7 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
     }
   }, [isThermocyclerAttached, selectedSlot])
   return (
-    <>
+    <div className={styles.app}>
       <Controls
         protocolName={protocolDisplayName}
         numErrors={analysis.errors.length}
@@ -155,9 +155,12 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
             groupedCommands={groupedCommands}
             setSelectedCommand={setSelectedCommand}
             percentComplete={percentComplete}
+            handlePause={() => {
+              setIsPlaying(false)
+            }}
           />
         )}
       </div>
-    </>
+    </div>
   )
 }
