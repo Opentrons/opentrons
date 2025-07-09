@@ -297,14 +297,14 @@ const getLiquidClassValues = (
       aspirate?.mix.enable === false
         ? undefined
         : {
-            mixVolume: aspirate?.mix.params?.volume,
-            repetitions: aspirate?.mix.params?.repetitions,
+            mixVolume: aspirate?.mix.params?.volume ?? 0,
+            repetitions: aspirate?.mix.params?.repetitions ?? 0,
           },
     delayAspirate:
       aspirate?.delay.enable === false
         ? undefined
         : {
-            delayDuration: aspirate?.delay.params?.duration,
+            delayDuration: aspirate?.delay.params?.duration ?? 0,
           },
     retractAspirate: {
       speed: aspirate?.retract.speed ?? 0,
