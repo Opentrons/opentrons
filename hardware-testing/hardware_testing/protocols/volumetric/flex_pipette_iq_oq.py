@@ -201,9 +201,18 @@ def add_parameters(params: ParameterContext) -> None:
         default=False,
     )
     params.add_str(
-        display_name="custom_ul_comma_separated",
-        variable_name="custom_ul_comma_separated",
-        default="",
+        display_name="ul_ranges_to_test",
+        variable_name="ul_ranges_to_test",
+        default="low-mid-high",
+        choices=[
+            {"display_name": "low,mid,high", "value": "low,mid,high"},
+            {"display_name": "low,mid", "value": "low,mid"},
+            {"display_name": "low,high", "value": "low,high"},
+            {"display_name": "mid,high", "value": "mid,high"},
+            {"display_name": "low", "value": "low"},
+            {"display_name": "mid", "value": "mid"},
+            {"display_name": "high", "value": "high"},
+        ]
     )
 
 
@@ -218,6 +227,9 @@ def get_trials(
 def get_volumes(
     ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float
 ) -> List[float]:
+    if ctx.params.just_fill_plate_200ul:
+        return [DYE_READER_IDEAL_UL]
+
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
     # NOTE: limiting pipettes (eg: 96ch) to only test <=250uL
@@ -230,27 +242,19 @@ def get_volumes(
     # NOTE: configuring for MINIMUM tip uL before calculate test volumes
     pipette.configure_for_volume(1)
 
-    if ctx.params.just_fill_plate_200ul:
-        return [DYE_READER_IDEAL_UL]
-    elif ctx.params.custom_ul_comma_separated:
-        try:
-            ul_list_str = ctx.params.custom_ul_comma_separated.split(",")
-            custom_ul_list = [float(ul_str.strip()) for ul_str in ul_list_str]
-            assert custom_ul_list
-        except (ValueError, AssertionError):
-            raise ValueError(
-                f"unexpected list of volumes: {ctx.params.custom_ul_comma_separated}"
-            )
-        ul_out_of_range = [ul for ul in custom_ul_list if ul < 0 or ul > max_possible_ul]
-        if len(ul_out_of_range):
-            raise ValueError(
-                f"volumes {ul_out_of_range} greater than max ({max_possible_ul})"
-            )
-    else:
-        return [
-            float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
-            for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
-        ]
+    volumes_per_range = [
+        float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
+        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
+    ]
+    volumes_to_test: List[float] = []
+    if "low" in ctx.params.ul_ranges_to_test:
+        volumes_to_test.append(volumes_per_range[0])
+    if "mid" in ctx.params.ul_ranges_to_test:
+        volumes_to_test.append(volumes_per_range[1])
+    if "high" in ctx.params.ul_ranges_to_test:
+        volumes_to_test.append(volumes_per_range[2])
+
+    return volumes_to_test
 
 
 def load_tip_racks(
