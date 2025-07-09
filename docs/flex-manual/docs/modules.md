@@ -133,7 +133,7 @@ The Opentrons Flex Gripper is required when using the plate reader. The Gripper 
 
 The plate reader fits in deck slots A3–D3 only. It comes preinstalled in a caddy, which helps secure the unit to the deck. This module does not require calibration, but you can run Labware Position Check on any installed labware.
 
-#### Software Control
+#### Software control
 
 The plate reader is fully programmable in Protocol Designer and the Python Protocol API.
 
