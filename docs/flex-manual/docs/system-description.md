@@ -552,8 +552,8 @@ In the stopped state, Flex and connected hardware will behave as follows:
             <td>
                 <ul>
                     <li>When analyzing a sample, the module will continue to operate.</li>
-                    <li>If the gripper is moving the plate reader's lid, that module behaves as described above.</li>
-                    <li>The gripper will also place the plate reader's lid back in its docking area after you disengage the E-stop and clear the error from the touchscreen.</li>
+                    <li>If the gripper is moving the plate reader's lid, its jaws remain enabled to hold the lid.</li>
+                    <li>The gripper will automatically place the plate reader's lid back in its docking area after you fully reset the E-stop.</li>
                 </ul>
             </td>
         </tr>
