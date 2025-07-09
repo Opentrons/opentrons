@@ -3,6 +3,7 @@ import type { LwGeometryDetails } from '/app/redux/protocol-runs'
 export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
   'labware-uri-1': {
     id: 'labware-1',
+    version: 1,
     displayName: 'Labware 1',
     defaultOffsetDetails: {
       existingOffset: null,
@@ -22,6 +23,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
   },
   'labware-uri-2': {
     id: 'labware-2',
+    version: 2,
     displayName: 'Labware 2',
     defaultOffsetDetails: {
       existingOffset: {

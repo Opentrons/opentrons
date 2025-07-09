@@ -187,6 +187,7 @@
   "total_offsets": "Total Offsets",
   "try_again": "Try again",
   "unsaved_changes_will_be_lost": "Unsaved changes will be lost",
+  "version_number": "v{{version}}",
   "view_current_offsets": "view current offsets",
   "view_data": "View data",
   "view_labware_list": "View labware list",
