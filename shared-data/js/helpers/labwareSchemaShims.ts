@@ -1,6 +1,6 @@
 /** Compatibility shims to ease transitioning between with labware schemas 2 and 3. */
 
-import { getVectorInverse, getVectorSum } from './vectorMath'
+import { getVectorInverse, getVectorSum, IDENTITY_VECTOR } from './vectorMath'
 
 import type {
   AddressableArea,
@@ -8,8 +8,6 @@ import type {
   LabwareDefinition2,
   Vector3D,
 } from '../types'
-
-const VEC_ZERO: Vector3D = { x: 0, y: 0, z: 0 }
 
 /** Return dimensions of the total labware bounding box in the style of labware schema 2. */
 export function getSchema2Dimensions(
@@ -75,7 +73,7 @@ export function getDeckSlotOriginToLabwareOrigin(
   slotDefinition: AddressableArea,
   labwareDefinition: LabwareDefinition
 ): Vector3D {
-  const slotOriginToSlotFrontLeft = VEC_ZERO
+  const slotOriginToSlotFrontLeft = IDENTITY_VECTOR
 
   if (labwareDefinition.schemaVersion === 2) {
     // For schema 2 labware, the labware origin is always its front-left-bottom (-x, -y, -z),
@@ -83,7 +81,7 @@ export function getDeckSlotOriginToLabwareOrigin(
     // slot, plus an adjustment supplied by the labware (cornerOffsetFromSlot).
     const slotFrontLeftToLabwareFrontLeftBottom =
       labwareDefinition.cornerOffsetFromSlot
-    const labwareFrontLeftBottomToLabwareOrigin = VEC_ZERO
+    const labwareFrontLeftBottomToLabwareOrigin = IDENTITY_VECTOR
     return getVectorSum(
       slotOriginToSlotFrontLeft,
       slotFrontLeftToLabwareFrontLeftBottom,
@@ -95,7 +93,7 @@ export function getDeckSlotOriginToLabwareOrigin(
     // Here, we're accounting for the variance in labware origin, but simplifying the positioning,
     // for now, to always put the front-left-bottom (-x, -y, -z) of the labware at the front-left of
     // the slot. This is good enough for current display purposes and matches the schema 2 behavior.
-    const slotFrontLeftToLabwareFrontLeftBottom = VEC_ZERO
+    const slotFrontLeftToLabwareFrontLeftBottom = IDENTITY_VECTOR
     const labwareOriginToLabwareFrontLeftBottom = {
       x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
       y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,

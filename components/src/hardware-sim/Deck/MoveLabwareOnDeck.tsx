@@ -8,12 +8,13 @@ import {
   getPositionFromSlotId,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
+  IDENTITY_AFFINE_TRANSFORM,
+  multiplyMatrices,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
 import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 
 import type { ReactNode } from 'react'
 import type {
