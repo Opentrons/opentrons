@@ -16,12 +16,14 @@ interface ConfirmSetupStepsCompleteModalProps {
   onCloseClick: () => void
   onConfirmClick: () => void
   missingSteps: string[]
+  isRunStarting: boolean
 }
 
 export function ConfirmSetupStepsCompleteModal({
   onCloseClick,
   missingSteps,
   onConfirmClick,
+  isRunStarting,
 }: ConfirmSetupStepsCompleteModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
@@ -63,6 +65,8 @@ export function ConfirmSetupStepsCompleteModal({
             buttonType="primary"
             buttonText={t('start_run')}
             onClick={handleStartRun}
+            iconName={isRunStarting ? 'ot-spinner' : undefined}
+            iconPlacement={isRunStarting ? 'startIcon' : undefined}
           />
         </Flex>
       </Flex>
