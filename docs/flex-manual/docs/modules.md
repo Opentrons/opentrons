@@ -137,7 +137,7 @@ The plate reader fits in deck slots A3–D3 only. It comes preinstalled in a cad
 
 The plate reader is fully programmable in Protocol Designer and the Python Protocol API.
 
-### Plate Reader Specifications
+### Plate reader specifications
 
 <table>
     <tr>
