@@ -18,7 +18,7 @@ import type {
   // PositionReference,
   // Vector3D,
 } from '@opentrons/shared-data'
-import type { QuickTransferSummaryState } from '../types'
+import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
 
 export const setLiquidClassValues = (
   state: QuickTransferSummaryState,
@@ -268,55 +268,109 @@ const getLiquidClassValues = (
 
   const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
 
+  const convertBlowoutLocation = (
+    location: string | undefined
+  ): BlowOutLocation | undefined => {
+    if (!location) return undefined
+
+    switch (location) {
+      case 'source':
+        return 'source_well'
+      case 'destination':
+        return 'dest_well'
+      case 'trash':
+        return state.dropTipLocation
+      default:
+        return undefined
+    }
+  }
+
   const aspirateState = {
     aspirateFlowRate: flowRate.aspirate,
-    tipPositionAspirate: aspirate?.aspiratePosition.positionReference ?? 0,
+    tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
-      positionFromBottom: aspirate?.submerge.startPosition.offset.z,
+      positionFromBottom: aspirate?.submerge.startPosition.offset.z ?? 0,
     },
     preWetTip: aspirate?.preWet ?? false,
-    mixOnAspirate: {
-      mixVolume: aspirate?.mix.params?.volume,
-      repetitions: aspirate?.mix.params?.repetitions,
-    },
-    delayAspirate: {
-      delayDuration: aspirate?.delay.params?.duration,
-    },
+    mixOnAspirate:
+      aspirate?.mix.enable === false
+        ? undefined
+        : {
+            mixVolume: aspirate?.mix.params?.volume,
+            repetitions: aspirate?.mix.params?.repetitions,
+          },
+    delayAspirate:
+      aspirate?.delay.enable === false
+        ? undefined
+        : {
+            delayDuration: aspirate?.delay.params?.duration,
+          },
     retractAspirate: {
       speed: aspirate?.retract.speed ?? 0,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      positionFromBottom: aspirate?.retract.endPosition.offset.z ?? 0,
     },
-    touchTipAspirate: aspirate?.retract.touchTip.params?.mmFromEdge,
-    touchTipAspirateSpeed: aspirate?.retract.touchTip.params?.speed,
+    touchTipAspirate:
+      aspirate?.retract.touchTip.enable === false
+        ? undefined
+        : aspirate?.retract.touchTip.params?.mmFromEdge,
+    touchTipAspirateSpeed:
+      aspirate?.retract.touchTip.enable === false
+        ? undefined
+        : aspirate?.retract.touchTip.params?.speed,
     airGapAspirate: airGap.aspirate,
     conditionAspirate: conditioning ?? 0,
   }
 
   const dispenseState = {
     dispenseFlowRate: flowRate.dispense,
-    tipPositionDispense: dispense?.dispensePosition.positionReference ?? 0,
+    tipPositionDispense: dispense?.dispensePosition.offset.z ?? 0,
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      positionFromBottom: dispense?.submerge.startPosition.offset.z ?? 0,
     },
-    delayDispense: {
-      delayDuration: dispense?.delay.params?.duration,
-    },
+    delayDispense:
+      dispense?.delay.enable === false
+        ? undefined
+        : {
+            delayDuration: dispense?.delay.params?.duration ?? 0,
+          },
+    mixOnDispense:
+      path === 'multiDispense' || singleDispense?.mix?.enable === false
+        ? undefined
+        : {
+            mixVolume: singleDispense?.mix?.params?.volume ?? 0,
+            repetitions: singleDispense?.mix?.params?.repetitions ?? 0,
+          },
     pushOut: pushOut > 0,
     retractDispense: {
       speed: dispense?.retract.speed ?? 0,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      positionFromBottom: dispense?.retract.endPosition.offset.z ?? 0,
     },
-    // ToDo will be updated when the blowout pr is merged
-    blowOut: singleDispense?.retract.blowout?.params?.location ?? null,
-    touchTipDispense: dispense?.retract.touchTip.params?.mmFromEdge,
-    touchTipDispenseSpeed: dispense?.retract.touchTip.params?.speed,
+    blowOutDispense:
+      dispense?.retract.blowout?.enable === false
+        ? undefined
+        : {
+            location: convertBlowoutLocation(
+              dispense?.retract.blowout?.params?.location
+            ),
+            flowRate: dispense?.retract.blowout?.params?.flowRate ?? 0,
+          },
+    touchTipDispense:
+      dispense?.retract.touchTip.enable === false
+        ? undefined
+        : dispense?.retract.touchTip.params?.mmFromEdge,
+    touchTipDispenseSpeed:
+      dispense?.retract.touchTip.enable === false
+        ? undefined
+        : dispense?.retract.touchTip.params?.speed,
     airGapDispense: airGap.dispense,
     disposalVolumeDispenseSettings: {
       volume: disposal ?? 0,
       blowOutLocation:
-        singleDispense?.retract.blowout?.params?.location ?? null,
+        convertBlowoutLocation(dispense?.retract.blowout?.params?.location) ??
+        state.dropTipLocation,
+
       flowRate: flowRate.dispense,
     },
   }
