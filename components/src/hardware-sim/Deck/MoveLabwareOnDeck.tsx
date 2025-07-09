@@ -14,7 +14,7 @@ import { COLORS } from '../../helix-design-system'
 import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
 
-import type { ReactNode } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type {
   DeckConfiguration,
   DeckDefinition,
@@ -153,13 +153,15 @@ export function MoveLabwareOnDeck(
           highlight={true}
         />
         <AnimatedG style={{ opacity: springProps.splashOpacity }}>
-          <path
-            d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
-            stroke={COLORS.blue50}
-            strokeWidth="3.57"
-            strokeLinecap="round"
-            transform="scale(.97, -1) translate(-19, -104)"
-          />
+          <AlignSplashToLabware labwareDefinition={movedLabwareDef}>
+            <path
+              d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
+              stroke={COLORS.blue50}
+              strokeWidth="3.57"
+              strokeLinecap="round"
+              transform="scale(.97, -1) translate(-19, -104)"
+            />
+          </AlignSplashToLabware>
         </AnimatedG>
       </AnimatedG>
     </BaseDeck>
@@ -362,6 +364,30 @@ function usePositionChangeReset(
   const previousFinalRef = useRef(finalPosition)
 
   return shouldReset
+}
+
+/**
+ * The splash SVG is made for its origin to be placed at the -x,-y corner of a labware
+ * (or the slot that the labware is in). If this component is placed at the labware
+ * origin and the splash is placed inside this component, it will align the splash
+ * accordingly.
+ */
+function AlignSplashToLabware(
+  props: PropsWithChildren<{ labwareDefinition: LabwareDefinition }>
+): JSX.Element {
+  const { labwareDefinition, children } = props
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
+  const labwareOriginToFrontLeftCorner = {
+    x: labwareViewBox.minX,
+    y: labwareViewBox.minY,
+  }
+  return (
+    <g
+      transform={`translate(${labwareOriginToFrontLeftCorner.x} ${labwareOriginToFrontLeftCorner.y})`}
+    >
+      {children}
+    </g>
+  )
 }
 
 /**
