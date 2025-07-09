@@ -3318,32 +3318,6 @@
         "moduleId": "UUID"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 12.0,
-            "y": 8.75,
-            "z": 80.09
-          },
-          "compatibleWith": [
-            "temperatureModuleV2"
-          ],
-          "dimensions": {
-            "bareOverallHeight": 84.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Temperature Module GEN1",
-          "gripperOffsets": {},
-          "labwareOffset": {
-            "x": -0.15,
-            "y": -0.15,
-            "z": 80.09
-          },
-          "model": "temperatureModuleV1",
-          "moduleType": "temperatureModuleType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {}
-        },
         "model": "temperatureModuleV1",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -32049,16 +32023,7 @@
     "description": "Protocol to measure hydrogen peroxide levels from THP-1 cells using the OT-2",
     "protocolName": "Amplex Red Hydrogen Peroxide Assay"
   },
-  "modules": [
-    {
-      "id": "UUID",
-      "location": {
-        "slotName": "3"
-      },
-      "model": "temperatureModuleV1",
-      "serialNumber": "UUID"
-    }
-  ],
+  "modules": [],
   "pipettes": [
     {
       "id": "UUID",

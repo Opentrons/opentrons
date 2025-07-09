@@ -3727,47 +3727,6 @@
         "model": "magneticBlockV1"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "compatibleWith": [],
-          "dimensions": {
-            "bareOverallHeight": 45.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Magnetic Block GEN1",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.0
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 38.0
-          },
-          "model": "magneticBlockV1",
-          "moduleType": "magneticBlockType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {},
-            "ot2_standard": {},
-            "ot3_standard": {}
-          }
-        },
         "model": "magneticBlockV1",
         "moduleId": "UUID"
       },

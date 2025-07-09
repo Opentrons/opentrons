@@ -137,7 +137,7 @@ analyze-chunk:
 .PHONY: install-ot
 install-ot:
 	@echo "Installing the opentrons package from the local codebase"
-	uv pip install -e ../shared-data/python
+	uv pip install -e ../shared-data
 	uv pip install -e ../api
 
 .PHONY: create-pl-protocols
