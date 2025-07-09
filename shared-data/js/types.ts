@@ -229,8 +229,16 @@ export type WellSegment =
   | SphericalSegment
   | RoundedCuboidSegment
 
+export interface HeightVolumePair {
+  height: number
+  volume: number
+}
+
 export interface InnerWellGeometry {
   sections: WellSegment[]
+}
+export interface UserDefinedVolumes {
+  heightToVolumeMap: HeightVolumePair[]
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in

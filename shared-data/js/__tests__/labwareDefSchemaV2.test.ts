@@ -11,6 +11,7 @@ import type {
   InnerWellGeometry,
   LabwareDefinition2,
   LabwareWell,
+  UserDefinedVolumes,
 } from '../types'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
@@ -263,11 +264,36 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
   test('sections of a well geometry should be sorted top to bottom', () => {
     const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
     for (const geometry of geometries) {
-      const sectionList = geometry.sections
-      const sortedSectionList = sectionList.toSorted(
-        (a, b) => b.topHeight - a.topHeight
-      )
-      expect(sortedSectionList).toStrictEqual(sectionList)
+      if ('sections' in geometry) {
+        const sectionList = geometry.sections
+        const sortedSectionList = sectionList.toSorted(
+          (a, b) => b.topHeight - a.topHeight
+        )
+        expect(sortedSectionList).toStrictEqual(sectionList)
+      }
+      if ('heightToVolumeMap' in geometry) {
+        const pairingList = geometry.heightToVolumeMap
+        const sortedPairingList = pairingList.toSorted(
+          (a, b) => b.height - a.height
+        )
+      }
+    }
+  })
+
+  test('the last entry for UserDefinedVolumes should be the max volume of the well at its depth', () => {
+    for (const well of Object.values(labwareDef.wells)) {
+      const wellGeometryId = well.geometryDefinitionId
+
+      if (wellGeometryId === undefined) return
+      if (labwareDef.innerLabwareGeometry == null) return
+      if (!('sections' in labwareDef.innerLabwareGeometry)) return
+      const wellGeometry = labwareDef.innerLabwareGeometry[wellGeometryId]
+      if (wellGeometry === undefined) return
+
+      const wellDepth = well.depth
+      const sectionList = wellGeometry.sections
+      const last_entry = sectionList[sectionList.length - 1]
+      expect(last_entry.height).toStrictEqual(wellDepth)
     }
   })
 
@@ -275,8 +301,10 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
     )) {
-      const bottomFrustum = geometry.sections[geometry.sections.length - 1]
-      expect(bottomFrustum.bottomHeight).toStrictEqual(0)
+      if ('sections' in geometry) {
+        const bottomFrustum = geometry.sections[geometry.sections.length - 1]
+        expect(bottomFrustum.bottomHeight).toStrictEqual(0)
+      }
     }
   })
 
@@ -284,8 +312,10 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
     )) {
-      for (const section of geometry.sections) {
-        expect(section.topHeight).toBeGreaterThan(section.bottomHeight)
+      if ('sections' in geometry) {
+        for (const section of geometry.sections) {
+          expect(section.topHeight).toBeGreaterThan(section.bottomHeight)
+        }
       }
     }
   })
@@ -294,8 +324,10 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
     )) {
-      for (const [above, below] of pairsFromArray(geometry.sections)) {
-        expect(above.bottomHeight).toStrictEqual(below.topHeight)
+      if ('sections' in geometry) {
+        for (const [above, below] of pairs(geometry.sections)) {
+          expect(above.bottomHeight).toStrictEqual(below.topHeight)
+        }
       }
     }
   })
@@ -306,7 +338,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
       if (wellGeometryId === undefined) return
       if (labwareDef.innerLabwareGeometry == null) return
-
+      if (!('heightToVolumeMap' in labwareDef.innerLabwareGeometry)) return
       const wellGeometry = labwareDef.innerLabwareGeometry[wellGeometryId]
       if (wellGeometry === undefined) return
 

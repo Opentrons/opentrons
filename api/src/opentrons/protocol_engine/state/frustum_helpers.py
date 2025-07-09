@@ -366,17 +366,23 @@ def find_volume_user_defined_volumes(
     """Return a linear interpolation of volume based on target height."""
     if isinstance(target_height, SimulatedProbeResult):
         return target_height
-    max_height = well_geometry[-1].height
+    max_height = well_geometry.heightToVolumeMap[-1].height
     if target_height < 0 or target_height > max_height:
         raise InvalidLiquidHeightFound(
             f"Invalid target height {target_height} mm; max well height is {max_height} mm."
         )
     # note: i think lets require UserDefinedVolumes
-    # to have at least two entries: (0: 0) and (well_depth: well_capacity)
+    # to have at least (well_depth: well_capacity)
 
+    # make sure this works:
+    #   - with target height of 0
+    #   - between 0 and the first entry's height
     prev_height = 0.0
-    for pair in well_geometry:
-        if target_height == pair.height:
+    if target_height == 0.0:
+        return 0.0
+    for pair in well_geometry.heightToVolumeMap:
+        reveal_type(pair)
+        if target_height == pair["height"]:
             return pair.volume
         if target_height > prev_height and target_height < pair.height:
             proportional_diff = (target_height - prev_height) / (
