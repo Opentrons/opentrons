@@ -582,15 +582,22 @@ describe('isModuleAllowedOnAA', () => {
   })
 })
 
-
 describe('getAAForModuleFixture', () => {
   it('should return temp module aa', () => {
-    const result = getAAForModuleFixture('cutoutB3', 'temperatureModuleV2', 'temperatureModuleV2')
+    const result = getAAForModuleFixture(
+      'cutoutB3',
+      'temperatureModuleV2',
+      'temperatureModuleV2'
+    )
     expect(result).toEqual('temperatureModuleV2B3')
   })
 
   it('should return stacker module aa', () => {
-    const result = getAAForModuleFixture('cutoutB3', 'flexStackerModuleV1', 'flexStackerModuleV1')
+    const result = getAAForModuleFixture(
+      'cutoutB3',
+      'flexStackerModuleV1',
+      'flexStackerModuleV1'
+    )
     expect(result).toEqual('flexStackerModuleV1B4')
   })
 })

@@ -22,20 +22,18 @@ import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 import type { RequestState } from '/app/redux/robot-api/types'
 import type { State } from '/app/redux/types'
+import { SelectLocation } from '../SelectLocation'
+import { AttachedModule, updateDeckConfiguration } from '@opentrons/api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { PipetteInformation } from '/app/redux/pipettes'
 
-vi.mock('/app/redux/robot-api')
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 
-const LAST_ID = 'lastRequestId'
-
-const render = (props: ComponentProps<typeof CloseDoor>) => {
-  return renderWithProviders(<CloseDoor {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
-
-const installRender = (props: ComponentProps<typeof InstallShuttle>) => {
-  return renderWithProviders(<InstallShuttle {...props} />, {
+const render = (props: ComponentProps<typeof SelectLocation>) => {
+  return renderWithProviders(<SelectLocation {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -45,109 +43,47 @@ const mockStacker: CutoutConfig = {
   opentronsModuleSerialNumber: 'fsm123',
 }
 const mockDeckConfig: DeckConfiguration = [mockStacker]
+const attachedModule: Partial<AttachedModule> = {
+    moduleModel: 'temperatureModuleV2'
+}
+const RUN_ID_1: string = 'mock_run_1'
+describe('SelectLocation', () => {
+  let props: ComponentProps<typeof SelectLocation>
 
-describe('CloseDoorInstallShuttle', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-  let handleModuleApiRequests: (robotName: string, serial: string) => void
-  let props: React.ComponentProps<typeof CloseDoor>
   beforeEach(() => {
-    vi.useFakeTimers()
-    dispatchApiRequest = vi.fn()
-    handleModuleApiRequests = vi.fn()
+const myMock = vi.fn();
     props = {
-      proceed: vi.fn(),
-      goBack: vi.fn(),
-      restartSetup: vi.fn(),
-      chainRunCommands: vi.fn().mockResolvedValue(undefined),
-      isRobotMoving: false,
-      isModuleUpdating: false,
-      setIsModuleUpdating: vi.fn(),
-      attachedModule: mockFlexStacker,
-      attachedPipette: mockAttachedPipetteInformation,
-      errorMessage: null,
-      setErrorMessage: vi.fn(),
-      isOnDevice: false,
-      deckConfig: mockDeckConfig,
-      maintenanceRunId: null,
+        proceed: vi.fn(),
+        goBack: vi.fn,
+        restartSetup: vi.fn(),
+        isRobotMoving: false,
+        isModuleUpdating: false,
+        setIsModuleUpdating: vi.fn(),
+        attachedModule: attachedModule as AttachedModule,
+        deckConfig: mockDeckConfig,
+        createMaintenanceRun: vi.fn(),
+        setErrorMessage: vi.fn(),
+        maintenanceRunId: RUN_ID_1,
+        isLoadedInRun: true,
+        isOnDevice: false,
+        errorMessage: '',
+        attachedPipette: {} as PipetteInformation
     }
-    vi.mocked(useModuleApiRequests).mockReturnValue([
-      () => LAST_ID,
-      handleModuleApiRequests,
-    ])
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({} as RequestState)
-    vi.mocked(useDispatchApiRequest).mockReturnValue([
-      dispatchApiRequest,
-      [LAST_ID],
-    ])
+    const mock = vi.mocked(updateDeckConfiguration)
+    console.log("mock: ", mock)
+    mock.mockReturnValue({
+      updateDeckConfiguration: myMock,
+    } as any)
+    // vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    //   data: [],
+    // } as unknown) as UseQueryResult<DeckConfiguration>)
+    // vi.mocked(useModulesQuery).mockReturnValue(({
+    //   data: { data: [] },
+    // } as unknown) as UseQueryResult<Modules>)
+    // vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
 
-  afterEach(() => {
-    vi.clearAllTimers()
-  })
-
-  it('should render the close door screen in preparation for stacke shuttle home', () => {
+  it('handleAddFixture', () => {
     render(props)
-    screen.getByText('Close robot and stacker door')
-    screen.getByText(
-      'The robot needs to safely move to its home location before you can set the labware shuttle onto the track.'
-    )
-    const continueButton = screen.getByRole('button', { name: 'Continue' })
-    fireEvent.click(continueButton)
-  })
-
-  it('should render the robot in motion text', async () => {
-    props = {
-      proceed: vi.fn(),
-      goBack: vi.fn(),
-      restartSetup: vi.fn(),
-      chainRunCommands: vi.fn(),
-      isRobotMoving: true,
-      isModuleUpdating: false,
-      setIsModuleUpdating: vi.fn(),
-      attachedModule: mockFlexStacker,
-      attachedPipette: mockAttachedPipetteInformation,
-      errorMessage: null,
-      setErrorMessage: vi.fn(),
-      isOnDevice: false,
-      deckConfig: mockDeckConfig,
-      maintenanceRunId: null,
-    }
-    render(props)
-    screen.getByText('Stand back, robot is in motion')
-  })
-
-  it('should render the install shuttle instruction screen followed by a fail screen', () => {
-    const installProps = {
-      proceed: vi.fn(),
-      goBack: vi.fn(),
-      chainRunCommands: vi.fn(),
-      isRobotMoving: true,
-      attachedModule: mockFlexStackerMissingShuttle,
-      attachedPipette: mockAttachedPipetteInformation,
-      errorMessage: null,
-      setErrorMessage: vi.fn(),
-      isOnDevice: false,
-      deckConfig: mockDeckConfig,
-      maintenanceRunId: null,
-      restartSetup: vi.fn(),
-      isModuleUpdating: false,
-      setIsModuleUpdating: vi.fn(),
-      attachedModules: [mockFlexStackerMissingShuttle],
-    }
-    installRender(installProps)
-    screen.getByText('Place labware shuttle on track')
-    screen.getByText(
-      'Place the magnetic labware shuttle flush on the top of the track.'
-    )
-    const confirmButton = screen.getByRole('button', {
-      name: 'Confirm placement',
-    })
-    fireEvent.click(confirmButton)
-    screen.getByText('Shuttle installed incorrectly')
-    screen.getByText(
-      'There was an issue with the install of the shuttle. Please try installing again or contact support.'
-    )
   })
 })
