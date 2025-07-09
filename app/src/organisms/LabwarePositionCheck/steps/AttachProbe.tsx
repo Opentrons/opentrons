@@ -56,7 +56,9 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
       {...props}
       header={t('labware_position_check_title')}
       onClickButton={handleAttachProbeCheck}
-      buttonText={t('continue')}
+      oddHeaderBtnCopy={t('continue')}
+      desktopFooterBtnCopy={t('continue')}
+      desktopHeaderBtnCopy={t('exit')}
       secondaryButtonProps={{
         buttonText: t('exit'),
         buttonCategory: 'rounded',

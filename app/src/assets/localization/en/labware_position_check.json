@@ -165,6 +165,7 @@
   "robot_in_motion": "Stand back, robot is in motion.",
   "run": "Run",
   "save": "Save",
+  "save_and_exit": "Save & exit",
   "secondary_pipette_tipracks_section": "Check tip racks with {{secondary_mount}} Pipette",
   "see_how_offsets_work": "See how labware offsets work",
   "select_labware_to_view_data": "Select a labware to view its stored offset data.",
