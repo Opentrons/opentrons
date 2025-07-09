@@ -83,9 +83,27 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
-            {"display_name": "nest 8", "value": "nest_24_wellplate_10.4ml"},
+            {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
         ],
-        default="corning_24_wellplate_3.4ml_flat",
+        default="nest_24_wellplate_10.4ml",
+    )
+
+    parameters.add_float(
+        variable_name="number_of_steps",
+        display_name="Number of Steps",
+        description="Number of steps to take in the protocol.",
+        default=STEPS,
+        maximum=100.0,
+        minimum=1.0,
+    )
+
+    parameters.add_float(
+        variable_name="labware_version",
+        display_name="Labware Version",
+        description="Version of the labware to use.",
+        default=2.0,
+        maximum=2.0,
+        minimum=1.0
     )
 
 
@@ -107,6 +125,7 @@ def _setup(
 
     reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
     quick_mode = ctx.params.quick_mode  # type: ignore[attr-defined]
+    number_of_steps = int(ctx.params.number_of_steps)  # type: ignore[attr-defined]
 
     liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
@@ -138,7 +157,7 @@ def _setup(
     props.dispense.dispense_position.offset.z = meniscus_z
 
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
-    labware = ctx.load_labware(labware_type, SLOT_LABWARE)
+    labware = ctx.load_labware(labware_type, SLOT_LABWARE, version=ctx.params.labware_version)
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
@@ -147,7 +166,7 @@ def _setup(
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     max_volume = labware["A1"].max_volume
-    step_volume = max_volume / STEPS
+    step_volume = max_volume / number_of_steps
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
