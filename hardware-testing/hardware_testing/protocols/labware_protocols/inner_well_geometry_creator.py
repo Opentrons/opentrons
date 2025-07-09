@@ -319,36 +319,38 @@ def run(ctx: ProtocolContext) -> None:
 
     if quick_mode:
         pick_up_tips()
-        tip_z_error = 0.0
+        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-        height = 0.0
-        volume_dispensed = 0.0
 
         for step in range(STEPS):
-            liq_pipette.transfer_with_liquid_class(
-                ethanol,
-                step_volume,
-                src["A1"],
-                labware["A1"],
-                new_tip="never",
-                return_tip=False,
-            )
+            if step > 0: 
+                liq_pipette.transfer_with_liquid_class(
+                    ethanol,
+                    step_volume,
+                    src["A1"],
+                    labware["A1"],
+                    new_tip="never",
+                    return_tip=False,
+                )
 
-            volume_dispensed = round(volume_dispensed + step_volume, 5)
+                volume_dispensed = round(volume_dispensed + step_volume, 5)
 
-            try:
                 try:
-                    height = round(
-                        _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                        5,
-                    )
+                    try:
+                        height = round(
+                            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                            5,
+                        )
+                    except PipetteLiquidNotFoundError:
+                        height = round(
+                            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                            5,
+                        )
                 except PipetteLiquidNotFoundError:
-                    height = round(
-                        _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                        5,
-                    )
-            except PipetteLiquidNotFoundError:
-                height = 99.0
+                    height = 99.0
+            else: 
+                height = 0.0
+                volume_dispensed = 0.0
 
             corrected_height = height + tip_z_error
             trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
@@ -362,11 +364,7 @@ def run(ctx: ProtocolContext) -> None:
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
 
-            if step == 0:
-                src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-                height = 0.0
-                volume_dispensed = 0.0
-            else:
+            if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
                     step_volume,
@@ -395,7 +393,11 @@ def run(ctx: ProtocolContext) -> None:
                         )
                 except PipetteLiquidNotFoundError:
                     height = 99.0
-
+            else:
+                src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+                height = 0.0
+                volume_dispensed = 0.0
+                
             corrected_height = height + tip_z_error
             trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
