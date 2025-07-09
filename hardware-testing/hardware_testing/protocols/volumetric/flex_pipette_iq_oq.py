@@ -752,6 +752,8 @@ def run(ctx: ProtocolContext) -> None:
                 #        however probing >=2x times requires LLD support in liquid-classes.
                 pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
                 diluent_probed = True
+            # FIXME: (sigler) if we don't configure, the transfer-with-liquid-class
+            #        command can get stuck in a wrong configuration. Fix API.
             pip_for_dil.configure_for_volume(dil_ul)
             pip_for_dil.transfer_with_liquid_class(
                 test_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
@@ -783,6 +785,8 @@ def run(ctx: ProtocolContext) -> None:
         # TRANSFER DYE TO PLATE
         if ul <= DYE_SHAKER_MAX_UL:
             list_of_the_same_src_well = [src_well] * len(dst_wells_organized_by_channel)
+            # FIXME: (sigler) if we don't configure, the transfer-with-liquid-class
+            #        command can get stuck in a wrong configuration. Fix API.
             test_pip.configure_for_volume(ul)
             test_pip.transfer_with_liquid_class(
                 test_class,
@@ -792,6 +796,8 @@ def run(ctx: ProtocolContext) -> None:
                 new_tip="always",
             )
         else:
+            # FIXME: (sigler) if we don't configure, the transfer-with-liquid-class
+            #        command can get stuck in a wrong configuration. Fix API.
             test_pip.configure_for_volume(tip_ul)
             dist_vol = ul / ceil(ul / DYE_SHAKER_MAX_UL)
             test_pip.distribute_with_liquid_class(
