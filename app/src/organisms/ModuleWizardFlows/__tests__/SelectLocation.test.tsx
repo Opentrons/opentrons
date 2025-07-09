@@ -1,8 +1,7 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
-
-import { FLEX_STACKER_V1_FIXTURE } from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, it, vi, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { FLEX_STACKER_V1_FIXTURE, getAAForModuleFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -26,6 +25,8 @@ import { SelectLocation } from '../SelectLocation'
 import { AttachedModule, updateDeckConfiguration } from '@opentrons/api-client'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { PipetteInformation } from '/app/redux/pipettes'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
@@ -47,11 +48,12 @@ const attachedModule: Partial<AttachedModule> = {
     moduleModel: 'temperatureModuleV2'
 }
 const RUN_ID_1: string = 'mock_run_1'
-describe('SelectLocation', () => {
+describe('handleAddFixture', () => {
   let props: ComponentProps<typeof SelectLocation>
 
   beforeEach(() => {
 const myMock = vi.fn();
+const mockGetAAForModuleFixture = vi.fn()
     props = {
         proceed: vi.fn(),
         goBack: vi.fn,
@@ -69,21 +71,21 @@ const myMock = vi.fn();
         errorMessage: '',
         attachedPipette: {} as PipetteInformation
     }
-    const mock = vi.mocked(updateDeckConfiguration)
-    console.log("mock: ", mock)
+    const mock = vi.mocked(useUpdateDeckConfigurationMutation)
     mock.mockReturnValue({
       updateDeckConfiguration: myMock,
     } as any)
-    // vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
-    //   data: [],
-    // } as unknown) as UseQueryResult<DeckConfiguration>)
-    // vi.mocked(useModulesQuery).mockReturnValue(({
-    //   data: { data: [] },
-    // } as unknown) as UseQueryResult<Modules>)
-    // vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
+    vi.mocked(getAAForModuleFixture)
   })
 
-  it('handleAddFixture', () => {
+  it('should update deck config with temp module fixture', async () => {
     render(props)
+    const handleAddFixture = vi.fn()
+    fireEvent.click(screen.getByTestId('D3'))
+    expect(handleAddFixture).toBeCalledWith('D3')
+
   })
 })
