@@ -148,5 +148,6 @@ export interface QuickTransferSummaryState {
   liquidClass: LiquidClass // this has been added
   pushOut: boolean // this has been added
   conditionAspirate?: number // this has been added
+  liquidClassValuesInitialized: boolean // this has been added
 }
 ```
