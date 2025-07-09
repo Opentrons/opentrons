@@ -1,0 +1,227 @@
+{
+  "commandAnnotations": [],
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      20
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "RuntimeParameterRequired [line 197]: Error 4010 RUNTIME_PARAMETER_VALUE_REQUIRED (RuntimeParameterRequired): CSV parameter needs to be set to a file for full analysis or run.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "CSV parameter needs to be set to a file for full analysis or run.",
+          "errorCode": "4010",
+          "errorInfo": {},
+          "errorType": "RuntimeParameterRequired",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [],
+  "labware": [],
+  "liquidClasses": [],
+  "liquids": [],
+  "metadata": {
+    "author": "Harshal Desai",
+    "description": "Cherrypicking protocol with CSV handling and dual pipettes",
+    "protocolName": "Cherrypicking_Flex with Dual Pipettes"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "parameter-value-required",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "description": "Table of labware, wells, and volumes to transfer.",
+      "displayName": "Transfer CSV",
+      "type": "csv_file",
+      "variableName": "transfer_csv"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "None",
+          "value": "none"
+        },
+        {
+          "displayName": "FLEX 1-Channel 50µL",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "FLEX 1-Channel 1000µL",
+          "value": "flex_1channel_1000"
+        }
+      ],
+      "default": "flex_1channel_50",
+      "description": "Select the left pipette type.",
+      "displayName": "Left Pipette Type",
+      "type": "str",
+      "value": "flex_1channel_50",
+      "variableName": "left_pipette_type"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "Standard 50µL",
+          "value": "standard_50"
+        },
+        {
+          "displayName": "Filter 50µL",
+          "value": "filter_50"
+        },
+        {
+          "displayName": "Standard 200µL",
+          "value": "standard_200"
+        },
+        {
+          "displayName": "Filter 200µL",
+          "value": "filter_200"
+        },
+        {
+          "displayName": "Standard 1000µL",
+          "value": "standard_1000"
+        },
+        {
+          "displayName": "Filter 1000µL",
+          "value": "filter_1000"
+        }
+      ],
+      "default": "standard_50",
+      "description": "Select the left pipette tip type.",
+      "displayName": "Left Pipette Tip Type",
+      "type": "str",
+      "value": "standard_50",
+      "variableName": "left_tip_type"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "None",
+          "value": "none"
+        },
+        {
+          "displayName": "FLEX 1-Channel 50µL",
+          "value": "flex_1channel_50"
+        },
+        {
+          "displayName": "FLEX 1-Channel 1000µL",
+          "value": "flex_1channel_1000"
+        }
+      ],
+      "default": "flex_1channel_1000",
+      "description": "Select the right pipette type.",
+      "displayName": "Right Pipette Type",
+      "type": "str",
+      "value": "flex_1channel_1000",
+      "variableName": "right_pipette_type"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "Standard 50µL",
+          "value": "standard_50"
+        },
+        {
+          "displayName": "Filter 50µL",
+          "value": "filter_50"
+        },
+        {
+          "displayName": "Standard 200µL",
+          "value": "standard_200"
+        },
+        {
+          "displayName": "Filter 200µL",
+          "value": "filter_200"
+        },
+        {
+          "displayName": "Standard 1000µL",
+          "value": "standard_1000"
+        },
+        {
+          "displayName": "Filter 1000µL",
+          "value": "filter_1000"
+        }
+      ],
+      "default": "standard_1000",
+      "description": "Select the right pipette tip type.",
+      "displayName": "Right Pipette Tip Type",
+      "type": "str",
+      "value": "standard_1000",
+      "variableName": "right_tip_type"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "Always",
+          "value": "always"
+        },
+        {
+          "displayName": "Never",
+          "value": "never"
+        }
+      ],
+      "default": "always",
+      "description": "Select the tip reuse strategy.",
+      "displayName": "Tip Reuse",
+      "type": "str",
+      "value": "always",
+      "variableName": "tip_reuse"
+    },
+    {
+      "default": 1.0,
+      "description": "Set the aspiration rate (0.1 to 10).",
+      "displayName": "Aspiration Rate",
+      "max": 10.0,
+      "min": 0.1,
+      "type": "float",
+      "value": 1.0,
+      "variableName": "asp_rate"
+    },
+    {
+      "default": 1.0,
+      "description": "Set the dispense rate (0.1 to 10).",
+      "displayName": "Dispense Rate",
+      "max": 10.0,
+      "min": 0.1,
+      "type": "float",
+      "value": 1.0,
+      "variableName": "disp_rate"
+    },
+    {
+      "default": true,
+      "description": "Enable or disable liquid presence detection for the entire protocol.",
+      "displayName": "Enable Liquid Detection",
+      "type": "bool",
+      "value": true,
+      "variableName": "enable_liquid_detection"
+    }
+  ]
+}
