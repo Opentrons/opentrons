@@ -2,7 +2,7 @@
 from datetime import datetime
 from math import ceil, inf
 from statistics import stdev
-from typing import List, Optional, Tuple, Dict, cast
+from typing import List, Optional, Tuple, Dict, cast, Any
 
 from opentrons.config import infer_config_base_dir
 from opentrons.protocol_api import (
@@ -216,6 +216,17 @@ def add_parameters(params: ParameterContext) -> None:
     )
 
 
+def split_list_by_ranges(ctx: ProtocolContext, the_list: List[Any]) -> List[Any]:
+    ret: List[int] = []
+    if "low" in ctx.params.ul_ranges_to_test:
+        ret.append(the_list[0])
+    if "mid" in ctx.params.ul_ranges_to_test:
+        ret.append(the_list[1])
+    if "high" in ctx.params.ul_ranges_to_test:
+        ret.append(the_list[2])
+    return ret
+
+
 def get_trials(
     ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float
 ) -> List[int]:
@@ -223,14 +234,7 @@ def get_trials(
         return [int(96 / pipette.channels)]
 
     trials_per_range = TRIALS_BY_PIPETTE_BY_TIP[pipette.name][tip_ul]
-    trials_to_test: List[int] = []
-    if "low" in ctx.params.ul_ranges_to_test:
-        trials_to_test.append(trials_per_range[0])
-    if "mid" in ctx.params.ul_ranges_to_test:
-        trials_to_test.append(trials_per_range[1])
-    if "high" in ctx.params.ul_ranges_to_test:
-        trials_to_test.append(trials_per_range[2])
-    return trials_to_test
+    return split_list_by_ranges(ctx, trials_per_range)
 
 
 def get_volumes(
@@ -255,15 +259,7 @@ def get_volumes(
         float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
         for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
     ]
-    volumes_to_test: List[float] = []
-    if "low" in ctx.params.ul_ranges_to_test:
-        volumes_to_test.append(volumes_per_range[0])
-    if "mid" in ctx.params.ul_ranges_to_test:
-        volumes_to_test.append(volumes_per_range[1])
-    if "high" in ctx.params.ul_ranges_to_test:
-        volumes_to_test.append(volumes_per_range[2])
-
-    return volumes_to_test
+    return split_list_by_ranges(ctx, volumes_per_range)
 
 
 def load_tip_racks(
@@ -432,8 +428,9 @@ def load_liquid_dye(
 
     load_name = reservoirs_dye[0].load_name
     critical_ul = CRITICAL_UL_BY_LABWARE[load_name]
+    artel_names_for_dyes = split_list_by_ranges(ctx, reservoir_cfg[2])
     src_well_names: List[str] = [
-        DYE_WELL_BY_LABWARE[load_name][d] for d in reservoir_cfg[2]
+        DYE_WELL_BY_LABWARE[load_name][d] for d in artel_names_for_dyes
     ]
 
     if pipette.channels == 96:
@@ -599,22 +596,29 @@ def run(ctx: ProtocolContext) -> None:
     dye_well_by_volume = load_liquid_dye(ctx, test_pip, reservoirs_dye, volumes, tip_ul)
     load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
     test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+    diluent_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+
+    # NOTE: (sigler) contact dispensing creates bubbles sometimes, which is bad for reader
+    #       so we can fix this by doing non-contact dispense
+    diluent_props = diluent_class.get_for(pip_for_dil, diluent_tips)
+    diluent_props.dispense.dispense_position.position_reference = "well-top"
+    diluent_props.dispense.dispense_position.offset.z = 0.0
 
     # ENABLE LIQUID-MENISCUS PIPETTING
     if ctx.params.pipette_at_liquid_meniscus:
-        for pip, rack in [
-            (test_pip, test_pip.tip_racks[0]),
-            (pip_for_dil, diluent_tips),
-        ]:
-            _cls = test_class.get_for(pip, rack)
-            _cls.aspirate.aspirate_position.position_reference = "liquid-meniscus"
-            _cls.aspirate.aspirate_position.offset.z = -1.5
-            _cls.dispense.dispense_position.position_reference = "liquid-meniscus"
-            is_eth = bool(
-                "ethanol" in test_class.name.lower()
-                or "volatile" in test_class.name.lower()
-            )
-            _cls.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
+        # aspirate diluent from meniscus
+        diluent_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+        diluent_props.aspirate.aspirate_position.offset.z = -1.5
+        # modify test class (aspirate + dispense)
+        test_props = test_class.get_for(test_pip, test_pip.tip_racks[0])
+        test_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+        test_props.aspirate.aspirate_position.offset.z = -1.5
+        test_props.dispense.dispense_position.position_reference = "liquid-meniscus"
+        is_eth = bool(
+            "ethanol" in test_class.name.lower()
+            or "volatile" in test_class.name.lower()
+        )
+        test_props.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
     # VARIABLES TO KEEP TRACK OF TEST STATE
     plate: Optional[Labware] = None
@@ -682,7 +686,7 @@ def run(ctx: ProtocolContext) -> None:
         if not diluent_probed:
             pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
         pip_for_dil.distribute_with_liquid_class(
-            test_class,
+            diluent_class,
             DYE_READER_IDEAL_UL,
             reservoir_diluent["A1"],
             plate.columns(),
@@ -756,7 +760,7 @@ def run(ctx: ProtocolContext) -> None:
             #        command can get stuck in a wrong configuration. Fix API.
             pip_for_dil.configure_for_volume(dil_ul)
             pip_for_dil.transfer_with_liquid_class(
-                test_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
+                diluent_class, dil_ul, diluent_src, diluent_dest, new_tip="never"
             )
             if pip_for_dil.channels == 96:
                 pip_for_dil.return_tip()
