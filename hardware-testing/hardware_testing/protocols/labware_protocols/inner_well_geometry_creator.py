@@ -63,7 +63,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Quick Mode",
         variable_name="quick_mode",
         description="If true, dial indicator is not used and tips are reused.",
-        default=True,
+        default=False,
     )
 
     parameters.add_bool(
@@ -99,8 +99,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="labware_version",
         display_name="Labware Version",
         description="Version of the labware to use.",
-        default=2.0,
-        maximum=2.0,
+        default=3,
+        maximum=10,
         minimum=1.0
     )
 
@@ -363,18 +363,19 @@ def run(ctx: ProtocolContext) -> None:
         pick_up_tips()
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-        drop_tips()
         for step in range(STEPS):
+            drop_tips()
             if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
                     step_volume,
                     src["A1"],
                     labware["A1"],
-                    new_tip="always",
-                    return_tip=False,
+                    new_tip="Always",
+                    return_tip=True,
                 )
 
+                pick_up_tips()
                 volume_dispensed = round(volume_dispensed + step_volume, 5)
 
                 try:
@@ -395,8 +396,6 @@ def run(ctx: ProtocolContext) -> None:
                         )
                 except PipetteLiquidNotFoundError:
                     height = 99.0
-                
-                drop_tips()
             else:
                 height = 0.0
                 volume_dispensed = 0.0
