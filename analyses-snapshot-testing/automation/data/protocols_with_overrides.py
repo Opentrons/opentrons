@@ -1,3 +1,6 @@
+# This file Manually maintained
+# So we may map the overrides
+from automation.data.protocol import GENERATORS_FOLDER
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
@@ -18,6 +21,7 @@ class ProtocolsWithOverrides:
             "wrong_type_in_maximum",
             "wrong_type_in_unit",  # we going unit or suffix?
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP: ProtocolWithOverrides = ProtocolWithOverrides(
@@ -29,6 +33,7 @@ class ProtocolsWithOverrides:
             "default_greater_than_maximum",
             "default_less_than_minimum",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice: ProtocolWithOverrides = ProtocolWithOverrides(
@@ -37,6 +42,7 @@ class ProtocolsWithOverrides:
         robot="Flex",
         override_variable_name="type_to_test",
         overrides=["str_default_no_matching_choices", "float_default_no_matching_choices", "int_default_no_matching_choices"],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs.py
@@ -56,6 +62,7 @@ class ProtocolsWithOverrides:
             "return_tip_error",
             "drop_tip_with_location",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/Flex_X_v2_20_96_None_Overrides_TooTallLabware.py
@@ -90,6 +97,7 @@ class ProtocolsWithOverrides:
             "distribute_source_collision",
             "distribute_destination_collision",
         ],
+        folder=GENERATORS_FOLDER,
     )
 
     # analyses-snapshot-testing/files/protocols/OT2_X_v2_20_8_Overrides_InvalidConfigs.py
@@ -106,4 +114,130 @@ class ProtocolsWithOverrides:
             "return_tip_error",
             "drop_tip_with_location",
         ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid.py
+    Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+            # new 3/26/2025
+            "50_exceeds",
+            "50_filter_exceeds",
+            "200_exceeds",
+            "200_filter_exceeds",
+            "1000_exceeds",
+            "1000_filter_exceeds",
+        ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid.py
+    # https://opentrons.atlassian.net/browse/AUTH-1619 - closed
+    Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_distribute_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",  # was bug
+            # new 3/26/2025
+            "50_under",
+            "50_filter_under",
+            "200_under",
+            "200_filter_under",
+        ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid.py
+
+    Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_96_HappyPath_Overrides_consolidate_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_under",
+            "50_filter",
+            "50_filter_exceeds",
+            "200",
+            "200_exceeds",
+            "200_filter",
+            "200_filter_under",
+            "1000",
+            "1000_under",
+            "1000_filter",
+            "1000_filter_exceeds",
+        ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid.py
+
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_transfer_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid.py
+
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+        folder=GENERATORS_FOLDER,
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid.py
+    # https://opentrons.atlassian.net/browse/AUTH-1602 - closed
+    Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_24_P1000_8ch_None_HappyPath_Overrides_distribute_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",  # was bug
+            "50_filter",
+            "200",
+            "200_filter",  # was bug
+            "1000",  # was bug
+            "1000_filter",
+        ],
+        folder=GENERATORS_FOLDER,
     )

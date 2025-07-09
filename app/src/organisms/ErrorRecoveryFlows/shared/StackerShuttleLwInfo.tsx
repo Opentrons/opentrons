@@ -11,15 +11,7 @@ import { RightColumnAnimation } from './RightColumnAnimation'
 import type { RecoveryContentProps } from '../types'
 
 export function StackerShuttleLwInfo(props: RecoveryContentProps): JSX.Element {
-  const { recoveryCommands, routeUpdateActions } = props
-  const { manualRetrieve } = recoveryCommands
-  const { proceedNextStep } = routeUpdateActions
-
   const { t } = useTranslation('error_recovery')
-
-  const primaryOnClick = (): void => {
-    void manualRetrieve().then(() => proceedNextStep())
-  }
 
   return (
     <RecoverySingleColumnContentWrapper>
@@ -29,11 +21,12 @@ export function StackerShuttleLwInfo(props: RecoveryContentProps): JSX.Element {
           title={t('load_labware_into_labware_shuttle')}
           type={'location'}
           layout={'stacked'}
+          showQuantity={false}
         />
         <RightColumnAnimation animationSrc={ShuttleLabware} />
       </TwoColumn>
       <RecoveryFooterButtons
-        primaryBtnOnClick={primaryOnClick}
+        primaryBtnOnClick={props.routeUpdateActions.proceedNextStep}
         secondaryBtnOnClick={props.routeUpdateActions.goBackPrevStep}
       />
     </RecoverySingleColumnContentWrapper>

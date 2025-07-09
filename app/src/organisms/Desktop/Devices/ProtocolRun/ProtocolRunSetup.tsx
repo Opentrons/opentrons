@@ -145,7 +145,7 @@ export function ProtocolRunSetup({
     if (flexOffsetsApplied) {
       dispatch(updateRunSetupStepsComplete(runId, { [LPC_STEP_KEY]: true }))
     }
-  }, [flexOffsetsApplied])
+  }, [dispatch, flexOffsetsApplied, runId])
 
   const offsetsConfirmed = isFlex
     ? runHasStarted ||
@@ -290,6 +290,11 @@ export function ProtocolRunSetup({
           setOffsetsConfirmed={confirmed => {
             if (confirmed) {
               dispatch(appliedOffsetsToRun(runId))
+              dispatch(
+                updateRunSetupStepsComplete(runId, {
+                  [LPC_STEP_KEY]: confirmed,
+                })
+              )
               updateLPCStatusWithRunId(runId)
 
               setExpandedStepKey(LABWARE_SETUP_STEP_KEY)

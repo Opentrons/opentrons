@@ -42,6 +42,10 @@ export interface UseConditionalConfirmResult<T extends any[]> {
   cancel: () => unknown
 }
 
+/**
+ * Provides conditional confirmation logic, allowing certain actions to be blocked
+ * until explicitly confirmed.
+ */
 export const useConditionalConfirm = <T extends any[]>(
   handleContinue: (...args: T) => any,
   shouldBlock: boolean
@@ -52,11 +56,17 @@ export const useConditionalConfirm = <T extends any[]>(
     if (shouldBlock && !pendingConfirm) {
       setPendingArgs(confirmArgs)
     } else {
-      // call handleContinue with pending args if we have them
-      const handleContinueArgs =
-        pendingArgs !== null ? pendingArgs : confirmArgs
-      handleContinue(...handleContinueArgs)
-      setPendingArgs(null)
+      const handleContinueArgs = pendingArgs ?? confirmArgs
+      const result = handleContinue(...handleContinueArgs)
+
+      // Check if result is a promise
+      if (result != null && typeof result.then === 'function') {
+        result.finally(() => {
+          setPendingArgs(null)
+        })
+      } else {
+        setPendingArgs(null)
+      }
     }
   }
 
