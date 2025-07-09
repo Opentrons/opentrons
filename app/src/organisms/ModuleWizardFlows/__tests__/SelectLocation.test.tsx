@@ -1,28 +1,15 @@
 import { afterEach, beforeEach, describe, it, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FLEX_STACKER_V1_FIXTURE, getAAForModuleFixture } from '@opentrons/shared-data'
+import { FLEX_STACKER_V1_FIXTURE, getAAForModuleFixture, getFixtureIdByCutoutIdFromModuleAnchorCutoutId } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
-import {
-  mockFlexStacker,
-  mockFlexStackerMissingShuttle,
-} from '/app/redux/modules/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
-import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
-
-import { CloseDoor } from '../CloseStackerDoor'
-import { InstallShuttle } from '../InstallShuttle'
 
 import type { ComponentProps } from 'react'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { RequestState } from '/app/redux/robot-api/types'
-import type { State } from '/app/redux/types'
-import { SelectLocation } from '../SelectLocation'
-import { AttachedModule, updateDeckConfiguration } from '@opentrons/api-client'
+import { getCutoutConfigReplacment, SelectLocation } from '../SelectLocation'
+import { AttachedModule } from '@opentrons/api-client'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { PipetteInformation } from '/app/redux/pipettes'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -53,7 +40,7 @@ describe('handleAddFixture', () => {
 
   beforeEach(() => {
 const myMock = vi.fn();
-const mockGetAAForModuleFixture = vi.fn()
+const mockGetCutoutConfigReplacment = vi.fn()
     props = {
         proceed: vi.fn(),
         goBack: vi.fn,
@@ -71,21 +58,20 @@ const mockGetAAForModuleFixture = vi.fn()
         errorMessage: '',
         attachedPipette: {} as PipetteInformation
     }
-    const mock = vi.mocked(useUpdateDeckConfigurationMutation)
-    mock.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: myMock,
     } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
-    vi.mocked(getAAForModuleFixture)
+    
+    vi.mocked(getFixtureIdByCutoutIdFromModuleAnchorCutoutId)
   })
 
-  it('should update deck config with temp module fixture', async () => {
+  it('should update deck config with flex module fixture', async () => {
     render(props)
-    const handleAddFixture = vi.fn()
     fireEvent.click(screen.getByTestId('D3'))
-    expect(handleAddFixture).toBeCalledWith('D3')
-
+    expect(getFixtureIdByCutoutIdFromModuleAnchorCutoutId).toHaveBeenCalledWith('D3','fakeD4')
+    // expect(getFixtureIdByCutoutIdFromModuleAnchorCutoutId).toBeCalledWith('D3','fakeD4')
   })
 })

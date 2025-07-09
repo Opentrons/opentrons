@@ -1037,13 +1037,13 @@ export const getAAForModuleFixture = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureIdsWithFakes,
   moduleModel: ModuleModel
-): AddressableAreaNamesWithFakes | undefined => {
+): AddressableAreaNamesWithFakes => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
   const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
   return aaList?.find(
     aa =>
       getAAByAAId(aa, deckDef).areaType === MODULE_AA_TYPE_BY_MODEL[moduleModel]
-  )
+  ) as AddressableAreaNamesWithFakes
 }
 
 /**

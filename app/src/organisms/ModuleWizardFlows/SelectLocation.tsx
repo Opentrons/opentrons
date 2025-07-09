@@ -35,11 +35,12 @@ import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
-  AddressableAreaNamesWithFakes,
+  CutoutConfig,
   CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModuleSetupWizardStepProps } from './types'
 
@@ -67,9 +68,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     setErrorMessage,
   } = props
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
     attachedModule,
     deckConfig
@@ -121,41 +119,22 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const handleAddFixture = (
     anchorCutoutId: CutoutId,
-    addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
+    console.log("handleAddFixtures")
     const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
       anchorCutoutId,
       moduleFixtures
     )
-
+    console.log("configuredFixtureIdByCutoutId: ", configuredFixtureIdByCutoutId)
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
-      const mainAA = getAAForModuleFixture(
-        anchorCutoutId,
-        moduleFixtures[0].id,
-        attachedModule.moduleModel
-      )
-      console.log('mainAA: ', mainAA)
       updateDeckConfiguration(
         deckConfig.map(cc => {
           if (cc.cutoutId in configuredFixtureIdByCutoutId) {
-            const addedCutoutConfigs: CutoutConfigMap[] = [
-              {
-                addressableAreaId: mainAA ?? addressableAreaId,
-                cutoutFixtureId: moduleFixtures[0].id,
-                cutoutId: anchorCutoutId,
-              },
-            ]
-            const replacmentFixture = replaceCutoutFixtureWithComboFixture(
-              addedCutoutConfigs,
-              deckConfigWithAA,
-              anchorCutoutId
-            )
-            console.log('replacmentFixture: ', replacmentFixture)
+            const replacement = getCutoutConfigReplacment(anchorCutoutId, moduleFixtures[0].id, attachedModule.moduleModel ,deckConfig)
+            console.log("replacement: ", replacement)
             return {
               ...cc,
-              cutoutFixtureId: replacmentFixture[0]
-                .cutoutFixtureId as CutoutFixtureId,
-              opentronsModuleSerialNumber: undefined,
+              replacement
             }
           } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
             return {
@@ -238,4 +217,33 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       }
     />
   )
+}
+
+export const getCutoutConfigReplacment = (cutoutId: CutoutId, fixtureId: CutoutFixtureId, moduleModel: ModuleModel, deckConfig: CutoutConfig[]) => {
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  ) 
+  const mainAA = getAAForModuleFixture(cutoutId,
+        fixtureId,
+        moduleModel
+      )
+  console.log('mainAA: ', mainAA)
+  const addedCutoutConfigs: CutoutConfigMap[] = [
+  {
+    addressableAreaId: mainAA,
+    cutoutFixtureId: fixtureId,
+    cutoutId: cutoutId,
+  },
+  ]
+  const replacmentFixture = replaceCutoutFixtureWithComboFixture(
+    addedCutoutConfigs,
+    deckConfigWithAA,
+    cutoutId
+  )
+
+  return {
+    cutoutId,
+    cutoutFixtureId: replacmentFixture[0].cutoutFixtureId as CutoutFixtureId,
+    opentronsModuleSerialNumber: undefined
+  }
 }
