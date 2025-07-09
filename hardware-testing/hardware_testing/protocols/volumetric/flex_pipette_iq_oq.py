@@ -121,6 +121,10 @@ ENABLE_MULTI_DISPENSE_BY_CHANNELS = {1: True, 8: True, 96: False}
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {1: 1, 8: 5, 96: 5}
 
+# NOTE: (sigler) T1000 makes bubbles at the bottom of the destination well.
+#       Switched to T200 (smaller bore diameter) to reduce occurrence.
+DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_200ul"
+
 # fmt: off
 # TODO: handle more tip-racks from off-deck (eg: stacker)
 SLOTS = {
@@ -251,7 +255,7 @@ def load_tip_racks(
             for s in accessible_rack_slot_names
         ]
         ctx.load_adapter(rack_ln, SLOTS["tips_diluent"]).load_labware(
-            "opentrons_flex_96_filtertiprack_1000ul"
+            DILUENT_TIP_LOAD_NAME
         )
     else:
         pipette.tip_racks = [
@@ -260,9 +264,7 @@ def load_tip_racks(
         ]
         assert diluent_pipette is not None, "diluent_pipette exists when it should not"
         diluent_pipette.tip_racks = [
-            ctx.load_labware(
-                "opentrons_flex_96_filtertiprack_1000ul", SLOTS["tips_diluent"]
-            )
+            ctx.load_labware(DILUENT_TIP_LOAD_NAME, SLOTS["tips_diluent"])
         ]
     inaccessible_racks = [
         ctx.load_labware(ctx.params.tips, SLOTS[f"tips_{i}"])
