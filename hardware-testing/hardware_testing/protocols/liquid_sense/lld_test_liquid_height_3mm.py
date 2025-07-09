@@ -9,11 +9,10 @@ from opentrons.protocol_api import (
     OFF_DECK,
 )
 from opentrons.types import Point, Dict
-from opentrons.protocols.labware import get_all_labware_definitions
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 metadata = {"protocolName": "lld-test-liquid-height-3mm"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 ###########################################
 #  VARIABLES - START
@@ -33,17 +32,16 @@ def create_dict_of_heights_for_labware(
 ) -> Dict[str, List[float | SimulatedProbeResult]]:
     """Create a dictionary of labware and their heights."""
     volumes_dict = {}
+    labware = protocol.params.labware_type  # type: ignore[attr-defined]
     if requirements["apiLevel"] == "2.24":
-        labware_definitions = get_all_labware_definitions()
-        for labware in labware_definitions:
-            labware_loaded = protocol.load_labware(labware, OFF_DECK)
-            well = labware_loaded["A1"]
-            volumes_dict[labware] = [
-                well.volume_from_height(height=3),
-                well.volume_from_height(height=well.depth / 2),
-                well.volume_from_height(height=well.depth - 3),
-                0.0,
-            ]
+        labware_loaded = protocol.load_labware(labware, OFF_DECK)
+        well = labware_loaded["A1"]
+        volumes_dict[labware] = [
+            well.volume_from_height(height=3),
+            well.volume_from_height(height=well.depth / 2),
+            well.volume_from_height(height=well.depth - 3),
+            0.0,
+        ]
     return volumes_dict
 
 
@@ -86,7 +84,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "nest 12", "value": "nest_12_reservoir_22ml"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
         ],
-        default="axygen_96_wellplate_500ul",
+        default="nest_24_wellplate_10.4ml",
     )
     protocols.create_tube_volume_parameter(parameters)
     protocols.create_trials_parameter(parameters)
@@ -199,8 +197,6 @@ def _setup(
     bool,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
-    # TODO: use runtime-variables instead of constants
-    # Variables
     # Pipette Types
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
