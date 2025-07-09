@@ -4,6 +4,7 @@ import min from 'lodash/min'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
   getPipetteSpecsV2,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_TOP,
@@ -15,6 +16,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
+import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -54,7 +56,7 @@ const getMigratedBlowoutLocation = (
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, labwareDefinitions, robot } = appData
+  const { designerApplication, robot } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
@@ -66,6 +68,7 @@ export const migrateFile = (
   } = designerApplication.data
   const { model: robotType } = robot
 
+  const allLabwareDefsByURI = getAllLabwareDefs()
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
@@ -123,16 +126,16 @@ export const migrateFile = (
         ...rest
       } = form
       const aspirateLabwareUri = labware[aspirate_labware].labwareDefURI
-      const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
+      const isAspirateLabwareTouchtipDisabled = allLabwareDefsByURI[
         aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
       const dispenseLabwareUri = labware[dispense_labware]?.labwareDefURI
 
       const isDispenseLabwareTouchtipDisabled =
         //  dispense is in a waste chute/trash bin
-        labwareDefinitions[dispenseLabwareUri] == null
+        allLabwareDefsByURI[dispenseLabwareUri] == null
           ? true
-          : labwareDefinitions[dispenseLabwareUri].parameters.quirks?.includes(
+          : allLabwareDefsByURI[dispenseLabwareUri].parameters.quirks?.includes(
               'touchTipDisabled'
             )
 
@@ -141,18 +144,18 @@ export const migrateFile = (
         firstTrashBinOrWasteChuteId
       )
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
+        allLabwareDefsByURI,
         aspirate_labware as string,
         labware,
         'aspirate'
       )
       const matchingDispenseLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
+        allLabwareDefsByURI,
         dispense_labware as string,
         labware,
         'dispense'
       )
-      const tipRackDef = labwareDefinitions[form.tipRack]
+      const tipRackDef = allLabwareDefsByURI[form.tipRack]
       const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
       const pipetteSpecs =
         pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
@@ -268,9 +271,9 @@ export const migrateFile = (
           mix_touchTip_checkbox,
           ...rest
         } = form
-        const tipRackDef = labwareDefinitions[form.tipRack]
+        const tipRackDef = allLabwareDefsByURI[form.tipRack]
         const mixLabwareUri = labware[formLabware].labwareDefURI
-        const isLabwareTouchtipDisabled = labwareDefinitions[
+        const isLabwareTouchtipDisabled = allLabwareDefsByURI[
           mixLabwareUri
         ].parameters.quirks?.includes('touchTipDisabled')
         const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
@@ -286,7 +289,7 @@ export const migrateFile = (
               )
 
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
-          labwareDefinitions,
+          allLabwareDefsByURI,
           formLabware as string,
           labware,
           'mix'
