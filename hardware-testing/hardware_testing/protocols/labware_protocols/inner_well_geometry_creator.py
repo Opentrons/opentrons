@@ -59,8 +59,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     from hardware_testing import protocols
 
     protocols.create_pipette_parameters(parameters)
-    # protocols.create_labware_parameters(parameters)
-
     parameters.add_bool(
         display_name="Quick Mode",
         variable_name="quick_mode",
@@ -162,7 +160,7 @@ def _setup(
     ctx.load_trash_bin("A3")
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
-
+    labware.load_empty(labware.wells())
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     max_volume = labware["A1"].max_volume
@@ -353,12 +351,11 @@ def run(ctx: ProtocolContext) -> None:
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         volume_dispensed = 0.0
         for step in range(STEPS):
-            if step > 0:
-                aspirate_and_dispense(
-                    liq_pipette, src, labware, step_volume, ethanol, quick_mode
-                )
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
-            probe_pipette.move_to(labware["A1"].top())
+
+            aspirate_and_dispense(
+                liq_pipette, src, labware, step_volume, ethanol, quick_mode
+            )
+            volume_dispensed = round(volume_dispensed + step_volume, 5)
             height = round(_get_height_of_liquid_in_well(
                 probe_pipette, labware["A1"], ctx.is_simulating())
             )
