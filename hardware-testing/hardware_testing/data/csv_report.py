@@ -364,7 +364,7 @@ class CSVReport:
         # set the results of each section based on current
         self._refresh_results_overview_values()
         # save to disk after storing new values
-        if self._file_name:
+        if self._file_name and not self._dont_write_to_disk:
             self.save_to_disk()
 
     def __getitem__(self, item: str) -> CSVSection:
@@ -445,7 +445,8 @@ class CSVReport:
         self._file_name = data_io.create_file_name(
             self._test_name, self._run_id, self.tag
         )
-        self.save_to_disk()
+        if not self._dont_write_to_disk:
+            self.save_to_disk()
 
     def set_device_id(self, device_id: str, barcode_id: Optional[str] = None) -> None:
         """Store DUT serial number."""
@@ -481,8 +482,6 @@ class CSVReport:
 
     def save_to_disk(self) -> Path:
         """CSV Report save to disk."""
-        if self._dont_write_to_disk:
-            return
         if not self._file_name:
             raise RuntimeError("must set tag of report using `Report.set_tag()`")
         _report_str = str(self)
