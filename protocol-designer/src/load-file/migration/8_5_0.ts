@@ -317,7 +317,7 @@ export const migrateFile = (
           [id]: {
             ...rest,
             id,
-            labware,
+            labware: formLabware,
             mix_touchTip_checkbox: isLabwareTouchtipDisabled
               ? false
               : mix_touchTip_checkbox,
