@@ -200,6 +200,11 @@ def add_parameters(params: ParameterContext) -> None:
         variable_name="include_baseline",
         default=False,
     )
+    params.add_str(
+        display_name="custom_ul_comma_separated",
+        variable_name="custom_ul_comma_separated",
+        default="",
+    )
 
 
 def get_trials(
@@ -213,8 +218,6 @@ def get_trials(
 def get_volumes(
     ctx: ProtocolContext, pipette: InstrumentContext, tip_ul: float
 ) -> List[float]:
-    if ctx.params.just_fill_plate_200ul:
-        return [DYE_READER_IDEAL_UL]
     # NOTE: configuring for MAX tip uL before calculate test volumes
     pipette.configure_for_volume(tip_ul)
     # NOTE: limiting pipettes (eg: 96ch) to only test <=250uL
@@ -226,10 +229,28 @@ def get_volumes(
     )
     # NOTE: configuring for MINIMUM tip uL before calculate test volumes
     pipette.configure_for_volume(1)
-    return [
-        float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
-        for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
-    ]
+
+    if ctx.params.just_fill_plate_200ul:
+        return [DYE_READER_IDEAL_UL]
+    elif ctx.params.custom_ul_comma_separated:
+        try:
+            ul_list_str = ctx.params.custom_ul_comma_separated.split(",")
+            custom_ul_list = [float(ul_str.strip()) for ul_str in ul_list_str]
+            assert custom_ul_list
+        except (ValueError, AssertionError):
+            raise ValueError(
+                f"unexpected list of volumes: {ctx.params.custom_ul_comma_separated}"
+            )
+        ul_out_of_range = [ul for ul in custom_ul_list if ul < 0 or ul > max_possible_ul]
+        if len(ul_out_of_range):
+            raise ValueError(
+                f"volumes {ul_out_of_range} greater than max ({max_possible_ul})"
+            )
+    else:
+        return [
+            float(min(max(v, pipette.min_volume), tip_ul, max_possible_ul))
+            for v in VOLUMES_BY_TIP_RACK[ctx.params.tips]  # type: ignore[attr-defined]
+        ]
 
 
 def load_tip_racks(
