@@ -97,7 +97,7 @@ const getNoLiquidClassValues = (
     tipPositionAspirate: aspirate.aspiratePosition.positionReference,
     submergeAspirate: {
       speed: aspirate.submerge.speed,
-      positionFromBottom: POSITION_REFERENCE_TOP,
+      positionFromBottom: aspirate.submerge.startPosition.offset.z,
     },
     preWetTip: aspirate.preWet,
     mixOnAspirate: {
@@ -270,12 +270,12 @@ const getLiquidClassValues = (
 
   const aspirateState = {
     aspirateFlowRate: flowRate.aspirate,
-    tipPositionAspirate: aspirate?.aspiratePosition.positionReference,
+    tipPositionAspirate: aspirate?.aspiratePosition.positionReference ?? 0,
     submergeAspirate: {
-      speed: aspirate?.submerge.speed,
-      positionFromBottom: POSITION_REFERENCE_TOP,
+      speed: aspirate?.submerge.speed ?? 0,
+      positionFromBottom: aspirate?.submerge.startPosition.offset.z,
     },
-    preWetTip: aspirate?.preWet,
+    preWetTip: aspirate?.preWet ?? false,
     mixOnAspirate: {
       mixVolume: aspirate?.mix.params?.volume,
       repetitions: aspirate?.mix.params?.repetitions,
@@ -284,7 +284,7 @@ const getLiquidClassValues = (
       delayDuration: aspirate?.delay.params?.duration,
     },
     retractAspirate: {
-      speed: aspirate?.retract.speed,
+      speed: aspirate?.retract.speed ?? 0,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
     touchTipAspirate: aspirate?.retract.touchTip.params?.mmFromEdge,
@@ -295,9 +295,9 @@ const getLiquidClassValues = (
 
   const dispenseState = {
     dispenseFlowRate: flowRate.dispense,
-    tipPositionDispense: dispense?.dispensePosition.positionReference,
+    tipPositionDispense: dispense?.dispensePosition.positionReference ?? 0,
     submergeDispense: {
-      speed: dispense?.submerge.speed,
+      speed: dispense?.submerge.speed ?? 0,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
     delayDispense: {
@@ -305,7 +305,7 @@ const getLiquidClassValues = (
     },
     pushOut: pushOut > 0,
     retractDispense: {
-      speed: dispense?.retract.speed,
+      speed: dispense?.retract.speed ?? 0,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     },
     // ToDo will be updated when the blowout pr is merged
@@ -314,7 +314,7 @@ const getLiquidClassValues = (
     touchTipDispenseSpeed: dispense?.retract.touchTip.params?.speed,
     airGapDispense: airGap.dispense,
     disposalVolumeDispenseSettings: {
-      volume: disposal,
+      volume: disposal ?? 0,
       blowOutLocation:
         singleDispense?.retract.blowout?.params?.location ?? null,
       flowRate: flowRate.dispense,
