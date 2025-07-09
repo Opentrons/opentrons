@@ -265,7 +265,6 @@ class FixtureSettings:
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
         print_info(f"Fast simulate {fast_simulate}")
-        print_info(str(os.environ))
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
@@ -664,7 +663,6 @@ def retract_and_wait(
                 return_val.grams_average += volume * -0.001
             elif mode == MeasurementType.DISPENSE:
                 return_val.grams_average += volume * 0.001
-        print_info(f"mode {mode} {return_val.grams_average}")
         return return_val
 
     m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
@@ -989,9 +987,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             liq,
                         )
                         - avg_asp_evap
-                    )
-                    print_info(
-                        f"change: {asp_with_evap} {measurements[volume][-1][0]} {measurements[volume][-1][1]}"
                     )
                     disp_with_evap = (
                         calculate_change_in_volume(
