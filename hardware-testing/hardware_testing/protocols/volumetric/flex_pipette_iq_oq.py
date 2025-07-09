@@ -121,9 +121,7 @@ ENABLE_MULTI_DISPENSE_BY_CHANNELS = {1: True, 8: True, 96: False}
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {1: 1, 8: 5, 96: 5}
 
-# NOTE: (sigler) T1000 makes bubbles at the bottom of the destination well.
-#       Switched to T200 (smaller bore diameter) to reduce occurrence.
-DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_200ul"
+DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_1000ul"
 
 # fmt: off
 # TODO: handle more tip-racks from off-deck (eg: stacker)
