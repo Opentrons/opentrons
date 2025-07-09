@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProb
 ASPIRATE_MM_FROM_BOTTOM = 5
 DISPENSE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_195ml"
-STEPS = 18  # optimize later
+DEFAULT_STEPS = 18  # optimize later
 
 LIQUID_MOUNT = "right"
 LIQUID_TIP_SIZE = 1000
@@ -90,7 +90,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="number_of_steps",
         display_name="Number of Steps",
         description="Number of steps to take in the protocol.",
-        default=STEPS,
+        default=DEFAULT_STEPS,
         maximum=100.0,
         minimum=1.0,
     )
@@ -118,6 +118,7 @@ def _setup(
     float,
     bool,
     LiquidClass,
+    float
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
 
@@ -201,6 +202,7 @@ def _setup(
         step_volume,
         quick_mode,
         ethanol,
+        number_of_steps
     )
 
 
@@ -296,6 +298,7 @@ def run(ctx: ProtocolContext) -> None:
         step_volume,
         quick_mode,
         ethanol,
+        number_of_steps
     ) = _setup(ctx)
 
     _store_dial_baseline(ctx, probe_pipette, dial)
@@ -322,7 +325,7 @@ def run(ctx: ProtocolContext) -> None:
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        for step in range(STEPS):
+        for step in range(number_of_steps):
             if step > 0: 
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
@@ -360,7 +363,7 @@ def run(ctx: ProtocolContext) -> None:
         drop_tips()
 
     else:
-        for step in range(STEPS):
+        for step in range(number_of_steps):
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
             if step > 0:
