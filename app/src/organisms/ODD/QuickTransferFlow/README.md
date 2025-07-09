@@ -137,7 +137,11 @@ export interface QuickTransferSummaryState {
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    // this has been updated
+    location?: BlowOutLocation
+    speed: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig

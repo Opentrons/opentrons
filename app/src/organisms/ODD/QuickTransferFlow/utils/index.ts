@@ -6,3 +6,5 @@ export { getCompatibleLabwareByCategory } from './getCompatibleLabwareByCategory
 export { getInitialSummaryState } from './getInitialSummaryState'
 export { getSelectedWellCount } from './getSelectedWellCount'
 export { getVolumeRange } from './getVolumeRange'
+export { getPipetteName } from './getPipetteName'
+export { getMaxUiFlowRate } from './getMaxUiFlowRate'

@@ -503,7 +503,7 @@ well_plate_2.load_liquid(
     wells=[
         "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8",
         "E3"
-        ],
+    ],
     liquid=liquid_2,
     volume=180,
 )`.trimStart()

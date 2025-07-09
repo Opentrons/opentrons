@@ -31,18 +31,21 @@ export function useDispenseSettingsConfig({
   const { makeSnackbar } = useToaster()
 
   const getBlowoutValueCopy = (): string | undefined => {
-    if (state.blowOut === 'dest_well') {
+    if (state.blowOutDispense?.location === 'dest_well') {
       return t('blow_out_into_destination_well')
-    } else if (state.blowOut === 'source_well') {
+    } else if (state.blowOutDispense?.location === 'source_well') {
       return t('blow_out_into_source_well')
     } else if (
-      state.blowOut != null &&
-      state.blowOut.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+      state.blowOutDispense?.location != null &&
+      state.blowOutDispense.location.cutoutFixtureId ===
+        TRASH_BIN_ADAPTER_FIXTURE
     ) {
       return t('blow_out_into_trash_bin')
     } else if (
-      state.blowOut != null &&
-      WASTE_CHUTE_FIXTURES.includes(state.blowOut.cutoutFixtureId)
+      state.blowOutDispense?.location != null &&
+      WASTE_CHUTE_FIXTURES.includes(
+        state.blowOutDispense.location.cutoutFixtureId
+      )
     ) {
       return t('blow_out_into_waste_chute')
     }
