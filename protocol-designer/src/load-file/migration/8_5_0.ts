@@ -16,12 +16,10 @@ import {
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
 import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
-import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
   LabwareDefinition2,
-  LoadLabwareCreateCommand,
   PipetteV2Specs,
   ProtocolFile,
 } from '@opentrons/shared-data'
@@ -56,20 +54,17 @@ const getMigratedBlowoutLocation = (
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, commands, labwareDefinitions, robot } = appData
+  const { designerApplication, labwareDefinitions, robot } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms, ingredients } = designerApplication.data
+  const {
+    savedStepForms,
+    ingredients,
+    labware,
+    pipettes,
+  } = designerApplication.data
   const { model: robotType } = robot
-  const loadLabwareCommands = commands.filter(
-    (command): command is LoadLabwareCreateCommand =>
-      command.commandType === 'loadLabware'
-  )
-  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
-    commands,
-    labwareDefinitions
-  )
 
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
@@ -127,13 +122,11 @@ export const migrateFile = (
         blowout_z_offset,
         ...rest
       } = form
-      const aspirateLabwareUri =
-        equipmentLoadInfoFromCommands.labware[aspirate_labware].labwareDefURI
+      const aspirateLabwareUri = labware[aspirate_labware].labwareDefURI
       const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
         aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
-      const dispenseLabwareUri =
-        equipmentLoadInfoFromCommands.labware[dispense_labware]?.labwareDefURI
+      const dispenseLabwareUri = labware[dispense_labware]?.labwareDefURI
 
       const isDispenseLabwareTouchtipDisabled =
         //  dispense is in a waste chute/trash bin
@@ -149,20 +142,18 @@ export const migrateFile = (
       )
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
-        loadLabwareCommands,
         aspirate_labware as string,
+        labware,
         'aspirate'
       )
       const matchingDispenseLabwareWellDepth = getMigratedPositionFromTop(
         labwareDefinitions,
-        loadLabwareCommands,
         dispense_labware as string,
+        labware,
         'dispense'
       )
       const tipRackDef = labwareDefinitions[form.tipRack]
-      const pipetteName =
-        equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
-        null
+      const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
       const pipetteSpecs =
         pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
       const defaultPushOutVolume =
@@ -272,20 +263,17 @@ export const migrateFile = (
         const {
           id,
           mix_touchTip_mmFromBottom,
-          labware,
+          labware: formLabware,
           liquidClassesSupported,
           mix_touchTip_checkbox,
           ...rest
         } = form
         const tipRackDef = labwareDefinitions[form.tipRack]
-        const mixLabwareUri =
-          equipmentLoadInfoFromCommands.labware[labware].labwareDefURI
+        const mixLabwareUri = labware[formLabware].labwareDefURI
         const isLabwareTouchtipDisabled = labwareDefinitions[
           mixLabwareUri
         ].parameters.quirks?.includes('touchTipDisabled')
-        const pipetteName =
-          equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
-          null
+        const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
         const pipetteSpecs =
           pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
         const defaultPushOutVolume =
@@ -299,8 +287,8 @@ export const migrateFile = (
 
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
           labwareDefinitions,
-          loadLabwareCommands,
-          labware as string,
+          formLabware as string,
+          labware,
           'mix'
         )
 

@@ -1,44 +1,36 @@
-import type {
-  LabwareDefinition2,
-  LoadLabwareCreateCommand,
-} from '@opentrons/shared-data'
+import { Labware } from '../../../file-types'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { MoveLiquidPrefixType } from '../../../resources/types'
 
 export const getMigratedPositionFromTop = (
   labwareDefinitions: {
     [definitionId: string]: LabwareDefinition2
   },
-  loadLabwareCommands: LoadLabwareCreateCommand[],
-  labware: string,
+  formLabwareId: string,
+  labware: Labware,
   type: MoveLiquidPrefixType
 ): number => {
-  const matchingLoadLabware = loadLabwareCommands.find(
-    command =>
-      command.commandType === 'loadLabware' &&
-      command.params.labwareId === labware
-  )
-  if (matchingLoadLabware == null) {
+  const labwareDefUri = labware[formLabwareId].labwareDefURI
+
+  if (labwareDefUri == null) {
     console.error(
-      `expected to find matching ${type} labware load command but could not with ${type}_labware from form data as ${labware}`
+      `unable to find matching labware def uri from form labware id ${formLabwareId}`
     )
   }
-  const labwareUri =
-    matchingLoadLabware != null
-      ? `${matchingLoadLabware.params.namespace}/${matchingLoadLabware.params.loadName}/${matchingLoadLabware.params.version}`
-      : ''
 
   //    early exit for dispense_labware equaling trashBin or wasteChute
-  if (labwareDefinitions[labwareUri] == null) {
+  if (labwareDefinitions[labwareDefUri] == null) {
     return 0
   }
 
-  const matchingLabwareWellDepth = labwareUri
-    ? labwareDefinitions[labwareUri].wells.A1.depth
+  const matchingLabwareWellDepth = labwareDefUri
+    ? labwareDefinitions[labwareDefUri].wells.A1.depth
     : 0
 
   if (matchingLabwareWellDepth === 0) {
     console.error(
-      `error in finding the ${type} labware well depth with labware uri ${labwareUri}`
+      `error in finding the ${type} labware well depth with labware uri ${labwareDefUri}`
     )
   }
   return matchingLabwareWellDepth
