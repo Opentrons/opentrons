@@ -281,16 +281,10 @@ export function quickTransferSummaryReducer(
         disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
       }
     }
-    case 'SET_LIQUID_CLASS_VALUES_ASPIRATE': {
+    case 'SET_LIQUID_CLASS_VALUES': {
       return {
         ...state,
-        ...action.liquidClassAspirateValues,
-      }
-    }
-    case 'SET_LIQUID_CLASS_VALUES_DISPENSE': {
-      return {
-        ...state,
-        ...action.liquidClassDispenseValues,
+        ...action.liquidClassValues,
       }
     }
   }

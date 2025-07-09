@@ -12,22 +12,17 @@ import {
 
 import { getTransferPlanAndReferenceVolumes } from './getTransferPlanAndReferenceVolumes'
 
-import type {
-  LiquidHandlingPropertyByVolume,
-  // PositionReference,
-  // Vector3D,
-} from '@opentrons/shared-data'
+import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
 
-export const setLiquidClassValues = (
+export const retrieveLiquidClassValues = (
   state: QuickTransferSummaryState,
-  liquidHandlingAction: 'aspirate' | 'dispense'
+  liquidHandlingAction: 'aspirate' | 'dispense' | 'all'
 ): QuickTransferSummaryState => {
   const { pipette } = state
   const convertedPipetteName = getFlexNameConversion(pipette)
 
   if (state.liquidClass.liquidClassName === NONE_LIQUID_CLASS_NAME) {
-    // none getNoLiquidClassValues
     return getNoLiquidClassValues(
       state,
       convertedPipetteName,
@@ -68,7 +63,7 @@ const convertBlowoutLocation = (
 const getNoLiquidClassValues = (
   state: QuickTransferSummaryState,
   convertedPipetteName: string,
-  liquidHandlingAction: 'aspirate' | 'dispense'
+  liquidHandlingAction: 'aspirate' | 'dispense' | 'all'
 ): QuickTransferSummaryState => {
   const { tipRack, path, volume } = state
   const tiprackDefinition = getLabwareDefURI(tipRack)
@@ -154,6 +149,14 @@ const getNoLiquidClassValues = (
     touchTipDispense: dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
   }
+
+  if (liquidHandlingAction === 'all') {
+    return {
+      ...state,
+      ...aspirateState,
+      ...dispenseState,
+    }
+  }
   if (liquidHandlingAction === 'aspirate') {
     return {
       ...state,
@@ -170,7 +173,7 @@ const getNoLiquidClassValues = (
 const getFlowRateFields = (
   volume: number,
   flowRateByVolume: LiquidHandlingPropertyByVolume,
-  liquidHandlingAction: 'aspirate' | 'dispense'
+  liquidHandlingAction: 'aspirate' | 'dispense' | 'all'
 ): Record<string, number | null> => {
   const interpolatedFlowRate = linearInterpolate(
     volume,
@@ -189,7 +192,7 @@ const getFlowRateFields = (
 const getLiquidClassValues = (
   state: QuickTransferSummaryState,
   convertedPipetteName: string,
-  liquidHandlingAction: 'aspirate' | 'dispense'
+  liquidHandlingAction: 'aspirate' | 'dispense' | 'all'
 ): QuickTransferSummaryState => {
   const {
     tipRack,
@@ -345,6 +348,13 @@ const getLiquidClassValues = (
     },
   }
 
+  if (liquidHandlingAction === 'all') {
+    return {
+      ...state,
+      ...aspirateState,
+      ...dispenseState,
+    }
+  }
   if (liquidHandlingAction === 'aspirate') {
     return {
       ...state,

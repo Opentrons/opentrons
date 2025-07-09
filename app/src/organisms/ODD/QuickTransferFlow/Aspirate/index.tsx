@@ -54,8 +54,9 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     <>
       {showResetAdvancedSettingsModal ? (
         <ResetAdvancedSettingsModal
+          state={state}
           kind="aspirate"
-          liquidClass={state.liquidClass}
+          dispatch={dispatch}
           onClose={handleClose}
         />
       ) : null}

@@ -116,6 +116,8 @@ export interface QuickTransferSummaryState {
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+  // Note this is used to apply liquid class values to the state only once
+  liquidClassValuesInitialized: boolean
 }
 
 export type TransferType =
@@ -161,8 +163,7 @@ export type QuickTransferSummaryAction =
   | SetPushOut
   | SetConditionAspirate
   | SetDisposalVolumeDispense
-  | SetLiquidClassValuesAspirate
-  | SetLiquidClassValuesDispense
+  | SetLiquidClassValues
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -325,37 +326,7 @@ interface SetDisposalVolumeDispense {
     flowRate: number
   }
 }
-
-type FilteredAspirateKeys = {
-  [K in keyof QuickTransferSummaryState]: K extends `${string}Aspirate${string}`
-    ? K
-    : never
-}[keyof QuickTransferSummaryState]
-type AspirateKeys = Extract<
-  FilteredAspirateKeys | 'preWetTip' | 'aspirateFlowRate',
-  keyof QuickTransferSummaryState
->
-type AspirateValuesPayload = Partial<
-  Pick<QuickTransferSummaryState, AspirateKeys>
->
-type FilteredDispenseKeys = {
-  [K in keyof QuickTransferSummaryState]: K extends `${string}Dispense${string}`
-    ? K
-    : never
-}[keyof QuickTransferSummaryState]
-type DispenseKeys = Extract<
-  FilteredDispenseKeys | 'pushOut' | 'dispenseFlowRate',
-  keyof QuickTransferSummaryState
->
-type DispenseValuesPayload = Partial<
-  Pick<QuickTransferSummaryState, DispenseKeys>
->
-interface SetLiquidClassValuesAspirate {
-  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUE_ASPIRATE
-  liquidClassAspirateValues: AspirateValuesPayload
-}
-
-interface SetLiquidClassValuesDispense {
-  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUE_DISPENSE
-  liquidClassDispenseValues: DispenseValuesPayload
+interface SetLiquidClassValues {
+  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUES
+  liquidClassValues: QuickTransferSummaryState
 }

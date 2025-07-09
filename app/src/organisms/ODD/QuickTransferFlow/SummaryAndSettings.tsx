@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -17,7 +17,6 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -36,7 +35,11 @@ import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
 import { TipManagement } from './TipManagement'
-import { createQuickTransferFile, getInitialSummaryState } from './utils'
+import {
+  createQuickTransferFile,
+  getInitialSummaryState,
+  retrieveLiquidClassValues,
+} from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
@@ -82,9 +85,6 @@ export function SummaryAndSettings(
     initialSummaryState
   )
 
-  console.log('SummaryAndSettings state', state)
-  console.log(getLabwareDefURI(state.tipRack))
-
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
@@ -98,6 +98,19 @@ export function SummaryAndSettings(
     },
     host
   )
+
+  useEffect(() => {
+    if (enableLiquidClassesForQT && !state.liquidClassValuesInitialized) {
+      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+      dispatch({
+        type: 'SET_LIQUID_CLASS_VALUES',
+        liquidClassValues: {
+          ...liquidClassValues,
+          liquidClassValuesInitialized: true,
+        },
+      })
+    }
+  })
 
   const isMultiTransferAspirate = state?.path === 'multiAspirate'
   const isMultiTransferDispense = state?.path === 'multiDispense'
