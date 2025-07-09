@@ -1,5 +1,5 @@
 
-In Protocol Designer, you'll define the hardware, labware, and liquids the robot will use during a procedure. This manual details how to use Protocol Designer to build protocols that work for your application in four steps: 
+In Protocol Designer, you'll define the hardware, labware, and liquids the robot will use during a protocol. This manual details how to use Protocol Designer to build protocols that work for your application in four steps: 
 
 | **Step** | **Description** | 
 | -------- | --------------- | 
