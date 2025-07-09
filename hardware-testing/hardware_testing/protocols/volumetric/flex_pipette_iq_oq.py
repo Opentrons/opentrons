@@ -121,7 +121,7 @@ ENABLE_MULTI_DISPENSE_BY_CHANNELS = {1: True, 8: True, 96: False}
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {1: 1, 8: 5, 96: 5}
 
-DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_1000ul"
+DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_200ul"
 
 # fmt: off
 # TODO: handle more tip-racks from off-deck (eg: stacker)
