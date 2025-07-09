@@ -16,7 +16,6 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
