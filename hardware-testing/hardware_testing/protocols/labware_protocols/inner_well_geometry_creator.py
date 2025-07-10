@@ -322,50 +322,45 @@ def run(ctx: ProtocolContext) -> None:
         ethanol,
     ) = _setup(ctx)
 
-
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
     def pick_up_tips() -> None:
-        """Each pipette picks up a tip."""
         if not probe_pipette.has_tip:
             probe_pipette.pick_up_tip(probing_rack)
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip(liquid_rack)
 
     def drop_tips() -> None:
-        """Each pipette drops a tip."""
         if probe_pipette.has_tip:
             probe_pipette.drop_tip()
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    #beginning of protocol
-
     drop_tips()
+    volume_dispensed = 0.0
 
     if quick_mode:
         pick_up_tips()
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        for step in range(step_volumes):
-            if step > 0: 
+        for step, step_volume in enumerate(step_volumes):
+            if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    step_volumes[step],
+                    step_volume,
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
                     return_tip=False,
                 )
-
-                volume_dispensed = round(volume_dispensed + step_volumes[step], 5)
+                volume_dispensed = round(volume_dispensed + step_volume, 5)
                 height = round(
                     _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
                     5,
                 )
-            else: 
+            else:
                 height = 0.0
                 volume_dispensed = 0.0
 
@@ -376,37 +371,35 @@ def run(ctx: ProtocolContext) -> None:
         drop_tips()
 
     else:
-        for step in range(step_volumes):
+        for step, step_volume in enumerate(step_volumes):
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
             if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    step_volumes[step],
+                    step_volume,
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
                     return_tip=False,
                 )
-
                 height = round(
                     _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
                     5,
                 )
-
-                volume_dispensed = round(volume_dispensed + step_volumes[step], 5)
+                volume_dispensed = round(volume_dispensed + step_volume, 5)
             else:
                 src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
                 height = 0.0
                 volume_dispensed = 0.0
-            drop_tips()
 
-                
+            drop_tips()
             corrected_height = height + tip_z_error
             trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
         drop_tips()
+
 
     
 
