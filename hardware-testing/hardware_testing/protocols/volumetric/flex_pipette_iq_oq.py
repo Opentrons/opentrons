@@ -121,6 +121,10 @@ ENABLE_MULTI_DISPENSE_BY_CHANNELS = {1: True, 8: True, 96: False}
 
 NUM_RACKS_NEEDED_FOR_DYE_BY_CHANNELS = {1: 1, 8: 5, 96: 5}
 
+# NOTE: (sigler) T1000 creates bubbles, even during non-contact dispense
+#       likely because of the bore diameter. Bubbles on the surface during
+#       non-contact dispense can pop can cause small droplets to spray around.
+#       However, contact dispense creates bubbles under the surface, even with T200.
 DILUENT_TIP_LOAD_NAME = "opentrons_flex_96_filtertiprack_200ul"
 
 # fmt: off
@@ -601,6 +605,9 @@ def run(ctx: ProtocolContext) -> None:
     diluent_props = diluent_class.get_for(pip_for_dil, diluent_tips)
     diluent_props.dispense.dispense_position.position_reference = "well-top"
     diluent_props.dispense.dispense_position.offset.z = 0.0
+    diluent_props.dispense.submerge.start_position.offset.z = 0.0
+    diluent_props.dispense.retract.end_position.offset.z = 0.0
+    diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
 
     # ENABLE LIQUID-MENISCUS PIPETTING
     if ctx.params.pipette_at_liquid_meniscus:
@@ -656,7 +663,6 @@ def run(ctx: ProtocolContext) -> None:
                 _f.write(csv_row + "\n")
             _f.write(f"CV{CSV_SEPARATOR}{cv}\n")
             _f.write(f"AVG{CSV_SEPARATOR}{avg}\n")
-            ctx.comment(f"RESULT: {test_volume} uL %CV = {cv}%")
 
     def _process_the_current_plate() -> None:
         nonlocal plate, ul_in_this_plate
@@ -813,8 +819,3 @@ def run(ctx: ProtocolContext) -> None:
         # Transfer & SHAKE/READ the FINAL PLATE
         if ul_idx == len(volumes) - 1:
             _process_the_current_plate()
-
-    # DISPLAY RESULTS as COMMENTS
-    with open(results_filepath, "r") as _f:
-        for line in _f.readlines():
-            ctx.comment(line.strip())
