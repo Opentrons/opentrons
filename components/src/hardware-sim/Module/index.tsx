@@ -52,7 +52,16 @@ interface Props {
     | {}
   statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
   children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
+
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * Supply this if you're rendering the module on a deck for correct positioning.
+   */
   targetSlotId?: string
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * Supply this if you're rendering the module on a deck for correct positioning.
+   */
   targetDeckId?: string
 }
 
