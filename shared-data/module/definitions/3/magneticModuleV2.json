@@ -7,19 +7,7 @@
     "y": -0.125,
     "z": 82.25
   },
-  "features": {
-    "slotFootprintAsParent": {
-      "z": 0,
-      "backLeft": {
-        "x": 0,
-        "y": 86
-      },
-      "frontRight": {
-        "x": 128,
-        "y": 0
-      }
-    }
-  },
+  "features": {},
   "dimensions": {
     "bareOverallHeight": 110.152,
     "overLabwareHeight": 4.052,

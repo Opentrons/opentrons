@@ -178,30 +178,6 @@
               "enum": ["backLeftBottom"]
             }
           }
-        },
-        "slotFootprintAsParent": {
-          "description": "The 2D plane on which a child deck item resides.",
-          "type": "object",
-          "required": ["backLeft", "frontRight", "z"],
-          "properties": {
-            "backLeft": {
-              "description": "(-x, +y), the back left corner of a module's mating plane.",
-              "$ref": "#/definitions/vector2D"
-            },
-            "frontRight": {
-              "description": "(+x, -y), the back left corner of a module's module plane.",
-              "$ref": "#/definitions/vector2D"
-            },
-            "z": {
-              "description": "Always zero by convention. The z-offset from the bottom of the module's mating plane to the plane on which a child deck item resides.",
-              "type": "number"
-            },
-            "springDirectionalForce": {
-              "description": "Applicable when the module contains a spring that influences a child deck item.",
-              "type": "string",
-              "enum": ["backLeftBottom"]
-            }
-          }
         }
       }
     },
