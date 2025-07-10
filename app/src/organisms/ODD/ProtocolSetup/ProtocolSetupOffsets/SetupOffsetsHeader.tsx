@@ -8,14 +8,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import {
-  useApplyOffsets,
-  useLPCAnalytics,
-} from '/app/organisms/LabwarePositionCheck'
+import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
   appliedOffsetsToRun,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -31,10 +27,6 @@ export function SetupOffsetsHeader({
 }: ProtocolSetupOffsetsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
-  const { reportApplyOffsets } = useLPCAnalytics({
-    runId,
-    robotType: FLEX_ROBOT_TYPE,
-  })
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
@@ -44,7 +36,6 @@ export function SetupOffsetsHeader({
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       dispatch(appliedOffsetsToRun(runId))
-      reportApplyOffsets()
       updateWithRunId(runId)
       setSetupScreen('prepare to run')
     })

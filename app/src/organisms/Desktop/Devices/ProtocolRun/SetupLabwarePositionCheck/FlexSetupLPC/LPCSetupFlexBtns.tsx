@@ -39,10 +39,6 @@ export function LPCSetupFlexBtns({
   hasMissingCalForFlex,
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { reportApplyOffsets } = useLPCAnalytics({
-    runId,
-    robotType: FLEX_ROBOT_TYPE,
-  })
   const lpcDisabledReason = useLPCDisabledReason({
     robotName,
     runId,
@@ -99,7 +95,6 @@ export function LPCSetupFlexBtns({
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       setOffsetsConfirmed(true)
-      reportApplyOffsets()
     })
   }
 
