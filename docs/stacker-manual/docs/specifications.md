@@ -10,7 +10,7 @@ The Stacker is packaged separately from the User Kit and ships with its own set 
 
 ## User Kit Parts
 
-The User Kit is packaged separately from the Stacker and ships with its own set of parts. Each kit supports up to 4 Stackers. The User Kit contains following items:
+The User Kit is packaged separately from the Stacker and ships with its own set of parts. Each kit supports up to 4 Stackers. The User Kit contains the following items:
 
 ![Stacker user kit contents](images/user-kit5.svg)
 
@@ -24,7 +24,7 @@ The User Kit is packaged separately from the Stacker and ships with its own set 
     <tr>
         <th><strong>Tower dimensions</strong></th>
         <td>194.5 mm L x 106 mm W x 955.5 mm H
-(~8” L x 4” W x 37” H). Measurements are taken from the base of the tower and exclude the track.</p></td>
+(~8” L x 4” W x 37” H). Measurements are taken from the base of the tower and exclude the track.</td>
     </tr>
     <tr>
         <th><strong>Side clearance</strong></th>
@@ -32,7 +32,7 @@ The User Kit is packaged separately from the Stacker and ships with its own set 
     </tr>
     <tr>
         <th><strong>Weight</strong></th>
-        <td>13.6 kg (~30 lbs). Installation may require the assistance of a lab partner.</p></td>
+        <td>13.6 kg (~30 lbs). Installation may require the assistance of a lab partner.</td>
     </tr>
 </table>
 

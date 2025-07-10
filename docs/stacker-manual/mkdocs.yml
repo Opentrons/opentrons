@@ -26,9 +26,6 @@ markdown_extensions:
   - attr_list
   - sane_lists
 
-copyright:
-  Copyright © OPENTRONS, 2025. ALL RIGHTS RESERVED
-
 nav:
   - Product Description: index.md
   - Safety and Compliance: compliance.md

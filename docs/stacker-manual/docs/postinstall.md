@@ -2,9 +2,9 @@
 
 After attaching and powering on the robot and Stacker, instructions on the touchscreen will guide you through these final steps:
 
-* Updating firmware, if required.
-* Mapping the Stacker's deck location.
-* Attaching the labware shuttle to the track.
+- Updating firmware, if required.
+- Mapping the Stacker's deck location.
+- Attaching the labware shuttle to the track.
 
 ## Attaching the Shuttle
 

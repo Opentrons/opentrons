@@ -4,7 +4,7 @@ Opentrons recommends that you follow the safe use specifications listed in this 
 
 ## General Safety Guidelines
 
-The Stacker is designed for laboratory use by trained personnel only. Use this product only as specified. Review the safety information before installing or operating this module. This information can help you operate the Stacker in a safe manner and avoid damage to it or any other attached equipment. If the Stacker is used in a manner not specified by Opentrons, the protection provided by the equipment may be impaired.
+The Stacker is designed for laboratory use by trained personnel only. Use this product only as specified. Review the safety information before installing or operating this module. This information can help you operate the Stacker safely and avoid damage to it or any other attached equipment. If the Stacker is used in a manner not specified by Opentrons, the protection provided by the equipment may be impaired.
 
 ## Instrument Safety Warnings
 
@@ -62,12 +62,13 @@ Always observe the following electrical safety warnings.
         <th>Symbol</th>
         <th>Description</th>
     </tr>
-    <td><img src="/images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
-    <td>Plug the Stacker into a grounded, Class 1 circuit. The module is grounded through the grounding conductor of the power cable. Do not:
-        <ul>
-            <li>Damage, disable, or remove the ground connection on the power cable.</li>
-            <li>Replace the AC power cable unless at the direction of Opentrons Support.</li>
-        </ul>
+    <tr> <td><img src="/images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
+        <td>Plug the Stacker into a grounded, Class 1 circuit. The module is grounded through the grounding conductor of the power cable. Do not:
+            <ul>
+                <li>Damage, disable, or remove the ground connection on the power cable.</li>
+                <li>Replace the AC power cable unless at the direction of Opentrons Support.</li>
+            </ul>
+        </td>
     </tr>
     <tr>
         <td><img src="/images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
@@ -140,21 +141,21 @@ Cancer and reproductive harm – [www.P65Warnings.ca.gov](https://www.p65warning
 
 ## UV Safety Features
 
-You can install and use Stackers with the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module). Newer Flex models, the HEPA/UV module, and the Stacker all include features that help protect you from UV-C exposure and prevent the UV lights from operating in an unsafe manner.
+You can install and use Stackers with the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module). Newer Flex models, the HEPA/UV module, and the Stacker all include features that help protect you from UV-C exposure and prevent the UV lights from operating unsafely.
 
 | Safety feature | Description |
 |----|----|
 |Side panels | The replacement side panel that comes with the User Kit is opaque to UV-C light. The other panels on the robot block UV-spectrum light to below a level which represents an exposure risk. |
-| Attachment sensors | The Stacker and HEPA/UV Module each use sensors and switches to determine if they’re installed properly. These devices deactivate/disable the UV lights when the Stacker door is open or these components are not installed properly, removed while in operation, or misaligned. |
+| Attachment sensors | The Stacker and HEPA/UV Module each use sensors and switches to determine if they’re installed properly. These devices deactivate/disable the UV lights when the Stacker door is open, or these components are improperly installed, removed during operation, or misaligned.|
 
 ## Stacker and HEPA/UV Compatibility
 
-Flex robots manufactured before September 2025 require an upgrade kit. This kit adds new hardware to your Flex, preventing the HEPA/UV module from operating if the Stacker is improperly installed.
+Flex robots manufactured before September 2025 require a retrofit kit. This kit adds new hardware to your Flex, preventing the HEPA/UV module from operating if the Stacker is improperly installed.
 
-Refer to your robot's serial number to determine if an upgrade kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require the upgrade kit.
+Refer to your robot's serial number to determine if an retrofit kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require retrofitting.
 
 ![Flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
 
-Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs the upgrade kit installed.
+Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs to be retrofitted.
