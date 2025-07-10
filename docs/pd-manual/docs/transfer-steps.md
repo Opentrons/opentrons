@@ -1,6 +1,7 @@
-[//]: # (this section could benefit from additional headers to break up the text now that we're in mkdocs- avoid the Big Page)
 
 Your protocol timeline includes steps the robot will peform in your protocol. To start, the timeline includes the starting and ending deck states. Click **Add Step** in the lower left to add transfer, move, mix, pause, or module-specific steps to your protocol. 
+
+## The Basics
 
 Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a three-part form. In the first, select basic settings for your liquid transfer: 
 
@@ -17,7 +18,9 @@ Click **Choose wells** then click and drag to select source and destination well
 | Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
 | Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
 
-Customizing tip handling in your transfer steps can prevent contamination or reduce tip use in a protocol. Choose how often the robot selects a new tip: 
+## Tip Management
+
+Customizing tip management in your transfer steps can prevent contamination or reduce tip use in a protocol. Choose how often the robot selects a new tip: 
 
 * **Before every aspirate**: selects a new tip before every aspirate in a transfer step. 
 * **Once at the start of the step**: selects a new tip once at the beginning of the entire transfer step. 
@@ -41,7 +44,7 @@ Choose a tip drop location to dispose of used tips before clicking **Continue**.
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
-[//]: # (is the above sentence still true if the liquid is already defined as a liquid class? test this)
+## Additional Settings
 
 Click **Continue** to move to the third form. Here, click the aspirate and dispense tabs to access additional settings. 
 * **Custom flow rate**: the speed the robot aspirates or dispenses liquid at. 
@@ -71,4 +74,4 @@ Additional advanced pipetting settings are available in the Aspirate and Dispens
 | Touch tip | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Touch the tip to the four sides of the well to remove droplets after aspirating or dispensing</li><li>Customize touch tip position from the top of the well</li></ul> |
 | Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li></ul> |
 
-Some advanced settings, like mix and blowout, are not available with consolidate and distribute pipette paths to prevent sample contamination. Settings like touch tip are not available with some types of labware. Protocol Designer only allows you to select compatible settings. 
+Some advanced settings, like mix and blowout, are not available with consolidate and distribute pipette paths to prevent sample contamination. Settings like touch tip are not available with some types of labware. Protocol Designer only allows you to select compatible settings in your transfer step. 

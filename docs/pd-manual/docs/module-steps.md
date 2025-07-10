@@ -75,6 +75,7 @@ To use an Absorbance Plate Reader Module in a Protocol Designer protocol, you'll
 Follow the instructions to add a total of six Absorbance Plate Reader steps to your protocol. 
 
 <div class="instruction-list" markdown>
+
 1. Add an Absorbance Plate Reader step to close the lid. In the step form, click to **Change lid position**. Click **Continue** and use the toggle switch to change the lid position from open to closed. The gripper will close the lid with no labware inside. 
 2. Use a second Absorbance Plate Reader step to initialize the module. Click **Define initialization settings** and choose a single or multiple initialization wavelenghts from the dropdown menu. 
 
@@ -94,20 +95,23 @@ Absorbance Plate Reader step.
   <figcaption>Add a single initialization and a reference wavelength in a Plate Reader step.</figcaption>
   </figure>
 
+<div class="instruction-list" markdown>
+
 3. Add an Absorbance Plate Reader step to open the lid using the gripper. The Plate Reader lid must be open to add labware to the module. 
 4. Use a move step to move your plate to the Absorbance Plate Reader. You can add labware to the module manually or using the gripper. 
 
-Most 96-well plates from the Opentrons <a href="https://labware.opentrons.com"> Labware Library</a> are supported. 
+Most 96-well plates from the Opentrons [Labware Library](https://labware.opentrons.com "Labware Library") are supported. 
+
 5. Add an Absorbance Plate Reader step to read the plate in the module. Click **Read labware** to collect absorbance data for the samples in your plate. 
 
 **Read labware** is only available if the Plate Reader is initialized, with a plate inside and the lid closed. 
 6. Enter a name for your CSV file. You can find this file and any previous Absorbance Plate Reader data in your robot's recent protocol runs in the Opentrons App. 
 
-Data from this CSV file can be used in your Python protocols, but not in Protocol Designer protocols. 
-
-[//]: # (still true, I think- but may not be in future releases)
+Data from this CSV file can only be used in your Python protocols created outside of Protocol Designer.
 
 After reading your plate, follow the same steps to open the lid, remove the plate, and close the Absorbance Plate Reader lid with the gripper. 
+
+</div>
 
 ## Heater-Shaker Module steps
 
@@ -118,9 +122,7 @@ Adding a Heater-Shaker Module step to your protocol displays any labware and ada
   <figcaption>Add a temperature, shake speed, and timer for Heater-Shaker step.</figcaption>
   </figure>
 
-In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a timeline error could occur. 
-
-[//]: # (get internal links working; link "timeline error" to the relevant section)
+In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](warnings-errors.md#errors) could occur. 
 
 In the Heater-Shaker step form, set the temperature or shake functions to "Active" and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 37 and 95° C, and shake samples between 200 band 3000 rpm. 
 

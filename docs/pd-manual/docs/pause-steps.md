@@ -9,3 +9,8 @@ You can add a pause step in Protocol Designer to stop your protocol. Three optio
 For each option, you can add a custom message to display on the
 Flex touchscreen or in the Opentrons App. Once a pause step is
 created, you can also rename the step to add more information. 
+
+<figure class="screenshot" markdown>
+  ![Pause step](images/pause_step.png)
+  <figcaption>Add a custom name and message for your pause step.</figcaption>
+  </figure>
