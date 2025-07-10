@@ -51,6 +51,7 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Exit')
     screen.getByText('Continue')
     screen.getByText('Once at the start of the transfer')
+    screen.getByText('Never')
     screen.getByText('Per source well')
   })
 
