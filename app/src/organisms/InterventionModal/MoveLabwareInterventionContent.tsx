@@ -210,6 +210,8 @@ export function MoveLabwareInterventionContent({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
+                      targetDeckId,
+                      targetSlotId,
                     }) => (
                       <Module
                         key={moduleId}
@@ -217,6 +219,8 @@ export function MoveLabwareInterventionContent({
                         x={x}
                         y={y}
                         orientation={inferModuleOrientationFromXCoordinate(x)}
+                        targetDeckId={targetDeckId}
+                        targetSlotId={targetSlotId}
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (

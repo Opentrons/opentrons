@@ -768,3 +768,16 @@ export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
 }
+export interface WellContents {
+  // eg 'A1', 'A2' etc
+  wellName?: string
+  groupIds: string[]
+  ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
+}
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
+}

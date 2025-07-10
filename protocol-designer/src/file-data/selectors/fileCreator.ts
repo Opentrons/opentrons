@@ -19,9 +19,9 @@ import {
   pythonImports,
   pythonMetadata,
   pythonRequirements,
+  swatchColors,
 } from '@opentrons/step-generation'
 
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'

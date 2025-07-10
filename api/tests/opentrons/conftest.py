@@ -809,7 +809,6 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
-        "twoDimensionalRendering": {},
     }
 
 

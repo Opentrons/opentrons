@@ -33,7 +33,6 @@ const mockMagneticModuleDefinition = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 
 const MAGNETIC_MODULE_INFO = {
