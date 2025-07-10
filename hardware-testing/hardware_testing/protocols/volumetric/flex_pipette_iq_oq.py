@@ -601,33 +601,40 @@ def run(ctx: ProtocolContext) -> None:
     # LOAD LIQUIDS & LIQUID-CLASS
     dye_well_by_volume = load_liquid_dye(ctx, test_pip, reservoirs_dye, volumes, tip_ul)
     load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
-    test_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
+    dye_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
     diluent_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
-    # NOTE: (sigler) contact dispensing creates bubbles sometimes, which is bad for reader
+    # MODIFY DILUENT LIQUID-CLASS
+    # NOTE: (sigler) contact dispensing creates bubbles in water & glycerol (not ethanol)
     #       so we can fix this by doing non-contact dispense
+    is_eth = bool(
+        "ethanol" in dye_class.name.lower()
+        or "volatile" in dye_class.name.lower()
+    )
     diluent_props = diluent_class.get_for(pip_for_dil, diluent_tips)
-    diluent_props.dispense.dispense_position.position_reference = "well-top"
-    diluent_props.dispense.dispense_position.offset.z = 0.0
-    diluent_props.dispense.submerge.start_position.offset.z = 0.0
-    diluent_props.dispense.retract.end_position.offset.z = 0.0
-    diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
+    if is_eth:
+        diluent_props.dispense.dispense_position.position_reference = "liquid-meniscus"
+        # NOTE: (sigler) ethanol dispense is -0.5, all others are -1.5
+        diluent_props.dispense.dispense_position.offset.z = -0.5
+    else:
+        diluent_props.dispense.dispense_position.position_reference = "well-top"
+        diluent_props.dispense.dispense_position.offset.z = 0.0
+        diluent_props.dispense.submerge.start_position.offset.z = 0.0
+        diluent_props.dispense.retract.end_position.offset.z = 0.0
+        diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
 
-    # ENABLE LIQUID-MENISCUS PIPETTING
-    test_props = test_class.get_for(test_pip, test_pip.tip_racks[0])
+    # MODIFY DYE LIQUID-CLASS
+    dye_props = dye_class.get_for(test_pip, test_pip.tip_racks[0])
     if ctx.params.pipette_at_liquid_meniscus:
         # aspirate diluent from meniscus
         diluent_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
         diluent_props.aspirate.aspirate_position.offset.z = -1.5
         # modify test class (aspirate + dispense)
-        test_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
-        test_props.aspirate.aspirate_position.offset.z = -1.5
-        test_props.dispense.dispense_position.position_reference = "liquid-meniscus"
-        is_eth = bool(
-            "ethanol" in test_class.name.lower()
-            or "volatile" in test_class.name.lower()
-        )
-        test_props.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
+        dye_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+        dye_props.aspirate.aspirate_position.offset.z = -1.5
+        dye_props.dispense.dispense_position.position_reference = "liquid-meniscus"
+        # NOTE: (sigler) ethanol dispense is -0.5, all others are -1.5
+        dye_props.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
 
     # VARIABLES TO KEEP TRACK OF TEST STATE
     plate: Optional[Labware] = None
@@ -796,7 +803,7 @@ def run(ctx: ProtocolContext) -> None:
         src_well: Well = dye_well_by_volume[ul]
         test_pip.pick_up_tip()
         test_pip.require_liquid_presence(src_well)
-        _hacky_aspirate_meniscus_submerge_retract(test_props, src_well)
+        _hacky_aspirate_meniscus_submerge_retract(dye_props, src_well)
         test_pip.drop_tip()
 
         # ORGANIZE WELLS FOR PIPETTES
@@ -818,7 +825,7 @@ def run(ctx: ProtocolContext) -> None:
             #        command can get stuck in a wrong configuration. Fix API.
             test_pip.configure_for_volume(ul)
             test_pip.transfer_with_liquid_class(
-                test_class,
+                dye_class,
                 ul,
                 list_of_the_same_src_well,
                 dst_wells_organized_by_channel,
@@ -830,7 +837,7 @@ def run(ctx: ProtocolContext) -> None:
             test_pip.configure_for_volume(tip_ul)
             dist_vol = ul / ceil(ul / DYE_SHAKER_MAX_UL)
             test_pip.distribute_with_liquid_class(
-                test_class,
+                dye_class,
                 dist_vol,
                 src_well,
                 dst_wells_organized_by_channel,
