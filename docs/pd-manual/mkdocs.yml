@@ -5,8 +5,8 @@ theme:
   palette: 
     primary: custom
     accent: custom
-  favicon: site-assets/favicon.png
-  logo: site-assets/logo.png
+  favicon: images/favicon.png
+  logo: images/logo.png
 
 extra_css:
   - stylesheets/style.css
@@ -27,8 +27,6 @@ markdown_extensions:
 plugins:
  - glightbox # for zoom functionality on images
 
-copyright:
-  Copyright © OPENTRONS, 2025
 
 nav: 
 ## index.md includes About PD through the bulleted list

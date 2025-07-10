@@ -15,8 +15,8 @@ In some cases, a step warning appears after creating a step. If a transfer step 
 
 Many step warnings shown by Protocol Designer will not affect the function of your protocol steps. You can save and run a protocol on the robot with these warnings present. For example, the robot can still aspirate and dispense your chosen amount of liquid, even if it overflows a destination well. We recommend resolving all warnings to avoid problems in your workflow. 
 
-Errors
--------
+## Errors
+
 A protocol error represents a larger problem in the protocol timeline. Although you can save, download, and import your protocol into the Opentrons App, a protocol with an error cannot be run on the robot and will cause a run to fail. 
 
 A protocol error appears in a red text box above the deck map and, like a warning, includes a description of the error and required actions to resolve it. Most errors in Protocol Designer are caused by the order of steps or changes to the protocol timeline. Any labware, liquids, or modules that you edit or delete on the protocol starting deck can also cause errors for each protocol step they are used in. 
@@ -26,9 +26,7 @@ A protocol error appears in a red text box above the deck map and, like a warnin
   <figcaption>The Flex deck doesn't have enough tips to complete the transfer step.</figcaption>
   </figure>
 
-In this example, not enough tips are available on the deck to complete the number of transfers. Because the robot cannot complete the protocol as is, Protocol Designer displays a protocol error. To resolve the error, add more tips to the protocol starting deck or change tip management, or tip handling, settings in the transfer step form. 
-
-[//]: # (check screenshots AND this text for whatever the new word for tip handling is)
+In this example, not enough tips are available on the deck to complete the number of transfers. Because the robot cannot complete the protocol as is, Protocol Designer displays a protocol error. To resolve the error, add more tips to the protocol starting deck or change tip management settings in the transfer step form. 
 
 When designing your protocol, consider the order the labware and modules should interact in to avoid protocol errors. 
 

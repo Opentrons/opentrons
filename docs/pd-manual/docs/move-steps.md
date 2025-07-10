@@ -9,7 +9,6 @@ when selecting labware for a move step, labware locations in a module are listed
   <figcaption>Add a move step that uses the Flex Gripper.</figcaption>
   </figure>
 
-[//]: # (will be replaced with Figma or an improved screenshot, because this doesn't need to be this massive)
 If required, labware adapters need to be added to a module before a labware move. To add an adapter, return to the protocol starting deck. 
 
 When moving labware to and from the Heater-Shaker or Absorbance Plate Reader Module, the labware latch or lid must be open. Add a Heater-Shaker or Absorbance Plate Reader step to open the latch or lid before moving labware to or from the module. You'll need to use a Flex Gripper to move the lid or off the Absorbance Plate Reader Module. 

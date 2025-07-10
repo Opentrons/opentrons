@@ -1,3 +1,10 @@
+Next, click open slots to add modules or fixtures to the deck.
+
+<figure class="screenshot" markdown>
+  ![Configure deck hardware](images/configure-hardware.png)
+  <figcaption>Click an open Flex deck slot to add compatible modules and fixtures.</figcaption>
+  </figure>
+
 Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, as shown below. Flex lets you use multiple modules of the same type, except for the Thermocycler. On the Flex, you can also customize fixtures, including the waste chute, trash bin, and staging areas, to optimize deck space. 
 
 | **Module** | **Opentrons Flex** | **Opentrons OT-2** |
