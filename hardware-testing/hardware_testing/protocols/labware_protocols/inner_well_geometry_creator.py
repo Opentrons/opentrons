@@ -118,7 +118,8 @@ def _setup(
     float,
     bool,
     LiquidClass,
-    float
+    float,
+    float,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
 
@@ -184,7 +185,7 @@ def _setup(
         _write_line_to_csv(ctx, [probing_pip_name])
         _write_line_to_csv(ctx, [labware_type])
         _write_line_to_csv(ctx, ["step vol", str(step_volume)])
-        _write_line_to_csv(ctx, ["steps", str(STEPS)])
+        _write_line_to_csv(ctx, ["steps", str(number_of_steps)])
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
         # Record LPC
         lpc = str(labware._core.get_calibrated_offset())
@@ -202,7 +203,8 @@ def _setup(
         step_volume,
         quick_mode,
         ethanol,
-        number_of_steps
+        number_of_steps,
+        max_volume
     )
 
 
@@ -284,6 +286,22 @@ def _get_height_of_liquid_in_well(
             return 99.0
     return 99.0
 
+def smooth_ramp_then_plateau(total_volume_ml, steps, ramp_fraction):
+    ramp_steps = int(steps * ramp_fraction)
+    plateau_steps = steps - ramp_steps
+
+    # Quadratic increasing ramp
+    ramp_weights = [(i + 1) ** 2 for i in range(ramp_steps)]
+    plateau_weight = ramp_weights[-1]  # flatten at peak of ramp
+    plateau_weights = [plateau_weight] * plateau_steps
+
+    all_weights = ramp_weights + plateau_weights
+
+    total_weight = sum(all_weights)
+    increments = [round((w / total_weight) * total_volume_ml, 3) for w in all_weights]
+
+    return increments
+
 
 def run(ctx: ProtocolContext) -> None:
     """Protocol."""
@@ -298,7 +316,8 @@ def run(ctx: ProtocolContext) -> None:
         step_volume,
         quick_mode,
         ethanol,
-        number_of_steps
+        number_of_steps,
+        max_volume,
     ) = _setup(ctx)
 
     _store_dial_baseline(ctx, probe_pipette, dial)
@@ -318,6 +337,12 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
+    #testing dynamic volume increments
+    vol_steps = smooth_ramp_then_plateau()
+
+
+    #beginning of protocol
+
     drop_tips()
 
     if quick_mode:
@@ -325,18 +350,19 @@ def run(ctx: ProtocolContext) -> None:
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        for step in range(number_of_steps):
+        #for step in range(number_of_steps):
+        for step in range(vol_steps):
             if step > 0: 
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    step_volume,
+                    vol_steps[step],
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
                     return_tip=False,
                 )
 
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
+                volume_dispensed = round(volume_dispensed + vol_steps[step], 5)
 
                 try:
                     try:
@@ -369,7 +395,8 @@ def run(ctx: ProtocolContext) -> None:
             if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    step_volume,
+                    #step_volume,
+                    vol_steps[step],
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
@@ -395,7 +422,7 @@ def run(ctx: ProtocolContext) -> None:
                 except PipetteLiquidNotFoundError:
                     height = 99.0
 
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
+                volume_dispensed = round(volume_dispensed + vol_steps[step], 5) #step_volume
             else:
                 src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
                 height = 0.0
@@ -408,6 +435,10 @@ def run(ctx: ProtocolContext) -> None:
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
         drop_tips()
+
+    
+
+
 
 
 
