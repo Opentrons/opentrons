@@ -293,20 +293,79 @@ Outside of protocols, the Opentrons App can display the current status of the He
 
 ### Heater-Shaker specifications
 
-| **Specification**               | **Details**  |
-|---------------------------------|--------------|
-| **Dimensions**                  | 152 × 90 × 82 mm (L/W/H)                                                   |
-| **Weight**                      | 1.34 kg                                                                    |
-| **Module power input**          | 36 VDC, 6.1 A                                                              |
-| **Power adapter input**         | 100–240 VAC, 50/60 Hz                                                      |
-| **Mains supply voltage fluctuation** | ±10%                                                                  |
-| **Overvoltage**                 | Category II                                                                |
-| **Power consumption**           | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | 20–25 °C                                                                   |
-| **Relative humidity**           | Up to 80%, non-condensing                                                  |
-| **Altitude**                    | Up to 2,000 m above sea level                                              |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>152 × 90 × 82 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.34 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power input</strong></td>
+      <td>36 VDC, 6.1 A</td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter input</strong></td>
+      <td>100–240 VAC, 50/60 Hz</td>
+    </tr>
+    <tr>
+        <td><strong>Power adapter connector</td>
+        <td>4-pin DIN<br> <!-- CSS for a border here or go borderless? float right? -->
+        <img src="/images/module-power-connector.png" width="40%"><br>
+        When connecting the power cable to the module, match the flat side of the connector to the flat side of the power port.
+        </td>
+    </tr>
+    <tr>
+      <td><strong>Mains supply voltage fluctuation</strong></td>
+      <td>±10%</td>
+    </tr>
+    <tr>
+      <td><strong>Overvoltage</strong></td>
+      <td>Category II</td>
+    </tr>
+    <tr>
+      <td><strong>Power consumption</strong></td>
+      <td>
+        Idle: 3 W<br />Typical:
+        <ul>
+          <li>Shaking: 4–11 W</li>
+          <li>Heating: 10–30 W</li>
+          <li>Heating and shaking: 10–40 W</li>
+        </ul>
+        Maximum: 125–130 W
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>20–25 °C</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 80%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2,000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## HEPA/UV Module
 
