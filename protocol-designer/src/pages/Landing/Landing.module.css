@@ -8,14 +8,14 @@
 }
 
 .button_text {
-  line-height: 1.5rem; /* 24px */
-  font-size: 1rem;
+  line-height: var(--line-height-24);
+  font-size: var(--font-size-16);
   font-style: normal;
-  font-weight: 600; /* semibold */
+  font-weight: 600;
 }
 
 .nav_link {
-  color: white;
+  color: var(--white);
   text-decoration: none;
 }
 
@@ -25,24 +25,24 @@
 
 .landing_page {
   display: flex;
-  background-color: #f7f8fa; /* COLORS.grey10 */
+  background-color: var(--grey-10);
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: calc(100vh - 9rem);
   width: 100%;
-  gap: 2rem; /* SPACING.spacing32 */
+  row-gap: var(--spacing-32);
 }
 
 .content_section {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* SPACING.spacing16 */
+  row-gap: var(--spacing-16);
 }
 
 .text_section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* SPACING.spacing8 */
+  row-gap: var(--spacing-8);
   align-items: center;
 }
