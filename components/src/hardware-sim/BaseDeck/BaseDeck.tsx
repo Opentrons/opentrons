@@ -18,6 +18,7 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
@@ -174,6 +175,12 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(fixture.cutoutFixtureId) &&
       fixture.cutoutId === WASTE_CHUTE_CUTOUT
   )
+  const wasteChuteStackerFixtures = deckConfig.filter(
+    fixture =>
+      fixture.cutoutFixtureId != null &&
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId) &&
+      fixture.cutoutId === WASTE_CHUTE_CUTOUT
+  )
 
   const [singleLocationModules, stackerModules] = partition(
     modulesOnDeck,
@@ -310,6 +317,19 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   slotClipColor={darkFill}
                   fixtureBaseColor={lightFill}
                 />
+                {wasteChuteStackerFixtures.map(fixture => {
+                  if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+                    return (
+                      <WasteChuteFixture
+                        key={fixture.cutoutId}
+                        cutoutId={fixture.cutoutId}
+                        deckDefinition={deckDef}
+                        fixtureBaseColor={lightFill}
+                        wasteChuteColor={mediumFill}
+                      />
+                    )
+                  }
+                })}
                 <Module
                   key={`${moduleModel} ${moduleLocation.slotName}`}
                   def={moduleDef}
