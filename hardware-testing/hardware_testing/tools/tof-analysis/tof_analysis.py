@@ -211,6 +211,7 @@ def read_filtered_data(dataframes: List[str], config: dict):
 
                 if not is_valid_row(axis, platform, zone, config):
                     continue
+
                 bins = list(row[start_index : start_index + bin_count])
                 measurements[axis][platform][zone].append({stacker: bins})
 
@@ -239,6 +240,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
         with open(baseline_path, "r") as file:
             definition = json.load(file)
             baseline_data = definition["uniqueModuleData"]["TOFSensorBaseline"]
+            baseline_data = {k.lower(): v for k, v in baseline_data.items()}
             version = baseline_data.pop("version", config["baseline_version"])
 
             for axis, data in baseline_data.items():
@@ -404,6 +406,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             baseline_version = baseline_version or tof_sensor_baseline["version"]
 
             for axis, data in baselines.items():
+                axis = axis.upper()
                 for platform, baseline in data.items():
                     tof_sensor_baseline[axis][platform] = str(baseline)
 
