@@ -2,15 +2,15 @@ site_name: hepa-uv
 
 nav:
   - Home: index.md
-  - Safety Information and Regulatory Compliance: safety-information-and-regulatory-compliance.md
+  - Safety Information and Regulatory Compliance: compliance.md
   - Product Specifications: product-specifications.md
   - HEPA Specifications: hepa-specifications.md
   - UV Specifications: uv-specifications.md
-  - Unboxing and Installation: unboxing-and-installation.md
+  - Unboxing and Installation: installation.md
   - Hardware Controls: hardware-controls.md
   - Maintenance: maintenance.md
   - Cleaning: cleaning.md
-  - Additional Product Information: additional-product-information.md
+  - Additional Product Information: additional-info.md
 
 theme:
   name: material
