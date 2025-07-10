@@ -55,6 +55,8 @@
   "default": "Default",
   "delay_after_aspirating": "Delay after aspirating",
   "delay_before_dispensing": "Delay before dispensing",
+  "delay_description_aspirate": "Delay after each aspiration and air gap",
+  "delay_description_dispense": "Delay after each dispense",
   "delay_duration_s": "Delay duration (seconds)",
   "delay_value": "{{delay}}s",
   "delay": "Delay",
