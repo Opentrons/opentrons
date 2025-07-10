@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  FAKE_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   getAAForModuleFixture,
   getCutoutFixturesForModuleModel,
@@ -72,6 +73,11 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     attachedModule,
     deckConfig
   )
+
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
+
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const handleOnClick = (): void => {
@@ -97,18 +103,42 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     []
   )
 
-  const editableCutoutIds = deckConfig.reduce<CutoutId[]>(
-    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
+  console.log('mayMountToCutoutIds: ', mayMountToCutoutIds)
+
+  const editableCutoutIds = deckConfigWithAA.reduce<CutoutId[]>(
+    (
+      acc,
+      {
+        cutoutId,
+        cutoutFixtureId,
+        opentronsModuleSerialNumber,
+        addressableAreaId,
+      }
+    ) => {
       const isCurrentConfiguration =
         Object.values(configuredFixtureIdByCutoutId).includes(
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
+      console.log('cutoutId: ', cutoutId)
+      console.log('isCurrentConfiguration: ', isCurrentConfiguration)
+      console.log(
+        'mayMountToCutoutIds.includes(cutoutId); ',
+        mayMountToCutoutIds.includes(cutoutId)
+      )
+      console.log('isLoadedInRun; ', isLoadedInRun)
+      console.log(
+        'SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId): ',
+        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      )
+      console.log('addressableAreaId: ', addressableAreaId)
+      console.log('cutoutFixtureId: ', cutoutFixtureId)
       if (
         // in run setup, module calibration only available when module location is already correctly configured
         !isLoadedInRun &&
         mayMountToCutoutIds.includes(cutoutId) &&
         (isCurrentConfiguration ||
-          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+          FAKE_FIXTURE_IDS.includes(cutoutFixtureId))
       ) {
         return [...acc, cutoutId]
       }
@@ -123,6 +153,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
+    console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
     console.log(
       'configuredFixtureIdByCutoutId: ',
       configuredFixtureIdByCutoutId
@@ -131,23 +162,28 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       updateDeckConfiguration(
         deckConfig.map(cc => {
           if (cc.cutoutId in configuredFixtureIdByCutoutId) {
-            const replacement = getCutoutConfigReplacment(
-              anchorCutoutId,
-              moduleFixtures[0].id,
-              attachedModule.moduleModel,
-              deckConfig
-            )
-            console.log('replacement: ', replacement)
+            let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+            if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
+              replacementFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+            } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
+              replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+            }
             return {
               ...cc,
-              replacement,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
             }
           } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
+            const replacement = getCutoutConfigReplacment(
+              anchorCutoutId,
+              selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
+              attachedModule.moduleModel,
+              deckConfig,
+              attachedModule.serialNumber
+            )
             return {
               ...cc,
-              cutoutFixtureId:
-                selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
-              opentronsModuleSerialNumber: attachedModule.serialNumber,
+              ...replacement,
             }
           } else {
             return cc
@@ -229,8 +265,9 @@ export const getCutoutConfigReplacment = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
   moduleModel: ModuleModel,
-  deckConfig: CutoutConfig[]
-) => {
+  deckConfig: CutoutConfig[],
+  serialNumber?: string
+): CutoutConfig => {
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
   )
@@ -254,6 +291,6 @@ export const getCutoutConfigReplacment = (
   return {
     cutoutId,
     cutoutFixtureId: replacmentFixture[0].cutoutFixtureId as CutoutFixtureId,
-    opentronsModuleSerialNumber: undefined,
+    opentronsModuleSerialNumber: serialNumber,
   }
 }

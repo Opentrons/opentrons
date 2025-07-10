@@ -1,13 +1,11 @@
 import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AttachedModule } from '@opentrons/api-client'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_V1_FIXTURE,
-  getAAForModuleFixture,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
 } from '@opentrons/shared-data'
 
@@ -89,7 +87,7 @@ describe('getCutoutConfigReplacment', () => {
     })
   })
 
-    it('should get flex module replacment fixture', () => {
+  it('should get flex module replacment fixture', () => {
     expect(
       getCutoutConfigReplacment(
         'cutoutC3',
