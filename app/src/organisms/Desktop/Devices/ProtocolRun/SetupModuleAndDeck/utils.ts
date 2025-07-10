@@ -15,7 +15,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import flexStackerWithWasteChute from '/app/assets/images/flex_stacker_with_waste_chute.png'
+import flexStackerWithWasteChute from '/app/assets/images/flex_stacker_waste_chute.png'
 import trashBin from '/app/assets/images/flex_trash_bin.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticBlockGen1 from '/app/assets/images/magnetic_block_gen_1.png'
