@@ -684,12 +684,16 @@ def run(ctx: ProtocolContext) -> None:
         ul_in_this_plate = []
 
     def _hacky_aspirate_meniscus_submerge_retract(props: TransferProperties, well: Well) -> None:
+        if ctx.is_simulating():
+            return
         # NOTE: in lieu of using meniscus-relative submerge/retract (b/c it's buggy)
         #       we can instead update the well-relative offsets each time we aspirate.
         #       This isn't ideal b/c we can't update the position for each aspirate,
         #       But it's better than submerging super slowly from the top of the well
-        mm = well.current_liquid_height + 3.0
+        mm = well.current_liquid_height() + 3.0
+        props.aspirate.submerge.start_position.position_reference = "well-bottom"
         props.aspirate.submerge.start_position.offset.z = mm
+        props.aspirate.retract.end_position.position_reference = "well-bottom"
         props.aspirate.retract.end_position.offset.z = mm
 
     # BASELINE
