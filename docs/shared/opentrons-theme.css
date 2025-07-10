@@ -11,6 +11,16 @@ code, pre {
   font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
+/* Font sizes */
+
+.admonition p {
+  font-size: 0.75rem;
+}
+
+th, td {
+  font-size: 0.75rem;
+}
+
 /* Headers */
 
 .md-typeset h1 {
