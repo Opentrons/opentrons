@@ -8,8 +8,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from opentrons.hardware_control.modules.flex_stacker import FlexStacker
-from opentrons.drivers.flex_stacker.driver import (
+from opentrons.hardware_control.modules.flex_stacker import (
+    FlexStacker,
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,
 )

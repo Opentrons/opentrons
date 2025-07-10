@@ -9,15 +9,15 @@ Usage:
 import os
 import sys
 import argparse
-import plotly.graph_objects as go
-import pandas as pd
+import plotly.graph_objects as go  # type: ignore
+import pandas as pd  # type: ignore
 import statistics
 import json
 
 from ast import literal_eval
 from collections import defaultdict
 from enum import Enum
-from typing import Any, Dict, List, Tuple
+from typing import Any, DefaultDict, Dict, List, Tuple
 from itertools import chain, product
 from math import trunc
 
@@ -57,12 +57,12 @@ class Platform(Enum):
     RETRACT = "retract"
 
 
-def truncate(f, decimals=2):
-    factor = 10 ** decimals
+def _truncate(f: float, decimals: int = 2) -> float:
+    factor = 10**decimals
     return trunc(f * factor) / factor
 
 
-def parse_axis(arg):
+def _parse_axis(arg: str) -> str:
     try:
         return arg.lower()
     except ValueError:
@@ -71,7 +71,7 @@ def parse_axis(arg):
         )
 
 
-def parse_tuple(arg):
+def _parse_tuple(arg: str) -> Tuple[int, int]:
     try:
         key, value = arg.split(",")
         return (int(key), int(value))
@@ -81,7 +81,7 @@ def parse_tuple(arg):
         )
 
 
-def get_value_from_index(deviations: List[int], axis: str, platform: str) -> int:
+def _get_value_from_index(deviations: List[int], axis: str, platform: str) -> int:
     index_map = {
         ("X", "extend"): 0,
         ("X", "retract"): 1,
@@ -91,7 +91,7 @@ def get_value_from_index(deviations: List[int], axis: str, platform: str) -> int
     return deviations[index_map.get((axis, platform), 0)]
 
 
-def get_tuple_from_index(
+def _get_tuple_from_index(
     bins_list: List[Tuple[int, int]], axis: str, platform: str
 ) -> Tuple[int, int]:
     index_map = {
@@ -101,6 +101,43 @@ def get_tuple_from_index(
         ("Z", "retract"): 3,
     }
     return bins_list[index_map.get((axis, platform), 0)]
+
+
+def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
+    """Convert a defaultdict to dict."""
+    return {k: convert_to_dict(v) for k, v in obj.items()}
+
+
+def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
+    """Determine if the row should be processed."""
+    for a in ["x", "z"]:
+        if axis == a:
+            platform_list = config[f"platform_list_{a}"]
+            zone_list = config[f"zone_list_{a}"]
+            return (not platform_list or platform in platform_list) and (
+                not zone_list or zone in zone_list
+            )
+    return True
+
+
+def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
+    """Parses common arguments."""
+    return {
+        "axis_list": args.axis,
+        "stacker_list": args.stackers or [],
+        "labware_list": [] if "all" in args.labwares else args.labwares or ["baseline"],
+        "platform_list_x": args.platform_x,
+        "platform_list_z": args.platform_z,
+        "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
+        "zone_list_z": args.zones_z or list(range(NUMBER_OF_ZONES)),
+        "bins_list": args.bins or list(range(NUMBER_OF_BINS)),
+        "max_samples": args.max_samples or DEFAULT_MAX_SAMPLES,
+        "baseline_version": getattr(args, "baseline_version", None),
+        "output_file": getattr(args, "output_file", None),
+        "std": getattr(args, "std", [DEFAULT_STD] * 4),
+        "threshold": args.threshold,
+        "bin_range": args.bin_range,
+    }
 
 
 def create_baseline(
@@ -152,46 +189,13 @@ def create_baseline(
     return dict(baseline)
 
 
-def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
-    return {
-        "axis_list": args.axis,
-        "stacker_list": args.stackers or [],
-        "labware_list": [] if "all" in args.labwares else args.labwares or ["baseline"],
-        "platform_list_x": args.platform_x,
-        "platform_list_z": args.platform_z,
-        "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
-        "zone_list_z": args.zones_z or list(range(NUMBER_OF_ZONES)),
-        "bins_list": args.bins or list(range(NUMBER_OF_BINS)),
-        "max_samples": args.max_samples or DEFAULT_MAX_SAMPLES,
-        "baseline_version": getattr(args, "baseline_version", None),
-        "output_file": getattr(args, "output_file", None),
-        "std": getattr(args, "std", [DEFAULT_STD] * 4),
-        "threshold": args.threshold,
-        "bin_range": args.bin_range,
-    }
-
-
-def is_valid_row(axis, platform, zone, config):
-    for a in ["x", "z"]:
-        if axis == a:
-            platform_list = config[f"platform_list_{a}"]
-            zone_list = config[f"zone_list_{a}"]
-            return (not platform_list or platform in platform_list) and (
-                not zone_list or zone in zone_list
-            )
-    return True
-
-
-def convert_to_dict(obj):
-    if isinstance(obj, defaultdict) or isinstance(obj, dict):
-        return {k: convert_to_dict(v) for k, v in obj.items()}
-    return obj
-
-
-def read_filtered_data(dataframes: List[str], config: dict):
+def read_filtered_data(
+    dataframes: List[str], config: dict
+) -> Tuple[Dict[str, Any], int]:
+    """Parses the dataframe CSV files into a defaultdict of measurements."""
     samples = 0
     bin_count = len(config["bins_list"])
-    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # type: ignore
     for filepath in dataframes:
         if not os.path.exists(filepath):
             sys.exit(f"ERROR: Invalid dataframe file provided - {filepath}")
@@ -225,7 +229,9 @@ def read_filtered_data(dataframes: List[str], config: dict):
 def plot_baseline(args: argparse.Namespace) -> None:
     """Plots the baseline and dataframe."""
 
-    def get_visibility_mask(visibility_dict, key, total):
+    def _get_visibility_mask(
+        visibility_dict: DefaultDict[str, List[int]], key: str, total: int
+    ) -> List[bool]:
         mask = [False] * total
         for i in visibility_dict[key]:
             mask[i] = True
@@ -307,7 +313,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                             method="update",
                             args=[
                                 {
-                                    "visible": get_visibility_mask(
+                                    "visible": _get_visibility_mask(
                                         trace_visibility, key, total
                                     )
                                 },
@@ -322,7 +328,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                             method="update",
                             args=[
                                 {
-                                    "visible": get_visibility_mask(
+                                    "visible": _get_visibility_mask(
                                         zone_visibility, z, total
                                     )
                                 },
@@ -368,11 +374,11 @@ def generate_baseline(args: argparse.Namespace) -> None:
         f" ZonesX={config['zone_list_x']}, ZonesZ={config['zone_list_z']}, Bins={config['bins_list']}\n"
     )
 
-    baselines = defaultdict(dict)
+    baselines = defaultdict(dict)  # type: ignore
     for axis, platform_data in histograms.items():
         zone_count = zone_count_x if axis == "X" else zone_count_z
         for platform, zone_data in platform_data.items():
-            deviation = get_value_from_index(deviations, axis, platform)
+            deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
             baselines[axis][platform] = baseline
 
@@ -425,7 +431,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
 
     for axis, data in baselines.items():
         for platform, baseline in data.items():
-            deviation = get_value_from_index(deviations, axis, platform)
+            deviation = _get_value_from_index(deviations, axis, platform)
             print(f"Baseline {axis} {platform} std={deviation}:\n")
             print(baseline, "\n")
 
@@ -441,7 +447,6 @@ def validate_baseline(args: argparse.Namespace) -> None:
             " cant be more than 4."
         )
 
-    no_labware_detected = defaultdict(list)
     detected_labware = defaultdict(list)
     measurements, samples = read_filtered_data(args.dataframe, config)
     for baseline_path in args.baseline:
@@ -473,34 +478,35 @@ def validate_baseline(args: argparse.Namespace) -> None:
 
                 baseline_data = baseline[axis][platform][zone]
                 data = measurements[axis][platform][zone]
-                for stacker, raw_data in chain.from_iterable(
-                    d.items() for d in data
-                ):
-                    bin_range = get_tuple_from_index(bin_ranges, axis, platform)
-                    threshold = get_tuple_from_index(thresholds, axis, platform)
+                for stacker, raw_data in chain.from_iterable(d.items() for d in data):
+                    bin_range = _get_tuple_from_index(bin_ranges, axis, platform)
+                    threshold = _get_tuple_from_index(thresholds, axis, platform)
                     for bin in range(*bin_range):
                         raw_data_value = raw_data[bin]
                         baseline_value = baseline_data[bin]
-                        delta = truncate(raw_data_value - baseline_value)
+                        delta = _truncate(raw_data_value - baseline_value)
                         if raw_data_value > threshold and delta > 0:
-                            detected_labware[stacker].append(dict(
-                                detected=True,
-                                stacker=stacker,
-                                axis=axis,
-                                platform=platform,
-                                zone=zone,
-                                bin=bin,
-                                raw_data=raw_data,
-                                raw_data_value=raw_data_value,
-                                baseline_value=baseline_value,
-                                delta=delta,
-                            ))
+                            detected_labware[stacker].append(
+                                dict(
+                                    detected=True,
+                                    stacker=stacker,
+                                    axis=axis,
+                                    platform=platform,
+                                    zone=zone,
+                                    bin=bin,
+                                    raw_data=raw_data,
+                                    raw_data_value=raw_data_value,
+                                    baseline_value=baseline_value,
+                                    delta=delta,
+                                )
+                            )
                             break
                     else:
                         print("NOT DETECTED", stacker, axis, platform, zone, bin_range)
 
 
-def main(args: argparse.Namespace):
+def main(args: argparse.Namespace) -> None:
+    """Script main entry point."""
     match args.action:
         case "plot":
             plot_baseline(args)
@@ -552,7 +558,7 @@ if __name__ == "__main__":
         "--axis",
         help="The axis to generate baseline for (x, z), generates both if empty.",
         default=["x", "z"],
-        type=parse_axis,
+        type=_parse_axis,
         nargs="+",
     )
     parser.add_argument(
@@ -610,7 +616,7 @@ if __name__ == "__main__":
         "X-Extend, X-Retract, Z-Extend, Z-Retract."
         "The tuple format is `start_index + comma + end_index` like so."
         "1,2 3,4 5,6 7,8",
-        type=parse_tuple,
+        type=_parse_tuple,
         default=DEFAULT_BIN_RANGES,
         nargs="+",
     )

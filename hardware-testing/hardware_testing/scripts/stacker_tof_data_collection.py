@@ -7,15 +7,17 @@ import subprocess
 import re
 import time
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from hardware_testing import data
-from opentrons.hardware_control.ot3api import OT3API
-from hardware_testing.opentrons_api.types import OT3Mount, Axis
+from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor
+from opentrons.hardware_control.ot3api import OT3API
 
 
-def build_arg_parser():
+def build_arg_parser() -> argparse.ArgumentParser:
+    """Builds the argument parser."""
     arg_parser = argparse.ArgumentParser(description=__doc__)
     arg_parser.add_argument(
         "-p",
@@ -52,19 +54,22 @@ def build_arg_parser():
 
 
 class Stacker_TOF_Data_Collection:
+    """Class to collect TOF Sensor data."""
+
     def __init__(
         self, simulate: bool, samples: int, interval: int, labware_amount: int
     ) -> None:
+        """Init."""
         self.simulate = simulate
         self.samples = samples
         self.interval = interval
         self.labware_amount = labware_amount
-        self.api = None
-        self.mount = None
-        self.home = None
+        self.api: Optional[OT3API] = None
+        self.mount: Optional[OT3Mount] = None
+        self.home: Optional[Point] = None
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
-        self.stackers = []
-        self.test_files = []
+        self.stackers: List[str] = []
+        self.test_files: List[str] = []
         self.test_data = {
             "Time": "None",
             "Sample": "None",
@@ -79,24 +84,28 @@ class Stacker_TOF_Data_Collection:
             "Extend": Direction.EXTEND,
         }
 
-    async def test_setup(self):
+    async def test_setup(self) -> None:
+        """Setup the test."""
         self.api = await build_async_ot3_hardware_api(
             is_simulating=self.simulate, use_defaults=True
         )
         self.mount = OT3Mount.LEFT
         await self.stacker_setup()
         self.file_setup()
-        print(f"\n-> Starting Stacker TOF Validation Test!\n")
+        print("\n-> Starting Stacker TOF Validation Test!\n")
         self.start_time = time.time()
 
-    async def stacker_setup(self):
+    async def stacker_setup(self) -> None:
+        """Find stacker symlinks from the file system."""
         res = subprocess.check_output(["ls", "-la", "/dev"])
         self.port_list = re.findall(r"ot_module_flexstacker[0-9]", res.decode())
         for i in range(len(self.port_list)):
-            serial_number = self.api.attached_modules[i].device_info["serial"]
-            self.stackers.append(serial_number)
+            if self.api is not None:
+                serial_number = self.api.attached_modules[i].device_info["serial"]
+                self.stackers.append(serial_number)
 
-    def file_setup(self):
+    def file_setup(self) -> None:
+        """Setup where the test output is stored."""
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
         self.test_header = self.dict_keys_to_line(self.test_data)
@@ -165,13 +174,16 @@ class Stacker_TOF_Data_Collection:
             print(test_file_z_ret)
             print(test_file_z_ext)
 
-    def dict_keys_to_line(self, dict):
+    def dict_keys_to_line(self, dict: Dict[str, Any]) -> str:
+        """Convert dict keys to CSV line."""
         return str.join(",", list(dict.keys())) + "\n"
 
-    def dict_values_to_line(self, dict):
+    def dict_values_to_line(self, dict: Dict[str, Any]) -> str:
+        """Convert dict values to CSV line."""
         return str.join(",", list(dict.values())) + "\n"
 
-    async def read_stacker_tof(self):
+    async def read_stacker_tof(self) -> None:
+        """Read the stacker TOF Sensor data."""
         for i in range(len(self.stackers)):
             print(f"\n>> Stacker = {self.stackers[i]}")
             for axis, tof_axis in self.tof_axes.items():
@@ -180,47 +192,50 @@ class Stacker_TOF_Data_Collection:
                         sample = k + 1
                         print(f">>> Reading {axis} {pos} Sample = {sample}")
                         elapsed_time = (time.time() - self.start_time) / 60
-                        await self.api.attached_modules[i].home_axis(
-                            StackerAxis.X, direction
-                        )
-                        hist = await self.api.attached_modules[
-                            i
-                        ]._driver.get_tof_histogram(tof_axis)
-                        for zone, bins_list in hist.bins.items():
-                            test_data = self.test_data.copy()
-                            test_data["Time"] = str(elapsed_time)
-                            test_data["Sample"] = str(sample)
-                            test_data["Zone"] = str(zone)
-                            bins_dict = {
-                                index: str(value)
-                                for index, value in enumerate(bins_list)
-                            }
-                            test_data.update(bins_dict)
-                            test_data = self.dict_values_to_line(test_data)
-                            for test_file in self.test_files:
-                                if (
-                                    self.stackers[i] in test_file
-                                    and axis.lower() in test_file
-                                    and pos.lower() in test_file
-                                ):
-                                    data.append_data_to_file(
-                                        test_name=self.test_name,
-                                        run_id=self.test_date,
-                                        file_name=test_file,
-                                        data=test_data,
-                                    )
-                        time.sleep(self.interval)
+                        if self.api is not None:
+                            await self.api.attached_modules[i].home_axis(  # type: ignore
+                                StackerAxis.X, direction
+                            )
+                            hist = await self.api.attached_modules[  # type: ignore
+                                i
+                            ]._driver.get_tof_histogram(tof_axis)
+                            for zone, bins_list in hist.bins.items():
+                                test_data = self.test_data.copy()
+                                test_data["Time"] = str(elapsed_time)
+                                test_data["Sample"] = str(sample)
+                                test_data["Zone"] = str(zone)
+                                bins_dict = {
+                                    index: str(value)
+                                    for index, value in enumerate(bins_list)
+                                }
+                                test_data.update(bins_dict)  # type: ignore
+                                test_data_str = self.dict_values_to_line(test_data)
+                                for test_file in self.test_files:
+                                    if (
+                                        self.stackers[i] in test_file
+                                        and axis.lower() in test_file
+                                        and pos.lower() in test_file
+                                    ):
+                                        data.append_data_to_file(
+                                            test_name=self.test_name,
+                                            run_id=self.test_date,
+                                            file_name=test_file,
+                                            data=test_data_str,
+                                        )
+                            time.sleep(self.interval)
                 print("")
 
     async def _home(self, api: OT3API, mount: OT3Mount) -> None:
         await api.home()
         self.home = await api.gantry_position(mount)
 
-    async def exit(self):
+    async def exit(self) -> None:
+        """Before exiting the program."""
         if self.api:
             await self.api.disengage_axes(self.axes)
 
     async def run(self) -> None:
+        """Main entry point."""
         try:
             await self.test_setup()
             if self.api and self.mount:
