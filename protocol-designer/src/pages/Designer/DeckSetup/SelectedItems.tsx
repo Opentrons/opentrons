@@ -103,6 +103,12 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       slotPosition != null &&
       orientation != null ? (
         <>
+          {/*
+          todo(mm, 2025-07-10): This <Module> and <ModuleLabel> positioning is not
+          quite right, most obviously for the Thermocycler on a Flex. We aren't
+          passing a targetSlotId and targetDeckId down to <Module>, which means
+          it isn't applying slot-specific adjustments.
+          */}
           <Module
             key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
             x={slotPosition[0]}
