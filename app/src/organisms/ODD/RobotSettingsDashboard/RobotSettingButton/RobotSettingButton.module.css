@@ -1,9 +1,9 @@
 .setting_button {
   width: 100%;
-  margin-bottom: 0.5rem;
-  background-color: #cbcccc;
-  padding: 1.25rem 1.5rem;
-  border-radius: 1rem;
+  margin-bottom: var(--spacing-8);
+  background-color: var(--grey-35);
+  padding: var(--spacing-20) var(--spacing-24);
+  border-radius: var(--border-radius-16);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -17,7 +17,7 @@
 .content_wrapper {
   display: flex;
   flex-direction: row;
-  gap: 1.5rem;
+  gap: var(--spacing-24);
   align-items: center;
   width: 100%;
   white-space: nowrap;
@@ -26,7 +26,7 @@
 .text_content {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: var(--spacing-2);
   align-items: flex-start;
   justify-content: center;
 }
@@ -36,14 +36,14 @@
 }
 
 .setting_info {
-  color: #4a4c4e;
+  color: var(--grey-60);
   font-weight: 400;
   text-align: left;
 }
 
 .right_element_wrapper {
   display: flex;
-  gap: 2.5rem;
+  gap: var(--spacing-40);
   align-items: center;
 }
 

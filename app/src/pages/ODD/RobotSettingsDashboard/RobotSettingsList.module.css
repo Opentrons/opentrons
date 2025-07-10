@@ -1,12 +1,12 @@
 .feature_flag_button {
-  width: 100%;
-  margin-bottom: 0.5rem;
-  background-color: #cbcccc;
-  padding: 1.25rem 1.5rem;
-  border-radius: 1rem;
   display: flex;
+  width: 100%;
+  margin-bottom: var(--spacing-8);
+  background-color: var(--grey-35);
+  padding: var(--spacing-20) var(--spacing-24);
+  border-radius: var(--border-radius-16);
   flex-direction: row;
-  gap: 1.5rem;
+  gap: var(--spacing-24);
   justify-content: space-between;
   align-items: center;
 }
@@ -14,14 +14,14 @@
 .feature_flag_content {
   display: flex;
   flex-direction: row;
-  gap: 1.5rem;
+  gap: var(--spacing-24);
   align-items: center;
 }
 
 .feature_flag_text_content {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: var(--spacing-2);
   align-items: flex-start;
   justify-content: center;
   width: 46.25rem;
@@ -44,12 +44,11 @@
 .settings_content {
   display: flex;
   flex-direction: column;
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
+  padding: 0 var(--spacing-40);
 }
 
 .right_element_with_icon {
   display: flex;
-  gap: 2.5rem;
+  gap: var(--spacing-40);
   align-items: center;
 }
