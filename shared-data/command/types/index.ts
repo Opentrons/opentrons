@@ -138,14 +138,24 @@ export interface RunCommandErrorFlexStackerStall extends RunCommandErrorBase {
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttle extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleMissing
+  extends RunCommandErrorBase {
   errorCode: '3020'
   errorType: 'flexStackerShuttleMissing'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerHopper extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleLabware
+  extends RunCommandErrorBase {
+  errorCode: '3021'
+  errorType: 'flexStackerLabwareRetrieveFailed'
+  isDefined: true
+  errorInfo: { labwareId?: string }
+}
+
+export interface RunCommandErrorFlexStackerHopperLabware
+  extends RunCommandErrorBase {
   errorCode: '3022'
   errorType: 'flexStackerHopperLabwareFailed'
   isDefined: true
@@ -154,5 +164,6 @@ export interface RunCommandErrorFlexStackerHopper extends RunCommandErrorBase {
 
 export type RunCommandFlexStackerError =
   | RunCommandErrorFlexStackerStall
-  | RunCommandErrorFlexStackerShuttle
-  | RunCommandErrorFlexStackerHopper
+  | RunCommandErrorFlexStackerShuttleMissing
+  | RunCommandErrorFlexStackerHopperLabware
+  | RunCommandErrorFlexStackerShuttleLabware

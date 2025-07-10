@@ -1,9 +1,10 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { PromptPreview } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
 
 import type { ComponentProps } from 'react'
 

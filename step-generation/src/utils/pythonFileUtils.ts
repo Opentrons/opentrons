@@ -9,7 +9,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { getPythonLiquidClassName } from './liquidClassUtils'
+import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
   CUSTOM_LABWARE_DICT_NAME,
@@ -375,7 +375,7 @@ export function getLoadLiquids(
       const pythonWells =
         formattedWells.length < 8
           ? formattedWells.join(', ')
-          : `\n${indentedWells}\n${INDENT}`
+          : `\n${indentedWells}\n`
 
       const loadLiquidArgs = [
         `wells=[${pythonWells}],\n` +
@@ -402,8 +402,9 @@ export function getLoadLiquidClasses(
       if (liquidClass == null) {
         return ''
       }
-      return `${getPythonLiquidClassName(
-        liquidClass
+      return `${getLiquidClassName(
+        liquidClass,
+        true
       )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
         allLiquidClassDefs[liquidClass].liquidClassName
       )})`

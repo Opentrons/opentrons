@@ -33,7 +33,9 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('move_gantry_to_front')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('move_gantry_to_front')}
+      oddHeaderBtnCopy={t('move_gantry_to_front')}
       onClickButton={commandUtils.headerCommands.handleProceed}
       secondaryButtonProps={{
         buttonText: t('exit'),

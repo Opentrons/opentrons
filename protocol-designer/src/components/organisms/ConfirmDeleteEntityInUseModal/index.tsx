@@ -36,7 +36,7 @@ export function ConfirmDeleteEntityInUseModal(
           <Flex
             justifyContent={JUSTIFY_END}
             gridGap={SPACING.spacing8}
-            padding={SPACING.spacing24}
+            padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
           >
             <SecondaryButton
               onClick={() => {

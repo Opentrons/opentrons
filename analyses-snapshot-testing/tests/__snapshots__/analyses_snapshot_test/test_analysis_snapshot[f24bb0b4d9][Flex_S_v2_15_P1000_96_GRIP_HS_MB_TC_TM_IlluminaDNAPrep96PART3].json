@@ -41,442 +41,6 @@
         "model": "heaterShakerModuleV1"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 12.0,
-            "y": 8.75,
-            "z": 68.275
-          },
-          "compatibleWith": [],
-          "dimensions": {
-            "bareOverallHeight": 82.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Heater-Shaker Module GEN1",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.0
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": -0.125,
-            "y": 1.125,
-            "z": 68.275
-          },
-          "model": "heaterShakerModuleV1",
-          "moduleType": "heaterShakerModuleType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot2_standard": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    -1,
-                    0,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot3_standard": {
-              "A1": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "A3": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "B1": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "B3": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "C1": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "C3": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "D1": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              },
-              "D3": {
-                "labwareOffset": [
-                  [
-                    -49.325,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -1.125,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.125,
-                    1
-                  ]
-                ]
-              }
-            }
-          }
-        },
         "model": "heaterShakerModuleV1",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -2946,444 +2510,6 @@
         "model": "temperatureModuleV2"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 11.7,
-            "y": 8.75,
-            "z": 80.09
-          },
-          "compatibleWith": [
-            "temperatureModuleV1"
-          ],
-          "dimensions": {
-            "bareOverallHeight": 84.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Temperature Module GEN2",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.0
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": -1.45,
-            "y": -0.15,
-            "z": 80.09
-          },
-          "model": "temperatureModuleV2",
-          "moduleType": "temperatureModuleType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.15,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot2_standard": {
-              "3": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "6": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              },
-              "9": {
-                "labwareOffset": [
-                  [
-                    -1,
-                    -0.3,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "ot3_standard": {
-              "A1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "A3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "B1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "B3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "C1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "C3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "D1": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              },
-              "D3": {
-                "labwareOffset": [
-                  [
-                    -71.09,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0.15,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    1,
-                    1.45
-                  ]
-                ]
-              }
-            }
-          }
-        },
         "model": "temperatureModuleV2",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -4596,47 +3722,6 @@
         "model": "magneticBlockV1"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "compatibleWith": [],
-          "dimensions": {
-            "bareOverallHeight": 45.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Magnetic Block GEN1",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.0
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 38.0
-          },
-          "model": "magneticBlockV1",
-          "moduleType": "magneticBlockType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {},
-            "ot2_standard": {},
-            "ot3_standard": {}
-          }
-        },
         "model": "magneticBlockV1",
         "moduleId": "UUID"
       },
@@ -7251,101 +6336,6 @@
         "model": "thermocyclerModuleV2"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 14.4,
-            "y": 64.93,
-            "z": 97.8
-          },
-          "compatibleWith": [],
-          "dimensions": {
-            "bareOverallHeight": 108.96,
-            "lidHeight": 61.7,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Thermocycler Module GEN2",
-          "gripperOffsets": {
-            "default": {
-              "dropOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 5.6
-              },
-              "pickUpOffset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 4.6
-              }
-            }
-          },
-          "labwareOffset": {
-            "x": 0.0,
-            "y": 68.8,
-            "z": 108.96
-          },
-          "model": "thermocyclerModuleV2",
-          "moduleType": "thermocyclerModuleType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot3_standard": {
-              "B1": {
-                "cornerOffsetFromSlot": [
-                  [
-                    -98,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -20.005,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -0.84,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ],
-                "labwareOffset": [
-                  [
-                    -98,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -20.005,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    -0.84,
-                    0,
-                    0,
-                    1
-                  ],
-                  [
-                    0,
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            }
-          }
-        },
         "model": "thermocyclerModuleV2",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -18213,26 +17203,9 @@
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Specifying top with an offset of x=0.0 y=0.0 z=-14.780000000000001 and a volume offset of 0.0 results in an operation location below the bottom of the well",
-        "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "OperationLocationNotInWellError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
       "id": "UUID",
       "key": "7e96139ed2163fa7f870805d0b3d14b6",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
+      "notes": [],
       "params": {
         "forceDirect": false,
         "labwareId": "UUID",
@@ -18248,8 +17221,1472 @@
         },
         "wellName": "A1"
       },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 181.24,
+          "z": 38.92
+        }
+      },
       "startedAt": "TIMESTAMP",
-      "status": "failed"
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2fc4e3b5c5496c9069bfa428594d5b83",
+      "notes": [],
+      "params": {
+        "flowRate": 40.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -14.780000000000001
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 181.24,
+          "z": 38.92
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "293b75ea0ecbacefa153ed06957d3826",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 50.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.3,
+          "y": 395.15,
+          "z": 41.0
+        },
+        "volume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4af4d6dfa210405e5cda86ca70a2b4cb",
+      "notes": [],
+      "params": {
+        "seconds": 6.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2cc6facd963f1224ab3a1c427ebad360",
+      "notes": [],
+      "params": {
+        "flowRate": 80.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.3,
+          "y": 395.15,
+          "z": 41.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ae58a93b888702ea3d5552a7132259df",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -5.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.3,
+          "y": 395.15,
+          "z": 36.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e8c17bd83a28f7fb554fceccc7739e56",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.3,
+          "y": 395.15,
+          "z": 41.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ef9b94f267046d3d18f9ceaaf8b588de",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": false,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 74.38,
+          "z": 74.99000000000001
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ac51f98a51b8090329bb6c97661ef3f6",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": true
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1eeb10d9c927d233fbdcd7031c0047c8",
+      "notes": [],
+      "params": {
+        "dropOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 2.5
+        },
+        "labwareId": "UUID",
+        "newLocation": {
+          "moduleId": "UUID"
+        },
+        "pickUpOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 29.5
+        },
+        "strategy": "usingGripper"
+      },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "addressableAreaName": "heaterShakerV1D1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "heaterShakerModuleV1"
+            ]
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "addressableAreaName": "heaterShakerV1D1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "heaterShakerModuleV1"
+            ]
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1C1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutC1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ]
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cdcab4e78991715e0bd9f7f9f9787e78",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9e3315bbaf72df202626719681f8ce51",
+      "notes": [],
+      "params": {
+        "message": "--> Adding RSB"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8c78a5a5e700de468ff2bfdbf04a1805",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 110.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.4,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2c72aeeb2fbdbd435fe7cf4375bdf270",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.3,
+          "y": 288.15,
+          "z": 4.0
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "529f6bdecc10296be849fa04c80cab54",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 1.040000000000001,
+            "y": 0.0,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 15.420000000000002,
+          "y": 74.24,
+          "z": 23.260000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "808f476d33c89da7e686062ef89e0144",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 1.040000000000001,
+            "y": 0.0,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 15.420000000000002,
+          "y": 74.24,
+          "z": 23.260000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b190d73bc896ade45ea37cec649f3b01",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "10aebaf6c91650e96e0109fad6356664",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d271d42ba20c1265c1f9ae67c271b2bc",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 1.0400000000000063,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 75.28,
+          "z": 23.260000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "967ae7e19729a3be3c1088c3bd828eaa",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 1.0400000000000063,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 75.28,
+          "z": 23.260000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e8d89c46d2923c53a08d30fbfd2a1aeb",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "59c1c1d6ab2c03db5e259df571ce465c",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bc0efc7c278528f930177c36ad06dc85",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": -1.040000000000001,
+            "y": 0.0,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 13.34,
+          "y": 74.24,
+          "z": 23.260000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "18f440bd39035ecb965dcfea353c0fc7",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": -1.040000000000001,
+            "y": 0.0,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 13.34,
+          "y": 74.24,
+          "z": 23.260000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "441a8c45231b4d0bd3b74b19cf0b6f2e",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5b91b3bbb5b42019d65d2928092c97fd",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "affaefea06a32b323d65abe188b7189f",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": -1.0400000000000063,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 73.19999999999999,
+          "z": 23.260000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4c8bd3ab016b893f1c874f352d5b1096",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": -1.0400000000000063,
+            "z": -11.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 73.19999999999999,
+          "z": 23.260000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f7f03696df895d9193cf13c923514c84",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b2fa28a02c50105c9eb3561d3e0884e4",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "055e47e1903d32ccfe1d698520e46cbe",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 32.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.779999999999998
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 20.870000000000005
+        },
+        "volume": 32.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a717aa36dd5fd15117af9e58ec89dc0e",
+      "notes": [],
+      "params": {
+        "flowRate": 80.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -7.389999999999997
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 27.260000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3dafa44bfa9eee7df3c3d6badec818d0",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 5.000000000000007
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 39.650000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "336db1f7801ff0793594c821c00fc6ed",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 34.65
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "05603da7b787a935d2795191fa5939cd",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 5.000000000000007
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.24,
+          "z": 39.650000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6285fe5cc3b2dbf857d179a0fe4980c3",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": false,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 75.26
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f20ecefeef9d0ff676b3a42bad54f7a7",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID",
+        "rpm": 1600.0
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7fc5156557fc1da3a55ffcd9a30d932c",
+      "notes": [],
+      "params": {
+        "seconds": 6.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "072bba5a89de6aafc71b6d4ee9211a6b",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "270c2246839a255fcd68d65312799287",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f2a883d8cba1af0fc1023bd432929649",
+      "notes": [],
+      "params": {
+        "dropOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 30.0
+        },
+        "labwareId": "UUID",
+        "newLocation": {
+          "moduleId": "UUID"
+        },
+        "pickUpOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 3.5
+        },
+        "strategy": "usingGripper"
+      },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1C1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutC1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1C1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutC1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "addressableAreaName": "heaterShakerV1D1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "heaterShakerModuleV1"
+            ]
+          }
+        ]
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "24a4cb6ddce3a043fe2d24e05503b0c0",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2a436f2cf99cf4571f513096b79cd097",
+      "notes": [],
+      "params": {
+        "message": "--> Transferring Supernatant"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d95fa6c98b0f1bb8a56ec15ccb20aad1",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 110.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.4,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "69aec81355d6906a53d6332d03d13b57",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -14.530000000000001
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 181.24,
+          "z": 39.17
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9c4c29f2e23c3e6b80bb890941d5e8e6",
+      "notes": [],
+      "params": {
+        "flowRate": 40.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 31.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -14.530000000000001
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 181.24,
+          "z": 39.17
+        },
+        "volume": 31.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d381169b8dfd5c89cb788046bbb2b0df",
+      "notes": [],
+      "params": {
+        "flowRate": 160.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 31.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.780000000000003
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 74.24,
+          "z": 10.919999999999996
+        },
+        "volume": 31.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "65dbf2a58a2011f0749d994fcc632997",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": false,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 288.38,
+          "z": 75.26
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -18260,46 +18697,8 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 280]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): OperationLocationNotInWellError: Specifying top with an offset of x=0.0 y=0.0 z=-14.780000000000001 and a volume offset of 0.0 results in an operation location below the bottom of the well",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "OperationLocationNotInWellError: Specifying top with an offset of x=0.0 y=0.0 z=-14.780000000000001 and a volume offset of 0.0 results in an operation location below the bottom of the well",
-          "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "ProtocolCommandFailedError",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": [
-            {
-              "createdAt": "TIMESTAMP",
-              "detail": "Specifying top with an offset of x=0.0 y=0.0 z=-14.780000000000001 and a volume offset of 0.0 results in an operation location below the bottom of the well",
-              "errorCode": "4000",
-              "errorInfo": {},
-              "errorType": "OperationLocationNotInWellError",
-              "id": "UUID",
-              "isDefined": false,
-              "wrappedErrors": []
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "files": [
-    {
-      "name": "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3.py",
-      "role": "main"
-    }
-  ],
+  "errors": [],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",
@@ -18457,7 +18856,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

@@ -15,6 +15,9 @@ from opentrons.drivers.flex_stacker.types import Direction, StackerAxis
 from opentrons.drivers.flex_stacker.errors import EStopTriggered
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
+X_DISTANCE = 5
+L_DISTANCE = 5
+
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
@@ -48,9 +51,18 @@ async def axis_at_limit(stacker: FlexStacker, axis: StackerAxis) -> Direction:
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
+    # Get the direction of each axis that is at the limit switch
     x_limit = await axis_at_limit(stacker, StackerAxis.X)
     z_limit = await axis_at_limit(stacker, StackerAxis.Z)
     l_limit = await axis_at_limit(stacker, StackerAxis.L)
+
+    # Move the X and L axis off the limit switch
+    await stacker._driver.move_in_mm(
+        StackerAxis.X, x_limit.opposite().distance(X_DISTANCE)
+    )
+    await stacker._driver.move_in_mm(
+        StackerAxis.L, l_limit.opposite().distance(L_DISTANCE)
+    )
 
     ui.print_header("Trigger E-Stop")
     if not stacker.is_simulated:
@@ -68,6 +80,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         StackerAxis.X, x_limit
     )
     if limit_switch_triggered:
+        ui.print_error("X axis is still on the limit switch")
         report(
             section,
             "x-move-disabled",
@@ -76,7 +89,9 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     else:
         print("try to move X axis back to the limit switch...")
         try:
-            await stacker._driver.move_in_mm(StackerAxis.X, x_limit.distance(3))
+            await stacker._driver.move_in_mm(
+                StackerAxis.X, x_limit.distance(X_DISTANCE)
+            )
         except EStopTriggered:
             print("E-Stop Error is raised")
         triggered = await stacker._driver.get_limit_switch(StackerAxis.X, x_limit)
@@ -86,6 +101,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             [CSVResult.from_bool(not triggered)],
         )
 
+    # The Z axis brake should hold the axis on the limit switch when in E-Stop
     print("try to move Z axis...")
     try:
         await stacker._driver.move_in_mm(StackerAxis.Z, z_limit.opposite().distance(10))
@@ -103,21 +119,21 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         StackerAxis.L, l_limit
     )
     if limit_switch_triggered:
+        ui.print_error("L axis is still on the limit switch")
         report(
             section,
             "l-move-disabled",
             [CSVResult.from_bool(False)],
         )
     else:
-        print("try to move L axis off the limit switch...")
+        print("try to move L axis back to the limit switch...")
         try:
             await stacker._driver.move_in_mm(
-                StackerAxis.L, l_limit.opposite().distance(5)
+                StackerAxis.L, l_limit.distance(L_DISTANCE)
             )
         except EStopTriggered:
             print("E-Stop Error is raised")
         triggered = await stacker._driver.get_limit_switch(StackerAxis.L, l_limit)
-        print("L should not move")
         report(
             section,
             "l-move-disabled",
@@ -128,3 +144,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         ui.get_user_ready("Untrigger the E-Stop")
     estop_released = not await get_estop(stacker)
     report(section, "untrigger-estop", [CSVResult.from_bool(estop_released)])
+
+    await stacker.home_axis(StackerAxis.X, x_limit)
+    await stacker.home_axis(StackerAxis.L, l_limit)
+    await stacker.home_axis(StackerAxis.Z, z_limit)

@@ -4,7 +4,7 @@ import { getLabwareLocation } from '@opentrons/components'
 import {
   fixture96Plate,
   getLoadedLabwareDefinitionsByUri,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -30,7 +30,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     ...actual,
     getLoadedLabwareDefinitionsByUri: vi.fn(),
     getPositionFromSlotId: vi.fn(),
-    getModuleDef2: vi.fn(),
+    getModuleDef: vi.fn(),
   }
 })
 vi.mock('@opentrons/components')
@@ -59,7 +59,7 @@ describe('getRunCurrentModulesOnDeck', () => {
   ]
 
   beforeEach(() => {
-    vi.mocked(getModuleDef2).mockReturnValue({ model: 'MOCK_MODEL' } as any)
+    vi.mocked(getModuleDef).mockReturnValue({ model: 'MOCK_MODEL' } as any)
     vi.mocked(getLabwareLocation).mockReturnValue({ slotName: 'A1' })
   })
 
@@ -274,7 +274,7 @@ describe('getRunCurrentModulesInfo', () => {
       'opentrons/opentrons_96_pcr_adapter/1': 'MOCK_LW_DEF',
     } as any)
     vi.mocked(getPositionFromSlotId).mockReturnValue('position' as any)
-    vi.mocked(getModuleDef2).mockReturnValue('MOCK_MODULE_DEF' as any)
+    vi.mocked(getModuleDef).mockReturnValue('MOCK_MODULE_DEF' as any)
   })
 
   it('should return an empty array if runRecord is null', () => {

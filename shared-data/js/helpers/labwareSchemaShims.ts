@@ -113,6 +113,29 @@ export function getDeckSlotOriginToLabwareOrigin(
 }
 
 /**
+ * Return the offset from a labware's back-left-bottom (-x, +y, -z) corner to its origin.
+ *
+ * This is a lower-level helper for the rare cases where we want to position a labware
+ * specifically by its back-left corner. Typically, you'll want something higher-level,
+ * like `getLabwareViewBox()` or `getDeckSlotOriginToLabwareOrigin()`, instead.
+ */
+export function getLabwareBackLeftBottomToOrigin(
+  definition: LabwareDefinition
+): Vector3D {
+  if (definition.schemaVersion === 2) {
+    return {
+      x: 0,
+      y: -definition.dimensions.yDimension,
+      z: 0,
+    }
+  } else {
+    const originToBackLeftBottom = definition.extents.total.backLeftBottom
+    const backLeftBottomToOrigin = getVectorInverse(originToBackLeftBottom)
+    return backLeftBottomToOrigin
+  }
+}
+
+/**
  * Return a definition's cornerOffsetFromSlot in the style of labware schema 2.
  *
  * @deprecated This is probably an inherently wrong interface to attempt, for a couple

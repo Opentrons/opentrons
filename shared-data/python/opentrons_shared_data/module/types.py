@@ -126,7 +126,6 @@ ModuleDefinitionV3 = TypedDict(
         "compatibleWith": List[ModuleModel],
         "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
-        "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
     },
     total=False,
