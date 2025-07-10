@@ -11,12 +11,8 @@ import {
   TOOLTIP_BOTTOM,
   useHoverTooltip,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  useApplyOffsets,
-  useLPCAnalytics,
-} from '/app/organisms/LabwarePositionCheck/LPCFlows'
+import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectTotalCountNonHardCodedLSOffsets,
@@ -39,10 +35,6 @@ export function LPCSetupFlexBtns({
   hasMissingCalForFlex,
 }: LPCSetupFlexBtnsProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { reportApplyOffsets } = useLPCAnalytics({
-    runId,
-    robotType: FLEX_ROBOT_TYPE,
-  })
   const lpcDisabledReason = useLPCDisabledReason({
     robotName,
     runId,
@@ -99,7 +91,6 @@ export function LPCSetupFlexBtns({
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       setOffsetsConfirmed(true)
-      reportApplyOffsets()
     })
   }
 
