@@ -328,14 +328,14 @@ def run(ctx: ProtocolContext) -> None:
 
     volume_dispensed = 0.0
     step_volume = MIN_STEP
-
+    height = 0.0
     cheight_list = [0.0]
     hdelta = 0.0
-
     epsilon = 1e-4
     K = 50
     step = 0 
     tolerance = max_volume / 20
+    corrected_height = 0.0
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -358,12 +358,13 @@ def run(ctx: ProtocolContext) -> None:
         step = K / (abs(hdelta) + epsilon)
         return max(MIN_STEP, min(MAX_STEP, step))
     
-    
+
     #################### Protocol Start 
 
     drop_tips()
 
-    trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
+
+    
 
     if quick_mode:
         pick_up_tips()
@@ -371,6 +372,7 @@ def run(ctx: ProtocolContext) -> None:
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
         #step 0: establish baseline and report initial z tip error
+        trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
         #tolerance so the bot doesn't have to get volume exactly within max volume
@@ -414,6 +416,7 @@ def run(ctx: ProtocolContext) -> None:
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
         #step 0: establish baseline and report initial z tip error
+        trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
         
         drop_tips()
