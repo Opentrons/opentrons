@@ -17,6 +17,7 @@ on:
       - '.github/workflows/api-test-lint-deploy.yaml'
       - '.github/actions/python/**'
       - '.github/workflows/utils.js'
+      - 'package-testing/**''
   push:
     paths:
       - 'api/**'
