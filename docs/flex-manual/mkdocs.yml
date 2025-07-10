@@ -48,8 +48,6 @@ markdown_extensions:
   - sane_lists
   - toc:
       permalink: true
-      # Recommend setting toc_depth: 3 for less clutter and better right-side navigation
-
 
 extra_css:
   - manual.css

@@ -700,7 +700,7 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
-## Command Line Operation Over SSH
+## Command line operation over SSH
 
 You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
@@ -708,7 +708,7 @@ You can work with your Flex through a Secure Shell (SSH) terminal connection. Te
     - SSH keys are required before you can connect to Flex and issue commands from a terminal.
     - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
 
-### Creating SSH Keys
+### Creating SSH keys
 
 Follow these steps to create SSH keys on your Mac, Windows, or Linux computer:
 
@@ -727,7 +727,7 @@ Follow these steps to create SSH keys on your Mac, Windows, or Linux computer:
 
 1. Eject the USB drive.
 
-### Making an SSH Connection
+### Making an SSH connection
 
 To make an SSH connection:
 
@@ -752,20 +752,20 @@ To make an SSH connection:
 
 When an SSH connection is successful, the terminal command prompt changes to `root@` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
 
-### Hardwired SSH Connections
+### Hardwired SSH connections
 
 A hardwired connection uses an Ethernet cable to connect and transmit data directly between your computer and Flex. This is a secure alternative for SSH access in situations where network policies prevent you from making a wireless connection to the robot.
 
 !!!note
-    The hardwired SSH procedure requires familiarity with working in a terminal window and setting a static IP address. You may want to ask for help from your IT support team before proceeding.
+    The hardwired SSH procedure requires assigning a static IP address to the robot. You may want to ask for help from your IT support team before proceeding.
 
-#### Physical Connection
+#### Physical connection
 
-Connect a laptop to the robot using an Ethernet cable. If your laptop has a built-in RJ-45 Ethernet port, plug one end into the computer and connect the other end to the Ethernet port on the robot. If you're using a laptop without an Ethernet port, use an adapter with an Ethernet port to make this connection.
+Connect a computer to the robot using an Ethernet cable. If your computer has a built-in RJ-45 Ethernet port, plug one end into the computer and connect the other end to the Ethernet port on the robot. If you're using a computer without an Ethernet port, use an adapter with an Ethernet port to make this connection.
 
 When disconnected from a network, your Flex will assign itself an IP address and subnet mask. You'll need this information to set a static address on your computer within the same IP address range and subnet as your Flex.
 
-#### Finding the Robot's IP Address
+#### Finding the robot's IP address
 
 You can get the IP address range and subnet mask from the robot by connecting it to your computer and checking the Opentrons App:
 
@@ -785,9 +785,9 @@ The Networking tab will show you the IP address and subnet mask of your robot. W
 - IP address: 169.254.29.160
 - Subnet mask: 255.255.0.0
 
-#### Setting a Static IP Address
+#### Setting a static IP address
 
-The static IP address on your laptop needs to be in the same IP range and subnet that your Flex uses. Given the robot's IP address above, you could set your computer's IP address and subnet as shown here:
+The static IP address on your computer needs to be in the same IP range and subnet that your Flex uses. Given the robot's IP address above, you could set your computer's IP address and subnet as shown here:
 
 - IP address: 169.254.29.164
 - Subnet mask: 255.255.0.0
