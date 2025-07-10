@@ -46,7 +46,7 @@ export function useApplyOffsets(runId: string): ApplyOffsetsResult {
         lwOffsetsForRun.map(data => createLabwareOffset({ runId, data }))
       )
         .then(() => {
-          reportApplyOffsets()
+          reportApplyOffsets(lwOffsetsForRun)
         })
         .catch(error => {
           makeSnackbar(t('failed_to_apply_offsets') as string)
