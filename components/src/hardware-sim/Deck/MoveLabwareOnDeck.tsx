@@ -16,6 +16,7 @@ import { LabwareRender } from '../Labware'
 
 import type { PropsWithChildren, ReactNode } from 'react'
 import type {
+  ComputeLabwareOriginInput,
   DeckConfiguration,
   DeckDefinition,
   LabwareDefinition,
@@ -193,7 +194,7 @@ function resolveLabwareLocation({
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
   labwareDefinitions: LabwareDefinition[]
-}): 'error' | 'offDeck' | Parameters<typeof computeLabwareOrigin>[0] {
+}): 'error' | 'offDeck' | ComputeLabwareOriginInput {
   // todo(mm, 2025-07-07): Dear god, this is so much code.
   // Can any of this be simplified or offloaded to existing helpers?
 

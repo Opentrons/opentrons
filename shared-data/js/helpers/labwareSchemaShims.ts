@@ -78,7 +78,7 @@ export function getLabwareViewBox(
 }
 
 /** Logically specifies where a labware is located. */
-interface ComputeLabwareOriginInput {
+export interface ComputeLabwareOriginInput {
   /** The underlying deck. */
   deckDefinition: DeckDefinition
 
@@ -103,28 +103,15 @@ interface ComputeLabwareOriginInput {
  * Computes the absolute deck coordinates of a labware.
  * Returns null if there was some internal error.
  */
-export function computeLabwareOrigin({
-  deckDefinition,
-  slotId,
-  moduleDefinition,
-  labwareDefinitionsBottomToTop,
-}: ComputeLabwareOriginInput): Vector3D | null {
-  const stack = getLabwareStackAsArray({
-    deckDefinition,
-    slotId,
-    moduleDefinition,
-    labwareDefinitionsBottomToTop,
-  })
+export function computeLabwareOrigin(
+  input: ComputeLabwareOriginInput
+): Vector3D | null {
+  const stack = getLabwareStackAsArray(input)
 
   if (stack == null) {
     console.warn(
       "Can't compute labware position. This is probably a bug in the call site, like passing in a nonexistent slot ID.",
-      {
-        deckDefinition,
-        slotId,
-        moduleDefinition,
-        labwareDefinitionsBottomToTop,
-      }
+      input
     )
     return null
   }
@@ -140,17 +127,16 @@ export function computeLabwareOrigin({
  * Translate the args of `computeLabwarePosition()`, which should be optimized for
  * safety and ergonomics, into something that's easier for us to sum up.
  */
-function getLabwareStackAsArray({
-  deckDefinition,
-  slotId,
-  moduleDefinition,
-  labwareDefinitionsBottomToTop,
-}: {
-  deckDefinition: DeckDefinition
-  slotId: string
-  moduleDefinition?: ModuleDefinition
-  labwareDefinitionsBottomToTop: LabwareDefinition[]
-}): LabwareStackElement[] | null {
+function getLabwareStackAsArray(
+  input: ComputeLabwareOriginInput
+): LabwareStackElement[] | null {
+  const {
+    deckDefinition,
+    slotId,
+    moduleDefinition,
+    labwareDefinitionsBottomToTop,
+  } = input
+
   if (labwareDefinitionsBottomToTop.length === 0) {
     return []
   }
