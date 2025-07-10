@@ -174,6 +174,8 @@ class FixtureSettings:
             ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
         )
         name = lookup_key("name", csv_params)[0]
+        if ctx.is_simulating():
+            name = f"{name}-simulate"
         increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
