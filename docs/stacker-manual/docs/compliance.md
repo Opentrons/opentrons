@@ -150,12 +150,12 @@ You can install and use Stackers with the [Opentrons Flex HEPA/UV Module](https:
 
 ## Stacker and HEPA/UV Compatibility
 
-Flex robots manufactured before September 2025 require a retrofit kit. This kit adds new hardware to your Flex, preventing the HEPA/UV module from operating if the Stacker is improperly installed.
+Flex robots manufactured before September 2025 require an upgrade kit. This kit adds new hardware to your Flex, preventing the HEPA/UV module from operating if the Stacker is improperly installed.
 
-Refer to your robot's serial number to determine if an retrofit kit is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require retrofitting.
+Refer to your robot's serial number to determine if an upgrade is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require an upgrade.
 
 ![Flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
 
-Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs to be retrofitted.
+Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs to be upgraded.
