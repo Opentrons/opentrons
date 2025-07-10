@@ -117,24 +117,30 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     []
   )
 
-  const handleAddFixture = (
-    anchorCutoutId: CutoutId,
-  ): void => {
-    console.log("handleAddFixtures")
+  const handleAddFixture = (anchorCutoutId: CutoutId): void => {
+    console.log('handleAddFixtures')
     const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
       anchorCutoutId,
       moduleFixtures
     )
-    console.log("configuredFixtureIdByCutoutId: ", configuredFixtureIdByCutoutId)
+    console.log(
+      'configuredFixtureIdByCutoutId: ',
+      configuredFixtureIdByCutoutId
+    )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       updateDeckConfiguration(
         deckConfig.map(cc => {
           if (cc.cutoutId in configuredFixtureIdByCutoutId) {
-            const replacement = getCutoutConfigReplacment(anchorCutoutId, moduleFixtures[0].id, attachedModule.moduleModel ,deckConfig)
-            console.log("replacement: ", replacement)
+            const replacement = getCutoutConfigReplacment(
+              anchorCutoutId,
+              moduleFixtures[0].id,
+              attachedModule.moduleModel,
+              deckConfig
+            )
+            console.log('replacement: ', replacement)
             return {
               ...cc,
-              replacement
+              replacement,
             }
           } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
             return {
@@ -219,21 +225,23 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   )
 }
 
-export const getCutoutConfigReplacment = (cutoutId: CutoutId, fixtureId: CutoutFixtureId, moduleModel: ModuleModel, deckConfig: CutoutConfig[]) => {
+export const getCutoutConfigReplacment = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureId,
+  moduleModel: ModuleModel,
+  deckConfig: CutoutConfig[]
+) => {
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
-  ) 
-  const mainAA = getAAForModuleFixture(cutoutId,
-        fixtureId,
-        moduleModel
-      )
+  )
+  const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
   console.log('mainAA: ', mainAA)
   const addedCutoutConfigs: CutoutConfigMap[] = [
-  {
-    addressableAreaId: mainAA,
-    cutoutFixtureId: fixtureId,
-    cutoutId: cutoutId,
-  },
+    {
+      addressableAreaId: mainAA,
+      cutoutFixtureId: fixtureId,
+      cutoutId: cutoutId,
+    },
   ]
   const replacmentFixture = replaceCutoutFixtureWithComboFixture(
     addedCutoutConfigs,
@@ -241,9 +249,11 @@ export const getCutoutConfigReplacment = (cutoutId: CutoutId, fixtureId: CutoutF
     cutoutId
   )
 
+  console.log('replacmentFixture: ', replacmentFixture)
+
   return {
     cutoutId,
     cutoutFixtureId: replacmentFixture[0].cutoutFixtureId as CutoutFixtureId,
-    opentronsModuleSerialNumber: undefined
+    opentronsModuleSerialNumber: undefined,
   }
 }
