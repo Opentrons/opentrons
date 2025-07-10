@@ -11,12 +11,8 @@ import {
   TOOLTIP_BOTTOM,
   useHoverTooltip,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  useApplyOffsets,
-  useLPCAnalytics,
-} from '/app/organisms/LabwarePositionCheck/LPCFlows'
+import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectTotalCountNonHardCodedLSOffsets,
