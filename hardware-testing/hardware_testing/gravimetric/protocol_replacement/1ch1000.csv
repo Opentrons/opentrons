@@ -4,7 +4,7 @@ mount,left,,,
 pipette,1000,1,,
 tips,50,1000,,
 trials,10,,,
-return_tip,TRUE,,,
+return_tip,FALSE,,,
 touch_tip,FALSE,,,
 liquid,water,Deionized water,#0000ff,100000
 tipracks_20ul,,,,
