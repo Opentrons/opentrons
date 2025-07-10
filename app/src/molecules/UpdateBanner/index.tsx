@@ -52,13 +52,13 @@ export const UpdateBanner = ({
   }
 
   const canProceed =
-    updateType === 'calibration'
-      ? !isEstopNotDisengaged &&
+    updateType === 'firmware'
+      ? true
+      : !isEstopNotDisengaged &&
         !isTooHot &&
         !attachPipetteRequired &&
         !calibratePipetteRequired &&
         !updatePipetteFWRequired
-      : true
 
   const getMessage = (): string => {
     switch (updateType) {
@@ -81,7 +81,12 @@ export const UpdateBanner = ({
 
   const isFlex = useIsFlex(robotName)
   // Only show banner for needing firmware update if robot is an OT-2
-  if (!isFlex && updateType !== 'firmware') return null
+  if (!isFlex && updateType !== 'firmware') {
+    return null
+  }
+  if (updateType === 'setup' && !canProceed) {
+    return null
+  }
   return (
     <Flex
       data-testid={`ModuleCard_${updateType}_update_banner_${serialNumber}`}

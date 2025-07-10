@@ -7,7 +7,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.20",
+    "apiLevel": "2.24",
 }
 
 
@@ -34,10 +34,10 @@ def comment_tip_rack_status(ctx, tip_rack):
         ctx.comment(status_line)
 
 
-def aspirate_to_reservoir_test(ctx, labware):
+def aspirate_to_reservoir_test(ctx, labware, pipette):
     location = labware.wells()[0]
     ctx.comment(f"Aspirating from {labware.parent} {location}")
-    ctx.aspirate(20, location)
+    pipette.aspirate(20, location)
     ctx.pause("Where did I aspirate from?")
 
 
@@ -82,10 +82,4 @@ def run(protocol):
 
     pipette.pick_up_tip()
     comment_tip_rack_status(protocol, partial_tip_rack)
-    aspirate_to_reservoir_test(protocol, agilent_290)
-
-    pipette.configure_nozzle_layout(
-        style=COLUMN,
-        start="A1",
-        tip_racks=[partial_tip_rack],
-    )
+    aspirate_to_reservoir_test(protocol, agilent_290, pipette)

@@ -1,6 +1,6 @@
 import {
   fixture96Plate,
-  getModuleDef2,
+  getModuleDef,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_MODULE_V1,
@@ -42,7 +42,7 @@ const Template: Story<{
   return (
     <RobotCoordinateSpace height="100vh" width="100vw" viewBox="0 -50 200 320">
       <ModuleComponent
-        def={getModuleDef2(args.model)}
+        def={getModuleDef(args.model)}
         x={0}
         y={0}
         innerProps={args.innerProps}

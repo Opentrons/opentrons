@@ -49,6 +49,7 @@ export interface ConflictTimestampInfo {
 export interface LwGeometryDetails {
   id: string
   displayName: string
+  version: number
   defaultOffsetDetails: DefaultOffsetDetails
   locationSpecificOffsetDetails: LocationSpecificOffsetDetails[]
 }

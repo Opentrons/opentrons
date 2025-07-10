@@ -38,6 +38,9 @@ interface FlexTrashProps {
   showHighlight?: boolean
   /** optional tag info to display a tag below the trash */
   tagInfo?: DeckLabelProps[]
+  onClick?: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 /**
@@ -52,6 +55,9 @@ export const FlexTrash = ({
   trashCutoutId,
   showHighlight,
   tagInfo,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: FlexTrashProps): JSX.Element | null => {
   // be sure we don't try to render for an OT-2
   if (robotType !== FLEX_ROBOT_TYPE) return null
@@ -97,8 +103,16 @@ export const FlexTrash = ({
         height={yDimension}
         x={x + xAdjustment}
         y={y + yAdjustment}
-        flexProps={{ flex: '1' }}
-        foreignObjectProps={{ flex: '1' }}
+        flexProps={{
+          flex: '1',
+          onClick: onClick,
+          onMouseEnter: onMouseEnter,
+          onMouseLeave: onMouseLeave,
+        }}
+        foreignObjectProps={{
+          flex: '1',
+          cursor: onClick != null ? 'pointer' : 'default',
+        }}
       >
         <Flex
           alignItems={ALIGN_CENTER}

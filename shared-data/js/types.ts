@@ -572,7 +572,6 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
 export type AffineTransformMatrix = number[][]
@@ -895,7 +894,7 @@ export interface ByTipTypeSetting {
   singleDispense: SingleDispenseProperties
   multiDispense?: MultiDispenseProperties
 }
-interface ByPipetteSetting {
+export interface ByPipetteSetting {
   pipetteModel: string
   byTipType: ByTipTypeSetting[]
 }

@@ -17,13 +17,13 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
+import { wellFillFromWellContents } from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { arrayToWellGroup } from '../../../utils'
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { StepFieldName } from '../../../form-types'

@@ -1282,12 +1282,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs_Override_eight_partial_column_bottom_left.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

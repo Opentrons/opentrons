@@ -120,7 +120,6 @@ export function useAspirateSettingsConfig({
         state.delayAspirate !== undefined
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
