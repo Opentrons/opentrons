@@ -104,6 +104,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   )
 
   console.log('mayMountToCutoutIds: ', mayMountToCutoutIds)
+  console.log("deckConfigWithAA: ", deckConfigWithAA)
 
   const editableCutoutIds = deckConfigWithAA.reduce<CutoutId[]>(
     (
@@ -112,26 +113,15 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         cutoutId,
         cutoutFixtureId,
         opentronsModuleSerialNumber,
-        addressableAreaId,
       }
     ) => {
       const isCurrentConfiguration =
         Object.values(configuredFixtureIdByCutoutId).includes(
           cutoutFixtureId
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
-      console.log('cutoutId: ', cutoutId)
-      console.log('isCurrentConfiguration: ', isCurrentConfiguration)
-      console.log(
-        'mayMountToCutoutIds.includes(cutoutId); ',
-        mayMountToCutoutIds.includes(cutoutId)
-      )
-      console.log('isLoadedInRun; ', isLoadedInRun)
-      console.log(
-        'SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId): ',
-        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
-      console.log('addressableAreaId: ', addressableAreaId)
-      console.log('cutoutFixtureId: ', cutoutFixtureId)
+        console.log("isCurrentConfiguration: ", isCurrentConfiguration)
+        console.log("mayMountToCutoutIds.includes(cutoutId): ", mayMountToCutoutIds.includes(cutoutId))
+        console.log("isLoadedInRun: ", isLoadedInRun)
       if (
         // in run setup, module calibration only available when module location is already correctly configured
         !isLoadedInRun &&
@@ -146,6 +136,9 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     },
     []
   )
+
+  console.log("editableCutoutIds; ", editableCutoutIds)
+  console.log("moduleFixtures: ", moduleFixtures)
 
   const handleAddFixture = (anchorCutoutId: CutoutId): void => {
     console.log('handleAddFixtures')
@@ -198,6 +191,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
+    
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
@@ -272,7 +266,6 @@ export const getCutoutConfigReplacment = (
     deckConfig
   )
   const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
-  console.log('mainAA: ', mainAA)
   const addedCutoutConfigs: CutoutConfigMap[] = [
     {
       addressableAreaId: mainAA,
@@ -285,8 +278,6 @@ export const getCutoutConfigReplacment = (
     deckConfigWithAA,
     cutoutId
   )
-
-  console.log('replacmentFixture: ', replacmentFixture)
 
   return {
     cutoutId,

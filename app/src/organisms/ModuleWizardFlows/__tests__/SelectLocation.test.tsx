@@ -7,6 +7,10 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_V1_FIXTURE,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -34,44 +38,120 @@ const mockStacker: CutoutConfig = {
   cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
   opentronsModuleSerialNumber: 'fsm123',
 }
+
+const mockTempModuleTestId: CutoutConfig = {
+cutoutId: 'cutoutD1',
+  cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+  opentronsModuleSerialNumber: 'test123',
+}
+const mockTempModule: CutoutConfig = {
+cutoutId: 'cutoutD3',
+  cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+  opentronsModuleSerialNumber: 'test',
+}
 const mockDeckConfig: DeckConfiguration = [mockStacker]
+const mockSimpleDeckConfig: CutoutConfig[] = [{
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutA2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutB2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+},
+ {
+    cutoutId: 'cutoutC2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutD2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+},
+{
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+}
+]
 const attachedModule: Partial<AttachedModule> = {
   moduleModel: 'temperatureModuleV2',
+  serialNumber: 'test123'
 }
 const RUN_ID_1: string = 'mock_run_1'
-describe('getCutoutConfigReplacment', () => {
-  let props: ComponentProps<typeof SelectLocation>
+const mockUpdateDeckConfiguration = vi.fn()
 
-  beforeEach(() => {
-    const myMock = vi.fn()
-    const mockGetCutoutConfigReplacment = vi.fn()
-    props = {
-      proceed: vi.fn(),
-      goBack: vi.fn,
-      restartSetup: vi.fn(),
-      isRobotMoving: false,
-      isModuleUpdating: false,
-      setIsModuleUpdating: vi.fn(),
-      attachedModule: attachedModule as AttachedModule,
-      deckConfig: mockDeckConfig,
-      createMaintenanceRun: vi.fn(),
-      setErrorMessage: vi.fn(),
-      maintenanceRunId: RUN_ID_1,
-      isLoadedInRun: true,
-      isOnDevice: false,
-      errorMessage: '',
-      attachedPipette: {} as PipetteInformation,
-    }
-    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
-      updateDeckConfiguration: myMock,
-    } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
-      data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+describe('', () => {
+    let props: ComponentProps<typeof SelectLocation>
 
-    vi.mocked(getFixtureIdByCutoutIdFromModuleAnchorCutoutId)
+    beforeEach(() => {
+        const mockUpdateDeckConfiguration = vi.fn()
+        props = {
+        proceed: vi.fn(),
+        goBack: vi.fn,
+        restartSetup: vi.fn(),
+        isRobotMoving: false,
+        isModuleUpdating: false,
+        setIsModuleUpdating: vi.fn(),
+        attachedModule: attachedModule as AttachedModule,
+        deckConfig: mockSimpleDeckConfig,
+        createMaintenanceRun: vi.fn(),
+        setErrorMessage: vi.fn(),
+        maintenanceRunId: RUN_ID_1,
+        isLoadedInRun: false,
+        isOnDevice: false,
+        errorMessage: '',
+        attachedPipette: {} as PipetteInformation,
+        }
+        vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
+        updateDeckConfiguration: mockUpdateDeckConfiguration,
+        } as any)
+        vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+        data: [],
+        } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
+  it('should call updateDeckConfig with tempDeck', async () => {
+    render(props)
+    console.log(screen.getByTestId('D1'))
+    
+    fireEvent.click(screen.getByTestId('D3'))
+    //     await waitFor(() =>
+        expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith({
+          cutoutId: 'CutoutD3',
+          cutoutFixtureId: 'temperatureModuleV2',
+            opentronsModuleSerialNumber: 'test123'
+        })
+    // )
+  })
+})
+
+describe('getCutoutConfigReplacment', () => {
   it('should get temp module replacment fixture', () => {
     expect(
       getCutoutConfigReplacment(
