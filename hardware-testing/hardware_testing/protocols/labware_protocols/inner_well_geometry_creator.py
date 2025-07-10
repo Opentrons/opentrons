@@ -53,7 +53,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["steps", "volume", "height", "tip-z-error", "cheight"]
+CSV_HEADER = ["step", "volume", "height", "tip-z-error", "cheight"]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -106,6 +106,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1.0
     )
 
+    parameters.add_bool(
+        display_name="Dynamic Steps",
+        variable_name="dynamic_steps",
+        description="If true, stepvol starts slowly and increases",
+        default=False,
+    )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -117,17 +124,16 @@ def _setup(
     Labware,
     Labware,
     Labware,
-    float,
+    List[float],
     bool,
     LiquidClass,
-    float,
-    float,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
 
     reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
     quick_mode = ctx.params.quick_mode  # type: ignore[attr-defined]
     number_of_steps = int(ctx.params.number_of_steps)  # type: ignore[attr-defined]
+    dynamic_steps = ctx.params.dynamic_steps  # type: ignore[attr-defined]
 
     liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
@@ -136,45 +142,44 @@ def _setup(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
 
-    if reservoir_used:
-        # change to 8 channel later
-        liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
-    else:
-        liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
+    liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
     probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
 
     liq_pipette = ctx.load_instrument(
         liquid_pip_name, LIQUID_MOUNT, tip_racks=[liquid_rack]
     )
-
     probe_pipette = ctx.load_instrument(probing_pip_name, PROBING_MOUNT)
-    # Add Liquid Class
+
     ethanol = ctx.get_liquid_class("ethanol_80")
     lm = "liquid-meniscus"
     props = ethanol.get_for(liq_pipette, liquid_rack)
     meniscus_z = -0.5
-    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+    props.aspirate.aspirate_position.position_reference = lm
     props.aspirate.aspirate_position.offset.z = meniscus_z
-    props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+    props.dispense.dispense_position.position_reference = lm
     props.dispense.dispense_position.offset.z = meniscus_z
 
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     labware = ctx.load_labware(labware_type, SLOT_LABWARE, version=ctx.params.labware_version)
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
+
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     labware.load_empty(labware.wells())
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     max_volume = labware["A1"].max_volume
-    #step_volume = max_volume / number_of_steps
+
+    if dynamic_steps:
+        step_volumes = quad_step(max_volume, number_of_steps, RAMP_FRACTION)
+    else:
+        fixed_volume = round(max_volume / number_of_steps, 5)
+        step_volumes = [fixed_volume] * number_of_steps
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-            Mitutoyo_Digimatic_Indicator,
-        )
+        from hardware_testing.drivers.mitutoyo_digimatic_indicator import Mitutoyo_Digimatic_Indicator
 
         DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
         DIAL_PORT.connect()
@@ -186,13 +191,10 @@ def _setup(
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [probing_pip_name])
         _write_line_to_csv(ctx, [labware_type])
-        #_write_line_to_csv(ctx, ["step vol", str(step_volume)])
         _write_line_to_csv(ctx, ["steps", str(number_of_steps)])
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
-        # Record LPC
         lpc = str(labware._core.get_calibrated_offset())
-        lpc_line = ["LPC Offset", labware.load_name, lpc]
-        _write_line_to_csv(ctx, lpc_line)
+        _write_line_to_csv(ctx, ["LPC Offset", labware.load_name, lpc])
 
     return (
         liq_pipette,
@@ -202,11 +204,9 @@ def _setup(
         labware,
         src,
         dial,
-        #step_volume,
+        step_volumes,
         quick_mode,
         ethanol,
-        number_of_steps,
-        max_volume
     )
 
 
@@ -317,12 +317,11 @@ def run(ctx: ProtocolContext) -> None:
         labware,
         src,
         dial,
-        #step_volume,
+        step_volumes,
         quick_mode,
         ethanol,
-        number_of_steps,
-        max_volume,
     ) = _setup(ctx)
+
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -340,9 +339,6 @@ def run(ctx: ProtocolContext) -> None:
             probe_pipette.drop_tip()
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
-
-    #testing dynamic volume increments
-    step_volumes = quad_step(max_volume, number_of_steps, RAMP_FRACTION)
 
     #beginning of protocol
 
@@ -398,7 +394,7 @@ def run(ctx: ProtocolContext) -> None:
                     5,
                 )
 
-                volume_dispensed = round(volume_dispensed + step_volumes[step], 5) #step_volume
+                volume_dispensed = round(volume_dispensed + step_volumes[step], 5)
             else:
                 src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
                 height = 0.0
