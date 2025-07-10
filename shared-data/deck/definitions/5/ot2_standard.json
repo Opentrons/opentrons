@@ -24,18 +24,7 @@
         },
         "displayName": "Slot 1",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -55,18 +44,7 @@
         },
         "displayName": "Slot 2",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -86,18 +64,7 @@
         },
         "displayName": "Slot 3",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -117,18 +84,7 @@
         },
         "displayName": "Slot 4",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -148,18 +104,7 @@
         },
         "displayName": "Slot 5",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -179,18 +124,7 @@
         },
         "displayName": "Slot 6",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -210,18 +144,7 @@
         },
         "displayName": "Slot 7",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -242,18 +165,7 @@
         },
         "displayName": "Slot 8",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -273,18 +185,7 @@
         },
         "displayName": "Slot 9",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -304,18 +205,7 @@
         },
         "displayName": "Slot 10",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -335,18 +225,7 @@
         },
         "displayName": "Slot 11",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": [
           "magneticModuleType",
@@ -365,18 +244,7 @@
         },
         "displayName": "Slot 12",
         "features": {
-          "slotFootprintAsParent": {
-            "z": 0,
-            "backLeft": {
-              "x": 0,
-              "y": 86.0
-            },
-            "frontRight": {
-              "x": 128.0,
-              "y": 0
-            },
-            "springDirectionalForce": "backLeftBottom"
-          }
+          "springDirectionalForceAsParent": "backLeftBottom"
         },
         "compatibleModuleTypes": []
       },

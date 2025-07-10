@@ -177,6 +177,7 @@ class LocatingFeatures(TypedDict):
 
     slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
     slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
+    springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
 
 
 class LabwareDefinition2(TypedDict):
