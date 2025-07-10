@@ -27,6 +27,8 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
 from opentrons.config import infer_config_base_dir, IS_ROBOT
+from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
+from opentrons.hardware_control.types import OT3AxisKind
 from opentrons.types import Point, DeckSlotName
 
 metadata = {"protocolName": "Gravimetric QC"}
@@ -159,6 +161,8 @@ class FixtureSettings:
     labware_on_scale: str
     slot_scale: str
     fast_simulate: bool
+    retract_discontinuity: float
+    disc_ver_cuttoff: int
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -216,6 +220,11 @@ class FixtureSettings:
         ]
         extra = bool(lookup_key("is_extra", csv_params)[0] == "TRUE")
 
+        retract_discontinuity = float(
+            lookup_key("retract_discontinuity", csv_params)[0]
+        )
+        disc_ver_cuttoff = int(lookup_key("disc_ver_cuttoff", csv_params)[0])
+        gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -246,6 +255,7 @@ class FixtureSettings:
         pipette = ctx.load_instrument(
             f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
+        pipette.default_speed = gantry_speed
         simulating = ctx.is_simulating()
         if simulating:
             pipette_tag = "pipette"
@@ -352,6 +362,8 @@ class FixtureSettings:
             labware_on_scale=labware_on_scale,
             slot_scale=slot_scale,
             fast_simulate=fast_simulate,
+            retract_discontinuity=retract_discontinuity,
+            disc_ver_cuttoff=disc_ver_cuttoff,
         )
 
     def validate_settings(self) -> bool:
@@ -695,6 +707,41 @@ def retract_and_wait(
     return m_data
 
 
+def _should_alter_discontinuity(fixture_settings: FixtureSettings) -> bool:
+    if not fixture_settings.ctx.is_simulating():
+        pip_version = int(fixture_settings.pipette_tag[5:7])
+        return pip_version <= fixture_settings.disc_ver_cuttoff
+    return False
+
+
+def override_retract_discontinuity(fixture_settings: FixtureSettings) -> None:
+    """Update the Z discontinuity to a desired Setting."""
+    if _should_alter_discontinuity(fixture_settings):
+        hw_api = fixture_settings.ctx._core.get_hardware()
+        if fixture_settings.pipette_channels == 96:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+                OT3AxisKind.Z
+            ] = fixture_settings.retract_discontinuity
+        else:
+            hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+                OT3AxisKind.Z
+            ] = fixture_settings.retract_discontinuity
+
+
+def reset_retract_discontinuity(fixture_settings: FixtureSettings) -> None:
+    """Reset the Z discontinuity to default."""
+    if _should_alter_discontinuity(fixture_settings):
+        hw_api = fixture_settings.ctx._core.get_hardware()
+        if fixture_settings.pipette_channels == 96:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+                OT3AxisKind.Z
+            ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+        else:
+            hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+                OT3AxisKind.Z
+            ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
+
+
 def aspirate_with_liquid_class(
     fixture_settings: FixtureSettings,
     tip: int,
@@ -707,7 +754,8 @@ def aspirate_with_liquid_class(
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
-    return fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
+    override_retract_discontinuity(fixture_settings)
+    contents = fixture_settings.pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         source=(
             fixture_settings.liquid_source.top(),
@@ -723,6 +771,8 @@ def aspirate_with_liquid_class(
         ],
         volume_for_pipette_mode_configuration=volume,
     )
+    reset_retract_discontinuity(fixture_settings)
+    return contents
 
 
 def dispense_with_liquid_class(
@@ -739,6 +789,7 @@ def dispense_with_liquid_class(
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("dispense", volume, channel, trial)
     )
+    override_retract_discontinuity(fixture_settings)
     fixture_settings.pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
         volume=volume,
         dest=(
@@ -752,6 +803,7 @@ def dispense_with_liquid_class(
         add_final_air_gap=final_air_gap,
         trash_location=fixture_settings.pipette.trash_container,
     )
+    reset_retract_discontinuity(fixture_settings)
 
 
 def run_blank_test(
