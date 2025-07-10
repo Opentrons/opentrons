@@ -24,7 +24,8 @@ requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 assert (
     str(MAX_SUPPORTED_VERSION) == requirements["apiLevel"]
-), f"api level: {requirements['apiLevel']}"
+), (f"API level ({requirements['apiLevel']}) must be "
+    f"updated to the latest ({str(MAX_SUPPORTED_VERSION)})")
 
 CSV_SEPARATOR = "\t"
 
@@ -543,9 +544,10 @@ def run(ctx: ProtocolContext) -> None:
     results_filepath = results_directory / results_filename
     results_directory.mkdir(parents=True, exist_ok=True)
     with open(results_filepath, "w+") as file:
-        file.write("==================\n")
-        file.write("FLEX-PIPETTE-IQ-OQ\n")
-        file.write("==================\n")
+        p_name = metadata['protocolName']
+        file.write(f"{'=' * len(p_name)}\n")
+        file.write(f"{p_name}\n")
+        file.write(f"{'=' * len(p_name)}\n")
         file.write(f"simulation{CSV_SEPARATOR}{ctx.is_simulating()}\n")
         file.write(f"time{CSV_SEPARATOR}{time_str}\n")
         file.write(f"pipette_sn{CSV_SEPARATOR}{pip_sn}\n")
