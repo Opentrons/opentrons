@@ -328,7 +328,7 @@ def _get_spring_force(
 def _parent_origin_to_slot_bottom_center(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
-    """Returns offset from the parent's origin to the slot's bottom center."""
+    """Returns the offset from something's origin to the bottom center of the slot that it provides."""
     slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
     assert slot_footprint_as_parent is not None
 
@@ -348,7 +348,7 @@ def _parent_origin_to_slot_bottom_center(
 def _parent_origin_to_slot_back_left_bottom(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
-    """Returns offset from the parent origin to slot back left bottom."""
+    """Returns the offset from something's origin to the back left bottom of the slot that it provides."""
     slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
     assert slot_footprint_as_parent is not None
 
@@ -362,7 +362,7 @@ def _parent_origin_to_slot_back_left_bottom(
 def slot_bottom_center_to_child_origin(
     child_labware: LabwareDefinition3,
 ) -> Point:
-    """Returns offset from the slot's bottom center to the child origin."""
+    """Returns offset from a parent slot's bottom center to the child origin."""
     slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
     assert slot_footprint_as_child is not None
 
@@ -382,7 +382,7 @@ def slot_bottom_center_to_child_origin(
 def _slot_back_left_bottom_to_child_origin(
     child_labware: LabwareDefinition3,
 ) -> Point:
-    """Returns offset from the slot's back left bottom the child's origin."""
+    """Returns offset from a parent slot's back left bottom to the child's origin."""
     slot_footprint_as_child = child_labware.features.get("slotFootprintAsChild")
     assert slot_footprint_as_child is not None
 

@@ -14,6 +14,8 @@ from opentrons_shared_data.labware.labware_definition import (
     Extents,
     AxisAlignedBoundingBox3D,
     Dimensions,
+    Parameters2,
+    Parameters3,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.types import (
@@ -78,7 +80,7 @@ _LW_V2_2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     version=1,
     schemaVersion=2,
     dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
-    parameters=type("MockParams", (), {"loadName": "labware-name"})(),
+    parameters=Parameters2.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
 )
 
 _LW_V2_3 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -90,7 +92,7 @@ _LW_V2_3 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         yDimension=900,
         zDimension=1000,
     ),
-    parameters=type("MockParams", (), {"loadName": "unknown-labware-name"})(),
+    parameters=Parameters3.model_construct(loadName="unknown-labware-name"),  # type: ignore[call-arg]
 )
 
 
@@ -109,7 +111,7 @@ _LW_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
             backLeft=Vector2D(x=-10, y=5), frontRight=Vector2D(x=30, y=-20), z=0
         )
     ),
-    parameters=type("MockParams", (), {"loadName": "labware-v3-basic"})(),
+    parameters=Parameters3.model_construct(loadName="labware-v3-basic"),  # type: ignore[call-arg]
 )
 
 _LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -130,7 +132,7 @@ _LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE = LabwareDefinition3.model_construct(  # ty
     stackingOffsetWithLabware={
         "default": Vector3D(x=0, y=0, z=0),
     },
-    parameters=type("MockParams", (), {"loadName": "labware-v3-child"})(),
+    parameters=Parameters3.model_construct(loadName="labware-v3-child"),  # type: ignore[call-arg]
 )
 
 _LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -148,7 +150,7 @@ _LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE = LabwareDefinition3.model_construct(  # t
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=120, y=90), z=10
         )
     ),
-    parameters=type("MockParams", (), {"loadName": "parent-labware-v3"})(),
+    parameters=Parameters3.model_construct(loadName="parent-labware-v3"),  # type: ignore[call-arg]
 )
 
 _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -169,7 +171,7 @@ _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct( 
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=100, y=80), z=12
         ),
     ),
-    parameters=type("MockParams", (), {"loadName": "dual-feature-labware"})(),
+    parameters=Parameters3.model_construct(loadName="dual-feature-labware"),  # type: ignore[call-arg]
 )
 
 _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
