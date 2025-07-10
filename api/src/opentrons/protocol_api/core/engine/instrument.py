@@ -1435,7 +1435,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 ) from None
             raise
 
-        # If the volume to dispense into a well is less than threashold for low volume mode,
+        # If the volume to dispense into a well is less than threshold for low volume mode,
         # then set the max working volume to the max volume of low volume mode.
         # NOTE: this logic will need to be updated once we support list of volumes
         # TODO (spp): refactor this to use the volume thresholds from shared data
@@ -1450,9 +1450,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         # to consecutively distribute to at least two wells, then we resort to using
         # a regular, one-to-one transfer to carry out the distribution.
         min_asp_vol_for_multi_dispense = 2 * volume
-        if transfer_props.multi_dispense is None or (
-            transfer_props.multi_dispense is not None
-            and not self._tip_can_hold_volume_for_multi_dispensing(
+        if (
+            transfer_props.multi_dispense is None
+            or not self._tip_can_hold_volume_for_multi_dispensing(
                 transfer_volume=min_asp_vol_for_multi_dispense,
                 multi_dispense_properties=transfer_props.multi_dispense,
                 tip_working_volume=working_volume,
