@@ -618,23 +618,21 @@ def run(ctx: ProtocolContext) -> None:
     diluent_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
     # MODIFY DILUENT LIQUID-CLASS
-    # NOTE: (sigler) contact dispensing creates bubbles in water & glycerol (not ethanol)
+    # NOTE: (sigler) contact dispensing creates bubbles
     #       so we can fix this by doing non-contact dispense
     is_eth = bool(
         "ethanol" in dye_class.name.lower()
         or "volatile" in dye_class.name.lower()
     )
+    dest_well_radius = plates[0]["A1"].diameter / 2.0
     diluent_props = diluent_class.get_for(pip_for_dil, diluent_tips)
+    diluent_props.dispense.dispense_position.position_reference = "well-top"
+    diluent_props.dispense.dispense_position.offset.z = 0.0
     if is_eth:
-        diluent_props.dispense.dispense_position.position_reference = "liquid-meniscus"
-        # NOTE: (sigler) ethanol dispense is -0.5, all others are -1.5
-        diluent_props.dispense.dispense_position.offset.z = -0.5
-    else:
-        diluent_props.dispense.dispense_position.position_reference = "well-top"
-        diluent_props.dispense.dispense_position.offset.z = 0.0
-        diluent_props.dispense.submerge.start_position.offset.z = 0.0
-        diluent_props.dispense.retract.end_position.offset.z = 0.0
-        diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
+        diluent_props.dispense.dispense_position.offset.x = dest_well_radius - 1.0
+    diluent_props.dispense.submerge.start_position.offset.z = 0.0
+    diluent_props.dispense.retract.end_position.offset.z = 0.0
+    diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
 
     # MODIFY DYE LIQUID-CLASS
     dye_props = dye_class.get_for(test_pip, test_pip.tip_racks[0])
@@ -646,8 +644,12 @@ def run(ctx: ProtocolContext) -> None:
         dye_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
         dye_props.aspirate.aspirate_position.offset.z = -1.5
         dye_props.dispense.dispense_position.position_reference = "liquid-meniscus"
-        # NOTE: (sigler) ethanol dispense is -0.5, all others are -1.5
-        dye_props.dispense.dispense_position.offset.z = -0.5 if is_eth else -1.5
+        if is_eth:
+            dye_props.dispense.dispense_position.offset.x = dest_well_radius - 1.0
+            dye_props.dispense.dispense_position.offset.z = 3.0
+        else:
+            dye_props.dispense.dispense_position.offset.z = -1.5
+
 
     # VARIABLES TO KEEP TRACK OF TEST STATE
     plate: Optional[Labware] = None
