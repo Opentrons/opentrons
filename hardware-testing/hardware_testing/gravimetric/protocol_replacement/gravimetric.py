@@ -308,9 +308,15 @@ class FixtureSettings:
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
         test_report.set_firmware(fw_version)
-        t50_str = f"{ctx.params.cavity_50}{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
-        t200_str = f"{ctx.params.cavity_200}{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
-        t1000_str = f"{ctx.params.cavity_1000}{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
+        t50_str = f"{ctx.params.cavity_50}"  # type: ignore [attr-defined]
+        if ctx.params.cavity_50 != "Unused":  # type: ignore [attr-defined]
+            t50_str += f"{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
+        t200_str = f"{ctx.params.cavity_200}"  # type: ignore [attr-defined]
+        if ctx.params.cavity_200 != "Unused":  # type: ignore [attr-defined]
+            t50_str += f"{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
+        t1000_str = f"{ctx.params.cavity_1000}"  # type: ignore [attr-defined]
+        if ctx.params.cavity_1000 != "Unused":  # type: ignore [attr-defined]
+            t50_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
         report.store_serial_numbers(
             test_report,
             robot=robot_serial,
