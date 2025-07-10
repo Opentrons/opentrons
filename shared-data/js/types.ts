@@ -577,11 +577,15 @@ export interface ModuleDefinition {
 export type AffineTransformMatrix = number[][]
 
 export interface SlotTransforms {
-  [deckOtId: string]: {
-    [slotId: string]: {
-      [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
-    }
-  }
+  [deckOtId: string]:
+    | undefined
+    | {
+        [slotId: string]:
+          | undefined
+          | {
+              [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
+            }
+      }
 }
 
 export type ModuleOrientation = 'left' | 'right'
