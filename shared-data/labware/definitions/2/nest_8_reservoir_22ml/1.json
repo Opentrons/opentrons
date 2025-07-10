@@ -24,7 +24,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 74.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "B1": {
       "depth": 26.85,
@@ -34,7 +35,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 65.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "C1": {
       "depth": 26.85,
@@ -44,7 +46,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 56.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "D1": {
       "depth": 26.85,
@@ -54,7 +57,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 47.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "E1": {
       "depth": 26.85,
@@ -64,7 +68,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 38.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "F1": {
       "depth": 26.85,
@@ -74,7 +79,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 29.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "G1": {
       "depth": 26.85,
@@ -84,7 +90,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 20.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "H1": {
       "depth": 26.85,
@@ -94,7 +101,8 @@
       "yDimension": 8.25,
       "x": 64.4,
       "y": 11.24,
-      "z": 4.55
+      "z": 4.55,
+      "geometryDefinitionId": "cuboidalWell"
     }
   },
   "groups": [
@@ -126,5 +134,29 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "cuboidalWell": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "topXDimension": 107.1,
+          "topYDimension": 8,
+          "bottomXDimension": 107.1,
+          "bottomYDimension": 8,
+          "topHeight": 26.85,
+          "bottomHeight": 3
+        },
+        {
+          "shape": "cuboidal",
+          "topXDimension": 107.1,
+          "topYDimension": 8,
+          "bottomXDimension": 101.1,
+          "bottomYDimension": 2,
+          "topHeight": 3,
+          "bottomHeight": 0
+        }
+      ]
+    }
   }
 }

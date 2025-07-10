@@ -37,7 +37,8 @@
       "yDimension": 71.5,
       "x": 14.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A2": {
       "depth": 39.55,
@@ -47,7 +48,8 @@
       "yDimension": 71.5,
       "x": 23.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A3": {
       "depth": 39.55,
@@ -57,7 +59,8 @@
       "yDimension": 71.5,
       "x": 32.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A4": {
       "depth": 39.55,
@@ -67,7 +70,8 @@
       "yDimension": 71.5,
       "x": 41.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A5": {
       "depth": 39.55,
@@ -77,7 +81,8 @@
       "yDimension": 71.5,
       "x": 50.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A6": {
       "depth": 39.55,
@@ -87,7 +92,8 @@
       "yDimension": 71.5,
       "x": 59.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A7": {
       "depth": 39.55,
@@ -97,7 +103,8 @@
       "yDimension": 71.5,
       "x": 68.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A8": {
       "depth": 39.55,
@@ -107,7 +114,8 @@
       "yDimension": 71.5,
       "x": 77.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A9": {
       "depth": 39.55,
@@ -117,7 +125,8 @@
       "yDimension": 71.5,
       "x": 86.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A10": {
       "depth": 39.55,
@@ -127,7 +136,8 @@
       "yDimension": 71.5,
       "x": 95.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A11": {
       "depth": 39.55,
@@ -137,7 +147,8 @@
       "yDimension": 71.5,
       "x": 104.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     },
     "A12": {
       "depth": 39.55,
@@ -147,7 +158,8 @@
       "yDimension": 71.5,
       "x": 113.38,
       "y": 42.74,
-      "z": 4.85
+      "z": 4.85,
+      "geometryDefinitionId": "cuboidalWell"
     }
   },
   "groups": [
@@ -192,5 +204,29 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "cuboidalWell": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "topXDimension": 8,
+          "topYDimension": 71.5,
+          "bottomXDimension": 8,
+          "bottomYDimension": 71.5,
+          "topHeight": 39.55,
+          "bottomHeight": 3
+        },
+        {
+          "shape": "cuboidal",
+          "topXDimension": 8,
+          "topYDimension": 71.5,
+          "bottomXDimension": 2,
+          "bottomYDimension": 65.5,
+          "topHeight": 3,
+          "bottomHeight": 0
+        }
+      ]
+    }
   }
 }
