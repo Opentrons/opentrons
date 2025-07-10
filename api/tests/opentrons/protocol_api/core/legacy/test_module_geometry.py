@@ -46,7 +46,6 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 
@@ -73,7 +72,6 @@ def minimal_heater_shaker_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 
