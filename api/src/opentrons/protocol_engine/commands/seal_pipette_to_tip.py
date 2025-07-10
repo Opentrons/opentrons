@@ -338,9 +338,9 @@ class SealPipetteToTip(
     params: SealPipetteToTipParams
     result: Optional[SealPipetteToTipResult] = None
 
-    _ImplementationCls: Type[SealPipetteToTipImplementation] = (
+    _ImplementationCls: Type[
         SealPipetteToTipImplementation
-    )
+    ] = SealPipetteToTipImplementation
 
 
 class SealPipetteToTipCreate(BaseCommandCreate[SealPipetteToTipParams]):

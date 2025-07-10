@@ -94,9 +94,9 @@ class ConfigureForVolume(
     params: ConfigureForVolumeParams
     result: Optional[ConfigureForVolumeResult] = None
 
-    _ImplementationCls: Type[ConfigureForVolumeImplementation] = (
+    _ImplementationCls: Type[
         ConfigureForVolumeImplementation
-    )
+    ] = ConfigureForVolumeImplementation
 
 
 class ConfigureForVolumeCreate(BaseCommandCreate[ConfigureForVolumeParams]):
