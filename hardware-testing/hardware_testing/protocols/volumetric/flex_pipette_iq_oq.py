@@ -204,6 +204,11 @@ def add_parameters(params: ParameterContext) -> None:
         variable_name="include_baseline",
         default=False,
     )
+    params.add_bool(
+        display_name="diluent_already_in_plates",
+        variable_name="diluent_already_in_plates",
+        default=False,
+    )
     params.add_str(
         display_name="ul_ranges_to_test",
         variable_name="ul_ranges_to_test",
@@ -358,7 +363,7 @@ def load_liquid_diluent(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     reservoir: Labware,
-    volumes: List[float],
+    wells_by_volume: Dict[float, List[Well]],
     tip_ul: float,
 ) -> None:
     """Load diluent into wells of reservoir.
@@ -367,6 +372,17 @@ def load_liquid_diluent(
     all diluent is calculated. The total diluent (plus dead volume)
     is then loaded into consecutive wells in the reservoir.
     """
+
+    diluent = ctx.define_liquid(
+        "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
+    )
+
+    if ctx.params.diluent_already_in_plates:
+        for v, wells in wells_by_volume.items():
+            if v >= DYE_READER_IDEAL_UL:
+                continue  # no diluent
+            for w in wells:
+                w.load_liquid(diluent, DYE_READER_IDEAL_UL - v)
 
     def _round_up_to(multiple_of: int = 1, value: int = 1):
         return ((value + (multiple_of - 1)) // multiple_of) * multiple_of
@@ -377,7 +393,7 @@ def load_liquid_diluent(
     total_diluent_aspirated_ul = sum(
         [
             max(DYE_READER_IDEAL_UL - v, 0) * pipette.channels * t
-            for v, t in zip(volumes, trials)
+            for v, t in zip(list(wells_by_volume.keys()), trials)
         ]
     )
     # NOTE: adding more for the baseline reading at the end
@@ -391,10 +407,6 @@ def load_liquid_diluent(
     ), (
         f"{reservoir.load_name} unable to hold {total_diluent_aspirated_ul} ul "
         f"(min={critical_ul['dead']}, max={critical_ul['setup_max']})"
-    )
-
-    diluent = ctx.define_liquid(
-        "diluent", "diluent", display_color=DYE_CONFIGS["diluent"][2]
     )
     reservoir["A1"].load_liquid(
         diluent, critical_ul["dead"] + total_diluent_aspirated_ul
@@ -564,6 +576,7 @@ def run(ctx: ProtocolContext) -> None:
         )
         file.write(f"include_baseline{CSV_SEPARATOR}{ctx.params.include_baseline}\n")
         file.write(f"ul_ranges_to_test{CSV_SEPARATOR}{ctx.params.ul_ranges_to_test}\n")
+        file.write(f"diluent_already_in_plates{CSV_SEPARATOR}{ctx.params.diluent_already_in_plates}\n")
 
     # LOAD MODULES
     heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
@@ -600,7 +613,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # LOAD LIQUIDS & LIQUID-CLASS
     dye_well_by_volume = load_liquid_dye(ctx, test_pip, reservoirs_dye, volumes, tip_ul)
-    load_liquid_diluent(ctx, test_pip, reservoir_diluent, volumes, tip_ul)
+    load_liquid_diluent(ctx, test_pip, reservoir_diluent, dest_wells_by_volume, tip_ul)
     dye_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
     diluent_class = ctx.get_liquid_class(ctx.params.liquid)  # type: ignore[attr-defined]
 
