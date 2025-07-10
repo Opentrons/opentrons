@@ -20,18 +20,16 @@ import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
   DeckDefinition,
-  DeckSlotId,
   RobotType,
 } from '@opentrons/shared-data'
 
 interface SelectedItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
-  slotId: DeckSlotId
   slotPosition: CoordinateTuple | null
 }
 export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
-  const { deckDef, robotType, slotId, slotPosition } = props
+  const { deckDef, robotType, slotPosition } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
@@ -111,8 +109,6 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             y={slotPosition[1]}
             def={getModuleDef(selectedModuleModel)}
             orientation={orientation}
-            targetSlotId={slotId}
-            targetDeckId={deckDef.otId}
           >
             <>
               <SelectedModuleLabwareRender

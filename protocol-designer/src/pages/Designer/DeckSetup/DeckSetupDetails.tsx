@@ -591,9 +591,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         deckDef={deckDef}
         robotType={robotType}
         slotPosition={slotPosition}
-        // todo(mm, 2025-07-10): In practice, can selectedZoomInSlot actually be nullish
-        // if we've reached this point? If so, what should we do about that?
-        slotId={selectedZoomInSlot ?? ''}
       />
 
       {/* slot overflow menu */}
