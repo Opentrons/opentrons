@@ -1240,16 +1240,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 "No tipracks found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        try:
-            transfer_props = liquid_class.get_for(
-                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-            )
-        except NoLiquidClassPropertyError:
-            if self._protocol_core.robot_type == "OT-2 Standard":
-                raise NoLiquidClassPropertyError(
-                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                ) from None
-            raise
+        transfer_props = self._get_transfer_properties_for_tip_rack(
+            liquid_class, tiprack_uri_for_transfer_props
+        )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1422,18 +1415,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         ]
 
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
-
-        try:
-            transfer_props = liquid_class.get_for(
-                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-            )
-        except NoLiquidClassPropertyError:
-            if self._protocol_core.robot_type == "OT-2 Standard":
-                raise NoLiquidClassPropertyError(
-                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                ) from None
-            raise
+        transfer_props = self._get_transfer_properties_for_tip_rack(
+            liquid_class, tiprack_uri_for_transfer_props
+        )
 
         # If the volume to dispense into a well is less than threshold for low volume mode,
         # then set the max working volume to the max volume of low volume mode.
@@ -1443,6 +1427,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             "flex_1channel_50",
             "flex_8channel_50",
         ]
+        working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
         if has_low_volume_mode and volume < 5:
             working_volume = 30
         # If there are no multi-dispense properties or if the volume to distribute
@@ -1704,16 +1689,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             TransferTipPolicyV2.ALWAYS,
         ]
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        try:
-            transfer_props = liquid_class.get_for(
-                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-            )
-        except NoLiquidClassPropertyError:
-            if self._protocol_core.robot_type == "OT-2 Standard":
-                raise NoLiquidClassPropertyError(
-                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                ) from None
-            raise
+        transfer_props = self._get_transfer_properties_for_tip_rack(
+            liquid_class, tiprack_uri_for_transfer_props
+        )
 
         blow_out_properties = transfer_props.dispense.retract.blowout
         if (
@@ -1839,6 +1817,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_labware_core.get_uri(),
             tip_well,
         )
+
+    def _get_transfer_properties_for_tip_rack(
+        self, liquid_class: LiquidClass, tip_rack_uri: str
+    ) -> TransferProperties:
+        try:
+            return liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tip_rack_uri
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
 
     def get_working_volume_for_tip_rack(self, tip_rack: LabwareCore) -> float:
         """Given a tip rack, return the maximum allowed volume for the pipette."""
