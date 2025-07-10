@@ -39,6 +39,9 @@ SLOT_DIAL = "B2"
 
 RAMP_FRACTION = 1/3
 
+MIN_STEP = 10
+MAX_STEP = 500
+
 ###########################################
 #  VARIABLES - END
 ###########################################
@@ -53,7 +56,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "hdelta", "volume", "height", "tip-z-error", "cheight"]
+CSV_HEADER = ["step", "step_volume", "volume", "height", "tip-z-error", "cheight"]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -127,6 +130,7 @@ def _setup(
     List[float],
     bool,
     LiquidClass,
+    float
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
 
@@ -207,6 +211,7 @@ def _setup(
         step_volumes,
         quick_mode,
         ethanol,
+        max_volume
     )
 
 
@@ -285,8 +290,8 @@ def _get_height_of_liquid_in_well(
         if not simulating:
             return extract_float(pipette.measure_liquid_height(well))
         else:
-            return 99.0
-    return 99.0
+            return 0.01
+    return 0.01
 
 def quad_step(total_volume_ml, steps, ramp_fraction):
     ramp_steps = int(steps * ramp_fraction)
@@ -318,7 +323,19 @@ def run(ctx: ProtocolContext) -> None:
         step_volumes,
         quick_mode,
         ethanol,
+        max_volume
     ) = _setup(ctx)
+
+    volume_dispensed = 0.0
+    step_volume = MIN_STEP
+
+    cheight_list = [0.0]
+    hdelta = 0.0
+
+    epsilon = 1e-4
+    K = 50
+    step = 0 
+    tolerance = max_volume / 20
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -335,92 +352,107 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    drop_tips()
-    volume_dispensed = 0.0
+    def adaptive_volume_step(hdelta):
+        if abs(hdelta) < epsilon:  # flat region
+            return MAX_STEP
+        step = K / (abs(hdelta) + epsilon)
+        return max(MIN_STEP, min(MAX_STEP, step))
+    
+    
+    #################### Protocol Start 
 
-    #list of cheights for checking the derivatives
-    cheight_list = []
+    drop_tips()
+
+    trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
 
     if quick_mode:
         pick_up_tips()
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        for step, step_volume in enumerate(step_volumes):
-            if step > 0:
-                liq_pipette.transfer_with_liquid_class(
-                    ethanol,
-                    step_volume,
-                    src["A1"],
-                    labware["A1"],
-                    new_tip="never",
-                    return_tip=False,
-                )
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
-                height = round(
-                    _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                    5,
-                )
+        #step 0: establish baseline and report initial z tip error
+        _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
-            else:
-                height = 0.0
-                volume_dispensed = 0.0
+        #tolerance so the bot doesn't have to get volume exactly within max volume
+        while volume_dispensed < (max_volume - tolerance):
+            liq_pipette.transfer_with_liquid_class(
+                ethanol,
+                step_volume,
+                src["A1"],
+                labware["A1"],
+                new_tip="never",
+                return_tip=False,
+            )
 
+            volume_dispensed += step_volume
+
+            # Probe for liquid height
+            height = round(
+            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+            5,
+            )
+
+            # Calculate corrected height and update cheight_list
             corrected_height = height + tip_z_error
             cheight_list.append(corrected_height)
-            
-            trial_data = [step, hdelta, volume_dispensed, height, tip_z_error, corrected_height]
+
+            # Calculate height delta and adapt step volume
+            hdelta = cheight_list[-1] - cheight_list[-2]
+            step_volume = adaptive_volume_step(hdelta)
+
+            # Log trial data
+            trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
-            if len(cheight_list) >= 2:
-                hdelta = cheight_list[-1] - cheight_list[-2]
-                _write_line_to_csv(ctx, [f"delta_cheight_step_{step}", str(delta)])
+            step += 1
 
         drop_tips()
 
     else:
-        for step, step_volume in enumerate(step_volumes):
-            pick_up_tips()
-            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-            if step > 0:
-                liq_pipette.transfer_with_liquid_class(
-                    ethanol,
-                    step_volume,
-                    src["A1"],
-                    labware["A1"],
-                    new_tip="never",
-                    return_tip=False,
-                )
-                height = round(
-                    _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                    5,
-                )
-                volume_dispensed = round(volume_dispensed + step_volume, 5)
-            else:
-                src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-                height = 0.0
-                volume_dispensed = 0.0
+        pick_up_tips()
+        tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+        src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-            drop_tips()
-            corrected_height = height + tip_z_error
-            cheight_list.append(corrected_height)
-            trial_data = [step, hdelta, volume_dispensed, height, tip_z_error, corrected_height]
-            _write_line_to_csv(ctx, [str(d) for d in trial_data])
-
-            if len(cheight_list) >= 2:
-                hdelta = cheight_list[-1] - cheight_list[-2]
-                _write_line_to_csv(ctx, [f"delta_cheight_step_{step}", str(hdelta)])
-
-            
-
-
-
+        #step 0: establish baseline and report initial z tip error
+        _write_line_to_csv(ctx, [str(d) for d in trial_data])
+        
         drop_tips()
 
+        #tolerance so the bot doesn't have to get volume exactly within max volume
+        while volume_dispensed < (max_volume - tolerance):
+            pick_up_tips()
+            liq_pipette.transfer_with_liquid_class(
+                ethanol,
+                step_volume,
+                src["A1"],
+                labware["A1"],
+                new_tip="never",
+                return_tip=False,
+            )
+            drop_tips()
 
-    
+            volume_dispensed += step_volume
 
+            # Probe for liquid height
+            height = round(
+            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+            5,
+            )
 
+            # Calculate corrected height and update cheight_list
+            corrected_height = height + tip_z_error
+            cheight_list.append(corrected_height)
 
+            # Calculate height delta and adapt step volume
+            hdelta = cheight_list[-1] - cheight_list[-2]
+            step_volume = adaptive_volume_step(hdelta)
+
+            # Log trial data
+            trial_data = [step, step_volume, volume_dispensed, height, tip_z_error, corrected_height]
+            _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+            step += 1
+
+        drop_tips()
 
 
