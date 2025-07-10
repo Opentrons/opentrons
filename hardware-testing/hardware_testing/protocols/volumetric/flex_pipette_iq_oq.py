@@ -717,7 +717,7 @@ def run(ctx: ProtocolContext) -> None:
         props.aspirate.retract.end_position.offset.z = mm
 
     # BASELINE
-    if ctx.params.include_baseline:
+    if ctx.params.include_baseline and not ctx.params.diluent_already_in_plates:
         plate = plates.pop(-1)
         ul_in_this_plate.append(0.0)  # NOTE: marking baseline as being 0.0uL
         heater_shaker.open_labware_latch()
@@ -781,7 +781,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # TRANSFER DILUENT TO PLATE
         dil_ul = DYE_READER_IDEAL_UL - ul
-        if dil_ul > 0:
+        if dil_ul > 0 and not ctx.params.diluent_already_in_plates:
             if pip_for_dil.channels == 96:
                 assert dest_wells[0].well_name == "A1"
                 diluent_dest = dest_wells[0].parent.wells()
