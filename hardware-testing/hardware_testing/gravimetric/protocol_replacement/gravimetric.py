@@ -1150,6 +1150,8 @@ def run(ctx: ProtocolContext) -> None:
     fixture_settings = FixtureSettings.build(ctx)
     try:
         _store_config_as_old_style(fixture_settings)
+        if _should_alter_discontinuity(fixture_settings):
+            print_info("Adjusting z discontinuity for this pipette.")
         _run(ctx, fixture_settings)
     finally:
         if fixture_settings.recorder is not None:
