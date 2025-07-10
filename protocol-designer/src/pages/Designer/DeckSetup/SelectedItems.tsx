@@ -115,6 +115,8 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             y={slotPosition[1]}
             def={getModuleDef(selectedModuleModel)}
             orientation={orientation}
+            targetDeckId={null}
+            targetSlotId={null}
           >
             <>
               <SelectedModuleLabwareRender

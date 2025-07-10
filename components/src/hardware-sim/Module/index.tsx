@@ -5,7 +5,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
-  OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -55,14 +54,14 @@ interface Props {
 
   /**
    * Used for applying slot-specific positioning adjustments.
-   * Supply this if you're rendering the module on a deck for correct positioning.
+   * If you're rendering the module on a deck, supply this for correct positioning.
    */
-  targetSlotId?: string
+  targetSlotId: string | null
   /**
    * Used for applying slot-specific positioning adjustments.
-   * Supply this if you're rendering the module on a deck for correct positioning.
+   * If you're rendering the module on a deck, supply this for correct positioning.
    */
-  targetDeckId?: string
+  targetDeckId: string | null
 }
 
 const statusInfoWrapperProps = {
@@ -89,8 +88,9 @@ export const Module = (props: Props): JSX.Element => {
     statusInfo,
     children,
     targetSlotId,
-    targetDeckId = OT2_STANDARD_DECKID,
+    targetDeckId,
   } = props
+
   const moduleType = getModuleType(def.model)
 
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
@@ -119,19 +119,16 @@ export const Module = (props: Props): JSX.Element => {
   let nestedLabwareOffsetY = labwareOffsetY
 
   // additional transforms to apply to vectors in certain deck/slot combinations
-  const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
+  const transformsForDeckBySlot =
+    (targetDeckId != null ? def?.slotTransforms?.[targetDeckId] : null) ?? {}
   const slotTransformsForDeckSlot =
-    targetSlotId != null &&
-    transformsForDeckBySlot != null &&
-    targetSlotId in transformsForDeckBySlot
-      ? transformsForDeckBySlot[targetSlotId]
-      : null
-  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
-  if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
+    (targetSlotId != null ? transformsForDeckBySlot[targetSlotId] : null) ?? {}
+
+  if (slotTransformsForDeckSlot.cornerOffsetFromSlot != null) {
     const [
       [slotTranslateX],
       [slotTranslateY],
-    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.cornerOffsetFromSlot, [
       [translateX],
       [translateY],
       [translateZ],
@@ -139,11 +136,11 @@ export const Module = (props: Props): JSX.Element => {
     ])
     offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
-  if (deckSpecificTransforms?.labwareOffset != null) {
+  if (slotTransformsForDeckSlot.labwareOffset != null) {
     const [
       [slotLabwareOffsetX],
       [slotLabwareOffsetY],
-    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.labwareOffset, [
       [labwareOffsetX],
       [labwareOffsetY],
       [1],
