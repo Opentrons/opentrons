@@ -563,6 +563,7 @@ def run(ctx: ProtocolContext) -> None:
             f"pipette_at_liquid_meniscus{CSV_SEPARATOR}{ctx.params.pipette_at_liquid_meniscus}\n"
         )
         file.write(f"include_baseline{CSV_SEPARATOR}{ctx.params.include_baseline}\n")
+        file.write(f"ul_ranges_to_test{CSV_SEPARATOR}{ctx.params.ul_ranges_to_test}\n")
 
     # LOAD MODULES
     heater_shaker = ctx.load_module("heaterShakerModuleV1", SLOTS["plate"])
