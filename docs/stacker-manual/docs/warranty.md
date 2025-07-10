@@ -22,7 +22,7 @@ Long Island City, NY 11101
 
 
 <figure class="general figure-end-of-doc">
-  <img src="/images/tm-opentrons-full-blackcolor.svg" alt="opentrons-logo">
+  <img src="../images/tm-opentrons-full-blackcolor.svg" alt="opentrons-logo">
   <figcaption>
     <p><strong>Post-sales & contacting Opentrons</strong></p>
     <p class="caption-text-block">
