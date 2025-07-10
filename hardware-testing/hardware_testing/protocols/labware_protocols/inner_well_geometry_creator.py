@@ -53,7 +53,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "volume", "height", "tip-z-error", "cheight"]
+CSV_HEADER = ["step", "hdelta", "volume", "height", "tip-z-error", "cheight"]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -283,8 +283,6 @@ def _get_height_of_liquid_in_well(
             return extract_float(pipette.measure_liquid_height(well))
     except PipetteLiquidNotFoundError:
         if not simulating:
-            pipette.drop_tip()
-            pipette.pick_up_tip()
             return extract_float(pipette.measure_liquid_height(well))
         else:
             return 99.0
@@ -294,7 +292,7 @@ def quad_step(total_volume_ml, steps, ramp_fraction):
     ramp_steps = int(steps * ramp_fraction)
     plateau_steps = steps - ramp_steps
 
-    # Quadratic increasing ramp
+    #Quadratically increasing at the beginning
     ramp_weights = [(i + 1) ** 2 for i in range(ramp_steps)]
     plateau_weight = ramp_weights[-1]  # flatten at peak of ramp
     plateau_weights = [plateau_weight] * plateau_steps
@@ -340,6 +338,9 @@ def run(ctx: ProtocolContext) -> None:
     drop_tips()
     volume_dispensed = 0.0
 
+    #list of cheights for checking the derivatives
+    cheight_list = []
+
     if quick_mode:
         pick_up_tips()
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
@@ -360,13 +361,20 @@ def run(ctx: ProtocolContext) -> None:
                     _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
                     5,
                 )
+
             else:
                 height = 0.0
                 volume_dispensed = 0.0
 
             corrected_height = height + tip_z_error
-            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
+            cheight_list.append(corrected_height)
+            
+            trial_data = [step, hdelta, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+            if len(cheight_list) >= 2:
+                hdelta = cheight_list[-1] - cheight_list[-2]
+                _write_line_to_csv(ctx, [f"delta_cheight_step_{step}", str(delta)])
 
         drop_tips()
 
@@ -395,8 +403,17 @@ def run(ctx: ProtocolContext) -> None:
 
             drop_tips()
             corrected_height = height + tip_z_error
-            trial_data = [step, volume_dispensed, height, tip_z_error, corrected_height]
+            cheight_list.append(corrected_height)
+            trial_data = [step, hdelta, volume_dispensed, height, tip_z_error, corrected_height]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
+
+            if len(cheight_list) >= 2:
+                hdelta = cheight_list[-1] - cheight_list[-2]
+                _write_line_to_csv(ctx, [f"delta_cheight_step_{step}", str(hdelta)])
+
+            
+
+
 
         drop_tips()
 
