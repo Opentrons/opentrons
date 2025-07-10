@@ -3,7 +3,7 @@
   "moduleType": "absorbanceReaderType",
   "model": "absorbanceReaderV1",
   "labwareOffset": {
-    "x": 0.0,
+    "x": 2.0,
     "y": 0.0,
     "z": 0.65
   },
@@ -12,10 +12,10 @@
       "z": 0,
       "backLeft": {
         "x": 0,
-        "y": 95.5
+        "y": 85.48
       },
       "frontRight": {
-        "x": 155.3,
+        "x": 127.76,
         "y": 0
       }
     }

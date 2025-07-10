@@ -2132,8 +2132,8 @@
   },
   "Flex,absorbanceReaderV1,None,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
-      358.15,
-      79.25,
+      344.38,
+      74.24,
       16.65
     ],
     "spec": {
@@ -11664,8 +11664,8 @@
   },
   "Flex,thermocyclerModuleV2,None,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
-      16.495,
-      436.06,
+      -5.625,
+      356.2,
       26.96
     ],
     "spec": {
@@ -11680,8 +11680,8 @@
   },
   "Flex,thermocyclerModuleV2,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
-      16.5,
-      436.065,
+      -5.62,
+      356.205,
       109.96
     ],
     "spec": {
@@ -12308,8 +12308,8 @@
   },
   "Flex,thermocyclerModuleV2,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
-      16.495,
-      436.06,
+      -5.625,
+      356.2,
       33.21
     ],
     "spec": {
@@ -12327,8 +12327,8 @@
   },
   "Flex,thermocyclerModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
-      19.495,
-      433.06,
+      -2.625,
+      353.2,
       38.16
     ],
     "spec": {
@@ -12346,8 +12346,8 @@
   },
   "Flex,thermocyclerModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
-      19.5,
-      433.065,
+      -2.62,
+      353.205,
       121.16
     ],
     "spec": {
@@ -12365,8 +12365,8 @@
   },
   "Flex,thermocyclerModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
-      16.495,
-      436.06,
+      -5.625,
+      356.2,
       37.96
     ],
     "spec": {
@@ -12384,8 +12384,8 @@
   },
   "Flex,thermocyclerModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
-      16.5,
-      436.065,
+      -5.62,
+      356.205,
       120.96
     ],
     "spec": {
