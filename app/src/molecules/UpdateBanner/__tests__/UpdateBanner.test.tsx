@@ -123,6 +123,21 @@ describe('Module Update Banner', () => {
     expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
   })
 
+  it('should not render module setup banner if pipette calibration is required', () => {
+    props = {
+      ...props,
+      updateType: 'setup',
+      calibratePipetteRequired: true,
+    }
+    render(props)
+    expect(
+      screen.queryByLabelText(
+        'ModuleCard_calibration_update_banner_test_number'
+      )
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+  })
+
   it('should not render a module setup link if pipette firmware update is required', () => {
     props = {
       ...props,

@@ -11,7 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ControlledTextAreaField } from '../../atoms/ControlledTextAreaField'
+import { ControlledTextAreaField } from '/ai-client/atoms/ControlledTextAreaField'
 
 export const STEPS_FIELD_NAME = 'steps'
 

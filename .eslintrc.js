@@ -127,7 +127,10 @@ module.exports = {
       },
     },
     {
-      files: ['./app/src/**/*.@(ts|tsx)'],
+      files: [
+        './app/src/**/*.@(ts|tsx)',
+        './opentrons-ai-client/src/**/*.@(ts|tsx)',
+      ],
       rules: {
         'import/no-absolute-path': 'off',
         '@eslint-react/no-nested-component-definitions': 'error',
@@ -216,6 +219,25 @@ module.exports = {
       rules: {
         'opentrons/no-margins-in-css': 'warn',
         'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['**/*.tsx'],
+      excludedFiles: ['**/*.stories.tsx'],
+      rules: {
+        // TODO: Switch this rule to 'error' once the CSS modules migration is complete.
+        'react/forbid-dom-props': [
+          'warn',
+          {
+            forbid: [
+              {
+                propName: 'style',
+                message:
+                  'Inline styles are not allowed. Use CSS modules instead.',
+              },
+            ],
+          },
+        ],
       },
     },
   ],

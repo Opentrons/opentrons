@@ -158,6 +158,7 @@ describe('Max dispense well volume', () => {
     fieldsWithDispenseLabware = {
       dispense_labware: { def: fixture24Tuberack },
       dispense_wells: ['A1', 'A2'],
+      aspirate_wells: ['A1', 'A2'],
     }
   })
   it('should NOT return a warning when there is no dispense labware', () => {
@@ -305,7 +306,7 @@ const MOCK_WATER = {
     },
   ],
 } as LiquidClass
-describe('class compatibility', () => {
+describe('liquid class compatibility', () => {
   let fields: any
   beforeEach(() => {
     fields = {
@@ -321,7 +322,20 @@ describe('class compatibility', () => {
       water: MOCK_WATER,
     })
   })
-
+  it('should return null if the pipette is null', () => {
+    fields = {
+      ...fields,
+      pipette: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
+  it('should return null if the tiprack is null', () => {
+    fields = {
+      ...fields,
+      tipRack: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
   it('should return null if the liquid class is compatible with the pipette, tips, volume, and path', () => {
     expect(incompatibleLiquidClass(fields)).toBe(null)
   })

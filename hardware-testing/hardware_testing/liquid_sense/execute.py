@@ -200,9 +200,7 @@ def run(
     hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware[run_args.test_well]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
-    tips: List[Well] = get_unused_tips(
-        ctx=run_args.ctx, tip_volume=tip, pipette_mount=""
-    )
+    tips: List[Well] = get_unused_tips(ctx=run_args.ctx, tip_volume=tip)
     row = "ABCDEFGH".index(starting_tip[0])
     column = int(starting_tip[1:]) - 1
     num_of_tips_to_skip = (column * 8) + row

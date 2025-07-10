@@ -182,7 +182,7 @@ async def test_platform_state(
     # update the cached value
     await subject._reader.get_limit_switch_status()
     await subject._reader.get_platform_sensor_state()
-    assert subject._get_platform_live_data() == expected
+    assert subject.platform_state == expected
 
 
 @pytest.mark.parametrize(
@@ -206,7 +206,7 @@ async def test_platform_state_unknown(
     # update the value
     await subject._reader.get_limit_switch_status()
     await subject._reader.get_platform_sensor_state()
-    assert subject._get_platform_live_data() == expected
+    assert subject.platform_state == expected
 
 
 @pytest.mark.parametrize(

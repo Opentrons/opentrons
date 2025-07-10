@@ -12,16 +12,14 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
-import { initializeMixpanel } from './analytics/mixpanel'
+import { initializeMixpanel, setMixpanelTracking } from './analytics/mixpanel'
 import { ExitConfirmModal } from './molecules/ExitConfirmModal'
 import { Footer } from './molecules/Footer'
 import { Header } from './molecules/Header'
 import { HeaderWithMeter } from './molecules/HeaderWithMeter'
 import { Loading } from './molecules/Loading'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
-import { FeatureFlagsModal } from './organisms/FeatureFlagsModal'
 import {
-  displayFeatureFlagsModalAtom,
   featureFlagsAtom,
   headerWithMeterAtom,
   mixpanelAtom,
@@ -38,7 +36,6 @@ export function OpentronsAI(): JSX.Element | null {
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
-  const [displayFeatureFlagsModal] = useAtom(displayFeatureFlagsModalAtom)
 
   const trackEvent = useTrackEvent()
 
@@ -71,6 +68,23 @@ export function OpentronsAI(): JSX.Element | null {
     }
   }, [isAuthenticated])
 
+  // Sync feature flag changes with Mixpanel analytics state
+  useEffect(() => {
+    if (mixpanelState?.isInitialized) {
+      const analyticsEnabled = featureFlags.enableAnalytics ?? true
+      const currentMixpanelState = mixpanelState.analytics.hasOptedIn
+
+      // Only update if there's a difference to avoid unnecessary calls
+      if (analyticsEnabled !== currentMixpanelState) {
+        setMixpanelState({
+          ...mixpanelState,
+          analytics: { hasOptedIn: analyticsEnabled },
+        })
+        setMixpanelTracking(analyticsEnabled)
+      }
+    }
+  }, [featureFlags.enableAnalytics, mixpanelState, setMixpanelState])
+
   if (isLoading) {
     return <Loading />
   }
@@ -84,43 +98,35 @@ export function OpentronsAI(): JSX.Element | null {
   }
 
   return (
-    <Flex
-      id="opentrons-ai"
-      width={'100%'}
-      height={'100vh'}
-      flexDirection={DIRECTION_COLUMN}
-    >
-      {displayFeatureFlagsModal && featureFlags.enablePrereleaseMode && (
-        <FeatureFlagsModal />
-      )}
-      <StickyHeader>
-        {displayHeaderWithMeter ? (
-          <HeaderWithMeter progressPercentage={progress} />
-        ) : (
-          <Header />
-        )}
-      </StickyHeader>
+    <HashRouter>
+      <Flex width="100%" height="100vh" flexDirection={DIRECTION_COLUMN}>
+        <StickyHeader>
+          {displayHeaderWithMeter ? (
+            <HeaderWithMeter progressPercentage={progress} />
+          ) : (
+            <Header />
+          )}
+        </StickyHeader>
 
-      <Flex
-        flex={1}
-        flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.grey10}
-        overflow={OVERFLOW_AUTO}
-      >
         <Flex
-          width="100%"
-          maxWidth={CLIENT_MAX_WIDTH}
-          alignSelf={ALIGN_CENTER}
-          flex={1}
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          backgroundColor={COLORS.grey10}
+          overflow={OVERFLOW_AUTO}
         >
-          <HashRouter>
+          <Flex
+            width="100%"
+            maxWidth={CLIENT_MAX_WIDTH}
+            alignSelf={ALIGN_CENTER}
+            flex="1"
+          >
             <ExitConfirmModal />
             <OpentronsAIRoutes />
-          </HashRouter>
+          </Flex>
+          <Footer />
         </Flex>
-        <Footer />
       </Flex>
-    </Flex>
+    </HashRouter>
   )
 }
 

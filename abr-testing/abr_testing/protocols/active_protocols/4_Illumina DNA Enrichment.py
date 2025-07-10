@@ -24,7 +24,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }
 
 # SCRIPT SETTINGS
@@ -77,7 +77,7 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -107,7 +107,7 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
-    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
+    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -155,7 +155,7 @@ def run(protocol: ProtocolContext) -> None:
     ) -> None:
         """Determine which wells to use as liquid waste."""
         remaining_volume = vol_to_trash
-        max_capacity = 1500.0  # Maximum capacity of a well in µL
+        max_capacity = 1200.0  # Maximum capacity of a well in µL
         for well, current_volume in liquid_trash_list.items():
             if remaining_volume <= 0 or pipette.current_volume == 0.0:
                 break

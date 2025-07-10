@@ -25,7 +25,9 @@ export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('exit')}
+      oddHeaderBtnCopy={t('exit')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('exit')}
       onClickButton={props.commandUtils.headerCommands.handleCloseAndHome}
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
     >

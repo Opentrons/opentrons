@@ -131,6 +131,12 @@ export function DeckSetupToolbox(
       createdStackForSlot.forEach(itemId =>
         dispatch(deleteContainer({ labwareId: itemId }))
       )
+      if (
+        createdLidForSlot != null &&
+        !createdStackForSlot.includes(createdLidForSlot.id)
+      ) {
+        dispatch(deleteContainer({ labwareId: createdLidForSlot.id }))
+      }
     } else {
       createdStackForSlot.forEach(itemId =>
         dispatch(deleteContainer({ labwareId: itemId }))
@@ -310,12 +316,10 @@ export function DeckSetupToolbox(
                       createdStackForSlot[createdStackForSlot.length - 1]
                     ]
                   }
-                  lidDisplayName={
-                    createdLidForSlot != null &&
-                    createdStackForSlot.includes(createdLidForSlot?.id)
-                      ? undefined
-                      : createdLidForSlot?.def.metadata.displayName
-                  }
+                  {...(createdLidForSlot != null &&
+                  createdStackForSlot.includes(createdLidForSlot?.id)
+                    ? {}
+                    : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
                 />
               ) : null}

@@ -1,3 +1,4 @@
+import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 
@@ -16,9 +17,18 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../constants'
+import {
+  CHANNELS_MAPPED_TO_MAX_SPEED,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
+} from '../../../constants'
+import { getMaxUiFlowRate } from '../../../pages/Designer/ProtocolSteps/StepForm/PipetteFields/utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { canPipetteUseLabware, getWellSetForMultichannel } from '../../../utils'
+import {
+  canPipetteUseLabware,
+  getDefaultPushOutVolume,
+  getMatchingTipLiquidSpecs,
+  getWellSetForMultichannel,
+} from '../../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 
 import type {
@@ -29,7 +39,6 @@ import type {
   LiquidHandlingPropertyByVolume,
   MixProperties,
   PipetteChannels,
-  PipetteV2Specs,
   PositionReference,
   RetractAspirate,
   RetractDispense,
@@ -42,6 +51,7 @@ import type {
   AdditionalEquipmentEntities,
   LabwareEntities,
   PipetteEntities,
+  PipetteEntity,
   ReferenceVolumes,
 } from '@opentrons/step-generation'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
@@ -324,14 +334,18 @@ const getPositionReferenceFields = (
 const getFlowRateFields = (
   volume: number,
   flowRateByVolume: LiquidHandlingPropertyByVolume,
-  liquidHandlingAction: LiquidHandlingTab
+  liquidHandlingAction: LiquidHandlingTab,
+  hardwareMaximum: number | null = null
 ): Record<string, number | null> => {
   const interpolatedFlowRate = linearInterpolate(
     volume,
     flowRateByVolume as Array<[number, number]>
   )
   return {
-    [`${liquidHandlingAction}_flowRate`]: interpolatedFlowRate,
+    [`${liquidHandlingAction}_flowRate`]:
+      hardwareMaximum != null
+        ? min([interpolatedFlowRate, hardwareMaximum]) ?? null
+        : interpolatedFlowRate,
   }
 }
 
@@ -355,11 +369,18 @@ const getTouchTipFields = (
   }
 }
 
-const getBlowoutFields = (
-  blowout: BlowoutProperties,
-  additionalEquipmentEntities: AdditionalEquipmentEntities = {},
+const getBlowoutFields = (args: {
+  blowout: BlowoutProperties
+  additionalEquipmentEntities?: AdditionalEquipmentEntities
   disable?: boolean
-): Record<string, any> => {
+  hardwareMaximumFlowRate?: number | null
+}): Record<string, any> => {
+  const {
+    blowout,
+    additionalEquipmentEntities = {},
+    disable = false,
+    hardwareMaximumFlowRate = null,
+  } = args
   const { enable, params } = blowout
   // transform location to additional equipment entity ID
   const transformedLocation =
@@ -368,9 +389,16 @@ const getBlowoutFields = (
           ({ name }) => name === 'trashBin' || name === 'wasteChute'
         )?.id
       : params?.location) ?? null
+  const checkedFlowRate =
+    params != null
+      ? min([
+          params.flowRate,
+          ...(hardwareMaximumFlowRate != null ? [hardwareMaximumFlowRate] : []),
+        ])
+      : null
   return {
     blowout_checkbox: enable && !(disable ?? false),
-    blowout_flowRate: params?.flowRate ?? null,
+    blowout_flowRate: checkedFlowRate ?? null,
     blowout_location: transformedLocation,
   }
 }
@@ -436,7 +464,7 @@ const getSubmergeRetractFields = (args: {
       : submergeRetractLookup.endPosition
   const fullPrefix = `${liquidHandlingAction}_${tipMovement}` as SubmergeRetractAspirateDispensePrefix
   const offsetFields = getOffsetFields(offset, fullPrefix)
-  const PositionReferenceFields = getPositionReferenceFields(
+  const positionReferenceFields = getPositionReferenceFields(
     positionReference,
     fullPrefix
   )
@@ -462,16 +490,16 @@ const getSubmergeRetractFields = (args: {
   // retract dispense fields
   const blowoutFields =
     'blowout' in submergeRetractLookup
-      ? getBlowoutFields(
-          submergeRetractLookup.blowout,
+      ? getBlowoutFields({
+          blowout: submergeRetractLookup.blowout,
           additionalEquipmentEntities,
-          isDisposalVolumeEnabled
-        )
+          disable: isDisposalVolumeEnabled,
+        })
       : {}
 
   return {
     ...offsetFields,
-    ...PositionReferenceFields,
+    ...positionReferenceFields,
     ...delayFields,
     ...speedFields,
     ...airGapFields,
@@ -480,19 +508,32 @@ const getSubmergeRetractFields = (args: {
   }
 }
 
-const getNoLiquidClassValuesMoveLiquid = (
-  rawForm: FormData,
-  convertedPipetteName: string,
-  liquidHandlingAction: LiquidClassSettingsType,
-  robotType: RobotType,
-  pipetteSpecs: PipetteV2Specs
-): Record<string, any> => {
+const getNoLiquidClassValuesMoveLiquid = (args: {
+  rawForm: FormData
+  convertedPipetteName: string
+  liquidHandlingAction: LiquidClassSettingsType
+  robotType: RobotType
+  labwareEntities: LabwareEntities
+  pipetteEntity: PipetteEntity
+}): Record<string, any> => {
+  const {
+    rawForm,
+    convertedPipetteName,
+    liquidHandlingAction,
+    robotType,
+    labwareEntities,
+    pipetteEntity,
+  } = args
   const { tipRack: tiprack, path, volume: rawVolume, stepType } = rawForm
   if (stepType !== 'moveLiquid') {
     console.warn(`invalid step type for liquid classes: ${stepType}`)
     return {}
   }
   const volume = Number(rawVolume)
+  const tiprackEntity =
+    Object.values(labwareEntities).find(
+      ({ labwareDefURI }) => labwareDefURI === tiprack
+    ) ?? null
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
@@ -500,6 +541,7 @@ const getNoLiquidClassValuesMoveLiquid = (
   const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
     tipObject => tipObject.tiprack === tiprack
   )
+  const { spec: pipetteSpecs } = pipetteEntity
   if (robotType === OT2_ROBOT_TYPE) {
     const zSpeedOT2 =
       CHANNELS_MAPPED_TO_MAX_SPEED[OT2_ROBOT_TYPE][pipetteSpecs.channels].z
@@ -511,32 +553,162 @@ const getNoLiquidClassValuesMoveLiquid = (
             blowout_location: SOURCE_WELL_BLOWOUT_DESTINATION,
           }
         : {}
-    return {
+    const allOT2Defaults = getDefaultsForStepType('moveLiquid')
+    const aspirateOT2Defaults = {
+      aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
+      aspirate_wellOrder_second: allOT2Defaults.aspirate_wellOrder_second,
+      preWetTip: allOT2Defaults.preWetTip,
+      aspirate_airGap_checkbox: allOT2Defaults.aspirate_airGap_checkbox,
+      aspirate_airGap_volume: allOT2Defaults.aspirate_airGap_volume,
+      aspirate_mix_checkbox: allOT2Defaults.aspirate_mix_checkbox,
+      aspirate_mix_times: allOT2Defaults.aspirate_mix_times,
+      aspirate_delay_checkbox: allOT2Defaults.aspirate_delay_checkbox,
+      aspirate_delay_seconds: allOT2Defaults.aspirate_delay_seconds,
+      aspirate_flowRate: allOT2Defaults.aspirate_flowRate,
+      aspirate_mmFromBottom: allOT2Defaults.aspirate_mmFromBottom,
+      aspirate_position_reference: allOT2Defaults.aspirate_position_reference,
+      aspirate_touchTip_checkbox: allOT2Defaults.aspirate_touchTip_checkbox,
       aspirate_submerge_speed: zSpeedOT2,
+      aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      aspirate_submerge_delay_seconds:
+        allOT2Defaults.aspirate_submerge_delay_seconds,
       aspirate_retract_speed: zSpeedOT2,
+      aspirate_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      aspirate_retract_delay_seconds:
+        allOT2Defaults.aspirate_retract_delay_seconds,
+    }
+    const pushOutVolume =
+      tiprackEntity != null
+        ? getDefaultPushOutVolume(
+            Number(rawForm.volume),
+            pipetteSpecs,
+            tiprackEntity.def
+          )
+        : 0
+    const dispenseOT2Defaults = {
+      dispense_wellOrder_first: allOT2Defaults.dispense_wellOrder_first,
+      dispense_wellOrder_second: allOT2Defaults.dispense_wellOrder_second,
+      dispense_airGap_checkbox: allOT2Defaults.dispense_airGap_checkbox,
+      dispense_airGap_volume: allOT2Defaults.dispense_airGap_volume,
+      dispense_mix_checkbox: allOT2Defaults.dispense_mix_checkbox,
+      dispense_mix_times: allOT2Defaults.dispense_mix_times,
+      dispense_delay_checkbox: allOT2Defaults.dispense_delay_checkbox,
+      dispense_delay_seconds: allOT2Defaults.dispense_delay_seconds,
+      dispense_flowRate: allOT2Defaults.dispense_flowRate,
+      dispense_mmFromBottom: allOT2Defaults.dispense_mmFromBottom,
+      dispense_position_reference: allOT2Defaults.dispense_position_reference,
+      dispense_touchTip_checkbox: allOT2Defaults.dispense_touchTip_checkbox,
+      pushOut_checkbox: pushOutVolume > 0,
+      pushOut_volume: pushOutVolume,
       dispense_submerge_speed: zSpeedOT2,
+      dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      dispense_submerge_delay_seconds:
+        allOT2Defaults.dispense_submerge_delay_seconds,
       dispense_retract_speed: zSpeedOT2,
+      dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      dispense_retract_delay_seconds:
+        allOT2Defaults.dispense_retract_delay_seconds,
       ...dipsosalFields,
+    }
+    return {
+      ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'aspirate'
+        ? aspirateOT2Defaults
+        : {}),
+      ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'dispense'
+        ? dispenseOT2Defaults
+        : {}),
     }
   }
   if (liquidClassValuesForTip == null) {
     return {}
   }
   const { aspirate, singleDispense, multiDispense } = liquidClassValuesForTip
+  const {
+    multiWellHandling,
+    referenceVolumes: byVolumeLookup,
+  } = getTransferPlanAndReferenceVolumes({
+    pipetteSpecs,
+    tiprackDefinition: null,
+    conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
+      [number, number]
+    >,
+    disposalByVolume: (multiDispense?.disposalByVolume ?? []) as Array<
+      [number, number]
+    >,
+    volume,
+    path: rawForm.path as PathOption,
+    numDispenseWells: rawForm.dispense_wells.length,
+    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+      [number, number]
+    >,
+  })
+  const { isSupported: isMultiDispenseSupported } = multiWellHandling
   const dispense =
-    multiDispense != null && path === 'multiDispense'
+    multiDispense != null &&
+    path === 'multiDispense' &&
+    isMultiDispenseSupported
       ? multiDispense
       : singleDispense
+
+  const matchingTipLiquidSpecs =
+    pipetteEntity != null
+      ? getMatchingTipLiquidSpecs(
+          pipetteEntity,
+          volume,
+          rawForm.tipRack as string
+        )
+      : null
+
+  const aspirateCorrectionVolume =
+    linearInterpolate(
+      byVolumeLookup.correction.aspirate,
+      liquidClassValuesForTip.aspirate.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+  const dispenseCorrectionVolume =
+    linearInterpolate(
+      byVolumeLookup.correction.dispense,
+      dispense.correctionByVolume as Array<[number, number]>
+    ) ?? 0
+
+  const aspirateMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: byVolumeLookup.flowRate.aspirate,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'aspirate',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: aspirateCorrectionVolume,
+        })
+      : null
+  const dispenseMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: byVolumeLookup.flowRate.dispense,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'dispense',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: dispenseCorrectionVolume,
+        })
+      : null
+
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
     aspirate.flowRateByVolume,
-    'aspirate'
+    'aspirate',
+    aspirateMaxUiFlowRate
   )
 
   const dispenseFlowRateFields = getFlowRateFields(
     volume,
     dispense.flowRateByVolume,
-    'dispense'
+    'dispense',
+    dispenseMaxUiFlowRate
   )
   const pushOutVolume =
     linearInterpolate(
@@ -565,6 +737,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...aspirateFlowRateFields,
     ...aspirateOffsetFields,
     ...aspiratePositionReferenceFields,
+    aspirate_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     aspirate_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     aspirate_submerge_position_reference: POSITION_REFERENCE_TOP,
     aspirate_submerge_x_position: 0,
@@ -583,6 +756,7 @@ const getNoLiquidClassValuesMoveLiquid = (
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
+    dispense_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
     dispense_submerge_x_position: 0,
@@ -619,16 +793,26 @@ const getNoLiquidClassValuesMoveLiquid = (
   }
 }
 
-const getNoLiquidClassValuesMix = (
-  rawForm: FormData,
-  convertedPipetteName: string,
+const getNoLiquidClassValuesMix = (args: {
+  rawForm: FormData
+  convertedPipetteName: string
   liquidHandlingAction: LiquidClassSettingsType
-): Record<string, any> => {
+  pipetteEntity: PipetteEntity
+  robotType: RobotType
+}): Record<string, any> => {
+  const {
+    rawForm,
+    convertedPipetteName,
+    liquidHandlingAction,
+    pipetteEntity,
+    robotType,
+  } = args
   const { tipRack: tiprack, volume: rawVolume, stepType } = rawForm
   if (stepType !== 'mix') {
     console.warn(`invalid step type for liquid classes: ${stepType}`)
     return {}
   }
+  const { spec: pipetteSpecs } = pipetteEntity
   const volume = Number(rawVolume)
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
@@ -641,10 +825,60 @@ const getNoLiquidClassValuesMix = (
     return {}
   }
   const { aspirate, singleDispense } = liquidClassValuesForTip
+  const matchingTipLiquidSpecs =
+    pipetteEntity != null
+      ? getMatchingTipLiquidSpecs(
+          pipetteEntity,
+          volume,
+          rawForm.tipRack as string
+        )
+      : null
+
+  const aspirateCorrectionVolume =
+    linearInterpolate(
+      volume,
+      liquidClassValuesForTip.aspirate.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+  const dispenseCorrectionVolume =
+    linearInterpolate(
+      volume,
+      liquidClassValuesForTip.singleDispense.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+
+  const aspirateMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: volume,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'aspirate',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: aspirateCorrectionVolume,
+        })
+      : null
+  const dispenseMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: volume,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'dispense',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: dispenseCorrectionVolume,
+        })
+      : null
+
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
     aspirate.flowRateByVolume,
-    'aspirate'
+    'aspirate',
+    aspirateMaxUiFlowRate
   )
   const aspiratePositionReferenceFields = getPositionReferenceFields(
     aspirate.aspiratePosition.positionReference,
@@ -653,7 +887,8 @@ const getNoLiquidClassValuesMix = (
   const dispenseFlowRateFields = getFlowRateFields(
     volume,
     singleDispense.flowRateByVolume,
-    'dispense'
+    'dispense',
+    dispenseMaxUiFlowRate
   )
 
   const pushOutVolume =
@@ -698,21 +933,24 @@ const getNoLiquidClassValuesMix = (
 const getLiquidClassValuesMoveLiquid = (args: {
   rawForm: FormData
   liquidClassValuesForTip: ByTipTypeSetting
-  pipetteSpecs: PipetteV2Specs
   labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction: LiquidClassSettingsType
+  pipetteEntity: PipetteEntity
+  robotType: RobotType
 }): Record<string, any> => {
   const {
     rawForm,
     liquidClassValuesForTip,
-    pipetteSpecs,
     labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction,
+    pipetteEntity,
+    robotType,
   } = args
   const { aspirate, singleDispense, multiDispense } = liquidClassValuesForTip
   const { path, tipRack, volume: rawVolume } = rawForm
+  const { spec: pipetteSpecs } = pipetteEntity
   const volume = Number(rawVolume)
   const {
     flowRateByVolume: aspirateFlowRateByVolume,
@@ -753,7 +991,10 @@ const getLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tipRack
     )?.def ?? null
-  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
+  const {
+    referenceVolumes: byVolumeLookup,
+    multiWellHandling,
+  } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     conditioningByVolume,
@@ -764,17 +1005,66 @@ const getLiquidClassValuesMoveLiquid = (args: {
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
     >,
-  }).referenceVolumes
+  })
+  const { isSupported: isMultiDispenseSupported } = multiWellHandling
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(
     aspiratePositionReference,
     'aspirate'
   )
   const aspirateOffsetFields = getOffsetFields(aspirateOffset, 'aspirate')
+  const matchingTipLiquidSpecs =
+    pipetteEntity != null
+      ? getMatchingTipLiquidSpecs(
+          pipetteEntity,
+          volume,
+          rawForm.tipRack as string
+        )
+      : null
+
+  const aspirateCorrectionVolume =
+    linearInterpolate(
+      byVolumeLookup.correction.aspirate,
+      liquidClassValuesForTip.aspirate.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+  const dispenseCorrectionVolume =
+    linearInterpolate(
+      byVolumeLookup.correction.dispense,
+      dispense.correctionByVolume as Array<[number, number]>
+    ) ?? 0
+
+  const aspirateMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: byVolumeLookup.flowRate.aspirate,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'aspirate',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: aspirateCorrectionVolume,
+        })
+      : null
+  const dispenseMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: byVolumeLookup.flowRate.dispense,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'dispense',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: dispenseCorrectionVolume,
+        })
+      : null
+
   const aspirateFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.aspirate,
     aspirateFlowRateByVolume,
-    'aspirate'
+    'aspirate',
+    aspirateMaxUiFlowRate
   )
   const preWetFields = { preWetTip: preWet }
   const aspirateMixFields = getMixFields(aspirateMix, 'aspirate')
@@ -789,7 +1079,8 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const dispenseFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.dispense,
     dispenseFlowRateByVolume,
-    'dispense'
+    'dispense',
+    dispenseMaxUiFlowRate
   )
   const dispenseMixFields = getMixFields(dispenseMix, 'dispense')
   const dispenseDelayFields = getDelayFields(dispenseDelay, 'dispense')
@@ -833,7 +1124,9 @@ const getLiquidClassValuesMoveLiquid = (args: {
   })
   const dispenseSubmergeFields = getSubmergeRetractFields({
     submergeRetractLookup:
-      path === 'multiDispense' && multiDispense != null
+      path === 'multiDispense' &&
+      multiDispense != null &&
+      isMultiDispenseSupported
         ? multiDispense.submerge
         : singleDispense.submerge,
     volumes: byVolumeLookup,
@@ -851,7 +1144,9 @@ const getLiquidClassValuesMoveLiquid = (args: {
   })
   const dispenseRetractFields = getSubmergeRetractFields({
     submergeRetractLookup:
-      path === 'multiDispense' && multiDispense != null
+      path === 'multiDispense' &&
+      multiDispense != null &&
+      isMultiDispenseSupported
         ? multiDispense.retract
         : singleDispense.retract,
     volumes: byVolumeLookup,
@@ -909,16 +1204,21 @@ const getLiquidClassValuesMix = (args: {
   liquidClassValuesForTip: ByTipTypeSetting
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction: LiquidClassSettingsType
+  pipetteEntity: PipetteEntity
+  robotType: RobotType
 }): Record<string, any> => {
   const {
     rawForm,
     liquidClassValuesForTip,
     additionalEquipmentEntities,
     liquidHandlingAction,
+    pipetteEntity,
+    robotType,
   } = args
   const { volume: rawVolume } = rawForm
   const volume = Number(rawVolume)
   const { aspirate, singleDispense } = liquidClassValuesForTip
+  const { spec: pipetteSpecs } = pipetteEntity
   const {
     flowRateByVolume: aspirateFlowRateByVolume,
     aspiratePosition,
@@ -931,27 +1231,90 @@ const getLiquidClassValuesMix = (args: {
     retract: dispenseRetract,
     pushOutByVolume,
   } = singleDispense
+
+  const matchingTipLiquidSpecs =
+    pipetteEntity != null
+      ? getMatchingTipLiquidSpecs(
+          pipetteEntity,
+          volume,
+          rawForm.tipRack as string
+        )
+      : null
+
+  const aspirateCorrectionVolume =
+    linearInterpolate(
+      volume,
+      liquidClassValuesForTip.aspirate.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+  const dispenseCorrectionVolume =
+    linearInterpolate(
+      volume,
+      liquidClassValuesForTip.singleDispense.correctionByVolume as Array<
+        [number, number]
+      >
+    ) ?? 0
+
+  const aspirateMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: volume,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'aspirate',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: aspirateCorrectionVolume,
+        })
+      : null
+  const dispenseMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          targetVolume: volume,
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'dispense',
+          tipLiquidSpecs: matchingTipLiquidSpecs,
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+          correctionVolume: dispenseCorrectionVolume,
+        })
+      : null
+
+  const blowoutMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'blowout',
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+        })
+      : null
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
     aspirateFlowRateByVolume,
-    'aspirate'
+    'aspirate',
+    aspirateMaxUiFlowRate
   )
   const mixPositionReferenceFields = getPositionReferenceFields(
     positionReference,
     'mix'
   )
   const mixOffsetFields = getOffsetFields(offset, 'mix')
+
   const dispenseFlowRateFields = getFlowRateFields(
     volume,
     dispenseFlowRateByVolume,
-    'dispense'
+    'dispense',
+    dispenseMaxUiFlowRate
   )
   const aspirateDelayFields = getDelayFields(aspirateDelay, 'aspirate')
   const dispenseDelayFields = getDelayFields(dispenseDelay, 'dispense')
-  const blowoutFields = getBlowoutFields(
-    dispenseRetract.blowout,
-    additionalEquipmentEntities
-  )
+  const blowoutFields = getBlowoutFields({
+    blowout: dispenseRetract.blowout,
+    additionalEquipmentEntities,
+    hardwareMaximumFlowRate: blowoutMaxUiFlowRate,
+  })
   const pushOutFields = getByVolumeField({
     volume,
     byVolume: pushOutByVolume,
@@ -1023,23 +1386,25 @@ export const getLiquidClassesValues = (args: {
   if (pipetteEntity == null) {
     return {}
   }
-  const { spec: pipetteSpecs } = pipetteEntity
   const convertedPipetteName = getFlexNameConversion(pipetteEntity.spec)
   if (liquidClass === NONE_LIQUID_CLASS_NAME || robotType === OT2_ROBOT_TYPE) {
     // OT-2 liquid class selection should always be "none"
     return stepType === 'moveLiquid'
-      ? getNoLiquidClassValuesMoveLiquid(
+      ? getNoLiquidClassValuesMoveLiquid({
           rawForm,
           convertedPipetteName,
           liquidHandlingAction,
           robotType,
-          pipetteSpecs
-        )
-      : getNoLiquidClassValuesMix(
+          labwareEntities,
+          pipetteEntity,
+        })
+      : getNoLiquidClassValuesMix({
           rawForm,
           convertedPipetteName,
-          liquidHandlingAction
-        )
+          liquidHandlingAction,
+          pipetteEntity,
+          robotType,
+        })
   }
   if (liquidClassDef == null) {
     return {}
@@ -1059,15 +1424,18 @@ export const getLiquidClassesValues = (args: {
       liquidClassValuesForTip,
       additionalEquipmentEntities,
       liquidHandlingAction,
+      pipetteEntity,
+      robotType,
     })
   }
   return getLiquidClassValuesMoveLiquid({
     rawForm,
     liquidClassValuesForTip,
-    pipetteSpecs,
     labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction,
+    pipetteEntity,
+    robotType,
   })
 }
 

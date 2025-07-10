@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getDeckSlotOriginToLabwareOrigin,
+  getLabwareBackLeftBottomToOrigin,
   getLabwareViewBox,
   getSchema2Dimensions,
 } from '../..'
@@ -167,6 +168,50 @@ describe('getDeckSlotOriginToLabwareOrigin()', () => {
       x: 0,
       y: 100,
       z: 0,
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+})
+
+describe('getLabwareBackLeftBottomToOrigin()', () => {
+  it('should handle schema 2 labware definitions', () => {
+    const labwareDef: Partial<LabwareDefinition2> = {
+      schemaVersion: 2,
+      cornerOffsetFromSlot: {
+        // Should not affect result.
+        x: 10,
+        y: 20,
+        z: 30,
+      },
+      dimensions: {
+        xDimension: 100,
+        yDimension: 200,
+        zDimension: 300,
+      },
+    }
+    const result = getLabwareBackLeftBottomToOrigin(
+      labwareDef as LabwareDefinition2
+    )
+    const expectedResult: typeof result = { x: 0, y: -200, z: 0 }
+    expect(result).toStrictEqual(expectedResult)
+  })
+  it('should handle schema 3 labware definitions', () => {
+    const labwareDef: Partial<LabwareDefinition3> = {
+      schemaVersion: 3,
+      extents: {
+        total: {
+          backLeftBottom: { x: -10, y: 10, z: 0 },
+          frontRightTop: { x: 210, y: -110, z: 1000 },
+        },
+      },
+    }
+    const result = getLabwareBackLeftBottomToOrigin(
+      labwareDef as LabwareDefinition3
+    )
+    const expectedResult: typeof result = {
+      x: 10,
+      y: -10,
+      z: -0,
     }
     expect(result).toStrictEqual(expectedResult)
   })

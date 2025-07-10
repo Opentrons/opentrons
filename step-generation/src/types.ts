@@ -39,7 +39,10 @@ export interface PipetteTemporalProperties {
   entityId?: string
   //  primary nozzle's wellName if over a labware
   wellName?: string
+  //  pipette's nozzle configuration
   nozzles?: NozzleConfigurationStyle
+  //  current tiprack assosciated with pipette
+  tiprackId?: string
 }
 
 export interface MagneticModuleState {
@@ -764,4 +767,17 @@ export interface Timeline {
 export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
+}
+export interface WellContents {
+  // eg 'A1', 'A2' etc
+  wellName?: string
+  groupIds: string[]
+  ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
+}
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
 }
