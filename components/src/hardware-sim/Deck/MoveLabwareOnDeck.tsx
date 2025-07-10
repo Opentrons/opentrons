@@ -102,25 +102,25 @@ export function MoveLabwareOnDeck(
     SPLASH_Y_BUFFER_MM
   )
 
-  const initialCoordinates2 =
+  const animationInitialCoordinates =
     initialCoordinates !== 'error' && initialCoordinates !== 'offDeck'
       ? initialCoordinates
       : offDeckCoordinates
-  const finalCoordinates2 =
+  const animationFinalCoordinates =
     finalCoordinates !== 'error' && finalCoordinates !== 'offDeck'
       ? finalCoordinates
       : offDeckCoordinates
 
   const shouldReset = usePositionChangeReset(
-    initialCoordinates2,
-    finalCoordinates2
+    animationInitialCoordinates,
+    animationFinalCoordinates
   )
 
   const springProps = useSpring({
     reset: shouldReset,
     config: { duration: 1000, easing: easings.easeInOutSine },
     from: {
-      ...initialCoordinates2,
+      ...animationInitialCoordinates,
       splashOpacity: 0,
       deckOpacity: 0,
     },
@@ -128,7 +128,7 @@ export function MoveLabwareOnDeck(
       { deckOpacity: 1 },
       { splashOpacity: 1 },
       { splashOpacity: 0 },
-      { ...finalCoordinates2 },
+      { ...animationFinalCoordinates },
       { splashOpacity: 1 },
       { splashOpacity: 0 },
       { deckOpacity: 0 },
