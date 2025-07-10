@@ -1,8 +1,9 @@
 ---
 title: "HEPA/UV Module Instruction Manual"
+hide: toc
 ---
 
-# HEPA/UV Module Instruction Manual
+# HEPA/UV Module Instruction Manual {style="text-align: center;"}
 
 ![HEPA/UV Module hero image](images/hepa-uv-hero.png "HEPA/UV Module hero image")
 

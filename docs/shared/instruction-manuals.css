@@ -76,3 +76,9 @@ figure.side-by-side img {
   font-weight: bold; 
   font-size: 0.9em; 
 }
+
+.instruction-list > ol > li img {
+  width: 80%;
+  margin: 1em auto;
+  display: block;
+}

@@ -8,14 +8,47 @@ title: "HEPA/UV Module: Product Specifications"
 
 ## Included Parts
 
-- (1) HEPA/UV Module
-- (1) HEPA Filter
-- (1) Pre-Filter
-- (2) UV Bulbs
-- (1) M12 AUX Cable
-- (1) 2.5 mm Hex Screwdriver
-- (1) Power Cable
-- (4 each) Carrying Handles and Caps
+<div class="parts-list">
+<figure>
+  <img src="../images/parts-list/hepa-uv-module.svg" alt="HEPA/UV Module" title="HEPA/UV Module" />
+  <figcaption>(1) HEPA/UV Module</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/hepa-filter.svg" alt="HEPA Filter" title="HEPA Filter" />
+  <figcaption>(1) HEPA Filter</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/pre-filter.svg" alt="Pre-Filter" title="Pre-Filter" width="50%"/>
+  <figcaption>(1) Pre-Filter</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/uv-bulb.svg" alt="UV Bulbs" title="UV Bulbs" />
+  <figcaption>(2) UV Bulbs</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/aux-cable.svg" alt="M12 AUX Cable" title="M12 AUX Cable" />
+  <figcaption>(1) M12 AUX Cable</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/2-5-mm-hex-screwdriver.svg" alt="2.5 mm Hex Screwdriver" title="2.5 mm Hex Screwdriver" />
+  <figcaption>(1) 2.5 mm Hex Screwdriver</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/power-cable.svg" alt="Power Cable" title="Power Cable" />
+  <figcaption>(1) Power Cable</figcaption>
+</figure>
+
+<figure>
+  <img src="../images/parts-list/carrying-handles-caps.svg" alt="Carrying Handles and Caps" title="Carrying Handles and Caps" />
+  <figcaption>(4 each) Carrying Handles and Caps</figcaption>
+</figure>
+</div>
 
 ## Physical Specifications
 
@@ -32,7 +65,7 @@ The HEPA/UV Module has the following power input requirements, which are met by 
 
 !!! warning
     Observe the following when handling the module power cable:
-    
+
     - Always plug the power cable into a grounded outlet.
     - Make sure that the power cable is not obstructed, in case it needs to be disconnected.
     - Do not replace the power supply cable unless at the direction of Opentrons Support. This ensures that the power cable has adequate ratings for the equipment.
