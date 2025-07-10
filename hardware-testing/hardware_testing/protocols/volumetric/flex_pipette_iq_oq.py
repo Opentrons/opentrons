@@ -15,6 +15,7 @@ from opentrons.protocol_api import (
     AbsorbanceReaderContext,
     OFF_DECK,
 )
+from opentrons.protocol_api._liquid_properties import TransferProperties
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -612,12 +613,12 @@ def run(ctx: ProtocolContext) -> None:
     diluent_props.dispense.retract.blowout.enabled = True  # especially for glycerol
 
     # ENABLE LIQUID-MENISCUS PIPETTING
+    test_props = test_class.get_for(test_pip, test_pip.tip_racks[0])
     if ctx.params.pipette_at_liquid_meniscus:
         # aspirate diluent from meniscus
         diluent_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
         diluent_props.aspirate.aspirate_position.offset.z = -1.5
         # modify test class (aspirate + dispense)
-        test_props = test_class.get_for(test_pip, test_pip.tip_racks[0])
         test_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
         test_props.aspirate.aspirate_position.offset.z = -1.5
         test_props.dispense.dispense_position.position_reference = "liquid-meniscus"
@@ -681,6 +682,15 @@ def run(ctx: ProtocolContext) -> None:
         plate = None
         ul_in_this_plate = []
 
+    def _hacky_aspirate_meniscus_submerge_retract(props: TransferProperties, well: Well) -> None:
+        # NOTE: in lieu of using meniscus-relative submerge/retract (b/c it's buggy)
+        #       we can instead update the well-relative offsets each time we aspirate.
+        #       This isn't ideal b/c we can't update the position for each aspirate,
+        #       But it's better than submerging super slowly from the top of the well
+        mm = well.current_liquid_height + 3.0
+        props.aspirate.submerge.start_position.offset.z = mm
+        props.aspirate.retract.end_position.offset.z = mm
+
     # BASELINE
     if ctx.params.include_baseline:
         plate = plates.pop(-1)
@@ -691,6 +701,8 @@ def run(ctx: ProtocolContext) -> None:
         pip_for_dil.pick_up_tip(diluent_tips)
         if not diluent_probed:
             pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
+            diluent_probed = True
+        _hacky_aspirate_meniscus_submerge_retract(diluent_props, reservoir_diluent["A1"])
         pip_for_dil.distribute_with_liquid_class(
             diluent_class,
             DYE_READER_IDEAL_UL,
@@ -762,6 +774,7 @@ def run(ctx: ProtocolContext) -> None:
                 #        however probing >=2x times requires LLD support in liquid-classes.
                 pip_for_dil.require_liquid_presence(reservoir_diluent["A1"])
                 diluent_probed = True
+            _hacky_aspirate_meniscus_submerge_retract(diluent_props, reservoir_diluent["A1"])
             # FIXME: (sigler) if we don't configure, the transfer-with-liquid-class
             #        command can get stuck in a wrong configuration. Fix API.
             pip_for_dil.configure_for_volume(dil_ul)
@@ -778,6 +791,7 @@ def run(ctx: ProtocolContext) -> None:
         src_well: Well = dye_well_by_volume[ul]
         test_pip.pick_up_tip()
         test_pip.require_liquid_presence(src_well)
+        _hacky_aspirate_meniscus_submerge_retract(test_props, src_well)
         test_pip.drop_tip()
 
         # ORGANIZE WELLS FOR PIPETTES
