@@ -149,6 +149,8 @@ export function TwoColLwInfoAndDeck(
                     moduleDef,
                     nestedLabwareDef,
                     nestedLabwareId,
+                    targetDeckId,
+                    targetSlotId,
                   }) => (
                     <Module
                       key={moduleId}
@@ -156,6 +158,8 @@ export function TwoColLwInfoAndDeck(
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
+                      targetDeckId={targetDeckId}
+                      targetSlotId={targetSlotId}
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
