@@ -19,7 +19,10 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -31,7 +34,6 @@ import { getSelectedWells } from '../../../well-selection/selectors'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidButton } from '../../molecules'
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'

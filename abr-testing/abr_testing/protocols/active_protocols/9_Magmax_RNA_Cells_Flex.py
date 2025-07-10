@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.24",
 }
 """
 Slot A1: Tips 200
@@ -80,7 +80,7 @@ def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     dry_run = False
     inc_lysis = True
-    res_type = "nest_12_reservoir_15ml"
+    res_type = "opentrons_tough_12_reservoir_22ml"
     TIP_TRASH = False
     num_samples = 96
     wash_vol = 150.0
@@ -99,7 +99,7 @@ def run(protocol: ProtocolContext) -> None:
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters

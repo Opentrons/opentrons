@@ -26,6 +26,7 @@ import {
   FLEX_ROBOT_TYPE,
   getSortedLiquidClassDefs,
 } from '@opentrons/shared-data'
+import { swatchColors } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../../file-data/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
@@ -34,7 +35,6 @@ import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { TextAreaField } from '../../molecules'
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
-import { swatchColors } from './swatchColors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Ingredient } from '@opentrons/step-generation'

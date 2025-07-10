@@ -2,8 +2,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { ModuleListItemGroup } from '../index'
 
 // Define a local type matching the usage in the mock
@@ -26,6 +27,30 @@ const modulesMock: TestDisplayModule[] = [
     type: 'temperatureModuleType',
     model: 'temperatureModuleV2',
     name: 'Temperature Module GEN2',
+  },
+  {
+    id: 'module-3',
+    type: 'thermocyclerModuleType',
+    model: 'thermocyclerModuleV2',
+    name: 'Thermocycler Module GEN2',
+  },
+  {
+    id: 'module-4',
+    type: 'magneticModuleType',
+    model: 'magneticModuleV2',
+    name: 'Magnetic Module GEN2',
+  },
+  {
+    id: 'module-5',
+    type: 'magneticBlockType',
+    model: 'magneticBlockV1',
+    name: 'Magnetic Block GEN1',
+  },
+  {
+    id: 'module-6',
+    type: 'absorbanceReaderType',
+    model: 'absorbanceReaderV1',
+    name: 'Absorbance Plate Reader Module GEN1',
   },
 ]
 
@@ -54,13 +79,25 @@ describe('ModuleListItemGroup', () => {
     render()
 
     expect(screen.getAllByText('Adapter').length).toBe(2)
-    expect(screen.getAllByText('remove').length).toBe(2)
+    expect(screen.getAllByText('remove').length).toBe(6)
 
     screen.getByAltText('heaterShakerModuleType')
     screen.getByText('Heater-Shaker Module GEN1')
 
     screen.getByAltText('temperatureModuleType')
     screen.getByText('Temperature Module GEN2')
+
+    screen.getByAltText('thermocyclerModuleType')
+    screen.getByText('Thermocycler Module GEN2')
+
+    screen.getByAltText('magneticModuleType')
+    screen.getByText('Magnetic Module GEN2')
+
+    screen.getByAltText('magneticBlockType')
+    screen.getByText('Magnetic Block GEN1')
+
+    screen.getByAltText('absorbanceReaderType')
+    screen.getByText('Absorbance Plate Reader Module GEN1')
   })
 
   it('should remove the list item if remove is clicked', async () => {
@@ -75,9 +112,10 @@ describe('ModuleListItemGroup', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('should render the dropdown if adapters are available', () => {
+  it('should render the dropdown only for modules with adapters enabled', () => {
     render()
 
+    // Only Temperature Module and Heater-Shaker Module should have dropdowns
     expect(screen.getAllByText('Choose an adapter').length).toBe(2)
   })
 
@@ -92,7 +130,7 @@ describe('ModuleListItemGroup', () => {
     const listBox = await screen.findByRole('listbox')
 
     const adapterOptionButton = within(listBox).getByText(
-      'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+      'Opentrons 96 Deep Well Temperature Module Adapter'
     )
 
     fireEvent.click(adapterOptionButton)
@@ -110,12 +148,90 @@ describe('ModuleListItemGroup', () => {
 
     expect(
       within(secondModuleListItem).getByText(
-        'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap'
+        'Opentrons 96 Deep Well Temperature Module Adapter'
       )
     ).toBeInTheDocument()
 
     expect(
       within(secondModuleListItem).queryByText('Choose an adapter')
     ).not.toBeInTheDocument()
+  })
+
+  it('should not render dropdown for thermocycler, magnetic module, magnetic block, and absorbance reader', () => {
+    render()
+
+    const listItems = screen.getAllByTestId('ListItem_default')
+
+    // Test Thermocycler Module
+    const thermocyclerListItem = listItems.find(item =>
+      within(item).queryByText('Thermocycler Module GEN2')
+    )
+    if (thermocyclerListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the thermocycler module list item.'
+      )
+    }
+    expect(
+      within(thermocyclerListItem).queryByText('Adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(thermocyclerListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
+    expect(within(thermocyclerListItem).getByText('remove')).toBeInTheDocument()
+
+    // Test Magnetic Module
+    const magneticListItem = listItems.find(item =>
+      within(item).queryByText('Magnetic Module GEN2')
+    )
+    if (magneticListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the magnetic module list item.'
+      )
+    }
+    expect(
+      within(magneticListItem).queryByText('Adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(magneticListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
+    expect(within(magneticListItem).getByText('remove')).toBeInTheDocument()
+
+    // Test Magnetic Block
+    const magneticBlockListItem = listItems.find(item =>
+      within(item).queryByText('Magnetic Block GEN1')
+    )
+    if (magneticBlockListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the magnetic block list item.'
+      )
+    }
+    expect(
+      within(magneticBlockListItem).queryByText('Adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(magneticBlockListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(magneticBlockListItem).getByText('remove')
+    ).toBeInTheDocument()
+
+    // Test Absorbance Reader
+    const absorbanceReaderListItem = listItems.find(item =>
+      within(item).queryByText('Absorbance Plate Reader Module GEN1')
+    )
+    if (absorbanceReaderListItem == null) {
+      throw new Error(
+        'Test failed: Could not find the absorbance reader list item.'
+      )
+    }
+    expect(
+      within(absorbanceReaderListItem).queryByText('Adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(absorbanceReaderListItem).queryByText('Choose an adapter')
+    ).not.toBeInTheDocument()
+    expect(
+      within(absorbanceReaderListItem).getByText('remove')
+    ).toBeInTheDocument()
   })
 })

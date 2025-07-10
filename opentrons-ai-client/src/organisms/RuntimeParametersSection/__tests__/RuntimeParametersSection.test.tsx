@@ -2,15 +2,16 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { RuntimeParametersSection } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { PD, PROTOCOL_FORMAT, PYTHON } from '../../../resources/constants'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
 import {
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
   ROBOT_FIELD_NAME,
-} from '../../InstrumentsSection'
+} from '/ai-client/organisms/InstrumentsSection'
+import { PD, PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
+
+import { RuntimeParametersSection } from '..'
 
 const TestFormProviderComponent = ({
   protocolFormat = PYTHON,

@@ -123,20 +123,28 @@ export function constructInvariantContextFromRunCommands(
         const id = `${uuid()}:${addressableAreaName}`
         let location: string = GRIPPER_LOCATION
         if (addressableAreaName === 'fixedTrash') {
-          location = '12'
+          location = 'cutout12'
         } else if (addressableAreaName.includes('WasteChute')) {
-          location = 'D3'
+          location = 'cutoutD3'
         } else if (addressableAreaName.includes('movableTrash')) {
-          location = addressableAreaName.split('movableTrash')[1]
+          location = `cutout${addressableAreaName.split('movableTrash')[1]}`
         }
-        const trashBinEntities: TrashBinEntities = {
-          ...acc.trashBinEntities,
-          [id]: {
-            pythonName: 'trash_bin_1',
-            id,
-            location,
-          },
+        let trashBinEntities: TrashBinEntities = acc.trashBinEntities
+        if (
+          !Object.values(acc.trashBinEntities).some(
+            entity => entity.location === location
+          )
+        ) {
+          trashBinEntities = {
+            ...acc.trashBinEntities,
+            [id]: {
+              pythonName: 'trash_bin_1',
+              id,
+              location,
+            },
+          }
         }
+
         const wasteChuteEntities: WasteChuteEntities = {
           ...acc.wasteChuteEntities,
           [id]: {

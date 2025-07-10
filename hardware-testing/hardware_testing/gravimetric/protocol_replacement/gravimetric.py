@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
 import os
 import sys
@@ -11,9 +11,9 @@ from opentrons.protocol_api import (
     ParameterContext,
     InstrumentContext,
     Well,
-    Labware,
     Liquid,
     LiquidClass,
+    OFF_DECK,
 )
 from opentrons import version
 from opentrons.protocol_api._liquid_properties import TransferProperties
@@ -22,7 +22,7 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
 )
 from opentrons.config import infer_config_base_dir
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.25"}
@@ -94,7 +94,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.gravimetric import helpers, report  # noqa: E402
+from hardware_testing.gravimetric import helpers, report, tips  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -119,7 +119,7 @@ class FixtureSettings:
     liquid_name: str
     liquid: Liquid
     liquid_class: LiquidClass
-    tips: Dict[int, List[Well]]
+    tips: Dict[int, List[str]]
     liquid_source: Well
     volumes: Dict[int, List[float]]
     scale: Scale
@@ -196,45 +196,13 @@ class FixtureSettings:
             + volumes_to_test_200ul
             + volumes_to_test_1000ul
         )
-        adapter: Optional[str] = (
-            "opentrons_flex_96_tiprack_adapter" if pipette_channels == 96 else None
-        )
 
-        tipracks_20ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_20uL", slot, adapter=adapter)
-            for slot in tipracks_20ul
-        ]
-        tipracks_50ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_50uL", slot, adapter=adapter)
-            for slot in tipracks_50ul
-        ]
-        tipracks_200ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_200uL", slot, adapter=adapter)
-            for slot in tipracks_200ul
-        ]
-        tipracks_1000ul_lw = [
-            ctx.load_labware("opentrons_flex_96_tiprack_1000uL", slot, adapter=adapter)
-            for slot in tipracks_1000ul
-        ]
-        tips = {}
-
-        def add_tips(size: int, tipracks: List[Labware]) -> None:
-            if len(tipracks) > 0:
-                wells = []
-                for rack in tipracks:
-                    if pipette_channels == 1:
-                        wells += rack.wells()
-                    if pipette_channels == 8:
-                        # TODO remove the pattern
-                        wells += rack.wells()
-                    if pipette_channels == 96:
-                        wells += [rack.wells()[0]]
-                tips[size] = wells
-
-        add_tips(20, tipracks_20ul_lw)
-        add_tips(50, tipracks_50ul_lw)
-        add_tips(200, tipracks_200ul_lw)
-        add_tips(1000, tipracks_1000ul_lw)
+        tips = {
+            20: tipracks_20ul,
+            50: tipracks_50ul,
+            200: tipracks_200ul,
+            1000: tipracks_1000ul,
+        }
 
         source_well = ctx.load_labware(labware_on_scale, slot_scale)[
             labware_on_scale_well_name
@@ -344,6 +312,94 @@ class FixtureSettings:
         # - Tips fit on the given pipette
 
         return True
+
+
+def _get_tips_for_test_single_multi(
+    fixture_settings: FixtureSettings, tip: int, channel: int
+) -> List[Well]:
+    wells = []
+    loaded_labwares = fixture_settings.ctx.loaded_labwares
+    used_slots = [
+        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
+        for slot in loaded_labwares.keys()
+    ]
+    partially_used = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
+    tipracks_lw = [
+        fixture_settings.ctx.load_labware(f"opentrons_flex_96_tiprack_{tip}uL", slot)
+        for slot in fixture_settings.tips[tip]
+        if slot not in partially_used
+    ]
+    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
+        return tips.get_tips_for_individual_channel_on_multi(
+            fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
+        )
+
+    wells += tips.get_unused_tips(fixture_settings.ctx, tip)
+    for rack in tipracks_lw:
+        wells += rack.wells()
+    return wells
+
+
+def _get_tips_for_test_96(
+    fixture_settings: FixtureSettings, tip: int, blank: bool = False
+) -> List[Well]:
+    adapter = "opentrons_flex_96_tiprack_adapter"
+    loaded_labwares = fixture_settings.ctx.loaded_labwares
+    used_slots = [
+        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
+        for slot in loaded_labwares.keys()
+    ]
+    need_to_swap = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
+    if len(need_to_swap) != 0:
+        fixture_settings.ctx.pause(f"Replace slots {need_to_swap} with {tip}ul tips")
+        for slot in need_to_swap:
+            old_adapter = loaded_labwares[
+                DeckSlotName.from_primitive(slot).as_int()
+            ].parent
+            fixture_settings.ctx._core.move_labware(
+                loaded_labwares[DeckSlotName.from_primitive(slot).as_int()]._core,
+                new_location=OFF_DECK,
+                use_gripper=False,
+                pause_for_manual_move=False,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
+            fixture_settings.ctx._core.move_labware(
+                old_adapter._core,  # type: ignore [union-attr, arg-type]
+                new_location=OFF_DECK,
+                use_gripper=False,
+                pause_for_manual_move=False,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
+    if blank:
+        tipracks_lw = [
+            fixture_settings.ctx.load_labware(
+                f"opentrons_flex_96_tiprack_{tip}uL",
+                fixture_settings.tips[tip][0],
+                adapter=adapter,
+            )
+        ]
+
+    else:
+        tipracks_lw = [
+            fixture_settings.ctx.load_labware(
+                f"opentrons_flex_96_tiprack_{tip}uL", slot, adapter=adapter
+            )
+            for slot in fixture_settings.tips[tip]
+        ]
+    wells = []
+    for rack in tipracks_lw:
+        wells += [rack.wells()[0]]
+    return wells
+
+
+def _get_tips_for_test(
+    fixture_settings: FixtureSettings, tip: int, blank: bool = False, channel: int = 0
+) -> List[Well]:
+    if fixture_settings.pipette_channels == 96:
+        return _get_tips_for_test_96(fixture_settings, tip, blank)
+    return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -529,14 +585,16 @@ def dispense_with_liquid_class(
 
 
 def run_blank_test(
-    fixture_settings: FixtureSettings, tip: int, volume: float, trial: int
+    fixture_settings: FixtureSettings,
+    tip: int,
+    volume: float,
+    trial: int,
+    tip_well: Well,
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
     channel = 0
-    next_tip = fixture_settings.tips[tip][
-        0
-    ]  # this is the next tip we're gonna use we just need the uri
-    tiprack_uri = next_tip.parent.uri
+    # this is the next tip we're gonna use we just need the uri
+    tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
@@ -603,13 +661,13 @@ def run_blank_test(
 def run_one_test(
     fixture_settings: FixtureSettings,
     tip: int,
+    tip_well: Well,
     volume: float,
     trial: int,
     channel: int,
     last_measurement: MeasurementData,
 ) -> List[MeasurementData]:
-    """Pick up, aspirate, and dispense one trial and write it to the report."""
-    tip_well = fixture_settings.tips[tip].pop(0)
+    """Run one trial of one test."""
     tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
@@ -623,6 +681,7 @@ def run_one_test(
         tiprack_uri=tiprack_uri,
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
+    fixture_settings.pipette.configure_for_volume(volume)
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
@@ -647,20 +706,13 @@ def run_one_test(
     return [pre_aspirate, post_aspirate, post_dispense]
 
 
-def run(ctx: ProtocolContext) -> None:
+def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
-    fixture_settings = FixtureSettings.build(ctx)
-    try:
-        _do_run(ctx, fixture_settings)
-    finally:
-        if fixture_settings.recorder.is_recording:
-            fixture_settings.recorder.stop()
-
-
-def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
-    first_tip = fixture_settings.tips[list(fixture_settings.tips)[0]].pop(0)
+    first_tip = _get_tips_for_test(
+        fixture_settings, fixture_settings.tip_sizes[0], True
+    )[0]
     print_info("Picking up first tip.")
-    pick_up_tip_for_channel(fixture_settings, first_tip, 1)
+    pick_up_tip_for_channel(fixture_settings, first_tip, 0)
     print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     print_info(
@@ -681,6 +733,7 @@ def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 fixture_settings.tip_sizes[0],
                 fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
                 i,
+                first_tip,
             )
         )
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
@@ -725,6 +778,7 @@ def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             measurements[volume] = []
             for channel in fixture_settings.channels:
                 channel_aspriate_dict: Dict[int, List[float]]
+                tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 for trial in range(fixture_settings.trials):
                     print_header(
                         f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
@@ -733,6 +787,7 @@ def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         run_one_test(
                             fixture_settings,
                             tip,
+                            tips.pop(0),
                             volume,
                             trial,
                             channel,
@@ -848,3 +903,15 @@ def _do_run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     d=dispense_d,
                     flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
+
+
+def run(ctx: ProtocolContext) -> None:
+    """Pick up, aspirate, and dispense one trial and write it to the report."""
+    fixture_settings = FixtureSettings.build(ctx)
+    try:
+        _run(ctx, fixture_settings)
+    finally:
+        if fixture_settings.recorder is not None:
+            print_info("ending recording")
+            fixture_settings.recorder.stop()
+            fixture_settings.recorder.deactivate()

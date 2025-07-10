@@ -30,7 +30,7 @@ import {
 } from '../../utils'
 import {
   getCustomLiquidClassProperties,
-  getPythonLiquidClassName,
+  getLiquidClassName,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -354,7 +354,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
     ...(liquidClass != null
-      ? [`base_liquid_class=${getPythonLiquidClassName(liquidClass)}`]
+      ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
@@ -536,7 +536,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
           const isDispenseRetractSafeForAirGap = getIsRetractSafeForAirGap({
             retractZOffset: dispenseRetractZOffset,
-            retractPositionReference: dispensePositionReference,
+            retractPositionReference: dispenseRetractPositionReference,
             labwareId: destLabware,
             labwareEntities,
             well: destinationWell,
@@ -596,6 +596,15 @@ export const transfer: CommandCreator<TransferArgs> = (
               byVolumeProperty: 'correctionByVolume',
               defaultValue: 0,
             }) ?? 0
+          const delayAfterDispenseCommands =
+            dispenseDelay != null
+              ? [
+                  curryWithoutPython(delay, {
+                    seconds: dispenseDelay.seconds,
+                  }),
+                ]
+              : []
+
           const voidDispenseAirGapCommand =
             dispenseAirGapVol > 0 &&
             !changeTipNow &&
@@ -611,7 +620,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
+                    pushOut: 0,
                   }),
+                  ...delayAfterDispenseCommands,
                 ]
               : []
           const preAspirateSubmergeCommands = [
@@ -785,14 +796,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []),
           ]
-          const delayAfterDispenseCommands =
-            dispenseDelay != null
-              ? [
-                  curryWithoutPython(delay, {
-                    seconds: dispenseDelay.seconds,
-                  }),
-                ]
-              : []
           const dispenseCorrectionVolumeForAspirateAirGap =
             getByVolumeValue({
               liquidClass,

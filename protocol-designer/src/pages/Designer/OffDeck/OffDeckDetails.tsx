@@ -20,10 +20,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { SlotDetailsContainer } from '../../../components/organisms'
-import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
