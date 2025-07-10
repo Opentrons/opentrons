@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProb
 ASPIRATE_MM_FROM_BOTTOM = 5
 DISPENSE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_195ml"
-DEFAULT_STEPS = 18  # optimize later
+DEFAULT_STEPS = 18  # change later
 
 LIQUID_MOUNT = "right"
 LIQUID_TIP_SIZE = 1000
@@ -36,6 +36,8 @@ SLOT_PROBING_TIPRACK = "D3"
 SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C2"
 SLOT_DIAL = "B2"
+
+RAMP_FRACTION = 1/3
 
 ###########################################
 #  VARIABLES - END
@@ -166,7 +168,7 @@ def _setup(
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     max_volume = labware["A1"].max_volume
-    step_volume = max_volume / number_of_steps
+    #step_volume = max_volume / number_of_steps
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -184,7 +186,7 @@ def _setup(
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [probing_pip_name])
         _write_line_to_csv(ctx, [labware_type])
-        _write_line_to_csv(ctx, ["step vol", str(step_volume)])
+        #_write_line_to_csv(ctx, ["step vol", str(step_volume)])
         _write_line_to_csv(ctx, ["steps", str(number_of_steps)])
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
         # Record LPC
@@ -200,7 +202,7 @@ def _setup(
         labware,
         src,
         dial,
-        step_volume,
+        #step_volume,
         quick_mode,
         ethanol,
         number_of_steps,
@@ -281,12 +283,14 @@ def _get_height_of_liquid_in_well(
             return extract_float(pipette.measure_liquid_height(well))
     except PipetteLiquidNotFoundError:
         if not simulating:
+            pipette.drop_tip()
+            pipette.pick_up_tip()
             return extract_float(pipette.measure_liquid_height(well))
         else:
             return 99.0
     return 99.0
 
-def smooth_ramp_then_plateau(total_volume_ml, steps, ramp_fraction):
+def quad_step(total_volume_ml, steps, ramp_fraction):
     ramp_steps = int(steps * ramp_fraction)
     plateau_steps = steps - ramp_steps
 
@@ -313,7 +317,7 @@ def run(ctx: ProtocolContext) -> None:
         labware,
         src,
         dial,
-        step_volume,
+        #step_volume,
         quick_mode,
         ethanol,
         number_of_steps,
@@ -338,8 +342,7 @@ def run(ctx: ProtocolContext) -> None:
             liq_pipette.drop_tip()
 
     #testing dynamic volume increments
-    vol_steps = smooth_ramp_then_plateau()
-
+    step_volumes = quad_step(max_volume, number_of_steps, RAMP_FRACTION)
 
     #beginning of protocol
 
@@ -350,34 +353,22 @@ def run(ctx: ProtocolContext) -> None:
         tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
         src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        #for step in range(number_of_steps):
-        for step in range(vol_steps):
+        for step in range(step_volumes):
             if step > 0: 
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    vol_steps[step],
+                    step_volumes[step],
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
                     return_tip=False,
                 )
 
-                volume_dispensed = round(volume_dispensed + vol_steps[step], 5)
-
-                try:
-                    try:
-                        height = round(
-                            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                            5,
-                        )
-                    except PipetteLiquidNotFoundError:
-                        ctx.comment("Didn't find liquid, trying again")
-                        height = round(
-                            _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
-                            5,
-                        )
-                except PipetteLiquidNotFoundError:
-                    height = 99.0
+                volume_dispensed = round(volume_dispensed + step_volumes[step], 5)
+                height = round(
+                    _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                    5,
+                )
             else: 
                 height = 0.0
                 volume_dispensed = 0.0
@@ -389,40 +380,25 @@ def run(ctx: ProtocolContext) -> None:
         drop_tips()
 
     else:
-        for step in range(number_of_steps):
+        for step in range(step_volumes):
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
             if step > 0:
                 liq_pipette.transfer_with_liquid_class(
                     ethanol,
-                    #step_volume,
-                    vol_steps[step],
+                    step_volumes[step],
                     src["A1"],
                     labware["A1"],
                     new_tip="never",
                     return_tip=False,
                 )
 
-                try:
-                    try:
-                        height = round(
-                            _get_height_of_liquid_in_well(
-                                probe_pipette, labware["A1"], ctx.is_simulating()
-                            ),
-                            5,
-                        )
-                    except PipetteLiquidNotFoundError:
-                        ctx.comment("Didn't find liquid, trying again")
-                        height = round(
-                            _get_height_of_liquid_in_well(
-                                probe_pipette, labware["A1"], ctx.is_simulating()
-                            ),
-                            5,
-                        )
-                except PipetteLiquidNotFoundError:
-                    height = 99.0
+                height = round(
+                    _get_height_of_liquid_in_well(probe_pipette, labware["A1"], ctx.is_simulating()),
+                    5,
+                )
 
-                volume_dispensed = round(volume_dispensed + vol_steps[step], 5) #step_volume
+                volume_dispensed = round(volume_dispensed + step_volumes[step], 5) #step_volume
             else:
                 src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
                 height = 0.0
