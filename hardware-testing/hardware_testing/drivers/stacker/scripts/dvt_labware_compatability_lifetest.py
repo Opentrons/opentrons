@@ -22,7 +22,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.25",
 }
 
 test_data: Dict[str, Optional[Any]] = {
@@ -103,12 +103,20 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "value": "corning_48_wellplate_6.9ml_flat",
             },
             {
-                "display_name": "Corning 12 plate 122uL Flat",
+                "display_name": "Corning 12 plate 6.9mL Flat",
                 "value": "corning_12_wellplate_6.9ml_flat",
             },
             {
                 "display_name": "Artel 96 Plate 360uL flat",
                 "value": "corning_96_wellplate_360ul_flat",
+            },
+            {
+                "display_name": "biorad 384 plate 50uL PCR",
+                "value": "biorad_384_wellplate_50ul",
+            },
+            {
+                "display_name": "biorad 96 plate 200uL PCR",
+                "value": "biorad_96_wellplate_200ul_pcr",
             },
         ],
     )
