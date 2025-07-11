@@ -20,7 +20,7 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     High-capacity labware storage and retrieval for Flex.
 
-    [:octicons-arrow-right-24: Instruction Manual](stacker-manual/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../stacker-manual/index.md)
 
 -   :opentrons-hepa:{ .xl .middle } __HEPA/UV Module__
 
@@ -28,6 +28,6 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     Create an ISO-5 clean bench environment within Flex in 15 minutes.
 
-    [:octicons-arrow-right-24: Instruction Manual](hepa-uv/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../hepa-uv/index.md)
 
 </div>
