@@ -353,7 +353,9 @@ export function InputPrompt(): JSX.Element {
                 <AttachedFileItem
                   key={`${file.name}-${index}`}
                   file={file}
-                  onRemove={() => handleRemoveFile(index)}
+                  onRemove={() => {
+                    handleRemoveFile(index)
+                  }}
                   showRemoveButton={true}
                 />
               ))}

@@ -38,9 +38,8 @@ import {
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
-import { getFileTypeLabel } from '/ai-client/resources/utils/fileUtils'
 
-import type { ChatData, FileAttachment } from '/ai-client/resources/types'
+import type { ChatData } from '/ai-client/resources/types'
 
 interface ChatDisplayProps {
   chat: ChatData
