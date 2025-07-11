@@ -81,7 +81,7 @@ HOME_OFFSET_MD = 10.0
 LATCH_OFFSET = 2.25
 
 # Should put the bottom of the plate above this mm above the latch when dispensing.
-LATCH_CLEARANCE = 1.50
+LATCH_CLEARANCE = 1.25
 
 # Configs
 TOF_DETECTION_CONFIG = {
