@@ -113,7 +113,6 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           labwareLoadedOnModuleId,
           selectedRunTimeCommand
         )
-        console.log(isActiveLayerVisible, copy, labwareLoadedOnModuleId)
         const moduleDef = getModuleDef(moduleEntities[id].model)
         const moduleType = moduleEntities[id].type
 
