@@ -107,7 +107,7 @@ def load_tof_baseline_data(
     try:
         definition = load_definition("3", model_or_loadname)
         baseline = definition.get("uniqueModuleData", {})["TOFSensorBaseline"]
-        baseline['version'] = baseline.get('version', 1)
+        baseline["version"] = baseline.get("version", 1)
         # The baseline is stored as string, so convert to dict
         for axis, platform in product(["X", "Z"], ["extend", "retract"]):
             values = literal_eval(baseline[axis][platform])
