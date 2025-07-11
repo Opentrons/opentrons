@@ -318,10 +318,11 @@ Outside of protocols, the Opentrons App can display the current status of the He
       <td>100–240 VAC, 50/60 Hz</td>
     </tr>
     <tr>
-        <td><strong>Power adapter connector</td>
-        <td>4-pin DIN<br> <!-- CSS for a border here or go borderless? float right? -->
-        <img src="/images/module-power-connector.png" width="40%"><br>
-        When connecting the power cable to the module, match the flat side of the connector to the flat side of the power port.
+        <td><strong>Power adapter connector</strong></td>
+        <td>
+            4-pin DIN<br><!-- border around image might look odd here -->
+            <img src="../images/module-power-connector.png" alt="4-pin DIN connector with flat side" width="40%"><br>
+            Align the connector's flat side with the flat side of the module's power port.
         </td>
     </tr>
     <tr>
@@ -542,16 +543,61 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Temperature Module specifications
 
-| **Specification**               | **Details**                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| **Dimensions**                  | 194 × 90 × 84 mm (L/W/H)                                                   |
-| **Weight**                      | 1.5 kg                                                                    |
-| **Module power**                | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | <22 °C (recommended for optimal cooling)                                  |
-| **Relative humidity**           | Up to 60%, non-condensing                                                  |
-| **Altitude**                    | Up to 2000 m above sea level                                               |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th><strong>Specification</strong></th>
+      <th><strong>Details</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>194 × 90 × 84 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.5 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power</strong></td>
+      <td>
+        <ul>
+          <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
+          <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter connector</strong></td>
+      <td>
+        4-pin DIN<br>
+        <img src="../images/module-power-connector.png" alt="4-pin DIN connector with flat side" width="40%"><br>
+        Align the connector's flat side with the flat side of the module's power port.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>&lt;22 °C (recommended for optimal cooling)</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 60%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Thermocycler Module GEN2
 
