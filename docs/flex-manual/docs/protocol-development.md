@@ -25,7 +25,7 @@ Each protocol card will show:
 | **Time estimate**        | Approximately how long the protocol takes to run.                                                                                                       |
 | **Description**          | A short summary of what the protocol does.                                                                                                              |
 | **Robot model**          | Which Opentrons robots the protocol is compatible with.                                                                                                 |
-| **Protocol editability** | JSON protocols are editable in Protocol Designer, with no coding required. Python protocols are editable in any text editor, using the Python Protocol API. |
+| **Protocol editability** | JSON and Python protocols are editable in Protocol Designer, with no coding required. Python protocols are editable in any text editor, using the Python Protocol API. |
 | **Modules**              | Any hardware modules that are required.                                                                                                                 |
 
 In addition to these categories, in the sidebar you can filter results
@@ -108,90 +108,89 @@ Protocol Designer is a web-based, no-code tool for developing protocols that run
 
 - Pause to let you verify progress or access samples.
 
-All work on your protocol takes place within your web browser. When
+This section covers using Protocol Designer to create and edit a Flex protocol. For more details, see our Protocol Designer [instruction manual](https://insights.opentrons.com/hubfs/Protocol%20Designer%20Instruction%20Manual.pdf?_gl=1*ui6se*_ga*MTYxODA1OTk3LjE3MzgxODAyNjI.*_ga_66HK7MC5D7*MTc0MzUyMjc5NS4xMDQuMS4xNzQzNTIyODEwLjQ1LjAuMA..*_gcl_aw*R0NMLjE3NDAwMDA1NDYuQ2p3S0NBaUFuOWE5QmhCdEVpd0FiS2c2ZmlTMDk1QzdSekg3ZmVUUW0waUJ5LVpLckptZlQ2Y2ZpNFpGZVNQMmZvUElETWxrUzZfNjZCb0N2bHdRQXZEX0J3RQ..*_gcl_au*MjEyNDk3NTAzMi4xNzM5OTE4MjIy*_ga_GNSMNLW4RY*MTc0MzUyMjc5NS4xMDUuMS4xNzQzNTIyODEwLjQ1LjAuOTExNjgzNjA0 "instruction manual"). 
+
+All work in Protocol Designer takes place within your web browser. When
 you're done creating or editing your protocol, you need to export it to
-a JSON file. Then upload that file to a robot and run it, as you would
+a Python file. Then upload that file to a robot and run it, as you would
 with any protocol.
 
 ### Protocol Designer requirements
 
-Currently, Protocol Designer is only supported for use in Google Chrome
-and requires an internet connection. Uploading and running JSON
-protocols on Opentrons Flex requires version 7.0.0 or later of the
-Opentrons App.
+Protocol Designer is only supported for use in Google Chrome
+and requires an internet connection. Newer versions of Protocol Designer require newer versions of the Opentrons App. 
 
-You can't create or modify Python protocol files with Protocol Designer.
 
 ### Designing a protocol
 
 Protocols are all about informing the robot what hardware it will use to
-take specific actions. This process is broken down into three tabs in
+take specific actions. This process is broken down into five steps in
 Protocol Designer:
 
-**Icon Tab**
-
-The **File tab** is where you manage protocol files and specify hardware
-for use in your protocol.
-
-The **Liquids tab** lets you define samples, reagents, and any other
-liquids that your robot will handle.
-
-The **Design tab** is where you specify the initial state of the deck,
-add steps that the robot will perform, and view the projected outcomes
-of those steps.
-
-To create a protocol from scratch, you'll start on the File tab, work
-with the Liquids and Design tabs, and then return to the File tab to
-export your work. The remainder of this section goes through the
-protocol creation process in detail.
+| **Step** | **Description** |
+| -------- | --------------- |
+| Protocol setup | Specify your robot, pipettes, modules, and other hardware (like the Flex Gripper). |
+| Protocol overview | View protocol details like instruments, liquids, and the protocol starting deck at a glance. |
+| Edit protocol | Edit the starting deck, define liquids, and create protocol steps. |
+| Export protocol | Save and import your protocol into the Opentrons App to run on the Flex. |
 
 #### Part 1: Create a protocol
 
-When you launch Protocol Designer, you'll begin on the **File** tab. In
-the left sidebar, click **Create New** to open the Create New Protocol
-dialog. Click on the image of Opentrons Flex and then click **Next**.
+When you launch Protocol Designer, click to **Create a protocol**. Start by selecting pipettes and, if needed, a Flex Gripper to use with the Flex. You can also customize modules and fixtures, like the waste chute, trash bin, and staging areas, to optimize deck space. Only modules and fixtures compatible with Flex are available. 
 
-Choosing to create a protocol for Opentrons Flex in Protocol Designer.
+Protocol Designer protocols can control multiple Flex modules of the same type, except for the Thermocycler. At any time, you can edit the protocol to change your hardware configuration. 
 
-Enter a name for your protocol, which is how it will appear in the
-Opentrons App and on the touchscreen. You'll also see your protocol name
-in the Protocol Designer header while you're working on it. Optionally
-add a description and author information for your protocol.
+After naming your protocol, review the details in the protocol overview. Protocol Designer shows metadata, like the title and authors, instruments, liquids, and protocol steps. Click **Edit** in the upper right of each section to make changes. You can hover over the protocol starting deck on the right to view current deck slot details. 
 
-Next, Protocol Designer guides you through choosing the hardware used in
-your protocol:
+This overview is the first screen you'll see when you import an existing protocol into Protocol Designer. 
 
-1.  Pipettes and what type of tip racks you'll use with them. Every
-    protocol requires at least one pipette.
+<figure class="screenshot" markdown>
+  ![Protocol overview](images/protocol_overview.png)
+  <figcaption>The protocol overview includes metadata, instruments and deck hardware, and the protocol starting deck. Liquids and protocol steps not shown.</figcaption>
+  </figure>
 
-2.  Staging area slots in column 3 (optional).
+#### Part 2: Edit a protocol
 
-3.  Additional hardware used in your protocol, such as modules, the
-    gripper, or the waste chute. Only are shown.
+Click **Edit protocol** to add labware, liquids, and additional hardware to your protocol. The protocol starting deck view shows everything on the deck down to individual wells -- even on 384-well plates. 
 
-!!! note
-    You can't currently use multiple Heater-Shaker Modules or Magnetic Blocks in a JSON protocol. If your application requires them, you'll need to use a Python protocol. See the below.
+You can fully customize the Flex deck in Protocol Designer by adding compatible modules, staging areas, the waste chute, and custom labware. Click any open slot to add or edit hardware or labware. Click, drag, and drop to move labware and tips racks on the deck. 
 
-At any time, you can return to the File tab to rename your protocol, add
-an author name or description, or change your hardware configuration.
+Click **Liquids** in the upper right to add liquids in your protocol. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
 
-#### Part 2: Define liquids
+The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
 
-Move on to the **Liquids** tab to set up samples and reagents. This tab
-is only for *defining* types of liquids. You'll indicate the starting
-positions and amounts of liquids in Part 3, on the Design tab.
+[//]: # (formatting suggestions appreciated here! don't want to add another header level, but the numerous bullet lists aren't great (and look a lot better in Google docs than they do here.))
 
-Click **New Liquid** and then enter the name of your liquid and an
-optional description. You can also choose whether to *serialize* the
-liquid, so each well containing that liquid will be numbered on the deck
-map and in action steps. For example, if your protocol has blood
-samples, serialization can help you keep them separate in your workflow,
-while still labeling them all as "blood" and color-coding them the same.
+**Transfer steps** move liquid from one well or group of wells to another. In the first transfer step menu, specify the basics: source and destination, pipette path, and tip management settings. Next, choose whether to apply liquid class settings in the transfer step. 
 
-Each type of liquid appears in a different color on the deck map in
-Protocol Designer, in the Opentrons App, and on the touchscreen. You can
-use the default color, pick another preset color, or enter an RGB hex
-code to set a custom color.
+In the third menu, customize your transfer step with advanced settings, including: 
+
+* **Flow rate**: the speed the Flex aspirates or dispenses liquid at. 
+* **Well order**: the order the robot moves to source or destination wells. 
+* **Tip position**: where the Flex aspirates or dispenses in your labware. 
+* Additional advanced settings like pre-wet, touch tip, mix, delay, blowout, and air gap. 
+
+**Mix steps** mix liquid by repeatedly aspirating or dispensing. Mixing occurs in each well you select, one after the other, without moving any liquid between wells. 
+
+Choose how much liquid to mix with, the number of mixing repetitions, which wells will be mixed, and tip management settings for your workflow. You can also choose to apply Opentrons-verified liquid class settings to the mix. 
+
+**Move steps** let you control the Flex Gripper or move labware around the deck manually. By default, move steps use a gripper if added in your protocol. You need to use the gripper to dispose of labware when moving it into the waste chute, or when moving the lid off the Absorbance Plate Reader Module. 
+
+You need to manually move labware off-deck. During a manual move step, the protocol pauses. Confirm your labware move to resume the protocol.
+
+**Module steps** let you control Flex modules during a protocol. Protocol Designer includes different customizable options for each module. 
+
+* **Absorbance Plate Reader**: Protocol Designer lets you create multiple steps to initialize the plate reader, read samples in a plate, or move the lid on and off the module. An option to **Read labware** is only available when a plate is inside the plate reader. After reading a plate, you can find a CSV file with absorbance measurement data in the Flex's recent protocol runs in the Opentrons App. 
+
+[//]: # (insert below as a note)
+You'll need a Flex Gripper to add an Absorbance Plate Reader Module to your protocol starting deck. To prevent damage, only a Flex Gripper can move the lid on and off the Plate Reader. 
+
+[//]: # (work on some formatting for this section. ideally I could have >1 paragraph aligned with the bullet point)
+
+* **Heater-Shaker**: Protocol Designer supports multiple Heater-Shaker adapters for use with deep well, flat bottom, or PCR plates. In the step menu, control the temperature, shake speed, and labware latch of the Heater-Shaker Module. You can set a custom time for your step, to begin after the Heater-Shaker reaches the target temperature or shake speed. Because reaching a target temperature takes more time than changing the shaking speed, your protocol can proceed while the Heater-Shaker reaches a target temperature.
+
+
+
 
 #### Part 3: Lay out the deck
 
