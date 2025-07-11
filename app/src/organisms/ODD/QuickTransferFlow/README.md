@@ -103,11 +103,13 @@ export interface QuickTransferSummaryState {
   submergeAspirate?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractAspirate?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayAspirate?: {
@@ -124,11 +126,13 @@ export interface QuickTransferSummaryState {
   submergeDispense?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractDispense?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayDispense?: {
