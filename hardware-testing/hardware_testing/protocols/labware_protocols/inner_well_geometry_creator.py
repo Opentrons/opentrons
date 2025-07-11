@@ -13,6 +13,8 @@ from opentrons.types import Point
 from typing import Union
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
+import math
+from collections import deque
 
 ###########################################
 #  VARIABLES - START
@@ -39,9 +41,15 @@ SLOT_DIAL = "B2"
 
 RAMP_FRACTION = 1/3
 
+#hdelta controls this
+THRESHOLD = 3.5
 
-MIN_STEP = 10
-MAX_STEP = 500
+#sensitivity values for bottom and top zones:
+ALPHA_LOW = 3      # very sensitive near bottom (small height)
+ALPHA_HIGH = 0.5     # less sensitive near top (large height)
+
+# how many heights included in rolling average 
+SMOOTHING_WINDOW = 3
 
 ###########################################
 #  VARIABLES - END
@@ -72,13 +80,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=False,
     )
 
-    parameters.add_bool(
-        display_name="Reservoir Used?",
-        variable_name="reservoir_used",
-        description="If true, a reservoir is used for liquid pipetting.",
-        default=False,
-    )
-
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
@@ -88,6 +89,11 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
+            {"display_name": "applied24", "value": "appliedbiosystemsmicroamp_384_wellplate_40ul"},
+            {"display_name": "opentrons96", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"},
+            {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
+            {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
+
         ],
         default="corning_24_wellplate_3.4ml_flat",
     )
@@ -117,15 +123,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=False,
     )
 
-    parameters.add_float(
-        variable_name="Kp",
-        display_name="Gain Value",
-        description="A higher number means more aggressive scaling",
-        default=20,
-        maximum=50,
-        minimum=1
-
-    )
 
 def _setup(
     ctx: ProtocolContext,
@@ -139,20 +136,17 @@ def _setup(
     Labware,
     bool,
     float,
-    float,
     bool,
     LiquidClass,
     float
-]:
-
+]:     
 
     global DIAL_PORT, RUN_ID, FILE_NAME
 
-    reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
+    #reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
     quick_mode = ctx.params.quick_mode  # type: ignore[attr-defined]
     number_of_steps = int(ctx.params.number_of_steps)  # type: ignore[attr-defined]
     dynamic_steps = ctx.params.dynamic_steps  # type: ignore[attr-defined]
-    Kp = ctx.params.Kp # type: ignore[attr-defined]
 
     liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
@@ -220,7 +214,6 @@ def _setup(
         dial,
         dynamic_steps,
         number_of_steps,
-        Kp,
         quick_mode,
         ethanol,
         max_volume,
@@ -318,17 +311,19 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         dynamic_steps,
         number_of_steps,
-        Kp,
         quick_mode,
         ethanol,
         max_volume,
     ) = _setup(ctx)
 
+    # Constants, tune as needed
+    min_step = max_volume * 0.005     
+    max_step = max_volume * 0.05       
+
     # Initialize state
     volume_dispensed = 0.0
     step = 0
     tolerance = max_volume / 20
-    epsilon = 1e-4
     height = 0.0
     corrected_height = 0.0
     cheight_list = [0.0]
@@ -351,12 +346,40 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
+    delta_history = deque(maxlen=SMOOTHING_WINDOW)
+        
+    #Helper: determine the alpha region 
+    def get_alpha_for_height(height):
+        """Return control sensitivity alpha based on current height."""
+        if height < THRESHOLD:
+            return ALPHA_LOW
+        elif height > THRESHOLD:
+            return ALPHA_HIGH
+
     # Adaptive step volume based on change in liquid height
-    def adaptive_volume_step(delta_h):
-        if abs(delta_h) < epsilon:
-            return MAX_STEP
-        step_volume = Kp / (abs(delta_h) + epsilon)
-        return max(MIN_STEP, min(MAX_STEP, step_volume))
+    #current controller: exponential 
+    def adaptive_volume_step(hdelta, height):
+        neutral_threshold = 1.0  #desired step target height 
+        
+        # rolling average smoothing 
+        delta_history.append(abs(hdelta))
+        smoothed_delta = sum(delta_history) / len(delta_history)
+        
+        # Get alpha based on current height
+        alpha = get_alpha_for_height(height)
+
+        if smoothed_delta < neutral_threshold:
+            # Small change -> increase step volume
+            step_volume = max_step * math.exp(-alpha * smoothed_delta)
+        elif smoothed_delta == neutral_threshold:
+            # on threshold target -> maintain current step size
+            step_volume = step_volume  # maintain
+        else:
+            # large change  -> reduce more sharply
+            step_volume = min_step * math.exp(-alpha * smoothed_delta)
+
+        return max(min_step, min(max_step, step_volume))
+
 
     # ------------------ Start Protocol ------------------
 
@@ -368,7 +391,7 @@ def run(ctx: ProtocolContext) -> None:
         _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
         # Initial step volume
-        step_volume = MIN_STEP if dynamic_steps else max_volume / number_of_steps
+        step_volume = 600 if dynamic_steps else max_volume / number_of_steps
 
         # Step 0: Initial probe only, no dispense
         height = round(
@@ -405,9 +428,9 @@ def run(ctx: ProtocolContext) -> None:
             cheight_list.append(corrected_height)
 
             # Calculate hdelta and possibly adjust step volume
-            hdelta = cheight_list[-1] - cheight_list[-2]
             if dynamic_steps:
-                step_volume = adaptive_volume_step(hdelta)
+                hdelta = cheight_list[-1] - cheight_list[-2]
+                step_volume = adaptive_volume_step(hdelta, corrected_height)
 
             # Log trial data
             trial_data = [
@@ -417,6 +440,7 @@ def run(ctx: ProtocolContext) -> None:
                 height,
                 tip_z_error,
                 round(corrected_height, 5),
+                round(smoothed_delta)
             ]
             _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
@@ -440,7 +464,7 @@ def run(ctx: ProtocolContext) -> None:
         cheight_list.append(corrected_height)
 
         # Set initial step volume
-        step_volume = MIN_STEP if dynamic_steps else max_volume / number_of_steps
+        step_volume = min_step if dynamic_steps else max_volume / number_of_steps
 
         # Log step 0
         trial_data = [step, 0.0, volume_dispensed, height, tip_z_error, corrected_height]
@@ -477,7 +501,7 @@ def run(ctx: ProtocolContext) -> None:
             # Calculate new step volume if using dynamic steps
             if dynamic_steps:
                 hdelta = cheight_list[-1] - cheight_list[-2]
-                step_volume = adaptive_volume_step(hdelta)
+                step_volume = adaptive_volume_step(hdelta, corrected_height)
 
             # Log trial data
             trial_data = [
