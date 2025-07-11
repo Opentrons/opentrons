@@ -6,6 +6,7 @@ custom_dir: ./shared
 nav:
   - Opentrons Flex: '!include flex-manual/mkdocs.yml'
   - Modules:
+    - Modules home: modules/index.md
     - Flex Stacker: '!include stacker-manual/mkdocs.yml'
     - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
   - Python API: papi.md

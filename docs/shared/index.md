@@ -6,8 +6,6 @@
     }
 </style>
 
-Check out all our cool docs.
-
 <div class="grid cards" markdown>
 
 -   :opentrons-robot:{ .xl .middle } __Opentrons Flex__
@@ -24,7 +22,7 @@ Check out all our cool docs.
 
     Extend your robot's capabilities with easily swappable hardware.
 
-    [:octicons-arrow-right-24: Flex Stacker](stacker-manual/index.md)
+    [:octicons-arrow-right-24: View all modules](modules.md)
 
 -   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
 
