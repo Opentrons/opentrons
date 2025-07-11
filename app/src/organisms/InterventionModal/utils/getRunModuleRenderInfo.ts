@@ -26,8 +26,8 @@ export interface RunModuleInfo {
   moduleDef: ModuleDefinition
   nestedLabwareDef: LabwareDefinition | null
   nestedLabwareId: string | null
-  targetDeckId: ComponentProps<typeof Module>['targetDeckId']
-  targetSlotId: ComponentProps<typeof Module>['targetSlotId']
+  targetDeckId: NonNullable<ComponentProps<typeof Module>['targetDeckId']>
+  targetSlotId: NonNullable<ComponentProps<typeof Module>['targetSlotId']>
 }
 
 export function getRunModuleRenderInfo(
