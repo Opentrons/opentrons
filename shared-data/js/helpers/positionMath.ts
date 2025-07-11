@@ -1,4 +1,4 @@
-/** Compatibility shims to ease transitioning between with labware schemas 2 and 3. */
+/** Compute positions of labware stacked upon other labware, modules, deck slots, etc. */
 
 import {
   getAddressableAreaFromSlotId,
