@@ -41,15 +41,15 @@ SLOT_DIAL = "B2"
 
 RAMP_FRACTION = 1/3
 
-#hdelta controls this
+#below threshold, alpha low. above threshold, alpha high 
 THRESHOLD = 3.5
 
 #sensitivity values for bottom and top zones:
-ALPHA_LOW = 3      # very sensitive near bottom (small height)
-ALPHA_HIGH = 0.5     # less sensitive near top (large height)
+ALPHA_LOW = 1      
+ALPHA_HIGH = 0.5     
 
 # how many heights included in rolling average 
-SMOOTHING_WINDOW = 3
+SMOOTHING_WINDOW = 2
 
 ###########################################
 #  VARIABLES - END
@@ -332,7 +332,7 @@ def run(ctx: ProtocolContext) -> None:
     # Constants
     min_step = max_volume * 0.005
     max_step = max_volume * 0.05
-    tolerance = max_volume / 20
+    tolerance = max_volume / 25 
     neutral_threshold = 1.0  # target hdelta
 
     # State
@@ -383,7 +383,7 @@ def run(ctx: ProtocolContext) -> None:
             round(volume_dispensed, 5),
             round(tip_z_error, 5),
             round(corrected_height, 5),
-            round(sum(delta_history) / len(delta_history) if delta_history else 0.0, 5),
+            round(sum(delta_history) / len(delta_history), 5),
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
@@ -401,7 +401,9 @@ def run(ctx: ProtocolContext) -> None:
             corrected_height = height + tip_z_error
             cheight_list = [corrected_height]
         else:
-            dispense_volume = step_volume
+            if not quick_mode:
+                tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+            dispense_volume = step_volume #dispenses first_dispense initially
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
                 dispense_volume,
