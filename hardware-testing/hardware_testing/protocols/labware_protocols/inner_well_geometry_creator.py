@@ -65,7 +65,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step_volume", "total_vol", "height", "tip-z-error", "cheight", "smoothed_delta"]
+CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "cheight", "smoothed_delta"]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -346,7 +346,6 @@ def run(ctx: ProtocolContext) -> None:
         step,  
         round(dispense_volume, 5),
         round(volume_dispensed, 5),
-        round(height, 5),
         round(tip_z_error),
         round(corrected_height, 5),
         round(smoothed_delta, 5)
