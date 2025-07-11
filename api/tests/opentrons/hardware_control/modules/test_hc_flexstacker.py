@@ -415,7 +415,7 @@ async def test_dispense_labware_motion_sequence(
         )
 
         # We need to verify the move sequence
-        verify_hopper_labware_presence.assert_called_once_with(True)
+        verify_hopper_labware_presence.assert_called_once_with(Direction.RETRACT, True)
         _prepare_for_action.assert_called()
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD
