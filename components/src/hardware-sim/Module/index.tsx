@@ -40,8 +40,17 @@ export * from './Thermocycler'
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
 interface Props {
+  /**
+   * The x-coordinate of the module origin,
+   * which is the -x,-y corner of the slot that the module is in.
+   */
   x: number
+  /**
+   * The y-coordinate of the module origin,
+   * which is the -x,-y corner of the slot that the module is in.
+   */
   y: number
+
   def: ModuleDefinition
   orientation?: 'left' | 'right'
   innerProps?:
