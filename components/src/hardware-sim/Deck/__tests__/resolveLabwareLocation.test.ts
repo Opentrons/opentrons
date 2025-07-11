@@ -62,16 +62,18 @@ it('should resolve a labware location', () => {
     }],
   })
 
-  expect(result).toStrictEqual({
+  const expectedResult: typeof result = {
     deckDefinition,
     slotId,
     moduleDefinition,
     labwareDefinitionsBottomToTop: [
       labwareCDefinition,
       labwareBDefinition,
-      labwareADefinition
-    ]
-  } satisfies typeof result)
+      labwareADefinition,
+    ],
+  }
+
+  expect(result).toStrictEqual(expectedResult)
 })
 
 it('should return offDeck if the labware is off-deck', () => {
@@ -100,7 +102,9 @@ it('should return offDeck if the labware is off-deck', () => {
     loadedModules: [],
   })
 
-  expect(result).toStrictEqual("offDeck" satisfies typeof result)
+  const expectedResult: typeof result = 'offDeck'
+
+  expect(result).toStrictEqual(expectedResult)
 })
 
 it('should return error if something is missing from the input definitions', () => {
@@ -128,5 +132,7 @@ it('should return error if something is missing from the input definitions', () 
     loadedModules: [],
   })
 
-  expect(result).toStrictEqual("error" satisfies typeof result)
+  const expectedResult: typeof result = 'error'
+
+  expect(result).toStrictEqual(expectedResult)
 })
