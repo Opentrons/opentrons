@@ -4,7 +4,7 @@ import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
-import { getSchema2Dimensions } from './labwareSchemaShims'
+import { getSchema2Dimensions } from './positionMath'
 
 import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
 import type {
@@ -49,7 +49,7 @@ export * from './sortRunTimeParameters'
 export * from './parseAddressableArea'
 export * from './validateCustomLabwareHelper'
 export * from './getWellRangeForLiquidLabwarePair'
-export * from './labwareSchemaShims'
+export * from './positionMath'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
