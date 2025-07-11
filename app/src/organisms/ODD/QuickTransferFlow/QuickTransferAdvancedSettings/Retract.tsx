@@ -219,6 +219,7 @@ function RetractSettingComponent({
           <NumericalKeyboard
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
+            isDecimal
             initialValue={String(speed ?? '')}
             onChange={e => {
               setSpeed(Number(e))

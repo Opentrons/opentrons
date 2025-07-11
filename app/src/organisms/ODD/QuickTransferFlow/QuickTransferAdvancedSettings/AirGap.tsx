@@ -139,7 +139,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
     }
   }
 
-  const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
+  const volumeRange = { min: 0.1, max: Math.floor(maxAvailableCapacity) }
   let volumeError = null
   if (volumeRange.min > volumeRange.max) {
     volumeError = t('air_gap_capacity_error')
@@ -232,6 +232,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              isDecimal
               initialValue={String(volume ?? '')}
               onChange={e => {
                 setVolume(Number(e))

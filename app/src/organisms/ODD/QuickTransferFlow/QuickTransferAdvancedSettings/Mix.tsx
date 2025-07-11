@@ -234,6 +234,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              isDecimal
               initialValue={String(mixVolume ?? '')}
               onChange={e => {
                 setMixVolume(Number(e))

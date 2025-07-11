@@ -170,7 +170,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     if (userInput === '') {
       setSpeed(null)
     }
-    const parsedSpeed = parseInt(userInput)
+    const parsedSpeed = parseFloat(userInput)
     setSpeed(!isNaN(parsedSpeed) ? parsedSpeed : null)
   }
 
@@ -247,6 +247,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              isDecimal
               initialValue={String(speed ?? '')}
               onChange={e => {
                 handleSpeedChange(e)
@@ -288,6 +289,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               hasHyphen
+              isDecimal
               keyboardRef={keyboardRef}
               initialValue={String(position ?? '')}
               onChange={e => {
