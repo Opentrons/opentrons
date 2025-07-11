@@ -45,8 +45,8 @@ RAMP_FRACTION = 1/3
 THRESHOLD = 3.5
 
 #sensitivity values for bottom and top zones:
-ALPHA_LOW = 1      
-ALPHA_HIGH = 0.5     
+ALPHA_LOW = 2      
+ALPHA_HIGH = 1     
 
 # how many heights included in rolling average 
 SMOOTHING_WINDOW = 2
@@ -65,7 +65,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "cheight", "smoothed_delta"]
+CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "cheight", "hdelta"]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -332,8 +332,7 @@ def run(ctx: ProtocolContext) -> None:
     # Constants
     min_step = max_volume * 0.005
     max_step = max_volume * 0.05
-    tolerance = max_volume / 25 
-    neutral_threshold = 1.0  # target hdelta
+    tolerance = max_volume / 25 #if the height within tolerance, then protocol can finish. 
 
     # State
     volume_dispensed = 0.0
@@ -343,7 +342,7 @@ def run(ctx: ProtocolContext) -> None:
     cheight_list = [0.0]
     tip_z_error = 0.0
     step = 0
-    delta_history = deque(maxlen=SMOOTHING_WINDOW)
+    #delta_history = deque(maxlen=SMOOTHING_WINDOW)
 
     # Store baseline and header
     _store_dial_baseline(ctx, probe_pipette, dial)
@@ -367,14 +366,29 @@ def run(ctx: ProtocolContext) -> None:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
     def adaptive_volume_step(hdelta: float, h: float) -> float:
-        alpha = get_alpha_for_height(h)
-        delta_history.append(abs(hdelta))
-        smoothed_delta = sum(delta_history) / len(delta_history)
-        if smoothed_delta < neutral_threshold:
-            step_v = max_step * math.exp(-alpha * smoothed_delta)
+        # Target step gain: 1.0 mm
+        neutral_target = 1.0
+        delta_tolerance = 0.2  # +/- 0.2mm range around neutral
+
+        # deadband
+        lower_bound = neutral_target - delta_tolerance  # 0.8 mm
+        upper_bound = neutral_target + delta_tolerance  # 1.2 mm
+
+        # Get alpha sensitivity factor based on current height
+        alpha = get_alpha_for_height(height)
+
+        if lower_bound <= hdelta <= upper_bound:
+            # maintain current step volume
+            return step_volume  
+        elif hdelta < lower_bound:
+            # increase volume
+            step_volume = max_step * math.exp(-alpha * hdelta)
         else:
-            step_v = min_step * math.exp(-alpha * smoothed_delta)
-        return max(min_step, min(max_step, step_v))
+            # reduce volume
+            step_volume = min_step * math.exp(-alpha * hdelta)
+
+        # Clamp within bounds
+        return max(min_step, min(max_step, step_volume))
 
     def write_trial_log() -> None:
         trial_data = [
@@ -383,7 +397,8 @@ def run(ctx: ProtocolContext) -> None:
             round(volume_dispensed, 5),
             round(tip_z_error, 5),
             round(corrected_height, 5),
-            round(sum(delta_history) / len(delta_history), 5),
+            #round(sum(delta_history) / len(delta_history), 5),
+            round(hdelta,5)
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
@@ -420,7 +435,7 @@ def run(ctx: ProtocolContext) -> None:
             corrected_height = height + tip_z_error
             cheight_list.append(corrected_height)
 
-            if dynamic_steps and len(cheight_list) >= 2:
+            if dynamic_steps and len(cheight_list) > 1:
                 hdelta = cheight_list[-1] - cheight_list[-2]
                 step_volume = adaptive_volume_step(hdelta, corrected_height)
 
