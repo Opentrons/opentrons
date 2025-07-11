@@ -7,6 +7,13 @@ export type ProtocolFormat = 'Protocol Designer' | 'Python'
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
 
+export interface FileAttachment {
+  name: string
+  type: 'pdf' | 'csv' | 'python'
+  content: string
+  size: number
+}
+
 export interface ChatData {
   /** assistant: ChatGPT API, user: user */
   role: Role
@@ -20,6 +27,8 @@ export interface ChatData {
   protocol_content?: ProtocolFile
   /** The format of the protocol */
   protocol_format?: ProtocolFormat
+  /** attached files */
+  attachments?: FileAttachment[]
 }
 
 export interface CreatePrompt {

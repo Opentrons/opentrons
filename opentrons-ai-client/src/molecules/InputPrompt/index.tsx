@@ -2,17 +2,14 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
-  ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -39,7 +36,15 @@ import {
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '/ai-client/resources/utils'
+import {
+  getFileType,
+  MAX_FILES_PER_MESSAGE,
+  validateFile,
+} from '/ai-client/resources/utils/fileUtils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
+
+import { AttachedFileItem } from '../../atoms/AttachedFileItem'
+import { AttachFileButton } from '../../atoms/AttachFileButton'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -97,6 +102,39 @@ export function InputPrompt(): JSX.Element {
   }
 
   const [requestId, setRequestId] = useState<string>(uuidv4())
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [fileError, setFileError] = useState<string | null>(null)
+
+  const handleFileSelect = (files: FileList): void => {
+    setFileError(null)
+    const fileArray = Array.from(files)
+
+    // Check total file count
+    if (attachedFiles.length + fileArray.length > MAX_FILES_PER_MESSAGE) {
+      setFileError(
+        `You can attach a maximum of ${MAX_FILES_PER_MESSAGE} files per message.`
+      )
+      return
+    }
+
+    // Validate each file
+    const validFiles: File[] = []
+    for (const file of fileArray) {
+      const validation = validateFile(file)
+      if (!validation.isValid) {
+        setFileError(validation.error || 'Invalid file')
+        return
+      }
+      validFiles.push(file)
+    }
+
+    setAttachedFiles(prev => [...prev, ...validFiles])
+  }
+
+  const handleRemoveFile = (index: number): void => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
+    setFileError(null)
+  }
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
   useEffect(() => {
@@ -141,8 +179,18 @@ export function InputPrompt(): JSX.Element {
       role: 'user',
       reply: watchUserPrompt,
       protocol_format: currentProtocolFormat,
+      attachments:
+        attachedFiles.length > 0
+          ? attachedFiles.map(file => ({
+              name: file.name,
+              type: getFileType(file) as 'pdf' | 'csv' | 'python',
+              content: '', // Content will be read separately if needed
+              size: file.size,
+            }))
+          : undefined,
     }
     reset()
+    setAttachedFiles([]) // Clear attached files after sending
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -286,20 +334,60 @@ export function InputPrompt(): JSX.Element {
 
   return (
     <StyledForm id="User_Prompt">
-      <Flex css={CONTAINER_STYLE}>
-        <LegacyStyledTextarea
-          rows={calcTextAreaHeight(watchUserPrompt)}
-          placeholder={t('type_your_prompt')}
-          {...register('userPrompt')}
-        />
-        <SendButton
-          disabled={watchUserPrompt.length === 0}
-          isLoading={isLoading}
-          handleClick={() => {
-            handleClick()
-          }}
-        />
-      </Flex>
+      {/* Error message */}
+      {fileError && (
+        <ErrorContainer>
+          <StyledText color={COLORS.red50} fontSize={TYPOGRAPHY.fontSize14}>
+            {fileError}
+          </StyledText>
+        </ErrorContainer>
+      )}
+
+      {/* Main input container */}
+      <MainInputContainer>
+        {/* Display attached files above the input */}
+        {attachedFiles.length > 0 && (
+          <AttachedFilesSection>
+            <AttachedFilesList>
+              {attachedFiles.map((file, index) => (
+                <AttachedFileItem
+                  key={`${file.name}-${index}`}
+                  file={file}
+                  onRemove={() => handleRemoveFile(index)}
+                  showRemoveButton={true}
+                />
+              ))}
+            </AttachedFilesList>
+          </AttachedFilesSection>
+        )}
+
+        {/* Text input area - separate row */}
+        <TextInputSection>
+          <LegacyStyledTextarea
+            rows={calcTextAreaHeight(watchUserPrompt)}
+            placeholder={t('type_your_prompt')}
+            {...register('userPrompt')}
+          />
+        </TextInputSection>
+
+        {/* Bottom row with attach button and send button */}
+        <ButtonRowContainer>
+          <AttachFileButton
+            onFileSelect={handleFileSelect}
+            disabled={
+              isLoading || attachedFiles.length >= MAX_FILES_PER_MESSAGE
+            }
+          />
+          <Spacer />
+          <SendButton
+            disabled={watchUserPrompt.length === 0}
+            isLoading={isLoading}
+            handleClick={() => {
+              handleClick()
+            }}
+          />
+        </ButtonRowContainer>
+      </MainInputContainer>
     </StyledForm>
   )
 }
@@ -341,19 +429,12 @@ const StyledForm = styled.form`
   width: 100%;
 `
 
-const CONTAINER_STYLE = css`
-  padding: ${SPACING.spacing40};
-  grid-gap: ${SPACING.spacing40};
-  flex-direction: ${DIRECTION_ROW};
-  background-color: ${COLORS.white};
+const ErrorContainer = styled.div`
+  padding: ${SPACING.spacing12} ${SPACING.spacing16};
+  background-color: ${COLORS.red10};
   border-radius: ${BORDERS.borderRadius4};
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-  max-height: 21.25rem;
-
-  &:focus-within {
-    border: 1px ${BORDERS.styleSolid}${COLORS.blue50};
-  }
+  border: 1px solid ${COLORS.red30};
+  margin-bottom: ${SPACING.spacing8};
 `
 
 const LegacyStyledTextarea = styled.textarea`
@@ -364,18 +445,70 @@ const LegacyStyledTextarea = styled.textarea`
   background-color: ${COLORS.white};
   border: none;
   outline: none;
-  padding: 0;
+  padding: 1.2rem 0;
   box-shadow: none;
   color: ${COLORS.black90};
   width: 100%;
-  font-size: ${TYPOGRAPHY.fontSize20};
-  line-height: ${TYPOGRAPHY.lineHeight24};
-  padding: 1.2rem 0;
-  font-size: 1rem;
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  line-height: ${TYPOGRAPHY.lineHeight20};
+  font-family: 'Public Sans';
+  font-style: normal;
 
   ::placeholder {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    color: ${COLORS.grey50};
+    font-size: ${TYPOGRAPHY.fontSizeH3};
+    font-weight: ${TYPOGRAPHY.fontWeightRegular};
+    line-height: ${TYPOGRAPHY.lineHeight20};
+    font-family: 'Public Sans';
+    font-style: normal;
   }
+`
+
+const MainInputContainer = styled.div`
+  width: 100%;
+  border: 1px solid ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius12};
+  background-color: ${COLORS.white};
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: ${COLORS.blue50};
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+  }
+`
+
+const AttachedFilesSection = styled.div`
+  border-bottom: 1px solid ${COLORS.grey20};
+  background-color: ${COLORS.grey5};
+  border-radius: ${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0 0;
+`
+
+const AttachedFilesList = styled.div`
+  padding: ${SPACING.spacing12} ${SPACING.spacing16};
+  display: flex;
+  flex-direction: row;
+  gap: ${SPACING.spacing8};
+  flex-wrap: wrap;
+`
+
+const TextInputSection = styled.div`
+  padding: ${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing4}
+    ${SPACING.spacing16};
+  background-color: ${COLORS.white};
+`
+
+const ButtonRowContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing12} ${SPACING.spacing16};
+  background-color: ${COLORS.white};
+  border-radius: 0 0 ${BORDERS.borderRadius12} ${BORDERS.borderRadius12};
+`
+
+const Spacer = styled.div`
+  flex: 1;
 `

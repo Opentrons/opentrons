@@ -28,6 +28,7 @@ import {
 } from '@opentrons/components'
 
 import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
+import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
 import {
   chatDataAtom,
   createProtocolChatAtom,
@@ -37,8 +38,9 @@ import {
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+import { getFileTypeLabel } from '/ai-client/resources/utils/fileUtils'
 
-import type { ChatData } from '/ai-client/resources/types'
+import type { ChatData, FileAttachment } from '/ai-client/resources/types'
 
 interface ChatDisplayProps {
   chat: ChatData
@@ -64,36 +66,36 @@ const StyledIcon = styled(Icon)`
 
 const OuterContainer = styled.div`
   background-color: ${COLORS.white};
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 0.5rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 16px;
+  margin: 0 1rem;
 `
 
 const FileContainer = styled.div`
   background-color: ${COLORS.grey20};
-  border-radius: 12px;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 0.75rem 1rem;
   width: 100%;
 `
 
 const BadgeContainer = styled.div`
   background-color: ${COLORS.grey30};
-  border-radius: 4px;
+  border-radius: 0.25rem;
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 0.75rem 1rem;
   width: 100%;
 `
 
 const IconWrapper = styled.div`
-  width: 32px;
-  height: 32px;
-  margin-right: 12px;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,7 +107,7 @@ const ButtonContainer = styled(Flex)`
 `
 
 const FileName = styled.span`
-  font-size: 14px;
+  font-size: 0.875rem;
   color: ${COLORS.black90};
 `
 
@@ -124,7 +126,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
 
   const [showProtocolContent, setShowProtocolContent] = useState(false)
-  const { role, reply, requestId, protocol_content } = chat
+  const { role, reply, requestId, protocol_content, attachments } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {
@@ -253,8 +255,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
               <img
                 src={smallLogo}
                 alt="Opentrons logo"
-                width="24"
-                height="24"
+                width="1.5rem"
+                height="1.5rem"
               />
             </IconWrapper>
             <FileName>{protocolName}</FileName>
@@ -295,40 +297,57 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing12}
+      width="100%"
+    >
       <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
         <StyledText paddingTop={SPACING.spacing12}>
           {isUser ? t('you') : t('opentronsai')}
         </StyledText>
       </Flex>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
-      <Flex
-        padding={`${SPACING.spacing40} ${SPACING.spacing40} ${
-          isUser ? SPACING.spacing40 : SPACING.spacing12
-        } ${SPACING.spacing40}`}
+      <MessageContainer
+        padding="1.5rem"
         backgroundColor={isUser ? COLORS.blue30 : COLORS.grey30}
         data-testid={`ChatDisplay_from_${isUser ? 'user' : 'backend'}`}
         borderRadius={SPACING.spacing12}
-        width="100%"
         overflowY={OVERFLOW_AUTO}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
+        gridGap="1.5rem"
         position={POSITION_RELATIVE}
+        $isUser={isUser}
       >
         {protocol_content == null && (
-          <Markdown
-            components={{
-              div: undefined,
-              ul: UnnumberedListText,
-              h2: HeaderText,
-              li: ListItemText,
-              p: ParagraphText,
-              a: isUser ? ParagraphText : ExternalLink,
-              code: CodeText,
-            }}
-          >
-            {reply}
-          </Markdown>
+          <ContentWrapper>
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
+          </ContentWrapper>
+        )}
+
+        {/* Display file attachments for user messages */}
+        {isUser && attachments && attachments.length > 0 && (
+          <AttachmentsContainer>
+            {attachments.map((attachment, index) => (
+              <AttachedFileItem
+                key={`${attachment.name}-${index}`}
+                file={attachment}
+                showRemoveButton={false}
+              />
+            ))}
+          </AttachmentsContainer>
         )}
         {protocol_content != null && (
           <StyledText
@@ -423,7 +442,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             </HoverShadow>
           </Flex>
         ) : null}
-      </Flex>
+      </MessageContainer>
     </Flex>
   )
 }
@@ -472,4 +491,21 @@ const CodeWrapper = styled(Flex)`
   background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
+`
+
+const MessageContainer = styled(Flex)<{ $isUser: boolean }>`
+  width: fit-content;
+  max-width: 70%;
+  align-self: ${props => (props.$isUser ? 'flex-end' : 'flex-start')};
+`
+
+const ContentWrapper = styled.div`
+  width: 100%;
+`
+
+const AttachmentsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${SPACING.spacing8};
+  flex-wrap: wrap;
 `
