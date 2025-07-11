@@ -49,6 +49,6 @@
     "ot3_standard": {}
   },
   "compatibleWith": [],
-  "incompatibleWithDecks": ["ot2_standard"],
+  "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {}
 }
