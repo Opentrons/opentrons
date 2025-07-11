@@ -15,6 +15,7 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FAKE_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_FIXTURES,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
@@ -120,7 +121,8 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         mayMountToCutoutIds.includes(cutoutId) &&
         (isCurrentConfiguration ||
           SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
-          FAKE_FIXTURE_IDS.includes(cutoutFixtureId))
+          FAKE_FIXTURE_IDS.includes(cutoutFixtureId)) || 
+          FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
       ) {
         return [...acc, cutoutId]
       }
