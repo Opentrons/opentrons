@@ -90,7 +90,7 @@ export function Controls(props: ControlsProps): JSX.Element {
                 {numErrors === 0 ? (
                   <Chip type="success" chipSize="small" text="No errors" />
                 ) : (
-                  <Chip type="error" text={`${numErrors} errors`} />
+                  <Chip type="error" text={`${numErrors} error`} />
                 )}
               </div>
             </div>

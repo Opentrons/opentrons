@@ -145,6 +145,52 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const tempInnerProps = getModuleInnerProps(moduleState)
         const isActive = selectedSlot === slot || hoveredSlot === slot
+
+        const innerTCProps = {
+          ...tempInnerProps,
+          lidMotorState:
+            (tempInnerProps as ThermocyclerVizProps).lidMotorState !== 'open'
+              ? 'closed'
+              : 'open',
+        }
+
+        let fillColor = COLORS.grey50
+        if (showDeckRenders && !isActive) {
+          fillColor = COLORS.transparent
+        } else if (isActive) {
+          fillColor = COLORS.grey60
+        }
+
+        const innerLabwareRender =
+          labwareLoadedOnModuleId != null ? (
+            <>
+              <RobotCoordsForeignDiv>
+                <div
+                  className={clsx(
+                    styles.slot_box,
+                    getSlotColorClass(
+                      hoveredSlot,
+                      selectedSlot,
+                      slot,
+                      isActiveLayerVisible
+                    )
+                  )}
+                >
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    transform={`rotate(180deg) scaleX(-1)`}
+                    color={COLORS.white}
+                  >
+                    {isActiveLayerVisible
+                      ? copy
+                      : labwareEntities[labwareLoadedOnModuleId].def.metadata
+                          .displayName}
+                  </StyledText>
+                </div>
+              </RobotCoordsForeignDiv>
+            </>
+          ) : null
+
         return (
           <Fragment key={id}>
             {showDeckRenders ? (
@@ -158,14 +204,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 )}
                 innerProps={
                   moduleType === THERMOCYCLER_MODULE_TYPE
-                    ? {
-                        ...tempInnerProps,
-                        lidMotorState:
-                          (tempInnerProps as ThermocyclerVizProps)
-                            .lidMotorState !== 'open'
-                            ? 'closed'
-                            : 'open',
-                      }
+                    ? innerTCProps
                     : tempInnerProps
                 }
                 targetSlotId={slot}
@@ -211,13 +250,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               key={slot}
               slotId={slot}
               slotPosition={slotPosition}
-              slotFillColor={
-                isActive
-                  ? COLORS.grey60
-                  : showDeckRenders
-                  ? COLORS.transparent
-                  : COLORS.grey50
-              }
+              slotFillColor={fillColor}
               robotType={robotType}
               invariantContext={invariantContext}
               robotState={robotState}
@@ -238,34 +271,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     </StyledText>
                   </div>
                 ) : null}
-                {labwareLoadedOnModuleId != null && !showDeckRenders ? (
-                  <>
-                    <RobotCoordsForeignDiv>
-                      <div
-                        className={clsx(
-                          styles.slot_box,
-                          getSlotColorClass(
-                            hoveredSlot,
-                            selectedSlot,
-                            slot,
-                            isActiveLayerVisible
-                          )
-                        )}
-                      >
-                        <StyledText
-                          desktopStyle="captionRegular"
-                          transform={`rotate(180deg) scaleX(-1)`}
-                          color={COLORS.white}
-                        >
-                          {isActiveLayerVisible
-                            ? copy
-                            : labwareEntities[labwareLoadedOnModuleId].def
-                                .metadata.displayName}
-                        </StyledText>
-                      </div>
-                    </RobotCoordsForeignDiv>
-                  </>
-                ) : null}
+                {showDeckRenders && !isActive ? null : innerLabwareRender}
               </div>
             </DeckViewOverlay>
             {isStepAssosciatedWithModule ? (

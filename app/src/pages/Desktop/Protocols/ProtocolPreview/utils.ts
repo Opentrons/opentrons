@@ -422,18 +422,19 @@ export function getPreviousGroupFirstCommandId(
 export const getThermocyclerOverlayText = (
   commandType: RunTimeCommand['commandType']
 ): string => {
-  if (commandType === 'loadModule') {
-    return 'Load Thermocycler'
-  } else if (commandType === 'thermocycler/openLid') {
-    return 'Opening lid'
-  } else if (commandType === 'thermocycler/closeLid') {
-    return 'Closing lid'
-  } else if (commandType === 'thermocycler/setTargetBlockTemperature') {
-    return 'Setting block temperature'
-  } else if (commandType === 'thermocycler/waitForLidTemperature') {
-    return 'Setting lid temperature'
-  } else {
-    //  TODO: the rest of the copy isn't needed for protocol viz user testing purposes
-    return 'Changing thermocycler state'
+  switch (commandType) {
+    case 'loadModule':
+      return 'Load Thermocycler'
+    case 'thermocycler/openLid':
+      return 'Opening lid'
+    case 'thermocycler/closeLid':
+      return 'Closing lid'
+    case 'thermocycler/setTargetBlockTemperature':
+      return 'Setting block temperature'
+    case 'thermocycler/waitForLidTemperature':
+      return 'Setting lid temperature'
+    default:
+      //  TODO: the rest of the copy isn't needed for protocol viz user testing purposes
+      return 'Changing thermocycler state'
   }
 }

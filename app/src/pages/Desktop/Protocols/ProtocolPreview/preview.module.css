@@ -61,8 +61,8 @@
 
 .controls_overflow_btn {
   position: absolute;
-  top: var(--spacing-4);
-  right: var(--spacing-4);
+  top: 0.25rem;
+  right: 0.25rem;
 }
 
 .max_content_size {
