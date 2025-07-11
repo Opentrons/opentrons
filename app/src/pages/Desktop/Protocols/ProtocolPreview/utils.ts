@@ -256,8 +256,9 @@ export const getActiveLayer = (
     selectedRunTimeCommand.params.labwareId === id
   const isMoveStepAssosciatedWithLabwareId =
     selectedRunTimeCommand != null &&
-    'newLocation' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.newLocation?.labwareId === id
+    selectedRunTimeCommand.commandType === 'moveLabware' &&
+    'labwareId' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.labwareId === id
   const isLoadStepAssosciatedWithLabwareId =
     selectedRunTimeCommand != null &&
     'labwareId' in selectedRunTimeCommand.params &&
@@ -270,12 +271,30 @@ export const getActiveLayer = (
     isMoveStepAssosciatedWithLabwareId
 
   let activeCopy = isTiprack
-    ? 'Tiprack used in transfer'
-    : 'Labware used in transfer'
+    ? 'Tiprack used in pipetting step'
+    : 'Labware used in pipetting step'
   if (isLoadStepAssosciatedWithLabwareId) {
     activeCopy = 'Loading labware'
   } else if (isMoveStepAssosciatedWithLabwareId) {
-    activeCopy = 'Moving labware'
+    activeCopy = 'Moving plate'
+  } else if (
+    isTiprack &&
+    isStepAssosciatedWithLabwareId &&
+    selectedRunTimeCommand?.commandType === 'pickUpTip'
+  ) {
+    activeCopy = 'Picking up tips'
+  } else if (
+    !isTiprack &&
+    isStepAssosciatedWithLabwareState &&
+    selectedRunTimeCommand?.commandType === 'aspirateInPlace'
+  ) {
+    activeCopy = 'Aspirating'
+  } else if (
+    !isTiprack &&
+    isStepAssosciatedWithLabwareState &&
+    selectedRunTimeCommand?.commandType === 'dispenseInPlace'
+  ) {
+    activeCopy = 'Dispensing'
   }
 
   return {
@@ -397,5 +416,24 @@ export function getPreviousGroupFirstCommandId(
     return previousGroup.subCommands[0]?.command.id ?? null
   } else {
     return previousGroup.command.id
+  }
+}
+
+export const getThermocyclerOverlayText = (
+  commandType: RunTimeCommand['commandType']
+): string => {
+  if (commandType === 'loadModule') {
+    return 'Load Thermocycler'
+  } else if (commandType === 'thermocycler/openLid') {
+    return 'Opening lid'
+  } else if (commandType === 'thermocycler/closeLid') {
+    return 'Closing lid'
+  } else if (commandType === 'thermocycler/setTargetBlockTemperature') {
+    return 'Setting block temperature'
+  } else if (commandType === 'thermocycler/waitForLidTemperature') {
+    return 'Setting lid temperature'
+  } else {
+    //  TODO: the rest of the copy isn't needed for protocol viz user testing purposes
+    return 'Changing thermocycler state'
   }
 }

@@ -1,5 +1,8 @@
-import { Chip, COLORS, Icon } from '@opentrons/components'
+import { useState } from 'react'
 
+import { Chip, COLORS, Icon, OverflowBtn } from '@opentrons/components'
+
+import { ControlsOverflowMenu } from './ControlsOverflowMenu'
 import styles from './preview.module.css'
 import {
   getNextGroupFirstCommandId,
@@ -20,6 +23,8 @@ interface ControlsProps {
   isPlaying: boolean
   commands: RunTimeCommand[]
   groupedCommands: GroupedCommands | null
+  setShowDeckRenders: Dispatch<SetStateAction<boolean>>
+  showDeckRenders: boolean
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -32,7 +37,10 @@ export function Controls(props: ControlsProps): JSX.Element {
     isPlaying,
     commands,
     groupedCommands,
+    showDeckRenders,
+    setShowDeckRenders,
   } = props
+  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
   const currentCommandId = commands[currentCommandIndex].id
   const nextGroupFirstCommandId = getNextGroupFirstCommandId(
     groupedCommands,
@@ -58,8 +66,21 @@ export function Controls(props: ControlsProps): JSX.Element {
     }
   }
 
+  const handleOverflowMenuClick = (showRenders: boolean): void => {
+    setShowDeckRenders(showRenders)
+    setShowOverflowMenu(false)
+  }
+
   return (
     <>
+      {showOverflowMenu ? (
+        <ControlsOverflowMenu
+          handleDeckView={showRenders => {
+            handleOverflowMenuClick(showRenders)
+          }}
+          showsRenders={showDeckRenders}
+        />
+      ) : null}
       <div className={styles.container}>
         <div className={styles.controls_container}>
           <div className={styles.all_controls_info}>
@@ -76,7 +97,7 @@ export function Controls(props: ControlsProps): JSX.Element {
             <div className={styles.buttons}>
               <button className={styles.fast_button} onClick={handleBack}>
                 <Icon
-                  name="ot-end"
+                  name="skip-backward"
                   width="1.5625rem"
                   height="1.875rem"
                   color={COLORS.blue50}
@@ -92,13 +113,20 @@ export function Controls(props: ControlsProps): JSX.Element {
               </button>
               <button className={styles.fast_button} onClick={handleForward}>
                 <Icon
-                  name="ot-start"
+                  name="skip-forward"
                   width="1.5625rem"
                   height="1.875rem"
                   color={COLORS.blue50}
                 />
               </button>
             </div>
+          </div>
+          <div className={styles.controls_overflow_btn}>
+            <OverflowBtn
+              onClick={() => {
+                setShowOverflowMenu(prev => !prev)
+              }}
+            />
           </div>
         </div>
         <input

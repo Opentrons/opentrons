@@ -92,7 +92,7 @@ export function ActiveWellSlotDetails(
           {'speed' in params ? (
             <div className={styles.well_details_speed}>
               <StyledText desktopStyle="bodyDefaultRegular">Speed</StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">{`${params.speed} uL/s`}</StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{`${params.speed} mm/s`}</StyledText>
             </div>
           ) : null}
         </div>
@@ -114,7 +114,7 @@ export function ActiveWellSlotDetails(
               <div className={styles.well_details_caption_side}>
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                   {round(labwareDepth, 0)}
-                  {'mL'}
+                  {'mm'}
                 </StyledText>
               </div>
             )}
@@ -122,7 +122,7 @@ export function ActiveWellSlotDetails(
               <div className={styles.well_details_caption_bottom}>
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                   {xLabwareWellWidth}
-                  {'mL'}
+                  {'mm'}
                 </StyledText>
               </div>
             )}
