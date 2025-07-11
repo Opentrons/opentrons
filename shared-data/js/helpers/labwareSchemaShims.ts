@@ -93,7 +93,7 @@ export interface ComputeLabwareOriginInput {
    * This should be specified even if it's only transitively underneath the labware,
    * like slot -> module -> adapter -> labware in question.
    */
-  moduleDefinition?: ModuleDefinition
+  moduleDefinition: ModuleDefinition | null
 
   /** The labware and all the labware underneath it. */
   labwareDefinitionsBottomToTop: LabwareDefinition[]

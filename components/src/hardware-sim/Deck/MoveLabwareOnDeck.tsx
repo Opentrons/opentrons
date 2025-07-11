@@ -224,7 +224,7 @@ function resolveLabwareLocation({
     | 'error'
     | {
         slotId: string
-        moduleDefinition?: ModuleDefinition
+        moduleDefinition: ModuleDefinition | null
       } => {
     if ('moduleId' in bottomLabwareLocation) {
       const loadedModule = loadedModules.find(
@@ -238,9 +238,12 @@ function resolveLabwareLocation({
       if (modSlot == null) return 'error'
       return { slotId: modSlot.id, moduleDefinition }
     } else if ('slotName' in bottomLabwareLocation) {
-      return { slotId: bottomLabwareLocation.slotName }
+      return { slotId: bottomLabwareLocation.slotName, moduleDefinition: null }
     } else if ('addressableAreaName' in bottomLabwareLocation) {
-      return { slotId: bottomLabwareLocation.addressableAreaName }
+      return {
+        slotId: bottomLabwareLocation.addressableAreaName,
+        moduleDefinition: null,
+      }
     } else {
       // Should not be reachable if resolveLabwareStack() did its job.
       return 'error'
