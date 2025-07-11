@@ -269,8 +269,15 @@ export interface SlotFootprintAsChildFeature {
   frontRight: Vector2D
 }
 
+export interface SlotFootprintAsParentFeature {
+  z: number
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
 export interface LocatingFeatures {
   slotFootprintAsChild?: SlotFootprintAsChildFeature
+  slotFootprintAsParent?: SlotFootprintAsParentFeature
 }
 
 export type LabwareRoles =
@@ -574,7 +581,13 @@ export interface ModuleDefinition {
   compatibleWith: ModuleModel[]
 }
 
-export type AffineTransformMatrix = number[][]
+type AffineTransformRow = [number, number, number, number]
+export type AffineTransformMatrix = [
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow
+]
 
 export interface SlotTransforms {
   [deckOtId: string]:

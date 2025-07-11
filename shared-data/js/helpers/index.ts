@@ -32,6 +32,7 @@ export * from './getAreFlexSlotsAdjacent'
 export * from './getMmFromBottom'
 export * from './getModuleVizDims'
 export * from './vectorMath'
+export * from './matrixMath'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getFixedTrashLabwareDefinition'
 export * from './getOccludedSlotCountForModule'
@@ -50,6 +51,7 @@ export * from './parseAddressableArea'
 export * from './validateCustomLabwareHelper'
 export * from './getWellRangeForLiquidLabwarePair'
 export * from './positionMath'
+export * from './pairsFromArray'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

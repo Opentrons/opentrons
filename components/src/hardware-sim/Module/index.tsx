@@ -5,6 +5,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
+  multiplyMatrices,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -20,7 +21,6 @@ import {
   SPACING_1,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-import { multiplyMatrices } from '../utils'
 import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
 import { MagneticBlock } from './MagneticBlock'

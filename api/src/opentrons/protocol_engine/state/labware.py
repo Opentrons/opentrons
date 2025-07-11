@@ -1179,7 +1179,9 @@ class LabwareView:
                 " on other labware."
             )
         below_labware = self.get(bottom_labware_id)
-        if not labware_validation.validate_labware_can_be_stacked(
+        if isinstance(
+            top_labware_definition, LabwareDefinition2
+        ) and not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,
             below_labware_load_name=below_labware.loadName,
         ):
