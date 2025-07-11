@@ -106,6 +106,7 @@ class ProtocolEngine:
         This constructor is only for `ProtocolEngine` unit tests.
         Prefer the `create_protocol_engine()` factory function.
         """
+        _log.info(f"LEAK engine {id(self)} __init__")
         self._hardware_api = hardware_api
         self._file_provider = file_provider
         self._state_store = state_store
@@ -119,6 +120,9 @@ class ProtocolEngine:
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()
+
+    def __del__(self) -> None:
+        _log.info(f"LEAK engine {id(self)} __del__")
 
     @property
     def state_view(self) -> StateView:
@@ -377,6 +381,7 @@ class ProtocolEngine:
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
+        _log.info(f"LEAK engine {id(self)} queue worker cancel")
         self._get_queue_worker.cancel()
         if self._hardware_api.is_movement_execution_taskified():
             # We 'taskify' hardware controller movement functions when running protocols

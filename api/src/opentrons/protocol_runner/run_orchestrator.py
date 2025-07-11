@@ -1,7 +1,7 @@
 """Engine/Runner provider."""
 
 from __future__ import annotations
-
+from logging import getLogger
 import enum
 from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping
 
@@ -48,6 +48,9 @@ from ..protocols.parse import PythonParseMode
 from ..protocol_engine.state.module_substates import FlexStackerSubState
 
 
+log = getLogger(__name__)
+
+
 class NoProtocolRunAvailable(RuntimeError):
     """An error raised if there is no protocol run available."""
 
@@ -82,6 +85,9 @@ class RunOrchestrator:
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
 
+    def __del__(self) -> None:
+        log.warning(f"LEAK orchestrator {id(self)} __del__")
+
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
@@ -106,6 +112,7 @@ class RunOrchestrator:
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
             run_id: run id if any, associated to the runner/engine.
         """
+        log.warning(f"LEAK orchestrator {id(self)} __init__")
         self._run_id = run_id
         self._protocol_engine = protocol_engine
         self._protocol_runner = json_or_python_protocol_runner
@@ -183,11 +190,15 @@ class RunOrchestrator:
     ) -> RunResult:
         """Start the run."""
         if self._protocol_runner:
-            return await self._protocol_runner.run(
-                deck_configuration=deck_configuration,
-                protocol_source=protocol_source,
-                run_time_param_values=run_time_param_values,
-            )
+            log.warning(f"LEAK orchestrator {id(self)} run start")
+            try:
+                return await self._protocol_runner.run(
+                    deck_configuration=deck_configuration,
+                    protocol_source=protocol_source,
+                    run_time_param_values=run_time_param_values,
+                )
+            finally:
+                log.warning(f"LEAK orchestrator {id(self)} run end")
         elif self._protocol_live_runner:
             return await self._protocol_live_runner.run(
                 deck_configuration=deck_configuration
@@ -458,29 +469,34 @@ class RunOrchestrator:
         stackers: Dict[str, FlexStackerSubState] = {}
         for module in modules:
             if module.model == ModuleModel.FLEX_STACKER_MODULE_V1:
-                stackers[
-                    module.id
-                ] = self._protocol_engine.state_view.modules.get_flex_stacker_substate(
-                    module.id
+                stackers[module.id] = (
+                    self._protocol_engine.state_view.modules.get_flex_stacker_substate(
+                        module.id
+                    )
                 )
         return stackers
 
     async def command_generator(self) -> AsyncGenerator[str, None]:
         """Yield next command to execute."""
-        while True:
-            try:
-                # TODO(tz, 6-26-2024): avoid using private accessor in a follow up pr.
-                command_id = await self._protocol_engine._state_store.wait_for(
-                    condition=self._protocol_engine.state_view.commands.get_next_to_execute
-                )
-                # Assert for type hinting. This is valid because the wait_for() above
-                # only returns when the value is truthy.
-                assert command_id is not None
-                yield command_id
-            except RunStoppedError:
-                # There are no more commands that we should execute, either because the run has
-                # completed on its own, or because a client requested it to stop.
-                break
+        log.warning(f"LEAK orchestrator {id(self)} command generator begin")
+        try:
+            while True:
+                try:
+                    # TODO(tz, 6-26-2024): avoid using private accessor in a follow up pr.
+                    command_id = await self._protocol_engine._state_store.wait_for(
+                        condition=self._protocol_engine.state_view.commands.get_next_to_execute
+                    )
+                    # Assert for type hinting. This is valid because the wait_for() above
+                    # only returns when the value is truthy.
+                    assert command_id is not None
+                    yield command_id
+                except RunStoppedError:
+                    # There are no more commands that we should execute, either because the run has
+                    # completed on its own, or because a client requested it to stop.
+                    break
+            log.warning(f"LEAK orchestrator {id(self)} command generator end ok")
+        finally:
+            log.warning(f"LEAK orchestrator {id(self)} command generator end")
 
     @staticmethod
     def _map_parse_mode_to_python_parse_mode(parse_mode: ParseMode) -> PythonParseMode:

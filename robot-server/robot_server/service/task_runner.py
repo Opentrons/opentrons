@@ -29,6 +29,11 @@ class TaskRunner:
 
         self._running_tasks: Set[asyncio.Task[None]] = set()
 
+    def ps(self) -> str:
+        return "TaskRunner tasks: " + "\n\t".join(
+            [f"{task.get_name()}: {task.get_stack()}" for task in self._running_tasks]
+        )
+
     def run(self, func: TaskFunc, **kwargs: Any) -> None:
         """Run an async function in the background.
 
@@ -52,7 +57,7 @@ class TaskRunner:
             finally:
                 self._running_tasks.remove(current_task)
 
-        wrapper_task = asyncio.create_task(wrapper())
+        wrapper_task = asyncio.create_task(wrapper(), name=func_name)
         self._running_tasks.add(wrapper_task)
 
     async def cancel_all_and_clean_up(self) -> None:

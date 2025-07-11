@@ -281,13 +281,17 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
+        _log.warning("LEAK orchestrator store clear start")
         if self.run_orchestrator.get_is_okay_to_clear():
+            _log.warning("LEAK orchestrator store start call finish")
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
+            _log.warning("LEAK orchestrator store end call finish")
         else:
+            _log.warning("LEAK orchestrator store raise")
             raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = self.run_orchestrator.get_state_summary()
@@ -295,8 +299,9 @@ class RunOrchestratorStore:
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
         command_annotations = self.run_orchestrator.get_command_annotations()
 
+        _log.warning("LEAK orchestrator store unparent orchestrator")
         self._run_orchestrator = None
-
+        _log.warning("LEAK orchestrator store clear return")
         return RunResult(
             state_summary=run_data,
             commands=commands,

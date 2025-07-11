@@ -1,6 +1,8 @@
 """Wrappers for Protocol API v2 execution pipeline."""
+
 import asyncio
 from typing import Dict, Iterable, Optional, cast
+from logging import getLogger
 
 from anyio import to_thread
 
@@ -34,6 +36,7 @@ from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.execution.execute_python import exec_add_parameters
 from opentrons.protocols.types import Protocol, PythonProtocol
 
+_log = getLogger(__name__)
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the previous direct hardware calls from protocol api.
@@ -156,12 +159,16 @@ class PythonProtocolExecutor:
         run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        await to_thread.run_sync(
-            run_protocol,
-            protocol,
-            context,
-            run_time_parameters_with_overrides,
-        )
+        _log.warning(f"LEAK executor {id(protocol)} start run protoco")
+        try:
+            await to_thread.run_sync(
+                run_protocol,
+                protocol,
+                context,
+                run_time_parameters_with_overrides,
+            )
+        finally:
+            _log.warning(f"LEAK executor {id(protocol)} end run protocol")
 
     @staticmethod
     def extract_run_parameters(

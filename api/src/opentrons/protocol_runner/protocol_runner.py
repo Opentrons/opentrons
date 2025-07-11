@@ -1,6 +1,8 @@
 """Protocol run control and management."""
+
 import asyncio
 from typing import List, NamedTuple, Optional, Union
+from logging import getLogger
 
 from abc import ABC, abstractmethod
 
@@ -49,6 +51,8 @@ from ..protocol_engine.types import (
     CSVRuntimeParamPaths,
 )
 from ..protocols.types import PythonProtocol
+
+_log = getLogger(__name__)
 
 
 class RunResult(NamedTuple):
@@ -147,6 +151,9 @@ class AbstractRunner(ABC):
 class PythonAndLegacyRunner(AbstractRunner):
     """Protocol runner implementation for Python protocols, and JSON protocols ≤v5."""
 
+    def __del__(self) -> None:
+        _log.warning(f"LEAK runner {id(self)} del")
+
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
@@ -159,6 +166,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         drop_tips_after_run: bool = True,
     ) -> None:
         """Initialize the PythonAndLegacyRunner with its dependencies."""
+        _log.warning(f"LEAK runner {id(self)} init")
         super().__init__(protocol_engine)
         self._hardware_api = hardware_api
         self._protocol_file_reader = (
@@ -175,8 +183,16 @@ class PythonAndLegacyRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue()
+
+        async def _do_cleanup(*args, **kwargs):
+            _log.warning(f"LEAK runner {id(self)} engine finish call start")
+            try:
+                return await protocol_engine.finish(*args, **kwargs)
+            finally:
+                _log.warning(f"LEAK runner {id(self)} engine finish call end")
+
         self._task_queue.set_cleanup_func(
-            func=protocol_engine.finish,
+            func=_do_cleanup,
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
@@ -248,14 +264,19 @@ class PythonAndLegacyRunner(AbstractRunner):
         )
 
         async def run_func() -> None:
-            await self._protocol_engine.add_and_execute_command(
-                request=initial_home_command
-            )
-            await self._protocol_executor.execute(
-                protocol=protocol,
-                context=context,
-                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
-            )
+            _log.warning(f"LEAK runner {id(self)} run func start")
+            try:
+                await self._protocol_engine.add_and_execute_command(
+                    request=initial_home_command
+                )
+                await self._protocol_executor.execute(
+                    protocol=protocol,
+                    context=context,
+                    run_time_parameters_with_overrides=run_time_parameters_with_overrides,
+                )
+                _log.warning(f"LEAK runner {id(self)} run func ending ok")
+            finally:
+                _log.warning(f"LEAK runner {id(self)} run func ending")
 
         self._task_queue.set_run_func(run_func)
 
@@ -279,7 +300,9 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
+        _log.warning(f"LEAK runner {id(self)} task queue join begins")
         await self._task_queue.join()
+        _log.warning(f"LEAK runner {id(self)} task queue join complete")
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()

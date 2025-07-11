@@ -1,4 +1,5 @@
 """Command queue execution worker module."""
+
 import asyncio
 from logging import getLogger
 from typing import Optional, AsyncGenerator, Callable
@@ -26,10 +27,14 @@ class QueueWorker:
             command_executor: Interface used to execute and update commands.
             command_generator: Command generator to get the next command to execute.
         """
+        log.warning(f"LEAK queue worker {id(self)} __init__")
         self._state_store: StateStore = state_store
         self._command_executor: CommandExecutor = command_executor
         self._command_generator = command_generator
         self._worker_task: Optional["asyncio.Task[None]"] = None
+
+    def __del__(self) -> None:
+        log.warning(f"LEAK queue worker {id(self)} __del__")
 
     def start(self) -> None:
         """Start processing jobs.
@@ -58,7 +63,7 @@ class QueueWorker:
 
         if worker_task:
             self._worker_task = None
-
+            log.warning(f"LEAK queue worker {id(self)} join start")
             try:
                 await worker_task
             except asyncio.CancelledError:  # From self.cancel().
@@ -66,8 +71,13 @@ class QueueWorker:
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)
                 raise e
+            finally:
+                log.warning(f"LEAK queue worker {id(self)} join end")
+        else:
+            log.warning(f"LEAK queue worker {id(self)} join second call")
 
     async def _run_commands(self) -> None:
+        log.warning(f"LEAK queue worker {id(self)} run command start")
         async for command_id in self._command_generator():
             try:
                 await self._command_executor.execute(command_id=command_id)
@@ -84,3 +94,4 @@ class QueueWorker:
             # Yield to the event loop in case we're executing a long sequence of commands
             # that never yields internally. For example, a long sequence of comment commands.
             await asyncio.sleep(0)
+        log.warning(f"LEAK queue worker {id(self)} run commands end")

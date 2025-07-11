@@ -2,6 +2,7 @@
 
 Contains routes dealing primarily with `Run` models.
 """
+
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -36,6 +37,7 @@ from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.hardware import get_hardware, get_robot_type_enum
+from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 from robot_server.service.json_api import (
     RequestModel,
@@ -331,9 +333,11 @@ async def get_runs(
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
-        current=ResourceLink.model_construct(href=f"/runs/{current_run_id}")
-        if current_run_id is not None
-        else None
+        current=(
+            ResourceLink.model_construct(href=f"/runs/{current_run_id}")
+            if current_run_id is not None
+            else None
+        )
     )
 
     return await PydanticResponse.create(
@@ -416,6 +420,7 @@ async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -428,6 +433,7 @@ async def update_run(
         run_data = await run_data_manager.update(
             runId, current=request_body.data.current
         )
+        log.info(task_runner.ps())
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
@@ -676,12 +682,14 @@ async def get_current_state(  # noqa: C901
 
     last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(
-        lastCompleted=CommandLinkNoMeta.model_construct(
-            id=last_completed_command.command_id,
-            href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+        lastCompleted=(
+            CommandLinkNoMeta.model_construct(
+                id=last_completed_command.command_id,
+                href=f"/runs/{runId}/commands/{last_completed_command.command_id}",
+            )
+            if last_completed_command is not None
+            else None
         )
-        if last_completed_command is not None
-        else None
     )
 
     return await PydanticResponse.create(
