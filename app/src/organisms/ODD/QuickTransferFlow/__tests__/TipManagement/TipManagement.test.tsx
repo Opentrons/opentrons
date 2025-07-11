@@ -50,7 +50,7 @@ describe('TipManagement', () => {
   it('renders tip management options and their values', () => {
     render(props)
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Once')
     screen.getByText('Tip drop location')
     screen.getByText('Trash bin')
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
