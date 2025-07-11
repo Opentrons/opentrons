@@ -650,7 +650,6 @@ def run(ctx: ProtocolContext) -> None:
         else:
             dye_props.dispense.dispense_position.offset.z = -1.5
 
-
     # VARIABLES TO KEEP TRACK OF TEST STATE
     plate: Optional[Labware] = None
     ul_in_this_plate: List[float] = []
@@ -768,7 +767,7 @@ def run(ctx: ProtocolContext) -> None:
         if locations_to_replace_by_hand:
             tips_ln = ctx.params.tips  # type: ignore[attr-defined]
             ctx.pause(f"ADD: {tips_ln} to 96ch Adapters on the Deck...")
-            test_pip.tip_racks = [
+            test_pip.tip_racks += [
                 location.load_labware(tips_ln)
                 for location in locations_to_replace_by_hand
             ]
