@@ -17,30 +17,30 @@ import type {
  * This basically just does a lot of tedious lookups to resolve IDs into full definitions.
  *
  * Returns "error" if there was a problem doing the conversion, probably because of
- * some invalid input to this function, like entries missing from `loadedLabware`.
+ * some invalid input to this function, like entries missing from `otherLoadedLabware`.
  * Returns "offDeck" if the labware is known to be off-deck, so it doesn't have
  * coordinates.
  */
 export function resolveLabwareLocation({
   deckDef,
-  movedLabwareDef,
-  location,
+  targetLabwareDef,
+  targetLabwareLocation,
   loadedModules,
-  loadedLabware,
-  labwareDefinitions,
+  otherLoadedLabware,
+  otherLabwareDefinitions,
 }: {
   deckDef: DeckDefinition
-  movedLabwareDef: LabwareDefinition
-  location: LabwareLocation
+  targetLabwareDef: LabwareDefinition
+  targetLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
-  loadedLabware: LoadedLabware[]
-  labwareDefinitions: LabwareDefinition[]
+  otherLoadedLabware: LoadedLabware[]
+  otherLabwareDefinitions: LabwareDefinition[]
 }): 'error' | 'offDeck' | ComputeLabwareOriginInput {
   const labwareTopToBottom = resolveLabwareStack({
-    topLabwareDef: movedLabwareDef,
-    topLabwareLocation: location,
-    loadedLabware,
-    labwareDefinitions,
+    topLabwareDef: targetLabwareDef,
+    topLabwareLocation: targetLabwareLocation,
+    otherLoadedLabware,
+    otherLabwareDefinitions,
   })
   const labwareBottomToTop =
     labwareTopToBottom !== 'error' ? labwareTopToBottom.toReversed() : 'error'
@@ -107,13 +107,13 @@ export function resolveLabwareLocation({
 function resolveLabwareStack({
   topLabwareDef,
   topLabwareLocation,
-  loadedLabware,
-  labwareDefinitions,
+  otherLoadedLabware,
+  otherLabwareDefinitions,
 }: {
   topLabwareDef: LabwareDefinition
   topLabwareLocation: LabwareLocation
-  loadedLabware: LoadedLabware[]
-  labwareDefinitions: LabwareDefinition[]
+  otherLoadedLabware: LoadedLabware[]
+  otherLabwareDefinitions: LabwareDefinition[]
 }):
   | 'error'
   | Array<{
@@ -131,10 +131,10 @@ function resolveLabwareStack({
     'labwareId' in bottomMostLabwareSoFar.location
   ) {
     const newBottomLabwareId = bottomMostLabwareSoFar.location.labwareId
-    const newBottomLabware = loadedLabware.find(
+    const newBottomLabware = otherLoadedLabware.find(
       l => l.id === newBottomLabwareId
     )
-    const newBottomLabwareDefinition = labwareDefinitions.find(
+    const newBottomLabwareDefinition = otherLabwareDefinitions.find(
       def => getLabwareDefURI(def) === newBottomLabware?.definitionUri
     )
     if (newBottomLabware == null || newBottomLabwareDefinition == null) {

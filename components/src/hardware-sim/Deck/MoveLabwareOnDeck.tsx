@@ -59,19 +59,19 @@ export function MoveLabwareOnDeck(
 
   const initialResolvedLocation = resolveLabwareLocation({
     deckDef,
-    movedLabwareDef,
-    location: initialLabwareLocation,
+    targetLabwareDef: movedLabwareDef,
+    targetLabwareLocation: initialLabwareLocation,
     loadedModules,
-    loadedLabware,
-    labwareDefinitions,
+    otherLoadedLabware: loadedLabware,
+    otherLabwareDefinitions: labwareDefinitions,
   })
   const finalResolvedLocation = resolveLabwareLocation({
     deckDef,
-    movedLabwareDef,
-    location: finalLabwareLocation,
+    targetLabwareDef: movedLabwareDef,
+    targetLabwareLocation: finalLabwareLocation,
     loadedModules,
-    loadedLabware,
-    labwareDefinitions,
+    otherLoadedLabware: loadedLabware,
+    otherLabwareDefinitions: labwareDefinitions,
   })
 
   const initialCoordinates =
