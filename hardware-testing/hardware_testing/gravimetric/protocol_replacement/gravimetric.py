@@ -32,6 +32,7 @@ from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount
 from opentrons.types import Point, DeckSlotName
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.25"}
@@ -670,7 +671,7 @@ def pick_up_tip_for_channel(
         f"Picking up tip {tip.well_name} of rack {tip.parent.parent} with channel {channel} and offset {offset}"
     )
     fixture_settings.pipette.pick_up_tip(tip.top().move(point_offset))
-    if fixture_settings.increment:
+    if fixture_settings.increment and not fixture_settings.ctx.is_simulating():
         print_info("clearing pipette ul-per-mm table to be linear")
         clear_pipette_ul_per_mm(
             fixture_settings.ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
@@ -1187,8 +1188,18 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 )
 
 
+def _override_check(
+    aspirate_volume: float,
+    air_gap: float,
+    max_volume: float,
+    current_volume: float,
+) -> None:
+    pass
+
+
 def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
     helpers._override_software_supports_high_volumes()
+    tx_ctl_lib.check_valid_liquid_class_volume_parameters = _override_check
 
 
 def run(ctx: ProtocolContext) -> None:
