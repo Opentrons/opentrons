@@ -24,31 +24,32 @@ describe('SendButton', () => {
   })
   it('should render button with send icon and its initially disabled', () => {
     render(props)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: 'Send' })
     expect(button).toBeDisabled()
-    screen.getByTestId('SendButton_icon_send')
+    expect(screen.getByText('Send')).toBeInTheDocument()
   })
 
   it('should render button and its not disabled when disabled false', () => {
     props = { ...props, disabled: false }
     render(props)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: 'Send' })
     expect(button).not.toBeDisabled()
-    screen.getByTestId('SendButton_icon_send')
+    expect(screen.getByText('Send')).toBeInTheDocument()
   })
 
   it('should render button with spinner icon when isLoading', () => {
     props = { ...props, isLoading: true }
     render(props)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: 'Send' })
     expect(button).toBeDisabled()
-    screen.getByTestId('SendButton_icon_ot-spinner')
+    // When loading, it shows progress text instead of 'Send'
+    expect(screen.queryByText('Send')).not.toBeInTheDocument()
   })
 
   it('should call a mock function when clicking the button', () => {
     props = { ...props, disabled: false }
     render(props)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: 'Send' })
     fireEvent.click(button)
     expect(mockHandleClick).toHaveBeenCalled()
   })

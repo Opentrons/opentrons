@@ -55,15 +55,16 @@ describe('InputPrompt', () => {
     render()
     screen.getByRole('textbox')
     screen.queryByPlaceholderText('Type your prompt...')
-    screen.getByRole('button')
-    expect(screen.getByRole('button')).toBeDisabled()
+    const sendButton = screen.getByRole('button', { name: 'Send' })
+    expect(sendButton).toBeDisabled()
   })
 
   it('should make send button not disabled when a user inputs something in textarea', () => {
     render()
     const textbox = screen.getByRole('textbox')
     fireEvent.change(textbox, { target: { value: ['test'] } })
-    expect(screen.getByRole('button')).not.toBeDisabled()
+    const sendButton = screen.getByRole('button', { name: 'Send' })
+    expect(sendButton).not.toBeDisabled()
   })
 
   // ToDo (kk:04/19/2024) add more test cases
@@ -76,10 +77,11 @@ describe('InputPrompt', () => {
 
     // Add a small wait to ensure state updates propagate
     await waitFor(() => {
-      expect(screen.getByRole('button')).not.toBeDisabled()
+      const sendButton = screen.getByRole('button', { name: 'Send' })
+      expect(sendButton).not.toBeDisabled()
     })
 
-    const sendButton = screen.getByRole('button')
+    const sendButton = screen.getByRole('button', { name: 'Send' })
     expect(sendButton).not.toBeDisabled() // Double check before clicking
     fireEvent.click(sendButton)
 
