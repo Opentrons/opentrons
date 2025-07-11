@@ -42,6 +42,8 @@ LabwareRoles = Literal[
     "system",
 ]
 
+SpringDirectionalForce = Literal["backLeftBottom"]
+
 
 class Vector2D(TypedDict):
     x: float
@@ -160,12 +162,22 @@ class SlotFootprintAsChildFeature(TypedDict):
     z: float
     backLeft: Vector2D
     frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
+
+
+class SlotFootprintAsParentFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
 
 
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
     slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
+    slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
+    springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
 
 
 class LabwareDefinition2(TypedDict):
