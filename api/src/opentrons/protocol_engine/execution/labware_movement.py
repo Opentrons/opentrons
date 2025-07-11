@@ -274,9 +274,12 @@ class LabwareMovementHandler:
                 await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
                     labware_parent=parent
                 )
-                await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
-                    labware_parent=parent
-                )
+                if not self._state_store.labware.is_lid(labware_id):
+                    # Lid placement is actually improved by holding the labware latched on the H/S
+                    # So, we skip this check for lids.
+                    await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
+                        labware_parent=parent
+                    )
             except ThermocyclerNotOpenError:
                 raise LabwareMovementNotAllowedError(
                     "Cannot move labware to or from a Thermocycler with its lid closed."

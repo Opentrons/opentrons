@@ -567,7 +567,7 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
             labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
         )
     ).then_raise(ThermocyclerNotOpenError("Thou shall not pass!"))
-
+    decoy.when(state_store.labware.is_lid(labware_id="labware-id")).then_return(False)
     with pytest.raises(LabwareMovementNotAllowedError):
         await subject.ensure_movement_not_obstructed_by_module(
             labware_id="labware-id", new_location=to_loc
@@ -583,6 +583,7 @@ async def test_ensure_movement_not_obstructed_by_modules(
     decoy.when(
         state_store.labware.get_parent_location(labware_id="labware-id")
     ).then_return(ModuleLocation(moduleId="a-rando-module-id"))
+    decoy.when(state_store.labware.is_lid(labware_id="labware-id")).then_return(False)
     await subject.ensure_movement_not_obstructed_by_module(
         labware_id="labware-id",
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
@@ -614,6 +615,7 @@ async def test_ensure_movement_obstructed_by_heater_shaker_raises(
     decoy.when(
         state_store.labware.get_parent_location(labware_id="labware-id")
     ).then_return(from_loc)
+    decoy.when(state_store.labware.is_lid(labware_id="labware-id")).then_return(False)
     decoy.when(
         await heater_shaker_movement_flagger.raise_if_labware_latched_on_heater_shaker(
             labware_parent=ModuleLocation(moduleId="a-heater-shaker-id")
@@ -638,4 +640,40 @@ async def test_ensure_movement_not_obstructed_does_not_raise_for_slot_locations(
     await subject.ensure_movement_not_obstructed_by_module(
         labware_id="labware-id",
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["from_loc", "to_loc"],
+    argvalues=[
+        (
+            ModuleLocation(moduleId="a-heater-shaker-id"),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            ModuleLocation(moduleId="a-heater-shaker-id"),
+        ),
+    ],
+)
+async def test_ensure_movement_not_obstructed_does_not_raise_for_lids_on_hs(
+    decoy: Decoy,
+    subject: LabwareMovementHandler,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    from_loc: NonStackedLocation,
+    to_loc: LabwareLocation,
+) -> None:
+    """It should not raise any errors when moving lid from a latched H/S."""
+    decoy.when(
+        state_store.labware.get_parent_location(labware_id="labware-id")
+    ).then_return(from_loc)
+    decoy.when(state_store.labware.is_lid(labware_id="labware-id")).then_return(True)
+    decoy.when(
+        await heater_shaker_movement_flagger.raise_if_labware_latched_on_heater_shaker(
+            labware_parent=ModuleLocation(moduleId="a-heater-shaker-id")
+        )
+    ).then_raise(HeaterShakerLabwareLatchNotOpenError("Thou shall not take!"))
+    await subject.ensure_movement_not_obstructed_by_module(
+        labware_id="labware-id", new_location=to_loc
     )

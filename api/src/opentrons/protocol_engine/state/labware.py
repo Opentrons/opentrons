@@ -1011,6 +1011,10 @@ class LabwareView:
             self.get(labware_id).loadName
         )
 
+    def is_lid(self, labware_id: str) -> bool:
+        """Check if labware is a lid."""
+        return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
+
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""
         labware = self.get(labware_id)
