@@ -9,7 +9,6 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
-    SlotFootprintAsParentFeature,
 )
 
 from opentrons.types import DeckSlotName
@@ -301,12 +300,7 @@ def test_get_potential_cutout_fixtures_raises(
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 features=LocatingFeatures(
-                    slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 86},
-                        frontRight={"x": 128, "y": 0},
-                        z=0,
-                        springDirectionalForce="backLeftBottom",
-                    )
+                    springDirectionalForceAsParent="backLeftBottom"
                 ),
                 compatible_module_types=[
                     "magneticModuleType",
@@ -332,12 +326,7 @@ def test_get_potential_cutout_fixtures_raises(
                     "heaterShakerModuleType",
                 ],
                 features=LocatingFeatures(
-                    slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 86},
-                        frontRight={"x": 128, "y": 0},
-                        z=0,
-                        springDirectionalForce="backLeftBottom",
-                    )
+                    springDirectionalForceAsParent="backLeftBottom"
                 ),
                 mating_surface_unit_vector=[-1, 1, -1],
             ),
@@ -354,12 +343,7 @@ def test_get_potential_cutout_fixtures_raises(
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
                 features=LocatingFeatures(
-                    slotFootprintAsParent=SlotFootprintAsParentFeature(
-                        backLeft={"x": 0, "y": 86},
-                        frontRight={"x": 128, "y": 0},
-                        z=0,
-                        springDirectionalForce="backLeftBottom",
-                    )
+                    springDirectionalForceAsParent="backLeftBottom"
                 ),
                 mating_surface_unit_vector=[-1, 1, -1],
             ),
@@ -376,7 +360,7 @@ def test_get_potential_cutout_fixtures_raises(
                 position=AddressableOffsetVector(x=-5.25, y=6, z=3),
                 compatible_module_types=[],
                 features=LocatingFeatures(),
-                mating_surface_unit_vector=[-1, 1, -1],
+                mating_surface_unit_vector=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -391,7 +375,7 @@ def test_get_potential_cutout_fixtures_raises(
                 position=AddressableOffsetVector(x=65, y=31, z=139.5),
                 compatible_module_types=[],
                 features=LocatingFeatures(),
-                mating_surface_unit_vector=[-1, 1, -1],
+                mating_surface_unit_vector=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),

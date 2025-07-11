@@ -243,75 +243,55 @@ def _shim_does_locating_feature_pair_exist(
     )
 
 
-def _shim_is_tc_or_mag_block(parent_deck_item: LabwareParentDefinition) -> bool:
-    """Temporary util."""
-    model = None
-    if hasattr(parent_deck_item, "model"):
-        model = parent_deck_item.model  # type: ignore[union-attr]
-    elif isinstance(parent_deck_item, dict):
-        model = parent_deck_item.get("model")
-    return model in [
-        ModuleModel.THERMOCYCLER_MODULE_V2,
-        ModuleModel.THERMOCYCLER_MODULE_V1,
-        ModuleModel.MAGNETIC_BLOCK_V1,
-    ]
-
-
 def _parent_deck_item_with_features(
     parent_deck_item: Union[
         LabwareDefinition3, DeckLocationDefinition, ModuleDefinition
     ],
 ) -> _Labware3SupportedParentDefinition:
     """Returns a standardized parent deck item interface."""
-    if hasattr(parent_deck_item, "features"):
-        if isinstance(parent_deck_item, ModuleDefinition):
-            slot_footprint_as_parent = _module_slot_footprint_as_parent(
-                parent_deck_item
+    if isinstance(parent_deck_item, ModuleDefinition):
+        slot_footprint_as_parent = _module_slot_footprint_as_parent(parent_deck_item)
+        if slot_footprint_as_parent is not None:
+            return _Labware3SupportedParentDefinition(
+                {
+                    **parent_deck_item.features,
+                    "slotFootprintAsParent": slot_footprint_as_parent,
+                }
             )
-            if slot_footprint_as_parent is not None:
-                return _Labware3SupportedParentDefinition(
-                    {
-                        **parent_deck_item.features,
-                        "slotFootprintAsParent": slot_footprint_as_parent,
-                    }
-                )
-            else:
-                return _Labware3SupportedParentDefinition(parent_deck_item.features)
-        elif isinstance(parent_deck_item, AddressableArea):
-            slot_footprint_as_parent = _aa_slot_footprint_as_parent(parent_deck_item)
-            if slot_footprint_as_parent is not None:
-                return _Labware3SupportedParentDefinition(
-                    {
-                        **parent_deck_item.features,
-                        "slotFootprintAsParent": slot_footprint_as_parent,
-                    }
-                )
-            else:
-                return _Labware3SupportedParentDefinition(parent_deck_item.features)
-        elif isinstance(parent_deck_item, LabwareDefinition3):
-            return _Labware3SupportedParentDefinition(parent_deck_item.features)
         else:
-            raise NotImplementedError("Unsupported parent deck item type.")
+            return _Labware3SupportedParentDefinition(parent_deck_item.features)
+    elif isinstance(parent_deck_item, AddressableArea):
+        slot_footprint_as_parent = _aa_slot_footprint_as_parent(parent_deck_item)
+        if slot_footprint_as_parent is not None:
+            return _Labware3SupportedParentDefinition(
+                {
+                    **parent_deck_item.features,
+                    "slotFootprintAsParent": slot_footprint_as_parent,
+                }
+            )
+        else:
+            return _Labware3SupportedParentDefinition(parent_deck_item.features)
+    elif isinstance(parent_deck_item, LabwareDefinition3):
+        return _Labware3SupportedParentDefinition(parent_deck_item.features)
     # The slotDefV3 case.
-    elif (
-        hasattr(parent_deck_item, "get")
-        and parent_deck_item.get("features") is not None
-    ):
-        slot_footprint_as_parent = _slot_def_slot_footprint_as_parent(parent_deck_item)  # type: ignore[arg-type]
+    else:
+        slot_footprint_as_parent = _slot_def_slot_footprint_as_parent(parent_deck_item)
         return _Labware3SupportedParentDefinition(
             {
-                **parent_deck_item["features"],  # type: ignore[index]
+                **parent_deck_item["features"],
                 "slotFootprintAsParent": slot_footprint_as_parent,
             }
         )
-    else:
-        raise ValueError("Expected parent deck item to have features.")
 
 
 def _module_slot_footprint_as_parent(
     parent_deck_item: ModuleDefinition,
 ) -> SlotFootprintAsParentFeature | None:
-    """Returns the slot footprint as parent feature if inherently supported by the module definition."""
+    """Returns the slot footprint as parent feature if inherently supported by the module definition.
+
+    This utility is a normalization shim until labwareOffset + labwareInterfaceX/YDimension is deleted in module defs
+    and replaced with the same slotFootprintAsParent that exists in labware def v3.
+    """
     dimensions = parent_deck_item.dimensions
     if (
         dimensions.labwareInterfaceYDimension is None
@@ -330,7 +310,11 @@ def _module_slot_footprint_as_parent(
 def _aa_slot_footprint_as_parent(
     parent_deck_item: AddressableArea,
 ) -> SlotFootprintAsParentFeature | None:
-    """Returns the slot footprint as parent feature for addressable areas."""
+    """Returns the slot footprint as parent feature for addressable areas.
+
+    This utility is a normalization shim until bounding box in deck defs and
+    replaced with the same slotFootprintAsParent that exists in labware def v3.
+    """
     bb = parent_deck_item.bounding_box
 
     if parent_deck_item.mating_surface_unit_vector is not None:
@@ -356,7 +340,11 @@ def _aa_slot_footprint_as_parent(
 def _slot_def_slot_footprint_as_parent(
     parent_deck_item: SlotDefV3,
 ) -> SlotFootprintAsParentFeature:
-    """Returns the slot footprint as parent feature for slot definitions."""
+    """Returns the slot footprint as parent feature for slot definitions.
+
+    This utility is a normalization shim until bounding box in deck defs and
+    replaced with the same slotFootprintAsParent that exists in labware def v3.
+    """
     bb = parent_deck_item["boundingBox"]
     return SlotFootprintAsParentFeature(
         z=0,
