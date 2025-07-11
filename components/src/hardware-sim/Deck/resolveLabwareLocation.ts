@@ -43,9 +43,9 @@ export function resolveLabwareLocation({
     labwareDefinitions,
   })
   const labwareBottomToTop =
-    labwareTopToBottom != null ? labwareTopToBottom.toReversed() : null
+    labwareTopToBottom !== 'error' ? labwareTopToBottom.toReversed() : 'error'
 
-  if (labwareBottomToTop == null || labwareBottomToTop.length < 1) {
+  if (labwareBottomToTop === 'error' || labwareBottomToTop.length < 1) {
     return 'error'
   }
 
@@ -114,10 +114,12 @@ function resolveLabwareStack({
   topLabwareLocation: LabwareLocation
   loadedLabware: LoadedLabware[]
   labwareDefinitions: LabwareDefinition[]
-}): Array<{
-  definition: LabwareDefinition
-  location: LabwareLocation
-}> | null {
+}):
+  | 'error'
+  | Array<{
+      definition: LabwareDefinition
+      location: LabwareLocation
+    }> {
   let bottomMostLabwareSoFar = {
     definition: topLabwareDef,
     location: topLabwareLocation,
@@ -139,7 +141,7 @@ function resolveLabwareStack({
       console.warn(
         `Expected to find details for labware ID ${newBottomLabwareId} but could not.`
       )
-      return null
+      return 'error'
     }
     bottomMostLabwareSoFar = {
       definition: newBottomLabwareDefinition,
