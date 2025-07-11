@@ -1,3 +1,7 @@
+---
+title: "Flex Stacker: Additional Product Information"
+---
+
 # Additional Product Information
 
 ## Warranty

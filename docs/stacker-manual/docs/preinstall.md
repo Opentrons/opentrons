@@ -1,3 +1,7 @@
+---
+title: "Flex Stacker: Pre-installation Information"
+---
+
 # Pre-installation Information
 
 Review this section for important information about Stacker placement, deck adapters, the power/data hub, and other components.
