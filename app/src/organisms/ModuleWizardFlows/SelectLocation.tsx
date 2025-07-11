@@ -16,11 +16,14 @@ import {
   FAKE_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_FIXTURES,
+  getAAForModuleFixture,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
+  getReplacementFixtureForFixtureRemoval,
+  MODULE_AA_TYPE_BY_MODEL,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -117,12 +120,12 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       console.log('isLoadedInRun: ', isLoadedInRun)
       if (
         // in run setup, module calibration only available when module location is already correctly configured
-        !isLoadedInRun &&
-        mayMountToCutoutIds.includes(cutoutId) &&
-        (isCurrentConfiguration ||
-          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
-          FAKE_FIXTURE_IDS.includes(cutoutFixtureId)) || 
-          FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
+        (!isLoadedInRun &&
+          mayMountToCutoutIds.includes(cutoutId) &&
+          (isCurrentConfiguration ||
+            SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+            FAKE_FIXTURE_IDS.includes(cutoutFixtureId))) ||
+        FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
       ) {
         return [...acc, cutoutId]
       }
@@ -191,18 +194,30 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       moduleFixtures
     )
 
+    const fixtureInPlace = deckConfigWithAA.find(
+      dc => dc.cutoutId === anchorCutoutId
+    )
+    console.log('fixtureInPlace: ', fixtureInPlace)
+    console.log('removedFixtureIdByCutoutIds: ', removedFixtureIdByCutoutIds)
+
+    const aa = getAAForModuleFixture(
+      anchorCutoutId,
+      removedFixtureIdByCutoutIds[anchorCutoutId],
+      attachedModule.moduleModel
+    )
+    console.log('aa: ', aa)
+    const replacment = getReplacementFixtureForFixtureRemoval(
+      fixtureInPlace?.cutoutFixtureId,
+      anchorCutoutId,
+      aa
+    )
+    console.log('replacment: ', replacment)
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
-          let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-          if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
-            replacementFixtureId = SINGLE_CENTER_SLOT_FIXTURE
-          } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
-            replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
-          }
           return {
             ...cc,
-            cutoutFixtureId: replacementFixtureId,
+            cutoutFixtureId: replacment,
             opentronsModuleSerialNumber: undefined,
           }
         } else {
