@@ -131,6 +131,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1.0
     )
 
+    parameters.add_float(
+        variable_name="neutral_target",
+        display_name="Step Height Target",
+        description="Specify the desired target step height, i.e 1mm",
+        default=1,
+        maximum=10,   #clamp this off so that dispense amount equals at least 1ul
+        minimum=0.01
+    )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -147,6 +156,7 @@ def _setup(
     bool,
     LiquidClass,
     float,
+    float,
     float
 ]:     
 
@@ -157,6 +167,7 @@ def _setup(
     number_of_steps = int(ctx.params.number_of_steps)  # type: ignore[attr-defined]
     dynamic_steps = ctx.params.dynamic_steps  # type: ignore[attr-defined]
     first_dispense = ctx.params.first_dispense # type: ignore[attr-defined]
+    neutral_target = ctx.params.neutral_target # type: ignore[attr-defined]
 
     liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
@@ -228,6 +239,7 @@ def _setup(
         ethanol,
         max_volume,
         first_dispense,
+        neutral_target,
     )
 
 
@@ -326,6 +338,7 @@ def run(ctx: ProtocolContext) -> None:
         ethanol,
         max_volume,
         first_dispense,
+        neutral_target,
     ) = _setup(ctx)
 
     # Constants
@@ -365,8 +378,7 @@ def run(ctx: ProtocolContext) -> None:
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
-    def adaptive_volume_step(hdelta: float, height: float, step_volume: float) -> float:
-        neutral_target = 1.0  # desired steady state height step in mm
+    def adaptive_volume_step(hdelta: float, height: float, step_volume: float, neutral_target: float) -> float:  # desired steady state height step in mm
         delta_tolerance = 0.2  # acceptable +/- mm around target
 
         lower_bound = neutral_target - delta_tolerance  # 0.8
@@ -445,7 +457,7 @@ def run(ctx: ProtocolContext) -> None:
 
             if dynamic_steps and len(cheight_list) > 1:
                 hdelta = cheight_list[-1] - cheight_list[-2]
-                step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume)
+                step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, neutral_target)
 
         write_trial_log()
         step += 1
