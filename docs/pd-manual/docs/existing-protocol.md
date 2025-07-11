@@ -2,14 +2,8 @@ You can upload and edit protocols you've previously made in Protocol Designer. C
 
 Your protocol details will be visible in the protocol overview. Click **Edit protocol** to make your desired changes. 
 
-When uploading a .JSON or .py file created in a previous version of Protocol Designer, the protocol will be automatically updated to the latest version. Changes to keep your protocol up-to-date include:
-
-* updates for new labware definitions
-* changes to liquid handling actions, like default aspirate or dispense heights.
-
-[//]: # (check list with Jethary. do we still recommend that users run LPC again after an old protocol is updated to the latest?)
-
-While you can use Protocol Designer to modify JSON files previously created in earlier versions, you'll only be create and export Python files in Protocol Designer 8.5.0 and newer.
+When uploading a .JSON or .py file created in a previous version of Protocol Designer, the protocol will be automatically updated to the latest version. Changes to keep your protocol up-to-date can include changes to liquid handling, like default flow rates, aspirate or dispense positions, or changes to supported actions. While you can use Protocol Designer to modify JSON files previously created in earlier versions, you'll only be create and export Python files in Protocol Designer 8.5.0 and newer.
+[//]: # (checked with Jethary. there's not very many specific changes  (when a protocol is updated) that we want to mention. feels a bit clunky still)
 
 Your updated protocol will be incompatible with previous Protocol Designer and Opentrons App versions. We recommend making a separate copy of your protocol before importing and editing. 
 
