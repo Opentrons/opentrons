@@ -43,9 +43,8 @@ RAMP_FRACTION = 1/3
 
 #below threshold, alpha low. above threshold, alpha high 
 THRESHOLD = 3.5
-
 #sensitivity values for bottom and top zones:
-ALPHA_LOW = 2      
+ALPHA_LOW = 2.5      
 ALPHA_HIGH = 1     
 
 # how many heights included in rolling average 
@@ -332,9 +331,9 @@ def run(ctx: ProtocolContext) -> None:
     # Constants
     min_step = max_volume * 0.005
     max_step = max_volume * 0.05
-    tolerance = max_volume / 25 #if the height within tolerance, then protocol can finish. 
+    tolerance = max_volume / 30 #if the height within tolerance, then protocol can finish. 
 
-    # State
+    # Initialize state
     volume_dispensed = 0.0
     dispense_volume = 0.0
     height = 0.0
@@ -342,6 +341,7 @@ def run(ctx: ProtocolContext) -> None:
     cheight_list = [0.0]
     tip_z_error = 0.0
     step = 0
+    hdelta = 0.0
     #delta_history = deque(maxlen=SMOOTHING_WINDOW)
 
     # Store baseline and header
@@ -365,30 +365,38 @@ def run(ctx: ProtocolContext) -> None:
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
-    def adaptive_volume_step(hdelta: float, h: float) -> float:
-        # Target step gain: 1.0 mm
-        neutral_target = 1.0
-        delta_tolerance = 0.2  # +/- 0.2mm range around neutral
+    def adaptive_volume_step(hdelta: float, height: float, step_volume: float) -> float:
+        neutral_target = 1.0  # desired steady state height step in mm
+        delta_tolerance = 0.2  # acceptable +/- mm around target
 
-        # deadband
-        lower_bound = neutral_target - delta_tolerance  # 0.8 mm
-        upper_bound = neutral_target + delta_tolerance  # 1.2 mm
+        lower_bound = neutral_target - delta_tolerance  # 0.8
+        upper_bound = neutral_target + delta_tolerance  # 1.2
 
-        # Get alpha sensitivity factor based on current height
         alpha = get_alpha_for_height(height)
 
         if lower_bound <= hdelta <= upper_bound:
-            # maintain current step volume
-            return step_volume  
-        elif hdelta < lower_bound:
-            # increase volume
-            step_volume = max_step * math.exp(-alpha * hdelta)
-        else:
-            # reduce volume
-            step_volume = min_step * math.exp(-alpha * hdelta)
+            # Height change close to target, maintain current volume
+            return step_volume
 
-        # Clamp within bounds
-        return max(min_step, min(max_step, step_volume))
+        elif hdelta < lower_bound and hdelta > 0:
+            # Height increase smaller than target, increase volume gently
+            diff = neutral_target - hdelta
+            new_volume = step_volume * (1 + alpha * diff)  # increase proportional to difference
+
+        elif hdelta > upper_bound:
+            # Height increase larger than target, decrease volume gently
+            diff = hdelta - neutral_target
+            new_volume = step_volume * max(0.5, 1 - alpha * diff)  # decrease proportional to difference, but not too low
+
+        else:
+            # hdelta <= 0 
+            new_volume = step_volume * 0.8  # cautiously reduce volume
+
+        # Clamp new_volume within limits
+        new_volume = max(min_step, min(max_step, new_volume))
+
+        return new_volume
+
 
     def write_trial_log() -> None:
         trial_data = [
@@ -412,7 +420,7 @@ def run(ctx: ProtocolContext) -> None:
         if step == 0:
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-            height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+            src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
             corrected_height = height + tip_z_error
             cheight_list = [corrected_height]
         else:
@@ -437,7 +445,7 @@ def run(ctx: ProtocolContext) -> None:
 
             if dynamic_steps and len(cheight_list) > 1:
                 hdelta = cheight_list[-1] - cheight_list[-2]
-                step_volume = adaptive_volume_step(hdelta, corrected_height)
+                step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume)
 
         write_trial_log()
         step += 1
