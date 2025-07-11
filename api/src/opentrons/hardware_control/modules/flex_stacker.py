@@ -78,7 +78,10 @@ HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
-PLATFORM_OFFSET = 4
+LATCH_OFFSET = 2.25
+
+# Should put the bottom of the plate above this mm above the latch when dispensing.
+LATCH_CLEARANCE = 1.25
 
 # Configs
 TOF_DETECTION_CONFIG = {
@@ -423,6 +426,7 @@ class FlexStacker(mod_abc.AbstractModule):
             max_speed=speed, acceleration=acceleration
         )
         distance = direction.distance(distance)
+        log.warning(f"MOVE: Axis {axis} {distance}mm in the {direction} direction speed={motion_params.max_speed} accel={motion_params.acceleration}.")
         res = await self._driver.move_in_mm(axis, distance, params=motion_params)
         if res == MoveResult.STALL_ERROR:
             self._stall_detected = True
@@ -453,6 +457,7 @@ class FlexStacker(mod_abc.AbstractModule):
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
         )
+        log.warning(f"HOME: Axis {axis} in the {direction} direction speed={motion_params.max_speed} accel={motion_params.acceleration}.")
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
         )
@@ -510,6 +515,7 @@ class FlexStacker(mod_abc.AbstractModule):
         enforce_shuttle_lw_sensing: bool = True,
     ) -> None:
         """Dispenses the next labware in the stacker."""
+        log.warning(f"DISPENSE: {labware_height}")
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
@@ -521,16 +527,17 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Transfer
         await self.open_latch()
-        # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
+        # NOTE: When moving from the +Z limit switch down, the LATCH_OFFSET makes
         # sure the bottom of the next labware is sitting N mm above the latch.
         # So when moving the labware_height we dont need to add an additional
         # offset to make sure we arent cutting it too close since the labware
         # will always be above the latch.
-        await self.move_axis(StackerAxis.Z, Direction.RETRACT, labware_height)
+        latch_clear_distance = labware_height + LATCH_OFFSET - LATCH_CLEARANCE
+        await self.move_axis(StackerAxis.Z, Direction.RETRACT, latch_clear_distance)
         await self.close_latch()
 
         # Move Z down the rest of the way
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
         await self.move_axis(StackerAxis.Z, Direction.RETRACT, z_distance)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
@@ -544,6 +551,7 @@ class FlexStacker(mod_abc.AbstractModule):
         enforce_shuttle_lw_sensing: bool = True,
     ) -> None:
         """Stores a labware in the stacker."""
+        log.warning(f"STORE: {labware_height}")
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
 
@@ -553,12 +561,12 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
         # Move the Z so the labware sits right under any labware already stored
-        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
+        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - LATCH_OFFSET
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         await self.open_latch()
         # Move the labware the rest of the way at half move speed to increase torque.
-        remaining_z = labware_height + PLATFORM_OFFSET - HOME_OFFSET_SM
+        remaining_z = labware_height + LATCH_OFFSET - HOME_OFFSET_SM
         speed_z = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, remaining_z, speed_z)
         await self.home_axis(StackerAxis.Z, Direction.EXTEND, speed_z)
