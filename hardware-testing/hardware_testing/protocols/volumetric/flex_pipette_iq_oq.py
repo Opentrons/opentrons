@@ -737,7 +737,11 @@ def run(ctx: ProtocolContext) -> None:
             plate.columns(),
             new_tip="never",
         )
-        pip_for_dil.drop_tip()
+        if pip_for_dil.channels == 96:
+            pip_for_dil.return_tip()
+            diluent_tips.reset()
+        else:
+            pip_for_dil.drop_tip()
         _process_the_current_plate()
 
     # TEST EACH VOLUME
