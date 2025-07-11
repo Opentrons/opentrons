@@ -77,31 +77,32 @@ const AttachedFileItemContainer = styled.div<{ $showRemoveButton: boolean }>`
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  padding-right: ${props => (props.$showRemoveButton ? '2.5rem' : '0.5rem')};
+  gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
+  padding-right: ${props =>
+    props.$showRemoveButton ? SPACING.spacing40 : SPACING.spacing8};
   background-color: rgba(22, 33, 45, 0.2);
-  border-radius: 0.5rem;
+  border-radius: ${BORDERS.borderRadius8};
   border: none;
   width: fit-content;
-  min-width: 9.94rem;
+  min-width: 10rem;
   max-width: 100%;
 `
 
 const RemoveFileButton = styled.button`
   position: absolute;
-  top: 0.125rem;
-  right: 0.125rem;
+  top: ${SPACING.spacing2};
+  right: ${SPACING.spacing2};
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.125rem;
+  padding: ${SPACING.spacing2};
   border-radius: ${BORDERS.borderRadius4};
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: ${SPACING.spacing28};
+  height: ${SPACING.spacing28};
 
   &:hover {
     background-color: ${COLORS.grey20};
@@ -120,7 +121,7 @@ const FileIconContainer = styled.div`
   width: 2.125rem;
   height: 2.125rem;
   background-color: ${COLORS.white};
-  border-radius: 0.25rem;
+  border-radius: ${BORDERS.borderRadius4};
   flex-shrink: 0;
 `
 

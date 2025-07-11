@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import styled from 'styled-components'
 
-import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 interface AttachFileButtonProps {
   onFileSelect: (files: FileList) => void
@@ -56,13 +56,13 @@ const StyledButton = styled.button<{ disabled: boolean }>`
   gap: ${SPACING.spacing8};
   background: transparent;
   border: 1px solid ${COLORS.blue50};
-  border-radius: 8px;
+  border-radius: ${BORDERS.borderRadius8};
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   opacity: ${props => (props.disabled ? 0.5 : 1)};
   padding: ${SPACING.spacing8} ${SPACING.spacing12};
   color: ${COLORS.blue50};
   transition: all 0.2s ease;
-  height: 36px;
+  height: ${SPACING.spacing36};
   white-space: nowrap;
 
   &:hover:not(:disabled) {
@@ -75,7 +75,7 @@ const StyledButton = styled.button<{ disabled: boolean }>`
     outline: none;
     background: ${COLORS.blue10};
     border-color: ${COLORS.blue60};
-    box-shadow: 0 0 0 2px ${COLORS.blue50}20;
+    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.blue50}20;
   }
 `
 

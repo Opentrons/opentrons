@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import { COLORS, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  BORDERS,
+  COLORS,
+  Icon,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 interface SendButtonProps {
   handleClick: () => void
@@ -80,7 +86,7 @@ const StyledSendButton = styled.button<{ disabled: boolean }>`
   background-color: ${props =>
     props.disabled ? COLORS.grey35 : COLORS.blue50};
   border: none;
-  border-radius: 0.5rem;
+  border-radius: ${BORDERS.borderRadius8};
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   opacity: ${props => (props.disabled ? 0.6 : 1)};
   transition: all 0.2s ease;
@@ -92,7 +98,7 @@ const StyledSendButton = styled.button<{ disabled: boolean }>`
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 0.125rem ${COLORS.blue50}40;
+    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.blue50}40;
   }
 
   &:active:not(:disabled) {
