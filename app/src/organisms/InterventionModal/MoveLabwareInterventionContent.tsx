@@ -197,6 +197,7 @@ export function MoveLabwareInterventionContent({
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
+              labwareDefinitions={Object.values(labwareDefsByUri)}
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}

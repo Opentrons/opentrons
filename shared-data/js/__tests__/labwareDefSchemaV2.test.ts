@@ -1,10 +1,10 @@
 import path from 'path'
 import Ajv from 'ajv'
 import glob from 'glob'
-import range from 'lodash/range'
 import { beforeAll, describe, expect, it, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
+import { pairsFromArray } from '../helpers/pairsFromArray'
 import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
 
 import type {
@@ -294,7 +294,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
     )) {
-      for (const [above, below] of pairs(geometry.sections)) {
+      for (const [above, below] of pairsFromArray(geometry.sections)) {
         expect(above.bottomHeight).toStrictEqual(below.topHeight)
       }
     }
@@ -543,16 +543,4 @@ function getGeometry(
     }
     return result
   }
-}
-
-/**
- * [1, 2, 3, 4] -> [[1, 2], [2, 3], [3, 4]]
- *
- * [1] -> []
- */
-function pairs<T>(array: T[]): Array<[T, T]> {
-  return range(array.length - 1).map(firstIndex => [
-    array[firstIndex],
-    array[firstIndex + 1],
-  ])
 }

@@ -581,7 +581,13 @@ export interface ModuleDefinition {
   compatibleWith: ModuleModel[]
 }
 
-export type AffineTransformMatrix = number[][]
+type AffineTransformRow = [number, number, number, number]
+export type AffineTransformMatrix = [
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow
+]
 
 export interface SlotTransforms {
   [deckOtId: string]:
