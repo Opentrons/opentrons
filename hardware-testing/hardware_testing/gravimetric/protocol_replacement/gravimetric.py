@@ -25,11 +25,13 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 )
 from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
+    pipette_movement_conflict,
 )
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.hardware_control.types import OT3AxisKind, OT3Mount
 from opentrons.types import Point, DeckSlotName
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 metadata = {"protocolName": "Gravimetric QC"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
@@ -102,6 +104,10 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
+from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
+    clear_pipette_ul_per_mm,
+)  # noqa: E402
+from hardware_testing.gravimetric.tips import MULTI_CHANNEL_TEST_ORDER  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -184,8 +190,8 @@ class FixtureSettings:
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
-        if pipette_channels == 8:
-            channels = [0, 1, 2, 3, 4, 5, 6, 7]
+        if pipette_channels == 8 and not increment:
+            channels = MULTI_CHANNEL_TEST_ORDER
         else:
             channels = [0]
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
@@ -257,10 +263,21 @@ class FixtureSettings:
         )
         pipette.default_speed = gantry_speed
         simulating = ctx.is_simulating()
+        if pipette_channels == 8 and not increment:
+            pipette._core.configure_nozzle_layout(
+                style=NozzleLayout.SINGLE,
+                primary_nozzle="A1",
+                front_right_nozzle="A1",
+                back_left_nozzle="A1",
+            )
+            # override pipette movement conflict checking 'cause we specially lay out our tipracks
+        pipette_movement_conflict.check_safe_for_pipette_movement = (
+            helpers._override_check_safe_for_pipette_movement
+        )
         if simulating:
             pipette_tag = "pipette"
         else:
-            pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
+            pipette_tag = helpers._get_tag_from_pipette(pipette, increment, False)
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
         test_report = report.create_csv_test_report(
@@ -430,10 +447,13 @@ def _get_tips_for_test_single_multi(
         for slot in fixture_settings.tips[tip]
         if slot not in partially_used
     ]
-    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
-        return tips.get_tips_for_individual_channel_on_multi(
-            fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
-        )
+    if fixture_settings.pipette_channels == 8:
+        if fixture_settings.increment:
+            return tips.get_tips_for_all_channels_on_multi(fixture_settings.ctx, tip)
+        else:
+            return tips.get_tips_for_individual_channel_on_multi(
+                fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
+            )
 
     wells += tips.get_unused_tips(fixture_settings.ctx, tip)
     for rack in tipracks_lw:
@@ -635,7 +655,7 @@ def _get_offset_for_channel(
     fixture_settings: FixtureSettings, channel: int, submerge_depth: float = 0
 ) -> Coordinate:
     offset = Coordinate(x=0, y=0, z=submerge_depth)
-    if fixture_settings.channels == 8 and not fixture_settings.increment:
+    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
         offset.y = channel * 9.0
     return offset
 
@@ -646,7 +666,16 @@ def pick_up_tip_for_channel(
     """Do channel offset if needed."""
     offset = _get_offset_for_channel(fixture_settings, channel)
     point_offset = Point(x=offset.x, y=offset.y, z=offset.z)
+    print_info(
+        f"Picking up tip {tip.well_name} of rack {tip.parent.parent} with channel {channel} and offset {offset}"
+    )
     fixture_settings.pipette.pick_up_tip(tip.top().move(point_offset))
+    if fixture_settings.increment:
+        print_info("clearing pipette ul-per-mm table to be linear")
+        clear_pipette_ul_per_mm(
+            fixture_settings.ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if fixture_settings.mount == "left" else OT3Mount.RIGHT,
+        )
 
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
@@ -775,7 +804,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
-        volume_for_pipette_mode_configuration=volume,
+        volume_for_pipette_mode_configuration=None,
     )
     reset_retract_discontinuity(fixture_settings)
     return contents
@@ -911,8 +940,12 @@ def run_one_test(
     offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.submerge_depth
     )
+    transfer_properties.aspirate.submerge.start_position.offset = offset
+    transfer_properties.dispense.submerge.start_position.offset = offset
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
+    transfer_properties.aspirate.retract.end_position.offset = offset
+    transfer_properties.dispense.retract.end_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
@@ -926,7 +959,10 @@ def run_one_test(
     )
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
     fixture_settings.pipette.configure_for_volume(volume)
-    fixture_settings.pipette.move_to(fixture_settings.liquid_source.top(20))
+    fixture_settings.pipette.prepare_to_aspirate()
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.top(20).move(Point(0, offset.y, 0))
+    )
     fixture_settings.pipette._retract()
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
@@ -1151,6 +1187,10 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 )
 
 
+def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
+    helpers._override_software_supports_high_volumes()
+
+
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
@@ -1158,6 +1198,8 @@ def run(ctx: ProtocolContext) -> None:
         _store_config_as_old_style(fixture_settings)
         if _should_alter_discontinuity(fixture_settings):
             print_info("Adjusting z discontinuity for this pipette.")
+        if fixture_settings.increment:
+            _adjust_settings_for_increment(fixture_settings)
         _run(ctx, fixture_settings)
     finally:
         if fixture_settings.recorder is not None:
