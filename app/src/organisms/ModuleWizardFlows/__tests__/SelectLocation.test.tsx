@@ -4,8 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AttachedModule } from '@opentrons/api-client'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_STACKER_V1_FIXTURE,
+  getCutoutConfigReplacmentForModule,
+  getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -16,10 +20,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { PipetteInformation } from '/app/redux/pipettes'
 
-import { getCutoutConfigReplacment, SelectLocation } from '../SelectLocation'
+import { SelectLocation } from '../SelectLocation'
 
 import type { ComponentProps } from 'react'
-import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
+import type { CutoutConfig, CutoutConfigMap } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 // vi.mock('@opentrons/shared-data')
@@ -32,23 +36,7 @@ const render = (props: ComponentProps<typeof SelectLocation>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockStacker: CutoutConfig = {
-  cutoutId: 'cutoutD3',
-  cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-  opentronsModuleSerialNumber: 'fsm123',
-}
 
-const mockTempModuleTestId: CutoutConfig = {
-  cutoutId: 'cutoutD1',
-  cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-  opentronsModuleSerialNumber: 'test123',
-}
-const mockTempModule: CutoutConfig = {
-  cutoutId: 'cutoutD3',
-  cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-  opentronsModuleSerialNumber: 'test',
-}
-const mockDeckConfig: DeckConfiguration = [mockStacker]
 const mockSimpleDeckConfig: CutoutConfig[] = [
   {
     cutoutId: 'cutoutA1',
@@ -99,13 +87,76 @@ const mockSimpleDeckConfig: CutoutConfig[] = [
     cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
   },
 ]
+
+const mockDeckConfigWithAA: CutoutConfigMap[] = [
+  {
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+    addressableAreaId: 'A1',
+  },
+  {
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+    addressableAreaId: 'B1',
+  },
+  {
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+    addressableAreaId: 'C1',
+  },
+  {
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+    addressableAreaId: 'D1',
+  },
+  {
+    cutoutId: 'cutoutA2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    addressableAreaId: 'A2',
+  },
+  {
+    cutoutId: 'cutoutB2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    addressableAreaId: 'B2',
+  },
+  {
+    cutoutId: 'cutoutC2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    addressableAreaId: 'C2',
+  },
+  {
+    cutoutId: 'cutoutD2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    addressableAreaId: 'D2',
+  },
+  {
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: FAKE_STAGING_AREA_RIGHT_SLOT,
+    addressableAreaId: 'A3',
+  },
+  {
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: FAKE_STAGING_AREA_RIGHT_SLOT,
+    addressableAreaId: 'B3',
+  },
+  {
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: FAKE_STAGING_AREA_RIGHT_SLOT,
+    addressableAreaId: 'C3',
+  },
+  {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: FAKE_STAGING_AREA_RIGHT_SLOT,
+    addressableAreaId: 'D3',
+  },
+]
+
 const attachedModule: Partial<AttachedModule> = {
   moduleModel: 'temperatureModuleV2',
   serialNumber: 'test123',
 }
 const RUN_ID_1: string = 'mock_run_1'
 const mockUpdateDeckConfiguration = vi.fn()
-const mockGetFixtureIdByCutoutIdFromModuleAnchorCutoutId = vi.fn()
 
 describe('handleAddFixture', () => {
   let props: ComponentProps<typeof SelectLocation>
@@ -131,10 +182,7 @@ describe('handleAddFixture', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(getFixtureIdByCutoutIdFromModuleAnchorCutoutId).mockReturnValue({
-
-    })
-})
+  })
 
   it('should call updateDeckConfig with tempDeck', async () => {
     render(props)
@@ -148,44 +196,9 @@ describe('handleAddFixture', () => {
       }
       return config
     })
-    console.log('mockUpdatedDeckConfig: ', mockUpdatedDeckConfig)
-    // await waitFor(() =>
-    expect(mockGetFixtureIdByCutoutIdFromModuleAnchorCutoutId).toBeCalledTimes(1)
+
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
       mockUpdatedDeckConfig
     )
-    //)
-  })
-})
-
-describe('getCutoutConfigReplacment', () => {
-  it('should get temp module replacment fixture', () => {
-    expect(
-      getCutoutConfigReplacment(
-        'cutoutD3',
-        'temperatureModuleV2',
-        'temperatureModuleV2',
-        mockDeckConfig
-      )
-    ).toStrictEqual({
-      cutoutId: 'cutoutD3',
-      cutoutFixtureId: 'temperatureModuleV2',
-      opentronsModuleSerialNumber: undefined,
-    })
-  })
-
-  it('should get flex module replacment fixture', () => {
-    expect(
-      getCutoutConfigReplacment(
-        'cutoutC3',
-        'flexStackerModuleV1',
-        'flexStackerModuleV1',
-        mockDeckConfig
-      )
-    ).toStrictEqual({
-      cutoutId: 'cutoutC3',
-      cutoutFixtureId: 'flexStackerModuleV1',
-      opentronsModuleSerialNumber: undefined,
-    })
   })
 })

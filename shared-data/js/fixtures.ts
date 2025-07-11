@@ -1265,3 +1265,34 @@ export const isFixtureInUsbModules = (fixtureId: CutoutFixtureId): boolean => {
     )
   )
 }
+
+export const getCutoutConfigReplacmentForModule = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureId,
+  moduleModel: ModuleModel,
+  deckConfig: CutoutConfig[],
+  serialNumber?: string
+): CutoutConfig => {
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
+  const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
+  const addedCutoutConfigs: CutoutConfigMap[] = [
+    {
+      addressableAreaId: mainAA,
+      cutoutFixtureId: fixtureId,
+      cutoutId: cutoutId,
+    },
+  ]
+  const replacmentFixture = replaceCutoutFixtureWithComboFixture(
+    addedCutoutConfigs,
+    deckConfigWithAA,
+    cutoutId
+  )
+
+  return {
+    cutoutId,
+    cutoutFixtureId: replacmentFixture[0].cutoutFixtureId as CutoutFixtureId,
+    opentronsModuleSerialNumber: serialNumber,
+  }
+}

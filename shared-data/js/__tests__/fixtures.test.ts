@@ -22,6 +22,7 @@ import {
   getAAForModuleFixture,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
+  getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
   getMainAAForAFixture,
   getReplacementFixtureForFakeFixture,
@@ -599,5 +600,44 @@ describe('getAAForModuleFixture', () => {
       'flexStackerModuleV1'
     )
     expect(result).toEqual('flexStackerModuleV1B4')
+  })
+})
+
+describe('getCutoutConfigReplacment', () => {
+  const mockStacker: CutoutConfig = {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+    opentronsModuleSerialNumber: 'fsm123',
+  }
+
+  const mockDeckConfig: DeckConfiguration = [mockStacker]
+  it('should get temp module replacment fixture', () => {
+    expect(
+      getCutoutConfigReplacmentForModule(
+        'cutoutD3',
+        'temperatureModuleV2',
+        'temperatureModuleV2',
+        mockDeckConfig
+      )
+    ).toStrictEqual({
+      cutoutId: 'cutoutD3',
+      cutoutFixtureId: 'temperatureModuleV2',
+      opentronsModuleSerialNumber: undefined,
+    })
+  })
+
+  it('should get flex module replacment fixture', () => {
+    expect(
+      getCutoutConfigReplacmentForModule(
+        'cutoutC3',
+        'flexStackerModuleV1',
+        'flexStackerModuleV1',
+        mockDeckConfig
+      )
+    ).toStrictEqual({
+      cutoutId: 'cutoutC3',
+      cutoutFixtureId: 'flexStackerModuleV1',
+      opentronsModuleSerialNumber: undefined,
+    })
   })
 })
