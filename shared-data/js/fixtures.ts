@@ -1,3 +1,8 @@
+/**
+ * Code to deal with fixtures in the sense of deck configuration.
+ * Not to be confused with fixtures in the sense of dummy test data.
+ */
+
 import isEqual from 'lodash/isEqual'
 
 import {
