@@ -50,9 +50,9 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Select change tip frequency')
     screen.getByText('Exit')
     screen.getByText('Continue')
-    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Once')
     screen.getByText('Never')
-    screen.getByText('Per source well')
+    screen.getByText('Per source')
   })
 
   it('renders once at the start of the transfer option only', () => {
@@ -60,13 +60,13 @@ describe('SelectTipFrequency', () => {
     props.state.destinationWells = []
     props.state.path = 'single'
     render(props)
-    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Once')
   })
 
   it('renders once at the start of the transfer option only', () => {
     props.state.transferType = 'distribute'
     render(props)
-    screen.getByText('Per destination well')
+    screen.getByText('Per destination')
   })
 
   it('should call mock function when tappin exit button', () => {
@@ -77,7 +77,7 @@ describe('SelectTipFrequency', () => {
 
   it('should call mock function when tappin continue button', () => {
     render(props)
-    fireEvent.click(screen.getByText('Once at the start of the transfer'))
+    fireEvent.click(screen.getByText('Once'))
     fireEvent.click(screen.getByText('Continue'))
     expect(props.onNext).toHaveBeenCalled()
     expect(props.dispatch).toHaveBeenCalledWith({
