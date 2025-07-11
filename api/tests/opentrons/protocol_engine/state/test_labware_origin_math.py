@@ -212,6 +212,7 @@ _ADDRESSABLE_AREA = AddressableArea(
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
     features=LocatingFeatures(),
+    mating_surface_unit_vector=[-1, 1, -1],
 )
 
 _ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
@@ -227,6 +228,7 @@ _ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=150, y=120), z=15
         )
     ),
+    mating_surface_unit_vector=[-1, 1, -1],
 )
 
 
@@ -419,7 +421,7 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         parent_definition=_ADDRESSABLE_AREA,
         is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
-        expected_total_offset=Point(x=0, y=0, z=0),
+        expected_total_offset=Point(x=10, y=1495, z=0),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
@@ -428,7 +430,7 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         labware_location=AddressableAreaLocation(
             addressableAreaName="test_area_with_parent"
         ),
-        expected_total_offset=Point(x=35.0, y=30.0, z=10),
+        expected_total_offset=Point(x=0, y=1600, z=-5),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,

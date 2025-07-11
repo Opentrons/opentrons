@@ -14,8 +14,10 @@ from opentrons_shared_data.labware.types import (
     SlotFootprintAsChildFeature,
     LocatingFeatures,
     SpringDirectionalForce,
+    SlotFootprintAsParentFeature,
 )
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons.protocol_engine.types import AddressableArea
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from ..types import (
     LabwareParentDefinition,
     ModuleDefinition,
@@ -262,14 +264,106 @@ def _parent_deck_item_with_features(
 ) -> _Labware3SupportedParentDefinition:
     """Returns a standardized parent deck item interface."""
     if hasattr(parent_deck_item, "features"):
-        return _Labware3SupportedParentDefinition(parent_deck_item.features)  # type: ignore[union-attr]
+        if isinstance(parent_deck_item, ModuleDefinition):
+            slot_footprint_as_parent = _module_slot_footprint_as_parent(
+                parent_deck_item
+            )
+            if slot_footprint_as_parent is not None:
+                return _Labware3SupportedParentDefinition(
+                    {
+                        **parent_deck_item.features,
+                        "slotFootprintAsParent": slot_footprint_as_parent,
+                    }
+                )
+            else:
+                return _Labware3SupportedParentDefinition(parent_deck_item.features)
+        elif isinstance(parent_deck_item, AddressableArea):
+            slot_footprint_as_parent = _aa_slot_footprint_as_parent(parent_deck_item)
+            if slot_footprint_as_parent is not None:
+                return _Labware3SupportedParentDefinition(
+                    {
+                        **parent_deck_item.features,
+                        "slotFootprintAsParent": slot_footprint_as_parent,
+                    }
+                )
+            else:
+                return _Labware3SupportedParentDefinition(parent_deck_item.features)
+        elif isinstance(parent_deck_item, LabwareDefinition3):
+            return _Labware3SupportedParentDefinition(parent_deck_item.features)
+        else:
+            raise NotImplementedError("Unsupported parent deck item type.")
+    # The slotDefV3 case.
     elif (
         hasattr(parent_deck_item, "get")
         and parent_deck_item.get("features") is not None
     ):
-        return _Labware3SupportedParentDefinition(parent_deck_item.get("features"))  # type: ignore[arg-type]
+        slot_footprint_as_parent = _slot_def_slot_footprint_as_parent(parent_deck_item)  # type: ignore[arg-type]
+        return _Labware3SupportedParentDefinition(
+            {
+                **parent_deck_item["features"],  # type: ignore[index]
+                "slotFootprintAsParent": slot_footprint_as_parent,
+            }
+        )
     else:
         raise ValueError("Expected parent deck item to have features.")
+
+
+def _module_slot_footprint_as_parent(
+    parent_deck_item: ModuleDefinition,
+) -> SlotFootprintAsParentFeature | None:
+    """Returns the slot footprint as parent feature if inherently supported by the module definition."""
+    dimensions = parent_deck_item.dimensions
+    if (
+        dimensions.labwareInterfaceYDimension is None
+        or dimensions.labwareInterfaceXDimension is None
+    ):
+        return None
+    else:
+        # Modules with springs would require special mating types and therefore are not handled here.
+        return SlotFootprintAsParentFeature(
+            z=0,
+            backLeft={"x": 0, "y": dimensions.labwareInterfaceYDimension},
+            frontRight={"x": dimensions.labwareInterfaceXDimension, "y": 0},
+        )
+
+
+def _aa_slot_footprint_as_parent(
+    parent_deck_item: AddressableArea,
+) -> SlotFootprintAsParentFeature | None:
+    """Returns the slot footprint as parent feature for addressable areas."""
+    bb = parent_deck_item.bounding_box
+
+    if parent_deck_item.mating_surface_unit_vector is not None:
+        if parent_deck_item.mating_surface_unit_vector == [-1, 1, -1]:
+            return SlotFootprintAsParentFeature(
+                z=0,
+                backLeft={"x": 0, "y": bb.y},
+                frontRight={"x": bb.x, "y": 0},
+                springDirectionalForce="backLeftBottom",
+            )
+        else:
+            raise NotImplementedError(
+                "Slot footprint as parent does not support mating surface unit vector."
+            )
+    else:
+        return SlotFootprintAsParentFeature(
+            z=0,
+            backLeft={"x": 0, "y": bb.y},
+            frontRight={"x": bb.x, "y": 0},
+        )
+
+
+def _slot_def_slot_footprint_as_parent(
+    parent_deck_item: SlotDefV3,
+) -> SlotFootprintAsParentFeature:
+    """Returns the slot footprint as parent feature for slot definitions."""
+    bb = parent_deck_item["boundingBox"]
+    return SlotFootprintAsParentFeature(
+        z=0,
+        backLeft={"x": 0, "y": bb["yDimension"]},
+        frontRight={"x": bb["xDimension"], "y": 0},
+        springDirectionalForce="backLeftBottom",
+    )
 
 
 def _parent_deck_item_to_child_labware_feature_offset(
