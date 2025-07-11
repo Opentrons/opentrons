@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import {
   BORDERS,
   COLORS,
@@ -24,7 +25,7 @@ const getSimpleFileTypeLabel = (type: string, fileName: string): string => {
   if (fileName.toLowerCase().endsWith('.py')) {
     return 'Python file'
   }
-  
+
   switch (type) {
     case 'pdf':
       return 'PDF file'
@@ -51,30 +52,21 @@ export function AttachedFileItem({
   showRemoveButton = true,
 }: AttachedFileItemProps): JSX.Element {
   const fileType = getFileType(file as File)
-  
+
   return (
-    <AttachedFileItemContainer $showRemoveButton={showRemoveButton && !!onRemove}>
+    <AttachedFileItemContainer
+      $showRemoveButton={showRemoveButton && !!onRemove}
+    >
       <FileIconContainer>
-        <FileExtension>
-          {getFileExtension(file.name)}
-        </FileExtension>
+        <FileExtension>{getFileExtension(file.name)}</FileExtension>
       </FileIconContainer>
       <FileDetailsContainer>
         <FileName>{file.name}</FileName>
-        <FileDetails>
-          {getSimpleFileTypeLabel(fileType, file.name)}
-        </FileDetails>
+        <FileDetails>{getSimpleFileTypeLabel(fileType, file.name)}</FileDetails>
       </FileDetailsContainer>
       {showRemoveButton && onRemove && (
-        <RemoveFileButton
-          onClick={onRemove}
-          aria-label={`Remove ${file.name}`}
-        >
-          <Icon 
-            name="close" 
-            size="1.75rem" 
-            color={COLORS.grey60}
-          />
+        <RemoveFileButton onClick={onRemove} aria-label={`Remove ${file.name}`}>
+          <Icon name="close" size="1.75rem" color={COLORS.grey60} />
         </RemoveFileButton>
       )}
     </AttachedFileItemContainer>
@@ -87,8 +79,8 @@ const AttachedFileItemContainer = styled.div<{ $showRemoveButton: boolean }>`
   align-items: flex-start;
   gap: 0.5rem;
   padding: 0.5rem;
-  padding-right: ${props => props.$showRemoveButton ? '2.5rem' : '0.5rem'};
-  background-color: rgba(22, 33, 45, 0.20);
+  padding-right: ${props => (props.$showRemoveButton ? '2.5rem' : '0.5rem')};
+  background-color: rgba(22, 33, 45, 0.2);
   border-radius: 0.5rem;
   border: none;
   width: fit-content;
@@ -110,11 +102,11 @@ const RemoveFileButton = styled.button`
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  
+
   &:hover {
     background-color: ${COLORS.grey20};
   }
-  
+
   &:focus {
     outline: none;
     box-shadow: 0 0 0 2px ${COLORS.blue50}40;
@@ -137,7 +129,7 @@ const FileExtension = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   line-height: ${TYPOGRAPHY.lineHeight20};
   color: #000;
-  font-family: "Reddit Mono";
+  font-family: 'Reddit Mono';
   font-style: normal;
   text-align: center;
 `
@@ -156,7 +148,7 @@ const FileName = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   line-height: ${TYPOGRAPHY.lineHeight16};
   color: ${COLORS.black90};
-  font-family: "Public Sans";
+  font-family: 'Public Sans';
   font-style: normal;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -168,6 +160,6 @@ const FileDetails = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight16};
   color: ${COLORS.black90};
-  font-family: "Public Sans";
+  font-family: 'Public Sans';
   font-style: normal;
 `
