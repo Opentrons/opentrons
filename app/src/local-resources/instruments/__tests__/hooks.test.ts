@@ -120,7 +120,7 @@ const mockP1000V2Specs = {
       minVolume: 0,
     },
   },
-} as PipetteV2Specs
+}
 
 describe('pipette data accessor hooks', () => {
   beforeEach(() => {

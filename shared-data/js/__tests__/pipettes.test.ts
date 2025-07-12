@@ -171,7 +171,7 @@ describe('pipette data accessors', () => {
             minVolume: 0,
           },
         },
-      } as PipetteV2Specs
+      }
       expect(getPipetteSpecsV2('p1000_single_flex')).toStrictEqual(
         mockP1000Specs
       )
@@ -258,7 +258,7 @@ describe('pipette data accessors', () => {
           },
         },
       },
-    } as PipetteV2LiquidSpecs
+    }
     const mockLiquidLowVolume = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipracks: [
@@ -339,8 +339,8 @@ describe('pipette data accessors', () => {
           },
         },
       },
-    } as PipetteV2LiquidSpecs
-    const mockLiquids: Record<string, PipetteV2LiquidSpecs> = {
+    }
+    const mockLiquids = {
       default: mockLiquidDefault,
       lowVolumeDefault: mockLiquidLowVolume,
     }

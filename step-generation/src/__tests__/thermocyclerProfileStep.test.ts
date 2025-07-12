@@ -41,14 +41,14 @@ describe('thermocyclerProfileStep', () => {
       expected: [
         {
           commandType: 'thermocycler/closeLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetLidTemperature',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             celsius: 55,
@@ -56,7 +56,7 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/runProfile',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             profile: [],
@@ -65,14 +65,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/openLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -80,7 +80,7 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -122,7 +122,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       expected: [
         {
           commandType: 'thermocycler/runProfile',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -131,14 +131,14 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/openLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -146,7 +146,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -186,14 +186,14 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       expected: [
         {
           commandType: 'thermocycler/closeLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/runProfile',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -202,14 +202,14 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/openLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -217,7 +217,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -258,7 +258,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       expected: [
         {
           commandType: 'thermocycler/runProfile',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -267,14 +267,14 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/openLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -282,7 +282,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         },
         {
           commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: {
             moduleId: 'thermocyclerId',
           },

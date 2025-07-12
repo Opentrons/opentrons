@@ -65,7 +65,7 @@ describe('LabwareMapView', () => {
         labwareLocation: { slotName: 'C1' },
         definition: fixtureTiprack300ul as LabwareDefinition,
         topLabwareId: '300_ul_tiprack_id',
-        onLabwareClick: expect.any(Function),
+        onLabwareClick: (expect.any(Function) as unknown) as () => void,
         labwareChildren: null,
       },
     ]
@@ -75,7 +75,7 @@ describe('LabwareMapView', () => {
         moduleLocation: { slotName: 'B1' },
         nestedLabwareDef: mockProtocolModuleInfo[0]
           .nestedLabwareDef as LabwareDefinition,
-        onLabwareClick: expect.any(Function),
+        onLabwareClick: (expect.any(Function) as unknown) as () => void,
         moduleChildren: null,
         innerProps: {},
       },

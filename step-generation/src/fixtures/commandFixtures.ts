@@ -69,7 +69,7 @@ export const prepareAndConfigureCommands = (
       ? [
           {
             commandType: 'configureForVolume',
-            key: expect.any(String),
+            key: (expect.any(String) as unknown) as string,
             params: {
               pipetteId: 'p300SingleId',
               volume: volumeToConfigure,
@@ -81,7 +81,7 @@ export const prepareAndConfigureCommands = (
     ...configureCommands,
     {
       commandType: 'prepareToAspirate',
-      key: expect.any(String),
+      key: (expect.any(String) as unknown) as string,
       params: {
         pipetteId: 'p300SingleId',
       },
@@ -158,7 +158,7 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
   params
 ) => ({
   commandType: 'aspirate',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     ..._defaultAspirateParams,
     ...bakedParams,
@@ -185,7 +185,7 @@ export const makeAspirateInPlaceHelper: MakeAspDispCompoundHelper<
     doMove && moveToWellParams != null
       ? {
           commandType: 'moveToWell',
-          key: expect.any(String),
+          key: (expect.any(String) as unknown) as string,
           params: moveToWellParams,
         }
       : null
@@ -205,7 +205,7 @@ export const makeDispenseInPlaceHelper: MakeAspDispCompoundHelper<
 > = bakedParams => (dispenseInPlaceParams, moveToWellParams) => [
   {
     commandType: 'dispenseInPlace',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: dispenseInPlaceParams,
   },
 ]
@@ -928,7 +928,7 @@ export const blowoutHelper = (
   params?: Partial<BlowoutParams>
 ): CreateCommand => ({
   commandType: 'blowout',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: labware,
@@ -947,7 +947,7 @@ export const blowoutHelper = (
 export const blowoutInPlaceHelper = (): CreateCommand[] => [
   {
     commandType: 'moveToAddressableArea',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: 'p300SingleId',
       addressableAreaName: 'movableTrashA3',
@@ -956,7 +956,7 @@ export const blowoutInPlaceHelper = (): CreateCommand[] => [
   },
   {
     commandType: 'blowOutInPlace',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: 'p300SingleId',
       flowRate: 2.3,
@@ -982,7 +982,7 @@ export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams
   params
 ) => ({
   commandType: 'dispense',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     ..._defaultDispenseParams,
     ...bakedParams,
@@ -996,7 +996,7 @@ export const makeDispenseAirGapHelper = (
   volume: number
 ): CreateCommand => ({
   commandType: 'dispense',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: DEST_LABWARE,
@@ -1032,7 +1032,7 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   params
 ) => ({
   commandType: 'touchTip',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
 export const delayCommand = (
@@ -1040,7 +1040,7 @@ export const delayCommand = (
   message?: string
 ): CreateCommand => ({
   commandType: 'waitForDuration',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     seconds: seconds,
     message,
@@ -1057,7 +1057,7 @@ export const delayWithOffset = (
 ): CreateCommand[] => [
   {
     commandType: 'moveToWell',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: DEFAULT_PIPETTE,
       labwareId,
@@ -1076,7 +1076,7 @@ export const delayWithOffset = (
   },
   {
     commandType: 'waitForDuration',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       seconds: seconds ?? 12,
       message,
@@ -1087,7 +1087,7 @@ export const delayWithOffset = (
 export const dropTipHelper = (pipette?: string): CreateCommand[] => [
   {
     commandType: 'moveToAddressableAreaForDropTip',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: pipette ?? DEFAULT_PIPETTE,
       addressableAreaName: 'movableTrashA3',
@@ -1097,7 +1097,7 @@ export const dropTipHelper = (pipette?: string): CreateCommand[] => [
   },
   {
     commandType: 'dropTipInPlace',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: pipette ?? DEFAULT_PIPETTE,
     },
@@ -1108,7 +1108,7 @@ export const dropTipIntoWasteChuteHelper = (
 ): CreateCommand[] => [
   {
     commandType: 'moveToAddressableArea',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: pipette ?? DEFAULT_PIPETTE,
       addressableAreaName: 'movableTrashA3',
@@ -1117,7 +1117,7 @@ export const dropTipIntoWasteChuteHelper = (
   },
   {
     commandType: 'dropTipInPlace',
-    key: expect.any(String),
+    key: (expect.any(String) as unknown) as string,
     params: {
       pipetteId: pipette ?? DEFAULT_PIPETTE,
     },
@@ -1131,7 +1131,7 @@ export const pickUpTipHelper = (
   }
 ): CreateCommand => ({
   commandType: 'pickUpTip',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: 'tiprack1Id',
@@ -1143,7 +1143,7 @@ export const dropTipInPlaceHelper = (params?: {
   pipetteId?: string
 }): CreateCommand => ({
   commandType: 'dropTipInPlace',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     pipetteId: DEFAULT_PIPETTE,
     ...params,
@@ -1154,7 +1154,7 @@ export const moveToAddressableAreaHelper = (params?: {
   addressableAreaName: AddressableAreaName
 }): CreateCommand => ({
   commandType: 'moveToAddressableArea',
-  key: expect.any(String),
+  key: (expect.any(String) as unknown) as string,
   params: {
     pipetteId: DEFAULT_PIPETTE,
     addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,

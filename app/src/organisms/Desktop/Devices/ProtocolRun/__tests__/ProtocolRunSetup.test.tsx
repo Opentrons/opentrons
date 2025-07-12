@@ -123,7 +123,9 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useRequiredSetupStepsInOrder))
       .calledWith({
         runId: RUN_ID,
-        protocolAnalysis: expect.any(Object),
+        protocolAnalysis: (expect.any(
+          Object
+        ) as unknown) as SharedData.ProtocolAnalysisOutput,
       })
       .thenReturn({
         orderedSteps: [

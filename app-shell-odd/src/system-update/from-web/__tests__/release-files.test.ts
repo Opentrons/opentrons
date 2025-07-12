@@ -404,9 +404,11 @@ describe('downloadReleaseFiles', () => {
           (_url, dest, options) =>
             new Promise((resolve, reject) => {
               const listener = () => {
-                reject(options.signal.reason)
+                reject(options?.signal?.reason)
               }
-              options.signal.addEventListener('abort', listener, { once: true })
+              options?.signal?.addEventListener('abort', listener, {
+                once: true,
+              })
               aborter.abort('oh no!')
               return fs
                 .writeFile(dest, 'this is the contents of the system.zip')

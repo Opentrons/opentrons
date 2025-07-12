@@ -94,7 +94,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
-        { hostname: expect.any(String) },
+        { hostname: (expect.any(String) as unknown) as string },
         expect.any(Array)
       )
       .thenReturn({

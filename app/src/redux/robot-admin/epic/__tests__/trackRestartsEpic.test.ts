@@ -42,7 +42,7 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           null,
-          expect.any(Date)
+          (expect.any(Date) as unknown) as Date
         ),
       })
     })
@@ -70,7 +70,7 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           'previous-boot-id',
-          expect.any(Date)
+          (expect.any(Date) as unknown) as Date
         ),
       })
     })
