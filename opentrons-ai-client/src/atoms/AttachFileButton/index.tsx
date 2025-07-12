@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
@@ -18,6 +19,7 @@ export function AttachFileButton({
   onFileSelect,
   disabled = false,
 }: AttachFileButtonProps): JSX.Element {
+  const { t } = useTranslation('protocol_generator')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleClick = (): void => {
@@ -38,11 +40,10 @@ export function AttachFileButton({
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        aria-label="Attach file"
-        title="Attach file"
+        aria-label={t('attach_file')}
       >
         <Icon name="paper-clip" size="1rem" />
-        <ButtonText>Attach file</ButtonText>
+        <ButtonText>{t('attach_file')}</ButtonText>
       </StyledButton>
       <HiddenFileInput
         ref={fileInputRef}

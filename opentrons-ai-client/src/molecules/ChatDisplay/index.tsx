@@ -65,36 +65,36 @@ const StyledIcon = styled(Icon)`
 
 const OuterContainer = styled.div`
   background-color: ${COLORS.white};
-  border-radius: 0.5rem;
-  padding: 1rem;
+  border-radius: 8px;
+  padding: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 1rem;
+  margin: 0 16px;
 `
 
 const FileContainer = styled.div`
   background-color: ${COLORS.grey20};
-  border-radius: 0.75rem;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 12px 16px;
   width: 100%;
 `
 
 const BadgeContainer = styled.div`
   background-color: ${COLORS.grey30};
-  border-radius: 0.25rem;
+  border-radius: 4px;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 12px 16px;
   width: 100%;
 `
 
 const IconWrapper = styled.div`
-  width: 2rem;
-  height: 2rem;
-  margin-right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,7 +106,7 @@ const ButtonContainer = styled(Flex)`
 `
 
 const FileName = styled.span`
-  font-size: 0.875rem;
+  font-size: 14px;
   color: ${COLORS.black90};
 `
 

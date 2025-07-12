@@ -61,7 +61,7 @@ export function SendButton({
       aria-label="Send"
     >
       <Icon name="send" size="1.25rem" color="white" />
-      <ButtonText>{isLoading ? buttonText : 'Send'}</ButtonText>
+      <ButtonText>{isLoading ? buttonText : t('send')}</ButtonText>
       {isLoading && (
         <LoadingIcon>
           <Icon
