@@ -50,9 +50,15 @@ export const validateFile = (file: File): FileValidationResult => {
 export const getFileType = (file: File): FileType => {
   const extension = '.' + file.name.split('.').pop()?.toLowerCase()
 
-  if (ALLOWED_FILE_TYPES.pdf.includes(extension)) return 'pdf'
-  if (ALLOWED_FILE_TYPES.csv.includes(extension)) return 'csv'
-  if (ALLOWED_FILE_TYPES.python.includes(extension)) return 'python'
+  if (ALLOWED_FILE_TYPES.pdf.includes(extension)) {
+    return 'pdf'
+  }
+  if (ALLOWED_FILE_TYPES.csv.includes(extension)) {
+    return 'csv'
+  }
+  if (ALLOWED_FILE_TYPES.python.includes(extension)) {
+    return 'python'
+  }
 
   return 'unknown'
 }
@@ -108,7 +114,9 @@ export const readFileContent = async (
 }
 
 export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 B'
+  if (bytes === 0) {
+    return '0 B'
+  }
 
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB']
