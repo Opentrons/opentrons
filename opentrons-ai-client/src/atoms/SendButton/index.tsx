@@ -60,7 +60,7 @@ export function SendButton({
       disabled={disabled || isLoading}
       aria-label="Send"
     >
-      <SendIcon />
+      <Icon name="send" size="1.25rem" color="white" />
       <ButtonText>{isLoading ? buttonText : 'Send'}</ButtonText>
       {isLoading && (
         <LoadingIcon>
@@ -105,15 +105,6 @@ const StyledSendButton = styled.button<{ disabled: boolean }>`
     background-color: ${COLORS.blue70};
   }
 `
-
-const SendIcon = (): JSX.Element => (
-  <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
-    <path
-      d="M16 6.99902L0.325195 13.6309V0.367188L16 6.99902ZM1.8252 5.74902L5.5752 6.99902L1.8252 7.83203V11.3672L12.1504 6.99902L1.8252 2.62988V5.74902Z"
-      fill="white"
-    />
-  </svg>
-)
 
 const ButtonText = styled.span`
   font-size: ${TYPOGRAPHY.fontSizeH3};
