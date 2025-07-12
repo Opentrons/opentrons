@@ -130,8 +130,8 @@ export function useDispenseSettingsConfig({
       option: 'dispense_push_out',
       copy: t('push_out'),
       value:
-        state.pushOut != null && state.pushOut
-          ? t('option_enabled')
+        state.pushOutDispense != null && state.pushOutDispense.volume != null
+          ? t('push_out_value', { volume: state.pushOutDispense.volume })
           : t('option_disabled'),
       enabled: true,
       onClick: () => {

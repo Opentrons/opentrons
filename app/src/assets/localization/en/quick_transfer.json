@@ -125,6 +125,8 @@
   "pre_wet_tip": "Pre-wet tip",
   "push_out_after_dispensing": "Push out after dispensing",
   "push_out_description": "Helps ensure all liquid leaves the tip",
+  "push_out_volume": "Push out volume (µL)",
+  "push_out_value": "{{volume}} µL",
   "push_out": "Push out",
   "quick_transfer_volume": "Quick Transfer {{volume}}µL",
   "quick_transfer": "Quick transfer",

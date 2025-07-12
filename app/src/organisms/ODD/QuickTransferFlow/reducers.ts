@@ -266,7 +266,7 @@ export function quickTransferSummaryReducer(
     case 'SET_PUSH_OUT': {
       return {
         ...state,
-        pushOut: action.pushOut,
+        pushOutDispense: action.pushOutSettings,
       }
     }
     case 'SET_CONDITION_ASPIRATE': {

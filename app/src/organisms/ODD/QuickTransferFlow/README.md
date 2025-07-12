@@ -96,17 +96,18 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOutDispense?: {
+    volume: number
+  }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
   submergeAspirate?: {
-    // this has been added
     speed: number
     positionFromBottom: number
   }
   retractAspirate?: {
-    // this has been added
     speed: number
     positionFromBottom: number
   }
@@ -122,12 +123,10 @@ export interface QuickTransferSummaryState {
     repetitions: number
   }
   submergeDispense?: {
-    // this has been added
     speed: number
     positionFromBottom: number
   }
   retractDispense?: {
-    // this has been added
     speed: number
     positionFromBottom: number
   }
@@ -138,15 +137,17 @@ export interface QuickTransferSummaryState {
   touchTipDispenseSpeed?: number
   disposalVolume?: number
   blowOutDispense?: {
-    // this has been updated
     location?: BlowOutLocation
-    speed: number
+    flowRate?: number
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass // this has been added
-  pushOut: boolean // this has been added
-  conditionAspirate?: number // this has been added
-}
+  liquidClass: LiquidClass
+  conditionAspirate?: number
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 ```
