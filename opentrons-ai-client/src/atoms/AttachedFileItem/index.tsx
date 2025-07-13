@@ -1,7 +1,8 @@
-import { Icon, COLORS } from '@opentrons/components'
-import styles from './AttachedFileItem.module.css'
+import { COLORS, Icon } from '@opentrons/components'
 
 import { getFileType } from '/ai-client/resources/utils/fileUtils'
+
+import styles from './AttachedFileItem.module.css'
 
 interface AttachedFileItemProps {
   file: {
@@ -36,7 +37,7 @@ const getSimpleFileTypeLabel = (type: string, fileName: string): string => {
 // Helper to get file extension for display in the icon container
 const getFileExtension = (fileName: string): string => {
   const extension = fileName.split('.').pop()?.toLowerCase()
-  return extension ? `.${extension}` : '.file'
+  return extension != null && extension !== '' ? `.${extension}` : '.file'
 }
 
 export function AttachedFileItem({
@@ -47,7 +48,7 @@ export function AttachedFileItem({
   const fileType = getFileType(file as File)
 
   const containerClass = `${styles.container} ${
-    showRemoveButton && onRemove
+    showRemoveButton && onRemove != null
       ? styles.container_with_remove
       : styles.container_without_remove
   }`
@@ -55,15 +56,19 @@ export function AttachedFileItem({
   return (
     <div className={containerClass}>
       <div className={styles.file_icon_container}>
-        <div className={styles.file_extension}>{getFileExtension(file.name)}</div>
+        <div className={styles.file_extension}>
+          {getFileExtension(file.name)}
+        </div>
       </div>
       <div className={styles.file_details_container}>
         <div className={styles.file_name}>{file.name}</div>
-        <div className={styles.file_details}>{getSimpleFileTypeLabel(fileType, file.name)}</div>
+        <div className={styles.file_details}>
+          {getSimpleFileTypeLabel(fileType, file.name)}
+        </div>
       </div>
-      {showRemoveButton && onRemove && (
-        <button 
-          onClick={onRemove} 
+      {showRemoveButton && onRemove != null && (
+        <button
+          onClick={onRemove}
           aria-label={`Remove ${file.name}`}
           className={styles.remove_button}
         >
@@ -73,4 +78,3 @@ export function AttachedFileItem({
     </div>
   )
 }
-

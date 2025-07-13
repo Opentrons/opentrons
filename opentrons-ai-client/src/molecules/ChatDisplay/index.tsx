@@ -6,7 +6,6 @@ import { useAtom } from 'jotai'
 import { delay } from 'lodash'
 
 import {
-  COLORS,
   Icon,
   LegacyStyledText,
   Link,
@@ -52,7 +51,13 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
 
   const [showProtocolContent, setShowProtocolContent] = useState(false)
-  const { role, reply, requestId, protocol_content, attachments } = chat
+  const {
+    role,
+    reply,
+    requestId,
+    protocol_content: protocolContent,
+    attachments,
+  } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {
@@ -89,8 +94,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleFileDownload = (): void => {
-    if (protocol_content) {
-      const blob = new Blob([JSON.stringify(protocol_content, null, 2)], {
+    if (protocolContent != null) {
+      const blob = new Blob([JSON.stringify(protocolContent, null, 2)], {
         type: 'application/json',
       })
       const url = URL.createObjectURL(blob)
@@ -106,7 +111,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     const lastCodeBlock = document.querySelector(`#${chatId}`)
     const code = lastCodeBlock?.textContent?.trim() ?? ''
     // Don't proceed if code is empty, no need to download as a python file
-    if (!code) {
+    if (code === '') {
       return
     }
     // Make sure python protocol is valid
@@ -135,8 +140,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleClickCopy = async (): Promise<void> => {
-    if (protocol_content) {
-      await navigator.clipboard.writeText(JSON.stringify(protocol_content))
+    if (protocolContent != null) {
+      await navigator.clipboard.writeText(JSON.stringify(protocolContent))
     } else {
       const lastCodeBlock = document.querySelector(`#${chatId}`)
       const code = lastCodeBlock?.textContent ?? ''
@@ -204,9 +209,9 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             </div>
             <div
               className={styles.hover_shadow}
-              onClick={async e => {
+              onClick={e => {
                 e.stopPropagation()
-                await handleClickCopy()
+                void handleClickCopy()
               }}
             >
               <Icon
@@ -252,7 +257,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         }`}
         data-testid={`ChatDisplay_from_${isUser ? 'user' : 'backend'}`}
       >
-        {protocol_content == null && (
+        {protocolContent == null && (
           <div className={styles.content_wrapper}>
             <Markdown
               components={{
@@ -271,7 +276,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         )}
 
         {/* Display file attachments for user messages */}
-        {isUser && attachments && attachments.length > 0 && (
+        {isUser && attachments != null && attachments.length > 0 && (
           <div className={styles.attachments_container}>
             {attachments.map((attachment, index) => (
               <AttachedFileItem
@@ -282,7 +287,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             ))}
           </div>
         )}
-        {protocol_content != null && (
+        {protocolContent != null && (
           <StyledText
             fontSize={TYPOGRAPHY.fontSize20}
             lineHeight={TYPOGRAPHY.lineHeight24}
@@ -299,15 +304,14 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
               <Icon
                 name="open-in-new"
                 size="1rem"
-                margin={`${SPACING.spacing4} 0 0 ${SPACING.spacing4}`}
-                className={styles.styled_icon}
+                className={`${styles.styled_icon} ${styles.open_in_new_icon}`}
               />
             </Link>
           </StyledText>
         )}
 
         {/* Display protocol_content badge and content */}
-        {!isUser && protocol_content && (
+        {!isUser && protocolContent != null && (
           <>
             <ProtocolContentBadge
               onClick={() => {
@@ -317,7 +321,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
 
             {showProtocolContent && (
               <div className={styles.code_wrapper}>
-                {JSON.stringify(protocol_content, null, 2)}
+                {JSON.stringify(protocolContent, null, 2)}
               </div>
             )}
             <Markdown
@@ -336,7 +340,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
           </>
         )}
 
-        {!isUser && !protocol_content ? (
+        {!isUser && protocolContent == null ? (
           <div className={styles.actions_container}>
             <div
               className={styles.hover_shadow}
@@ -364,8 +368,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             </div>
             <div
               className={styles.hover_shadow}
-              onClick={async () => {
-                await handleClickCopy()
+              onClick={() => {
+                void handleClickCopy()
               }}
             >
               <Icon
@@ -399,7 +403,7 @@ function ExternalLink(
   return (
     <a
       {...props}
-      style={{ color: COLORS.blue50 }}
+      className={styles.external_link}
       target="_blank"
       rel="noopener noreferrer"
     />
@@ -422,7 +426,7 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
+  return <LegacyStyledText {...props} as="li" className={styles.list_item} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {

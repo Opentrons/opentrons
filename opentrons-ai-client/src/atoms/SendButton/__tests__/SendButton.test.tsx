@@ -11,7 +11,7 @@ import type { ComponentProps } from 'react'
 
 // Create a mock i18n instance for testing
 const testI18n = i18n.createInstance()
-testI18n.use(initReactI18next).init({
+void testI18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
   resources: {

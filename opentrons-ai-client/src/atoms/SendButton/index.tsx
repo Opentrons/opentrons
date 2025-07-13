@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, Icon } from '@opentrons/components'
+
 import styles from './SendButton.module.css'
 
 interface SendButtonProps {
@@ -56,7 +57,9 @@ export function SendButton({
       className={styles.button}
     >
       <Icon name="send" size="1.25rem" color="white" />
-      <span className={styles.button_text}>{isLoading ? buttonText : t('send')}</span>
+      <span className={styles.button_text}>
+        {isLoading ? buttonText : t('send')}
+      </span>
       {isLoading && (
         <div className={styles.loading_icon}>
           <Icon
@@ -70,4 +73,3 @@ export function SendButton({
     </button>
   )
 }
-

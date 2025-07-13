@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Icon } from '@opentrons/components'
+
 import styles from './AttachFileButton.module.css'
 
 interface AttachFileButtonProps {
@@ -51,4 +52,3 @@ export function AttachFileButton({
     </>
   )
 }
-

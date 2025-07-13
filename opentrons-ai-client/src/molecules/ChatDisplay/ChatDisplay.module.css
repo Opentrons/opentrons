@@ -68,6 +68,18 @@
   color: var(--blue-50);
 }
 
+.open_in_new_icon {
+  margin: var(--spacing-4) 0 0 var(--spacing-4);
+}
+
+.external_link {
+  color: var(--blue-50);
+}
+
+.list_item {
+  margin-left: var(--spacing-16);
+}
+
 .outer_container {
   background-color: var(--white);
   border-radius: 8px;
