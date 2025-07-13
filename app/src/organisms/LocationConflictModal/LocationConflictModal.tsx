@@ -31,6 +31,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -56,6 +57,7 @@ interface LocationConflictModalProps {
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
+  moduleSerialNumber?: string
 }
 
 export const LocationConflictModal = (
@@ -68,6 +70,7 @@ export const LocationConflictModal = (
     requiredFixtureId,
     requiredModule,
     deckDef,
+    moduleSerialNumber,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
@@ -113,10 +116,23 @@ export const LocationConflictModal = (
           existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
           replacementCutoutFixtureId != null
         ) {
-          return {
-            ...existingCutoutConfig,
-            cutoutFixtureId: replacementCutoutFixtureId,
-            opentronsModuleSerialNumber: moduleSerialNumber,
+          if (
+            requiredFixtureId != null &&
+            WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(requiredFixtureId)
+          ) {
+            // if the required fixture is a combo waste chute fixture, use the required fixture id
+            // instead of the module fixture id
+            return {
+              ...existingCutoutConfig,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          } else {
+            return {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
           }
         } else if (
           isThermocyclerCurrentFixture &&
@@ -145,7 +161,11 @@ export const LocationConflictModal = (
   }
 
   const handleUpdateDeck = (): void => {
-    if (requiredModule != null) {
+    if (requiredModule != null && moduleSerialNumber != null) {
+      // if there is a conflict for a combo fixture that includes a module
+      // and the module is already matched then we can skip the configure module screen
+      handleConfigureModule(moduleSerialNumber)
+    } else if (requiredModule != null) {
       setShowModuleSelect(true)
     } else if (requiredFixtureId != null) {
       const newRequiredFixtureDeckConfig = deckConfig.map(fixture => {
