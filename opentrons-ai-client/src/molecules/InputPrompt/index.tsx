@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
-  BORDERS,
   COLORS,
-  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import styles from './InputPrompt.module.css'
 
 import { SendButton } from '/ai-client/atoms/SendButton'
 import {
@@ -333,22 +331,22 @@ export function InputPrompt(): JSX.Element {
   }, [data, isLoading, submitted])
 
   return (
-    <StyledForm id="User_Prompt">
+    <form id="User_Prompt" className={styles.form}>
       {/* Error message */}
       {fileError && (
-        <ErrorContainer>
-          <StyledText color={COLORS.red50} fontSize={TYPOGRAPHY.fontSize14}>
+        <div className={styles.error_container}>
+          <StyledText color={COLORS.red50} fontSize={TYPOGRAPHY.fontSizeH3}>
             {fileError}
           </StyledText>
-        </ErrorContainer>
+        </div>
       )}
 
       {/* Main input container */}
-      <MainInputContainer>
+      <div className={styles.main_input_container}>
         {/* Display attached files above the input */}
         {attachedFiles.length > 0 && (
-          <AttachedFilesSection>
-            <AttachedFilesList>
+          <div className={styles.attached_files_section}>
+            <div className={styles.attached_files_list}>
               {attachedFiles.map((file, index) => (
                 <AttachedFileItem
                   key={`${file.name}-${index}`}
@@ -359,28 +357,29 @@ export function InputPrompt(): JSX.Element {
                   showRemoveButton={true}
                 />
               ))}
-            </AttachedFilesList>
-          </AttachedFilesSection>
+            </div>
+          </div>
         )}
 
         {/* Text input area - separate row */}
-        <TextInputSection>
-          <LegacyStyledTextarea
+        <div className={styles.text_input_section}>
+          <textarea
             rows={calcTextAreaHeight(watchUserPrompt)}
             placeholder={t('type_your_prompt')}
+            className={styles.textarea}
             {...register('userPrompt')}
           />
-        </TextInputSection>
+        </div>
 
         {/* Bottom row with attach button and send button */}
-        <ButtonRowContainer>
+        <div className={styles.button_row_container}>
           <AttachFileButton
             onFileSelect={handleFileSelect}
             disabled={
               isLoading || attachedFiles.length >= MAX_FILES_PER_MESSAGE
             }
           />
-          <Spacer />
+          <div className={styles.spacer} />
           <SendButton
             disabled={watchUserPrompt.length === 0}
             isLoading={isLoading}
@@ -388,9 +387,9 @@ export function InputPrompt(): JSX.Element {
               handleClick()
             }}
           />
-        </ButtonRowContainer>
-      </MainInputContainer>
-    </StyledForm>
+        </div>
+      </div>
+    </form>
   )
 }
 
@@ -427,90 +426,3 @@ const getUpdateEndpoint = (): string => {
   }
 }
 
-const StyledForm = styled.form`
-  width: 100%;
-`
-
-const ErrorContainer = styled.div`
-  padding: ${SPACING.spacing12} ${SPACING.spacing16};
-  background-color: ${COLORS.red10};
-  border-radius: ${BORDERS.borderRadius4};
-  border: 1px solid ${COLORS.red30};
-  margin-bottom: ${SPACING.spacing8};
-`
-
-const LegacyStyledTextarea = styled.textarea`
-  resize: none;
-  min-height: 3.75rem;
-  max-height: 17.25rem;
-  overflow-y: auto;
-  background-color: ${COLORS.white};
-  border: none;
-  outline: none;
-  padding: 1.2rem 0;
-  box-shadow: none;
-  color: ${COLORS.black90};
-  width: 100%;
-  font-size: ${TYPOGRAPHY.fontSizeH3};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  font-family: 'Public Sans';
-  font-style: normal;
-
-  ::placeholder {
-    color: ${COLORS.grey50};
-    font-size: ${TYPOGRAPHY.fontSizeH3};
-    font-weight: ${TYPOGRAPHY.fontWeightRegular};
-    line-height: ${TYPOGRAPHY.lineHeight20};
-    font-family: 'Public Sans';
-    font-style: normal;
-  }
-`
-
-const MainInputContainer = styled.div`
-  width: 100%;
-  border: 1px solid ${COLORS.grey20};
-  border-radius: ${BORDERS.borderRadius12};
-  background-color: ${COLORS.white};
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus-within {
-    border-color: ${COLORS.blue50};
-    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
-  }
-`
-
-const AttachedFilesSection = styled.div`
-  border-bottom: 1px solid ${COLORS.grey20};
-  background-color: ${COLORS.grey5};
-  border-radius: ${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0 0;
-`
-
-const AttachedFilesList = styled.div`
-  padding: ${SPACING.spacing12} ${SPACING.spacing16};
-  display: flex;
-  flex-direction: row;
-  gap: ${SPACING.spacing8};
-  flex-wrap: wrap;
-`
-
-const TextInputSection = styled.div`
-  padding: ${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing4}
-    ${SPACING.spacing16};
-  background-color: ${COLORS.white};
-`
-
-const ButtonRowContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing12} ${SPACING.spacing16};
-  background-color: ${COLORS.white};
-  border-radius: 0 0 ${BORDERS.borderRadius12} ${BORDERS.borderRadius12};
-`
-
-const Spacer = styled.div`
-  flex: 1;
-`

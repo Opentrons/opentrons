@@ -1,0 +1,88 @@
+@import '@opentrons/components/styles';
+
+.form {
+  width: 100%;
+}
+
+.error_container {
+  padding: var(--spacing-12) var(--spacing-16);
+  background-color: var(--red-20);
+  border-radius: var(--border-radius-4);
+  border: 1px solid var(--red-30);
+  margin-bottom: var(--spacing-8);
+}
+
+.textarea {
+  resize: none;
+  min-height: 3.75rem;
+  max-height: 17.25rem;
+  overflow-y: auto;
+  background-color: var(--white);
+  border: none;
+  outline: none;
+  padding: 1.2rem 0;
+  box-shadow: none;
+  color: var(--black-90);
+  width: 100%;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  font-family: 'Public Sans', sans-serif;
+  font-style: normal;
+}
+
+.textarea::placeholder {
+  color: var(--grey-50);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  font-family: 'Public Sans', sans-serif;
+  font-style: normal;
+}
+
+.main_input_container {
+  width: 100%;
+  border: 1px solid var(--grey-20);
+  border-radius: var(--border-radius-12);
+  background-color: var(--white);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.main_input_container:focus-within {
+  border-color: var(--blue-50);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.attached_files_section {
+  border-bottom: 1px solid var(--grey-20);
+  background-color: var(--grey-10);
+  border-radius: var(--border-radius-12) var(--border-radius-12) 0 0;
+}
+
+.attached_files_list {
+  padding: var(--spacing-12) var(--spacing-16);
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+  flex-wrap: wrap;
+}
+
+.text_input_section {
+  padding: var(--spacing-16) var(--spacing-16) var(--spacing-4) var(--spacing-16);
+  background-color: var(--white);
+}
+
+.button_row_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-16);
+  background-color: var(--white);
+  border-radius: 0 0 var(--border-radius-12) var(--border-radius-12);
+}
+
+.spacer {
+  flex: 1;
+}

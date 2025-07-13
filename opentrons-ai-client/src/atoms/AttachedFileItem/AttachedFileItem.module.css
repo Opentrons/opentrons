@@ -1,0 +1,99 @@
+@import '@opentrons/components/styles';
+
+.container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-8);
+  padding: var(--spacing-8);
+  background-color: rgba(22, 33, 45, 0.2);
+  border-radius: var(--border-radius-8);
+  border: none;
+  width: fit-content;
+  min-width: 10rem;
+  max-width: 100%;
+}
+
+.container_with_remove {
+  padding-right: var(--spacing-40);
+}
+
+.container_without_remove {
+  padding-right: var(--spacing-8);
+}
+
+.remove_button {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--border-radius-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+}
+
+.remove_button:hover {
+  background-color: var(--grey-20);
+}
+
+.remove_button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--blue-50) 40;
+}
+
+.file_icon_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  background-color: var(--white);
+  border-radius: var(--border-radius-4);
+  flex-shrink: 0;
+}
+
+.file_extension {
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+  color: #000;
+  font-family: 'Reddit Mono', monospace;
+  font-style: normal;
+  text-align: center;
+}
+
+.file_details_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.file_name {
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-16);
+  color: var(--black-90);
+  font-family: 'Public Sans', sans-serif;
+  font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file_details {
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-16);
+  color: var(--black-90);
+  font-family: 'Public Sans', sans-serif;
+  font-style: normal;
+}

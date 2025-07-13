@@ -1,4 +1,6 @@
+import { initReactI18next } from 'react-i18next'
 import { fireEvent, screen } from '@testing-library/react'
+import i18n from 'i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
@@ -7,9 +9,29 @@ import { SendButton } from '../index'
 
 import type { ComponentProps } from 'react'
 
+// Create a mock i18n instance for testing
+const testI18n = i18n.createInstance()
+testI18n.use(initReactI18next).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  resources: {
+    en: {
+      protocol_generator: {
+        send: 'Send',
+        progressInitializing: 'Initializing...',
+        progressProcessing: 'Processing...',
+        progressGenerating: 'Generating...',
+        progressFinalizing: 'Finalizing...',
+      },
+    },
+  },
+})
+
 const mockHandleClick = vi.fn()
 const render = (props: ComponentProps<typeof SendButton>) => {
-  return renderWithProviders(<SendButton {...props} />)
+  return renderWithProviders(<SendButton {...props} />, {
+    i18nInstance: testI18n,
+  })
 }
 
 describe('SendButton', () => {

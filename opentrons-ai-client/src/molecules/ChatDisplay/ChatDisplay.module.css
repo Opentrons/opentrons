@@ -1,0 +1,138 @@
+@import '@opentrons/components/styles';
+
+.main_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  width: 100%;
+}
+
+.header_container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.header_container_user {
+  justify-content: flex-end;
+}
+
+.header_container_ai {
+  justify-content: flex-start;
+}
+
+.message_container {
+  width: fit-content;
+  max-width: 70%;
+  padding: 1.5rem;
+  border-radius: var(--spacing-12);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.message_container_user {
+  align-self: flex-end;
+  background-color: var(--blue-30);
+}
+
+.message_container_ai {
+  align-self: flex-start;
+  background-color: var(--grey-30);
+}
+
+.actions_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--spacing-20);
+  padding-top: var(--spacing-12);
+}
+
+.hover_shadow {
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+  transition: box-shadow 0.3s ease;
+  border-radius: var(--border-radius-8);
+  display: flex;
+}
+
+.hover_shadow:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-8);
+}
+
+.styled_icon {
+  color: var(--blue-50);
+}
+
+.outer_container {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px;
+}
+
+.file_container {
+  background-color: var(--grey-20);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+}
+
+.badge_container {
+  background-color: var(--grey-30);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+}
+
+.icon_wrapper {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button_container {
+  flex-direction: row;
+  margin-left: auto;
+  display: flex;
+}
+
+.file_name {
+  font-size: 14px;
+  color: var(--black-90);
+}
+
+.code_wrapper {
+  display: inline-flex;
+  font-family: monospace;
+  padding: var(--spacing-4);
+  color: var(--black-80);
+  background-color: var(--grey-20);
+  border-radius: var(--border-radius-4);
+  overflow: auto;
+}
+
+.content_wrapper {
+  width: 100%;
+}
+
+.attachments_container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+  flex-wrap: wrap;
+}
