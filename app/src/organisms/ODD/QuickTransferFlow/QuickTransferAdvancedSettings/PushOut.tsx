@@ -43,7 +43,7 @@ export function PushOut(props: PushOutProps): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
   const [pushOutIsEnabled, setPushOutIsEnabled] = useState<boolean | null>(
-    state.pushOutDispense?.volume != null ? true : false
+    state.pushOutDispense?.volume != null
   )
   const [volume, setVolume] = useState<number | null>(
     state.pushOutDispense?.volume ?? null
@@ -182,7 +182,6 @@ export function PushOut(props: PushOutProps): JSX.Element {
             paddingX={SPACING.spacing24}
             height="21.25rem"
             marginTop="7.75rem"
-            borderRadius="0"
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}

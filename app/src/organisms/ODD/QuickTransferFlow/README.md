@@ -96,24 +96,24 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
-  pushOutDispense?: {
+  pushOutDispense?: { // this has been update - pushOut boolean
     volume: number
   }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
-  submergeAspirate?: {
+  submergeAspirate?: { // this has been added
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
-  retractAspirate?: {
+  retractAspirate?: { // this has been added
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
-  delayAspirate?: {
+  delayAspirate?: { // this has been updated - removed positionFromBottom
     delayDuration: number
   }
   touchTipAspirate?: number
@@ -124,32 +124,32 @@ export interface QuickTransferSummaryState {
     mixVolume: number
     repetitions: number
   }
-  submergeDispense?: {
+  submergeDispense?: {  // this has been added
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
-  retractDispense?: {
+  retractDispense?: {  // this has been added
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
-  delayDispense?: {
+  delayDispense?: { // this has been updated - removed positionFromBottom
     delayDuration: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOutDispense?: {
+  blowOutDispense?: {  // this has been added - updated from blowOut
     location?: BlowOutLocation
     flowRate?: number
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass
-  conditionAspirate?: number
-  disposalVolumeDispenseSettings?: {
+  liquidClass: LiquidClass  // this has been added
+  conditionAspirate?: number  // this has been added
+  disposalVolumeDispenseSettings?: {  // this has been added
     volume: number
     blowOutLocation: BlowOutLocation
     flowRate: number
