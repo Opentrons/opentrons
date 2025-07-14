@@ -56,7 +56,11 @@ export interface LabwareOnDeck {
   definition: LabwareDefinition
   wellFill?: WellFill
   missingTips?: WellGroup
-  /** generic prop to render self-positioned children for each labware */
+  /**
+   * Additional children to render alongside this labware.
+   * The SVG origin of these children is the front-left (-x,-y) corner of
+   * the slot that the labware is in.
+   */
   labwareChildren?: ReactNode
   onLabwareClick?: () => void
   highlight?: boolean
@@ -70,7 +74,11 @@ export interface ModuleOnDeck {
   nestedLabwareDef?: LabwareDefinition | null
   nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
-  /** generic prop to render self-positioned children for each module */
+  /**
+   * Additional children to render atop this module, after `nestedLabwareDef`.
+   * The SVG origin of these children is the front-left (-x,-y) corner of the slot that
+   * the module is in.
+   */
   moduleChildren?: ReactNode
   onLabwareClick?: () => void
   highlightLabware?: boolean
