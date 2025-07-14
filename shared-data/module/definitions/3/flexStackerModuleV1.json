@@ -7,19 +7,7 @@
     "y": 1.125,
     "z": 68.275
   },
-  "features": {
-    "slotFootprintAsChild": {
-      "z": 0,
-      "backLeft": {
-        "x": 0,
-        "y": 0
-      },
-      "frontRight": {
-        "x": 128,
-        "y": -86
-      }
-    }
-  },
+  "features": {},
   "dimensions": {
     "bareOverallHeight": 82,
     "overLabwareHeight": 0,
@@ -73,32 +61,6 @@
   "displayName": "Flex Stacker Module GEN1",
   "quirks": [],
   "slotTransforms": {
-    "ot2_standard": {
-      "3": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      },
-      "6": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      },
-      "9": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      }
-    },
     "ot2_short_trash": {
       "3": {
         "labwareOffset": [
@@ -193,7 +155,7 @@
     }
   },
   "compatibleWith": [],
-  "incompatibleWithDecks": [],
+  "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {
     "TOFSensorBaseline": {
       "version": 1,
