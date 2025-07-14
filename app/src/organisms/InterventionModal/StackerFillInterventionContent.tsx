@@ -11,10 +11,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  getStackerLocationFromSlotName,
+} from '@opentrons/shared-data'
 
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
-import { getStackerLocationFromSlotName } from '/app/transformations/commands'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 

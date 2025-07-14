@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareViewBox,
+  getLiquidsByIdForLabware,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
@@ -17,15 +18,14 @@ import { OddModal } from '/app/molecules/OddModal'
 import {
   getDisabledWellFillFromLabwareId,
   getDisabledWellGroupForLiquidId,
-  getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareByLiquidId,
   LabwareDefinition,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
 
 interface LabwareLiquidsDetailModalProps {
   labwareId: string

@@ -12,8 +12,8 @@ import {
 
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
-import { getLabwareDefinitionsByURIForProtocol } from '../getLabwareDefinitionsByURIForProtocol'
-import { getStackedItemsOnStartingDeck } from '../getStackedItemsOnStartingDeck'
+import { getLabwareDefinitionsByURIForProtocol } from '@opentrons/shared-data/js/helpers/getLabwareDefinitionsByURIForProtocol'
+import { getStackedItemsOnStartingDeck } from '@opentrons/shared-data/js/helpers/getStackedItemsOnStartingDeck'
 
 import type {
   LabwareDefinition2,

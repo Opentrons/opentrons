@@ -1,36 +1,36 @@
+import { CutoutId } from '../../deck'
+import {
+  FlexStackerFillRunTimeCommand,
+  FlexStackerSetStoredLabwareRunTimeCommand,
+  LoadLabwareRunTimeCommand,
+  LoadLidParams,
+  LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
+  OnAddressableAreaLocationSequenceComponent,
+  OnCutoutFixtureLocationSequenceComponent,
+  RunTimeCommand,
+} from '../../protocol'
 import {
   FLEX_STACKER_MODULE_TYPE,
-  getCutoutDisplayName,
-  getLabwareDefURI,
-  getModuleType,
-  getSlotFromAddressableAreaName,
   SPAN7_8_10_11_SLOT,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-} from '@opentrons/shared-data'
-
-import { getLiquidsByIdForLabware } from '/app/transformations/analysis'
-
-import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
-
-import type {
-  CutoutId,
-  FlexStackerFillRunTimeCommand,
-  FlexStackerSetStoredLabwareRunTimeCommand,
+} from '../constants'
+import { getCutoutDisplayName } from '../fixtures'
+import { getModuleType } from '../modules'
+import {
   LabwareDefinition,
   LoadedLabware,
   LoadedModule,
-  LoadLabwareRunTimeCommand,
-  LoadLidParams,
-  LoadLidRunTimeCommand,
-  LoadLidStackRunTimeCommand,
   ModuleModel,
-  OnAddressableAreaLocationSequenceComponent,
-  OnCutoutFixtureLocationSequenceComponent,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+} from '../types'
+import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
+import { getLabwareDefURI } from './getLabwareDefURI'
+import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
+import { getSlotFromAddressableAreaName } from './parseAddressableArea'
+
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {

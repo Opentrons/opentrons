@@ -3,31 +3,27 @@ import { useMemo } from 'react'
 import { BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getLabwareDefinitionsByURIForProtocol,
+  getLabwareOnDeck,
+  getModuleFromStack,
   getSimplestDeckConfigForProtocol,
+  getStacksOnModules,
+  getTopLabwareFromStack,
+  getWellFillFromLabwareId,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
-import {
-  getLabwareDefinitionsByURIForProtocol,
-  getLabwareOnDeck,
-  getModuleFromStack,
-  getStacksOnModules,
-  getTopLabwareFromStack,
-} from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
-  ModuleModel,
-} from '@opentrons/shared-data'
-import type {
   LabwareByLiquidId,
+  ModuleModel,
   StackedItemsOnDeck,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 interface LabwareMapViewProps {
   handleLabwareClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>

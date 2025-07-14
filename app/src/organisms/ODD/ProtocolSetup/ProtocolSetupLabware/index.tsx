@@ -30,6 +30,11 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getLabwareInfoByLiquidId,
+  getLabwareLiquidRenderInfoFromStack,
+  getModuleFromStack,
+  getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -42,13 +47,6 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
-import {
-  getLabwareInfoByLiquidId,
-  getLabwareLiquidRenderInfoFromStack,
-  getModuleFromStack,
-  getStackedItemsOnStartingDeck,
-  getStacksWithLabware,
-} from '/app/transformations/commands'
 
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
@@ -59,13 +57,11 @@ import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data'
-import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import type {
   LabwareByLiquidId,
   LabwareInStack,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
+import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type { SetupScreens } from '../types'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000

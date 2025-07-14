@@ -4,6 +4,7 @@ import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
+import { getLabwareDefURI } from './getLabwareDefURI'
 import { getSchema2Dimensions } from './positionMath'
 
 import type { AddressableAreaName, CutoutId } from '../../deck/types/schemaV5'
@@ -52,22 +53,16 @@ export * from './validateCustomLabwareHelper'
 export * from './getWellRangeForLiquidLabwarePair'
 export * from './positionMath'
 export * from './pairsFromArray'
+export * from './getWellFillFromLabwareId'
+export * from './getStandardDeckViewLayerBlockList'
+export * from './getLabwareDefinitionsByURIForProtocol'
+export * from './getLabwareInfoByLiquidId'
+export { getLabwareDefURI } from './getLabwareDefURI'
+export * from './getLiquidsByIdForLabware'
+export * from './getStackedItemsOnStartingDeck'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
-
-export const getLabwareDefURI = (def: LabwareDefinition): string =>
-  constructLabwareDefURI(
-    def.namespace,
-    def.parameters.loadName,
-    String(def.version)
-  )
-
-export const constructLabwareDefURI = (
-  namespace: string,
-  loadName: string,
-  version: string
-): string => `${namespace}/${loadName}/${version}`
 
 export interface URIDetails {
   loadName: string

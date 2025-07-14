@@ -1,35 +1,28 @@
 import { useMemo } from 'react'
 
-import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getSimplestDeckConfigForProtocol,
-} from '@opentrons/shared-data'
-
-import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareInfoByLiquidId,
   getLabwareOnDeck,
   getModuleFromStack,
+  getSimplestDeckConfigForProtocol,
   getStackedItemsOnStartingDeck,
   getStacksOnModules,
-  getTopLabwareFromStack,
-} from '/app/transformations/commands'
-
-import {
   getStandardDeckViewLayerBlockList,
+  getTopLabwareFromStack,
   getWellFillFromLabwareId,
-} from './utils'
+} from '@opentrons/shared-data'
+
+import { BaseDeck, LabwareOnDeck } from '../../hardware-sim'
 
 import type { ComponentProps } from 'react'
-import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   ModuleModel,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
-export * from './utils'
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   /** extra props to pass through to BaseDeck component */

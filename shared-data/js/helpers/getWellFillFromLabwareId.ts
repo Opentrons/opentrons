@@ -1,6 +1,12 @@
 import type { WellFill } from '@opentrons/components/src/hardware-sim/Labware'
-import type { Liquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
+import type { Liquid } from '../types'
+
+interface LabwareByLiquidId {
+  [liquidId: string]: Array<{
+    labwareId: string
+    volumeByWell: { [well: string]: number }
+  }>
+}
 
 export function getWellFillFromLabwareId(
   labwareId: string,

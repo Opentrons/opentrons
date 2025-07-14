@@ -12,22 +12,20 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
-  getModuleType,
-  getSimplestDeckConfigForProtocol,
-  THERMOCYCLER_MODULE_V1,
-} from '@opentrons/shared-data'
-
-import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
-import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareInfoByLiquidId,
   getLabwareOnDeck,
   getModuleFromStack,
+  getModuleType,
+  getSimplestDeckConfigForProtocol,
   getStackedItemsOnStartingDeck,
   getStacksOnModules,
   getTopLabwareFromStack,
-} from '/app/transformations/commands'
+  getWellFillFromLabwareId,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
+
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
@@ -38,8 +36,8 @@ import type {
   CompletedProtocolAnalysis,
   ModuleModel,
   ProtocolAnalysisOutput,
+  StackItem,
 } from '@opentrons/shared-data'
-import type { StackItem } from '/app/transformations/commands'
 
 interface SetupLabwareMapProps {
   runId: string

@@ -1,8 +1,7 @@
 import { COLORS } from '@opentrons/components'
 
 import type { WellGroup } from '@opentrons/components'
-import type { Liquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
+import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
@@ -107,24 +106,6 @@ export function getTotalVolumePerLiquidLabwarePair(
     .reduce((prev, curr) => prev + curr, 0)
 
   return totalVolume
-}
-
-export function getLiquidsByIdForLabware(
-  labwareId: string,
-  labwareByLiquidId: LabwareByLiquidId
-): LabwareByLiquidId {
-  return Object.entries(labwareByLiquidId).reduce(
-    (acc, [liquidId, labwareArray]) => {
-      const filteredArray = labwareArray.filter(
-        labware => labware.labwareId === labwareId
-      )
-      if (filteredArray.length > 0) {
-        return { ...acc, [liquidId]: filteredArray }
-      }
-      return acc
-    },
-    {}
-  )
 }
 
 export function getWellGroupForLiquidId(
