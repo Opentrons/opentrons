@@ -1,6 +1,6 @@
 import { Icon, LegacyStyledText } from '@opentrons/components'
 
-import styles from './RobotSettingButton.module.css'
+import styles from './robotsettingbutton.module.css'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
