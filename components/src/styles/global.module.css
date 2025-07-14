@@ -176,7 +176,4 @@
   --purple-35: var(--purple-35-touchscreen);
   --purple-30: var(--purple-30-touchscreen);
   --purple-20: var(--purple-20-touchscreen);
-
-  /* font-family */
-  --font-family-main: 'Public Sans';
 }
