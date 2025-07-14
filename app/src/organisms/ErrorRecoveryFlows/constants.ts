@@ -223,6 +223,7 @@ export const RECOVERY_MAP = {
     ROUTE: 'stacker-hopper-empty-retry',
     STEPS: {
       FILL_HOPPER: 'fill-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -429,6 +430,7 @@ export const STEP_ORDER: StepOrder = {
   ],
   [STACKER_HOPPER_EMPTY_RETRY.ROUTE]: [
     STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER,
+    STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY,
   ],
   [STACKER_HOPPER_EMPTY_SKIP.ROUTE]: [
@@ -638,6 +640,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
   },
   [STACKER_HOPPER_EMPTY_RETRY.ROUTE]: {
     [STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
       allowDoorOpen: true,
     },
     [STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
