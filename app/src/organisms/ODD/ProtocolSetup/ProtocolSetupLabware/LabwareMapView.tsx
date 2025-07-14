@@ -12,17 +12,13 @@ import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareOnDeck,
-  getModuleFromStack,
   getStacksOnModules,
   getTopLabwareFromStack,
 } from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
-import type {
-  CompletedProtocolAnalysis,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   LabwareByLiquidId,
   StackedItemsOnDeck,

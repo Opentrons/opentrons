@@ -10,7 +10,6 @@ import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareInfoByLiquidId,
   getLabwareOnDeck,
-  getModuleFromStack,
   getStackedItemsOnStartingDeck,
   getStacksOnModules,
   getTopLabwareFromStack,
