@@ -365,7 +365,7 @@ export const blowoutLocationHelper = (args: {
     labware = invariantContext.labwareEntities?.[blowoutLocation]
     well = trashOrLabware === 'labware' ? 'A1' : null
   }
-  console.log(trashOrLabware, 'trashOrLabware')
+
   if (well != null && trashOrLabware === 'labware' && labware != null) {
     return [
       curryCommandCreator(blowOutInWell, {
@@ -382,9 +382,8 @@ export const blowoutLocationHelper = (args: {
       }),
     ]
   } else if (
-    trashOrLabware === 'wasteChute' ||
-    (additionalEquipmentEntities[blowoutLocation] != null &&
-      additionalEquipmentEntities[blowoutLocation].name === 'wasteChute')
+    additionalEquipmentEntities[blowoutLocation] != null &&
+    additionalEquipmentEntities[blowoutLocation].name === 'wasteChute'
   ) {
     const wasteChute = Object.values(additionalEquipmentEntities).find(
       ae => ae.name === 'wasteChute'
