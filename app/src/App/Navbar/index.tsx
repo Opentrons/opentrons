@@ -8,7 +8,7 @@ import { Icon, LegacyStyledText, Link } from '@opentrons/components'
 import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 import logoSvg from '/app/assets/images/logo_nav.svg'
 
-import styles from './Navbar.module.css'
+import styles from './navbar.module.css'
 
 import type { MouseEvent } from 'react'
 import type { RouteProps } from '../types'
