@@ -23,7 +23,6 @@ import {
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
   getReplacementFixtureForFixtureRemoval,
-  MODULE_AA_TYPE_BY_MODEL,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -194,27 +193,30 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       moduleFixtures
     )
 
-    const fixtureInPlace = deckConfigWithAA.find(
-      dc => dc.cutoutId === anchorCutoutId
-    )
-    console.log('fixtureInPlace: ', fixtureInPlace)
     console.log('removedFixtureIdByCutoutIds: ', removedFixtureIdByCutoutIds)
 
-    const aa = getAAForModuleFixture(
-      anchorCutoutId,
-      removedFixtureIdByCutoutIds[anchorCutoutId],
-      attachedModule.moduleModel
-    )
-    console.log('aa: ', aa)
-    const replacment = getReplacementFixtureForFixtureRemoval(
-      fixtureInPlace?.cutoutFixtureId,
-      anchorCutoutId,
-      aa
-    )
-    console.log('replacment: ', replacment)
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
+          const fixtureInPlace = deckConfigWithAA.find(
+            dc => dc.cutoutId === anchorCutoutId
+          )
+          console.log('fixtureInPlace: ', fixtureInPlace)
+          const removedDefaultFixture = removedFixtureIdByCutoutIds[
+            cc.cutoutId
+          ] as CutoutFixtureId // we know there is a match by the condition
+          const aa = getAAForModuleFixture(
+            anchorCutoutId,
+            removedDefaultFixture,
+            attachedModule.moduleModel
+          )
+          console.log('aa: ', aa)
+          const replacment = getReplacementFixtureForFixtureRemoval(
+            fixtureInPlace?.cutoutFixtureId ?? removedDefaultFixture,
+            anchorCutoutId,
+            aa
+          )
+          console.log('replacment: ', replacment)
           return {
             ...cc,
             cutoutFixtureId: replacment,

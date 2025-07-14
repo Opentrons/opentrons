@@ -139,7 +139,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
-  //const showCalModal = true
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runStatus = useCurrentRunStatus()

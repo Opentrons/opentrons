@@ -1105,12 +1105,13 @@ export const isModuleAllowedOnAA = (
       SINGLE_RIGHT_CUTOUTS.includes(cutoutId) &&
       moduleModel === FLEX_STACKER_MODULE_V1
     ) {
-      const item = aaWithSlotLikeId?.find(
-        aaItem =>
-          FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
-          aa === aaItem.slotLikeId
+      return (
+        aaWithSlotLikeId?.some(
+          aaItem =>
+            FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
+            aa === aaItem.slotLikeId
+        ) ?? false
       )
-      return item === undefined ? false : true
     }
     return aaWithSlotLikeId?.some(item => item.slotLikeId === aa) ?? false
   } else {
