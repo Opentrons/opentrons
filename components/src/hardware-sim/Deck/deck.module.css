@@ -1,0 +1,36 @@
+.deck_labels_column {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 2.5rem;
+}
+
+.deck_label_column_container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.deck_labels_row {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 2.5rem;
+  width: var(--dynamic-width, 5rem); /* fallback if variable not set */
+}
+
+.deck_label_row_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dynamic-width);
+}
+
+.robot_coords_foreign_object_container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transform: scale(1, -1);
+}

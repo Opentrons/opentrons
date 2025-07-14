@@ -1,6 +1,5 @@
-import { css } from 'styled-components'
-
 import { Flex, ForeignObject } from '../../primitives'
+import styles from './deck.module.css'
 
 import type { ComponentProps, ReactNode } from 'react'
 
@@ -29,16 +28,12 @@ export const RobotCoordsForeignObject = (
 
   return (
     <ForeignObject {...{ x, y, height, width }}>
-      <Flex
-        height="100%"
-        width="100%"
-        css={css`
-          transform: scale(1, -1);
-        `}
+      <div
+        className={styles.robot_coords_foreign_object_container}
         {...foreignObjectProps}
       >
         <Flex {...flexProps}>{children}</Flex>
-      </Flex>
+      </div>
     </ForeignObject>
   )
 }

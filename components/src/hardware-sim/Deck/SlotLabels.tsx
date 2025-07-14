@@ -1,10 +1,12 @@
+import clsx from 'clsx'
+
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { DeckInfoLabel } from '../../molecules'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
+import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
+import type { CSSProperties } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotLabelsProps {
@@ -25,6 +27,14 @@ export const SlotLabels = ({
   const widthSmallRem = 10.5
   const widthLargeRem = 15.25
 
+  const rowDynamicWidth = show4thColumn
+    ? `${widthSmallRem * 2 + widthLargeRem * 2}rem`
+    : `${widthSmallRem + widthLargeRem * 2}rem`
+
+  const itemDynamicWidth = show4thColumn
+    ? `${widthSmallRem}rem`
+    : `${widthLargeRem}rem`
+
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
@@ -33,26 +43,20 @@ export const SlotLabels = ({
         x="-147"
         y="-10"
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          flexDirection={DIRECTION_COLUMN}
-          flex="1"
-          height="100%"
-          width="2.5rem"
-        >
-          <Flex alignItems={ALIGN_CENTER} flex="1">
+        <div className={styles.deck_labels_column}>
+          <div className={styles.deck_label_column_container}>
             <DeckInfoLabel deckLabel="A" height="max-content" width="100%" />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
+          </div>
+          <div className={styles.deck_label_column_container}>
             <DeckInfoLabel deckLabel="B" height="max-content" width="100%" />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
+          </div>
+          <div className={styles.deck_label_column_container}>
             <DeckInfoLabel deckLabel="C" height="max-content" width="100%" />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
+          </div>
+          <div className={styles.deck_label_column_container}>
             <DeckInfoLabel deckLabel="D" height="max-content" width="100%" />
-          </Flex>
-        </Flex>
+          </div>
+        </div>
       </RobotCoordsForeignObject>
       <RobotCoordsForeignObject
         height="2.5rem"
@@ -64,49 +68,51 @@ export const SlotLabels = ({
         x="-100"
         y="-55"
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          flex="1"
-          width={`${
-            show4thColumn
-              ? widthSmallRem * 2 + widthLargeRem * 2
-              : widthSmallRem + widthLargeRem * 2
-          }rem`}
-          height="2.5rem"
+        <div
+          className={clsx(styles.deck_labels_row)}
+          style={{ '--dynamic-width': rowDynamicWidth } as CSSProperties}
         >
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={`${widthLargeRem}rem`}
+          <div
+            className={styles.deck_label_row_container}
+            style={
+              {
+                '--dynamic-width': `${widthLargeRem}rem`,
+              } as React.CSSProperties
+            }
           >
             <DeckInfoLabel deckLabel="1" height="100%" />
-          </Flex>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={`${widthSmallRem}rem`}
+          </div>
+          <div
+            className={styles.deck_label_row_container}
+            style={
+              {
+                '--dynamic-width': `${widthLargeRem}rem`,
+              } as React.CSSProperties
+            }
           >
             <DeckInfoLabel deckLabel="2" height="100%" />
-          </Flex>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={
-              show4thColumn ? `${widthSmallRem}rem` : `${widthLargeRem}rem`
+          </div>
+          <div
+            className={styles.deck_label_row_container}
+            style={
+              { '--dynamic-width': itemDynamicWidth } as React.CSSProperties
             }
           >
             <DeckInfoLabel deckLabel="3" height="100%" />
-          </Flex>
+          </div>
           {show4thColumn ? (
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
-              width={`${widthSmallRem}rem`}
+            <div
+              className={styles.deck_label_row_container}
+              style={
+                {
+                  '--dynamic-width': `${widthSmallRem}rem`,
+                } as React.CSSProperties
+              }
             >
               <DeckInfoLabel deckLabel="4" height="100%" />
-            </Flex>
+            </div>
           ) : null}
-        </Flex>
+        </div>
       </RobotCoordsForeignObject>
     </>
   ) : null
