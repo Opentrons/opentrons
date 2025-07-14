@@ -22,6 +22,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
+import { getMaxPushOutVolume } from '../utils'
 
 import type { Dispatch } from 'react'
 import type {
@@ -117,6 +118,13 @@ export function PushOut(props: PushOutProps): JSX.Element {
     buttonIsDisabled = volume == null
   }
 
+  const pushOutMaxVolume = getMaxPushOutVolume(state.volume, state.pipette)
+  console.log('pushOutMaxVolume', pushOutMaxVolume)
+  const volumeError =
+    volume != null && volume > pushOutMaxVolume
+      ? t('value_out_of_range', { min: 0, max: pushOutMaxVolume })
+      : null
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
@@ -173,7 +181,7 @@ export function PushOut(props: PushOutProps): JSX.Element {
             <InputField
               type="number"
               value={volume}
-              // error={durationError}
+              error={volumeError}
               title={t('push_out_volume')}
               readOnly
             />
