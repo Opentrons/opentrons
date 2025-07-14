@@ -23,6 +23,8 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    InnerWellGeometry,
+    UserDefinedVolumes,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -2068,10 +2070,17 @@ class GeometryView:
         return handling_height
 
     def find_volume_at_well_height(
+        self,
+        labware_id: str,
+        well_name: str,
         target_height: LiquidTrackingType,
-        well_geometry: InnerWellGeometry | UserDefinedVolumes,
+        # well_geometry: InnerWellGeometry | UserDefinedVolumes,
     ) -> LiquidTrackingType:
         """Call the correct volume from height function based on well geoemtry type."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
         if isinstance(well_geometry, InnerWellGeometry):
             return find_volume_inner_well_geometry(
                 target_height=target_height, well_geometry=well_geometry
@@ -2082,17 +2091,23 @@ class GeometryView:
             )
 
     def find_height_at_well_volume(
+        self,
+        labware_id: str,
+        well_name: str,
         target_volume: LiquidTrackingType,
-        well_geometry: InnerWellGeometry | UserDefinedVolumes,
     ) -> LiquidTrackingType:
         """Call the correct height from volume function based on well geoemtry type."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
         if isinstance(well_geometry, InnerWellGeometry):
             return find_height_inner_well_geometry(
                 target_volume=target_volume, well_geometry=well_geometry
             )
         else:
             return find_height_user_defined_volumes(
-                target_height=target_height, well_geometry=well_geometry
+                target_volume=target_volume, well_geometry=well_geometry
             )
 
     def get_well_height_after_liquid_handling(
@@ -2109,14 +2124,10 @@ class GeometryView:
         """
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-        well_geometry = self._labware.get_well_geometry(
-            labware_id=labware_id, well_name=well_name
-        )
-        # need to discern by type here actually
 
         try:
             initial_volume = self.find_volume_at_well_height(
-                target_height=initial_height, well_geometry=well_geometry
+                labware_id=labware_id, well_name=well_name, target_height=initial_height
             )
             final_volume = initial_volume + (
                 volume
@@ -2130,7 +2141,7 @@ class GeometryView:
             # adjusted inside find_height_at_well_volume to accomodate well the height
             # calculation.
             height_inside_well = self.find_height_at_well_volume(
-                target_volume=final_volume, well_geometry=well_geometry
+                labware_id=labware_id, well_name=well_name, target_volume=final_volume
             )
             return self._validate_well_position(
                 target_height=height_inside_well,
@@ -2147,10 +2158,9 @@ class GeometryView:
         self, labware_id: str, well_name: str, volume: LiquidTrackingType
     ) -> LiquidTrackingType:
         """Convert well volume to height."""
-        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
         try:
-            return find_height_at_well_volume(
-                target_volume=volume, well_geometry=well_geometry
+            return self.find_height_at_well_volume(
+                labware_id=labware_id, well_name=well_name, target_volume=volume
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
@@ -2165,10 +2175,9 @@ class GeometryView:
         height: LiquidTrackingType,
     ) -> LiquidTrackingType:
         """Convert well height to volume."""
-        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
         try:
-            return find_volume_at_well_height(
-                target_height=height, well_geometry=well_geometry
+            return self.find_volume_at_well_height(
+                labware_id=labware_id, well_name=well_name, target_height=height
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
@@ -2193,8 +2202,10 @@ class GeometryView:
                 labware_id=labware_id, well_name=well_name
             )
             try:
-                meniscus_volume = find_volume_at_well_height(
-                    target_height=meniscus_height, well_geometry=well_geometry
+                meniscus_volume = self.find_volume_at_well_height(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    target_height=meniscus_height,
                 )
             except InvalidLiquidHeightFound as _exception:
                 raise InvalidLiquidHeightFound(

@@ -378,20 +378,24 @@ def find_volume_user_defined_volumes(
     #   - with target height of 0
     #   - between 0 and the first entry's height
     prev_height = 0.0
+    prev_volume = 0.0
     if target_height == 0.0:
         return 0.0
     for pair in well_geometry.heightToVolumeMap:
-        reveal_type(pair)
-        if target_height == pair["height"]:
+        # reveal_type(pair)
+        if target_height == pair.height:
             return pair.volume
         if target_height > prev_height and target_height < pair.height:
             proportional_diff = (target_height - prev_height) / (
                 pair.height - prev_height
             )
             target_volume = (
-                prev_volume + (pair.volume - prev_volume) * proportional_diff
+                prev_volume + (pair.volume - prev_height) * proportional_diff
             )
+            # breakpoint()
             return target_volume
+        prev_height = pair.height
+        prev_volume = pair.volume
     raise InvalidLiquidHeightFound(
         f"Unable to find volume at target height {target_height}."
     )
@@ -404,7 +408,8 @@ def find_height_user_defined_volumes(
     """Return a linear interpolation of height based on target volume."""
     if isinstance(target_volume, SimulatedProbeResult):
         return target_volume
-    max_volume = well_geometry[-1].volume
+    # breakpoint()
+    max_volume = well_geometry.heightToVolumeMap[-1].volume
     if target_volume < 0 or target_volume > max_volume:
         raise InvalidLiquidHeightFound(
             f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
@@ -413,7 +418,10 @@ def find_height_user_defined_volumes(
     # to have at least two entries: (0: 0) and (well_depth: well_capacity)
 
     prev_volume = 0.0
-    for pair in well_geometry:
+    prev_height = 0.0
+    if target_volume == 0.0:
+        return 0.0
+    for pair in well_geometry.heightToVolumeMap:
         if target_volume == pair.volume:
             return pair.height
         if target_volume > prev_volume and target_volume < pair.volume:
@@ -424,6 +432,8 @@ def find_height_user_defined_volumes(
                 prev_height + (pair.height - prev_height) * proportional_diff
             )
             return target_height
+        prev_volume = pair.volume
+        prev_height = pair.height
     raise InvalidLiquidHeightFound(
         f"Unable to find volume at target volume {target_volume}."
     )
