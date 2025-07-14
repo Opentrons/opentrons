@@ -31,6 +31,7 @@ import {
   dispenseTouchTipMmFromEdgeRequired,
   dispenseTouchTipSpeedRequired,
   dispenseWellsRequired,
+  disposalVolumeRequired,
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
@@ -238,7 +239,8 @@ const stepFormHelperMap: {
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
-      dispenseRetractSpeedRequired
+      dispenseRetractSpeedRequired,
+      disposalVolumeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

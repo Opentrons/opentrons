@@ -619,6 +619,14 @@ const DISPENSE_RETRACT_SPEED_REQUIRED: FormError = {
   showOnReopen: true,
   tab: 'dispense',
 }
+const DISPOSAL_VOLUME_REQUIRED: FormError = {
+  title: 'Disposal volume required',
+  dependentFields: ['disposalVolume_checkbox', 'disposalVolume_volume'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'dispense',
+}
 
 export type FormErrorChecker = (
   arg: HydratedFormData,
@@ -1575,7 +1583,14 @@ export const dispenseRetractSpeedRequired = (
     ? DISPENSE_RETRACT_SPEED_REQUIRED
     : null
 }
-
+export const disposalVolumeRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { disposalVolume_checkbox, disposalVolume_volume } = fields
+  return disposalVolume_checkbox && !disposalVolume_volume
+    ? DISPOSAL_VOLUME_REQUIRED
+    : null
+}
 /*******************
  **     Helpers    **
  ********************/
