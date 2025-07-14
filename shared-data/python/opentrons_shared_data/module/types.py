@@ -102,7 +102,7 @@ class GripperOffsets(TypedDict):
 
 
 class TOFBaseline(TypedDict):
-    extend:  Dict[int, List[float]]
+    extend: Dict[int, List[float]]
     retract: Dict[int, List[float]]
 
 
