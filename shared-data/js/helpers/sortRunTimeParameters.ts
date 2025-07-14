@@ -1,4 +1,4 @@
-import type { RunTimeParameter } from '..'
+import { RunTimeParameter } from '../types'
 
 /**
  * This function sorts an array of runtime parameters. If a parameter of type 'csv_file' exists,

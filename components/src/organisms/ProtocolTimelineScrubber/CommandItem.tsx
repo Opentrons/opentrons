@@ -6,7 +6,6 @@ import { Flex } from '../../primitives'
 import { ALIGN_FLEX_END, DIRECTION_COLUMN, OVERFLOW_SCROLL } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import { CommandText } from '../CommandText'
-import { COMMAND_WIDTH_PX } from './index'
 import { getCommandTextData } from './utils'
 
 import type {
@@ -17,6 +16,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
+const COMMAND_WIDTH_PX = 240
 interface CommandItemProps {
   command: RunTimeCommand
   index: number

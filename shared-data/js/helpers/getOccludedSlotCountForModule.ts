@@ -1,6 +1,6 @@
-import { OT2_ROBOT_TYPE, THERMOCYCLER_MODULE_TYPE } from '..'
+import { OT2_ROBOT_TYPE, THERMOCYCLER_MODULE_TYPE } from '../constants'
 
-import type { ModuleType, RobotType } from '..'
+import type { ModuleType, RobotType } from '../types'
 
 export function getOccludedSlotCountForModule(
   moduleType: ModuleType,

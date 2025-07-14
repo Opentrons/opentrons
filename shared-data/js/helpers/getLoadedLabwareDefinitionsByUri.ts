@@ -1,6 +1,7 @@
-import { getLabwareDefURI } from '.'
+import { getLabwareDefURI } from './getLabwareDefURI'
 
-import type { LabwareDefinition, RunTimeCommand } from '..'
+import type { RunTimeCommand } from '../../protocol'
+import type { LabwareDefinition } from '../types'
 
 export interface LabwareDefinitionsByUri {
   [defURI: string]: LabwareDefinition

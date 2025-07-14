@@ -1,4 +1,4 @@
-import type { LabwareDefinition } from '..'
+import type { LabwareDefinition } from '../types'
 
 /**
  * This function is used to help validate that the wells and ordering matches in

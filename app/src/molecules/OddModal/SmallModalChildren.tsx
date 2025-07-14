@@ -9,7 +9,7 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 
-import { OddModal } from './index'
+import { OddModal } from './OddModal'
 
 interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void

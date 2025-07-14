@@ -2,7 +2,7 @@ import {
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
-} from '..'
+} from '../constants'
 
 import type { PositionReference } from '../types'
 

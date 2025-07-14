@@ -1,10 +1,8 @@
-import {
-  getAllLiquidClassDefs,
-  getFlexNameConversion,
-  linearInterpolate,
-} from '..'
+import { getAllLiquidClassDefs } from '../liquidClasses'
+import { getFlexNameConversion } from '../pipettes'
+import { linearInterpolate } from './linearInterpolate'
 
-import type { PipetteV2Specs } from '..'
+import type { PipetteV2Specs } from '../types'
 
 export const getByVolumeValue = (args: {
   liquidClass: string | null

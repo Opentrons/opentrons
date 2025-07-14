@@ -13,8 +13,10 @@
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
 import uniq from 'lodash/uniq'
 
-import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
+import { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+import { getLabwareDefURI } from './getLabwareDefURI'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import { orderWells } from './orderWells'
 
 import type {
   LabwareDefinition,

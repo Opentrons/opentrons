@@ -1,8 +1,8 @@
 // set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { getLabwareDefURI } from '..'
 import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { getLabwareDefURI } from './getLabwareDefURI'
 
 import type {
   LabwareLocation,

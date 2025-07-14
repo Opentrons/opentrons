@@ -15,19 +15,17 @@ import {
   getTopmostLabwareOnModuleFromStackRobotState,
 } from '@opentrons/step-generation'
 
+import { LegacyStyledText, PrimaryButton } from '../../atoms'
+import { COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
-  BaseDeck,
-  COLORS,
   DIRECTION_COLUMN,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_SCROLL,
-  PrimaryButton,
-  SPACING,
-} from '../..'
+} from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 import { getLabwareDefinitionsFromCommands } from '../CommandText/useCommandTextString/utils/getLabwareDefinitionsFromCommands'
 import { CommandItem } from './CommandItem'
 import { PipetteMountViz } from './PipetteVisuals'
@@ -44,7 +42,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
-import type { LabwareOnDeck, Module } from '../..'
+import type { BaseDeck, LabwareOnDeck, Module } from '../../hardware-sim'
 
 export * from './types'
 export * from './utils'

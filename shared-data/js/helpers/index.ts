@@ -1,7 +1,6 @@
 import uniq from 'lodash/uniq'
 
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
 import { getLabwareDefURI } from './getLabwareDefURI'
@@ -13,7 +12,6 @@ import type {
   LabwareDefinition,
   LiquidClass,
   ModuleModel,
-  RobotType,
   ThermalAdapterName,
 } from '../types'
 
@@ -23,6 +21,7 @@ export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
 export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
+export { getLabwareDefURI } from './getLabwareDefURI'
 
 export * from './__fixtures__'
 export * from './parseProtocolCommands'
@@ -57,9 +56,11 @@ export * from './getWellFillFromLabwareId'
 export * from './getStandardDeckViewLayerBlockList'
 export * from './getLabwareDefinitionsByURIForProtocol'
 export * from './getLabwareInfoByLiquidId'
-export { getLabwareDefURI } from './getLabwareDefURI'
 export * from './getLiquidsByIdForLabware'
 export * from './getStackedItemsOnStartingDeck'
+export * from './getDeckDefFromRobotType'
+export * from './sortWells'
+export * from './getLabwareHasQuirk'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -145,14 +146,6 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition): number => {
   return volume
 }
 
-export function getLabwareHasQuirk(
-  labwareDef: LabwareDefinition,
-  quirk: string
-): boolean {
-  const quirks = labwareDef.parameters.quirks
-  return quirks ? quirks.includes(quirk) : false
-}
-
 export const intToAlphabetLetter = (
   i: number,
   lowerCase: boolean = false
@@ -165,44 +158,6 @@ export const toWellName = ({
   rowNum: number
   colNum: number
 }): string => String.fromCharCode(rowNum + 65) + (colNum + 1)
-
-function _parseWell(well: string): [string, number] {
-  const res = well.match(/([A-Z]+)(\d+)/)
-  const letters = res && res[1]
-  const number = res && parseInt(res[2])
-
-  if (!letters || number == null || Number.isNaN(number)) {
-    console.warn(
-      `Could not parse well ${well}. Got letters: "${
-        letters || 'void'
-      }", number: "${number || 'void'}"`
-    )
-    return ['', NaN]
-  }
-
-  return [letters, number]
-}
-
-/** A compareFunction for sorting an array of well names
- * Goes down the columns (A1 to H1 on 96 plate)
- * Then L to R across rows (1 to 12 on 96 plate)
- */
-export function sortWells(a: string, b: string): number {
-  const [letterA, numberA] = _parseWell(a)
-
-  const [letterB, numberB] = _parseWell(b)
-
-  if (numberA !== numberB) {
-    return numberA > numberB ? 1 : -1
-  }
-
-  if (letterA.length !== letterB.length) {
-    // Eg 'B' vs 'AA'
-    return letterA.length > letterB.length ? 1 : -1
-  }
-
-  return letterA > letterB ? 1 : -1
-}
 
 export function splitWellsOnColumn(sortedArray: string[]): string[][] {
   return sortedArray.reduce<string[][]>((acc, curr) => {
@@ -416,15 +371,6 @@ export const getCalibrationAdapterLoadName = (
       )
       return null
   }
-}
-
-export const getDeckDefFromRobotType = (
-  robotType: RobotType
-): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDef
-    : standardOt2DeckDef
 }
 
 export const getCutoutIdFromAddressableArea = (

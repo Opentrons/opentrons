@@ -1,6 +1,7 @@
-import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
 import { getAddressableAreaFromSlotId } from '../fixtures'
+import { getAddressableAreasInProtocol } from './getAddressableAreasInProtocol'
+import { getDeckDefFromRobotType } from './getDeckDefFromRobotType'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'

@@ -1,15 +1,3 @@
-import { CutoutId } from '../../deck'
-import {
-  FlexStackerFillRunTimeCommand,
-  FlexStackerSetStoredLabwareRunTimeCommand,
-  LoadLabwareRunTimeCommand,
-  LoadLidParams,
-  LoadLidRunTimeCommand,
-  LoadLidStackRunTimeCommand,
-  OnAddressableAreaLocationSequenceComponent,
-  OnCutoutFixtureLocationSequenceComponent,
-  RunTimeCommand,
-} from '../../protocol'
 import {
   FLEX_STACKER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
@@ -20,17 +8,29 @@ import {
 } from '../constants'
 import { getCutoutDisplayName } from '../fixtures'
 import { getModuleType } from '../modules'
-import {
-  LabwareDefinition,
-  LoadedLabware,
-  LoadedModule,
-  ModuleModel,
-} from '../types'
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
 import { getSlotFromAddressableAreaName } from './parseAddressableArea'
 
+import type { CutoutId } from '../../deck'
+import type {
+  FlexStackerFillRunTimeCommand,
+  FlexStackerSetStoredLabwareRunTimeCommand,
+  LoadLabwareRunTimeCommand,
+  LoadLidParams,
+  LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
+  OnAddressableAreaLocationSequenceComponent,
+  OnCutoutFixtureLocationSequenceComponent,
+  RunTimeCommand,
+} from '../../protocol'
+import type {
+  LabwareDefinition,
+  LoadedLabware,
+  LoadedModule,
+  ModuleModel,
+} from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {

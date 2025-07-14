@@ -14,7 +14,7 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
-import { BaseDeck, LabwareOnDeck } from '../../hardware-sim'
+import { BaseDeck, LabwareOnDeck } from '../../hardware-sim/BaseDeck'
 
 import type { ComponentProps } from 'react'
 import type {
