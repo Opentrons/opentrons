@@ -186,6 +186,108 @@ STACKER_MOTION_CONFIG = {
     },
 }
 
+# Configs
+TOF_DETECTION_CONFIG = {
+    TOFSensor.X: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(30, 40)),
+            threshold=1000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(17, 30)),
+            threshold=1000,
+        ),
+    },
+    TOFSensor.Z: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(15, 63)),
+            threshold=1000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(15, 63)),
+            threshold=1000,
+        ),
+    },
+}
+
+
+# Stallguard defaults
+STALLGUARD_CONFIG = {
+    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
+}
+
+STACKER_MOTION_CONFIG = {
+    StackerAxis.X: {
+        "home": AxisParams(
+            run_current=1.5,  # mAmps
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=10.0,  # mm/s
+                acceleration=100.0,  # mm/s^2
+                max_speed_discont=40.0,  # mm/s
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.2,
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=200.0,
+                acceleration=1500.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+    },
+    StackerAxis.Z: {
+        "home": AxisParams(
+            run_current=1.5,
+            hold_current=1.5,
+            move_params=MoveParams(
+                max_speed=10.0,
+                acceleration=100.0,
+                max_speed_discont=25.0,
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.5,
+            hold_current=1.5,
+            move_params=MoveParams(
+                max_speed=150.0,
+                acceleration=500.0,
+                max_speed_discont=25.0,
+            ),
+        ),
+    },
+    StackerAxis.L: {
+        "home": AxisParams(
+            run_current=1.2,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.2,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+    },
+}
+
 
 class FlexStacker(mod_abc.AbstractModule):
     """Hardware control interface for an attached Flex-Stacker module."""

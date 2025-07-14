@@ -3,13 +3,13 @@
   "moduleType": "flexStackerModuleType",
   "model": "flexStackerModuleV1",
   "labwareOffset": {
-    "x": -0.125,
-    "y": 1.125,
-    "z": 68.275
+    "x": 97,
+    "y": 0,
+    "z": 31
   },
   "features": {},
   "dimensions": {
-    "bareOverallHeight": 82,
+    "bareOverallHeight": 35,
     "overLabwareHeight": 0,
     "xDimension": 156.25,
     "yDimension": 91.75,

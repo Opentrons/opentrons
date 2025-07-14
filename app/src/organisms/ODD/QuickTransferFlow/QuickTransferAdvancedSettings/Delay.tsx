@@ -11,6 +11,7 @@ import {
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -120,7 +121,7 @@ export function Delay(props: DelayProps): JSX.Element {
     delayIsEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
   // allow a maximum of 10 digits for delay duration
-  const durationRange = { min: 1, max: 9999999999 }
+  const durationRange = { min: 0.1, max: 9999999999 }
   const durationError =
     delayDuration != null &&
     (delayDuration < durationRange.min || delayDuration > durationRange.max)
@@ -153,19 +154,26 @@ export function Delay(props: DelayProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {delayEnabledDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={delayIsEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {kind === 'aspirate'
+              ? t('delay_description_aspirate')
+              : t('delay_description_dispense')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {delayEnabledDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={delayIsEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
@@ -202,6 +210,7 @@ export function Delay(props: DelayProps): JSX.Element {
             <NumericalKeyboard
               keyboardRef={keyboardRef}
               initialValue={String(delayDuration ?? '')}
+              isDecimal
               onChange={e => {
                 setDelayDuration(Number(e))
               }}
