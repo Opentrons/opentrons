@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { useAtom } from 'jotai'
-import { delay } from 'lodash'
+import delay from 'lodash/delay'
 
 import {
   Icon,
