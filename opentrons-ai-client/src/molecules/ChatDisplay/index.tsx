@@ -303,7 +303,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
             <Link href={PD_URL} external>
               <Icon
                 name="open-in-new"
-                size="1rem"
+                size="1.125rem"
                 className={`${styles.styled_icon} ${styles.open_in_new_icon}`}
               />
             </Link>

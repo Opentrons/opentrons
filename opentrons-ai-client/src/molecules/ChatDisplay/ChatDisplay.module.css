@@ -21,12 +21,12 @@
 .message_container {
   width: fit-content;
   max-width: 70%;
-  padding: 1.5rem;
+  padding: var(--spacing-24);
   border-radius: var(--spacing-12);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-24);
   position: relative;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .open_in_new_icon {
-  margin: var(--spacing-4) 0 0 var(--spacing-4);
+  padding: var(--spacing-2) 0 0 var(--spacing-4);
 }
 
 .external_link {
@@ -80,36 +80,35 @@
 
 .outer_container {
   background-color: var(--white);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: var(--border-radius-8);
+  padding: var(--spacing-16);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 16px;
 }
 
 .file_container {
   background-color: var(--grey-20);
-  border-radius: 12px;
+  border-radius: var(--border-radius-12);
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: var(--spacing-12) var(--spacing-16);
   width: 100%;
 }
 
 .badge_container {
   background-color: var(--grey-30);
-  border-radius: 4px;
+  border-radius: var(--border-radius-4);
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  gap: var(--spacing-12);
+  padding: var(--spacing-12) var(--spacing-16);
   width: 100%;
 }
 
 .icon_wrapper {
-  width: 32px;
-  height: 32px;
-  margin-right: 12px;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +121,7 @@
 }
 
 .file_name {
-  font-size: 14px;
+  font-size: var(--font-size-p);
   color: var(--black-90);
 }
 
