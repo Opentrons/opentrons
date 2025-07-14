@@ -57,7 +57,6 @@ from ..types import (
     OnDeckLabwareLocation,
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
-    # UserDefinedVolumeDict
 )
 from ..actions import (
     Action,
@@ -704,15 +703,7 @@ class LabwareView:
                 raise errors.IncompleteLabwareDefinitionError(
                     message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
                 )
-            # if isinstance(well_geometry, UserDefinedVolumes):
-            #     return user_defined_volume_dict(well_geometry)
             return well_geometry
-
-    # def user_defined_volume_dict(well_geometry: UserDefinedVolumes) -> UserDefinedVolumeDict:
-    #     """Convert a UserDefinedVolumes BaseModel to a dictionary whose keys are heights and values are volumes."""
-    #     heights_to_volumes: Dict[float, float]
-    #     for pair in well_geometry:
-    #         heights_to_volumes[pair.height]
 
     def get_well_size(
         self, labware_id: str, well_name: str

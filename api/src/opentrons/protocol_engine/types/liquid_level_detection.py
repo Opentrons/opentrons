@@ -148,8 +148,6 @@ class SimulatedProbeResult(BaseModel):
 # this union
 LiquidTrackingType = float | SimulatedProbeResult
 
-# UserDefinedVolumeDict = Dict[str, float]
-
 
 class LoadedVolumeInfo(BaseModel):
     """A well's liquid volume, initialized by a LoadLiquid, updated by Aspirate and Dispense."""
