@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -17,9 +17,6 @@ import {
 } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB } from '/app/redux/analytics'
-
 import { ChangeTip } from './ChangeTip'
 import { TipDropLocation } from './TipDropLocation'
 
@@ -37,15 +34,7 @@ interface TipManagementProps {
 export function TipManagement(props: TipManagementProps): JSX.Element | null {
   const { state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [selectedSetting, setSelectedSetting] = useState<string | null>(null)
-
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_TIP_MANAGEMENT_TAB,
-      properties: {},
-    })
-  }, [])
 
   const displayItems = [
     {

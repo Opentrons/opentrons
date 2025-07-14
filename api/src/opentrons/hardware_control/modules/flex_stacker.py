@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, Dict, Optional, Mapping
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Mapping, cast
 
 from opentrons.drivers.flex_stacker.types import (
     AxisParams,
@@ -12,6 +12,8 @@ from opentrons.drivers.flex_stacker.types import (
     MoveParams,
     MoveResult,
     StackerAxis,
+    StallGuardParams,
+    TOFDetection,
     TOFSensor,
     HardwareRevision,
     TOFSensorMode,
@@ -20,9 +22,6 @@ from opentrons.drivers.flex_stacker.types import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
-    STACKER_MOTION_CONFIG,
-    STALLGUARD_CONFIG,
-    TOF_DETECTION_CONFIG,
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
@@ -80,6 +79,108 @@ HOME_OFFSET_MD = 10.0
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
 PLATFORM_OFFSET = 4
+
+# Configs
+TOF_DETECTION_CONFIG = {
+    TOFSensor.X: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(30, 40)),
+            threshold=1000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=list(range(17, 30)),
+            threshold=1000,
+        ),
+    },
+    TOFSensor.Z: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(15, 63)),
+            threshold=1000,
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            bins=list(range(15, 63)),
+            threshold=1000,
+        ),
+    },
+}
+
+
+# Stallguard defaults
+STALLGUARD_CONFIG = {
+    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
+}
+
+STACKER_MOTION_CONFIG = {
+    StackerAxis.X: {
+        "home": AxisParams(
+            run_current=1.5,  # mAmps
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=10.0,  # mm/s
+                acceleration=100.0,  # mm/s^2
+                max_speed_discont=40.0,  # mm/s
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.2,
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=200.0,
+                acceleration=1500.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+    },
+    StackerAxis.Z: {
+        "home": AxisParams(
+            run_current=1.5,
+            hold_current=1.5,
+            move_params=MoveParams(
+                max_speed=10.0,
+                acceleration=100.0,
+                max_speed_discont=25.0,
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.5,
+            hold_current=1.5,
+            move_params=MoveParams(
+                max_speed=150.0,
+                acceleration=500.0,
+                max_speed_discont=25.0,
+            ),
+        ),
+    },
+    StackerAxis.L: {
+        "home": AxisParams(
+            run_current=1.2,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+        "move": AxisParams(
+            run_current=1.2,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
+        ),
+    },
+}
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -412,7 +513,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
-            await self.verify_hopper_labware_presence(True)
+            await self.verify_hopper_labware_presence(Direction.RETRACT, True)
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
@@ -538,10 +639,9 @@ class FlexStacker(mod_abc.AbstractModule):
         labware on the Z, but we need to do more data collection and testing
         to validate this method.
         """
+        dir_str = cast(Literal["extend", "retract"], str(direction))
         sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
-        # The TOF Detection configs are the same for the Z sensor
-        direction = Direction.EXTEND if sensor == TOFSensor.Z else direction
-        baseline = load_tof_baseline_data(self.model())[sensor.value]
+        baseline = load_tof_baseline_data(self.model())[sensor.value][dir_str]
         config = TOF_DETECTION_CONFIG[sensor][direction]
 
         # Take a histogram reading and determine if labware was detected
@@ -586,9 +686,11 @@ class FlexStacker(mod_abc.AbstractModule):
                 labware_expected=labware_expected,
             )
 
-    async def verify_hopper_labware_presence(self, labware_expected: bool) -> None:
+    async def verify_hopper_labware_presence(
+        self, direction: Direction, labware_expected: bool
+    ) -> None:
         """Check whether or not a labware is detected inside the hopper."""
-        result = await self.labware_detected(StackerAxis.Z, Direction.EXTEND)
+        result = await self.labware_detected(StackerAxis.Z, direction)
         if labware_expected != result:
             raise FlexStackerHopperLabwareError(
                 self.device_info["serial"],

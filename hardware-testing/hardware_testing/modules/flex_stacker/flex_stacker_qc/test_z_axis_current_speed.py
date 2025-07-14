@@ -8,12 +8,13 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
-from opentrons.drivers.flex_stacker.driver import (
+from opentrons.hardware_control.modules.flex_stacker import (
+    FlexStacker,
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,
 )
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
+from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
 TEST_AXIS = StackerAxis.Z
 HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
@@ -21,15 +22,14 @@ HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
 STALLTHRESHOLD = STALLGUARD_CONFIG[TEST_AXIS].threshold
 
 TEST_SPEEDS = [150, 180]  # mm/s
-TEST_CURRENTS = [1.5, 1.0, 0.7, 0.5, 0.4]  # A rms
+TEST_CURRENTS = [1.5, 1.2, 1.1, 1.0, 0.9, 0.8]  # A rms
 TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
-CURRENT_THRESHOD = 0.7  # A rms
+CURRENT_THRESHOD = 1.2  # A rms
 TEST_TRIALS = 10
 TEST_DIRECTIONS = [Direction.RETRACT, Direction.EXTEND]
 
 # All units in mm
-# This number SHOULD be the distance between the bottom and top lsw, currently
-# it seems to be off, correct this for DVT
+# This number SHOULD be the distance between the bottom and top lsw
 AXIS_TRAVEL = 137
 BOTTOM_OFFSET = 10  # Distance to be off of springs above bottom lsw
 TOP_OFFSET = 2  # this should be elimiated once we correct axis travel

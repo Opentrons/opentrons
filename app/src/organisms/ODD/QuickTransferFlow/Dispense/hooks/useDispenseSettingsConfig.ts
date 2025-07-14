@@ -80,6 +80,7 @@ export function useDispenseSettingsConfig({
         state.submergeDispense !== undefined
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
+              delayDuration: state.submergeDispense.delayDuration,
               position: state.submergeDispense.positionFromBottom,
             })
           : '',
@@ -145,6 +146,7 @@ export function useDispenseSettingsConfig({
         state.retractDispense !== undefined
           ? t('retract_value', {
               speed: state.retractDispense.speed,
+              delayDuration: state.retractDispense.delayDuration,
               position: state.retractDispense.positionFromBottom,
             })
           : '',
