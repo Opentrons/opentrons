@@ -224,7 +224,7 @@ Labware offsets are fine-tuned positional coordinates that help your robot align
 | Feature | Description |
 |----|----|
 | Protocol independence | Offsets are labware-based and no longer bound to a 20-protocol limit. Each piece of labware requires one default offset and can also be associated with a significantly larger number of applied offsets. |
-| Default offsets | Default offsets are automatically applied to particular piece of labware and to all other identical labware, regardless of deck slot or protocol. This ‘measure once, set everywhere’ feature means you don’t have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
+| Default offsets | Default offsets are automatically applied to particular piece of labware and to all other identical labware, regardless of deck slot or protocol. This 'measure once, set everywhere' feature means you don’t have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
 | Applied offsets | Applied offsets override defaults for a specific piece of labware in a specific deck slot. You can use an applied offset with different protocols, but the labware and deck slot must be the same as the original applied offset. |
 | Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the API code for a protocol to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
 
@@ -252,7 +252,7 @@ Tap **Labware Offsets** to see which labware is missing an offset and to start L
 
 #### Jog controls
 
-During Labware Position check, you’ll use the jog controls to align the pipette with the selected labware.
+During Labware Position Check, you’ll use the jog controls to align the pipette with the selected labware.
 
 <figure class="screenshot" markdown>
 ![Jog controls, with three options for jump size on the left, toggle between axes in the middle, and arrow buttons on the right.](images/touchscreen-lpc-jog-controls.png "Labware Position Check jog controls")
@@ -261,10 +261,10 @@ During Labware Position check, you’ll use the jog controls to align the pipett
 
 To use the jog controls:
 
-1. Select a jog control option to set the pipette’s axis of movement.
+1. Select a jog control option to set the pipette's axis of movement.
 1. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm.  Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette into labware.
 1. Tap an arrow to move the pipette for your selected direction and distance.
-1. Tap Close when, in your best judgement, the pipette is optimally aligned with the selected labware.
+1. Tap **Close** when, in your best judgement, the pipette is optimally aligned with the selected labware.
 1. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
 
 !!! note
