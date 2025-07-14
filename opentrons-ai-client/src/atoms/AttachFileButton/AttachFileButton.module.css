@@ -24,7 +24,7 @@
   outline: none;
   background: var(--blue-10);
   border-color: var(--blue-60);
-  box-shadow: 0 0 0 var(--spacing-2) var(--blue-50) 20;
+  box-shadow: 0 0 0 var(--spacing-2) var(--blue-50);
 }
 
 .button:hover:not(:disabled) {

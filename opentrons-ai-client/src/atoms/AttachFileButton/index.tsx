@@ -5,6 +5,8 @@ import { Icon } from '@opentrons/components'
 
 import styles from './AttachFileButton.module.css'
 
+const ACCEPT_EXTENSION = '.pdf,.csv,.py'
+
 interface AttachFileButtonProps {
   onFileSelect: (files: FileList) => void
   disabled?: boolean
@@ -45,7 +47,7 @@ export function AttachFileButton({
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".pdf,.csv,.py"
+        accept={ACCEPT_EXTENSION}
         onChange={handleFileChange}
         className={styles.hidden_input}
       />

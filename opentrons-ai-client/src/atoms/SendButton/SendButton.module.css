@@ -22,7 +22,7 @@
 
 .button:focus {
   outline: none;
-  box-shadow: 0 0 0 var(--spacing-2) var(--blue-50) 40;
+  box-shadow: 0 0 0 var(--spacing-2) var(--blue-50);
 }
 
 .button:hover:not(:disabled) {

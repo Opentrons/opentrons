@@ -4,7 +4,7 @@
   align-items: flex-start;
   gap: var(--spacing-8);
   padding: var(--spacing-8);
-  background-color: rgba(22, 33, 45, 0.2);
+  background-color: #16212d33;
   border-radius: var(--border-radius-8);
   border: none;
   width: fit-content;
@@ -32,8 +32,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--spacing-32);
-  height: var(--spacing-32);
+  width: 2rem;
+  height: 2rem;
 }
 
 .remove_button:hover {
@@ -42,7 +42,7 @@
 
 .remove_button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--blue-50) 40;
+  box-shadow: 0 0 0 2px var(--blue-50);
 }
 
 .file_icon_container {
