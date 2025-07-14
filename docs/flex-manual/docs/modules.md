@@ -532,7 +532,8 @@ The Thermocycler works with two different plate seals to help protect your sampl
 | Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
 
 !!!warning
-    ![Do not use the rubber seal and Opentrons tough seal simultaneously.](images/thermocycler-seal-warning.png)
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](images/thermocycler-lid-warning.png)
 
 #### Software control
 
