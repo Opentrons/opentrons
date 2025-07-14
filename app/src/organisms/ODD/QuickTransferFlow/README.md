@@ -103,16 +103,17 @@ export interface QuickTransferSummaryState {
   submergeAspirate?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractAspirate?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayAspirate?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipAspirate?: number
   touchTipAspirateSpeed?: number
@@ -125,24 +126,31 @@ export interface QuickTransferSummaryState {
   submergeDispense?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractDispense?: {
     // this has been added
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    // this has been updated
+    location?: BlowOutLocation
+    speed: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass // this has been added
+  pushOut: boolean // this has been added
+  conditionAspirate?: number // this has been added
 }
 ```

@@ -12,7 +12,10 @@ import {
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  PROTOCOL_CONTEXT_NAME,
+} from '@opentrons/step-generation'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -378,8 +381,10 @@ export const getMaxConditioningVolume = (args: {
     pipetteSpecs,
   } = args
   const { liquids } = pipetteSpecs
+  const minVolumeForMultiDispense = transferVolume * 2
   const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+    minVolumeForMultiDispense < liquids.default.minVolume &&
+    'lowVolumeDefault' in liquids
   const tiprack = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
@@ -391,7 +396,10 @@ export const getMaxConditioningVolume = (args: {
       : liquids.default.maxVolume,
     ...(tipMaxVolume != null ? [tipMaxVolume] : [])
   )
-  return maxWorkingVolume - disposalVolume - transferVolume
+  return Math.max(
+    0,
+    maxWorkingVolume - disposalVolume - minVolumeForMultiDispense
+  )
 }
 
 // for stacking
@@ -464,5 +472,21 @@ export const getHasTrash = (
 ): boolean => {
   return Object.values(additionalEquipment).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+}
+
+export const getAllLabwareIdsOfCertainURIOnStack = (
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareOnDeck: LabwareOnDeck
+): string[] => {
+  return Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labwareOnDeck.labwareDefURI &&
+        getSlotInLocationStack(stack) ===
+          getSlotInLocationStack(labwareOnDeck.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
   )
 }

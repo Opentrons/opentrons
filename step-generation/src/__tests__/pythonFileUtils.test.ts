@@ -1,24 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   fixture96Plate,
   fixtureP300MultiV2Specs,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
+  GLYCEROL_LIQUID_CLASS_NAME,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import {
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLiquidClasses,
   getLoadLiquids,
   getLoadModules,
   getLoadPipettes,
@@ -86,19 +90,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "OT-2",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.24"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `
-requirements = {
-    "robotType": "Flex",
-    "apiLevel": "2.24",
-}`.trimStart()
+      `requirements = {"robotType": "Flex", "apiLevel": "2.24"}`
     )
   })
 })
@@ -131,6 +127,7 @@ const labwareId2 = 'labwareId2'
 const labwareId3 = 'labwareId3'
 const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
+const labwareId6 = 'labwareId6'
 
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
@@ -163,6 +160,16 @@ const mockLabwareEntities: LabwareEntities = {
     def: fixture96Plate as LabwareDefinition2,
     pythonName: 'well_plate_3',
   },
+  [labwareId6]: {
+    id: labwareId6,
+    labwareDefURI: 'opentrons/mock_lid/1',
+    def: {
+      ...opentrons96Plate,
+      allowedRoles: ['lid'],
+      parameters: { loadName: 'mock_lid' } as any,
+    },
+    pythonName: 'lid_1',
+  },
 }
 
 const labwareRobotState: TimelineFrame['labware'] = {
@@ -176,6 +183,8 @@ const labwareRobotState: TimelineFrame['labware'] = {
   [labwareId4]: { stack: [labwareId4, moduleId3, 'A2'] },
   //  labware on a slot
   [labwareId5]: { stack: [labwareId5, 'C2'] },
+  // lid on labware
+  [labwareId6]: { stack: [labwareId6, labwareId3, labwareId2, 'B2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -217,7 +226,6 @@ describe('getLoadAdapters', () => {
 adapter_1 = magnetic_block_1.load_adapter(
     "fixture_flex_96_tiprack_adapter",
     namespace="opentrons",
-    version=1,
 )
 adapter_2 = protocol.load_adapter_from_definition(
     CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
@@ -228,7 +236,7 @@ adapter_2 = protocol.load_adapter_from_definition(
 })
 
 describe('getLoadLabware', () => {
-  it('should generate loadLabware for 3 labware', () => {
+  it('should generate loadLabware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
         mockModuleEntities,
@@ -243,12 +251,11 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
-    version=1,
+    lid="mock_lid",
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
-    version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
@@ -281,7 +288,6 @@ well_plate_5 = protocol.load_labware(
     "fixture_96_plate",
     location=protocol_api.OFF_DECK,
     namespace="opentrons",
-    version=1,
 )`.trimStart()
       )
     })
@@ -289,9 +295,10 @@ well_plate_5 = protocol.load_labware(
 })
 
 describe('getLoadPipettes', () => {
-  it('should generate loadPipette for 2 pipettes using the same tiprack', () => {
+  it('should generate loadPipette for 2 pipettes using the same tipracks and off-deck labware last', () => {
     const mockTiprackDefURI = 'fixture/fixture_flex_96_tiprack_1000ul/1'
     const tiprack1 = 'tiprack1'
+    const tiprack2 = 'tiprack2'
     const pipette1 = 'pipette1'
     const pipette2 = 'pipette2'
     const mockPipetteEntities: PipetteEntities = {
@@ -319,23 +326,34 @@ describe('getLoadPipettes', () => {
         labwareDefURI: mockTiprackDefURI,
         pythonName: 'tip_rack_1',
       },
+      [tiprack2]: {
+        id: tiprack2,
+        def: fixtureTiprack1000ul as LabwareDefinition2,
+        labwareDefURI: mockTiprackDefURI,
+        pythonName: 'tip_rack_2',
+      },
     }
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
       [pipette2]: { mount: 'right' },
+    }
+    const labwareRobotState: TimelineFrame['labware'] = {
+      [tiprack1]: { stack: [tiprack1, 'offDeck'] },
+      [tiprack2]: { stack: [tiprack2, 'A1'] },
     }
 
     expect(
       getLoadPipettes(
         mockPipetteEntities,
         mockTiprackEntities,
+        labwareRobotState,
         pipetteRobotState
       )
     ).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument("p300_multi_gen2", "left", tip_racks=[tip_rack_1])
-pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks=[tip_rack_1])`.trimStart()
+pipette_left = protocol.load_instrument("p300_multi_gen2", "left", tip_racks=[tip_rack_2, tip_rack_1])
+pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks=[tip_rack_2, tip_rack_1])`.trimStart()
     )
   })
 
@@ -360,6 +378,7 @@ pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks
       getLoadPipettes(
         mockPipetteEntities,
         mockTiprackEntities,
+        labwareRobotState,
         pipetteRobotState
       )
     ).toBe(
@@ -391,6 +410,7 @@ pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
       getLoadPipettes(
         mockPipetteEntities,
         mockTiprackEntities,
+        labwareRobotState,
         pipetteRobotState
       )
     ).toBe(
@@ -410,6 +430,7 @@ const mockLiquidEntities: LiquidEntities = {
     displayName: 'water',
     description: 'mock description',
     displayColor: 'mock display color',
+    liquidClass: WATER_LIQUID_CLASS_NAME,
   },
   [liquid2]: {
     liquidGroupId: liquid2,
@@ -417,6 +438,7 @@ const mockLiquidEntities: LiquidEntities = {
     description: '',
     displayName: 'sulfur',
     displayColor: 'mock display color 2',
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
   },
 }
 
@@ -439,7 +461,7 @@ liquid_2 = protocol.define_liquid(
 })
 
 describe('getLoadLiquids', () => {
-  it('should generate 2 liquids in 2 labware in 4 wells', () => {
+  it('should generate 2 liquids in 2 labware in multiple wells', () => {
     const mockLiquidsBylabwareId: LabwareLiquidState = {
       [labwareId3]: {
         A1: { [liquid1]: { volume: 10 } },
@@ -448,6 +470,14 @@ describe('getLoadLiquids', () => {
       },
       [labwareId4]: {
         D1: { [liquid2]: { volume: 180 } },
+        D2: { [liquid2]: { volume: 180 } },
+        D3: { [liquid2]: { volume: 180 } },
+        D4: { [liquid2]: { volume: 180 } },
+        D5: { [liquid2]: { volume: 180 } },
+        D6: { [liquid2]: { volume: 180 } },
+        D7: { [liquid2]: { volume: 180 } },
+        D8: { [liquid2]: { volume: 180 } },
+        E3: { [liquid2]: { volume: 180 } },
       },
     }
     expect(
@@ -459,10 +489,24 @@ describe('getLoadLiquids', () => {
     ).toBe(
       `
 # Load Liquids:
-well_plate_1["A1"].load_liquid(liquid_1, 10)
-well_plate_1["A2"].load_liquid(liquid_1, 10)
-well_plate_1["A3"].load_liquid(liquid_2, 50)
-well_plate_2["D1"].load_liquid(liquid_2, 180)`.trimStart()
+well_plate_1.load_liquid(
+    wells=["A1", "A2"],
+    liquid=liquid_1,
+    volume=10,
+)
+well_plate_1.load_liquid(
+    wells=["A3"],
+    liquid=liquid_2,
+    volume=50,
+)
+well_plate_2.load_liquid(
+    wells=[
+        "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8",
+        "E3"
+    ],
+    liquid=liquid_2,
+    volume=180,
+)`.trimStart()
     )
   })
 })
@@ -507,6 +551,24 @@ describe('getLoadWasteChute', () => {
       `
 # Load Waste Chute:
 waste_chute = protocol.load_waste_chute()`.trimStart()
+    )
+  })
+})
+
+describe('getLoadLiquidClasses', () => {
+  it('should load a liquid class for each liquid class types', () => {
+    expect(
+      getLoadLiquidClasses([
+        WATER_LIQUID_CLASS_NAME,
+        ETHANOL_LIQUID_CLASS_NAME,
+        GLYCEROL_LIQUID_CLASS_NAME,
+      ])
+    ).toBe(
+      `
+# Load Liquid Classes:
+water_base_class = protocol.get_liquid_class("water")
+ethanol_80_base_class = protocol.get_liquid_class("ethanol_80")
+glycerol_50_base_class = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
   })
 })

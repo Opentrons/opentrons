@@ -28,6 +28,8 @@ interface SubstepProps {
   dest?: SubstepWellData
   selectSubstep?: (substepIdentifier: SubstepIdentifier) => void
   isSameLabware?: boolean
+  aspirateVolume?: number
+  dispenseVolume?: number
 }
 
 function SubstepComponent(props: SubstepProps): JSX.Element {
@@ -40,6 +42,8 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
     trashName,
     selectSubstep: propSelectSubstep,
     isSameLabware,
+    aspirateVolume,
+    dispenseVolume,
   } = props
   const { i18n, t } = useTranslation([
     'application',
@@ -55,9 +59,22 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       type="default"
     />
   )
+  const aspirateTag =
+    aspirateVolume != null ? (
+      <Tag
+        text={`${formatVolume(aspirateVolume)} ${t('units.microliter')}`}
+        type="default"
+      />
+    ) : null
+  const dispenseTag =
+    dispenseVolume != null ? (
+      <Tag
+        text={`${formatVolume(dispenseVolume)} ${t('units.microliter')}`}
+        type="default"
+      />
+    ) : null
 
   const isMix = source?.well === dest?.well && isSameLabware
-
   return (
     <Flex
       onMouseEnter={() => {
@@ -115,7 +132,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('protocol_steps:aspirated')}
                   </StyledText>
-                  {volumeTag}
+                  {aspirateTag ?? volumeTag}
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('protocol_steps:from')}
                   </StyledText>
@@ -145,7 +162,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                     <StyledText desktopStyle="bodyDefaultRegular">
                       {t('protocol_steps:dispensed')}
                     </StyledText>
-                    {volumeTag}
+                    {dispenseTag ?? volumeTag}
                     <StyledText desktopStyle="bodyDefaultRegular">
                       {t('protocol_steps:into')}
                     </StyledText>

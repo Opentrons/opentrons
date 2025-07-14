@@ -10,7 +10,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getEnablePythonExport } from '../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
@@ -22,10 +21,8 @@ export function FileUploadMessagesModal(): JSX.Element | null {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')
-  const enableExportPython = useSelector(getEnablePythonExport)
   const modalContents = useFileUploadModalContents({
     uploadResponse: message,
-    enableExportPython,
   })
   const dismissModal = (): void => {
     dispatch(dismissFileUploadMessage())
@@ -36,10 +33,21 @@ export function FileUploadMessagesModal(): JSX.Element | null {
   }
 
   const { title, body } = modalContents
+
+  const isMigration = title === t('migration_header')
+
   const showButtons =
     title !== t('invalid_json_file') &&
     title !== t('incorrect_file_header') &&
     title !== t('incorrect_python_file_header')
+
+  const handleClose = (): void => {
+    if (isMigration) {
+      dispatch(undoLoadFile())
+    } else {
+      dismissModal()
+    }
+  }
 
   return (
     <Modal
@@ -47,7 +55,7 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       type={message?.isError ? 'error' : 'info'}
       title={title}
       closeOnOutsideClick
-      onClose={dismissModal}
+      onClose={handleClose}
       footer={
         showButtons && (
           <Flex
@@ -62,7 +70,9 @@ export function FileUploadMessagesModal(): JSX.Element | null {
             >
               {t('cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={dismissModal}>{t('confirm')}</PrimaryButton>
+            <PrimaryButton onClick={dismissModal}>
+              {isMigration ? t('import') : t('confirm')}
+            </PrimaryButton>
           </Flex>
         )
       }

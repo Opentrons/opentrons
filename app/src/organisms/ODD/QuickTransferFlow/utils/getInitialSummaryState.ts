@@ -31,6 +31,7 @@ interface InitialSummaryStateProps {
     volume: number
     path: PathOption
     liquidClass: LiquidClass
+    pushOut: boolean
   }
   deckConfig: DeckConfiguration
 }
@@ -96,12 +97,19 @@ export function getInitialSummaryState(
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
     disposalVolume: path === 'multiDispense' ? state.volume : undefined,
-    blowOut: path === 'multiDispense' ? trashConfigCutout : undefined,
+    blowOutDispense:
+      path === 'multiDispense'
+        ? {
+            location: trashConfigCutout,
+            flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+          }
+        : undefined,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
     changeTip,
     dropTipLocation: trashConfigCutout,
     liquidClass: state.liquidClass,
+    pushOut: state.pushOut,
   }
 }

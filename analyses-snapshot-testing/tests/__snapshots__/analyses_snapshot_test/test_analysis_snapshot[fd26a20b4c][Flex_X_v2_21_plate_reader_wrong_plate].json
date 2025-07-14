@@ -1472,35 +1472,6 @@
         "model": "absorbanceReaderV1"
       },
       "result": {
-        "definition": {
-          "calibrationPoint": {
-            "x": 14.4,
-            "y": 64.93,
-            "z": 97.8
-          },
-          "compatibleWith": [],
-          "dimensions": {
-            "bareOverallHeight": 18.5,
-            "lidHeight": 60.0,
-            "overLabwareHeight": 0.0
-          },
-          "displayName": "Absorbance Plate Reader Module GEN1",
-          "gripperOffsets": {},
-          "labwareOffset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.65
-          },
-          "model": "absorbanceReaderV1",
-          "moduleType": "absorbanceReaderType",
-          "otSharedSchema": "module/schemas/2",
-          "quirks": [],
-          "slotTransforms": {
-            "ot2_short_trash": {},
-            "ot2_standard": {},
-            "ot3_standard": {}
-          }
-        },
         "model": "absorbanceReaderV1",
         "moduleId": "UUID",
         "serialNumber": "UUID"
@@ -1599,12 +1570,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_21_plate_reader_wrong_plate.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

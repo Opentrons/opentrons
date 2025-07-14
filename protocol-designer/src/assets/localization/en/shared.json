@@ -44,8 +44,7 @@
   "import_existing_protocol": "Import existing protocol",
   "import": "Import",
   "incorrect_file_header": "Invalid file type",
-  "incorrect_file_type_body_ff": "Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.",
-  "incorrect_file_type_body": "Protocol Designer only accepts JSON protocol files created with Protocol Designer. Upload a valid file to continue.",
+  "incorrect_file_type_body": "Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.",
   "incorrect_python_file_header": "Unable to import",
   "incorrect_python_file_type_body": "This protocol file has been modified after export and can’t be imported. Please use the original, unedited file created in Protocol Designer.",
   "invalid_file_error": "Error message:",
@@ -64,35 +63,8 @@
   "magneticmoduletype": "Magnetic Module",
   "migration_header": "Your protocol was made in an older version of Protocol Designer",
   "migrations": {
-    "noBehaviorChange": {
-      "body1": "Your protocol will be automatically updated to the latest version.",
-      "body2": "We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior. Because of this we do not expect any changes in how the robot will execute this protocol. To be safe we will still recommend keeping a separate copy of the file you just imported.",
-      "body3": "As always, please contact us with any questions or feedback."
-    },
-    "toV8_1Migration": {
-      "body1": "Your protocol will be automatically updated to the latest version.",
-      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
-      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
-    },
-    "toV8Migration": {
-      "body1": "Your protocol will be automatically updated to the latest version.",
-      "body2": "Protocol Designer no longer supports aspirate or mix actions in a trash bin. If your protocol contains these actions, an error icon will appear next to them in the Protocol Timeline. To resolve the error, choose another location for aspirating or mixing.",
-      "body3": "Additionally, we have addressed a bug where blow out speeds were slower than expected. Your protocol will automatically update the flow rates unless they were specifically initialized.",
-      "body4": "As always, please contact us with any questions or feedback."
-    },
     "generic": {
-      "body1": "Your protocol will be automatically updated to the latest version. Please note that the updated file will be incompatible with older versions of the Protocol Designer. We recommend making a separate copy of the file that you just imported before continuing.",
-      "body2": "Updating the file may make changes to liquid handling actions. Please review your file in the Protocol Designer",
-      "body3": "As always, please contact us with any questions or feedback."
-    },
-    "toV3Migration": {
-      "title": "Update protocol to use new labware definitions",
-      "body1": "<strong>To import your file successfully, you must update your protocol to use the new labware definitions. </strong>Your protocol was made using an older version of Protocol Designer. Since then, Protocol Designer has been improved to include new labware definitions which are more accurate and reliable.",
-      "body2": "What this means for you protocol",
-      "body3": "Updating your protocol to use the new labware definitions will consequently require you to re-calibrate all labware in your protocol prior to running it on your robot. We recommend you try a dry run or one with water to ensure everything is working as expected.",
-      "body4": "What happens if you don't update",
-      "body5": "If you choose not to update, you will still be able to run your protocol as usual with older labware, however you will not be able to make further updates to this protocol using the Protocol Designer.",
-      "body6": "Please note that in order to run the updated protocol on your robot successfully, the OT-2 App and robot are required to be updated to version 3.10.0 or higher."
+      "body1": "Your protocol will be automatically updated to the latest version. We recommend making a separate copy of your file before importing."
     }
   },
   "magneticBlockAndStagingArea": "{{module}} with Staging Area",
@@ -164,6 +136,7 @@
   "tip_position_mix_touchTip_mmFromTop": "Edit touch tip position",
   "tip_position": "Edit {{prefix}} tip position",
   "trashBin": "Trash Bin",
+  "trash": "Trash",
   "updated_protocol_designer": "We've updated Protocol Designer!",
   "user_settings": "User Settings",
   "uses_standard_namespace": "Opentrons verified labware",

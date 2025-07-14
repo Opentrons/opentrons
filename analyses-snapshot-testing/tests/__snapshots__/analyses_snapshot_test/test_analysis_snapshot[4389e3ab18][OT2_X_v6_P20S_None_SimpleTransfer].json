@@ -1875,12 +1875,7 @@
       "wrappedErrors": []
     }
   ],
-  "files": [
-    {
-      "name": "OT2_X_v6_P20S_None_SimpleTransfer.json",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",

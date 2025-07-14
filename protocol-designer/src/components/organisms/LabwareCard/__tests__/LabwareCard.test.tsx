@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
@@ -10,8 +11,8 @@ import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../../utils'
 import { LabwareCard } from '../index'
 
 import type { ComponentProps } from 'react'
@@ -24,9 +25,10 @@ vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../LabwareCardOverflowMenu')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../utils')
+vi.mock('@opentrons/step-generation')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('../../EditLabwareQuantityModal')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -53,9 +55,12 @@ describe('LabwareCard', () => {
         labwareDefURI: 'mockuri',
         def: fixture96Plate as LabwareDefinition2,
       },
-      lidDisplayName: 'mock lid',
+      lidId: 'lidId',
       quantity: 1,
     }
+    vi.mocked(EditLabwareQuantityModal).mockReturnValue(
+      <div>mock EditLabwareQuantityModal</div>
+    )
     vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
       <div>mock LabwareCardOverflowMenu</div>
     )
@@ -76,6 +81,16 @@ describe('LabwareCard', () => {
           id: 'labwareId',
           labwareDefURI: 'mockuri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          stack: ['labwareId', 'A1'],
+        },
+        lidId: {
+          id: 'lidId',
+          labwareDefURI: 'mockuri',
+          def: ({
+            ...fixture96Plate,
+            metadata: { displayName: 'mock lid' },
+          } as any) as LabwareDefinition2,
           pythonName: 'mockPythonName',
           stack: ['labwareId', 'A1'],
         },
@@ -117,7 +132,7 @@ describe('LabwareCard', () => {
     screen.getByText('Quantity: 2')
     screen.getByText('Edit liquid and quantity')
   })
-  it('renders a labware card with edit quantity copy', () => {
+  it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
     props.labware = {
       ...props.labware,
       def: {
@@ -127,6 +142,7 @@ describe('LabwareCard', () => {
       } as LabwareDefinition2,
     }
     render(props)
-    screen.getByText('Edit quantity')
+    fireEvent.click(screen.getByText('Edit quantity'))
+    screen.getByText('mock EditLabwareQuantityModal')
   })
 })

@@ -61,8 +61,17 @@ export const feedbackModalAtom = atom<boolean>(false)
 
 export const tokenAtom = atom<string | null>(null)
 
+// feature flag atoms are a bit more fancy
+// they leverage local storage to persist settings across browser refreshes
+
+const DEFAULT_FEATURE_FLAG_STATE = {
+  enablePrereleaseMode: false,
+  enablePDProtocolGeneration: true,
+  enableAnalytics: true,
+}
+
 export const mixpanelAtom = atom<Mixpanel | null>({
-  analytics: { hasOptedIn: true }, // TODO: set to false when we have the opt-in modal
+  analytics: { hasOptedIn: DEFAULT_FEATURE_FLAG_STATE.enableAnalytics },
   isInitialized: false,
 })
 
@@ -78,16 +87,6 @@ export const createProtocolAtom = atom<CreateProtocolAtomProps>({
 
 export const displayExitConfirmModalAtom = atom<boolean>(false)
 
-export const displayFeatureFlagsModalAtom = atom<boolean>(false)
-
-// feature flag atoms are a bit more fancy
-// they leverage local storage to persist settings across browser refreshes
-
-const DEFAULT_FEATURE_FLAG_STATE = {
-  enablePrereleaseMode: false,
-  enablePDProtocolGeneration: true,
-}
-
 const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(
   'opentrons_ai_feature_flags',
   { ...DEFAULT_FEATURE_FLAG_STATE }
@@ -99,7 +98,6 @@ export const featureFlagsAtom = atom(
     // reset all feature flags to false if turning off prerelease mode
     if (update.enablePrereleaseMode === false) {
       set(rawFeatureFlagsAtom, { ...DEFAULT_FEATURE_FLAG_STATE })
-      set(displayFeatureFlagsModalAtom, false)
     } else {
       set(rawFeatureFlagsAtom, {
         ...get(rawFeatureFlagsAtom),

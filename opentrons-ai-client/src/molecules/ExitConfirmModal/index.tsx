@@ -13,7 +13,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { displayExitConfirmModalAtom } from '../../resources/atoms'
+import { displayExitConfirmModalAtom } from '/ai-client/resources/atoms'
 
 export function ExitConfirmModal(): JSX.Element {
   const [

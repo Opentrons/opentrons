@@ -56,7 +56,6 @@ describe('FixtureTable', () => {
         compatibleCutoutFixtureIds: [
           STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         ],
-        missingLabwareDisplayName: null,
       },
     ])
   })
@@ -76,7 +75,6 @@ describe('FixtureTable', () => {
         cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
         requiredAddressableAreas: [MOVABLE_TRASH_D3_ADDRESSABLE_AREA],
         compatibleCutoutFixtureIds: [TRASH_BIN_ADAPTER_FIXTURE],
-        missingLabwareDisplayName: null,
       },
     ])
 
@@ -98,7 +96,6 @@ describe('FixtureTable', () => {
         cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         requiredAddressableAreas: [MOVABLE_TRASH_D3_ADDRESSABLE_AREA],
         compatibleCutoutFixtureIds: [TRASH_BIN_ADAPTER_FIXTURE],
-        missingLabwareDisplayName: null,
       },
     ])
 

@@ -1,0 +1,16 @@
+{
+  "flex_stacker_display_name": "Stacker",
+  "flex_stacker_waste_chute_display_name": "Stacker + Waste chute",
+  "absorbance": "Absorbance",
+  "heater_Shaker": "Heater-Shaker",
+  "mag_block": "Mag",
+  "staging_area": "Stage",
+  "temperature": "Temperature",
+  "thermocycler": "Thermocycler",
+  "trash_bin": "Trash bin",
+  "waste": "Waste",
+  "magnetic_block": "Magnetic block",
+  "waste_chute": "Waste chute",
+  "staging_area_slot": "Staging area slot",
+  "module_in_port": "{{moduleName}} in  USB-{{usbPortNumber}}"
+}

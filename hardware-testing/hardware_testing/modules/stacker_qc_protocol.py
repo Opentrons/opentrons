@@ -1,17 +1,33 @@
-"""DVT Flex Stacker QC."""
-from opentrons.protocol_api import ProtocolContext
+"""PVT Flex Stacker QC."""
+from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api.module_contexts import (
     FlexStackerContext,
 )
 
 metadata = {
-    "protocolName": "Flex Stacker DVT QC",
+    "protocolName": "Flex Stacker PVT QC",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.23",
+    "apiLevel": "2.25",
 }
+
+
+def add_parameters(parameters: ParameterContext) -> None:
+    """Add parameters to the protocol."""
+    parameters.add_str(
+        variable_name="stacker_slot",
+        display_name="Flex Stacker Slot",
+        description="The slot where the Flex Stacker is loaded.",
+        default="D4",
+        choices=[
+            {"display_name": "A4", "value": "A4"},
+            {"display_name": "B4", "value": "B4"},
+            {"display_name": "C4", "value": "C4"},
+            {"display_name": "D4", "value": "D4"},
+        ],
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -19,7 +35,8 @@ def run(protocol: ProtocolContext) -> None:
     # ======================= SIMPLE SETUP ARRANGEMENT ======================
     # STACKERS
     stacker: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "D4"
+        "flexStackerModuleV1",
+        protocol.params.stacker_slot,  # type: ignore[attr-defined]
     )  # type: ignore[assignment]
     stacker.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
@@ -42,12 +59,11 @@ def run(protocol: ProtocolContext) -> None:
 
     # =================== FILL TIPRACKS WITH PCR PLATES ======================
 
-    stacker.empty("Emptying all labware from the Flex Stacker")
+    stacker.empty("Empty all tipracks from the hopper and load in 6 PCR plates.")
     stacker.set_stored_labware(
-        load_name="opentrons_96_wellplate_100ul_pcr_full_skirt",
+        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
         count=6,
     )
-    stacker.fill(message="Fill stacker with pcr plates")
 
     # ======================= RETRIEVE/STORE PCR PLATES ======================
     plates = []

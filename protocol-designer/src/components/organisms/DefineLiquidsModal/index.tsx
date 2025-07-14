@@ -26,8 +26,8 @@ import {
   FLEX_ROBOT_TYPE,
   getSortedLiquidClassDefs,
 } from '@opentrons/shared-data'
+import { swatchColors } from '@opentrons/step-generation'
 
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
@@ -35,7 +35,6 @@ import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { TextAreaField } from '../../molecules'
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
-import { swatchColors } from './swatchColors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Ingredient } from '@opentrons/step-generation'
@@ -73,7 +72,6 @@ export function DefineLiquidsModal(
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const robotType = useSelector(getRobotType)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
@@ -240,7 +238,7 @@ export function DefineLiquidsModal(
                     height="4.75rem"
                   />
                 </Flex>
-                {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
+                {robotType === FLEX_ROBOT_TYPE ? (
                   <LiquidClassDropdown
                     control={control}
                     setValue={setValue}

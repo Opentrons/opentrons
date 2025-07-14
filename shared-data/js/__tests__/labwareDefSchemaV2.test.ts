@@ -1,10 +1,10 @@
 import path from 'path'
 import Ajv from 'ajv'
 import glob from 'glob'
-import range from 'lodash/range'
 import { beforeAll, describe, expect, it, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
+import { pairsFromArray } from '../helpers/pairsFromArray'
 import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
 
 import type {
@@ -133,6 +133,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // this labware has a lip
   'ev_resin_tips_flex_96_labware/1.json': standard96WellNames,
   'ibidi_96_square_well_plate_300ul/1.json': standard96WellNames,
+  'ibidi_96_square_well_plate_300ul/2.json': standard96WellNames,
 
   // Presumably a bug. Fixed in v3 of this labware.
   'nest_1_reservoir_195ml/1.json': new Set(['A1']),
@@ -148,11 +149,14 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // liquid level detection and meniscus-relative pipetting. Probably, the wells were
   // updated but not the overall labware dimensions. This needs to be investigated and fixed.
   'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames,
+  'nest_96_wellplate_100ul_pcr_full_skirt/4.json': standard96WellNames,
   'opentrons_24_tuberack_nest_1.5ml_screwcap/2.json': standard24WellNames,
   'opentrons_24_tuberack_nest_2ml_screwcap/2.json': standard24WellNames,
   'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12), // Fixed in v3 of this labware.
   'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4),
+  'corning_12_wellplate_6.9ml_flat/4.json': generateStandardWellNames(3, 4),
   'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames,
+  'biorad_96_wellplate_200ul_pcr/4.json': standard96WellNames,
 }
 
 const filterWells = (
@@ -290,7 +294,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
     )) {
-      for (const [above, below] of pairs(geometry.sections)) {
+      for (const [above, below] of pairsFromArray(geometry.sections)) {
         expect(above.bottomHeight).toStrictEqual(below.topHeight)
       }
     }
@@ -313,9 +317,13 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
         'agilent_1_reservoir_290ml/2', // Fixed in v3 of this labware.
         'corning_24_wellplate_3.4ml_flat/3',
+        'corning_24_wellplate_3.4ml_flat/4',
         'corning_6_wellplate_16.8ml_flat/3',
+        'corning_6_wellplate_16.8ml_flat/4',
         'corning_96_wellplate_360ul_flat/3',
+        'corning_96_wellplate_360ul_flat/4',
         'nest_96_wellplate_2ml_deep/3',
+        'nest_96_wellplate_2ml_deep/4',
         'opentrons_15_tuberack_falcon_15ml_conical/2',
         'opentrons_24_aluminumblock_nest_1.5ml_screwcap/2',
         'opentrons_24_aluminumblock_nest_2ml_screwcap/2',
@@ -535,16 +543,4 @@ function getGeometry(
     }
     return result
   }
-}
-
-/**
- * [1, 2, 3, 4] -> [[1, 2], [2, 3], [3, 4]]
- *
- * [1] -> []
- */
-function pairs<T>(array: T[]): Array<[T, T]> {
-  return range(array.length - 1).map(firstIndex => [
-    array[firstIndex],
-    array[firstIndex + 1],
-  ])
 }

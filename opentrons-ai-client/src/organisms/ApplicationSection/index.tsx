@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
-import { ControlledInputField } from '../../atoms/ControlledInputField'
+import { ControlledDropdownMenu } from '/ai-client/atoms/ControlledDropdownMenu'
+import { ControlledInputField } from '/ai-client/atoms/ControlledInputField'
 
 export const BASIC_ALIQUOTING = 'basic_aliquoting'
 export const PCR = 'pcr'

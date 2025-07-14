@@ -73,12 +73,6 @@ class FlexBackend(Protocol):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         ...
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        ...
-
     def update_constraints_for_plunger_acceleration(
         self,
         mount: OT3Mount,

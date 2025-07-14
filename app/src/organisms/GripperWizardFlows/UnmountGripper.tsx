@@ -6,6 +6,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  AnimationVideo,
   Btn,
   COLORS,
   Flex,
@@ -139,18 +140,15 @@ export const UnmountGripper = (
     <GenericWizardTile
       header={t('branded:loosen_screws_and_detach')}
       rightHandBody={
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="unscrew and disconnect gripper"
         >
           <source src={unmountGripper} />
-        </video>
+        </AnimationVideo>
       }
       bodyText={
         <LegacyStyledText as="p">

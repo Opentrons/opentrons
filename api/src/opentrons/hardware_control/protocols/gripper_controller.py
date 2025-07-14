@@ -14,7 +14,7 @@ class GripperController(Protocol):
     ) -> None:
         ...
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(self, recalibrate_jaw_width: bool = False) -> None:
         ...
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:

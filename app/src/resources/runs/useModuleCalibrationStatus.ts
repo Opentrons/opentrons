@@ -22,8 +22,7 @@ export function useModuleCalibrationStatus(
     useModuleRenderInfoForProtocolById(runId),
     moduleRenderInfo =>
       moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE ||
-      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE ||
-      moduleRenderInfo.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
+      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE
   )
 
   // only check module calibration for Flex
@@ -39,9 +38,16 @@ export function useModuleCalibrationStatus(
     key => moduleRenderInfoForProtocolById[key]
   )
   if (
-    moduleData.some(
-      m => m.attachedModuleMatch?.moduleOffset?.last_modified == null
-    )
+    moduleData.some(m => {
+      if (m.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE) {
+        return (
+          m.attachedModuleMatch?.data.platformState !== 'extended' ||
+          m.attachedModuleMatch?.data.latchState !== 'closed'
+        )
+      } else {
+        return m.attachedModuleMatch?.moduleOffset?.last_modified == null
+      }
+    })
   ) {
     return { complete: false, reason: 'calibrate_module_failure_reason' }
   } else {

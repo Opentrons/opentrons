@@ -32,8 +32,12 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "ibidi96 SqrWellFltBtmPlt300µL",
                 "value": "ibidi_96_square_well_plate_300ul",
             },
+            {
+                "display_name": "ibidi lid",
+                "value": "ibidi_96_square_well_plate_300ul_lid",
+            },
         ],
-        default="axygen_96_wellplate_500ul",
+        default="ibidi_96_square_well_plate_300ul_lid",
     )
     parameters.add_bool(
         variable_name="heater_shaker",
@@ -49,9 +53,15 @@ def run(protocol: ProtocolContext) -> None:
     heater_shaker_enabled = protocol.params.heater_shaker  # type: ignore[attr-defined]
 
     # Lid loading
-    if labware_type == "corning_96_wellplate_360ul_lid":
+    if labware_type == "ibidi_96_square_well_plate_300ul_lid":
         protocol.load_lid_stack(labware_type, "C3", 1)
         labware = protocol.load_labware("ibidi_96_square_well_plate_300ul", "D3")
+        for _ in range(3):
+            protocol.move_lid("C3", labware, use_gripper=True)
+            protocol.move_lid(labware, "C3", use_gripper=True)
+    elif labware_type == "corning_96_wellplate_360ul_lid":
+        protocol.load_lid_stack(labware_type, "C3", 1)
+        labware = protocol.load_labware("corning_96_wellplate_360ul_flat", "D3")
         for _ in range(3):
             protocol.move_lid("C3", labware, use_gripper=True)
             protocol.move_lid(labware, "C3", use_gripper=True)

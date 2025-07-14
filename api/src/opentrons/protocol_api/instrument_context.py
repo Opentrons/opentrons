@@ -39,7 +39,10 @@ from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from ._liquid import LiquidClass
-from ._transfer_liquid_validation import verify_and_normalize_transfer_args
+from ._transfer_liquid_validation import (
+    verify_and_normalize_transfer_args,
+    resolve_keep_last_tip,
+)
 from . import labware, validation
 from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
@@ -567,13 +570,13 @@ class InstrumentContext(publisher.CommandPublisher):
                      dispensing flow rate is calculated as ``rate`` multiplied by
                      :py:attr:`flow_rate.dispense <flow_rate>`. See
                      :ref:`new-plunger-flow-rates`.
-        :param aspirate_flow_rate: The flow rate for each aspirate in the mix, in µL/s.
+        :param aspirate_flow_rate: The absolute flow rate for each aspirate in the mix, in µL/s.
                                    If this is specified, ``rate`` must not be set.
-        :param dispense_flow_rate: The flow rate for each dispense in the mix, in µL/s.
+        :param dispense_flow_rate: The absolute flow rate for each dispense in the mix, in µL/s.
                                    If this is specified, ``rate`` must not be set.
         :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
         :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
-        :param final_push_out: How much to push out after the final mix repetition. The
+        :param final_push_out: How much volume to push out after the final mix repetition. The
                                pipette will not push out after earlier repetitions. If
                                not specified or ``None``, the pipette will push out the
                                default non-zero amount. See :ref:`push-out-dispense`.
@@ -837,10 +840,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :type speed: float
         :param mm_from_edge: How far to move inside the well, as a distance from the
                              well's edge.
-                             When ``mm_from_edge=0``, the pipette tip will move all the
-                             way to the edge of the target well. When ``mm_from_edge=1``,
-                             the pipette tip will move to 1 mm from the well's edge.
-                             Lower values will press the tip harder into the well's
+                             When ``mm_from_edge=0``, the pipette will move to the target well's edge to touch the tip. When ``mm_from_edge=1``,
+                             the pipette will move to 1 mm from the target well's edge to touch the tip.
+                             Values lower than 0 will press the tip harder into the target well's
                              walls; higher values will touch the well more lightly, or
                              not at all.
                              ``mm_from_edge`` and ``radius`` are mutually exclusive: to
@@ -1774,7 +1776,7 @@ class InstrumentContext(publisher.CommandPublisher):
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def transfer_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -1795,6 +1797,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1825,13 +1828,16 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -1844,7 +1850,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1852,6 +1858,9 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+        )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
         )
 
         verified_dest: Union[
@@ -1881,7 +1890,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.transfer_with_liquid_class(
+            last_tip_location = self._core.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -1899,10 +1908,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def distribute_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -1917,6 +1939,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1938,19 +1961,23 @@ class InstrumentContext(publisher.CommandPublisher):
             Defaults to ``"once"``.
 
               - ``"once"``: Use one tip for the entire command.
+              - ``"always"``: Use a new tip before each aspirate.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -1963,7 +1990,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1972,6 +1999,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             raise ValueError(
                 "distribute_with_liquid_class() does not support trash bin or waste chute"
@@ -1985,11 +2016,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `distribute_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         verified_source = transfer_args.source[0]
@@ -2003,7 +2035,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.distribute_with_liquid_class(
+            last_tip_location = self._core.distribute_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=(
@@ -2024,10 +2056,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
-    @requires_version(2, 23)
+    @requires_version(2, 24)
     def consolidate_with_liquid_class(
         self,
         liquid_class: LiquidClass,
@@ -2042,6 +2087,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = None,
         return_tip: bool = False,
         group_wells: bool = True,
+        keep_last_tip: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2064,19 +2110,23 @@ class InstrumentContext(publisher.CommandPublisher):
             Defaults to ``"once"``.
 
               - ``"once"``: Use one tip for the entire command.
+              - ``"always"``: Use a new tip after each aspirate and dispense, even when visiting the same source again.
               - ``"never"``: Do not pick up or drop tips at all.
 
             See :ref:`param-tip-handling` for details.
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
             given into a single transfer step, taking into account the tip configuration. If ``False``, target
             each well given with the primary nozzle. Defaults to ``True``.
+        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
+            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
+            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -2089,7 +2139,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            last_tip_well=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2098,6 +2148,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        verified_keep_last_tip = resolve_keep_last_tip(
+            keep_last_tip, transfer_args.tip_policy
+        )
+
         verified_dest: Union[Tuple[types.Location, WellCore], TrashBin, WasteChute]
         if isinstance(transfer_args.dest, (TrashBin, WasteChute)):
             verified_dest = transfer_args.dest
@@ -2114,11 +2168,12 @@ class InstrumentContext(publisher.CommandPublisher):
         if transfer_args.tip_policy not in [
             TransferTipPolicyV2.ONCE,
             TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ALWAYS,
         ]:
             raise ValueError(
                 f"Incompatible `new_tip` value of {new_tip}."
                 f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
-                f" 'once' and 'never'."
+                f" 'once', 'never' and 'always'."
             )
 
         with publisher.publish_context(
@@ -2131,7 +2186,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            self._core.consolidate_with_liquid_class(
+            last_tip_location = self._core.consolidate_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -2149,7 +2204,20 @@ class InstrumentContext(publisher.CommandPublisher):
                 ),
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
+                keep_last_tip=verified_keep_last_tip,
+                last_tip_location=transfer_args.last_tip_location,
             )
+
+        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
+        #   moved to the engine core or engine as a simpler and more holistic solution
+        if last_tip_location is not None:
+            tip_rack_loc, tip_well_core = last_tip_location
+            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
+                tip_well_core.get_name()
+            ]
+        else:
+            self._last_tip_picked_up_from = None
+
         return self
 
     @requires_version(2, 0)
@@ -2574,10 +2642,9 @@ class InstrumentContext(publisher.CommandPublisher):
         From API version 2.15 to 2.22, this property returned an internal name for Flex
         pipettes. (e.g., ``"p1000_single_flex"``).
 
-        .. TODO uncomment when 2.23 is ready
-          In API version 2.23 and later, this property returns the Python Protocol API
-          :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
-          ``"flex_1channel_1000"``).
+        In API version 2.23 and later, this property returns the Python Protocol API
+        :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
+        ``"flex_1channel_1000"``).
         """
         return self._core.get_pipette_name()
 
@@ -2730,6 +2797,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
 
+    @publisher.publish(command=cmds.configure_for_volume)
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
         """Configure a pipette to handle a specific volume of liquid, measured in µL.
@@ -2824,6 +2892,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @publisher.publish(command=cmds.configure_nozzle_layout)
     @requires_version(2, 16)
     def configure_nozzle_layout(
         self,

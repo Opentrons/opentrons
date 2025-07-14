@@ -45,4 +45,6 @@ export function forPickUpTip(
       tipState.tipracks[labwareId][wellName] = false
     })
   }
+  // update tiprackID assosciated with pipette for configureNozzleLayout
+  robotStateAndWarnings.robotState.pipettes[pipetteId].tiprackId = labwareId
 }

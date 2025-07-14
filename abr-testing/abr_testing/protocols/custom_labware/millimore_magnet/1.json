@@ -1,0 +1,55 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Millipore",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Millipore 24 Ball Magnet",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.8,
+    "yDimension": 85.6,
+    "zDimension": 11.15
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "millipore_24_ball_magnet"
+  },
+  "namespace": "custom_beta",
+  "version": 2,
+  "schemaVersion": 2,
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0.5
+      }
+    }
+  }
+}

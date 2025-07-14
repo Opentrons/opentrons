@@ -16,6 +16,13 @@ vi.mock('/app/assets/videos/error-recovery/Gripper_Release.webm', () => ({
   default: 'mocked-animation-path.webm',
 }))
 
+vi.mock(
+  '/app/assets/videos/error-recovery/FlexStacker_ReleaseLatch.webm',
+  () => ({
+    default: 'mocked-stacker-latch-path.webm',
+  })
+)
+
 const render = (props: ComponentProps<typeof ReleaseLabware>) => {
   return renderWithProviders(<ReleaseLabware {...props} />, {
     i18nInstance: i18n,
@@ -26,59 +33,99 @@ describe('ReleaseLabware', () => {
   let props: ComponentProps<typeof ReleaseLabware>
   let mockHandleMotionRouting: Mock
 
-  beforeEach(() => {
-    mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+  describe('For gripper flows', () => {
+    beforeEach(() => {
+      mockHandleMotionRouting = vi.fn(() => Promise.resolve())
 
-    props = {
-      ...mockRecoveryContentProps,
-      routeUpdateActions: {
-        handleMotionRouting: mockHandleMotionRouting,
-        goBackPrevStep: vi.fn(),
-      } as any,
-    }
+      props = {
+        ...mockRecoveryContentProps,
+        routeUpdateActions: {
+          handleMotionRouting: mockHandleMotionRouting,
+          goBackPrevStep: vi.fn(),
+        } as any,
+      }
+    })
+
+    it('renders gripper copy', () => {
+      render(props)
+
+      screen.getByText('Release labware from gripper')
+      screen.getByText(
+        'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
+      )
+      screen.getByText('The labware will be released from its current height.')
+    })
+
+    it(`clicking the primary button routes to ${RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE}`, () => {
+      render(props)
+
+      clickButtonLabeled('Release')
+
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE
+      )
+    })
+
+    it('renders gripper animation', () => {
+      render(props)
+
+      screen.getByRole('presentation', { hidden: true })
+      expect(screen.getByTestId('release-animation')).toHaveAttribute(
+        'src',
+        'mocked-animation-path.webm'
+      )
+    })
   })
 
-  it('renders gripper copy', () => {
-    render(props)
+  describe('For stacker flows', () => {
+    beforeEach(() => {
+      mockHandleMotionRouting = vi.fn(() => Promise.resolve())
 
-    screen.getByText('Release labware from gripper')
-    screen.getByText(
-      'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
-    )
-    screen.getByText('The labware will be released from its current height.')
-  })
+      props = {
+        ...mockRecoveryContentProps,
+        recoveryMap: {
+          route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+          step:
+            RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS
+              .CONFIRM_LABWARE_IN_LATCH,
+        },
+        routeUpdateActions: {
+          handleMotionRouting: mockHandleMotionRouting,
+          goBackPrevStep: vi.fn(),
+        } as any,
+      }
+    })
 
-  it('renders latch copy', () => {
-    props.recoveryMap = {
-      route: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS
-          .CONFIRM_LABWARE_IN_LATCH,
-    }
-    render(props)
+    it('renders latch copy', () => {
+      render(props)
 
-    screen.getByText('Release labware from latch')
-    screen.getByText(
-      'Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.'
-    )
-    screen.getByText('The labware will be released from its current height.')
-  })
+      screen.getByText('Release labware from latch')
+      screen.getByText(
+        'Take any necessary precautions before positioning yourself to stabilize or catch the labware if needed. Once confirmed, a countdown will begin before the latch releases.'
+      )
+      screen.getByText('The labware will be released from its current height.')
+    })
 
-  it('clicking the primary button has correct behavior', () => {
-    render(props)
+    it(`clicking the primary button routes to ${RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
+      render(props)
 
-    clickButtonLabeled('Release')
+      clickButtonLabeled('Release')
 
-    expect(mockHandleMotionRouting).toHaveBeenCalled()
-  })
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+      )
+    })
 
-  it('renders gripper animation', () => {
-    render(props)
+    it('renders latch animation', () => {
+      render(props)
 
-    screen.getByRole('presentation', { hidden: true })
-    expect(screen.getByTestId('gripper-animation')).toHaveAttribute(
-      'src',
-      'mocked-animation-path.webm'
-    )
+      screen.getByRole('presentation', { hidden: true })
+      expect(screen.getByTestId('release-animation')).toHaveAttribute(
+        'src',
+        'mocked-stacker-latch-path.webm'
+      )
+    })
   })
 })

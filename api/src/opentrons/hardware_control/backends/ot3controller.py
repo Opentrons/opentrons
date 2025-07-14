@@ -48,7 +48,6 @@ from .ot3utils import (
     moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
-    get_system_constraints_for_calibration,
     get_system_constraints_for_plunger_acceleration,
 )
 from .tip_presence_manager import TipPresenceManager
@@ -408,19 +407,6 @@ class OT3Controller(FlexBackend):
     def get_pressure_sensor_available(self, pipette_axis: Axis) -> bool:
         pip_node = axis_to_node(pipette_axis)
         return self._pressure_sensor_available[pip_node]
-
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._move_manager.update_constraints(
-            get_system_constraints_for_calibration(
-                self._configuration.motion_settings, gantry_load
-            )
-        )
-        log.debug(
-            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
-        )
 
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._move_manager.update_constraints(
@@ -913,12 +899,15 @@ class OT3Controller(FlexBackend):
         async with self._monitor_overpressure(checked_moving_pipettes):
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
-        if Axis.Q in checked_axes:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-                    Axis.to_kind(Axis.Q)
-                ],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity[
+                    gantry_load
+                ][Axis.to_kind(Axis.Q)],
             )
 
         for position in positions:

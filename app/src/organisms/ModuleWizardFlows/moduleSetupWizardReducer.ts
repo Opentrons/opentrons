@@ -14,8 +14,17 @@ export function moduleSetupWizardReducer(
         currentStepIndex: 0,
         currentStep: stepsInFlow[0],
         totalStepCount: stepsInFlow.length - 1,
-        stepsInFlow: stepsInFlow,
+        stepsInFlow,
         attachedModule: action.attachedModule,
+      }
+    }
+    case ACTIONS.RESTART_FLOW: {
+      return {
+        currentStepIndex: 0,
+        currentStep: null,
+        totalStepCount: 0,
+        stepsInFlow: [],
+        attachedModule: null,
       }
     }
     case ACTIONS.PROCEED: {

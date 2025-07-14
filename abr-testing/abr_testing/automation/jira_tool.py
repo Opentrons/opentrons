@@ -125,7 +125,6 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         labels: list,
-        parent_name: str,
     ) -> Tuple[str, str]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
@@ -155,6 +154,7 @@ class JiraTicket:
             }
         }
         available_versions = self.get_project_versions(project_key)
+
         if affects_versions in available_versions:
             data["fields"]["versions"] = [{"name": affects_versions}]
             print(f"Software version {affects_versions} added.")

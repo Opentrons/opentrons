@@ -4,7 +4,7 @@ import partition from 'lodash/partition'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
-  getModuleDef2,
+  getModuleDef,
   getModuleType,
   getPositionFromSlotId,
   HEATERSHAKER_MODULE_V1,
@@ -292,7 +292,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName,
               deckDef
             )
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
               <Module
                 key={`${moduleModel} ${moduleLocation.slotName}`}
@@ -303,6 +303,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   slotPosition[0]
                 )}
                 innerProps={innerProps}
+                targetDeckId={deckDef.otId}
+                targetSlotId={moduleLocation.slotName}
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
@@ -341,7 +343,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName
             )
             const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
               <>
                 <StagingAreaFixture
@@ -361,6 +363,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     slotPosition[0]
                   )}
                   innerProps={innerProps}
+                  targetDeckId={deckDef.otId}
+                  targetSlotId={moduleLocation.slotName}
                 >
                   {nestedLabwareDef != null ? (
                     <g
@@ -437,7 +441,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {/* render stacked badge on module labware */}
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             const slotPosition = getPositionFromSlotId(
               moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStackerLocationFromSlot(moduleLocation.slotName)

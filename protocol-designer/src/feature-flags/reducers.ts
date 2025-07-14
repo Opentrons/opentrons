@@ -31,17 +31,15 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:
     process.env.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,
   OT_PD_ENABLE_REACT_SCAN: process.env.OT_PD_ENABLE_REACT_SCAN === '1' || false,
-  OT_PD_ENABLE_LIQUID_CLASSES:
-    process.env.OT_PD_ENABLE_LIQUID_CLASSES === '1' || false,
   OT_PD_ENABLE_MULTIPLE_TEMPS_OT2:
     process.env.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 === '1' || false,
   OT_PD_ENABLE_TIMELINE_SCRUBBER:
     process.env.OT_PD_ENABLE_TIMELINE_SCRUBBER === '1' || false,
-  OT_PD_ENABLE_PYTHON_EXPORT:
-    process.env.OT_PD_ENABLE_PYTHON_EXPORT === '1' || false,
   OT_PD_ENABLE_PARTIAL_TIP_SUPPORT:
     process.env.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT === '1' || false,
   OT_PD_ENABLE_STACKING: process.env.OT_PD_ENABLE_STACKING === '1' || false,
+  OT_PD_ENABLE_JSON_EXPORT:
+    process.env.OT_PD_ENABLE_JSON_EXPORT === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

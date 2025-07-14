@@ -78,7 +78,6 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 
 const mockTCModule = {
@@ -95,7 +94,6 @@ const mockTCModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 
 describe('SetupModulesMap', () => {

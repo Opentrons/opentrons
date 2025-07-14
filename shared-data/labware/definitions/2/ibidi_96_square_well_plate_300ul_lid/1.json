@@ -1,0 +1,110 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "ibidi",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "ibidi 96 Square Well Flat Bottom Plate 300 µL Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127,
+    "yDimension": 84.5,
+    "zDimension": 6.95
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": ["stackingMaxFive"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "ibidi_96_square_well_plate_300ul_lid"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "ibidi_96_square_well_plate_300ul_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 1.2
+    },
+    "ibidi_96_square_well_plate_300ul": {
+      "x": 0,
+      "y": 0,
+      "z": 4.75
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 34
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "ibidi_96_square_well_plate_300ul",
+    "ibidi_96_square_well_plate_300ul_lid"
+  ],
+  "gripForce": 10,
+  "gripHeightFromLabwareBottom": 5,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      }
+    },
+    "lidOffsets": {
+      "pickUpOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -5
+      },
+      "dropOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -1
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}

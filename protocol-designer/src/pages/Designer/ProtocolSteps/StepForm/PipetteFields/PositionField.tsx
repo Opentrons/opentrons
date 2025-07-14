@@ -21,13 +21,14 @@ import {
   TipPositionModal,
   ZTipPositionModal,
 } from '../../../../../components/organisms'
+import { MoveLiquidPrefixToAction } from '../../../../../components/organisms/TipPositionModal/constants'
 import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
 import { getIsDelayPositionField } from '../../../../../form-types'
-import { prefixMap } from '../../../../../resources/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type { PositionSpecs } from '../../../../../components/organisms'
 import type {
+  FormData,
   ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
@@ -47,10 +48,12 @@ interface PositionFieldProps {
   showButton?: boolean
   isNested?: boolean
   referenceField?: ReferenceFields
+  formData?: FormData
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
   const {
+    formData,
     labwareId,
     propsForFields,
     zField,
@@ -156,18 +159,19 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
       },
       x: {
         name: xName,
-        value: rawXValue != null ? Number(rawXValue) : null,
+        value: rawXValue != null ? Number(rawXValue) : 0,
         updateValue: xUpdateValue,
       },
       y: {
         name: yName,
-        value: rawYValue != null ? Number(rawYValue) : null,
+        value: rawYValue != null ? Number(rawYValue) : 0,
         updateValue: yUpdateValue,
       },
     }
 
     modal = (
       <TipPositionModal
+        formData={formData}
         closeModal={handleClose}
         wellDepthMm={wellDepthMm}
         wellXWidthMm={wellXWidthMm}
@@ -202,7 +206,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
               t('protocol_steps:tip_position', {
-                prefix: prefixMap[prefix],
+                prefix: MoveLiquidPrefixToAction[prefix],
               }),
               'capitalize'
             )}

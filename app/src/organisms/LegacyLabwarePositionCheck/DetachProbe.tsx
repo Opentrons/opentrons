@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
@@ -28,7 +29,7 @@ import type {
   WorkingOffset,
 } from './types'
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   padding-top: ${SPACING.spacing4};
   width: 100%;
   min-height: 18rem;
@@ -140,9 +141,9 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       header={i18n.format(t('detach_probe'), 'capitalize')}
       //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={
-        <StyledVideo autoPlay loop controls={false}>
+        <AnimationVideo css={VIDEO_STYLE}>
           <source src={probeVideoSrc} />
-        </StyledVideo>
+        </AnimationVideo>
       }
       bodyText={
         <StyledBody>{i18n.format(t('remove_probe'), 'capitalize')}</StyledBody>

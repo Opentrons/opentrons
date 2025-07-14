@@ -74,11 +74,18 @@ DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
-DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED: Final = 90
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
+        OT3AxisKind.X: 350,
+        OT3AxisKind.Y: 300,
+        OT3AxisKind.Z: 35,
+        OT3AxisKind.P: 15,
+        OT3AxisKind.Z_G: 50,
+        OT3AxisKind.Q: 10,
+    },
+    high_throughput_200={
         OT3AxisKind.X: 350,
         OT3AxisKind.Y: 300,
         OT3AxisKind.Z: 35,
@@ -96,7 +103,15 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
+        OT3AxisKind.X: 700,
+        OT3AxisKind.Y: 600,
+        OT3AxisKind.Z: 150,
+        OT3AxisKind.P: 30,
+        OT3AxisKind.Z_G: 150,
+        OT3AxisKind.Q: 10,
+    },
+    high_throughput_200={
         OT3AxisKind.X: 700,
         OT3AxisKind.Y: 600,
         OT3AxisKind.Z: 150,
@@ -116,7 +131,15 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
 DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
+        OT3AxisKind.X: 10,
+        OT3AxisKind.Y: 10,
+        OT3AxisKind.Z: 5,
+        OT3AxisKind.P: 5,
+        OT3AxisKind.Z_G: 5,
+        OT3AxisKind.Q: 5,
+    },
+    high_throughput_200={
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 5,
@@ -136,7 +159,15 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
+        OT3AxisKind.X: 5,
+        OT3AxisKind.Y: 5,
+        OT3AxisKind.Z: 1,
+        OT3AxisKind.P: 5,
+        OT3AxisKind.Q: 5,
+        OT3AxisKind.Z_G: 5,
+    },
+    high_throughput_200={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
         OT3AxisKind.Z: 1,
@@ -154,7 +185,15 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
 )
 
 DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
+        OT3AxisKind.X: 0.5,
+        OT3AxisKind.Y: 0.5,
+        OT3AxisKind.Z: 0.5,
+        OT3AxisKind.P: 0.8,
+        OT3AxisKind.Z_G: 0.2,
+        OT3AxisKind.Q: 0.3,
+    },
+    high_throughput_200={
         OT3AxisKind.X: 0.5,
         OT3AxisKind.Y: 0.5,
         OT3AxisKind.Z: 0.5,
@@ -172,11 +211,19 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
 )
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-    high_throughput={
+    high_throughput_1000={
         OT3AxisKind.X: 1.25,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.5,
         OT3AxisKind.P: 0.8,
+        OT3AxisKind.Z_G: 0.67,
+        OT3AxisKind.Q: 1.5,
+    },
+    high_throughput_200={
+        OT3AxisKind.X: 1.25,
+        OT3AxisKind.Y: 1.4,
+        OT3AxisKind.Z: 1.5,
+        OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },
@@ -255,8 +302,11 @@ def _build_default_bpk(
         low_throughput=_build_dict_with_default(
             from_conf.get("low_throughput", {}), default.low_throughput
         ),
-        high_throughput=_build_dict_with_default(
-            from_conf.get("high_throughput", {}), default.high_throughput
+        high_throughput_1000=_build_dict_with_default(
+            from_conf.get("high_throughput_1000", {}), default.high_throughput_1000
+        ),
+        high_throughput_200=_build_dict_with_default(
+            from_conf.get("high_throughput_200", {}), default.high_throughput_200
         ),
     )
 

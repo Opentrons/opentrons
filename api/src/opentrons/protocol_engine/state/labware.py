@@ -51,7 +51,6 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
-    ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -906,32 +905,6 @@ class LabwareView:
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
         )
 
-    def get_module_overlap_offsets(
-        self, definition: LabwareDefinition, module_model: ModuleModel
-    ) -> OverlapOffset:
-        """Get the labware's overlap with requested module model."""
-        stacking_overlap = definition.stackingOffsetWithModule.get(
-            str(module_model.value)
-        )
-        if not stacking_overlap:
-            if self._is_thermocycler_on_ot2(module_model):
-                return OverlapOffset(x=0, y=0, z=10.7)
-            else:
-                return OverlapOffset(x=0, y=0, z=0)
-
-        return OverlapOffset(
-            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
-        )
-
-    def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
-        """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
-        robot_model = self.get_deck_definition()["robot"]["model"]
-        return (
-            module_model
-            in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
-            and robot_model == "OT-2 Standard"
-        )
-
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
         """Return a labware's default Magnetic Module engage height with added offset, if supplied.
 
@@ -1056,6 +1029,10 @@ class LabwareView:
             self.get(labware_id).loadName
         )
 
+    def is_lid(self, labware_id: str) -> bool:
+        """Check if labware is a lid."""
+        return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
+
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""
         labware = self.get(labware_id)
@@ -1162,6 +1139,40 @@ class LabwareView:
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
 
+    def stacker_labware_pool_to_ordered_list(
+        self,
+        primary_labware_definition: LabwareDefinition,
+        lid_labware_definition: LabwareDefinition | None,
+        adapter_labware_definition: LabwareDefinition | None,
+    ) -> List[LabwareDefinition]:
+        """Get the pool definitions in the top-first order suitable for geometry calculations."""
+        self.raise_if_stacker_labware_pool_is_not_valid(
+            primary_labware_definition,
+            lid_labware_definition,
+            adapter_labware_definition,
+        )
+        return [
+            x
+            for x in [
+                lid_labware_definition,
+                primary_labware_definition,
+                adapter_labware_definition,
+            ]
+            if x is not None
+        ]
+
+    def get_stacker_labware_overlap_offset(
+        self, definitions: list[LabwareDefinition]
+    ) -> OverlapOffset:
+        """Get the overlap amount between each labware pool.
+
+        The definitions must be in top-first order, ideally created by
+        `stacker_labware_pool_to_ordered_list`.
+        """
+        return self.get_labware_overlap_offsets(
+            definitions[-1], definitions[0].parameters.loadName
+        )
+
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
@@ -1172,7 +1183,9 @@ class LabwareView:
                 " on other labware."
             )
         below_labware = self.get(bottom_labware_id)
-        if not labware_validation.validate_labware_can_be_stacked(
+        if isinstance(
+            top_labware_definition, LabwareDefinition2
+        ) and not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,
             below_labware_load_name=below_labware.loadName,
         ):

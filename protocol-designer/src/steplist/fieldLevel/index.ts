@@ -58,7 +58,7 @@ const getLabwareOrAdditionalEquipmentEntity = (
   } else return null
 }
 
-const getIsAdapterLocation = (
+const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
@@ -69,6 +69,7 @@ const getIsAdapterLocation = (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
 }
+
 const getIsAdditionalEquipmentLocation = (
   newLocation: string,
   wasteChuteEntities: WasteChuteEntities,
@@ -108,7 +109,7 @@ const getLabwareLocation = (
     return { moduleId: newLocationString }
   } else if (
     newLocationString != null &&
-    getIsAdapterLocation(newLocationString, state.labwareEntities)
+    getIsStackingLocation(newLocationString, state.labwareEntities)
   ) {
     return { labwareId: newLocationString }
   } else if (
@@ -251,15 +252,19 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_submerge_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   aspirate_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   dispense_submerge_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   dispense_retract_delay_seconds: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   pipette: {
     hydrate: getPipetteEntity,

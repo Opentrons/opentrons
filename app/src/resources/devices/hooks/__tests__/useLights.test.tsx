@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -17,7 +17,7 @@ import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useLights hook', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

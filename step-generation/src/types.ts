@@ -39,7 +39,10 @@ export interface PipetteTemporalProperties {
   entityId?: string
   //  primary nozzle's wellName if over a labware
   wellName?: string
+  //  pipette's nozzle configuration
   nozzles?: NozzleConfigurationStyle
+  //  current tiprack assosciated with pipette
+  tiprackId?: string
 }
 
 export interface MagneticModuleState {
@@ -229,7 +232,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number // TODO: deprecate this
 }
 
 interface CommonArgs {
@@ -242,6 +244,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -304,7 +307,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number // TODO: this arg doesn't map to anything in transfer_with_liquid_class
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
@@ -765,4 +767,17 @@ export interface Timeline {
 export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
+}
+export interface WellContents {
+  // eg 'A1', 'A2' etc
+  wellName?: string
+  groupIds: string[]
+  ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
+}
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
 }

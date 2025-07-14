@@ -200,15 +200,13 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         # Allow propagation of ModuleNotAttachedError.
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
-        stack_height = self._state_view.geometry.get_height_of_labware_stack(
-            pool_definitions
-        )
-
         state_update = update_types.StateUpdate()
         try:
             if stacker_hw is not None:
                 stacker_hw.set_stacker_identify(True)
-                await stacker_hw.store_labware(labware_height=stack_height)
+                await stacker_hw.store_labware(
+                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                )
         except FlexStackerStallError as e:
             return DefinedErrorData(
                 public=FlexStackerStallOrCollisionError(

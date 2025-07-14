@@ -16,6 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
@@ -25,6 +26,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -81,14 +83,14 @@ export function FixtureTable({
 
   const hasTwoLabwareThermocyclerConflicts =
     requiredDeckConfigCompatibility.some(
-      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+      ({ cutoutFixtureId, requiredAddressableAreas }) =>
         cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
-        missingLabwareDisplayName != null
+        requiredAddressableAreas.includes('B1')
     ) &&
     requiredDeckConfigCompatibility.some(
-      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
+      ({ cutoutFixtureId, requiredAddressableAreas }) =>
         cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
-        missingLabwareDisplayName != null
+        requiredAddressableAreas.includes('A1')
     )
 
   // if there are two labware conflicts with the thermocycler, don't show the conflict with the thermocycler rear fixture
@@ -117,7 +119,13 @@ export function FixtureTable({
         // as they're handled in the Modules Table
         return fixtureCompatibility.requiredAddressableAreas.every(raa =>
           FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null : (
+        ) ||
+          (fixtureCompatibility.requiredAddressableAreas.some(raa =>
+            FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa)
+          ) &&
+            !fixtureCompatibility.requiredAddressableAreas.some(raa =>
+              WASTE_CHUTE_ADDRESSABLE_AREAS.includes(raa)
+            )) ? null : (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}
@@ -147,7 +155,6 @@ function FixtureTableItem({
   cutoutId,
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
-  missingLabwareDisplayName,
   lastItem,
   setSetupScreen,
   setCutoutId,
@@ -165,7 +172,9 @@ function FixtureTableItem({
   const isCurrentFixtureCompatible =
     cutoutFixtureId != null &&
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-  const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
+  const isRequiredSingleSlotMissing = compatibleCutoutFixtureIds.some(
+    fixtureId => SINGLE_SLOT_FIXTURES.includes(fixtureId)
+  )
 
   const isThermocyclerCurrentFixture =
     cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
@@ -226,7 +235,6 @@ function FixtureTableItem({
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
           isOnDevice={true}
-          missingLabwareDisplayName={missingLabwareDisplayName}
           deckDef={deckDef}
           robotName={robotName}
         />

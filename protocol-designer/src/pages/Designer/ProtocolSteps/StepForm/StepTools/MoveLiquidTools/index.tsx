@@ -1,11 +1,6 @@
-import { useSelector } from 'react-redux'
-
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { useAssignLiquidClass, useSupportedLiquidClassOptions } from './hooks'
+import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 
@@ -20,7 +15,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     tab,
     setTab,
   } = props
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
@@ -32,7 +26,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     orderedLiquidClassOptions,
     formData
   )
-  const robotType = useSelector(getRobotType)
 
   const renderStepComponent = (): JSX.Element => {
     switch (toolboxStep) {
@@ -45,25 +38,13 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         )
       case 1:
         return (
-          <>
-            {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
-              <LiquidClassesStepTools
-                propsForFields={propsForFields}
-                formData={formData}
-                setShowFormErrors={setShowFormErrors}
-                type="transfer"
-                orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
-              />
-            ) : (
-              <SecondStepsMoveLiquidTools
-                propsForFields={propsForFields}
-                formData={formData}
-                tab={tab}
-                setTab={setTab}
-                setShowFormErrors={setShowFormErrors}
-              />
-            )}
-          </>
+          <LiquidClassesStepTools
+            propsForFields={propsForFields}
+            formData={formData}
+            setShowFormErrors={setShowFormErrors}
+            type="transfer"
+            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
+          />
         )
       case 2:
         return (

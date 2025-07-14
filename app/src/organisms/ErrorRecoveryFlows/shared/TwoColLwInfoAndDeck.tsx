@@ -30,8 +30,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
-    recoveryMap,
-    recoveryCommands,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -40,34 +39,15 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
-    MANUAL_REPLACE_STACKER_AND_RETRY,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    LOAD_LABWARE_SHUTTLE_AND_RETRY,
-    HOPPER_MANUAL_LOAD_AND_RETRY,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
   } = RECOVERY_MAP
-  const { manualRetrieve } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
     relevantPickUpTipWellName,
     relevantPickUpTipLabware,
-    labwareQuantity,
   } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
-  const { step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
-
-  const primaryOnClick = (): void => {
-    switch (step) {
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-        void manualRetrieve().then(() => proceedNextStep())
-    }
-    void proceedNextStep()
-  }
 
   const {
     displayNameCurrentLoc: slot,
@@ -96,26 +76,6 @@ export function TwoColLwInfoAndDeck(
           })
         }
       }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-        return t('ensure_stacker_has_labware')
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (
-          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS
-              .HOPPER_MANUAL_REPLACE ||
-          step === MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.CONFIRM_RETRY
-        ) {
-          return t('load_labware_into_labware_shuttle')
-        } else {
-          return t('ensure_stacker_has_labware')
-        }
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-        return t('ensure_stacker_has_labware')
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-        return t('load_labware_into_stacker', { quantity: labwareQuantity })
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -137,23 +97,6 @@ export function TwoColLwInfoAndDeck(
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
       }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-        return t('make_sure_loaded_correct_number_of_labware_stacker')
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        if (
-          step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE ||
-          step ===
-            HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.HOPPER_MANUAL_REPLACE
-        ) {
-          return null
-        } else {
-          return t('make_sure_loaded_correct_number_of_labware_stacker')
-        }
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-        return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -170,23 +113,6 @@ export function TwoColLwInfoAndDeck(
         return 'location-arrow-location'
       default:
         return 'location'
-    }
-  }
-
-  const buildLayoutType = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['layout'] => {
-    switch (selectedRecoveryOption) {
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-        return 'stacked'
-      default:
-        return 'default'
     }
   }
 
@@ -213,6 +139,7 @@ export function TwoColLwInfoAndDeck(
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
             backgroundItems={
               <>
@@ -224,6 +151,8 @@ export function TwoColLwInfoAndDeck(
                     moduleDef,
                     nestedLabwareDef,
                     nestedLabwareId,
+                    targetDeckId,
+                    targetSlotId,
                   }) => (
                     <Module
                       key={moduleId}
@@ -231,6 +160,8 @@ export function TwoColLwInfoAndDeck(
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
+                      targetDeckId={targetDeckId}
+                      targetSlotId={targetSlotId}
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
@@ -241,11 +172,15 @@ export function TwoColLwInfoAndDeck(
                 )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>
@@ -267,13 +202,13 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
-          layout={buildLayoutType()}
+          layout={'default'}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons
-        primaryBtnOnClick={primaryOnClick}
+        primaryBtnOnClick={proceedNextStep}
         secondaryBtnOnClick={goBackPrevStep}
       />
     </RecoverySingleColumnContentWrapper>

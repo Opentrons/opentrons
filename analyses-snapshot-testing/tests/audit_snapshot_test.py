@@ -1,4 +1,4 @@
-from tests.audit_snapshots import audit_snapshots
+from automation.audit_snapshots import audit_snapshots
 
 
 def test_audit_snapshots() -> None:

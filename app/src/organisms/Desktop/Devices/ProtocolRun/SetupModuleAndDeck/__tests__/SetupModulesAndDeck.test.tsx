@@ -128,7 +128,6 @@ describe('SetupModuleAndDeck', () => {
         cutoutFixtureId: 'trashBinAdapter',
         requiredAddressableAreas: ['movableTrashA1'],
         compatibleCutoutFixtureIds: ['trashBinAdapter'],
-        missingLabwareDisplayName: null,
       },
     ])
     render(props)

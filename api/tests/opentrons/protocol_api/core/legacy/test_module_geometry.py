@@ -37,6 +37,8 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
             "overLabwareHeight": 234,
             "xDimension": 345,
             "yDimension": 456,
+            "labwareInterfaceXDimension": 234,
+            "labwareInterfaceYDimension": 123,
         },
         "calibrationPoint": {"x": 111, "y": 222, "z": 333},
         "displayName": "Sample Module",
@@ -44,7 +46,6 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 
@@ -62,6 +63,8 @@ def minimal_heater_shaker_definition() -> ModuleDefinitionV3:
             "overLabwareHeight": 234,
             "xDimension": 345,
             "yDimension": 456,
+            "labwareInterfaceXDimension": 234,
+            "labwareInterfaceYDimension": 234,
         },
         "calibrationPoint": {"x": 111, "y": 222, "z": 333},
         "displayName": "Sample H/S Module",
@@ -69,7 +72,6 @@ def minimal_heater_shaker_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 
@@ -79,7 +81,12 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
     """A Gen1 Magnetic Module's schemaV1 definition fixture."""
     return {
         "labwareOffset": {"x": 11.0, "y": 22.0, "z": 33.0},
-        "dimensions": {"bareOverallHeight": 123, "overLabwareHeight": 321},
+        "dimensions": {
+            "bareOverallHeight": 123,
+            "overLabwareHeight": 321,
+            "labwareInterfaceXDimension": 12,
+            "labwareInterfaceYDimension": 23,
+        },
         "calibrationPoint": {"x": 44.0, "y": 55.0},
         "displayName": "Sample Old Module",
         "loadName": "magdeck",

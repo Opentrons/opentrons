@@ -11,7 +11,7 @@ import {
   ToggleButton,
 } from '@opentrons/components'
 
-import { featureFlagsAtom } from '../../resources/atoms'
+import { featureFlagsAtom } from '/ai-client/resources/atoms'
 
 export const FeatureFlags = (): JSX.Element | null => {
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)

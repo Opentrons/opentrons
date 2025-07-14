@@ -16,12 +16,14 @@ interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   setSelectedSetting: (setting: AspirateSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useAspirateSettingsConfig({
   state,
   dispatch,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -58,6 +60,7 @@ export function useAspirateSettingsConfig({
         state.submergeAspirate !== undefined
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
+              delayDuration: state.submergeAspirate.delayDuration,
               position: state.submergeAspirate.positionFromBottom,
             })
           : '',
@@ -100,13 +103,24 @@ export function useAspirateSettingsConfig({
       },
     },
     {
+      option: SETTING_OPTIONS.ASPIRATE_CONDITION,
+      copy: t('condition'),
+      value:
+        state.conditionAspirate != null || state.conditionAspirate !== 0
+          ? t('volume', { volume: state.conditionAspirate })
+          : '',
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
+      },
+    },
+    {
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
         state.delayAspirate !== undefined
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -121,6 +135,7 @@ export function useAspirateSettingsConfig({
         state.retractAspirate !== undefined
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
+              delayDuration: state.retractAspirate.delayDuration,
               position: state.retractAspirate.positionFromBottom,
             })
           : '',
@@ -134,7 +149,10 @@ export function useAspirateSettingsConfig({
       copy: t('touch_tip'),
       value:
         state.touchTipAspirate !== undefined
-          ? t('touch_tip_value', { position: state.touchTipAspirate })
+          ? t('touch_tip_value', {
+              speed: state.touchTipAspirateSpeed,
+              position: state.touchTipAspirate,
+            })
           : '',
       enabled: !sourceIsReservoir,
       onClick: () => {
@@ -159,5 +177,8 @@ export function useAspirateSettingsConfig({
     },
   ]
 
-  return aspirateSettingsItems
+  return aspirateSettingsItems.filter(
+    item =>
+      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
+  )
 }

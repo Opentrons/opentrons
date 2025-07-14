@@ -7,6 +7,9 @@
   "style": "src/index.module.css",
   "main": "src/index.ts",
   "module": "src/index.ts",
+  "exports": {
+    "./styles": "./src/styles/global.module.css"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"
@@ -41,7 +44,7 @@
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
-    "redux": "4.0.5",
+    "redux": "5.0.1",
     "styled-components": "5.3.6"
   },
   "devDependencies": {

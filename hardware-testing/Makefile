@@ -152,7 +152,7 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: test-stacker
 test-stacker:
-	$(python) -m hardware_testing.modules.flex_stacker_dvt_qc --simulate
+	$(python) -m hardware_testing.modules.flex_stacker_qc --simulate
 
 .PHONY: lint
 lint:
@@ -216,7 +216,7 @@ push-ot3:
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3
-	cd ../ && $(MAKE) -C shared-data push-ot3
+	#cd ../ && $(MAKE) -C shared-data push-ot3
 
 .PHONE: open-dev-app
 open-dev-app:

@@ -64,21 +64,23 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOut: boolean
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
   submergeAspirate?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractAspirate?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayAspirate?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipAspirate?: number
   touchTipAspirateSpeed?: number
@@ -90,24 +92,34 @@ export interface QuickTransferSummaryState {
   }
   submergeDispense?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractDispense?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayDispense?: {
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass
+  conditionAspirate?: number
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 
 export type TransferType =
@@ -150,6 +162,9 @@ export type QuickTransferSummaryAction =
   | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
+  | SetPushOut
+  | SetConditionAspirate
+  | SetDisposalVolumeDispense
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -181,12 +196,12 @@ interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipAspirate {
   type: typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
   position?: number
+  touchTipAspirateSpeed?: number
 }
 interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
@@ -196,6 +211,7 @@ interface SetSubmergeAspirate {
   type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
   submergeSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -203,6 +219,7 @@ interface SetRetractAspirate {
   type: typeof ACTIONS.SET_RETRACT_ASPIRATE
   retractSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -218,16 +235,19 @@ interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipDispense {
   type: typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
   position?: number
+  touchTipDispenseSpeed?: number
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
-  location?: BlowOutLocation
+  blowOutSettings?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
 }
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
@@ -237,6 +257,7 @@ interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
   submergeSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -244,6 +265,7 @@ interface SetRetractDispense {
   type: typeof ACTIONS.SET_RETRACT_DISPENSE
   retractSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -289,4 +311,23 @@ interface SetDestWellsAction {
 interface SetVolumeAction {
   type: typeof ACTIONS.SET_VOLUME
   volume: number
+}
+
+interface SetPushOut {
+  type: typeof ACTIONS.SET_PUSH_OUT
+  pushOut: boolean
+}
+
+interface SetConditionAspirate {
+  type: typeof ACTIONS.SET_CONDITION_ASPIRATE
+  conditionAspirate: number
+}
+
+interface SetDisposalVolumeDispense {
+  type: typeof ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }

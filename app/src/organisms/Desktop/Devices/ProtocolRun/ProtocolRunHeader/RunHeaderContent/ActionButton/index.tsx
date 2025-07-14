@@ -16,7 +16,7 @@ import {
 
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
+import { selectIsAnyNecessaryDefaultOffsetMissing } from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
@@ -72,14 +72,16 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName
   )
   const currentRunId = useCurrentRunId()
-  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const isRequiredOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
 
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
     missingModuleIds.length === 0
   const isRobotTypeSetupComplete = isFlex
-    ? isSetupComplete && areOffsetsApplied
+    ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
 
   const isCurrentRun = currentRunId === runId

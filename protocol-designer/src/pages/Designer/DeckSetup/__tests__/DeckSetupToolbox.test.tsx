@@ -14,7 +14,7 @@ import {
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 import { SelectLabwareModal } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   deleteContainer,
@@ -47,7 +47,7 @@ vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../../components/organisms/SelectLabwareModal')
 vi.mock('../../../../ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {

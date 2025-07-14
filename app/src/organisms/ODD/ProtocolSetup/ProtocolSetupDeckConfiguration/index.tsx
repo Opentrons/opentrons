@@ -12,6 +12,7 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
@@ -30,6 +31,7 @@ import { DeckConfigurationDiscardChangesModal } from '../../../DeviceDetailsDeck
 import type { Dispatch, SetStateAction } from 'react'
 import type { ModuleOnDeck } from '@opentrons/components'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureId,
   CutoutId,
   ModuleModel,
@@ -38,6 +40,7 @@ import type { SetupScreens } from '../types'
 
 interface ProtocolSetupDeckConfigurationProps {
   cutoutId: CutoutId | null
+  addressableAreaId: AddressableAreaNamesWithFakes | null
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   providedFixtureOptions: CutoutFixtureId[]
@@ -45,6 +48,7 @@ interface ProtocolSetupDeckConfigurationProps {
 
 export function ProtocolSetupDeckConfiguration({
   cutoutId,
+  addressableAreaId,
   runId,
   setSetupScreen,
   providedFixtureOptions,
@@ -133,14 +137,18 @@ export function ProtocolSetupDeckConfiguration({
               setShowConfirmationModal={setShowDiscardChangeModal}
             />
           ) : null}
-          {showConfigurationModal && cutoutId != null ? (
+          {showConfigurationModal &&
+          cutoutId != null &&
+          addressableAreaId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
+              addressableAreaId={addressableAreaId}
               closeModal={() => {
                 setShowConfigurationModal(false)
               }}
               providedFixtureOptions={providedFixtureOptions}
               isOnDevice
+              deckDef={getDeckDefFromRobotType(FLEX_ROBOT_TYPE)}
             />
           ) : null}
         </>,

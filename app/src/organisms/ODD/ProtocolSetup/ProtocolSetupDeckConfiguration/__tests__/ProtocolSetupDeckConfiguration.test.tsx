@@ -4,6 +4,7 @@ import { when } from 'vitest-when'
 
 import { BaseDeck } from '@opentrons/components'
 import {
+  useCreateLiveCommandMutation,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -19,6 +20,7 @@ import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { Modules } from '@opentrons/api-client'
 import type {
+  AddressableAreaNamesWithFakes,
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -57,11 +59,13 @@ const render = (
 
 describe('ProtocolSetupDeckConfiguration', () => {
   let props: ComponentProps<typeof ProtocolSetupDeckConfiguration>
+  const mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
       runId: 'mockRunId',
+      addressableAreaId: 'D3' as AddressableAreaNamesWithFakes,
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],
     }
@@ -78,6 +82,10 @@ describe('ProtocolSetupDeckConfiguration', () => {
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
+    mockCreateLiveCommand.mockResolvedValue(null)
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
 
   afterEach(() => {

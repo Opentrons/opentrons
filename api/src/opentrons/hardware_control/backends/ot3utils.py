@@ -3,7 +3,6 @@ from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Op
 from typing_extensions import Literal
 from logging import getLogger
 from opentrons.config.defaults_ot3 import (
-    DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
     DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED,
 )
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
@@ -216,7 +215,7 @@ def get_current_settings(
                 hold_current=conf_by_pip["hold_current"][axis_kind],
                 run_current=conf_by_pip["run_current"][axis_kind],
             )
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         # In high-throughput configuration, the right mount doesn't do anything: the
         # lead screw nut is disconnected from the carriage, and it just hangs out
         # up at the top of the axis. We should therefore not give it a lot of current.
@@ -243,7 +242,7 @@ def get_system_constraints(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         axis_kind_list.append(OT3AxisKind.Q)
     for axis_kind in axis_kind_list:
         for axis in Axis.of_kind(axis_kind):
@@ -252,29 +251,6 @@ def get_system_constraints(
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
                 conf_by_pip["default_max_speed"][axis_kind],
-            )
-    return constraints
-
-
-def get_system_constraints_for_calibration(
-    config: OT3MotionSettings,
-    gantry_load: GantryLoad,
-) -> "SystemConstraints[Axis]":
-    conf_by_pip = config.by_gantry_load(gantry_load)
-    constraints = {}
-    for axis_kind in [
-        OT3AxisKind.P,
-        OT3AxisKind.X,
-        OT3AxisKind.Y,
-        OT3AxisKind.Z,
-        OT3AxisKind.Z_G,
-    ]:
-        for axis in Axis.of_kind(axis_kind):
-            constraints[axis] = AxisConstraints.build(
-                conf_by_pip["acceleration"][axis_kind],
-                conf_by_pip["max_speed_discontinuity"][axis_kind],
-                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
-                DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
             )
     return constraints
 

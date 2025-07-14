@@ -12,13 +12,13 @@ import {
   GENERAL_ERROR_OPTIONS,
   getRecoveryOptions,
   GRIPPER_ERROR_OPTIONS,
-  LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
   NO_LIQUID_DETECTED_OPTIONS,
   OVERPRESSURE_PREPARE_TO_ASPIRATE,
   OVERPRESSURE_WHILE_ASPIRATING_OPTIONS,
   OVERPRESSURE_WHILE_DISPENSING_OPTIONS,
   RecoveryOptions,
   SelectRecoveryOption,
+  STACKER_SHUTTLE_EMPTY_OPTIONS,
   STALL_OR_COLLISION_OPTIONS,
   TIP_DROP_FAILED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
@@ -325,13 +325,13 @@ describe('RecoveryOptions', () => {
       .thenReturn('Home gantry and retry')
     when(mockGetRecoveryOptionCopy)
       .calledWith(
-        RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
         expect.any(String)
       )
       .thenReturn('manually_load_labware_into_shuttle_and_skips')
     when(mockGetRecoveryOptionCopy)
       .calledWith(
-        RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
         expect.any(String)
       )
       .thenReturn('replace_labware_in_stacker_and_retry')
@@ -407,10 +407,10 @@ describe('RecoveryOptions', () => {
     screen.getByRole('label', { name: 'Cancel run' })
   })
 
-  it(`renders valid recovery options for a ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE} errorKind`, () => {
+  it(`renders valid recovery options for a ${ERROR_KINDS.STACKER_SHUTTLE_EMPTY} errorKind`, () => {
     props = {
       ...props,
-      validRecoveryOptions: LABWARE_MISSING_IN_SHUTTLE_OPTIONS,
+      validRecoveryOptions: STACKER_SHUTTLE_EMPTY_OPTIONS,
     }
 
     renderRecoveryOptions(props)
@@ -552,12 +552,10 @@ describe('getRecoveryOptions', () => {
     expect(stallOrCollisionOptions).toBe(STALL_OR_COLLISION_OPTIONS)
   })
 
-  it(`returns valid options when the errorKind is ${ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE}`, () => {
+  it(`returns valid options when the errorKind is ${ERROR_KINDS.STACKER_SHUTTLE_EMPTY}`, () => {
     const labwareMissingInShuttleOptions = getRecoveryOptions(
-      ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE
+      ERROR_KINDS.STACKER_SHUTTLE_EMPTY
     )
-    expect(labwareMissingInShuttleOptions).toBe(
-      LABWARE_MISSING_IN_SHUTTLE_OPTIONS
-    )
+    expect(labwareMissingInShuttleOptions).toBe(STACKER_SHUTTLE_EMPTY_OPTIONS)
   })
 })
