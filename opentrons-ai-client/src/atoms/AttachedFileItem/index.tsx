@@ -35,6 +35,7 @@ const getSimpleFileTypeLabel = (type: string, fileName: string): string => {
 }
 
 // Helper to get file extension for display in the icon container
+// eg., example.py, somehting.pdf. first.csv
 const getFileExtension = (fileName: string): string => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   return extension != null && extension !== '' ? `.${extension}` : '.file'
