@@ -25,7 +25,7 @@ import {
   localStorageAnnouncementKey,
   setLocalStorageItem,
 } from '../../persist'
-import styles from './Landing.module.css'
+import styles from './landing.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
