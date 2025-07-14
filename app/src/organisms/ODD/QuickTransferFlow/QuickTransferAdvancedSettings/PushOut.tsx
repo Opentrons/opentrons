@@ -119,7 +119,6 @@ export function PushOut(props: PushOutProps): JSX.Element {
   }
 
   const pushOutMaxVolume = getMaxPushOutVolume(state.volume, state.pipette)
-  console.log('pushOutMaxVolume', pushOutMaxVolume)
   const volumeError =
     volume != null && volume > pushOutMaxVolume
       ? t('value_out_of_range', { min: 0, max: pushOutMaxVolume })
