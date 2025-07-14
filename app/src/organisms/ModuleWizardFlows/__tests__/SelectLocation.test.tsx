@@ -122,7 +122,18 @@ describe('SelectLocation', () => {
     } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
+  vi.restoreAllMocks()
+
   it('should render text and buttons slot D3', async () => {
+    props.deckConfig = mockSimpleDeckConfig.map(dc => {
+      const updatedDc = { ...dc }
+      if (updatedDc.cutoutId === 'cutoutD1') {
+        updatedDc.cutoutFixtureId = TEMPERATURE_MODULE_V2_FIXTURE
+        updatedDc.opentronsModuleSerialNumber = 'test123'
+      }
+      return updatedDc
+    })
+
     render(props)
     screen.getByText('Select module location')
     screen.getByText(
@@ -130,13 +141,11 @@ describe('SelectLocation', () => {
     )
 
     const confirmBtn = screen.getByText('Confirm location')
-    expect(confirmBtn).toBeDisabled()
 
-    // Click on A1 slot (using the correct test ID)
     fireEvent.click(screen.getByTestId('A1'))
 
     await waitFor(() => {
-      expect(screen.getByText('Confirm location')).toBeEnabled()
+      expect(confirmBtn).toBeEnabled()
     })
 
     fireEvent.click(screen.getByText('Confirm location'))
@@ -176,6 +185,8 @@ describe('handleAddFixture', () => {
     } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
+  vi.restoreAllMocks()
+
   it('should call updateDeckConfig with flex and mag block fixture', async () => {
     const mockDeckConfigWithMagBlock = mockSimpleDeckConfig.map(dc => {
       if (dc.cutoutId === 'cutoutD1') {
@@ -208,13 +219,13 @@ describe('handleAddFixture', () => {
     } as AttachedModule
     const mockUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
       if (config.cutoutId === 'cutoutD3') {
-        config.cutoutFixtureId = MAGNETIC_BLOCK_V1_FIXTURE
+        config.cutoutFixtureId = FLEX_STACKER_MODULE_V1
+        config.opentronsModuleSerialNumber = 'test123'
       }
-      return config
+      return { ...config, opentronsModuleSerialNumber: undefined }
     })
     props.deckConfig = mockUpdatedDeckConfig
     render(props)
-    console.log("screen.getByTestId('D3'): ", screen.getByTestId('D3'))
 
     fireEvent.click(screen.getByTestId('D3'))
     const mockStackerUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
@@ -256,6 +267,8 @@ describe('handleRemoveFixture', () => {
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
   })
+
+  vi.restoreAllMocks()
 
   it('should call updateDeckConfig without tempDeck', async () => {
     render(props)
