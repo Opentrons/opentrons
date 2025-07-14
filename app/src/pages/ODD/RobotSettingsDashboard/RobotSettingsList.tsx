@@ -30,7 +30,7 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import { useLEDLights } from '/app/resources/robot-settings'
 
-import styles from './RobotSettingsList.module.css'
+import styles from './robotsettingslist.module.css'
 
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
