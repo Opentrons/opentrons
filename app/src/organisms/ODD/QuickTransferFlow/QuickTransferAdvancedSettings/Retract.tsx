@@ -297,7 +297,6 @@ function RetractSettingComponent({
           paddingX={SPACING.spacing24}
           height="21.25rem"
           marginTop="7.75rem"
-          borderRadius="0"
         >
           <NumericalKeyboard
             key={`${kind}_delay_duration_keyboard`}
@@ -338,7 +337,6 @@ function RetractSettingComponent({
           paddingX={SPACING.spacing24}
           height="21.25rem"
           marginTop="7.75rem"
-          borderRadius="0"
         >
           <NumericalKeyboard
             key={`${kind}_position_keyboard`}
