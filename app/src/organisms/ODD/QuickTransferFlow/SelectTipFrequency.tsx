@@ -38,7 +38,7 @@ export function SelectTipFrequency({
     setSelectedChangeTipOption,
   ] = useState<ChangeTipOptions>()
 
-  const allowedChangeTipOptions: ChangeTipOptions[] = ['once', 'never']
+  const allowedChangeTipOptions: ChangeTipOptions[] = ['once']
   if (
     state.sourceWells !== undefined &&
     state.pipette !== undefined &&

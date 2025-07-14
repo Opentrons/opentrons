@@ -51,7 +51,6 @@ describe('SelectTipFrequency', () => {
     screen.getByText('Exit')
     screen.getByText('Continue')
     screen.getByText('Once')
-    screen.getByText('Never')
     screen.getByText('Per source')
   })
 
