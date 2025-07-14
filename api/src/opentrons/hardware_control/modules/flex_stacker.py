@@ -81,6 +81,7 @@ HOME_OFFSET_MD = 10.0
 PLATFORM_OFFSET = 2.25
 
 # Should put the bottom of the plate above this mm above the latch when dispensing.
+# Should put the bottom of the plate this mm below the latch when storing.
 LATCH_CLEARANCE = 2.5
 
 # Configs
@@ -552,13 +553,13 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
         # Move the Z so the labware sits right under any labware already stored
-        latch_clear_distance = labware_height - PLATFORM_OFFSET - LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         await self.open_latch()
         # Move the labware the rest of the way at half move speed to increase torque.
-        remaining_z = distance - HOME_OFFSET_SM
+        remaining_z = latch_clear_distance - HOME_OFFSET_SM
         speed_z = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, remaining_z, speed_z)
         await self.home_axis(StackerAxis.Z, Direction.EXTEND, speed_z)

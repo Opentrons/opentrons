@@ -358,13 +358,13 @@ async def test_store_labware_motion_sequence(
         verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Assertions for offset calculation and move_axis
-        latch_clear_distance = labware_height - PLATFORM_OFFSET - LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
+        z_distance = latch_clear_distance - HOME_OFFSET_SM
         z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_distance, z_speed)
         home_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_speed)
