@@ -4,7 +4,6 @@ import { getWellRangeForLiquidLabwarePair } from '@opentrons/shared-data'
 
 import {
   getDisabledWellGroupForLiquidId,
-  getLiquidsByIdForLabware,
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
   getWellFillFromLabwareId,
@@ -265,14 +264,6 @@ describe('getTotalVolumePerLiquidLabwarePair', () => {
         MOCK_LABWARE_BY_LIQUID_ID
       )
     ).toEqual(expected)
-  })
-})
-
-describe('getLiquidsByIdForLabware', () => {
-  it('returns liquid info by labware id', () => {
-    expect(
-      getLiquidsByIdForLabware(LABWARE_ID, MOCK_LABWARE_BY_LIQUID_ID as any)
-    ).toEqual(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE)
   })
 })
 

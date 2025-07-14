@@ -1,41 +1,59 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getCutoutDisplayName,
-  getLabwareDefURI,
-  getSlotFromAddressableAreaName,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-} from '@opentrons/shared-data'
-
-import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
-
-import { getLabwareDefinitionsByURIForProtocol } from '@opentrons/shared-data/js/helpers/getLabwareDefinitionsByURIForProtocol'
-import { getStackedItemsOnStartingDeck } from '@opentrons/shared-data/js/helpers/getStackedItemsOnStartingDeck'
+} from '../../constants'
+import { getCutoutDisplayName } from '../../fixtures'
+import { getLabwareDefinitionsByURIForProtocol } from '../getLabwareDefinitionsByURIForProtocol'
+import { getLabwareDefURI } from '../getLabwareDefURI'
+import { getStackedItemsOnStartingDeck } from '../getStackedItemsOnStartingDeck'
+import { getSlotFromAddressableAreaName } from '../parseAddressableArea'
 
 import type {
-  LabwareDefinition2,
-  LoadedLabware,
-  LoadedModule,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
-  ModuleModel,
   RunTimeCommand,
-} from '@opentrons/shared-data'
+} from '../../../protocol'
+import type {
+  LabwareDefinition,
+  LabwareDefinition2,
+  LoadedLabware,
+  LoadedModule,
+  ModuleModel,
+} from '../../types'
 
-vi.mock('@opentrons/shared-data', async () => {
-  const actual = await vi.importActual('@opentrons/shared-data')
-  return {
-    ...actual,
-    getCutoutDisplayName: vi.fn(),
-    getSlotFromAddressableAreaName: vi.fn(),
-    getLabwareDefURI: vi.fn(),
-  }
-})
+vi.mock('../../fixtures')
+vi.mock('../parseAddressableArea')
+vi.mock('../getLabwareDefURI')
 vi.mock('../getLabwareDefinitionsByURIForProtocol')
+
+const mockDefinition: LabwareDefinition = {
+  version: 1,
+  schemaVersion: 2,
+  namespace: 'custom',
+  metadata: {
+    displayName: 'Mock Definition',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'mL',
+  },
+  dimensions: { xDimension: 0, yDimension: 0, zDimension: 0 },
+  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+  parameters: {
+    loadName: 'mock_definition',
+    format: 'mock',
+    isTiprack: false,
+    tipLength: 1,
+    isMagneticModuleCompatible: false,
+  },
+  brand: { brand: 'Opentrons' },
+  ordering: [],
+  wells: {},
+  groups: [],
+}
 
 const MOCK_LABWARE_DEF = mockDefinition
 const MOCK_ADAPTER_DEF: LabwareDefinition2 = {

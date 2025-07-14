@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLabwareInfoByLiquidId } from '@opentrons/shared-data/js/helpers/getLabwareInfoByLiquidId'
+import { getLabwareInfoByLiquidId } from '../getLabwareInfoByLiquidId'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '../../../protocol'
 
 const mockLoadLiquidRunTimeCommands = [
   {

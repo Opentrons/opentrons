@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  getAllLiquidClassDefs,
-  getFlexNameConversion,
-  linearInterpolate,
-} from '../..'
+import { getAllLiquidClassDefs } from '../../liquidClasses'
+import { getFlexNameConversion } from '../../pipettes'
+import { linearInterpolate } from '../linearInterpolate'
 import { getByVolumeValue } from '../liquidClasses'
 
-vi.mock('../..')
+vi.mock('../../liquidClasses')
+vi.mock('../../pipettes')
+vi.mock('../linearInterpolate')
 
 const MOCK_PIPETTE_ID = 'flex_1channel_1000ul'
 const MOCK_UNKNOWN_PIPETTE_ID = 'flex_1channel_99ul'

@@ -16,8 +16,8 @@ import {
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 
-import { SetupLabware } from '..'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
+import { SetupLabware } from '../index'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
