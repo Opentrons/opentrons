@@ -79,8 +79,6 @@
   font-size: var(--font-size-p);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
-  color: var(--black-90);
-  font-family: 'Public Sans', sans-serif;
   font-style: normal;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -91,7 +89,5 @@
   font-size: var(--font-size-p);
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-16);
-  color: var(--black-90);
-  font-family: 'Public Sans', sans-serif;
   font-style: normal;
 }
