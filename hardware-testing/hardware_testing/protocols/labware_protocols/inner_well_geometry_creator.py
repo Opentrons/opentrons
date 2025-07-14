@@ -39,12 +39,10 @@ SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C2"
 SLOT_DIAL = "B2"
 
-RAMP_FRACTION = 1/3
-
 #below threshold, alpha low. above threshold, alpha high 
 THRESHOLD = 3.5
 #sensitivity values for bottom and top zones:
-ALPHA_LOW = 2.5      
+ALPHA_LOW = 2      
 ALPHA_HIGH = 1     
 
 # how many heights included in rolling average 
@@ -283,8 +281,7 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     if ctx.is_simulating():
         return
     from hardware_testing.data import append_data_to_file
-
-    # Format each field to a fixed width for even spacing (e.g., 15 chars)
+    
     formatted_line = [str(item).ljust(15) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
@@ -355,13 +352,9 @@ def run(ctx: ProtocolContext) -> None:
     tip_z_error = 0.0
     step = 0
     hdelta = 0.0
-    #delta_history = deque(maxlen=SMOOTHING_WINDOW)
 
-    # Store baseline and header
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
-
-    # ------------------ Helpers ------------------ #
 
     def pick_up_tips() -> None:
         if not probe_pipette.has_tip:
@@ -381,30 +374,26 @@ def run(ctx: ProtocolContext) -> None:
     def adaptive_volume_step(hdelta: float, height: float, step_volume: float, neutral_target: float) -> float:  # desired steady state height step in mm
         delta_tolerance = 0.2  # acceptable +/- mm around target
 
-        lower_bound = neutral_target - delta_tolerance  # 0.8
-        upper_bound = neutral_target + delta_tolerance  # 1.2
+        lower_bound = neutral_target - delta_tolerance 
+        upper_bound = neutral_target + delta_tolerance  
 
         alpha = get_alpha_for_height(height)
 
         if lower_bound <= hdelta <= upper_bound:
-            # Height change close to target, maintain current volume
             return step_volume
 
         elif hdelta < lower_bound and hdelta > 0:
-            # Height increase smaller than target, increase volume gently
             diff = neutral_target - hdelta
-            new_volume = step_volume * (1 + alpha * diff)  # increase proportional to difference
+            new_volume = step_volume * (1 + alpha * diff) 
 
         elif hdelta > upper_bound:
-            # Height increase larger than target, decrease volume gently
             diff = hdelta - neutral_target
-            new_volume = step_volume * max(0.5, 1 - alpha * diff)  # decrease proportional to difference, but not too low
+            new_volume = step_volume * max(0.2, 1 - alpha * diff) 
 
         else:
             # hdelta <= 0 
-            new_volume = step_volume * 0.8  # cautiously reduce volume
+            new_volume = step_volume
 
-        # Clamp new_volume within limits
         new_volume = max(min_step, min(max_step, new_volume))
 
         return new_volume
@@ -417,12 +406,11 @@ def run(ctx: ProtocolContext) -> None:
             round(volume_dispensed, 5),
             round(tip_z_error, 5),
             round(corrected_height, 5),
-            #round(sum(delta_history) / len(delta_history), 5),
             round(hdelta,5)
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
-    # ------------------ Begin Protocol ------------------ #
+    ################ Begin Protocol 
 
     drop_tips()
 
