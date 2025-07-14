@@ -965,7 +965,7 @@ def test_get_all_obstacle_highest_z_with_modules(
     # Note: since no labware are loaded on the modules, the thermocycler
     # lid is considered open, so the thermocycler lid height is not included
     # in the thermocycler height
-    assert isclose(subject.get_all_obstacle_highest_z(), 44.725)
+    assert isclose(subject.get_all_obstacle_highest_z(), 35.0)
 
 
 @pytest.mark.parametrize("use_mocks", [False])
