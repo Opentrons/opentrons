@@ -58,13 +58,11 @@ function InterventionStyleDeckMapContent(
   props: InterventionStyleDeckMapContentProps
 ): JSX.Element {
   const labwareWithHighlights =
-    props.labwareOnDeck?.map(labwareOnDeck =>
-      props.highlightLabwareEventuallyIn.reduce(
-        (found, locationToMatch) =>
-          found ||
-          getIsLabwareMatch(labwareOnDeck.labwareLocation, locationToMatch),
-        false
+    props.labwareOnDeck?.map(labwareOnDeck => {
+      const found = props.highlightLabwareEventuallyIn.some(locationToMatch =>
+        getIsLabwareMatch(labwareOnDeck.labwareLocation, locationToMatch)
       )
+      return found
         ? {
             ...labwareOnDeck,
             labwareChildren: (
@@ -75,14 +73,14 @@ function InterventionStyleDeckMapContent(
             ),
           }
         : labwareOnDeck
-    ) ?? []
+    }) ?? []
+
   const modulesWithHighlights =
-    props.modulesOnDeck?.map(module =>
-      props.highlightLabwareEventuallyIn.reduce(
-        (found, locationToMatch) =>
-          found || getIsLabwareMatch(module.moduleLocation, locationToMatch),
-        false
+    props.modulesOnDeck?.map(module => {
+      const found = props.highlightLabwareEventuallyIn.some(locationToMatch =>
+        getIsLabwareMatch(module.moduleLocation, locationToMatch)
       )
+      return found
         ? {
             ...module,
             moduleChildren:
@@ -94,7 +92,8 @@ function InterventionStyleDeckMapContent(
               ) : undefined,
           }
         : module
-    ) ?? []
+    }) ?? []
+
   return (
     <BaseDeck
       deckConfig={props.deckConfig}
