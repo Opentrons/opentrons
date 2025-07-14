@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -19,8 +19,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 import { AirGap } from './AirGap'
@@ -49,15 +47,7 @@ export function QuickTransferAdvancedSettings(
   const { state, dispatch } = props
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const [selectedSetting, setSelectedSetting] = useState<string | null>(null)
-  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { makeSnackbar } = useToaster()
-
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_ADVANCED_SETTINGS_TAB,
-      properties: {},
-    })
-  }, [])
 
   const getBlowoutValueCopy = (): string | undefined => {
     if (state.blowOutDispense?.location === 'dest_well') {
