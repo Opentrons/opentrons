@@ -56,14 +56,14 @@ describe('StartingDeck', () => {
     screen.getByText('Protocol Starting Deck')
     screen.getByText('Materials list')
     screen.getByRole('button', { name: 'On deck' })
-    screen.getByRole('button', { name: 'Off deck' })
+    screen.getByRole('button', { name: 'Off-deck' })
     screen.getByText('mock DeckThumbnail')
   })
 
   it('should render off deck when clicking toggle button', () => {
     render(props)
     screen.getByText('mock DeckThumbnail')
-    fireEvent.click(screen.getByRole('button', { name: 'Off deck' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Off-deck' }))
     screen.getByText('mock OffDeckThumbnail')
   })
 
