@@ -45,8 +45,6 @@ THRESHOLD = 3.5
 ALPHA_LOW = 2      
 ALPHA_HIGH = 1     
 
-# how many heights included in rolling average 
-SMOOTHING_WINDOW = 2
 
 ###########################################
 #  VARIABLES - END
@@ -281,7 +279,7 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     if ctx.is_simulating():
         return
     from hardware_testing.data import append_data_to_file
-    
+
     formatted_line = [str(item).ljust(15) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
@@ -339,8 +337,8 @@ def run(ctx: ProtocolContext) -> None:
     ) = _setup(ctx)
 
     # Constants
-    min_step = max_volume * 0.005
-    max_step = max_volume * 0.05
+    min_step = max(max_volume * 0.005, 5)
+    max_step = min(max_volume * 0.08, 1000)
     tolerance = max_volume / 30 #if the height within tolerance, then protocol can finish. 
 
     # Initialize state
@@ -371,8 +369,9 @@ def run(ctx: ProtocolContext) -> None:
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
+    #proportional controller 
     def adaptive_volume_step(hdelta: float, height: float, step_volume: float, neutral_target: float) -> float:  # desired steady state height step in mm
-        delta_tolerance = 0.2  # acceptable +/- mm around target
+        delta_tolerance = neutral_target * 0.2   # deadband
 
         lower_bound = neutral_target - delta_tolerance 
         upper_bound = neutral_target + delta_tolerance  
@@ -391,13 +390,12 @@ def run(ctx: ProtocolContext) -> None:
             new_volume = step_volume * max(0.2, 1 - alpha * diff) 
 
         else:
-            # hdelta <= 0 
+            # hdelta <= 0, probe hallucination 
             new_volume = step_volume
 
         new_volume = max(min_step, min(max_step, new_volume))
 
         return new_volume
-
 
     def write_trial_log() -> None:
         trial_data = [
