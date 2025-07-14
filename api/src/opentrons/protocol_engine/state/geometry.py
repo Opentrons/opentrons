@@ -24,7 +24,6 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     InnerWellGeometry,
-    UserDefinedVolumes,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -2074,10 +2073,8 @@ class GeometryView:
         labware_id: str,
         well_name: str,
         target_height: LiquidTrackingType,
-        # well_geometry: InnerWellGeometry | UserDefinedVolumes,
     ) -> LiquidTrackingType:
         """Call the correct volume from height function based on well geoemtry type."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
@@ -2097,7 +2094,6 @@ class GeometryView:
         target_volume: LiquidTrackingType,
     ) -> LiquidTrackingType:
         """Call the correct height from volume function based on well geoemtry type."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
@@ -2197,7 +2193,6 @@ class GeometryView:
         well_volumetric_capacity = float(well_def.totalLiquidVolume)
         if well_location.origin == WellOrigin.MENISCUS:
             # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
-            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
             )

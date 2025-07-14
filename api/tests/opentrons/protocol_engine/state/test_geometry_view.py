@@ -4440,7 +4440,7 @@ def test_virtual_find_height_and_volume(
         well_geometry=_TEST_INNER_WELL_GEOMETRY,
     )
 
-    volume_estimate = find_volume_user_defined_volumes(
+    volume_estimate = find_volume_inner_well_geometry(
         target_height=target_height_volume, well_geometry=_TEST_INNER_WELL_GEOMETRY
     )
 
@@ -4469,6 +4469,7 @@ def test_get_user_volumes(
     labware_store.handle_action(load_labware)
     well_def = subject._labware.get_well_definition("labware-id-1", "A1")
     well_geometry = subject._labware.get_well_geometry("labware-id-1", "A1")
+    assert isinstance(well_geometry, UserDefinedVolumes)
 
     def _expected_volume_result(
         target_height: float, well_geometry: UserDefinedVolumes
@@ -4490,6 +4491,7 @@ def test_get_user_volumes(
                 return target_volume
             prev_height = pair.height
             prev_volume = pair.volume
+        raise ValueError("test function unable to find volume.")
 
     for i in range(50):
         target_height_volume = target_height_volume_st.draw(
@@ -4529,6 +4531,7 @@ def test_get_user_heights(
     labware_store.handle_action(load_labware)
     well_def = subject._labware.get_well_definition("labware-id-1", "A1")
     well_geometry = subject._labware.get_well_geometry("labware-id-1", "A1")
+    assert isinstance(well_geometry, UserDefinedVolumes)
 
     def _expected_height_result(
         target_volume: float, well_geometry: UserDefinedVolumes
@@ -4551,6 +4554,7 @@ def test_get_user_heights(
                 return target_height
             prev_volume = pair.volume
             prev_height = pair.height
+        raise ValueError("test function unable to find volume.")
 
     for i in range(50):
         target_height_volume = target_height_volume_st.draw(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any
 from pydantic import BaseModel, model_serializer, model_validator
 
 
