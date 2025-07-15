@@ -2,7 +2,7 @@ import { COLORS, Icon } from '@opentrons/components'
 
 import { getFileType } from '/ai-client/resources/utils/fileUtils'
 
-import styles from './AttachedFileItem.module.css'
+import styles from './attachedfileitem.module.css'
 
 interface AttachedFileItemProps {
   file: {

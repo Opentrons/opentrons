@@ -27,7 +27,7 @@ import {
 } from '/ai-client/resources/atoms'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
-import styles from './ChatDisplay.module.css'
+import styles from './chatdisplay.module.css'
 
 import type { ChatData } from '/ai-client/resources/types'
 

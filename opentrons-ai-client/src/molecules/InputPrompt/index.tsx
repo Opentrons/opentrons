@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
-import { SendButton } from '/ai-client/atoms/SendButton'
+import { SendButton } from '/ai-client/atoms/sendbutton'
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -38,7 +38,7 @@ import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 
 import { AttachedFileItem } from '../../atoms/AttachedFileItem'
 import { AttachFileButton } from '../../atoms/AttachFileButton'
-import styles from './InputPrompt.module.css'
+import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'

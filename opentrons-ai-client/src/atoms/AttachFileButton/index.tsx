@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Icon } from '@opentrons/components'
 
-import styles from './AttachFileButton.module.css'
+import styles from './attachfilebutton.module.css'
 
 const ACCEPT_EXTENSION = '.pdf,.csv,.py'
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, Icon } from '@opentrons/components'
 
-import styles from './SendButton.module.css'
+import styles from './sendbutton.module.css'
 
 interface SendButtonProps {
   handleClick: () => void
