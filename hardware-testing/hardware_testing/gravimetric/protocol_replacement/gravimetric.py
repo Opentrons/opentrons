@@ -978,6 +978,16 @@ def run_one_test(
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
+    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    volume_lost_since_last_trial = calculate_change_in_volume(
+        last_measurement, pre_aspirate, liq
+    )
+    if not fixture_settings.ctx.is_simulating():
+        fixture_settings.liquid_source.load_liquid(
+            fixture_settings.liquid,
+            fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
+            - volume_lost_since_last_trial,
+        )
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
