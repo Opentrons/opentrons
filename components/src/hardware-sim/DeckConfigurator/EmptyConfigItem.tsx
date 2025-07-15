@@ -59,11 +59,11 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     cutout => cutout.id === fixtureLocation
   )
 
-  const isAllowedOnSlot = isModuleAllowedOnAA(
+  const isAllowedOnSlot = moduleModel ? isModuleAllowedOnAA(
     fixtureLocation,
     addressableAreaId,
     moduleModel
-  )
+  ) : true
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
