@@ -64,7 +64,9 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
-  pushOut: boolean
+  pushOutDispense?: {
+    volume: number
+  }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
@@ -318,7 +320,9 @@ interface SetVolumeAction {
 
 interface SetPushOut {
   type: typeof ACTIONS.SET_PUSH_OUT
-  pushOut: boolean
+  pushOutSettings?: {
+    volume: number
+  }
 }
 
 interface SetConditionAspirate {
