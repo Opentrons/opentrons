@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
-import { SendButton } from '/ai-client/atoms/sendbutton'
+import { SendButton } from '/ai-client/atoms/SendButton'
 import {
   chatDataAtom,
   chatHistoryAtom,
