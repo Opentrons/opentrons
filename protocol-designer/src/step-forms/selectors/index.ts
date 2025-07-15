@@ -444,35 +444,6 @@ export const getEquippedPipetteOptions: Selector<
     []
   )
 })
-// Formats pipette data specifically for file page InstrumentGroup component
-type PipettesForInstrumentGroup = ComponentProps<typeof InstrumentGroup>
-export const getPipettesForInstrumentGroup: Selector<
-  BaseState,
-  PipettesForInstrumentGroup
-> = createSelector(getInitialDeckSetup, initialDeckSetup =>
-  reduce(
-    initialDeckSetup.pipettes,
-    (
-      acc: PipettesForInstrumentGroup,
-      pipetteOnDeck: PipetteOnDeck,
-      pipetteId
-    ) => {
-      const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
-      const pipetteForInstrumentGroup: InstrumentInfoProps = {
-        mount: pipetteOnDeck.mount,
-        pipetteSpecs: pipetteSpec,
-        description: _getPipetteDisplayName(pipetteOnDeck.name),
-        tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
-          getLabwareDisplayName(def)
-        ),
-      }
-      acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
-      return acc
-    },
-    {}
-  )
-)
 export const getPipettesForEditPipetteForm: Selector<
   BaseState,
   FormPipettesByMount
