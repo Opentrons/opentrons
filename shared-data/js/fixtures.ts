@@ -1087,7 +1087,7 @@ export const isModuleAllowedOnAA = (
     const aaForFixture = getAAWithFakesFromCutoutFixtureId(
       cutoutId,
       fixtureId[0],
-      getDeckDefFromRobotType('OT-3 Standard')
+      getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
     console.log('aa: ', aa)
     const aaWithSlotLikeId = aaForFixture?.map(item => {
