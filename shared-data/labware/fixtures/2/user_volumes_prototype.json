@@ -30,7 +30,7 @@
   "parameters": {
     "format": "96Standard",
     "isTiprack": false,
-    "loadName": "fixture_96_plate",
+    "loadName": "user_volumes_prototype",
     "isMagneticModuleCompatible": false
   },
   "wells": {
