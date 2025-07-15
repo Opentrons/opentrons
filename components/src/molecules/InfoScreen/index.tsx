@@ -44,13 +44,11 @@ export function InfoScreen({
       >
         <StyledText desktopStyle="bodyDefaultSemiBold">{content}</StyledText>
         {subContent != null ? (
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
-            {subContent}
-          </StyledText>
+          <Flex color={COLORS.grey60} textAlign={TYPOGRAPHY.textAlignCenter}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {subContent}
+            </StyledText>
+          </Flex>
         ) : null}
       </Flex>
     </Flex>

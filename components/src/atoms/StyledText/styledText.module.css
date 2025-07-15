@@ -1,102 +1,102 @@
 /* Desktop Styles */
-.display_bold {
+.displayBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 700 2.4375rem/3rem Public Sans;
   }
 }
 
-.heading_large_regular {
+.headingLargeRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 1.625rem/2rem Public Sans;
   }
 }
 
-.heading_large_bold {
+.headingLargeBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 700 1.625rem/2rem Public Sans;
   }
 }
 
-.heading_medium_bold {
+.headingMediumBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 700 1.4375rem/1.75rem Public Sans;
   }
 }
 
-.heading_medium_semiBold {
+.headingMediumSemiBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 600 1.4375rem/1.75rem Public Sans;
   }
 }
 
-.heading_small_regular {
+.headingSmallRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 1.125rem/1.5rem Public Sans;
   }
 }
 
-.heading_small_bold {
+.headingSmallBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 700 1.125rem/1.5rem Public Sans;
   }
 }
 
-.heading_small_semiBold {
+.headingSmallSemiBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 600 1.125rem/1.5rem Public Sans;
   }
 }
 
-.body_large_semiBold {
+.bodyLargeSemiBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 600 1rem/1.5rem Public Sans;
   }
 }
 
-.body_large_regular {
+.bodyLargeRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 1rem/1.5rem Public Sans;
   }
 }
 
-.body_default_semiBold {
+.bodyDefaultSemiBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 600 0.875rem/1.25rem Public Sans;
   }
 }
 
-.body_default_regular {
+.bodyDefaultRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 0.875rem/1.25rem Public Sans;
   }
 }
 
-.body_default_reg_link {
+.bodyDefaultRegLink {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 0.875rem/1.25rem Public Sans;
     text-decoration: underline;
   }
 }
 
-.caption_semiBold {
+.captionSemiBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 600 0.8125rem/1rem Public Sans;
   }
 }
 
-.caption_bold {
+.captionBold {
   @media not (height: 600px) and (width: 1024px) {
     font: 700 0.8125rem/1rem Public Sans;
   }
 }
 
-.caption_regular {
+.captionRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 0.8125rem/1rem Public Sans;
   }
 }
 
-.code_regular {
+.codeRegular {
   @media not (height: 600px) and (width: 1024px) {
     font: 400 0.8125rem/1.25rem Reddit Mono;
   }
@@ -109,3 +109,120 @@
 }
 
 /* ODD Styles */
+.level_1_header {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-80);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-height-96);
+  }
+}
+.level_2_header_regular {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-38);
+    line-height: var(--font-height-48);
+    font-weight: var(--font-weight-regular);
+  }
+}
+.level_2_header_semiBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-38);
+    line-height: var(--font-height-48);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
+.level_2_header_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-38);
+    line-height: var(--font-height-48);
+    font-weight: var(--font-weight-bold);
+  }
+}
+.level_3_header_regular {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-32);
+    line-height: var(--font-height-42);
+    font-weight: var(--font-weight-regular);
+  }
+}
+.level_3_header_semiBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-32);
+    line-height: var(--font-height-42);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
+.level_3_header_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-32);
+    line-height: var(--font-height-42);
+    font-weight: var(--font-weight-bold);
+  }
+}
+.level_4_header_regular {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-28);
+    line-height: var(--font-height-36);
+    font-weight: var(--font-weight-regular);
+  }
+}
+.level_4_header_semiBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-28);
+    line-height: var(--font-height-36);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
+.level_4_header_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-28);
+    line-height: var(--font-height-36);
+    font-weight: var(--font-weight-bold);
+  }
+}
+.body_text_regular {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-22);
+    line-height: var(--font-height-28);
+    font-weight: var(--font-weight-regular);
+  }
+}
+.body_text_semiBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-22);
+    line-height: var(--font-height-28);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
+.body_text_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-22);
+    line-height: var(--font-height-28);
+    font-weight: var(--font-weight-bold);
+  }
+}
+.small_body_text_regular {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-20);
+    line-height: var(--font-height-24);
+    font-weight: var(--font-weight-regular);
+  }
+}
+.small_body_text_semiBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-20);
+    line-height: var(--font-height-24);
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
+.small_body_text_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-20);
+    line-height: var(--font-height-24);
+    font-weight: var(--font-weight-bold);
+  }
+}
+.hidden_touchscreen {
+  @media (height: 600px) and (width: 1024px) {
+    display: none;
+  }
+}

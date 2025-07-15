@@ -333,25 +333,30 @@ export function Toast(props: ToastProps): JSX.Element {
           width={showODDStyle ? 'auto' : '100%'}
         >
           {headingText.length > 0 ? (
-            <StyledText
-              oddStyle="bodyTextSemiBold"
-              desktopStyle="bodyDefaultRegular"
+            <Flex
               marginRight={showODDStyle ? SPACING.spacing4 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace={NO_WRAP}
             >
-              {headingText}
-            </StyledText>
+              <StyledText
+                oddStyle="bodyTextSemiBold"
+                desktopStyle="bodyDefaultRegular"
+              >
+                {headingText}
+              </StyledText>
+            </Flex>
           ) : null}
-          <Flex alignItems={ALIGN_CENTER}>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            overflow="hidden"
+            text-overflow="ellipsis"
+            white-space="nowrap"
+          >
             <StyledText
               oddStyle="bodyTextSemiBold"
               desktopStyle="bodyDefaultRegular"
-              overflow="hidden"
-              text-overflow="ellipsis"
-              white-space="nowrap"
             >
               {message}
             </StyledText>
@@ -370,26 +375,17 @@ export function Toast(props: ToastProps): JSX.Element {
             marginLeft={SPACING.spacing4}
             marginRight={SPACING.spacing8}
           >
-            <StyledText
-              fontSize={
-                showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-              }
-              fontWeight={
-                showODDStyle
-                  ? TYPOGRAPHY.fontWeightSemiBold
-                  : TYPOGRAPHY.fontWeightRegular
-              }
-              lineHeight={
-                showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-              }
-              textDecoration={
-                showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
-              }
+            <Flex
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               whiteSpace={NO_WRAP}
             >
-              {linkText}
-            </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                oddStyle="bodyTextRegular"
+              >
+                {linkText}
+              </StyledText>
+            </Flex>
           </Link>
         ) : null}
         {closeText ? (
@@ -400,17 +396,20 @@ export function Toast(props: ToastProps): JSX.Element {
             }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <StyledText
-              oddStyle="bodyTextSemiBold"
-              desktopStyle="bodyDefaultRegular"
+            <Flex
               textDecoration={
                 showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
               }
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               whiteSpace={NO_WRAP}
             >
-              {closeText}
-            </StyledText>
+              <StyledText
+                oddStyle="bodyTextSemiBold"
+                desktopStyle="bodyDefaultRegular"
+              >
+                {closeText}
+              </StyledText>
+            </Flex>
           </Link>
         ) : null}
       </Flex>

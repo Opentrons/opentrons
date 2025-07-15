@@ -92,13 +92,14 @@ function CommandStyledText(
 ): JSX.Element {
   if (isModernSTProps(props)) {
     return (
-      <StyledText
-        desktopStyle={props.desktopStyle ?? 'bodyDefaultRegular'}
-        oddStyle={props.oddStyle ?? 'bodyTextRegular'}
-        {...props}
-      >
-        {props.children}
-      </StyledText>
+      <Flex {...props}>
+        <StyledText
+          desktopStyle={props.desktopStyle ?? 'bodyDefaultRegular'}
+          oddStyle={props.oddStyle ?? 'bodyTextRegular'}
+        >
+          {props.children}
+        </StyledText>
+      </Flex>
     )
   } else {
     return (

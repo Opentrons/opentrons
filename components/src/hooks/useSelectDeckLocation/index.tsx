@@ -25,7 +25,7 @@ import {
 } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Text } from '../../primitives'
+import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
@@ -178,9 +178,9 @@ export function DeckLocationSelect({
                     size="1.5rem"
                     color={COLORS.white}
                   />
-                  <Text color={COLORS.white} fontSize="1.5rem">
-                    Selected
-                  </Text>
+                  <Flex fontSize="1.5rem">
+                    <Text color={COLORS.white}>Selected</Text>
+                  </Flex>
                 </RobotCoordsForeignDiv>
               </g>
             )
@@ -303,21 +303,22 @@ export function DeckLocationSelect({
                   }
             }
           >
-            <Text
-              color={COLORS.white}
+            <Flex
               fontSize="1.5rem"
               backgroundColor={COLORS.black90}
               padding={SPACING.spacing8}
               borderRadius="3px"
             >
-              {hoveredData.disabledReason != null
-                ? t('location_occupied', {
-                    fixture: getFixtureDisplayName(
-                      hoveredData.disabledReason
-                    ).toLowerCase(),
-                  })
-                : 'Slot unavailable'}
-            </Text>
+              <Text color={COLORS.white}>
+                {hoveredData.disabledReason != null
+                  ? t('location_occupied', {
+                      fixture: getFixtureDisplayName(
+                        hoveredData.disabledReason
+                      ).toLowerCase(),
+                    })
+                  : 'Slot unavailable'}
+              </Text>
+            </Flex>
           </RobotCoordsForeignDiv>
         )}
     </RobotCoordinateSpace>

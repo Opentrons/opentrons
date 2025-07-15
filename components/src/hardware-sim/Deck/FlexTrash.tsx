@@ -124,15 +124,15 @@ export const FlexTrash = ({
           border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
         >
           {rotateDegrees === '180' ? (
-            <Text
+            <Flex
               color={COLORS.white}
               // rotate text back 180 degrees
               transform={`rotate(${rotateDegrees}deg)`}
               transformOrigin="center"
               css={TYPOGRAPHY.bodyTextSemiBold}
             >
-              Trash bin
-            </Text>
+              <Text>Trash bin</Text>
+            </Flex>
           ) : null}
           <Icon
             name="trash"

@@ -281,14 +281,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               flexDirection={DIRECTION_ROW}
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
+              htmlFor={props.id}
+              css={TITLE_STYLE}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE}
-              >
-                {title}
-              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
               {tooltipText != null ? (
                 <>
                   <Flex {...targetProps}>

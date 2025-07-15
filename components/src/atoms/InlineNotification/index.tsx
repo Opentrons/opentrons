@@ -128,13 +128,14 @@ export function InlineNotification(
       >
         {linkText && (
           <Link onClick={onLinkClick}>
-            <StyledText
-              oddStyle="bodyTextRegular"
-              desktopStyle="bodyDefaultRegular"
-              textDecoration="underline"
-            >
-              {linkText}{' '}
-            </StyledText>
+            <Flex textDecoration="underline">
+              <StyledText
+                oddStyle="bodyTextRegular"
+                desktopStyle="bodyDefaultRegular"
+              >
+                {linkText}{' '}
+              </StyledText>
+            </Flex>
           </Link>
         )}
         {onCloseClick && (

@@ -134,13 +134,12 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
             border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
           >
             <Icon name="trash" color={wasteIconColor} height="2rem" />
-            <Text
-              color={COLORS.white}
+            <Flex
               textAlign={TEXT_ALIGN_CENTER}
               css={TYPOGRAPHY.bodyTextSemiBold}
             >
-              Waste chute
-            </Text>
+              <Text color={COLORS.white}>Waste chute</Text>
+            </Flex>
           </Flex>
         )}
       </RobotCoordsForeignObject>
