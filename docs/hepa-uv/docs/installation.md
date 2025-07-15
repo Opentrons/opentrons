@@ -2,12 +2,12 @@
 title: "HEPA/UV Module: Unboxing and Installation"
 ---
 
-# Unboxing and Installation
+# Unboxing and installation
 
 Ask a lab partner for help with unboxing, lifting, and attaching the module. For tools, you will need scissors and the 2.5 mm hex screwdriver that comes in the Module User Kit.
 
 !!! note
-    When attached, the HEPA/UV Module requires 20 cm (8”) of top and side clearance to operate properly.
+    When attached, the HEPA/UV Module requires 20 cm (8″) of top and side clearance to operate properly.
 
 ## Unboxing
 

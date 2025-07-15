@@ -82,3 +82,36 @@ figure.side-by-side img {
   margin: 1em auto;
   display: block;
 }
+
+/* Dots for status light colors */
+.status-dot {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid black;
+  margin-right: 5px;
+ }
+
+ .status-dot.white {
+  background-color: #F8F6F0;
+  animation: pulse-white 3s;
+  animation-iteration-count: 3;
+ }
+
+ .status-dot.green {
+  background-color: green;
+ }
+
+ .status-dot.blue {
+  background-color: #006CFA;
+ }
+
+ .status-dot.red {
+  background-color: red;
+ }
+
+ .status-dot.yellow {
+  background-color: #F09D20;
+ }

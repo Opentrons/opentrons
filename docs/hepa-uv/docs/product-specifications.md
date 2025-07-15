@@ -6,7 +6,7 @@ title: "HEPA/UV Module: Product Specifications"
 
 ![Labeled HEPA/UV Module diagram](images/hepa-uv-diagram.svg "Labeled HEPA/UV Module diagram")
 
-## Included Parts
+## Included parts
 
 <div class="parts-list">
 <figure>
@@ -50,7 +50,7 @@ title: "HEPA/UV Module: Product Specifications"
 </figure>
 </div>
 
-## Physical Specifications
+## Physical specifications
 
 | Specification | Details |
 |---|---|
@@ -59,7 +59,7 @@ title: "HEPA/UV Module: Product Specifications"
 | Module weight | ~20 kg (42 lbs) |
 | Operating space | 20 cm / 8” (minimum) of side and top clearance |
 
-## Input and Output Connections
+## Input and output connections
 
 The HEPA/UV Module has the following power input requirements, which are met by the included power supply.
 
@@ -70,16 +70,16 @@ The HEPA/UV Module has the following power input requirements, which are met by 
     - Make sure that the power cable is not obstructed, in case it needs to be disconnected.
     - Do not replace the power supply cable unless at the direction of Opentrons Support. This ensures that the power cable has adequate ratings for the equipment.
 
-### Power Specifications
+### Power specifications
 
 | Specification | Details |
 |---|---|
-| Input | 100–240 VAC, 50/60 Hz<br />2.2 A at 115 VAC<br />1.1 A at 230 VAC |
+| Input | <ul><li>100–240 VAC, 50/60 Hz</li><li>2.2 A at 115 VAC</li><li>1.1 A at 230 VAC</li></ul> |
 | Output | 24 VDC, 8.4 A, 201 W max |
 | Mains supply voltage fluctuation | 100–240 VAC ±10% |
 | Fuse type | T3.15 A, 250 V, 5×20 mm |
 
-### Power Consumption
+### Power consumption
 
 The power consumption specifications are measured with the UV lights and fan on.
 

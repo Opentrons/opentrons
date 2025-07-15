@@ -22,19 +22,19 @@ Ring lights around the on/off buttons change colors to indicate the operational 
 <table>
     <thead>
         <tr>
-            <th>LED color</th>
-            <th>LED pattern</th>
+            <th width="20%">LED color</th>
+            <th width="20%">LED pattern</th>
             <th>HEPA/UV status</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>White</td>
+            <td><span class="status-dot white"></span>White</td>
             <td>Solid</td>
             <td>Idle</td>
         </tr>
         <tr>
-            <td rowspan="2">Green</td>
+            <td rowspan="2"><span class="status-dot green"></span>Green</td>
             <td>Solid</td>
             <td>Normal operation</td>
         </tr>
@@ -43,7 +43,7 @@ Ring lights around the on/off buttons change colors to indicate the operational 
             <td>An operation cycle has been completed or canceled. Returns to white/idle state after pulse.</td>
         </tr>
         <tr>
-            <td>Blue</td>
+            <td><span class="status-dot blue"></span>Blue</td>
             <td>Solid</td>
             <td>Indicates user intervention required or an unsafe condition (e.g., the door opens while the UV lights are on).</td>
         </tr>

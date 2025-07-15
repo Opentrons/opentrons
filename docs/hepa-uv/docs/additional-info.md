@@ -10,11 +10,11 @@ All hardware purchased from Opentrons is covered under a 1-year standard warrant
 
 ## Support
 
-Opentrons Support can help you with questions about our products and services. If you discover a defect, or believe your product is not functioning to published specifications, contact us at support@opentrons.com.
+Opentrons Support can help you with questions about our products and services. If you discover a defect, or believe your product is not functioning to published specifications, contact us at <support@opentrons.com>.
 
 Please have the serial number available when contacting support. You can find the serial number on the back of the module near the power cable.
 
-## Manufacturer Description
+## Manufacturer description
 
 Opentrons Labworks Inc  
 45-18 Ct Square W  

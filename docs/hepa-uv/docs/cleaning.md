@@ -7,8 +7,8 @@ title: "HEPA/UV Module: Cleaning"
 The following table lists the chemicals you can use to clean the exterior of your HEPA/UV Module. Diluted alcohol and distilled water are our recommended cleaning products, but you can refer to this list for other cleaning options.
 
 !!! warning
-    Do not use acetone to clean the HEPA/UV Module.
-    Do not disassemble the HEPA/UV Module and attempt to clean its internal electronic components.
+    - *Do not* use acetone to clean the HEPA/UV Module.
+    - *Do not* disassemble the HEPA/UV Module and attempt to clean its internal electronic components.
 
 | Solution | Description |
 |---|---|
@@ -30,6 +30,6 @@ Once you’ve prepared the module for cleaning:
 3. Use a cloth dampened with distilled water as a rinse wipedown.
 4. Let the module air dry.
 
-## Broken Bulb Cleanup
+## Broken bulb cleanup
 
 The fluorescent UV bulbs used by the HEPA/UV Module contain small amounts of mercury. Intact bulbs do not present a health hazard, but a broken bulb can release mercury vapor. If a bulb breaks, follow your institution’s protocols for cleaning broken compact fluorescent bulbs.

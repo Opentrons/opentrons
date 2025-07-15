@@ -13,7 +13,7 @@ code, pre {
 
 /* Font sizes */
 
-.admonition p {
+.admonition p, .admonition li {
   font-size: 0.75rem;
 }
 
