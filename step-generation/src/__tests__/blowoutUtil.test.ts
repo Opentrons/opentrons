@@ -120,12 +120,12 @@ describe('blowoutLocationHelper', () => {
   it('mixBlowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
     mixBlowoutLocationHelper({
       ...blowoutArgs,
-      blowoutLocation: TROUGH_LABWARE,
+      blowoutLocation: 'dest_well',
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
-      labwareId: TROUGH_LABWARE,
-      wellName: 'A1',
+      labwareId: 'destPlateId',
+      wellName: 'A2',
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
         origin: 'top',
