@@ -17,49 +17,6 @@ requirements = {
 }
 
 
-def home_axes_only(ctx: ProtocolContext) -> None:
-    """Home axes and no plungers."""
-    hw_api = ctx._core.get_hardware()
-    hw_api.home([Axis.Z_L, Axis.Z_R, Axis.X, Axis.Y])
-
-
-def safe_mix(
-    pipette: InstrumentContext,
-    repetitions: int,
-    volume: float,
-    location: Well,
-    ctx: ProtocolContext,
-) -> None:
-    """Perform mix manually, catching stalls."""
-    stall_count = 0
-    for i in range(repetitions):
-        try:
-            pipette.aspirate(volume, location.bottom(z=1))
-            pipette.dispense(volume, location.bottom(z=2))
-        except Exception as e:
-            msg = str(e)
-            if "stall" in msg:
-                ctx.comment(f"Caught stall error (code 2003): {msg}")
-                try:
-                    pipette._retract()  # homes the z axis
-                except Exception as e:
-                    msg = str(e)
-                    ctx.comment(f"second error {msg}")
-                    if "position" in msg:
-                        # if PositionUnknownError Occurs after the Z axis homes, t
-                        # he pipette will home all axes excluding the plunger.
-                        home_axes_only(ctx)
-                pipette.blow_out(location.top())
-                pipette.home()  # pipette homes again after blow out to ensure plunger is homed.
-                pipette.move_to(location.top())
-            else:
-                ctx.comment(f"Unhandled error: {msg}")
-                raise
-            stall_count += 1
-            continue
-    ctx.comment(f"Total stalls: {stall_count}")
-
-
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters for the Mix protocol."""
     parameters.add_str(
@@ -114,6 +71,73 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="D1",
     )
+    parameters.add_float(
+        variable_name="mix_volume",
+        display_name="Mix Volume (ul)",
+        maximum=1000,
+        minimum=1,
+        default=200,
+    )
+    parameters.add_int(
+        variable_name="mix_reps",
+        display_name="Mix Repititions",
+        maximum=10000,
+        minimum=1,
+        default=200,
+    )
+    parameters.add_float(
+        variable_name="flow_rate",
+        display_name="Flow Rate",
+        description="Mix flow rate.",
+        maximum=850,
+        minimum=1,
+        default=716,
+    )
+
+
+def home_axes_only(ctx: ProtocolContext) -> None:
+    """Home axes and no plungers."""
+    hw_api = ctx._core.get_hardware()
+    hw_api.home([Axis.Z_L, Axis.Z_R, Axis.X, Axis.Y])
+
+
+def safe_mix(
+    pipette: InstrumentContext,
+    location: Well,
+    ctx: ProtocolContext,
+) -> None:
+    """Perform mix manually, catching stalls."""
+    stall_count = 0
+    mix_volume = ctx.params.mix_volume  # type: ignore[attr-defined]
+    mix_reps = ctx.params.mix_reps  # type: ignore[attr-defined]
+    mix_flow_rate = ctx.params.flow_rate  # type: ignore[attr-defined]
+
+    for i in range(mix_reps):
+        try:
+            pipette.aspirate(mix_volume, location.bottom(z=1), flow_rate=mix_flow_rate)
+            pipette.dispense(mix_volume, location.bottom(z=2), flow_rate=mix_flow_rate)
+        except Exception as e:
+            msg = str(e)
+            if "stall" in msg:
+                ctx.comment(f"Caught stall error (code 2003): {msg}")
+                try:
+                    pipette._retract()  # homes the z axis
+                except Exception as e:
+                    msg = str(e)
+                    ctx.comment(f"second error {msg}")
+                    if "position" in msg:
+                        # if PositionUnknownError Occurs after the Z axis homes, t
+                        # he pipette will home all axes excluding the plunger.
+                        home_axes_only(ctx)
+                pipette.blow_out(location.top())
+                pipette.home()  # pipette homes again after blow out to ensure plunger is homed.
+                pipette.move_to(location.top())
+            else:
+                ctx.comment(f"Unhandled error: {msg}")
+                raise
+            stall_count += 1
+            continue
+    ctx.comment(f"Total stalls: {stall_count}")
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -130,4 +154,4 @@ def run(ctx: ProtocolContext) -> None:
     )
     reservoir = ctx.load_labware("opentrons_tough_12_reservoir_22ml", "D2")
     pipette.pick_up_tip()
-    safe_mix(pipette, 10, 100, reservoir["A1"], ctx)
+    safe_mix(pipette, reservoir["A1"], ctx)
