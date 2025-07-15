@@ -255,24 +255,79 @@ All Opentrons-verified liquid classes position the pipette relative to the well.
 Defining New Liquid Classes
 ============================
 
-You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified liquid class, you'll start from scratch, providing a value for `every required property <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ in your liquid class. 
+You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified liquid class, you'll start from scratch, providing a value for every required property in your liquid class. 
 
 .. code-block:: python
 
- # examples of required properties in a dictionary for the pipette and tip racks
- custom_liquid_class_properties = {
-    "flex_1channel_50": {
-        "opentrons/opentrons_flex_96_tiprack_50ul/1": {
-            "aspirate": {
-                "aspirate_position": {
-                    "offset": {"x": 1, "y": 2, "z": 3},
-                    "position_reference": "well-bottom",
-                },
-            },
-        },
-    },
+    # add required properties in a dictionary for the chosen pipette and tip racks
+    custom_liquid_class_properties = {
+      "p20_single_gen2": {
+          "opentrons/opentrons_96_tiprack_20ul/1": {
+              "aspirate": {
+                  "aspirate_position": {
+                      "offset": {"x": 1, "y": 2, "z": 3},
+                      "position_reference": "well-bottom",
+                  },
+                  "correction_by_volume": [(0.0, 0.0)],
+                  "delay": {"enabled": False},
+                  "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                  "mix": {"enabled": False},
+                  "pre_wet": True,
+                  "retract": {
+                      "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                      "delay": {"enabled": False},
+                      "end_position": {
+                          "offset": {"x": 1, "y": 2, "z": 3},
+                          "position_reference": "well-bottom",
+                      },
+                      "speed": 40,
+                      "touch_tip": {"enabled": False},
+                  },
+                  "submerge": {
+                      "delay": {"enabled": False},
+                      "speed": 100,
+                      "start_position": {
+                          "offset": {"x": 1, "y": 2, "z": 3},
+                          "position_reference": "well-bottom",
+                      },
+                  },
+              },
+              "dispense": {
+                  "correction_by_volume": [(0.0, 0.0)],
+                  "delay": {"enabled": False},
+                  "dispense_position": {
+                      "offset": {"x": 1, "y": 2, "z": 3},
+                      "position_reference": "well-bottom",
+                  },
+                  "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                  "mix": {"enabled": False},
+                  "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
+                  "retract": {
+                      "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                      "blowout": {"enabled": False},
+                      "delay": {"enabled": False},
+                      "end_position": {
+                          "offset": {"x": 1, "y": 2, "z": 3},
+                          "position_reference": "well-bottom",
+                      },
+                      "speed": 40,
+                      "touch_tip": {"enabled": False},
+                  },
+                  "submerge": {
+                      "delay": {"enabled": False},
+                      "speed": 100,
+                      "start_position": {
+                          "offset": {"x": 1, "y": 2, "z": 3},
+                          "position_reference": "well-bottom",
+                      },
+                  },
+              },
+          }
+      }
   }
-              
+
+Then, use the defined properties and :py:meth:`~.ProtocolContext.define_liquid_class` to create your new liquid class::
+
  # create a new liquid class
  custom_viscous = protocol.define_liquid_class(
     name="custom_viscous",
@@ -282,7 +337,9 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 .. versionadded:: 2.24
 
-The example above is shortened and only includes aspirate position properties. To create your liquid class, you'll need to define values for all `required properties <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>` in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. 
+You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified `liquid class properties <https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1>`__ for examples. 
+
+You can also define optional properties, like a mix or blowout, in your liquid class. See `the liquid class schema <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ for a complete list of properties. 
 
 .. note:: 
 
