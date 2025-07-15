@@ -22,7 +22,7 @@
 
     Extend your robot's capabilities with easily swappable hardware.
 
-    [:octicons-arrow-right-24: View all modules](modules.md)
+    [:octicons-arrow-right-24: View all modules](modules/index.md)
 
 -   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
 
