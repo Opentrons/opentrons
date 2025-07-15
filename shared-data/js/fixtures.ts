@@ -1038,7 +1038,7 @@ export const getAAForModuleFixture = (
   fixtureId: CutoutFixtureIdsWithFakes,
   moduleModel: ModuleModel
 ): AddressableAreaNamesWithFakes => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
   return aaList?.find(
     aa =>
