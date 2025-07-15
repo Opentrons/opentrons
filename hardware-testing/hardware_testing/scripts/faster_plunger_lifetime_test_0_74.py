@@ -87,7 +87,6 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     top, bottom, blow_out, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print(f"Settings: {settings}")
     print(f"top: {top} bottom: {bottom} blow_out: {blow_out}")
-    input(1)
 
     async def position_check() -> bool:
         est, enc, aligned = await _is_plunger_still_aligned_with_encoder(api)
