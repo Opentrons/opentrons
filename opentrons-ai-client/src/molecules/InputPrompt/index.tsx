@@ -383,7 +383,9 @@ export function InputPrompt(): JSX.Element {
           <SendButton
             disabled={watchUserPrompt.length === 0}
             isLoading={isLoading}
-            handleClick={handleClick}
+            handleClick={() => {
+              handleClick()
+            }}
           />
         </div>
       </div>

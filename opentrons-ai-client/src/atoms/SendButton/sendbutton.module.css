@@ -26,11 +26,11 @@
 }
 
 .button:hover:not(:disabled) {
-  background-color: var(--blue-60);
+  background-color: var(--blue-55);
 }
 
 .button:active:not(:disabled) {
-  background-color: var(--blue-70);
+  background-color: var(--blue-60);
 }
 
 .button_text {

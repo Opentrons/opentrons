@@ -18,7 +18,7 @@
   background-color: var(--white);
   border: none;
   outline: none;
-  padding: 1rem 0;
+  padding: var(--spacing-16) 0;
   box-shadow: none;
   width: 100%;
   font-size: var(--font-size-h3);

@@ -62,12 +62,7 @@ export function SendButton({
       </span>
       {isLoading && (
         <div className={styles.loading_icon}>
-          <Icon
-            name="ot-spinner"
-            spin={true}
-            size="1rem"
-            color={COLORS.white}
-          />
+          <Icon name="ot-spinner" spin size="1rem" color={COLORS.white} />
         </div>
       )}
     </button>
