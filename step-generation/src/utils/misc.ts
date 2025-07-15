@@ -359,7 +359,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutLocationHelper = (args: {
+export const mixBlowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -381,24 +381,25 @@ export const blowoutLocationHelper = (args: {
     offsetFromTopMm,
     invariantContext,
   } = args
-  if (!blowoutLocation) return []
+  if (!blowoutLocation) {
+    return []
+  }
   const { trashBinEntities, wasteChuteEntities } = invariantContext
 
-  let labware: LabwareEntity | null = null
+  let labwareId: string | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-    labware = invariantContext.labwareEntities[sourceLabwareId]
+    labwareId = sourceLabwareId
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware = invariantContext.labwareEntities[destLabwareId]
+    labwareId = destLabwareId
     well = destWell
   }
-
-  if (well != null && labware != null) {
+  if (well != null && labwareId != null) {
     return [
       curryCommandCreator(blowOutInWell, {
         pipetteId: pipette,
-        labwareId: labware.id,
+        labwareId: labwareId,
         wellName: well,
         flowRate,
         wellLocation: {
