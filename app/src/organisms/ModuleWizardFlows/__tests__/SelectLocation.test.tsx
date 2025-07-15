@@ -239,7 +239,6 @@ describe('handleAddFixture', () => {
       return updatedDc
     })
 
-    console.log('mockStackerUpdatedDeckConfig:', mockStackerUpdatedDeckConfig)
 
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
       mockStackerUpdatedDeckConfig
