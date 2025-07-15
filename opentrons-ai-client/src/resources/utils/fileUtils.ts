@@ -1,10 +1,12 @@
+import { ValidFileType } from '../types'
+
 export const ALLOWED_FILE_TYPES = {
   pdf: ['.pdf'],
   csv: ['.csv'],
   python: ['.py'],
 } as const
 
-export type FileType = 'pdf' | 'csv' | 'python' | 'unknown'
+export type FileType = ValidFileType
 
 export interface FileValidationResult {
   isValid: boolean
@@ -16,18 +18,26 @@ export interface ProcessedFileContent {
   mediaType: string
 }
 
+const UNIT_MB = 1024 * 1024
+
 export const FILE_SIZE_LIMITS = {
-  pdf: 10 * 1024 * 1024, // 10MB
-  csv: 2 * 1024 * 1024, // 2MB
-  python: 1 * 1024 * 1024, // 1MB
+  pdf: 10 * UNIT_MB, // 10MB
+  csv: 2 * UNIT_MB, // 2MB
+  python: 1 * UNIT_MB, // 1MB
 } as const
 
 export const MAX_FILES_PER_MESSAGE = 5
 
 export const validateFile = (file: File): FileValidationResult => {
-  const fileType = getFileType(file)
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
 
-  if (fileType === 'unknown') {
+  // Check if file type is supported
+  const isSupportedType =
+    ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf') ||
+    ALLOWED_FILE_TYPES.csv.includes(extension as '.csv') ||
+    ALLOWED_FILE_TYPES.python.includes(extension as '.py')
+
+  if (!isSupportedType) {
     return {
       isValid: false,
       error:
@@ -35,9 +45,10 @@ export const validateFile = (file: File): FileValidationResult => {
     }
   }
 
+  const fileType = getFileType(file)
   const sizeLimit = FILE_SIZE_LIMITS[fileType]
   if (file.size > sizeLimit) {
-    const sizeMB = Math.round(sizeLimit / (1024 * 1024))
+    const sizeMB = Math.round(sizeLimit / UNIT_MB)
     return {
       isValid: false,
       error: `File size too large. ${fileType.toUpperCase()} files must be under ${sizeMB}MB.`,
@@ -50,31 +61,27 @@ export const validateFile = (file: File): FileValidationResult => {
 export const getFileType = (file: File): FileType => {
   const extension = '.' + file.name.split('.').pop()?.toLowerCase()
 
-  if (ALLOWED_FILE_TYPES.pdf.includes(extension)) {
+  if (ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf')) {
     return 'pdf'
   }
-  if (ALLOWED_FILE_TYPES.csv.includes(extension)) {
+  if (ALLOWED_FILE_TYPES.csv.includes(extension as '.csv')) {
     return 'csv'
   }
-  if (ALLOWED_FILE_TYPES.python.includes(extension)) {
+  if (ALLOWED_FILE_TYPES.python.includes(extension as '.py')) {
     return 'python'
   }
 
-  return 'unknown'
+  // This should never happen if validateFile is called first
+  throw new Error(`Unsupported file type: ${extension}`)
 }
 
-export const getFileTypeLabel = (type: FileType): string => {
-  switch (type) {
-    case 'pdf':
-      return 'PDF file'
-    case 'csv':
-      return 'CSV file'
-    case 'python':
-      return 'Python file'
-    default:
-      return 'File'
-  }
+const fileTypeLabels: Record<FileType, string> = {
+  pdf: 'PDF file',
+  csv: 'CSV file',
+  python: 'Python file',
 }
+
+export const getFileTypeLabel = (type: FileType): string => fileTypeLabels[type]
 
 export const readFileContent = async (
   file: File,
@@ -122,5 +129,8 @@ export const formatFileSize = (bytes: number): string => {
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
+  const size = bytes / Math.pow(k, i)
+  const rounded = size.toFixed(1)
+
+  return `${rounded} ${sizes[i]}`
 }

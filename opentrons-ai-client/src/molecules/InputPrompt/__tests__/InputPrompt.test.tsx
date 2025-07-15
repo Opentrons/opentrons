@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/ai-client/i18n'
 import { InputPrompt } from '../index'
 
 import type { ReactNode } from 'react'
@@ -55,8 +55,7 @@ describe('InputPrompt', () => {
     render()
     screen.getByRole('textbox')
     screen.queryByPlaceholderText('Type your prompt...')
-    const sendButton = screen.getByRole('button', { name: 'Send' })
-    expect(sendButton).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
   })
 
   it('should make send button not disabled when a user inputs something in textarea', () => {

@@ -177,7 +177,7 @@ export function InputPrompt(): JSX.Element {
         attachedFiles.length > 0
           ? attachedFiles.map(file => ({
               name: file.name,
-              type: getFileType(file) as 'pdf' | 'csv' | 'python',
+              type: getFileType(file),
               content: '', // Content will be read separately if needed
               size: file.size,
             }))
@@ -331,7 +331,11 @@ export function InputPrompt(): JSX.Element {
       {/* Error message */}
       {fileError && (
         <div className={styles.error_container}>
-          <StyledText color={COLORS.red50} fontSize={TYPOGRAPHY.fontSizeH3}>
+          <StyledText
+            color={COLORS.red50}
+            fontSize={TYPOGRAPHY.fontSizeH3}
+            lineHeight={TYPOGRAPHY.lineHeight20}
+          >
             {fileError}
           </StyledText>
         </div>
@@ -379,9 +383,7 @@ export function InputPrompt(): JSX.Element {
           <SendButton
             disabled={watchUserPrompt.length === 0}
             isLoading={isLoading}
-            handleClick={() => {
-              handleClick()
-            }}
+            handleClick={handleClick}
           />
         </div>
       </div>

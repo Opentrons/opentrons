@@ -7,9 +7,11 @@ export type ProtocolFormat = 'Protocol Designer' | 'Python'
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
 
+export type ValidFileType = 'pdf' | 'csv' | 'python'
+
 export interface FileAttachment {
   name: string
-  type: 'pdf' | 'csv' | 'python'
+  type: ValidFileType
   content: string
   size: number
 }
