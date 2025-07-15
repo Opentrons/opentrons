@@ -33,12 +33,7 @@
     },
     "dogEars": {
       "type": "string",
-      "enum": [
-        "bottomRight",
-        "bottomLeft",
-        "topRight",
-        "topLeft"
-      ]
+      "enum": ["bottomRight", "bottomLeft", "topRight", "topLeft"]
     },
     "displayCategory": {
       "type": "string",

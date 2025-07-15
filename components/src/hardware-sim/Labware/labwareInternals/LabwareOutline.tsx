@@ -20,7 +20,7 @@ function buildDogearPath(
     return path.join(' ')
   }
 
-  // Top-left
+  // topLeft
   if (dogears.includes('topLeft')) {
     path.push(`M 0 ${notchSize}`)
     path.push(`L ${notchSize} 0`)
@@ -28,7 +28,7 @@ function buildDogearPath(
     path.push('M 0 0')
   }
 
-  // Top-right
+  // TopRight
   if (dogears.includes('topRight')) {
     path.push(`L ${w - notchSize} 0`)
     path.push(`L ${w} ${notchSize}`)
@@ -36,7 +36,7 @@ function buildDogearPath(
     path.push(`L ${w} 0`)
   }
 
-  // Bottom-right
+  // BottomRight
   if (dogears.includes('bottomRight')) {
     path.push(`L ${w} ${h - notchSize}`)
     path.push(`L ${w - notchSize} ${h}`)
@@ -44,7 +44,7 @@ function buildDogearPath(
     path.push(`L ${w} ${h}`)
   }
 
-  // Bottom-left
+  // BottomLeft
   if (dogears.includes('bottomLeft')) {
     path.push(`L ${notchSize} ${h}`)
     path.push(`L 0 ${h - notchSize}`)
@@ -55,7 +55,6 @@ function buildDogearPath(
   path.push('Z')
   return path.join(' ')
 }
-
 
 export type LabwareOutlineProps = {
   /** if this labware is a tip rack, darken background and lighten borderx dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to false */
@@ -192,7 +191,6 @@ interface LabwareBorderProps extends SVGProps<SVGRectElement> {
   yDimension: number
   showRadius?: boolean
   dogEars?: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
-
 }
 function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   const {
@@ -206,7 +204,7 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   } = props
 
   const dogears = props.dogEars ?? []
-  const notchSize = 3  // You can later make this a prop too if needed
+  const notchSize = 3 
 
   if (dogears.length > 0) {
     const pathD = buildDogearPath(xDimension, yDimension, dogears, notchSize)
