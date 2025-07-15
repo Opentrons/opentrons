@@ -1194,6 +1194,7 @@
   },
   "schemaVersion": 2,
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
+  "dogEars": ["topLeft", "bottomLeft"],
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": { "x": 0, "y": 0, "z": 8.25 }
   },
