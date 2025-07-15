@@ -130,7 +130,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
-    console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
