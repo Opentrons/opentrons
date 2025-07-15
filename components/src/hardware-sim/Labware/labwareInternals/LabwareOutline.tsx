@@ -7,6 +7,56 @@ import type { CSSProperties } from 'styled-components'
 import type { SVGProps } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
+function buildDogearPath(
+  w: number,
+  h: number,
+  dogears: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>,
+  notchSize: number
+): string {
+  const path: string[] = []
+
+  if (dogears.length === 0) {
+    path.push(`M 0 0 H ${w} V ${h} H 0 Z`)
+    return path.join(' ')
+  }
+
+  // Top-left
+  if (dogears.includes('topLeft')) {
+    path.push(`M 0 ${notchSize}`)
+    path.push(`L ${notchSize} 0`)
+  } else {
+    path.push('M 0 0')
+  }
+
+  // Top-right
+  if (dogears.includes('topRight')) {
+    path.push(`L ${w - notchSize} 0`)
+    path.push(`L ${w} ${notchSize}`)
+  } else {
+    path.push(`L ${w} 0`)
+  }
+
+  // Bottom-right
+  if (dogears.includes('bottomRight')) {
+    path.push(`L ${w} ${h - notchSize}`)
+    path.push(`L ${w - notchSize} ${h}`)
+  } else {
+    path.push(`L ${w} ${h}`)
+  }
+
+  // Bottom-left
+  if (dogears.includes('bottomLeft')) {
+    path.push(`L ${notchSize} ${h}`)
+    path.push(`L 0 ${h - notchSize}`)
+  } else {
+    path.push(`L 0 ${h}`)
+  }
+
+  path.push('Z')
+  return path.join(' ')
+}
+
+
 export type LabwareOutlineProps = {
   /** if this labware is a tip rack, darken background and lighten borderx dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to false */
   isTiprack?: boolean
@@ -36,6 +86,8 @@ interface DefinitionReplacementProps {
   minX: number
   /** minimum y-coordinate (i.e. the bottom) of the outline. */
   minY: number
+  /** location of dog ears (i.e. bottomRight, bottomLeft) of the labware */
+  dogEars?: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
 }
 
 const OUTLINE_THICKNESS_MM = 1
@@ -139,6 +191,8 @@ interface LabwareBorderProps extends SVGProps<SVGRectElement> {
   xDimension: number
   yDimension: number
   showRadius?: boolean
+  dogEars?: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
+
 }
 function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   const {
@@ -150,6 +204,22 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
     showRadius = true,
     ...svgProps
   } = props
+
+  const dogears = props.dogEars ?? []
+  const notchSize = 3  // You can later make this a prop too if needed
+
+  if (dogears.length > 0) {
+    const pathD = buildDogearPath(xDimension, yDimension, dogears, notchSize)
+    return (
+      <path
+        d={pathD}
+        transform={`translate(${minX}, ${minY})`}
+        strokeWidth={2 * borderThickness}
+      />
+    )
+  }
+
+  // Default rectangle outline
   return (
     <rect
       x={minX + borderThickness}

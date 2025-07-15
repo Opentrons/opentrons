@@ -142,6 +142,7 @@ export interface LabwareParameters {
   isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
+  dogears?: string[]
 }
 
 export interface LabwareBrand {

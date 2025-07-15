@@ -31,6 +31,15 @@
         }
       }
     },
+    "dogEars": {
+      "type": "string",
+      "enum": [
+        "bottomRight",
+        "bottomLeft",
+        "topRight",
+        "topLeft"
+      ]
+    },
     "displayCategory": {
       "type": "string",
       "enum": [
