@@ -136,13 +136,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1.0,
     )
 
-    parameters.add_string(
+    parameters.add_str(
         variable_name="well_location",
         display_name="well_location",
         choices = [
-            {"A1"},
-            {"A2"},
-            {"A3"},
+            {"display_name": "A1", "value": "A1"},
+            {"display_name": "A2", "value": "A2"},
+            {"display_name": "A3", "value": "A3"},
         ],
         default = "A1"
     )
@@ -461,7 +461,7 @@ def run(ctx: ProtocolContext) -> None:
             height = round(
                 _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating()), 5
             )
-            
+
             #log corrected height 
             corrected_height = height + tip_z_error
             cheight_list.append(corrected_height)
