@@ -724,7 +724,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.FlexStacker]
 
-    def retrieve(self) -> LabwareCore:
+    def retrieve(self, latch_clearance: Optional[float] = None) -> LabwareCore:
         """Retrieve a labware from the Flex Stacker's hopper.
 
         Returns the primary labware.
@@ -732,6 +732,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.flex_stacker.RetrieveParams(
                 moduleId=self.module_id,
+                latchClearance=latch_clearance,
             )
         )
         base = self._protocol_core.get_labware_on_module(self)
@@ -742,11 +743,12 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 return primary
         return base
 
-    def store(self) -> None:
+    def store(self, latch_clearance: Optional[float] = None) -> None:
         """Store a labware into Flex Stacker's hopper."""
         self._engine_client.execute_command(
             cmd.flex_stacker.StoreParams(
                 moduleId=self.module_id,
+                latchClearance=latch_clearance,
             )
         )
 

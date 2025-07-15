@@ -59,6 +59,10 @@ class StoreParams(BaseModel):
         ...,
         description="Unique ID of the flex stacker.",
     )
+    latchClearance: float | SkipJsonSchema[None] = Field(
+        None,
+        description="optional latch clearance",
+    )
 
 
 class StoreResult(BaseModel):
@@ -205,7 +209,8 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             if stacker_hw is not None:
                 stacker_hw.set_stacker_identify(True)
                 await stacker_hw.store_labware(
-                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                    labware_height=stacker_state.get_pool_height_minus_overlap(),
+                    latch_clearance=params.latchClearance,
                 )
         except FlexStackerStallError as e:
             return DefinedErrorData(

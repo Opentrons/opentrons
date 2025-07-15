@@ -91,6 +91,10 @@ class RetrieveParams(BaseModel):
         description="Do not use. Present for internal backward compatibility.",
         json_schema_extra=_remove_default,
     )
+    latchClearance: float | SkipJsonSchema[None] = Field(
+        None,
+        description="optional latch clearance",
+    )
 
 
 class RetrieveResult(BaseModel):
@@ -269,7 +273,8 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             try:
                 stacker_hw.set_stacker_identify(True)
                 await stacker_hw.dispense_labware(
-                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                    labware_height=stacker_state.get_pool_height_minus_overlap(),
+                    latch_clearance=params.latchClearance,
                 )
             except (
                 FlexStackerStallError,

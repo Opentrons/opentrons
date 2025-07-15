@@ -1130,7 +1130,7 @@ class FlexStackerContext(ModuleContext):
         return self._core.get_serial_number()
 
     @requires_version(2, 25)
-    def retrieve(self) -> Labware:
+    def retrieve(self, latch_clearance: Optional[float] = None) -> Labware:
         """Retrieve a labware from the Flex Stacker and place it on the shuttle.
 
         :returns: The retrieved :py:class:`Labware` object. This will always be the main labware,
@@ -1138,7 +1138,7 @@ class FlexStackerContext(ModuleContext):
                   call :py:class:`Labware.parent` on the returned labware.
 
         """
-        labware_core = self._core.retrieve()
+        labware_core = self._core.retrieve(latch_clearance=latch_clearance)
 
         return self._core_map.get_or_add(
             labware_core,
@@ -1148,9 +1148,9 @@ class FlexStackerContext(ModuleContext):
         )
 
     @requires_version(2, 25)
-    def store(self) -> None:
+    def store(self, latch_clearance: Optional[float] = None) -> None:
         """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
-        self._core.store()
+        self._core.store(latch_clearance=latch_clearance)
 
     def _labware_to_cores(self, labware: Sequence[Labware]) -> list[LabwareCore]:
         return [labware._core for labware in labware]

@@ -407,14 +407,14 @@ class AbstractFlexStackerCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def retrieve(self) -> AbstractLabware[Any]:
+    def retrieve(self, latch_clearance: Optional[float] = None) -> AbstractLabware[Any]:
         """Release a labware from the hopper to the staging slot.
 
         Returns the retreived primary labware.
         """
 
     @abstractmethod
-    def store(self) -> None:
+    def store(self, latch_clearance: Optional[float] = None) -> None:
         """Store a labware in the stacker hopper."""
 
     @abstractmethod

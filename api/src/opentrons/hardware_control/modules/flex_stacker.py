@@ -428,6 +428,9 @@ class FlexStacker(mod_abc.AbstractModule):
             max_speed=speed, acceleration=acceleration
         )
         distance = direction.distance(distance)
+        log.warning(
+            f"MOVE: Axis {axis} {distance} mm in the {direction} direction speed={speed} accel={acceleration}"
+        )
         res = await self._driver.move_in_mm(axis, distance, params=motion_params)
         if res == MoveResult.STALL_ERROR:
             self._stall_detected = True
@@ -457,6 +460,9 @@ class FlexStacker(mod_abc.AbstractModule):
 
         motion_params = default.move_params.update(
             max_speed=speed, acceleration=acceleration
+        )
+        log.warning(
+            f"HOME: Axis {axis} in the {direction} direction speed={speed} accel={acceleration}"
         )
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
@@ -513,8 +519,10 @@ class FlexStacker(mod_abc.AbstractModule):
         labware_height: float,
         enforce_hopper_lw_sensing: bool = True,
         enforce_shuttle_lw_sensing: bool = True,
+        latch_clearance: Optional[float] = None,
     ) -> None:
         """Dispenses the next labware in the stacker."""
+        log.warning(f"DISPENSE: {labware_height}")
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
@@ -526,7 +534,8 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Transfer
         await self.open_latch()
-        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        latch_clearance = latch_clearance or LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - latch_clearance
         await self.move_axis(StackerAxis.Z, Direction.RETRACT, latch_clear_distance)
         await self.close_latch()
 
@@ -543,8 +552,10 @@ class FlexStacker(mod_abc.AbstractModule):
         self,
         labware_height: float,
         enforce_shuttle_lw_sensing: bool = True,
+        latch_clearance: Optional[float] = None,
     ) -> None:
         """Stores a labware in the stacker."""
+        log.warning(f"STORE: {labware_height}")
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
 
@@ -554,7 +565,8 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
         # Move the Z so the labware sits right under any labware already stored
-        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        latch_clearance = latch_clearance or LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET + latch_clearance
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
