@@ -1089,7 +1089,6 @@ export const isModuleAllowedOnAA = (
       fixtureId[0],
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
-    console.log('aa: ', aa)
     const aaWithSlotLikeId = aaForFixture?.map(item => {
       return {
         aa: item,
