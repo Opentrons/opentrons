@@ -1,6 +1,4 @@
 /* eslint-disable storybook/prefer-pascal-case */
-import { Flex } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
 import { HELIX_STYLES, ODD_STYLES, StyledText } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -24,9 +22,9 @@ const meta: Meta<typeof StyledText> = {
   },
   decorators: [
     Story => (
-      <Flex padding={SPACING.spacing16}>
+      <div style={{ padding: '16px' }}>
         <Story />
-      </Flex>
+      </div>
     ),
   ],
 }

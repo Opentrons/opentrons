@@ -1,0 +1,111 @@
+/* Desktop Styles */
+.display_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 2.4375rem/3rem Public Sans;
+  }
+}
+
+.heading_large_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 1.625rem/2rem Public Sans;
+  }
+}
+
+.heading_large_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 1.625rem/2rem Public Sans;
+  }
+}
+
+.heading_medium_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 1.4375rem/1.75rem Public Sans;
+  }
+}
+
+.heading_medium_semiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 1.4375rem/1.75rem Public Sans;
+  }
+}
+
+.heading_small_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 1.125rem/1.5rem Public Sans;
+  }
+}
+
+.heading_small_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 1.125rem/1.5rem Public Sans;
+  }
+}
+
+.heading_small_semiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 1.125rem/1.5rem Public Sans;
+  }
+}
+
+.body_large_semiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 1rem/1.5rem Public Sans;
+  }
+}
+
+.body_large_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 1rem/1.5rem Public Sans;
+  }
+}
+
+.body_default_semiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 0.875rem/1.25rem Public Sans;
+  }
+}
+
+.body_default_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 0.875rem/1.25rem Public Sans;
+  }
+}
+
+.body_default_reg_link {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 0.875rem/1.25rem Public Sans;
+    text-decoration: underline;
+  }
+}
+
+.caption_semiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 0.8125rem/1rem Public Sans;
+  }
+}
+
+.caption_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 0.8125rem/1rem Public Sans;
+  }
+}
+
+.caption_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 0.8125rem/1rem Public Sans;
+  }
+}
+
+.code_regular {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 400 0.8125rem/1.25rem Reddit Mono;
+  }
+}
+
+.hidden {
+  @media not (height: 600px) and (width: 1024px) {
+    display: none;
+  }
+}
+
+/* ODD Styles */

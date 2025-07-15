@@ -1,18 +1,19 @@
-import styled from 'styled-components'
+import type { ElementType } from 'react'
 
-import { isntStyleProp, styleProps } from './style-props'
+type TextProps<T extends ElementType> = {
+  as?: T
+  className?: string
+  children?: React.ReactNode
+} & React.ComponentPropsWithoutRef<T>
 
-import type { PrimitiveComponent } from './types'
-
-/**
- * Text primitive
- *
- * @component
- */
-export const Text: PrimitiveComponent<'p'> = styled.p.withConfig({
-  shouldForwardProp: isntStyleProp,
-})`
-  margin-top: 0;
-  margin-bottom: 0;
-  ${styleProps}
-`
+export function Text<T extends ElementType = 'p'>(
+  props: TextProps<T>
+): JSX.Element {
+  const { as, className, children, ...rest } = props
+  const Component = as || 'p'
+  return (
+    <Component className={className} {...rest}>
+      {children}
+    </Component>
+  )
+}
