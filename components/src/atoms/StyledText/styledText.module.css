@@ -1,104 +1,104 @@
 /* Desktop Styles */
 .display_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 2.4375rem/3rem Public Sans;
+    font: 700 2.4375rem/3rem 'Public Sans', sans-serif;
   }
 }
 
 .heading_large_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 1.625rem/2rem Public Sans;
+    font: 400 1.625rem/2rem 'Public Sans', sans-serif;
   }
 }
 
 .heading_large_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 1.625rem/2rem Public Sans;
+    font: 700 1.625rem/2rem 'Public Sans', sans-serif;
   }
 }
 
 .heading_medium_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 1.4375rem/1.75rem Public Sans;
+    font: 700 1.4375rem/1.75rem 'Public Sans', sans-serif;
   }
 }
 
-.heading_medium_semiBold {
+.heading_medium_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 1.4375rem/1.75rem Public Sans;
+    font: 600 1.4375rem/1.75rem 'Public Sans', sans-serif;
   }
 }
 
 .heading_small_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 1.125rem/1.5rem Public Sans;
+    font: 400 1.125rem/1.5rem 'Public Sans', sans-serif;
   }
 }
 
 .heading_small_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 1.125rem/1.5rem Public Sans;
+    font: 700 1.125rem/1.5rem 'Public Sans', sans-serif;
   }
 }
 
-.heading_small_semiBold {
+.heading_small_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 1.125rem/1.5rem Public Sans;
+    font: 600 1.125rem/1.5rem 'Public Sans', sans-serif;
   }
 }
 
-.body_default_semiBold {
+.body_large_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 1rem/1.5rem Public Sans;
+    font: 600 1rem/1.5rem 'Public Sans', sans-serif;
   }
 }
 
 .body_large_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 1rem/1.5rem Public Sans;
+    font: 400 1rem/1.5rem 'Public Sans', sans-serif;
   }
 }
 
-.body_default_semiBold {
+.body_default_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 0.875rem/1.25rem Public Sans;
+    font: 600 0.875rem/1.25rem 'Public Sans', sans-serif;
   }
 }
 
 .body_default_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 0.875rem/1.25rem Public Sans;
+    font: 400 0.875rem/1.25rem 'Public Sans', sans-serif;
   }
 }
 
 .body_default_reg_link {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 0.875rem/1.25rem Public Sans;
+    font: 400 0.875rem/1.25rem 'Public Sans', sans-serif;
     text-decoration: underline;
   }
 }
 
-.caption_semiBold {
+.caption_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 0.8125rem/1rem Public Sans;
+    font: 600 0.8125rem/1rem 'Public Sans', sans-serif;
   }
 }
 
 .caption_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 0.8125rem/1rem Public Sans;
+    font: 700 0.8125rem/1rem 'Public Sans', sans-serif;
   }
 }
 
 .caption_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 0.8125rem/1rem Public Sans;
+    font: 400 0.8125rem/1rem 'Public Sans', sans-serif;
   }
 }
 
 .code_regular {
   @media not (height: 600px) and (width: 1024px) {
-    font: 400 0.8125rem/1.25rem Reddit Mono;
+    font: 400 0.8125rem/1.25rem 'Reddit Mono', sans-serif;
   }
 }
 
@@ -116,6 +116,7 @@
     line-height: var(--font-height-96);
   }
 }
+
 .level_2_header_regular {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-38);
@@ -123,13 +124,15 @@
     font-weight: var(--font-weight-regular);
   }
 }
-.level_2_header_semiBold {
+
+.level_2_header_semi_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-38);
     line-height: var(--font-height-48);
     font-weight: var(--font-weight-semi-bold);
   }
 }
+
 .level_2_header_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-38);
@@ -137,6 +140,7 @@
     font-weight: var(--font-weight-bold);
   }
 }
+
 .level_3_header_regular {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-32);
@@ -144,13 +148,15 @@
     font-weight: var(--font-weight-regular);
   }
 }
-.level_3_header_semiBold {
+
+.level_3_header_semi_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-32);
     line-height: var(--font-height-42);
     font-weight: var(--font-weight-semi-bold);
   }
 }
+
 .level_3_header_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-32);
@@ -158,6 +164,7 @@
     font-weight: var(--font-weight-bold);
   }
 }
+
 .level_4_header_regular {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-28);
@@ -165,13 +172,15 @@
     font-weight: var(--font-weight-regular);
   }
 }
-.level_4_header_semiBold {
+
+.level_4_header_semi_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-28);
     line-height: var(--font-height-36);
     font-weight: var(--font-weight-semi-bold);
   }
 }
+
 .level_4_header_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-28);
@@ -179,6 +188,7 @@
     font-weight: var(--font-weight-bold);
   }
 }
+
 .body_text_regular {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-22);
@@ -186,13 +196,15 @@
     font-weight: var(--font-weight-regular);
   }
 }
-.body_text_semiBold {
+
+.body_text_semi_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-22);
     line-height: var(--font-height-28);
     font-weight: var(--font-weight-semi-bold);
   }
 }
+
 .body_text_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-22);
@@ -200,6 +212,7 @@
     font-weight: var(--font-weight-bold);
   }
 }
+
 .small_body_text_regular {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-20);
@@ -207,13 +220,15 @@
     font-weight: var(--font-weight-regular);
   }
 }
-.small_body_text_semiBold {
+
+.small_body_text_semi_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-20);
     line-height: var(--font-height-24);
     font-weight: var(--font-weight-semi-bold);
   }
 }
+
 .small_body_text_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-20);
@@ -221,6 +236,7 @@
     font-weight: var(--font-weight-bold);
   }
 }
+
 .hidden_touchscreen {
   @media (height: 600px) and (width: 1024px) {
     display: none;

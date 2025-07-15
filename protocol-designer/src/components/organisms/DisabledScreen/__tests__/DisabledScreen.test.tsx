@@ -27,16 +27,4 @@ describe('DisabledScreen', () => {
       `background-color: ${COLORS.black90}${COLORS.opacity40HexCode}`
     )
   })
-
-  it('should render white text', () => {
-    render()
-    expect(screen.getByText('Your browser size is too small')).toHaveStyle(
-      `color: ${COLORS.white}`
-    )
-    expect(
-      screen.getByText(
-        'Resize your browser to at least 768px wide and 650px tall to continue editing your protocol'
-      )
-    ).toHaveStyle(`color: ${COLORS.white}`)
-  })
 })

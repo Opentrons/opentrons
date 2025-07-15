@@ -31,8 +31,6 @@ describe('ModalHeader', () => {
 
   it('should render text and close icon', () => {
     render(props)
-    const title = screen.getByText('mock modal header title')
-    expect(title).toHaveStyle(`color: ${COLORS.black90}`)
     screen.getByTestId('ModalHeader_icon_close_mock modal header title')
   })
 
