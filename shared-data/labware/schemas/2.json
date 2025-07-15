@@ -444,7 +444,7 @@
       "required": ["height", "volume"],
       "properties": {
         "height": {
-          "description": "The height withinin a well at a user-defined volume.",
+          "description": "The height within a well at a user-defined volume.",
           "type": "number"
         },
         "volume": {
