@@ -1,4 +1,4 @@
-import { ValidFileType } from '../types'
+import type { ValidFileType } from '../types'
 
 export const ALLOWED_FILE_TYPES = {
   pdf: ['.pdf'],
