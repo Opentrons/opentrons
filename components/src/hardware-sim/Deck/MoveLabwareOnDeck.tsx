@@ -3,19 +3,17 @@ import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
 
 import {
+  computeLabwareOrigin,
   getDeckDefFromRobotType,
-  getModuleDef,
-  getPositionFromSlotId,
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
+  getLabwareViewBox,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
 import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
-import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
+import { resolveLabwareLocation } from './resolveLabwareLocation'
 
-import type { ReactNode } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type {
   DeckConfiguration,
   DeckDefinition,
@@ -28,109 +26,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
-const getModulePosition = (
-  deckDef: DeckDefinition,
-  moduleId: string,
-  loadedModules: LoadedModule[]
-): Vector3D | null => {
-  const loadedModule = loadedModules.find(m => m.id === moduleId)
-  if (loadedModule == null) return null
-  const modSlot = deckDef.locations.addressableAreas.find(
-    s => s.id === loadedModule.location.slotName
-  )
-  if (modSlot == null) return null
-
-  const modPosition = getPositionFromSlotId(modSlot.id, deckDef)
-  if (modPosition == null) return null
-  const [modX, modY] = modPosition
-
-  const deckSpecificAffineTransform =
-    getModuleDef(loadedModule.model).slotTransforms?.[deckDef.otId]?.[
-      modSlot.id
-    ]?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
-  const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(
-    [[modX], [modY], [1], [1]],
-    deckSpecificAffineTransform
-  )
-  return { x: labwareX, y: labwareY, z: labwareZ }
-}
-
-function getLabwareCoordinates({
-  deckDef,
-  location,
-  loadedModules,
-  loadedLabware,
-}: {
-  deckDef: DeckDefinition
-  location: LabwareLocation
-  loadedModules: LoadedModule[]
-  loadedLabware: LoadedLabware[]
-}): Vector3D | null {
-  if (location === 'offDeck' || location === 'systemLocation') {
-    return null
-  } else if ('labwareId' in location) {
-    const loadedAdapter = loadedLabware.find(l => l.id === location.labwareId)
-    if (loadedAdapter == null) return null
-    const loadedAdapterLocation = loadedAdapter.location
-
-    if (
-      loadedAdapterLocation === 'offDeck' ||
-      loadedAdapterLocation === 'systemLocation' ||
-      'labwareId' in loadedAdapterLocation
-    )
-      return null
-    //  adapter on module
-    if ('moduleId' in loadedAdapterLocation) {
-      return getModulePosition(
-        deckDef,
-        loadedAdapterLocation.moduleId,
-        loadedModules
-      )
-    }
-
-    //  adapter on deck
-    const loadedAdapterSlotPosition = getPositionFromSlotId(
-      'slotName' in loadedAdapterLocation
-        ? loadedAdapterLocation.slotName
-        : loadedAdapterLocation.addressableAreaName,
-      deckDef
-    )
-    return loadedAdapterSlotPosition != null
-      ? {
-          x: loadedAdapterSlotPosition[0],
-          y: loadedAdapterSlotPosition[1],
-          z: loadedAdapterSlotPosition[2],
-        }
-      : null
-  } else if ('addressableAreaName' in location) {
-    const slotCoordinateTuple = getPositionFromSlotId(
-      location.addressableAreaName,
-      deckDef
-    )
-    return slotCoordinateTuple != null
-      ? {
-          x: slotCoordinateTuple[0],
-          y: slotCoordinateTuple[1],
-          z: slotCoordinateTuple[2],
-        }
-      : null
-  } else if ('slotName' in location) {
-    const slotCoordinateTuple = getPositionFromSlotId(
-      location.slotName,
-      deckDef
-    )
-    return slotCoordinateTuple != null
-      ? {
-          x: slotCoordinateTuple[0],
-          y: slotCoordinateTuple[1],
-          z: slotCoordinateTuple[2],
-        }
-      : null
-  } else {
-    return getModulePosition(deckDef, location.moduleId, loadedModules)
-  }
-}
-
 const SPLASH_Y_BUFFER_MM = 10
 
 interface MoveLabwareOnDeckProps extends StyleProps {
@@ -140,6 +35,7 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
+  labwareDefinitions: LabwareDefinition[]
   deckConfig: DeckConfiguration
   backgroundItems?: ReactNode
   deckFill?: string
@@ -151,6 +47,7 @@ export function MoveLabwareOnDeck(
     robotType,
     movedLabwareDef,
     loadedLabware,
+    labwareDefinitions,
     initialLabwareLocation,
     finalLabwareLocation,
     loadedModules,
@@ -160,50 +57,67 @@ export function MoveLabwareOnDeck(
   } = props
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
 
-  const initialSlotId =
-    initialLabwareLocation === 'offDeck' ||
-    initialLabwareLocation === 'systemLocation' ||
-    !('slotName' in initialLabwareLocation)
-      ? deckDef.locations.addressableAreas[1].id
-      : initialLabwareLocation.slotName
+  const initialResolvedLocation = resolveLabwareLocation({
+    deckDef,
+    targetLabwareDef: movedLabwareDef,
+    targetLabwareLocation: initialLabwareLocation,
+    loadedModules,
+    otherLoadedLabware: loadedLabware,
+    otherLabwareDefinitions: labwareDefinitions,
+  })
+  const finalResolvedLocation = resolveLabwareLocation({
+    deckDef,
+    targetLabwareDef: movedLabwareDef,
+    targetLabwareLocation: finalLabwareLocation,
+    loadedModules,
+    otherLoadedLabware: loadedLabware,
+    otherLabwareDefinitions: labwareDefinitions,
+  })
 
-  const slotPosition = getPositionFromSlotId(initialSlotId, deckDef) ?? [
-    0,
-    0,
-    0,
-  ]
+  const initialCoordinates =
+    initialResolvedLocation === 'error' || initialResolvedLocation === 'offDeck'
+      ? initialResolvedLocation
+      : computeLabwareOrigin(initialResolvedLocation) ?? 'error'
+  const finalCoordinates =
+    finalResolvedLocation === 'error' || finalResolvedLocation === 'offDeck'
+      ? finalResolvedLocation
+      : computeLabwareOrigin(finalResolvedLocation) ?? 'error'
 
-  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(movedLabwareDef)
+  const referenceForOffDeckCoordinates = (() => {
+    if (initialCoordinates !== 'error' && initialCoordinates !== 'offDeck') {
+      return initialCoordinates
+    } else if (finalCoordinates !== 'error' && finalCoordinates !== 'offDeck') {
+      return finalCoordinates
+    } else {
+      return { x: 0, y: 0, z: 0 }
+    }
+  })()
+  const offDeckCoordinates = getOffDeckCoordinates(
+    deckDef,
+    movedLabwareDef,
+    referenceForOffDeckCoordinates,
+    SPLASH_Y_BUFFER_MM
+  )
 
-  const offDeckPosition = {
-    x: slotPosition[0],
-    y:
-      deckDef.cornerOffsetFromOrigin[1] -
-      getSchema2Dimensions(movedLabwareDef).xDimension -
-      SPLASH_Y_BUFFER_MM,
-  }
-  const initialPosition =
-    getLabwareCoordinates({
-      deckDef,
-      location: initialLabwareLocation,
-      loadedModules,
-      loadedLabware,
-    }) ?? offDeckPosition
-  const finalPosition =
-    getLabwareCoordinates({
-      deckDef,
-      location: finalLabwareLocation,
-      loadedModules,
-      loadedLabware,
-    }) ?? offDeckPosition
+  const animationInitialCoordinates =
+    initialCoordinates !== 'error' && initialCoordinates !== 'offDeck'
+      ? initialCoordinates
+      : offDeckCoordinates
+  const animationFinalCoordinates =
+    finalCoordinates !== 'error' && finalCoordinates !== 'offDeck'
+      ? finalCoordinates
+      : offDeckCoordinates
 
-  const shouldReset = usePositionChangeReset(initialPosition, finalPosition)
+  const shouldReset = usePositionChangeReset(
+    animationInitialCoordinates,
+    animationFinalCoordinates
+  )
 
   const springProps = useSpring({
     reset: shouldReset,
     config: { duration: 1000, easing: easings.easeInOutSine },
     from: {
-      ...initialPosition,
+      ...animationInitialCoordinates,
       splashOpacity: 0,
       deckOpacity: 0,
     },
@@ -211,17 +125,13 @@ export function MoveLabwareOnDeck(
       { deckOpacity: 1 },
       { splashOpacity: 1 },
       { splashOpacity: 0 },
-      { ...finalPosition },
+      { ...animationFinalCoordinates },
       { splashOpacity: 1 },
       { splashOpacity: 0 },
       { deckOpacity: 0 },
     ],
     loop: true,
   })
-
-  if (deckDef == null) {
-    return null
-  }
 
   return (
     <BaseDeck
@@ -235,11 +145,13 @@ export function MoveLabwareOnDeck(
     >
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
-        <g
-          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
-        >
-          <LabwareRender definition={movedLabwareDef} highlight={true} />
-          <AnimatedG style={{ opacity: springProps.splashOpacity }}>
+        <LabwareRender
+          definition={movedLabwareDef}
+          positioningMode="passThrough"
+          highlight={true}
+        />
+        <AnimatedG style={{ opacity: springProps.splashOpacity }}>
+          <AlignSplashToLabware labwareDefinition={movedLabwareDef}>
             <path
               d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
               stroke={COLORS.blue50}
@@ -247,11 +159,36 @@ export function MoveLabwareOnDeck(
               strokeLinecap="round"
               transform="scale(.97, -1) translate(-19, -104)"
             />
-          </AnimatedG>
-        </g>
+          </AlignSplashToLabware>
+        </AnimatedG>
       </AnimatedG>
     </BaseDeck>
   )
+}
+
+/**
+ * Returns the coordinates of a location beyond the bounds of the deck.
+ *
+ * @param onDeckCoordinates - The coordinates of the labware when it's on-deck. The
+ *  off-deck location is chosen to be vertically aligned with this, so the animation
+ *  goes straight up or down.
+ */
+function getOffDeckCoordinates(
+  deckDefinition: DeckDefinition,
+  labwareDefinition: LabwareDefinition,
+  onDeckCoordinates: Vector3D,
+  extraMargin: number
+): Vector3D {
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
+  const labwareOriginToLabwareMaxY =
+    labwareViewBox.minY + labwareViewBox.yDimension
+  const margin = labwareOriginToLabwareMaxY + extraMargin
+  const deckMinY = deckDefinition.cornerOffsetFromOrigin[1]
+  const y = deckMinY - margin - labwareOriginToLabwareMaxY
+  return {
+    ...onDeckCoordinates,
+    y,
+  }
 }
 
 function usePositionChangeReset(
@@ -285,6 +222,31 @@ function usePositionChangeReset(
 
   return shouldReset
 }
+
+/**
+ * The splash SVG is made for its origin to be placed at the -x,-y corner of a labware
+ * (or the slot that the labware is in). If this component is placed at the labware
+ * origin and the splash is placed inside this component, it will align the splash
+ * accordingly.
+ */
+function AlignSplashToLabware(
+  props: PropsWithChildren<{ labwareDefinition: LabwareDefinition }>
+): JSX.Element {
+  const { labwareDefinition, children } = props
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
+  const labwareOriginToFrontLeftCorner = {
+    x: labwareViewBox.minX,
+    y: labwareViewBox.minY,
+  }
+  return (
+    <g
+      transform={`translate(${labwareOriginToFrontLeftCorner.x} ${labwareOriginToFrontLeftCorner.y})`}
+    >
+      {children}
+    </g>
+  )
+}
+
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */

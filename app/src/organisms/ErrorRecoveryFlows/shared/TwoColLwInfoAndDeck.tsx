@@ -30,6 +30,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -138,6 +139,7 @@ export function TwoColLwInfoAndDeck(
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
             backgroundItems={
               <>

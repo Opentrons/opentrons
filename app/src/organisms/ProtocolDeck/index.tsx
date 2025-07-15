@@ -10,7 +10,6 @@ import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareInfoByLiquidId,
   getLabwareOnDeck,
-  getModuleFromStack,
   getStackedItemsOnStartingDeck,
   getStacksOnModules,
   getTopLabwareFromStack,
@@ -25,7 +24,6 @@ import type { ComponentProps } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
-  ModuleModel,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
@@ -60,8 +58,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
-    ([slotName, stackedItems]) => {
-      const module = getModuleFromStack(stackedItems)
+    ([slotName, { allItemsInStack: stackedItems, moduleInStack: module }]) => {
       const topLabwareInfo = getTopLabwareFromStack(stackedItems)
       const topLabwareDefinition =
         topLabwareInfo != null
@@ -69,8 +66,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           : null
 
       return {
-        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
-        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        moduleModel: module.moduleModel,
+        moduleLocation: { slotName: module.moduleSlotName },
         nestedLabwareDef: topLabwareDefinition,
         nestedLabwareWellFill:
           topLabwareInfo != null
