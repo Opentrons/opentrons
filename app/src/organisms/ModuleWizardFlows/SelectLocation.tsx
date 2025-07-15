@@ -130,6 +130,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
+    console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
@@ -158,15 +159,17 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             attachedModule.moduleModel,
             deckConfig
           )
+          console.log('fixtureReplacement: ', fixtureReplacement)
           return {
             ...cc,
-            cutoutFixutreId: fixtureReplacement,
+            cutoutFixtureId: fixtureReplacement,
             opentronsModuleSerialNumber: attachedModule.serialNumber,
           }
         } else {
           return cc
         }
       })
+      console.log('updatedDeckConfig: ', updatedDeckConfig)
       updateDeckConfiguration(updatedDeckConfig)
     }
   }
@@ -176,7 +179,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
-
+    console.log('removedFixtureIdByCutoutIds: ', removedFixtureIdByCutoutIds)
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
@@ -196,6 +199,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             anchorCutoutId,
             aa
           )
+          console.log('replacment: ', replacment)
           return {
             ...cc,
             cutoutFixtureId: replacment,

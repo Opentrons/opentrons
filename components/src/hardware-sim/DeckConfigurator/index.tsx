@@ -69,6 +69,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     moduleModel,
   } = props
 
+  console.log('moduleModel: ', moduleModel)
+  console.log('editableCutoutIds; ', editableCutoutIds)
+
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
