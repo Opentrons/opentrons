@@ -199,7 +199,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             anchorCutoutId,
             aa
           )
-          console.log('replacment: ', replacment)
           return {
             ...cc,
             cutoutFixtureId: replacment,
