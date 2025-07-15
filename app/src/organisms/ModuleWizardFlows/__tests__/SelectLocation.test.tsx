@@ -198,7 +198,6 @@ describe('handleAddFixture', () => {
 
     const updatedProps = { ...props, deckConfig: mockDeckConfigWithMagBlock }
     render(updatedProps)
-    console.log('updatedProps: ', updatedProps.deckConfig)
 
     fireEvent.click(screen.getByTestId('C1'))
     const mockUpdatedDeckConfig = mockDeckConfigWithMagBlock.map(config => {
