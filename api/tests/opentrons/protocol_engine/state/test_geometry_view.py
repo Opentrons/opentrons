@@ -4541,7 +4541,6 @@ def test_get_user_heights(
         if target_volume == 0.0:
             return 0.0
         for pair in well_geometry.heightToVolumeMap:
-            breakpoint()
             if target_volume == pair.volume:
                 return pair.height
             if target_volume > prev_volume and target_volume < pair.volume:
