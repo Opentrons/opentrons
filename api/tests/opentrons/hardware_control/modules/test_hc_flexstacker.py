@@ -14,6 +14,7 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import (
+    LATCH_CLEARANCE,
     MAX_TRAVEL,
     HOME_OFFSET_MD,
     HOME_OFFSET_SM,
@@ -357,12 +358,13 @@ async def test_store_labware_motion_sequence(
         verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Assertions for offset calculation and move_axis
-        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
+        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - distance - HOME_OFFSET_SM
+        z_distance = latch_clear_distance - HOME_OFFSET_SM
         z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_distance, z_speed)
         home_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_speed)
@@ -426,11 +428,14 @@ async def test_dispense_labware_motion_sequence(
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, labware_height)
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        move_axis.assert_any_call(
+            StackerAxis.Z, Direction.RETRACT, latch_clear_distance
+        )
         close_latch.assert_called_once()
 
         # Assertions for offset calculation and move_axis/home_axis
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
         move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, z_distance)
         home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT)
 
