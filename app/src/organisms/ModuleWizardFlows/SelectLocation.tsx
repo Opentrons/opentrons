@@ -158,7 +158,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             attachedModule.moduleModel,
             deckConfig
           )
-          console.log('fixtureReplacement: ', fixtureReplacement)
           return {
             ...cc,
             cutoutFixtureId: fixtureReplacement,
