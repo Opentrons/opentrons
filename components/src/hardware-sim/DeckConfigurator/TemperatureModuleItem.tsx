@@ -76,8 +76,6 @@ export function TemperatureModuleItem(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
-  console.log('aa: ', addressableAreaId)
-  console.log('handleClickRemove; ', handleClickRemove)
 
   const handleRemoveClick = (): void => {
     if (handleClickRemove != null) {
