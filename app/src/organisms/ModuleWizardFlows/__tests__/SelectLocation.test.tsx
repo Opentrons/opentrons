@@ -189,10 +189,11 @@ describe('handleAddFixture', () => {
 
   it('should call updateDeckConfig with flex and mag block fixture', async () => {
     const mockDeckConfigWithMagBlock = mockSimpleDeckConfig.map(dc => {
-      if (dc.cutoutId === 'cutoutD1') {
-        dc.cutoutFixtureId = MAGNETIC_BLOCK_V1_FIXTURE
+      const updatedDc = {...dc}
+      if (updatedDc.cutoutId === 'cutoutD1') {
+        updatedDc.cutoutFixtureId = MAGNETIC_BLOCK_V1_FIXTURE
       }
-      return dc
+      return updatedDc
     })
 
     const updatedProps = { ...props, deckConfig: mockDeckConfigWithMagBlock }
@@ -200,11 +201,12 @@ describe('handleAddFixture', () => {
 
     fireEvent.click(screen.getByTestId('C1'))
     const mockUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
-      if (config.cutoutId === 'cutoutC1') {
-        config.cutoutFixtureId = 'temperatureModuleV2'
-        config.opentronsModuleSerialNumber = 'test123'
+      const cd = {...config}
+      if (cd.cutoutId === 'cutoutC1') {
+        cd.cutoutFixtureId = 'temperatureModuleV2'
+        cd.opentronsModuleSerialNumber = 'test123'
       }
-      return config
+      return cd
     })
 
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
@@ -218,22 +220,24 @@ describe('handleAddFixture', () => {
       serialNumber: 'test123',
     } as AttachedModule
     const mockUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
-      if (config.cutoutId === 'cutoutD3') {
-        config.cutoutFixtureId = FLEX_STACKER_MODULE_V1
-        config.opentronsModuleSerialNumber = 'test123'
+      const cd = {...config}
+      if (cd.cutoutId === 'cutoutD3') {
+        cd.cutoutFixtureId = FLEX_STACKER_MODULE_V1
+        cd.opentronsModuleSerialNumber = 'test123'
       }
-      return { ...config, opentronsModuleSerialNumber: undefined }
+      return cd
     })
     props.deckConfig = mockUpdatedDeckConfig
     render(props)
 
     fireEvent.click(screen.getByTestId('D3'))
     const mockStackerUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
-      if (config.cutoutId === 'cutoutD3') {
-        config.cutoutFixtureId = FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
-        config.opentronsModuleSerialNumber = 'test123'
+      const updatedDc = {...config}
+      if (updatedDc.cutoutId === 'cutoutD3') {
+        updatedDc.cutoutFixtureId = FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+        updatedDc.opentronsModuleSerialNumber = 'test123'
       }
-      return config
+      return updatedDc
     })
 
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
@@ -273,14 +277,17 @@ describe('handleRemoveFixture', () => {
   it('should call updateDeckConfig without tempDeck', async () => {
     render(props)
 
-    fireEvent.click(screen.getByTestId('A1'))
     const mockUpdatedDeckConfig = mockSimpleDeckConfig.map(config => {
-      if (config.cutoutId === 'cutoutA1') {
-        config.cutoutFixtureId = TEMPERATURE_MODULE_V2_FIXTURE
-        config.opentronsModuleSerialNumber = 'test123'
+      const cd = {...config}
+      if (cd.cutoutId === 'cutoutA1') {
+        cd.cutoutFixtureId = TEMPERATURE_MODULE_V2_FIXTURE
+        cd.opentronsModuleSerialNumber = 'test123'
       }
-      return config
+      return cd
     })
+    console.log("mockUpdatedDeckConfig: ", mockUpdatedDeckConfig)
+    console.log("mockSimpleDeckConfig: ", mockSimpleDeckConfig)
+    fireEvent.click(screen.getByTestId('A1'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
       mockUpdatedDeckConfig
     )
