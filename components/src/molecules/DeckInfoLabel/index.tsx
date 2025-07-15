@@ -1,90 +1,64 @@
-import styled from 'styled-components'
+import clsx from 'clsx'
 
 import { StyledText } from '../../atoms'
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import styles from './deckInfoLabel.module.css'
 
-import type { IconName, ModuleIconName } from '../../icons'
-import type { StyleProps } from '../../primitives'
+import type { CSSProperties } from 'react'
 
-interface DeckLabelProps extends StyleProps {
-  /** deck label to display */
-  deckLabel: string
-  /** deck info label icon name */
-  iconName?: IconName
-  /** deck info label size large is for header text */
-  /** when use large, need to set svgSize to 1.25rem */
-  size?: 'default' | 'large'
-}
-
-interface HardwareIconProps extends StyleProps {
-  /** hardware icon name */
-  iconName: ModuleIconName | 'stacked'
+interface DeckInfoLabelProps {
   deckLabel?: string
-}
-
-// type union requires one of deckLabel or iconName, but not both
-export type DeckInfoLabelProps = (DeckLabelProps | HardwareIconProps) & {
+  iconName?: string
   highlight?: boolean
+  size?: 'large' | 'default'
+  height?: string | number
+  width?: string | number
   svgSize?: string | number
 }
 
-export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
-  align-items: ${ALIGN_CENTER};
-  background-color: ${props =>
-    props.highlight ?? false ? COLORS.blue50 : 'inherit'};
-  border: ${props => (props.size === 'large' ? '2px' : '1px')} solid
-    ${props => (props.highlight ?? false ? 'transparent' : COLORS.black90)};
-  width: ${props => props.width ?? 'max-content'};
-  padding: ${SPACING.spacing2} ${SPACING.spacing4};
-  border-radius: ${BORDERS.borderRadius8};
-  justify-content: ${JUSTIFY_CENTER};
-  height: ${props =>
-    props.height ?? (props.size === 'large' ? '1.75rem' : '1.25rem')};
-
-  svg {
-    height: ${props =>
-      props.svgSize ?? (props.size === 'large' ? '1.5rem' : '0.875rem')};
-    width: ${props =>
-      props.svgSize ?? (props.size === 'large' ? '1.5rem' : '0.875rem')};
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-width: 2px;
-    border-radius: ${BORDERS.borderRadius12};
-    height: ${props => props.height ?? SPACING.spacing32};
-    padding: ${SPACING.spacing4}
-      ${props =>
-        props.deckLabel != null ? SPACING.spacing8 : SPACING.spacing6};
-    > svg {
-      height: ${props => props.svgSize ?? '1.25rem'};
-      width: ${props => props.svgSize ?? '1.25rem'};
-    }
-  }
-`
-
-function DeckInfoLabelComponent({
+export function DeckInfoLabel({
   deckLabel,
   iconName,
   highlight = false,
   size = 'default',
-  ...styleProps
+  height,
+  width,
+  svgSize,
 }: DeckInfoLabelProps): JSX.Element {
+  const labelClass = clsx(
+    styles.label,
+    highlight ? styles.highlight : styles.noHighlight,
+    styles[size],
+    {
+      [styles.hasDeckLabel]: deckLabel != null,
+    }
+  )
+
+  const svgStyle: CSSProperties = {
+    height: svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem'),
+    width: svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem'),
+  }
+
+  const inlineStyle: CSSProperties = {
+    height,
+    width,
+  }
+
   return (
-    <Flex
+    <div
+      className={labelClass}
+      style={inlineStyle}
       data-testid={
         deckLabel != null
           ? `DeckInfoLabel_${deckLabel}`
           : `DeckInfoLabel_${iconName}`
       }
-      {...styleProps}
     >
       {iconName != null ? (
         <Icon
           name={iconName}
+          style={svgStyle}
           color={highlight ? COLORS.white : COLORS.black90}
           aria-label={iconName}
         />
@@ -97,6 +71,6 @@ function DeckInfoLabelComponent({
           {deckLabel}
         </StyledText>
       )}
-    </Flex>
+    </div>
   )
 }
