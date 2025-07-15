@@ -851,6 +851,9 @@ def run_blank_test(
 ) -> List[MeasurementData]:
     """Run a "blank" trial to measure the evaporation."""
     channel = 0
+    print_info(f"Running blank trial {trial} volume {volume}")
+    fixture_settings.pipette.configure_for_volume(volume)
+    fixture_settings.pipette.prepare_to_aspirate()
     # this is the next tip we're gonna use we just need the uri
     tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
@@ -934,6 +937,7 @@ def run_one_test(
     last_measurement: MeasurementData,
 ) -> List[MeasurementData]:
     """Run one trial of one test."""
+    print_info(f"Running trial {trial} volume {volume} channel {channel} tip {tip}")
     tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
