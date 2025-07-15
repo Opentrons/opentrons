@@ -99,7 +99,7 @@ from .wells import WellView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
-from .frustum_helpers import (
+from .inner_well_math_utils import (
     find_height_inner_well_geometry,
     find_volume_inner_well_geometry,
     find_height_user_defined_volumes,

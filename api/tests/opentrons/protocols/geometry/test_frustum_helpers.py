@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.labware_definition import (
     SphericalSegment,
     InnerWellGeometry,
 )
-from opentrons.protocol_engine.state.frustum_helpers import (
+from opentrons.protocol_engine.state.inner_well_math_utils import (
     _cross_section_area_rectangular,
     _cross_section_area_circular,
     _reject_unacceptable_heights,

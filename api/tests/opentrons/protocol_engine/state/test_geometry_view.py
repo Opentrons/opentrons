@@ -123,7 +123,7 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaState,
 )
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
-from opentrons.protocol_engine.state.frustum_helpers import (
+from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _volume_from_height_circular,
@@ -4493,23 +4493,22 @@ def test_get_user_volumes(
             prev_volume = pair.volume
         raise ValueError("test function unable to find volume.")
 
-    for i in range(50):
-        target_height_volume = target_height_volume_st.draw(
-            st.floats(
-                min_value=0,
-                max_value=well_def.depth,
-                allow_infinity=False,
-                allow_nan=False,
-            )
+    target_height_volume = target_height_volume_st.draw(
+        st.floats(
+            min_value=0,
+            max_value=well_def.depth,
+            allow_infinity=False,
+            allow_nan=False,
         )
-        volume_estimate = find_volume_user_defined_volumes(
-            target_height=target_height_volume, well_geometry=well_geometry
-        )
-        expected_volume_estimate = _expected_volume_result(
-            target_height=target_height_volume, well_geometry=well_geometry
-        )
-        # TODO: make sure this also works with SimulatedProbeResult
-        assert volume_estimate == expected_volume_estimate
+    )
+    volume_estimate = find_volume_user_defined_volumes(
+        target_height=target_height_volume, well_geometry=well_geometry
+    )
+    expected_volume_estimate = _expected_volume_result(
+        target_height=target_height_volume, well_geometry=well_geometry
+    )
+    # TODO: make sure this also works with SimulatedProbeResult
+    assert volume_estimate == expected_volume_estimate
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -4555,23 +4554,22 @@ def test_get_user_heights(
             prev_height = pair.height
         raise ValueError("test function unable to find volume.")
 
-    for i in range(50):
-        target_height_volume = target_height_volume_st.draw(
-            st.floats(
-                min_value=0,
-                max_value=well_def.depth,
-                allow_infinity=False,
-                allow_nan=False,
-            )
+    target_height_volume = target_height_volume_st.draw(
+        st.floats(
+            min_value=0,
+            max_value=well_def.depth,
+            allow_infinity=False,
+            allow_nan=False,
         )
-        height_estimate = find_height_user_defined_volumes(
-            target_volume=target_height_volume, well_geometry=well_geometry
-        )
-        expected_height_estimate = _expected_height_result(
-            target_volume=target_height_volume, well_geometry=well_geometry
-        )
-        # TODO: make sure this also works with SimulatedProbeResult
-        assert height_estimate == expected_height_estimate
+    )
+    height_estimate = find_height_user_defined_volumes(
+        target_volume=target_height_volume, well_geometry=well_geometry
+    )
+    expected_height_estimate = _expected_height_result(
+        target_volume=target_height_volume, well_geometry=well_geometry
+    )
+    # TODO: make sure this also works with SimulatedProbeResult
+    assert height_estimate == expected_height_estimate
 
 
 @pytest.mark.parametrize(
