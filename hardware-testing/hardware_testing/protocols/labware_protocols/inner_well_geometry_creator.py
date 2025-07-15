@@ -106,7 +106,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_float(
         variable_name="first_dispense",
         display_name="First Dispense Amount",
-        description="specify a first dispense to circumvent probing under 3mm",
+        description="specify a first dispense",
         default=50.0,
         maximum=99999.0,
         minimum=1.0
@@ -378,6 +378,7 @@ def run(ctx: ProtocolContext) -> None:
     step = 0
     hdelta = 0.0
     height = 0.0
+    height_check = 0.0
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -450,11 +451,11 @@ def run(ctx: ProtocolContext) -> None:
         #initial step, log 0
         if step == 0:
             pick_up_tips()
-            tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+            tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
             _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
         else:
             if not quick_mode:
-                tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
+                tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
             dispense_volume = step_volume #dispenses first_dispense initially
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
@@ -466,13 +467,22 @@ def run(ctx: ProtocolContext) -> None:
             )
             volume_dispensed += dispense_volume
 
+            
+            height_check = corrected_height
+
             #probe well
-            height = round(
-                _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating()), 5
-            )
+            height = _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating())
+            corrected_height = height + tip_z_error
+
+            #check if new height greater than old height 
+            if step > 1 and height_check > corrected_height:
+                liq_pipette.drop_tip()
+                liq_pipette.pick_up_tip()
+                height = _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating())
+                corrected_height = height + tip_z_error
+            
 
         #log corrected height 
-        corrected_height = height + tip_z_error
         cheight_list.append(corrected_height)
 
         #find hdelta and correct 
