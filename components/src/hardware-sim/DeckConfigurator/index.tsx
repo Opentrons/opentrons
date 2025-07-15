@@ -69,8 +69,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     moduleModel,
   } = props
 
-  console.log('deckConfig: ', deckConfig)
-  console.log('editableCutoutIds: ', editableCutoutIds)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
