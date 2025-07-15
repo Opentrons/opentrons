@@ -1077,12 +1077,14 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             trial_disp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
             }
-            actual_asp_list_channel: List[float] = []
-            actual_disp_list_channel: List[float] = []
+            actual_asp_list_all = []
+            actual_disp_list_all = []
             measurements[volume] = []
             for channel in fixture_settings.channels:
                 channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
+                actual_asp_list_channel: List[float] = []
+                actual_disp_list_channel: List[float] = []
                 for trial in range(fixture_settings.trials):
                     print_header(
                         f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
@@ -1133,53 +1135,56 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     trial_asp_dict[trial].append(asp_with_evap)
                     trial_disp_dict[trial].append(disp_with_evap)
                     last_measurement = measurements[volume][-1][-1]
-            aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                actual_asp_list_channel, volume
-            )
-            dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                actual_disp_list_channel, volume
-            )
-            aspirate_data_list = [elem[1] for elem in measurements[volume]]
-            dispense_data_list = [elem[2] for elem in measurements[volume]]
-            # Average Celsius
-            aspirate_celsius_avg = sum(
-                a_data.environment.celsius_pipette for a_data in aspirate_data_list
-            ) / len(aspirate_data_list)
-            dispense_celsius_avg = sum(
-                d_data.environment.celsius_pipette for d_data in dispense_data_list
-            ) / len(dispense_data_list)
-            # Average humidity
-            aspirate_humidity_avg = sum(
-                a_data.environment.humidity_pipette for a_data in aspirate_data_list
-            ) / len(aspirate_data_list)
-            dispense_humidity_avg = sum(
-                d_data.environment.humidity_pipette for d_data in dispense_data_list
-            ) / len(dispense_data_list)
+                aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                    actual_asp_list_channel, volume
+                )
+                dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                    actual_disp_list_channel, volume
+                )
+                aspirate_data_list = [elem[1] for elem in measurements[volume]]
+                dispense_data_list = [elem[2] for elem in measurements[volume]]
+                # Average Celsius
+                aspirate_celsius_avg = sum(
+                    a_data.environment.celsius_pipette for a_data in aspirate_data_list
+                ) / len(aspirate_data_list)
+                dispense_celsius_avg = sum(
+                    d_data.environment.celsius_pipette for d_data in dispense_data_list
+                ) / len(dispense_data_list)
+                # Average humidity
+                aspirate_humidity_avg = sum(
+                    a_data.environment.humidity_pipette for a_data in aspirate_data_list
+                ) / len(aspirate_data_list)
+                dispense_humidity_avg = sum(
+                    d_data.environment.humidity_pipette for d_data in dispense_data_list
+                ) / len(dispense_data_list)
 
-            report.store_volume_per_channel(
-                report=fixture_settings.test_report,
-                mode="aspirate",
-                volume=volume,
-                channel=channel,
-                average=aspirate_average,
-                cv=aspirate_cv,
-                d=aspirate_d,
-                celsius=aspirate_celsius_avg,
-                humidity=aspirate_humidity_avg,
-                flag="isolated" if fixture_settings.isolate_volumes else "",
-            )
-            report.store_volume_per_channel(
-                report=fixture_settings.test_report,
-                mode="dispense",
-                volume=volume,
-                channel=channel,
-                average=dispense_average,
-                cv=dispense_cv,
-                d=dispense_d,
-                celsius=dispense_celsius_avg,
-                humidity=dispense_humidity_avg,
-                flag="isolated" if fixture_settings.isolate_volumes else "",
-            )
+                report.store_volume_per_channel(
+                    report=fixture_settings.test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    channel=channel,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                    celsius=aspirate_celsius_avg,
+                    humidity=aspirate_humidity_avg,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                )
+                report.store_volume_per_channel(
+                    report=fixture_settings.test_report,
+                    mode="dispense",
+                    volume=volume,
+                    channel=channel,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                    celsius=dispense_celsius_avg,
+                    humidity=dispense_humidity_avg,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                )
+
+                actual_asp_list_all.extend(actual_asp_list_channel)
+                actual_disp_list_all.extend(actual_disp_list_channel)
             for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
                     trial_asp_dict[trial], volume
@@ -1207,6 +1212,30 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     d=dispense_d,
                     flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
+            aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                actual_asp_list_all, volume
+            )
+            dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                actual_disp_list_all, volume
+            )
+            report.store_volume_all(
+                report=fixture_settings.test_report,
+                mode="aspirate",
+                volume=volume,
+                average=aspirate_average,
+                cv=aspirate_cv,
+                d=aspirate_d,
+                flag="",
+            )
+            report.store_volume_all(
+                report=fixture_settings.test_report,
+                mode="dispense",
+                volume=volume,
+                average=dispense_average,
+                cv=dispense_cv,
+                d=dispense_d,
+                flag="",
+            )
 
 
 def _override_check(
