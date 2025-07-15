@@ -13,6 +13,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getMaxPushOutVolume } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -22,7 +23,6 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
-import { getMaxPushOutVolume } from '../utils'
 
 import type { Dispatch } from 'react'
 import type {
@@ -73,9 +73,7 @@ export function PushOut(props: PushOutProps): JSX.Element {
       ? t('shared:continue')
       : t('shared:save')
 
-  const handleClickBackOrExit = (): void => {
-    onBack()
-  }
+  const handleClickBackOrExit = onBack
 
   const handleClickSaveOrContinue = (): void => {
     if (currentStep === 1) {

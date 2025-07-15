@@ -52,6 +52,7 @@ export * from './validateCustomLabwareHelper'
 export * from './getWellRangeForLiquidLabwarePair'
 export * from './positionMath'
 export * from './pairsFromArray'
+export * from './getMaxPushOutVolume'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

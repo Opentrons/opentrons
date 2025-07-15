@@ -1,4 +1,5 @@
 import {
+  getMaxPushOutVolume,
   getMinXYDimension,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
@@ -31,11 +32,7 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import {
-  canPipetteUseLabware,
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../utils'
+import { canPipetteUseLabware, getMaxConditioningVolume } from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 

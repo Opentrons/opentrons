@@ -320,28 +320,6 @@ export const getDefaultBlowoutFlowRate = (
   ].defaultBlowOutFlowRate.default
 }
 
-/**
- * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
- *
- * @param {number} transferVolume - The transfer volume for the transfer plan
- * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
- * @returns {number} - The maximum supported push out volume for each dispense
- */
-export const getMaxPushOutVolume = (
-  transferVolume: number,
-  pipetteSpecs: PipetteV2Specs
-): number => {
-  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
-  const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const { bottom, blowout } = isInLowVolumeMode
-    ? plungerPositionsConfigurations.lowVolumeDefault ??
-      plungerPositionsConfigurations.default
-    : plungerPositionsConfigurations.default
-  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
-  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
-}
-
 export const getDefaultPushOutVolume = (
   transferVolume: number,
   pipetteSpecs: PipetteV2Specs,

@@ -1,6 +1,6 @@
 import { round } from 'lodash'
 
-import type { PipetteV2Specs } from '@opentrons/shared-data'
+import type { PipetteV2Specs } from '../types'
 
 export const getMaxPushOutVolume = (
   transferVolume: number,
