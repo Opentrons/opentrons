@@ -37,6 +37,6 @@
       "/app/*": ["./src/*"]
     },
   },
-  "include": ["typings", "src", "../shared-data/js/helpers/getWellFillFromLabwareId.ts", "../shared-data/js/helpers/getStandardDeckViewLayerBlockList.ts", "../shared-data/js/helpers/getLabwareDefinitionsByURIForProtocol.ts", "../shared-data/js/helpers/getLabwareInfoByLiquidId.ts", "../shared-data/js/helpers/getStackedItemsOnStartingDeck.ts"],
+  "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]
 }
