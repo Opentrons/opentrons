@@ -1,0 +1,15 @@
+.waste_chute_copy_container {
+  display: flex;
+  text-align: center;
+}
+
+.waste_chute_fixture_container {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  padding-inline: 8px;
+  width: 100%;
+}

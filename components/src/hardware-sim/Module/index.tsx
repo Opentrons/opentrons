@@ -20,7 +20,7 @@ import {
   JUSTIFY_CENTER,
   SPACING_1,
 } from '../../styles'
-import { RobotCoordsForeignObject } from '../Deck'
+import { FlexDirection, RobotCoordsForeignObject } from '../Deck'
 import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
 import { MagneticBlock } from './MagneticBlock'
@@ -69,7 +69,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,

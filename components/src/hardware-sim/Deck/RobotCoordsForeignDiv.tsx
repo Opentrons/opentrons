@@ -1,6 +1,4 @@
-import { Box } from '../../primitives'
-
-import type { ComponentProps, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 export interface RobotCoordsForeignDivProps {
   width?: string | number
@@ -9,7 +7,17 @@ export interface RobotCoordsForeignDivProps {
   y?: string | number
   children?: ReactNode
   outerProps?: any
-  innerDivProps?: ComponentProps<typeof Box>
+  innerDivProps?: {
+    borderRadius?: string
+    backgroundColor?: string
+    border?: string
+    width?: string
+    height?: string
+    display?: 'flex'
+    justifyContent?: string
+    alignItems?: string
+    padding?: string
+  }
   transformWithSVG?: boolean
   extraTransform?: string
   /** optional data-testid to test foreignObjects in cypress */
@@ -39,13 +47,15 @@ export const RobotCoordsForeignDiv = (
       {...{ x, y, height, width, ...outerProps }}
       transform={transformWithSVG ? transform : extraTransform}
     >
-      <Box
-        style={transformWithSVG ? {} : { transform }}
-        xmlns="http://www.w3.org/1999/xhtml"
-        {...innerDivProps}
+      <div
+        // xmlns="http://www.w3.org/1999/xhtml"
+        style={{
+          ...innerDivProps,
+          ...(transformWithSVG ? { transform } : {}),
+        }}
       >
         {children}
-      </Box>
+      </div>
     </foreignObject>
   )
 }

@@ -77,7 +77,7 @@ export const SlotLabels = ({
             style={
               {
                 '--dynamic-width': `${widthLargeRem}rem`,
-              } as React.CSSProperties
+              } as CSSProperties
             }
           >
             <DeckInfoLabel deckLabel="1" height="100%" />
@@ -87,16 +87,14 @@ export const SlotLabels = ({
             style={
               {
                 '--dynamic-width': `${widthLargeRem}rem`,
-              } as React.CSSProperties
+              } as CSSProperties
             }
           >
             <DeckInfoLabel deckLabel="2" height="100%" />
           </div>
           <div
             className={styles.deck_label_row_container}
-            style={
-              { '--dynamic-width': itemDynamicWidth } as React.CSSProperties
-            }
+            style={{ '--dynamic-width': itemDynamicWidth } as CSSProperties}
           >
             <DeckInfoLabel deckLabel="3" height="100%" />
           </div>
@@ -106,7 +104,7 @@ export const SlotLabels = ({
               style={
                 {
                   '--dynamic-width': `${widthSmallRem}rem`,
-                } as React.CSSProperties
+                } as CSSProperties
               }
             >
               <DeckInfoLabel deckLabel="4" height="100%" />

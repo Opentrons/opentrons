@@ -1,15 +1,9 @@
+import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { DeckLabelSet } from '../../organisms'
-import { Flex, Text } from '../../primitives'
-import {
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  TEXT_ALIGN_CENTER,
-} from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import styles from './baseDeck.module.css'
 import { SlotBase } from './SlotBase'
 
 import type { SVGProps } from 'react'
@@ -121,27 +115,24 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
         {overlay != null ? (
           overlay
         ) : (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            backgroundColor={backgroundColor}
-            borderRadius="6px"
-            color={wasteIconColor}
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing4}
-            justifyContent={JUSTIFY_CENTER}
-            padding={SPACING.spacing8}
-            width="100%"
-            border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
+          <div
+            className={styles.waste_chute_fixture_container}
+            style={{
+              backgroundColor,
+              color: wasteIconColor,
+              border: showHighlight ? `3px solid ${COLORS.blue50}` : 'none',
+            }}
           >
             <Icon name="trash" color={wasteIconColor} height="2rem" />
-            <Text
-              color={COLORS.white}
-              textAlign={TEXT_ALIGN_CENTER}
-              css={TYPOGRAPHY.bodyTextSemiBold}
-            >
-              Waste chute
-            </Text>
-          </Flex>
+            <div className={styles.waste_chute_copy_container}>
+              <PlaceholderStyledText
+                desktopStyle="bodyRegularSemiBold"
+                color={COLORS.white}
+              >
+                Waste chute
+              </PlaceholderStyledText>
+            </div>
+          </div>
         )}
       </RobotCoordsForeignObject>
       {tagInfo != null && tagInfo.length > 0 ? (

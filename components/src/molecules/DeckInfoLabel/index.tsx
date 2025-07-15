@@ -1,11 +1,9 @@
 import clsx from 'clsx'
 
-import { StyledText } from '../../atoms'
+import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './deckInfoLabel.module.css'
-
-import type { CSSProperties } from 'react'
 
 interface DeckInfoLabelProps {
   deckLabel?: string
@@ -35,20 +33,10 @@ export function DeckInfoLabel({
     }
   )
 
-  const svgStyle: CSSProperties = {
-    height: svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem'),
-    width: svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem'),
-  }
-
-  const inlineStyle: CSSProperties = {
-    height,
-    width,
-  }
-
   return (
     <div
       className={labelClass}
-      style={inlineStyle}
+      style={{ height, width }}
       data-testid={
         deckLabel != null
           ? `DeckInfoLabel_${deckLabel}`
@@ -58,18 +46,19 @@ export function DeckInfoLabel({
       {iconName != null ? (
         <Icon
           name={iconName}
-          style={svgStyle}
+          height={svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem')}
+          width={svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem')}
           color={highlight ? COLORS.white : COLORS.black90}
           aria-label={iconName}
         />
       ) : (
-        <StyledText
+        <PlaceholderStyledText
           desktopStyle={size === 'large' ? 'headingSmallBold' : 'captionBold'}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >
           {deckLabel}
-        </StyledText>
+        </PlaceholderStyledText>
       )}
     </div>
   )

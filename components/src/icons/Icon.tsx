@@ -1,15 +1,13 @@
-import cx from 'classnames'
-import { css, keyframes } from 'styled-components'
+import clsx from 'clsx'
 
-import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'
+import styles from './icons.module.css'
 
 import type { ReactNode } from 'react'
-import type { SvgProps } from '../primitives'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 
-export interface IconProps extends SvgProps {
+export interface IconProps {
   /** name constant of the icon to display */
   name: IconName
   /** classes to apply */
@@ -29,20 +27,11 @@ export interface IconProps extends SvgProps {
   /** optional children */
   children?: ReactNode
   id?: string
+  color?: string
+  size?: string
+  height?: string | number
+  width?: string | number
 }
-
-const spinAnimation = keyframes`
-  100% {
-    transform: rotate(360deg);
-  }
-`
-
-const spinStyle = css`
-  &.spin {
-    animation: ${spinAnimation} 0.8s steps(8) infinite;
-    transform-origin: center;
-  }
-`
 
 /**
  * Inline SVG icon component
@@ -53,8 +42,20 @@ const spinStyle = css`
  * ```
  */
 export function Icon(props: IconProps): JSX.Element | null {
-  const { name, children, className, spin, id, ...svgProps } = props
+  const {
+    name,
+    children,
+    className,
+    spin,
+    id,
+    size,
+    height: rawHeight,
+    width: rawWidth,
+    ...svgProps
+  } = props
 
+  const height = size != null ? size : rawHeight
+  const width = size != null ? size : rawWidth
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
     return null
@@ -63,17 +64,16 @@ export function Icon(props: IconProps): JSX.Element | null {
   const { viewBox, path } = ICON_DATA_BY_NAME[name]
 
   return (
-    <Svg
+    <svg
       aria-hidden="true"
       fill="currentColor"
       viewBox={viewBox}
-      className={cx(className, { spin })}
-      css={spinStyle}
-      {...svgProps}
+      className={clsx(className, { [styles.spin]: spin })}
+      style={{ width, height, ...svgProps }}
       id={id}
     >
       <path aria-roledescription={name} fillRule="evenodd" d={path} />
       {props.children}
-    </Svg>
+    </svg>
   )
 }
