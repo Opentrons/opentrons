@@ -325,7 +325,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       labwareDef.innerLabwareGeometry ?? {}
     )) {
       if ('sections' in geometry) {
-        for (const [above, below] of pairs(geometry.sections)) {
+        for (const [above, below] of pairsFromArray(geometry.sections)) {
           expect(above.bottomHeight).toStrictEqual(below.topHeight)
         }
       }
