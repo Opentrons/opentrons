@@ -1,4 +1,4 @@
-"""PEEK Mix Protocol with Error Recovery Turned Off."""
+"""Mix Protocol with Error Recovery Turned Off."""
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -8,7 +8,7 @@ from opentrons.protocol_api import (
 from opentrons.hardware_control.types import Axis
 
 metadata = {
-    "protocolName": "PEEK Mix without Error Recovery",
+    "protocolName": "Mix without Error Recovery",
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com>",
 }
 requirements = {
@@ -61,7 +61,7 @@ def safe_mix(
 
 
 def add_parameters(parameters: ParameterContext) -> None:
-    """Add parameters for the PEEK Mix protocol."""
+    """Add parameters for the Mix protocol."""
     parameters.add_str(
         variable_name="left_mount",
         display_name="Left Mount",
@@ -117,7 +117,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(ctx: ProtocolContext) -> None:
-    """Run the PEEK Mix protocol."""
+    """Run the Mix protocol."""
     # Load pipette
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     tip_rack = ctx.load_labware(
