@@ -1012,25 +1012,25 @@
     "userVolumes": {
       "heightToVolumeMap": [
         {
-          "height": 0.5,
-          "volume": 3
-        },
-        {
-          "height": 2.0,
-          "volume": 10
-        },
-        {
-          "height": 10.4,
-          "volume": 70
+          "height": 59.3,
+          "volume": 300
         },
         {
           "height": 30.8,
           "volume": 100
         },
         {
-          "height": 59.3,
-          "volume": 300
-        }
+          "height": 10.4,
+          "volume": 70
+        },
+        {
+          "height": 2.0,
+          "volume": 10
+        },
+        {
+          "height": 0.5,
+          "volume": 3
+        },
       ]
     }
   },

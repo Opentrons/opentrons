@@ -375,7 +375,10 @@ def find_volume_user_defined_volumes(
     prev_volume = 0.0
     if target_height == 0.0:
         return 0.0
-    for pair in well_geometry.heightToVolumeMap:
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    for pair in sorted_volume_map:
         if target_height == pair.height:
             return pair.volume
         if target_height > prev_height and target_height < pair.height:
@@ -410,7 +413,10 @@ def find_height_user_defined_volumes(
     prev_height = 0.0
     if target_volume == 0.0:
         return 0.0
-    for pair in well_geometry.heightToVolumeMap:
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    for pair in sorted_volume_map:
         if target_volume == pair.volume:
             return pair.height
         if target_volume > prev_volume and target_volume < pair.volume:

@@ -458,7 +458,7 @@
       "required": ["heightToVolumeMap"],
       "properties": {
         "heightToVolumeMap": {
-          "description": "A list mapping heights to volumes [height, volume]",
+          "description": "A list mapping heights to volumes [height, volume]. Must be ordered from top (highest z) to bottom (lowest z).",
           "type": "array",
           "minItems": 2,
           "items": {

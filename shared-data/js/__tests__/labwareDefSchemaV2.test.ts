@@ -276,6 +276,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
         const sortedPairingList = pairingList.toSorted(
           (a, b) => b.height - a.height
         )
+        expect(sortedPairingList).toStrictEqual(pairingList)
       }
     }
   })
