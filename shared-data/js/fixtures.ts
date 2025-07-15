@@ -1038,7 +1038,7 @@ export const getAAForModuleFixture = (
   fixtureId: CutoutFixtureIdsWithFakes,
   moduleModel: ModuleModel
 ): AddressableAreaNamesWithFakes => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
   return aaList?.find(
     aa =>
@@ -1071,9 +1071,6 @@ export const getMainAAForAFixture = (
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
       const singleSlotId = getAAWithFakesFromVSId(vsId)
-      console.log('aa: ', aa)
-      console.log('vsId: ', vsId)
-      console.log('addressableAreaId; ', addressableAreaId)
       return singleSlotId === addressableAreaId
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
@@ -1091,7 +1088,6 @@ export const isModuleAllowedOnAA = (
     fixtureId[0],
     getDeckDefFromRobotType('OT-3 Standard')
   )
-  console.log('aa: ', aa)
   const aaWithSlotLikeId = aaForFixture?.map(item => {
     return {
       aa: item,
