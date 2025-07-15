@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy
 
 from opentrons_shared_data.labware.types import (

@@ -99,9 +99,11 @@ export function Header({ isExitButton = false }: HeaderProps): JSX.Element {
           <LogoutOrExitButton onClick={handleLoginOrExitClick}>
             {isExitButton ? t('exit') : t('logout')}
           </LogoutOrExitButton>
-          <Box marginLeft={SPACING.spacing16}>
-            <SettingsButton onClick={handleSettingsClick} />
-          </Box>
+          {(location.pathname === '/' || location.pathname === '/settings') && (
+            <Box marginLeft={SPACING.spacing16}>
+              <SettingsButton onClick={handleSettingsClick} />
+            </Box>
+          )}
         </Flex>
       </HeaderBarContent>
     </HeaderBar>
