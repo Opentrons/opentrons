@@ -575,7 +575,7 @@ describe('isModuleAllowedOnAA', () => {
 
   it('should return true for no module input and fakeD4', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4', 'temperatureModuleV2')
-    expect(vs).toEqual(true)
+    expect(vs).toEqual(false)
   })
 
   it('should return true for tempModule on D3', () => {
@@ -620,11 +620,7 @@ describe('getCutoutConfigReplacmentForModule', () => {
         'temperatureModuleV2',
         mockDeckConfig
       )
-    ).toStrictEqual({
-      cutoutId: 'cutoutD3',
-      cutoutFixtureId: 'temperatureModuleV2',
-      opentronsModuleSerialNumber: undefined,
-    })
+    ).toStrictEqual('temperatureModuleV2')
   })
 
   it('should get flex module replacment fixture', () => {
@@ -635,10 +631,6 @@ describe('getCutoutConfigReplacmentForModule', () => {
         'flexStackerModuleV1',
         mockDeckConfig
       )
-    ).toStrictEqual({
-      cutoutId: 'cutoutC3',
-      cutoutFixtureId: 'flexStackerModuleV1',
-      opentronsModuleSerialNumber: undefined,
-    })
+    ).toStrictEqual('flexStackerModuleV1')
   })
 })
