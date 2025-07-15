@@ -7,7 +7,6 @@ import { createSelector } from 'reselect'
 import {
   ABSORBANCE_READER_TYPE,
   getLabwareDefURI,
-  getLabwareDisplayName,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -31,13 +30,7 @@ import { getLocationStackTopToBottom } from '../../utils'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 
 import type { Selector } from 'reselect'
-import type { ComponentProps } from 'react'
-import type {
-  DropdownOption,
-  InstrumentGroup,
-  InstrumentInfoProps,
-  Mount,
-} from '@opentrons/components'
+import type { DropdownOption, Mount } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
