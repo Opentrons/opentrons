@@ -1,9 +1,9 @@
 import isEqual from 'lodash/isEqual'
 
 import {
+  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
-  MODULE_AA_TYPE_BY_MODEL,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1040,10 +1040,18 @@ export const getAAForModuleFixture = (
 ): AddressableAreaNamesWithFakes => {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
-  return aaList?.find(
+  const aa = aaList?.find(
     aa =>
-      getAAByAAId(aa, deckDef).areaType === MODULE_AA_TYPE_BY_MODEL[moduleModel]
-  ) as AddressableAreaNamesWithFakes
+      getAAByAAId(aa, deckDef).areaType ===
+      FLEX_MODULE_AA_TYPE_BY_MODEL[moduleModel]
+  )
+  if (!aa) {
+    console.error(
+      `Was not able to find a aa match for module ${moduleModel} in cutout ${cutoutId}`
+    )
+    return A1_ADDRESSABLE_AREA
+  }
+  return aa
 }
 
 /**
@@ -1282,5 +1290,7 @@ export const getCutoutConfigReplacmentForModule = (
     cutoutId
   )
 
-  return replacmentFixture[0].cutoutFixtureId
+  return getReplacementFixtureForFakeFixture(
+    replacmentFixture[0].cutoutFixtureId
+  )
 }

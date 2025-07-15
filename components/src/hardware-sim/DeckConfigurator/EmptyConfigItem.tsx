@@ -9,7 +9,12 @@ import {
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
+import {
+  ALIGN_CENTER,
+  DISPLAY_FLEX,
+  JUSTIFY_CENTER,
+  SPACING_4,
+} from '../../styles'
 import { RESPONSIVENESS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -103,7 +108,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
         disabled={disableButton}
       >
         {!disableButton && (
-          <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
+          <Icon name="add-circle" color={COLORS.blue50} size={SPACING_4} />
         )}
       </Btn>
     </RobotCoordsForeignObject>

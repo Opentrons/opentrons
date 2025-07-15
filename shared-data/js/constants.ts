@@ -659,7 +659,7 @@ export const MODULE_FIXTURES_BY_MODEL: {
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
 }
 
-export const MODULE_AA_TYPE_BY_MODEL: {
+export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [moduleModel in ModuleModel]?: AreaType
 } = {
   [HEATERSHAKER_MODULE_V1]: 'heaterShaker',

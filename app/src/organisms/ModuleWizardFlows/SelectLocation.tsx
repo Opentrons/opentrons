@@ -114,6 +114,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
           mayMountToCutoutIds.includes(cutoutId) &&
           (isCurrentConfiguration ||
             SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+            // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
             FAKE_FIXTURE_IDS.includes(cutoutFixtureId))) ||
         FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
       ) {
