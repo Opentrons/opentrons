@@ -50,7 +50,6 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     moduleModel,
   } = props
 
-  console.log('addressableAreaId: ', addressableAreaId)
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
