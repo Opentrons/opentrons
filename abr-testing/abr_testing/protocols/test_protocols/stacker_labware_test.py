@@ -11,48 +11,39 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
 )
 
+from typing import List
 
 metadata = {
-    "protocolName": "Flex Stacker Stress Test",
+    "protocolName": "Flex Stacker Stamping Protocol",
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 
+DECK_SLOTS = ["A1", "A2", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]
+TIP_RACK_SLOTS = DECK_SLOTS[:2]
+LABWARE_SLOTS = DECK_SLOTS[2:]
+
+
 def set_liquid_class_behavior(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
-    tip_rack: Labware,
+    tip_racks: List[Labware],
     water: LiquidClass,
 ) -> None:
     """Set Liquid Class Behavior."""
     lm = "liquid-meniscus"
-    props = water.get_for(pipette, tip_rack)
-    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-    props.aspirate.aspirate_position.offset.z = -2
-    props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
-    props.dispense.dispense_position.offset.z = 1
-    pipette.tip_racks = [tip_rack]
+    for lbw in tip_racks:
+        props = water.get_for(pipette, lbw)
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        props.aspirate.aspirate_position.offset.z = -2
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+        props.dispense.dispense_position.offset.z = 1
 
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    slots = ["A4", "B4", "C4", "D4"]
-    for i in range(4):
-        parameters.add_str(
-            display_name=f"Stacker {i+1} Location",
-            variable_name=f"stacker_{i+1}_location",
-            default=slots[i],
-            description=f"Location of stacker {i+1}.",
-            choices=[
-                {"display_name": "A4", "value": "A4"},
-                {"display_name": "B4", "value": "B4"},
-                {"display_name": "C4", "value": "C4"},
-                {"display_name": "D4", "value": "D4"},
-                {"display_name": "None", "value": "none"},
-            ],
-        )
     parameters.add_bool(
         display_name="Use Temperature Module",
         variable_name="use_temp_mod",
@@ -61,20 +52,62 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
+def move_plates_to_deck_fill_and_store(
+    stacker: FlexStackerContext,
+    ctx: ProtocolContext,
+    p96: InstrumentContext,
+    water: LiquidClass,
+    reservoir: Labware,
+) -> None:
+    """Move plates to the deck, fill them with water, and store back in stacker."""
+    # Move PCR Plates and Fill
+    plates_on_deck = []
+    for i in range(6):
+        plate = stacker.retrieve()
+        ctx.move_labware(plate, LABWARE_SLOTS[i], use_gripper=True)
+        plate.load_empty(plate.wells())
+        if i % 2 == 0:
+            p96.reset_tipracks()
+            set_liquid_class_behavior(ctx, p96, p96.tip_racks, water)
+        p96.transfer_with_liquid_class(
+            water,
+            50,
+            reservoir["A1"],
+            plate["A1"],
+            new_tip="once",
+            return_tip=True,
+            group_wells=False,
+        )
+        plates_on_deck.append(plate)
+    for plate in plates_on_deck:
+        ctx.move_labware(plate, stacker, use_gripper=True)
+        stacker.store()
+
+
+def unload_tipracks_from_stacker(
+    ctx: ProtocolContext,
+    p96: InstrumentContext,
+    stacker: FlexStackerContext,
+    tiprack_adapters: List[Labware],
+) -> None:
+    """Unload tipracks and assign to pipette."""
+    p96.tip_racks.clear()
+    for i in range(2):
+        tip_rack = stacker.retrieve()
+        ctx.move_labware(tip_rack, tiprack_adapters[i], use_gripper=True)
+        # 🔁 Liquid class must be configured *after* tip rack is on deck
+        water = ctx.get_liquid_class("water")
+        set_liquid_class_behavior(ctx, p96, [tip_rack], water)
+        p96.tip_racks.append(tip_rack)
+
+
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
-    stacker_1 = ctx.params.stacker_1_location  # type: ignore[attr-defined]
-    stacker_2 = ctx.params.stacker_2_location  # type: ignore[attr-defined]
-    stacker_3 = ctx.params.stacker_3_location  # type: ignore[attr-defined]
-    stacker_4 = ctx.params.stacker_4_location  # type: ignore[attr-defined]
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
-    stacker_locations = [stacker_1, stacker_2, stacker_3, stacker_4]
-    deck_slots = ["A1", "A2", "B1", "B2", "B3", "C1", "C2", "C3", "D1",  "D3"]
-    tip_rack_slots = deck_slots[:2]  # Slots for tip racks
-    labware_slots = deck_slots[6:]
+
     tiprack_adapters = [
         ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
-        for slot in tip_rack_slots
+        for slot in TIP_RACK_SLOTS
     ]
     # Load Instrument and Liquids
     p96: InstrumentContext = ctx.load_instrument(
@@ -82,7 +115,7 @@ def run(ctx: ProtocolContext) -> None:
         mount="left",
         tip_racks=[],
     )
-    reservoir = ctx.load_labware("nest_1_reservoir_195ml", "D2")
+    reservoir = ctx.load_labware("nest_1_reservoir_195ml", "D1")
     water_liq = ctx.define_liquid("water", "#C0C0C0")
     reservoir["A1"].load_liquid(water_liq, 10000)
     if use_temp_mod:
@@ -90,19 +123,18 @@ def run(ctx: ProtocolContext) -> None:
             "temperaturModuleV1", "D1"
         )  # type: ignore[assignment]
         temp_mod.set_temperature(4)
-        deck_slots.remove("D1")
+        DECK_SLOTS.remove("D1")
     stackers = []
     labware = [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "appliedbiosystemsmicroamp_384_wellplate_40ul",
         "nest_96_wellplate_2ml_deep",
     ]
-    for i, location in enumerate(stacker_locations):
-        if location == "none":
-            continue
+    stacker_slots = ["A4", "B4", "C4", "D4"]
+    for i in range(4):
         stacker: FlexStackerContext = ctx.load_module(
             "flexStackerModuleV1",
-            location,
+            stacker_slots[i],
         )  # type: ignore[assignment]
         if i == 0:
             stacker.set_stored_labware(
@@ -113,29 +145,40 @@ def run(ctx: ProtocolContext) -> None:
             stacker.set_stored_labware(labware[i - 1], count=6)
         stackers.append(stacker)
     stacker_50ul = stackers[0]
-    stacker_prcplates = stackers[1]
+    stacker_pcrplates = stackers[1]
+    stacker_384plates = stackers[2]
+    stacker_nest96deep = stackers[3]
     water = ctx.get_liquid_class("water")
     ctx.load_trash_bin("A3")
-    pcr_on_deck = []
-    for i in range(4):
-        tip_rack = stacker_50ul.retrieve()
-        set_liquid_class_behavior(ctx, p96, tip_rack, water)
-        ctx.move_labware(tip_rack, tiprack_adapters[i], use_gripper=True)
-        pcr_plate = stacker_prcplates.retrieve()
-        if use_temp_mod:
-            ctx.move_labware(pcr_plate, temp_mod, use_gripper=True)
-        else:
-            ctx.move_labware(pcr_plate, labware_slots[i], use_gripper=True)
-        pcr_plate.load_empty(pcr_plate.wells())
-        print(i)
-        p96.transfer_with_liquid_class(
-            water,
-            45,
-            reservoir["A1"],
-            pcr_plate["A1"],
-            new_tip="once",
-            return_tip=True,
-            group_wells = False
-        )
-        pcr_on_deck.append(pcr_plate)
-        
+    # unload tipracks
+    unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
+    move_plates_to_deck_fill_and_store(stacker_pcrplates, ctx, p96, water, reservoir)
+    # Move old tipracks
+    old_tipracks = p96.tip_racks
+    ctx.move_labware(old_tipracks[0], "D2", use_gripper=True)
+    ctx.move_labware(old_tipracks[1], "D3", use_gripper=True)
+    # Get new tipracks
+    unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
+    # Second labware
+    move_plates_to_deck_fill_and_store(stacker_384plates, ctx, p96, water, reservoir)
+
+    # Unload last tip racks
+    unused_tiprack1 = stacker_50ul.retrieve()
+    ctx.move_labware(unused_tiprack1, "B1", use_gripper=True)
+    unused_tiprack2 = stacker_50ul.retrieve()
+    ctx.move_labware(unused_tiprack2, "B2", use_gripper=True)
+
+    # Store extra tip racks
+    for tip in p96.tip_racks:
+        ctx.move_labware(tip, stacker_50ul, use_gripper=True)
+        stacker_50ul.store()
+    # Move Tip racks to adapters
+    ctx.move_labware(unused_tiprack1, tiprack_adapters[0], use_gripper=True)
+    ctx.move_labware(unused_tiprack2, tiprack_adapters[1], use_gripper=True)
+
+    # Next Labware Type
+    p96.tip_racks.clear()
+    p96.tip_racks.append(unused_tiprack1)
+    p96.tip_racks.append(unused_tiprack2)
+    set_liquid_class_behavior(ctx, p96, [unused_tiprack1, unused_tiprack2], water)
+    move_plates_to_deck_fill_and_store(stacker_nest96deep, ctx, p96, water, reservoir)
