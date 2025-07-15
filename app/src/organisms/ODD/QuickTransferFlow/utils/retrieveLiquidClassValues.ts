@@ -9,6 +9,10 @@ import {
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 
 import { getTransferPlanAndReferenceVolumes } from './getTransferPlanAndReferenceVolumes'
 
@@ -41,13 +45,13 @@ const convertBlowoutLocation = (
   location: string | undefined,
   state: QuickTransferSummaryState
 ): BlowOutLocation | undefined => {
-  if (!location) return undefined
+  if (location == null) return undefined
 
   switch (location) {
     case 'source':
-      return 'source_well'
+      return SOURCE_WELL_BLOWOUT_DESTINATION
     case 'destination':
-      return 'dest_well'
+      return DEST_WELL_BLOWOUT_DESTINATION
     case 'trash':
       return state.dropTipLocation
     default:
