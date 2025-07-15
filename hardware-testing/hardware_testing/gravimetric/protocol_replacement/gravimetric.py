@@ -30,7 +30,7 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
@@ -970,10 +970,13 @@ def run_one_test(
     pip_ax = Axis.of_main_tool_actuator(hw_mount)
     estimate_bottom = hw_api.current_position_ot3(hw_mount)[pip_ax]
     encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
-    fixture_settings.pipette.move_to(
-        fixture_settings.liquid_source.top(20).move(Point(0, offset.y, 0))
+    well_top = fixture_settings.liquid_source.top().point
+    above_scale = Point(
+        well_top.x,
+        well_top.y + offset.y,
+        fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
-    fixture_settings.pipette._retract()
+    fixture_settings.pipette.move_to(Location(above_scale, None))
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
