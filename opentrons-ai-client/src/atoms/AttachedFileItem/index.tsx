@@ -70,7 +70,7 @@ export function AttachedFileItem({
       {showRemoveButton && onRemove != null && (
         <button
           onClick={onRemove}
-          aria-label={`Remove ${file.name}`}
+          aria-label={`Remove_${file.name}`}
           className={styles.remove_button}
         >
           <Icon name="close" size="1.75rem" color={COLORS.grey60} />
