@@ -10,7 +10,6 @@ import {
   getInitialRobotStateStandard,
   makeContext,
   SOURCE_LABWARE,
-  TROUGH_LABWARE,
 } from '../fixtures'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
