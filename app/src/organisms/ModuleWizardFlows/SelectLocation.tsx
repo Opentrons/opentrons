@@ -132,28 +132,35 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
-          let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
           if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
-            replacementFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+            return {
+              ...cc,
+              cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+              opentronsModuleSerialNumber: undefined,
+            }
           } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
-            replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+            return {
+              ...cc,
+              cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+              opentronsModuleSerialNumber: undefined,
+            }
           }
           return {
             ...cc,
-            cutoutFixtureId: replacementFixtureId,
+            cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
             opentronsModuleSerialNumber: undefined,
           }
         } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
-          const replacement = getCutoutConfigReplacmentForModule(
+          const fixtureReplacement = getCutoutConfigReplacmentForModule(
             anchorCutoutId,
             selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
             attachedModule.moduleModel,
-            deckConfig,
-            attachedModule.serialNumber
+            deckConfig
           )
           return {
             ...cc,
-            ...replacement,
+            cutoutFixutreId: fixtureReplacement,
+            opentronsModuleSerialNumber: attachedModule.serialNumber,
           }
         } else {
           return cc

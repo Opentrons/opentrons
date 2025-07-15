@@ -574,7 +574,7 @@ describe('isModuleAllowedOnAA', () => {
   })
 
   it('should return true for no module input and fakeD4', () => {
-    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4')
+    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4', 'temperatureModuleV2')
     expect(vs).toEqual(true)
   })
 
@@ -604,7 +604,7 @@ describe('getAAForModuleFixture', () => {
   })
 })
 
-describe('getCutoutConfigReplacment', () => {
+describe('getCutoutConfigReplacmentForModule', () => {
   const mockStacker: CutoutConfig = {
     cutoutId: 'cutoutD3',
     cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,

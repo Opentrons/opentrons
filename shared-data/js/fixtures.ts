@@ -1083,40 +1083,36 @@ export const getMainAAForAFixture = (
 export const isModuleAllowedOnAA = (
   cutoutId: CutoutId,
   aa: AddressableAreaNamesWithFakes,
-  moduleModel?: ModuleModel
+  moduleModel: ModuleModel
 ): boolean => {
-  if (moduleModel) {
-    const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
-    const aaForFixture = getAAWithFakesFromCutoutFixtureId(
-      cutoutId,
-      fixtureId[0],
-      getDeckDefFromRobotType('OT-3 Standard')
-    )
-    console.log('aa: ', aa)
-    const aaWithSlotLikeId = aaForFixture?.map(item => {
-      return {
-        aa: item,
-        slotLikeId: getAAWithFakesFromVSId(
-          getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
-        ),
-      }
-    })
-    if (
-      SINGLE_RIGHT_CUTOUTS.includes(cutoutId) &&
-      moduleModel === FLEX_STACKER_MODULE_V1
-    ) {
-      return (
-        aaWithSlotLikeId?.some(
-          aaItem =>
-            FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
-            aa === aaItem.slotLikeId
-        ) ?? false
-      )
+  const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
+  const aaForFixture = getAAWithFakesFromCutoutFixtureId(
+    cutoutId,
+    fixtureId[0],
+    getDeckDefFromRobotType('OT-3 Standard')
+  )
+  console.log('aa: ', aa)
+  const aaWithSlotLikeId = aaForFixture?.map(item => {
+    return {
+      aa: item,
+      slotLikeId: getAAWithFakesFromVSId(
+        getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
+      ),
     }
-    return aaWithSlotLikeId?.some(item => item.slotLikeId === aa) ?? false
-  } else {
-    return true
+  })
+  if (
+    SINGLE_RIGHT_CUTOUTS.includes(cutoutId) &&
+    moduleModel === FLEX_STACKER_MODULE_V1
+  ) {
+    return (
+      aaWithSlotLikeId?.some(
+        aaItem =>
+          FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
+          aa === aaItem.slotLikeId
+      ) ?? false
+    )
   }
+  return aaWithSlotLikeId?.some(item => item.slotLikeId === aa) ?? false
 }
 
 export const getVisualSlotIdForAA = (
@@ -1271,9 +1267,8 @@ export const getCutoutConfigReplacmentForModule = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
   moduleModel: ModuleModel,
-  deckConfig: CutoutConfig[],
-  serialNumber?: string
-): CutoutConfig => {
+  deckConfig: CutoutConfig[]
+): CutoutFixtureId => {
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
   )
@@ -1291,9 +1286,5 @@ export const getCutoutConfigReplacmentForModule = (
     cutoutId
   )
 
-  return {
-    cutoutId,
-    cutoutFixtureId: replacmentFixture[0].cutoutFixtureId as CutoutFixtureId,
-    opentronsModuleSerialNumber: serialNumber,
-  }
+  return replacmentFixture[0].cutoutFixtureId
 }
