@@ -378,6 +378,7 @@ def find_volume_user_defined_volumes(
     sorted_volume_map = sorted(
         well_geometry.heightToVolumeMap, key=lambda section: section.height
     )
+    # TODO: need to make this work for between last userDefinedVolumes entry and well depth 
     for pair in sorted_volume_map:
         if target_height == pair.height:
             return pair.volume
