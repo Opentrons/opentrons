@@ -26,8 +26,8 @@ RESERVOIR = "nest_1_reservoir_195ml"
 DEFAULT_STEPS = 18  # change later
 
 LIQUID_MOUNT = "right"
-LIQUID_TIP_SIZE = 1000
 LIQUID_PIPETTE_SIZE = 1000
+#liquid tip size is a param
 
 PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
@@ -42,8 +42,8 @@ SLOT_DIAL = "B2"
 #below threshold, alpha low. above threshold, alpha high 
 THRESHOLD = 3.5
 #sensitivity values for bottom and top zones:
-ALPHA_LOW = 1.3      
-ALPHA_HIGH = 1     
+ALPHA_LOW = 0.8     
+ALPHA_HIGH = 0.5     
 
 
 ###########################################
@@ -68,12 +68,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     from hardware_testing import protocols
 
     protocols.create_pipette_parameters(parameters)
-    parameters.add_bool(
-        display_name="Quick Mode",
-        variable_name="quick_mode",
-        description="If true, dial indicator is not used and tips are reused.",
-        default=False,
-    )
 
     parameters.add_str(
         variable_name="labware_type",
@@ -127,6 +121,24 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=0.01
     )
 
+    parameters.add_str(
+        variable_name="well_location",
+        display_name="Well Location",
+        choices = [
+            {"display_name": "A1", "value": "A1"},
+            {"display_name": "A2", "value": "A2"},
+            {"display_name": "A3", "value": "A3"},
+        ],
+        default = "A1"
+    )
+
+    parameters.add_bool(
+        display_name="Quick Mode",
+        variable_name="quick_mode",
+        description="If true, dial indicator is not used and tips are reused.",
+        default=False,
+    )
+
     parameters.add_float(
         variable_name="number_of_steps",
         display_name="Number of Steps",
@@ -137,14 +149,13 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_str(
-        variable_name="well_location",
-        display_name="well_location",
+        variable_name = "liq_tip_size",
+        display_name="Liquid Tip Size",
         choices = [
-            {"display_name": "A1", "value": "A1"},
-            {"display_name": "A2", "value": "A2"},
-            {"display_name": "A3", "value": "A3"},
+            {"display_name": "1000", "value": "1000"},
+            {"display_name": "50", "value": "50"},
         ],
-        default = "A1"
+        default="1000"
     )
 
 def _setup(
@@ -163,7 +174,6 @@ def _setup(
     LiquidClass,
     float,
     float,
-    float,
     str,
 ]:     
 
@@ -176,6 +186,7 @@ def _setup(
     neutral_target = ctx.params.neutral_target # type: ignore[attr-defined]
     well_location = ctx.params.well_location # type: ignore[attr-defined]
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
+    liq_tip_size = ctx.params.liq_tip_size # type: ignore[attr-defined]
     #reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
 
     #pipettes
@@ -184,7 +195,7 @@ def _setup(
 
     #tipracks 
     liquid_rack = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
+        f"opentrons_flex_96_tiprack_{liq_tip_size}uL", SLOT_LIQUID_TIPRACK
     )
     probing_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
@@ -216,8 +227,6 @@ def _setup(
     props.aspirate.aspirate_position.offset.z = meniscus_z
     props.dispense.dispense_position.position_reference = lm
     props.dispense.dispense_position.offset.z = meniscus_z
-
-    max_volume = labware[well_location].max_volume
 
 
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -251,7 +260,6 @@ def _setup(
         number_of_steps,
         quick_mode,
         ethanol,
-        max_volume,
         first_dispense,
         neutral_target,
         well_location
@@ -350,26 +358,26 @@ def run(ctx: ProtocolContext) -> None:
         number_of_steps,
         quick_mode,
         ethanol,
-        max_volume,
         first_dispense,
         neutral_target,
-        well_location
+        well_location,
     ) = _setup(ctx)
 
     # Constants
-    min_step = max(max_volume * 0.005, 5)
+    max_volume = labware[well_location].max_volume
+    min_step = max(max_volume * 0.005, 5) #
     max_step = min(max_volume * 0.08, 1000)
     tolerance = max_volume / 30 #if the height within tolerance, then protocol can finish. 
 
     # Initialize state
     volume_dispensed = 0.0
     dispense_volume = 0.0
-    height = 0.0
     corrected_height = 0.0
-    cheight_list = [0.0]
+    cheight_list = []
     tip_z_error = 0.0
     step = 0
     hdelta = 0.0
+    height = 0.0
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -386,13 +394,15 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
+    #defines alphas for different regions (under/over a threshold)
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
     #Proportional Controller 
     def adaptive_volume_step(hdelta: float, height: float, step_volume: float, neutral_target: float) -> float:  # desired steady state height step in mm
-        delta_tolerance = neutral_target * 0.2   # deadband
-
+        
+        # deadband to avoid unnecessary step volume corrections
+        delta_tolerance = neutral_target * 0.2  
         lower_bound = neutral_target - delta_tolerance 
         upper_bound = neutral_target + delta_tolerance  
 
@@ -401,16 +411,18 @@ def run(ctx: ProtocolContext) -> None:
         if lower_bound <= hdelta <= upper_bound:
             return step_volume
 
+        #increasing
         elif hdelta < lower_bound and hdelta > 0:
             error = neutral_target - hdelta
             new_volume = step_volume * (1 + alpha * error) 
 
+        #decreasing
         elif hdelta > upper_bound:
             error = hdelta - neutral_target
             new_volume = step_volume * max(0.2, 1 - alpha * error) 
 
+        # hdelta <= 0, most likely a probe error 
         else:
-            # hdelta <= 0, probe hallucination 
             new_volume = step_volume
 
         new_volume = max(min_step, min(max_step, new_volume))
@@ -439,13 +451,10 @@ def run(ctx: ProtocolContext) -> None:
         if step == 0:
             pick_up_tips()
             tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-            src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-            corrected_height = height + tip_z_error
-            cheight_list = [corrected_height]
+            _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
         else:
             if not quick_mode:
                 tip_z_error = round(_get_tip_z_error(ctx, probe_pipette, dial), 5)
-
             dispense_volume = step_volume #dispenses first_dispense initially
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
@@ -462,14 +471,14 @@ def run(ctx: ProtocolContext) -> None:
                 _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating()), 5
             )
 
-            #log corrected height 
-            corrected_height = height + tip_z_error
-            cheight_list.append(corrected_height)
+        #log corrected height 
+        corrected_height = height + tip_z_error
+        cheight_list.append(corrected_height)
 
-            #find hdelta and correct 
-            if dynamic_steps and len(cheight_list) > 1:
-                hdelta = cheight_list[-1] - cheight_list[-2]
-                step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, neutral_target)
+        #find hdelta and correct 
+        if dynamic_steps and len(cheight_list) > 1:
+            hdelta = cheight_list[-1] - cheight_list[-2]
+            step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, neutral_target)
 
         write_trial_log()
         step += 1
