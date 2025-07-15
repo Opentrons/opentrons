@@ -12,17 +12,13 @@ import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getLabwareDefinitionsByURIForProtocol,
   getLabwareOnDeck,
-  getModuleFromStack,
   getStacksOnModules,
   getTopLabwareFromStack,
 } from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
-import type {
-  CompletedProtocolAnalysis,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   LabwareByLiquidId,
   StackedItemsOnDeck,
@@ -50,8 +46,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     [mostRecentAnalysis]
   )
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
-    ([slotName, stackedItems]) => {
-      const module = getModuleFromStack(stackedItems)
+    ([slotName, { allItemsInStack: stackedItems, moduleInStack: module }]) => {
       const topLabwareInfo = getTopLabwareFromStack(stackedItems)
       const topLabwareDefinition =
         topLabwareInfo != null
@@ -67,10 +62,10 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             )
           : undefined
       return {
-        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
-        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        moduleModel: module.moduleModel,
+        moduleLocation: { slotName: module.moduleSlotName },
         innerProps:
-          module?.moduleModel === THERMOCYCLER_MODULE_V1
+          module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
         nestedLabwareDef: topLabwareDefinition,

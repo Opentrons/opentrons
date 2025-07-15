@@ -126,7 +126,6 @@ async def set_up_decoy_hardware_gripper(
     )
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def subject(
     ot3_hardware_api: OT3API,
