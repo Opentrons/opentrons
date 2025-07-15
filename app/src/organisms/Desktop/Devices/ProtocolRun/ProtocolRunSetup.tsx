@@ -15,7 +15,6 @@ import {
   NO_WRAP,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -346,15 +345,16 @@ export function ProtocolRunSetup({
         completeText: t('placements_ready'),
         incompleteText: null,
         incompleteElement: (
-          <StyledText
+          <Flex
             color={COLORS.black90}
-            css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
             id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
             whitespace={NO_WRAP}
           >
-            {t('check_locations_and_volumes')}
-          </StyledText>
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {t('check_locations_and_volumes')}
+            </StyledText>
+          </Flex>
         ),
       },
     },
@@ -480,14 +480,15 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           name="ot-check"
           id={`RunSetupCard_${props.stepKey}_completeIcon`}
         />
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
+        <Flex
           color={COLORS.green60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_completeText`}
         >
-          {props.completeText}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {props.completeText}
+          </StyledText>
+        </Flex>
       </Flex>
     )
   } else if (stepRequiresHW(props) && props.missingHardware) {
@@ -500,14 +501,15 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
+        <Flex
           color={COLORS.yellow60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >
-          {props.missingHardwareText}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {props.missingHardwareText}
+          </StyledText>
+        </Flex>
       </Flex>
     )
   } else if (props.incompleteText != null) {
@@ -520,14 +522,15 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
+        <Flex
           color={COLORS.yellow60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >
-          {props.incompleteText}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {props.incompleteText}
+          </StyledText>
+        </Flex>
       </Flex>
     )
   } else if (props.incompleteElement != null) {

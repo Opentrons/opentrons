@@ -82,14 +82,14 @@ function CancelRunConfirmation({
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {t('are_you_sure_you_want_to_cancel')}
         </StyledText>
-        <StyledText
-          oddStyle="level4HeaderRegular"
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.black90}
-          textAlign={ALIGN_CENTER}
-        >
-          {t('if_tips_are_attached')}
-        </StyledText>
+        <Flex color={COLORS.black90} textAlign={ALIGN_CENTER}>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            {t('if_tips_are_attached')}
+          </StyledText>
+        </Flex>
       </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={handleCancelRunClick}

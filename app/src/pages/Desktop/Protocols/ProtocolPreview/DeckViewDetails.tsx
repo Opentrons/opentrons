@@ -3,6 +3,7 @@ import clsx from 'clsx'
 
 import {
   COLORS,
+  Flex,
   RobotCoordsForeignDiv,
   SingleSlotFixture,
   StyledText,
@@ -143,16 +144,17 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                           )
                         )}
                       >
-                        <StyledText
-                          desktopStyle="captionRegular"
+                        <Flex
                           transform={`rotate(180deg) scaleX(-1)`}
                           color={COLORS.white}
                         >
-                          {isActiveLayerVisible
-                            ? copy
-                            : labwareEntities[labwareLoadedOnModuleId].def
-                                .metadata.displayName}
-                        </StyledText>
+                          <StyledText desktopStyle="captionRegular">
+                            {isActiveLayerVisible
+                              ? copy
+                              : labwareEntities[labwareLoadedOnModuleId].def
+                                  .metadata.displayName}
+                          </StyledText>
+                        </Flex>
                       </div>
                     </RobotCoordsForeignDiv>
                   </>

@@ -153,14 +153,15 @@ export function LabwareListItem(
                   marginTop={SPACING.spacing4}
                   color={COLORS.grey60}
                 />
-                <StyledText
-                  marginLeft={SPACING.spacing4}
-                  desktopStyle="bodyDefaultRegular"
+                <Flex
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   color={COLORS.grey60}
+                  marginLeft={SPACING.spacing4}
                 >
-                  {t('secure_labware_instructions')}
-                </StyledText>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('secure_labware_instructions')}
+                  </StyledText>
+                </Flex>
               </Flex>
             </Btn>
           )
@@ -338,13 +339,11 @@ export function LabwareListItem(
           {secureLabwareInstructions ?? null}
           {isHeaterShakerInProtocol ? (
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-                minWidth="6.2rem"
-              >
-                {t('labware_latch')}
-              </StyledText>
+              <Flex color={COLORS.grey60} minWidth="6.2rem">
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('labware_latch')}
+                </StyledText>
+              </Flex>
               <Flex
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing4}
@@ -359,9 +358,11 @@ export function LabwareListItem(
                   display={DISPLAY_FLEX}
                   alignItems={ALIGN_CENTER}
                 />
-                <StyledText desktopStyle="bodyDefaultRegular" width="4rem">
-                  {hsLatchText}
-                </StyledText>
+                <Flex width="4rem">
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {hsLatchText}
+                  </StyledText>
+                </Flex>
               </Flex>
             </Flex>
           ) : null}

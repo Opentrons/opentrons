@@ -243,14 +243,15 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
       width="100%"
     >
       <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
+        <Flex
           borderRadius={BORDERS.borderRadius4}
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         >
-          {cycleId != null ? getStepIndex(steps, cycleId) : steps.length + 1}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {cycleId != null ? getStepIndex(steps, cycleId) : steps.length + 1}
+          </StyledText>
+        </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">
           {i18n.format(
             t('form:step_edit_form.field.thermocyclerProfile.cycle'),
@@ -299,14 +300,15 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
       }}
     >
       <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
+        <Flex
           borderRadius={BORDERS.borderRadius4}
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         >
-          {getStepIndex(steps, cycleId ?? '')}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {getStepIndex(steps, cycleId ?? '')}
+          </StyledText>
+        </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">
           {i18n.format(
             t('form:step_edit_form.field.thermocyclerProfile.cycles', {
@@ -510,14 +512,16 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
               borderRadius={BORDERS.borderRadius4}
               data-testid={`cycleStep-${cycleStepIndex}`}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              <Flex
                 backgroundColor={COLORS.grey40}
                 padding={`${SPACING.spacing2} ${SPACING.spacing8} `}
                 borderRadius={BORDERS.borderRadius4}
-              >{`${getStepIndex(steps, cycleId ?? '')}.${
-                cycleStepIndex + 1
-              }`}</StyledText>
+              >
+                <StyledText desktopStyle="bodyDefaultRegular">{`${getStepIndex(
+                  steps,
+                  cycleId ?? ''
+                )}.${cycleStepIndex + 1}`}</StyledText>
+              </Flex>
               <StyledText desktopStyle="bodyDefaultRegular">{`${
                 stepState.name.value
               }, ${stepState.temp.value}${t('units.degrees')}, ${

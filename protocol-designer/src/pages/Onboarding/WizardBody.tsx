@@ -124,13 +124,14 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
           height="100%"
           overflowY={OVERFLOW_AUTO}
         >
-          <StyledText
+          <Flex
             color={COLORS.grey60}
-            desktopStyle="bodyDefaultSemiBold"
             textTransform={TYPOGRAPHY.textTransformUppercase}
           >
-            {t('shared:step_count', { current: stepNumber })}
-          </StyledText>
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {t('shared:step_count', { current: stepNumber })}
+            </StyledText>
+          </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <StyledText desktopStyle="displayBold">{header}</StyledText>

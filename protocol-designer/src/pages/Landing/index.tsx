@@ -138,14 +138,15 @@ export function Landing(): JSX.Element {
             <StyledText desktopStyle="headingLargeBold">
               {t('welcome')}
             </StyledText>
-            <StyledText
-              desktopStyle="headingSmallRegular"
+            <Flex
               color={COLORS.grey60}
               maxWidth="34.25rem"
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
-              {t('no-code-required')}
-            </StyledText>
+              <StyledText desktopStyle="headingSmallRegular">
+                {t('no-code-required')}
+              </StyledText>
+            </Flex>
           </Flex>
         </Flex>
         <StyledNavLink to="/createNew">

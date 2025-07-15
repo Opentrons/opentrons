@@ -140,23 +140,23 @@ export function BeginRemoval({
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {t('remove_any_attached_tips')}
         </StyledText>
-        <StyledText
-          oddStyle="level4HeaderRegular"
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.black90}
-          textAlign={ALIGN_CENTER}
-        >
-          <Trans
-            t={t}
-            i18nKey="homing_pipette_dangerous"
-            values={{
-              mount,
-            }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </StyledText>
+        <Flex color={COLORS.black90} textAlign={ALIGN_CENTER}>
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            <Trans
+              t={t}
+              i18nKey="homing_pipette_dangerous"
+              values={{
+                mount,
+              }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </StyledText>
+        </Flex>
       </Flex>
       <RecoveryFooterButtons
         primaryBtnOnClick={primaryOnClick}

@@ -218,13 +218,11 @@ export function RunningProtocolCommandList({
                   alignItems={ALIGN_CENTER}
                   gridGap={SPACING.spacing12}
                 >
-                  <StyledText
-                    minWidth={SPACING.spacing16}
-                    oddStyle="bodyTextRegular"
-                    height="1.75rem"
-                  >
-                    {index + 1}
-                  </StyledText>
+                  <Flex minWidth={SPACING.spacing16} height="1.75rem">
+                    <StyledText oddStyle="bodyTextRegular">
+                      {index + 1}
+                    </StyledText>
+                  </Flex>
                   <Flex
                     padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
                     alignItems={ALIGN_CENTER}

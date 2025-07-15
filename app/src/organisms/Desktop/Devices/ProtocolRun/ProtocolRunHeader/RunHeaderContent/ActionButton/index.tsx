@@ -152,7 +152,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText as="pSemiBold">{buttonText}</StyledText>
+        <StyledText desktopStyle="bodyDefaultSemiBold">{buttonText}</StyledText>
       </PrimaryButton>
       {disabledReason && (
         <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">

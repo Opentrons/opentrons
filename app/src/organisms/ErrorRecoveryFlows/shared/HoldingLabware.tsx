@@ -195,13 +195,11 @@ function DesktopGripperHoldingLwOptions({
           ({
             value: option,
             children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getCopyFromOption(option, t)}
-              </StyledText>
+              <Flex role="label" htmlFor={option}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {getCopyFromOption(option, t)}
+                </StyledText>
+              </Flex>
             ),
           } as const)
       )}

@@ -157,13 +157,11 @@ export const TextAreaField = forwardRef<
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE(textAlign)}
-              >
-                {title}
-              </StyledText>
+              <Flex htmlFor={props.id} css={TITLE_STYLE(textAlign)}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {title}
+                </StyledText>
+              </Flex>
               {tooltipText != null && (
                 <>
                   <Flex {...targetProps}>

@@ -25,13 +25,9 @@ export function NoQuickTransfers(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
     >
       <img alt={t('none_to_show')} src={imgSrc} width="284px" height="166px" />
-      <StyledText
-        oddStyle="level3HeaderBold"
-        marginTop={SPACING.spacing16}
-        marginBottom={SPACING.spacing8}
-      >
-        {t('none_to_show')}
-      </StyledText>
+      <Flex marginTop={SPACING.spacing16} marginBottom={SPACING.spacing8}>
+        <StyledText oddStyle="level3HeaderBold">{t('none_to_show')}</StyledText>
+      </Flex>
       <StyledText
         oddStyle="level4HeaderRegular"
         color={`${COLORS.black70}${COLORS.opacity60HexCode}`}

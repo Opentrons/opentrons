@@ -132,13 +132,12 @@ export function TimelineToolbox({
       width={`${sidebarWidth / 16}rem`}
       title={
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText
-            desktopStyle="bodyLargeSemiBold"
+          <Flex
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             css={LINE_CLAMP_TEXT_STYLE(1)}
           >
-            {name}
-          </StyledText>
+            <StyledText desktopStyle="bodyLargeSemiBold">{name}</StyledText>
+          </Flex>
           <Btn css={LINK_BUTTON_STYLE} onClick={handleGoBack}>
             <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
               <Icon name="chevron-left" size="0.75rem" minWidth="0.75rem" />

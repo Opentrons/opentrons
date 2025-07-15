@@ -87,12 +87,11 @@ export function LiquidDefinitions({
                   }
                   content={
                     getLiquidDescription(liquid) ?? (
-                      <StyledText
-                        desktopStyle="bodyDefaultRegular"
-                        alignSelf={ALIGN_CENTER}
-                      >
-                        {t('na')}
-                      </StyledText>
+                      <Flex alignSelf={ALIGN_CENTER}>
+                        <StyledText desktopStyle="bodyDefaultRegular">
+                          {t('na')}
+                        </StyledText>
+                      </Flex>
                     )
                   }
                 />

@@ -64,24 +64,26 @@ export const HeaterShakerModuleData = (
       case 'idle_open':
       case 'idle_unknown': {
         return (
-          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-            {t('open', { ns: 'heater_shaker' })}
-          </StyledText>
+          <Flex textTransform={TYPOGRAPHY.textTransformCapitalize}>
+            <StyledText>{t('open', { ns: 'heater_shaker' })}</StyledText>
+          </Flex>
         )
       }
       case 'closing':
       case 'idle_closed': {
         if (isShaking) {
           return (
-            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-              {t('closed_and_locked', { ns: 'heater_shaker' })}
-            </StyledText>
+            <Flex textTransform={TYPOGRAPHY.textTransformCapitalize}>
+              <StyledText>
+                {t('closed_and_locked', { ns: 'heater_shaker' })}
+              </StyledText>
+            </Flex>
           )
         } else {
           return (
-            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-              {t('closed', { ns: 'heater_shaker' })}
-            </StyledText>
+            <Flex textTransform={TYPOGRAPHY.textTransformCapitalize}>
+              <StyledText>{t('closed', { ns: 'heater_shaker' })}</StyledText>
+            </Flex>
           )
         }
       }

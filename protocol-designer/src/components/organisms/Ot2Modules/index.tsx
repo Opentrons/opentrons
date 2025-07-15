@@ -329,12 +329,11 @@ export function Ot2Modules(): JSX.Element {
           paddingTop={SPACING.spacing120}
         >
           {filteredSupportedModules.length > 0 ? (
-            <StyledText
-              desktopStyle="headingSmallBold"
-              paddingBottom={SPACING.spacing20}
-            >
-              {t('protocol_overview:modules')}
-            </StyledText>
+            <Flex paddingBottom={SPACING.spacing20}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('protocol_overview:modules')}
+              </StyledText>
+            </Flex>
           ) : null}
           <ModuleEmptySelectorButtons
             modules={filteredSupportedModules}

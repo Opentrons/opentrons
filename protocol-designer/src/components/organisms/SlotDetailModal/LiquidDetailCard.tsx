@@ -86,12 +86,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
-        <StyledText
-          desktopStyle="headingMediumSemiBold"
-          marginTop={SPACING.spacing8}
-        >
-          {displayName}
-        </StyledText>
+        <Flex marginTop={SPACING.spacing8}>
+          <StyledText desktopStyle="headingMediumSemiBold">
+            {displayName}
+          </StyledText>
+        </Flex>
         <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
           {description != null ? description : null}
         </StyledText>
@@ -129,12 +128,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                     : '0'
                 }
               >
-                <StyledText
-                  desktopStyle="captionRegular"
-                  marginRight={SPACING.spacing4}
-                >
-                  {well.wellName}
-                </StyledText>
+                <Flex marginRight={SPACING.spacing4}>
+                  <StyledText desktopStyle="captionRegular">
+                    {well.wellName}
+                  </StyledText>
+                </Flex>
                 <StyledText desktopStyle="captionRegular">
                   {well.volume.toFixed(1)} {MICRO_LITERS}
                 </StyledText>

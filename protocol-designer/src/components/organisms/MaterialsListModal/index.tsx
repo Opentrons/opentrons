@@ -192,20 +192,16 @@ export function MaterialsListModal({
                   gridGap={SPACING.spacing8}
                   paddingX={SPACING.spacing12}
                 >
-                  <StyledText
-                    flex="1"
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    {t('name')}
-                  </StyledText>
-                  <StyledText
-                    flex="1.27"
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    {t('total_well_volume')}
-                  </StyledText>
+                  <Flex flex="1" color={COLORS.grey60}>
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('name')}
+                    </StyledText>
+                  </Flex>
+                  <Flex flex="1.27" color={COLORS.grey60}>
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {t('total_well_volume')}
+                    </StyledText>
+                  </Flex>
                 </Flex>
               ) : null}
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>

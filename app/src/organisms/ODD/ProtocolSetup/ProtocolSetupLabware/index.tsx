@@ -487,12 +487,11 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => (
             <>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                >
-                  {labware.displayName}
-                </StyledText>
+                <Flex fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  <StyledText oddStyle="bodyTextSemiBold">
+                    {labware.displayName}
+                  </StyledText>
+                </Flex>
                 {labware.lidDisplayName != null ? (
                   <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
                     {labware.lidDisplayName}

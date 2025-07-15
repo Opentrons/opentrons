@@ -60,11 +60,8 @@ export function ErrorRecoveryBanner({
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {buildTitleText()}
         </StyledText>
-        <Flex>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            marginRight={SPACING.spacing4}
-          >
+        <Flex marginRight={SPACING.spacing4}>
+          <StyledText desktopStyle="bodyDefaultRegular">
             {t('another_app_controlling_robot')}
           </StyledText>
         </Flex>

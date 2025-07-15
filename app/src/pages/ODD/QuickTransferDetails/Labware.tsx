@@ -59,26 +59,23 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
-              color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingLeft={SPACING.spacing24}
-            >
-              {i18n.format(t('labware_name'), 'titleCase')}
-            </StyledText>
+            <Flex color={COLORS.grey60} paddingLeft={SPACING.spacing24}>
+              <StyledText oddStyle="smallBodyTextSemiBold">
+                {i18n.format(t('labware_name'), 'titleCase')}
+              </StyledText>
+            </Flex>
           </TableHeader>
           <TableHeader>
-            <StyledText
+            <Flex
               alignItems={ALIGN_CENTER}
               color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
-              {t('quantity')}
-            </StyledText>
+              <StyledText oddStyle="smallBodyTextSemiBold">
+                {t('quantity')}
+              </StyledText>
+            </Flex>
           </TableHeader>
         </tr>
       </thead>
@@ -103,22 +100,22 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <StyledText
-                    oddStyle="bodyTextSemiBold"
-                    alignItems={ALIGN_CENTER}
-                  >
-                    {labware.labwareDef.metadata.displayName}
-                  </StyledText>
+                  <Flex alignItems={ALIGN_CENTER}>
+                    <StyledText oddStyle="bodyTextSemiBold">
+                      {labware.labwareDef.metadata.displayName}
+                    </StyledText>
+                  </Flex>
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
+                <Flex
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
-                  {labware.quantity}
-                </StyledText>
+                  <StyledText oddStyle="bodyTextSemiBold">
+                    {labware.quantity}
+                  </StyledText>
+                </Flex>
               </TableDatum>
             </TableRow>
           )

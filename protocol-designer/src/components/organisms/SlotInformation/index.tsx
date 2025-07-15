@@ -77,13 +77,14 @@ export const SlotInformation: FC<SlotInformationProps> = ({
               changeFlexDirection={false}
               type="default"
               content={
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
+                <Flex
                   textAlign={TYPOGRAPHY.textAlignRight}
                   css={LINE_CLAMP_TEXT_STYLE(2, true)}
                 >
-                  {liquids.join(', ')}
-                </StyledText>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {liquids.join(', ')}
+                  </StyledText>
+                </Flex>
               }
               description={<Flex width="7.40625rem">{t('liquid')}</Flex>}
             />
@@ -164,8 +165,7 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
         }
         type="default"
         content={
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
+          <Flex
             textAlign={
               breakPointSize === 'medium'
                 ? TYPOGRAPHY.textAlignLeft
@@ -173,8 +173,10 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
             }
             css={LINE_CLAMP_TEXT_STYLE(3, true)}
           >
-            {stackInformation ?? t('none')}
-          </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {stackInformation ?? t('none')}
+            </StyledText>
+          </Flex>
         }
         description={
           <Flex>

@@ -78,13 +78,11 @@ export function SetupLabwareList(
           paddingLeft={SPACING.spacing16}
           paddingTop={SPACING.spacing20}
         >
-          <StyledText
-            width="6.25rem"
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-          >
-            {t('location')}
-          </StyledText>
+          <Flex width="6.25rem" color={COLORS.grey60}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('location')}
+            </StyledText>
+          </Flex>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('labware_name')}
           </StyledText>

@@ -166,8 +166,7 @@ export const LabwareControls = (
       textAlign={TYPOGRAPHY.textAlignCenter}
     >
       <Link role="button">
-        <StyledText
-          desktopStyle="bodyLargeSemiBold"
+        <Flex
           whiteSpace={WHITE_SPACE_PRE_WRAP}
           width={
             getDisplayText() === t('deck:overlay.slot.drag_to_new_slot')
@@ -175,8 +174,10 @@ export const LabwareControls = (
               : '100%'
           }
         >
-          {getDisplayText()}
-        </StyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {getDisplayText()}
+          </StyledText>
+        </Flex>
       </Link>
     </Flex>
   )

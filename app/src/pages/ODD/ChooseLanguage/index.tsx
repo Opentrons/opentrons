@@ -49,12 +49,11 @@ export function ChooseLanguage(): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <StyledText
-            oddStyle="level4HeaderRegular"
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
-            {t('select_a_language')}
-          </StyledText>
+          <Flex textAlign={TYPOGRAPHY.textAlignCenter}>
+            <StyledText oddStyle="level4HeaderRegular">
+              {t('select_a_language')}
+            </StyledText>
+          </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {LANGUAGES.map(lng => (
               <RadioButton

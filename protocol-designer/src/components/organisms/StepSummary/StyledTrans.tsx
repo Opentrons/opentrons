@@ -27,16 +27,14 @@ export function StyledTrans(props: StyledTransProps): JSX.Element {
         i18nKey={i18nKey}
         components={{
           text: (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              style={{ whiteSpace: NO_WRAP }}
-            />
+            <Flex style={{ whiteSpace: NO_WRAP }}>
+              <StyledText desktopStyle="bodyDefaultRegular" />
+            </Flex>
           ),
           semiBoldText: (
-            <StyledText
-              desktopStyle="bodyDefaultSemiBold"
-              style={{ whiteSpace: NO_WRAP }}
-            />
+            <Flex style={{ whiteSpace: NO_WRAP }}>
+              <StyledText desktopStyle="bodyDefaultSemiBold" />
+            </Flex>
           ),
           tag: <Tag type="default" text={tagText ?? ''} />,
         }}

@@ -47,13 +47,14 @@ export function StepInfo({
 
   return (
     <Flex display={DISPLAY_INLINE} {...styleProps}>
-      <StyledText
-        desktopStyle={desktopStyleDefaulted}
-        oddStyle={oddStyleDefaulted}
-        display={DISPLAY_INLINE}
-      >
-        {buildAtStepCopy()}
-      </StyledText>
+      <Flex display={DISPLAY_INLINE}>
+        <StyledText
+          desktopStyle={desktopStyleDefaulted}
+          oddStyle={oddStyleDefaulted}
+        >
+          {buildAtStepCopy()}
+        </StyledText>
+      </Flex>
       {failedCommand?.byAnalysis != null && protocolAnalysis != null ? (
         <CommandText
           command={failedCommand.byAnalysis}

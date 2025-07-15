@@ -330,23 +330,25 @@ export function QuickTransferAdvancedSettings(
                 onClick={displayItem.onClick}
               >
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText
-                    css={TYPOGRAPHY.level4HeaderSemiBold}
+                  <Flex
                     width="20rem"
                     color={displayItem.enabled ? COLORS.black90 : COLORS.grey50}
                   >
-                    {displayItem.copy}
-                  </StyledText>
+                    <StyledText oddStyle="level4HeaderSemiBold">
+                      {displayItem.copy}
+                    </StyledText>
+                  </Flex>
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                    <StyledText
-                      css={TYPOGRAPHY.level4HeaderRegular}
+                    <Flex
                       color={
                         displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                       }
                       textAlign={TYPOGRAPHY.textAlignRight}
                     >
-                      {displayItem.value}
-                    </StyledText>
+                      <StyledText oddStyle="level4HeaderRegular">
+                        {displayItem.value}
+                      </StyledText>
+                    </Flex>
                     {displayItem.enabled ? (
                       <Icon name="more" size="2rem" />
                     ) : null}
@@ -389,13 +391,11 @@ export function QuickTransferAdvancedSettings(
       {/* Aspirate Settings */}
       <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting === null ? (
-          <StyledText
-            css={TYPOGRAPHY.level4HeaderSemiBold}
-            color={COLORS.grey60}
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
-            {t('aspirate_settings')}
-          </StyledText>
+          <Flex color={COLORS.grey60} textAlign={TYPOGRAPHY.textAlignLeft}>
+            <StyledText oddStyle="level4HeaderSemiBold">
+              {t('aspirate_settings')}
+            </StyledText>
+          </Flex>
         ) : null}
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           {selectedSetting === null
@@ -406,28 +406,29 @@ export function QuickTransferAdvancedSettings(
                   onClick={displayItem.onClick}
                 >
                   <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                    <StyledText
-                      css={TYPOGRAPHY.level4HeaderSemiBold}
+                    <Flex
                       width="20rem"
                       color={
                         displayItem.enabled ? COLORS.black90 : COLORS.grey50
                       }
                     >
-                      {displayItem.copy}
-                    </StyledText>
+                      <StyledText oddStyle="level4HeaderSemiBold">
+                        {displayItem.copy}
+                      </StyledText>
+                    </Flex>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                      <StyledText
-                        oddStyle="level4HeaderRegular"
+                      <Flex
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
                         textAlign={TYPOGRAPHY.textAlignRight}
                       >
-                        {displayItem.value !== ''
-                          ? displayItem.value
-                          : t('option_disabled')}
-                      </StyledText>
-
+                        <StyledText oddStyle="level4HeaderRegular">
+                          {displayItem.value !== ''
+                            ? displayItem.value
+                            : t('option_disabled')}
+                        </StyledText>
+                      </Flex>
                       {displayItem.option !== 'pre_wet_tip' ? (
                         <Icon
                           name="more"
@@ -498,13 +499,11 @@ export function QuickTransferAdvancedSettings(
       {/* Dispense Settings */}
       <Flex gridGap={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
         {selectedSetting === null ? (
-          <StyledText
-            css={TYPOGRAPHY.level4HeaderSemiBold}
-            color={COLORS.grey60}
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
-            {t('dispense_settings')}
-          </StyledText>
+          <Flex color={COLORS.grey60} textAlign={TYPOGRAPHY.textAlignLeft}>
+            <StyledText oddStyle="level4HeaderSemiBold">
+              {t('dispense_settings')}
+            </StyledText>
+          </Flex>
         ) : null}
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
           {selectedSetting === null
@@ -515,27 +514,29 @@ export function QuickTransferAdvancedSettings(
                   onClick={displayItem.onClick}
                 >
                   <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                    <StyledText
-                      css={TYPOGRAPHY.level4HeaderSemiBold}
+                    <Flex
                       width="20rem"
                       color={
                         displayItem.enabled ? COLORS.black90 : COLORS.grey50
                       }
                     >
-                      {displayItem.copy}
-                    </StyledText>
+                      <StyledText oddStyle="level4HeaderSemiBold">
+                        {displayItem.copy}
+                      </StyledText>
+                    </Flex>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                      <StyledText
-                        css={TYPOGRAPHY.level4HeaderRegular}
+                      <Flex
                         color={
                           displayItem.enabled ? COLORS.grey60 : COLORS.grey50
                         }
                         textAlign={TYPOGRAPHY.textAlignRight}
                       >
-                        {displayItem.value !== ''
-                          ? displayItem.value
-                          : t('option_disabled')}
-                      </StyledText>
+                        <StyledText oddStyle="level4HeaderRegular">
+                          {displayItem.value !== ''
+                            ? displayItem.value
+                            : t('option_disabled')}
+                        </StyledText>
+                      </Flex>
                       <Icon
                         name="more"
                         size="2rem"

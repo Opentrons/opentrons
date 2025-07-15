@@ -56,7 +56,6 @@ import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
 import {
   MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 import { ErrorInfo } from './ErrorInfo'
@@ -403,7 +402,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
+                      block: <StyledText desktopStyle="captionRegular" />,
                     }}
                   />
                 </Banner>
@@ -422,31 +421,32 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   aria-label="ot-spinner"
                   color={COLORS.grey60}
                 />
-                <StyledText marginLeft={SPACING.spacing8}>
-                  {t('updating_firmware')}
-                </StyledText>
+                <Flex marginLeft={SPACING.spacing8}>
+                  <StyledText>{t('updating_firmware')}</StyledText>
+                </Flex>
               </Flex>
             ) : (
               <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
-                <StyledText
-                  textTransform={TYPOGRAPHY.textTransformUppercase}
-                  css={MODULE_INFO_HEADER_TEXT_STYLE}
-                  data-testid={`module_card_usb_port_${module.serialNumber}`}
-                >
-                  {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                  slotName != null
-                    ? t('deck_slot', { slot: slotName }) + ' - '
-                    : null}
-                  {module?.usbPort !== null
-                    ? t('usb_port', {
-                        port: module?.usbPort?.port,
-                        hubPort:
-                          module?.usbPort?.hubPort != null
-                            ? `.${module.usbPort.hubPort}`
-                            : '',
-                      })
-                    : t('usb_port_not_connected')}
-                </StyledText>
+                <Flex textTransform={TYPOGRAPHY.textTransformUppercase}>
+                  <StyledText
+                    desktopStyle="headingSmallRegular"
+                    data-testid={`module_card_usb_port_${module.serialNumber}`}
+                  >
+                    {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
+                    slotName != null
+                      ? t('deck_slot', { slot: slotName }) + ' - '
+                      : null}
+                    {module?.usbPort !== null
+                      ? t('usb_port', {
+                          port: module?.usbPort?.port,
+                          hubPort:
+                            module?.usbPort?.hubPort != null
+                              ? `.${module.usbPort.hubPort}`
+                              : '',
+                        })
+                      : t('usb_port_not_connected')}
+                  </StyledText>
+                </Flex>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                 >

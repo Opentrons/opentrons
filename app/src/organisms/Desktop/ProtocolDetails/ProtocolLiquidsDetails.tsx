@@ -61,19 +61,16 @@ export const ProtocolLiquidsDetails = (
                     flexDirection={DIRECTION_COLUMN}
                     justifyContent={JUSTIFY_CENTER}
                   >
-                    <StyledText
-                      desktopStyle="bodyDefaultSemiBold"
-                      marginX={SPACING.spacing16}
-                    >
-                      {liquid.displayName}
-                    </StyledText>
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      color={COLORS.grey60}
-                      marginX={SPACING.spacing16}
-                    >
-                      {liquid.description}
-                    </StyledText>
+                    <Flex marginX={SPACING.spacing16}>
+                      <StyledText desktopStyle="bodyDefaultSemiBold">
+                        {liquid.displayName}
+                      </StyledText>
+                    </Flex>
+                    <Flex color={COLORS.grey60} marginX={SPACING.spacing16}>
+                      <StyledText desktopStyle="bodyDefaultRegular">
+                        {liquid.description}
+                      </StyledText>
+                    </Flex>
                   </Flex>
                 </Flex>
               </Flex>

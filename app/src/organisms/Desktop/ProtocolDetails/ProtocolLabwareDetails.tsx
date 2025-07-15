@@ -45,15 +45,16 @@ export const ProtocolLabwareDetails = (props: {
       {labwareAndLidDetails.length > 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
+            <Flex
               color={COLORS.grey60}
               marginBottom={SPACING.spacing8}
               data-testid="ProtocolLabwareDetails_labware_name"
               width="66%"
             >
-              {t('labware_name')}
-            </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('labware_name')}
+              </StyledText>
+            </Flex>
             <StyledText
               desktopStyle="bodyDefaultRegular"
               color={COLORS.grey60}
@@ -121,20 +122,17 @@ export const ProtocolLabwareDetailItem = (
             <Flex marginLeft={SPACING.spacing20} />
           )}
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              paddingRight={SPACING.spacing32}
-            >
-              {displayName}
-            </StyledText>
-            {lidDisplayName != null ? (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-                paddingRight={SPACING.spacing32}
-              >
-                {t('with_lid_name', { lid: lidDisplayName })}
+            <Flex paddingRight={SPACING.spacing32}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {displayName}
               </StyledText>
+            </Flex>
+            {lidDisplayName != null ? (
+              <Flex color={COLORS.grey60} paddingRight={SPACING.spacing32}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('with_lid_name', { lid: lidDisplayName })}
+                </StyledText>
+              </Flex>
             ) : null}
           </Flex>
         </Flex>

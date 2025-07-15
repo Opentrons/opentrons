@@ -123,12 +123,11 @@ export function RunHeaderBannerContainer(
             alignItems={ALIGN_CENTER}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                desktopStyle="captionSemiBold"
-                marginBottom={SPACING.spacing4}
-              >
-                {t('download_files')}
-              </StyledText>
+              <Flex marginBottom={SPACING.spacing4}>
+                <StyledText desktopStyle="captionSemiBold">
+                  {t('download_files')}
+                </StyledText>
+              </Flex>
               <StyledText desktopStyle="captionRegular">
                 {t('files_available_robot_details')}
               </StyledText>

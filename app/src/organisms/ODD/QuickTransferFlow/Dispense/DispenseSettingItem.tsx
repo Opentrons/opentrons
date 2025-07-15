@@ -40,21 +40,23 @@ export function DispenseSettingItem({
       onClick={displayItem.onClick}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-        <StyledText
-          oddStyle="level4HeaderSemiBold"
+        <Flex
           width="20rem"
           color={displayItem.enabled ? COLORS.black90 : COLORS.grey50}
         >
-          {displayItem.copy}
-        </StyledText>
+          <StyledText oddStyle="level4HeaderSemiBold">
+            {displayItem.copy}
+          </StyledText>
+        </Flex>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          <StyledText
-            oddStyle="level4HeaderRegular"
+          <Flex
             color={displayItem.enabled ? COLORS.grey60 : COLORS.grey50}
             textAlign={TYPOGRAPHY.textAlignRight}
           >
-            {displayItem.value}
-          </StyledText>
+            <StyledText oddStyle="level4HeaderRegular">
+              {displayItem.value}
+            </StyledText>
+          </Flex>
           {displayItem.enabled ? <Icon name="more" size="2rem" /> : null}
         </Flex>
       </Flex>

@@ -111,13 +111,9 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
       >
         <StyledText oddStyle={headerStyle}>{header}</StyledText>
         {subText != null ? (
-          <StyledText
-            textAlign={TYPOGRAPHY.textAlignCenter}
-            oddStyle={subTextStyle}
-            color={COLORS.grey60}
-          >
-            {subText}
-          </StyledText>
+          <Flex color={COLORS.grey60} textAlign={TYPOGRAPHY.textAlignCenter}>
+            <StyledText oddStyle={subTextStyle}>{subText}</StyledText>
+          </Flex>
         ) : null}
       </Flex>
     </Flex>

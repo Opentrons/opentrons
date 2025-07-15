@@ -124,12 +124,11 @@ export function SetupLabwareStackView({
           alignItems={ALIGN_CENTER}
         >
           <ODDBackButton onClick={onClickBack} />
-          <StyledText
-            oddStyle="level2HeaderBold"
-            marginRight={SPACING.spacing16}
-          >
-            {t('labware_in')}
-          </StyledText>
+          <Flex marginRight={SPACING.spacing16}>
+            <StyledText oddStyle="level2HeaderBold">
+              {t('labware_in')}
+            </StyledText>
+          </Flex>
           <DeckInfoLabel
             deckLabel={
               slotName === 'offDeck'
@@ -163,23 +162,23 @@ export function SetupLabwareStackView({
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing16}
         >
-          <StyledText oddStyle="bodyTextBold" marginRight={SPACING.spacing16}>
-            {truncateString(
-              selectedLabware.displayName,
-              MAX_CHARS_FOR_DISPLAY_NAME
-            )}
-          </StyledText>
-          {selectedLabware.lidDisplayName ? (
-            <StyledText
-              oddStyle="bodyTextRegular"
-              color={COLORS.grey60}
-              marginRight={SPACING.spacing16}
-            >
+          <Flex marginRight={SPACING.spacing16}>
+            <StyledText oddStyle="bodyTextBold">
               {truncateString(
-                selectedLabware.lidDisplayName,
+                selectedLabware.displayName,
                 MAX_CHARS_FOR_DISPLAY_NAME
               )}
             </StyledText>
+          </Flex>
+          {selectedLabware.lidDisplayName ? (
+            <Flex color={COLORS.grey60} marginRight={SPACING.spacing16}>
+              <StyledText oddStyle="bodyTextRegular">
+                {truncateString(
+                  selectedLabware.lidDisplayName,
+                  MAX_CHARS_FOR_DISPLAY_NAME
+                )}
+              </StyledText>
+            </Flex>
           ) : null}
           <LabwareThumbnail
             viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}

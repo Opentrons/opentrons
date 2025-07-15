@@ -105,13 +105,12 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
             gridGap={SPACING.spacing4}
             width="100%"
           >
-            <StyledText
+            <Flex
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               color={COLORS.grey60}
-              desktopStyle="bodyDefaultRegular"
             >
-              {label}
-            </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
+            </Flex>
             <StyledText desktopStyle="bodyDefaultRegular">
               {description}
             </StyledText>

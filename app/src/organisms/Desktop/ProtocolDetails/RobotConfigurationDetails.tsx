@@ -71,12 +71,11 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
   const emptyText = (
-    <StyledText
-      desktopStyle="bodyDefaultRegular"
-      textTransform={TYPOGRAPHY.textTransformCapitalize}
-    >
-      {t('shared:empty')}
-    </StyledText>
+    <Flex textTransform={TYPOGRAPHY.textTransformCapitalize}>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('shared:empty')}
+      </StyledText>
+    </Flex>
   )
 
   const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
@@ -232,16 +231,15 @@ export const RobotConfigurationDetailsItem = (
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
     >
-      <StyledText
-        desktopStyle="bodyDefaultRegular"
+      <Flex
         flex="0 0 auto"
         marginRight={SPACING.spacing16}
         color={COLORS.grey60}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="9.375rem"
       >
-        {label}
-      </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
+      </Flex>
       <Flex data-testid={`RobotConfigurationDetails_${label}`}>{item}</Flex>
     </Flex>
   )

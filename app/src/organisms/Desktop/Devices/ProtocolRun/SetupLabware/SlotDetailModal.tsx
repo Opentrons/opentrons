@@ -16,7 +16,6 @@ import {
   SPACING,
   StyledText,
   Tag,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getLabwareViewBox,
@@ -150,12 +149,11 @@ export const SlotDetailModal = (
       : slotName
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER}>
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginRight={SPACING.spacing4}
-      >
-        {t('labware_in')}
-      </StyledText>
+      <Flex marginRight={SPACING.spacing4}>
+        <StyledText desktopStyle="bodyLargeSemiBold">
+          {t('labware_in')}
+        </StyledText>
+      </Flex>
       {isFlex ? (
         <DeckInfoLabel deckLabel={slotDisplayName} />
       ) : (
@@ -209,20 +207,15 @@ export const SlotDetailModal = (
             width={isVariedStack ? '' : '100%'}
           >
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-              <StyledText
-                desktopStyle="bodyDefaultSemiBold"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {selectedLabware.displayName}
               </StyledText>
               {selectedLabware.lidDisplayName != null ? (
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.grey60}
-                >
-                  {selectedLabware.lidDisplayName}
-                </StyledText>
+                <Flex color={COLORS.grey60}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {selectedLabware.lidDisplayName}
+                  </StyledText>
+                </Flex>
               ) : null}
             </Flex>
             <LabwareThumbnail

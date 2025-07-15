@@ -153,11 +153,9 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             }
           }}
           alignSelf={ALIGN_FLEX_END}
+          textDecoration={TEXT_DECORATION_UNDERLINE}
         >
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            textDecoration={TEXT_DECORATION_UNDERLINE}
-          >
+          <StyledText desktopStyle="bodyDefaultRegular">
             {t('delete')}
           </StyledText>
         </Btn>
@@ -170,9 +168,11 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             padding={`${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing12}`}
           >
             <Flex gridGap={SPACING.spacing4} color={COLORS.grey60}>
-              <StyledText width="50%" desktopStyle="bodyDefaultRegular">
-                {t('well')}
-              </StyledText>
+              <Flex width="50%">
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('well')}
+                </StyledText>
+              </Flex>
               <Flex width="50%">
                 <StyledText desktopStyle="bodyDefaultRegular">
                   {t('microliters')}

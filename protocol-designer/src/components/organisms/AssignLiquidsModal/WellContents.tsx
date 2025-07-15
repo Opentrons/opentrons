@@ -19,9 +19,9 @@ export function WellContents(props: WellContentsProps): JSX.Element {
 
   return (
     <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-      <StyledText width="50%" desktopStyle="bodyDefaultRegular">
-        {wellName}
-      </StyledText>
+      <Flex width="50%">
+        <StyledText desktopStyle="bodyDefaultRegular">{wellName}</StyledText>
+      </Flex>
       <Flex width="50%">
         <Tag
           text={`${volume} ${t('microliters')}`}

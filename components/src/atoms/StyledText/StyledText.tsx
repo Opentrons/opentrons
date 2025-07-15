@@ -1,16 +1,8 @@
 import clsx from 'clsx'
 
-import { styleProps, Text } from '../../primitives'
 import styles from './styledText.module.css'
 
-import type {
-  ComponentPropsWithoutRef,
-  ElementType,
-  FC,
-  ReactNode,
-} from 'react'
-
-styleProps
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react'
 
 export const helixProductStyleMap = {
   displayBold: { className: 'displayBold', as: 'h1' },
@@ -57,7 +49,7 @@ type HelixStyles = keyof typeof helixProductStyleMap
 type ODDStyles = keyof typeof ODDStyleMap
 
 export type StyledTextProps<T extends ElementType> = {
-  children: ReactNode
+  children?: ReactNode
   as?: T
   desktopStyle?: HelixStyles
   oddStyle?: ODDStyles

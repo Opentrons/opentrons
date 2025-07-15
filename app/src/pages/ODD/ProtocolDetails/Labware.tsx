@@ -65,26 +65,23 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
-              color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingLeft={SPACING.spacing24}
-            >
-              {i18n.format(t('labware_name'), 'titleCase')}
-            </StyledText>
+            <Flex color={COLORS.grey60} paddingLeft={SPACING.spacing24}>
+              <StyledText oddStyle="smallBodyTextSemiBold">
+                {i18n.format(t('labware_name'), 'titleCase')}
+              </StyledText>
+            </Flex>
           </TableHeader>
           <TableHeader>
-            <StyledText
+            <Flex
               alignItems={ALIGN_CENTER}
               color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
-              {i18n.format(t('quantity'), 'sentenceCase')}
-            </StyledText>
+              <StyledText oddStyle="smallBodyTextSemiBold">
+                {i18n.format(t('quantity'), 'sentenceCase')}
+              </StyledText>
+            </Flex>
           </TableHeader>
         </tr>
       </thead>
@@ -114,32 +111,30 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                     flexDirection={DIRECTION_COLUMN}
                     gridGap={SPACING.spacing4}
                   >
-                    <StyledText
-                      oddStyle="bodyTextSemiBold"
-                      alignItems={ALIGN_CENTER}
-                    >
-                      {labware.labwareDef.metadata.displayName}
-                    </StyledText>
-                    {labware.lidDisplayName ? (
-                      <StyledText
-                        oddStyle="bodyTextRegular"
-                        alignItems={ALIGN_CENTER}
-                        color={COLORS.grey60}
-                      >
-                        {t('with_lid_name', { lid: labware.lidDisplayName })}
+                    <Flex alignItems={ALIGN_CENTER}>
+                      <StyledText oddStyle="bodyTextSemiBold">
+                        {labware.labwareDef.metadata.displayName}
                       </StyledText>
+                    </Flex>
+                    {labware.lidDisplayName ? (
+                      <Flex alignItems={ALIGN_CENTER} color={COLORS.grey60}>
+                        <StyledText oddStyle="bodyTextRegular">
+                          {t('with_lid_name', { lid: labware.lidDisplayName })}
+                        </StyledText>
+                      </Flex>
                     ) : null}
                   </Flex>
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
+                <Flex
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
-                  {labware.quantity}
-                </StyledText>
+                  <StyledText oddStyle="bodyTextSemiBold">
+                    {labware.quantity}
+                  </StyledText>
+                </Flex>
               </TableDatum>
             </TableRow>
           )

@@ -150,13 +150,9 @@ export function PathField(props: PathFieldProps): JSX.Element {
   return (
     <Flex padding={padding} flexDirection={DIRECTION_COLUMN}>
       {title != null ? (
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          paddingBottom={SPACING.spacing8}
-          color={COLORS.grey60}
-        >
-          {title}
-        </StyledText>
+        <Flex paddingBottom={SPACING.spacing8} color={COLORS.grey60}>
+          <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
+        </Flex>
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}

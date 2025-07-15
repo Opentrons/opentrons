@@ -63,14 +63,13 @@ export function ThermocyclerProfileSubsteps(
                     />
                   )
                 })}
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  alignSelf={ALIGN_FLEX_END}
-                >
-                  {t('thermocycler_module.repeat', {
-                    repetitions: substep.repetitions,
-                  })}
-                </StyledText>
+                <Flex alignSelf={ALIGN_FLEX_END}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('thermocycler_module.repeat', {
+                      repetitions: substep.repetitions,
+                    })}
+                  </StyledText>
+                </Flex>
               </Flex>
             ) : (
               <ThermocyclerSubstep

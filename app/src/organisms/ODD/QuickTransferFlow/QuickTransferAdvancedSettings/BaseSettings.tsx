@@ -13,7 +13,6 @@ import {
   SPACING,
   StyledText,
   TEXT_ALIGN_RIGHT,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { FlowRateEntry } from './FlowRate'
@@ -82,17 +81,17 @@ export function BaseSettings(props: BaseSettingsProps): JSX.Element | null {
               onClick={displayItem.onClick}
             >
               <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                <StyledText css={TYPOGRAPHY.level4HeaderSemiBold} width="20rem">
-                  {displayItem.option}
-                </StyledText>
-                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <StyledText
-                    css={TYPOGRAPHY.level4HeaderRegular}
-                    color={COLORS.grey60}
-                    textAlign={TEXT_ALIGN_RIGHT}
-                  >
-                    {displayItem.value}
+                <Flex width="20rem">
+                  <StyledText oddStyle="level4HeaderRegular">
+                    {displayItem.option}
                   </StyledText>
+                </Flex>
+                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                  <Flex color={COLORS.grey60} textAlign={TEXT_ALIGN_RIGHT}>
+                    <StyledText oddStyle="level4HeaderRegular">
+                      {displayItem.value}
+                    </StyledText>
+                  </Flex>
                   {displayItem.enabled ? (
                     <Icon name="more" size={SIZE_2} />
                   ) : null}

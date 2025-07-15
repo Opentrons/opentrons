@@ -110,12 +110,11 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
             />
           ))}
           <StyledLabel>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              padding={SPACING.spacing4}
-            >
-              {t('add_custom_tips')}
-            </StyledText>
+            <Flex padding={SPACING.spacing4}>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('add_custom_tips')}
+              </StyledText>
+            </Flex>
             <input
               data-testid="SelectPipettes_customTipInput"
               type="file"
@@ -130,14 +129,13 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               <StyledLabel>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  padding={SPACING.spacing4}
-                >
-                  {allowAllTipracks
-                    ? t('show_default_tips')
-                    : t('show_all_tips')}
-                </StyledText>
+                <Flex padding={SPACING.spacing4}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {allowAllTipracks
+                      ? t('show_default_tips')
+                      : t('show_all_tips')}
+                  </StyledText>
+                </Flex>
               </StyledLabel>
             </Btn>
           )}

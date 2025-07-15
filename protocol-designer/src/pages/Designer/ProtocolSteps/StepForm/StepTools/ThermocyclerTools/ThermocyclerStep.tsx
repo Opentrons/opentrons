@@ -142,14 +142,15 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       width="100%"
     >
       <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
+        <Flex
           borderRadius={BORDERS.borderRadius4}
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         >
-          {id != null ? getStepIndex(steps, id) : steps.length + 1}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {id != null ? getStepIndex(steps, id) : steps.length + 1}
+          </StyledText>
+        </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">
           {i18n.format(
             t('form:step_edit_form.field.thermocyclerProfile.step'),
@@ -198,14 +199,15 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       }}
     >
       <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
+        <Flex
           borderRadius={BORDERS.borderRadius4}
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           padding={`${SPACING.spacing2} ${SPACING.spacing8}`}
         >
-          {getStepIndex(steps, id ?? '')}
-        </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {getStepIndex(steps, id ?? '')}
+          </StyledText>
+        </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">
           {[
             stepState.name.value,
