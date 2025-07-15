@@ -48,6 +48,9 @@
         "x": 127.75,
         "y": -85.75
       }
+    },
+    "opentronsFlexTipRackLidAsParent": {
+      "matingZ": 84.75
     }
   },
   "gripForce": 16,
