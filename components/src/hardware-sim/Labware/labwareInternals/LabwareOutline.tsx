@@ -85,8 +85,6 @@ interface DefinitionReplacementProps {
   minX: number
   /** minimum y-coordinate (i.e. the bottom) of the outline. */
   minY: number
-  /** location of dog ears (i.e. bottomRight, bottomLeft) of the labware */
-  dogEars?: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
 }
 
 const OUTLINE_THICKNESS_MM = 1
@@ -112,8 +110,11 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           yDimension: props.height,
         }
 
-  const { parameters = { isTiprack, loadName: '' } } = definition ?? {}
-
+  const { parameters = { isTiprack, loadName: '', dogears: [] } } = definition ?? {}
+  const dogEars = 
+        Array.isArray(parameters.dogears) && parameters.dogears.length > 0
+        ? parameters.dogears
+        : []
   let backgroundFill
   if (fill != null) {
     backgroundFill = fill
@@ -204,7 +205,7 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   } = props
 
   const dogears = props.dogEars ?? []
-  const notchSize = 3 
+  const notchSize = 3
 
   if (dogears.length > 0) {
     const pathD = buildDogearPath(xDimension, yDimension, dogears, notchSize)
@@ -213,6 +214,7 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
         d={pathD}
         transform={`translate(${minX}, ${minY})`}
         strokeWidth={2 * borderThickness}
+        {...svgProps}
       />
     )
   }

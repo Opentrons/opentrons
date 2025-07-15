@@ -528,6 +528,11 @@
             "type": "string"
           }
         },
+        "dogEars": {
+          "description": "Locations of cut out corners on labware and lids",
+          "type": "string",
+          "enum": ["bottomLeft", "bottomRight", "topLeft", "topRight"]
+        },
         "isTiprack": {
           "description": "Flag marking whether this labware is a tip rack or not",
           "type": "boolean"
