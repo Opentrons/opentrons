@@ -93,7 +93,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     'fakeStagingSlot'
   )
 
-  console.log('fakeStagingItems: ', fakeStagingItems)
 
   const emptySlotLikeItems = filterAAByAreaType(
     deckConfigWithAA,
