@@ -9,8 +9,7 @@ nav:
     - Modules home: modules/index.md
     - Flex Stacker: '!include stacker-manual/mkdocs.yml'
     - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
-  - Python API: papi.md
-  - Protocol Designer: pd.md
+  - Python API: https://docs.opentrons.com/v2/
 
 plugins:
   - monorepo
