@@ -1,0 +1,111 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "greiner",
+    "brandId": ["655090", "655094", "655096", "655097", "655098"]
+  },
+  "metadata": {
+    "displayName": "Greiner 96 Well Plate 392 µL Chimney Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.5,
+    "yDimension": 85,
+    "zDimension": 10
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": -0.71
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": ["stackingMaxFive"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "greiner_96_wellplate_392ul_chimney_lid"
+  },
+  
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "greiner_96_wellplate_392ul_chimney": {
+      "x": 0,
+      "y": 0,
+      "z": 7.4
+    },
+    "greiner_96_wellplate_392ul_chimney_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 1
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 34
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "greiner_96_wellplate_392ul_chimney",
+    "greiner_96_wellplate_392ul_chimney_lid"
+  ],
+  "gripForce": 10,
+  "gripHeightFromLabwareBottom": 7,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -5
+      }
+    },
+    "lidOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -5
+      },
+      "dropOffset":{
+        "x": 0,
+        "y": 0,
+        "z": -5
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}
