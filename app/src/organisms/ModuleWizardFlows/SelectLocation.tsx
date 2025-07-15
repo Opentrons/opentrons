@@ -167,7 +167,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
           return cc
         }
       })
-      console.log('updatedDeckConfig: ', updatedDeckConfig)
       updateDeckConfiguration(updatedDeckConfig)
     }
   }
