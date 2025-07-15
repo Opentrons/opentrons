@@ -114,7 +114,7 @@ export function ActiveWellSlotDetails(
               <div className={styles.well_details_caption_side}>
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                   {round(labwareDepth, 0)}
-                  {'mm'}
+                  mm
                 </StyledText>
               </div>
             )}
@@ -122,7 +122,7 @@ export function ActiveWellSlotDetails(
               <div className={styles.well_details_caption_bottom}>
                 <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                   {xLabwareWellWidth}
-                  {'mm'}
+                  mm
                 </StyledText>
               </div>
             )}
