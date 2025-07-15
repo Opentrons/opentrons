@@ -29,7 +29,7 @@ from opentrons.protocol_api.core.engine import (
 )
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
-from opentrons.hardware_control.types import OT3AxisKind, OT3Mount
+from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
@@ -965,6 +965,11 @@ def run_one_test(
     pick_up_tip_for_channel(fixture_settings, tip_well, channel)
     fixture_settings.pipette.configure_for_volume(volume)
     fixture_settings.pipette.prepare_to_aspirate()
+    hw_api = fixture_settings.ctx._core.get_hardware()
+    hw_mount = OT3Mount.LEFT if fixture_settings.mount == "left" else OT3Mount.RIGHT
+    pip_ax = Axis.of_main_tool_actuator(hw_mount)
+    estimate_bottom = hw_api.current_position_ot3(hw_mount)[pip_ax]
+    encoder_bottom = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
     fixture_settings.pipette.move_to(
         fixture_settings.liquid_source.top(20).move(Point(0, offset.y, 0))
     )
@@ -981,6 +986,8 @@ def run_one_test(
     post_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.ASPIRATE, tip, volume, trial, channel=channel
     )
+    estimate_aspirated = hw_api.current_position_ot3(hw_mount)[pip_ax]
+    encoder_aspirated = hw_api.encoder_current_position_ot3(hw_mount)[pip_ax]
     print_info("dispensing.")
     dispense_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties, contents
@@ -990,6 +997,16 @@ def run_one_test(
         fixture_settings, MeasurementType.DISPENSE, tip, volume, trial, channel=channel
     )
     remove_tip(fixture_settings)
+    report.store_encoder(
+        fixture_settings.test_report,
+        volume,
+        channel,
+        trial,
+        estimate_bottom,
+        encoder_bottom,
+        estimate_aspirated,
+        encoder_aspirated,
+    )
     return [pre_aspirate, post_aspirate, post_dispense]
 
 
