@@ -69,7 +69,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     moduleModel,
   } = props
 
-
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
@@ -92,7 +91,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckDef,
     'fakeStagingSlot'
   )
-
 
   const emptySlotLikeItems = filterAAByAreaType(
     deckConfigWithAA,
