@@ -299,6 +299,19 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+// fake AA
+export const FAKE_D4_ADDRESSABLE_AREA: 'fakeD4' = 'fakeD4'
+export const FAKE_C4_ADDRESSABLE_AREA: 'fakeC4' = 'fakeC4'
+export const FAKE_B4_ADDRESSABLE_AREA: 'fakeB4' = 'fakeB4'
+export const FAKE_A4_ADDRESSABLE_AREA: 'fakeA4' = 'fakeA4'
+
+export const FAKE_AA = [
+  FAKE_A4_ADDRESSABLE_AREA,
+  FAKE_C4_ADDRESSABLE_AREA,
+  FAKE_B4_ADDRESSABLE_AREA,
+  FAKE_A4_ADDRESSABLE_AREA,
+]
+
 export type FlexFakeAddressableAreaName =
   | 'fakeA4'
   | 'fakeB4'
@@ -509,6 +522,11 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
 ]
 
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] = [
+  ...FLEX_STAGING_ADDRESSABLE_AREAS,
+  ...FAKE_AA,
+]
+
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
 export const ADDRESSABLE_AREA_3: '3' = '3'
@@ -639,6 +657,17 @@ export const MODULE_FIXTURES_BY_MODEL: {
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
 }
 
+export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
+  [moduleModel in ModuleModel]?: AreaType
+} = {
+  [HEATERSHAKER_MODULE_V1]: 'heaterShaker',
+  [TEMPERATURE_MODULE_V2]: 'temperatureModule',
+  [MAGNETIC_BLOCK_V1]: 'magneticBlock',
+  [THERMOCYCLER_MODULE_V2]: 'thermocycler',
+  [ABSORBANCE_READER_V1]: 'absorbanceReader',
+  [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+}
+
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
@@ -689,14 +718,14 @@ export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
 
-export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
+export const FLEX_STACKER_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
 
-export const COMBO_FIXTURES: CutoutFixtureId[] = [
+export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FLEX_STACKER_FIXTURES,
   ...MAGNETIC_BLOCK_FIXTURES,
   ...WASTE_CHUTE_FIXTURES,
@@ -764,3 +793,9 @@ export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
     z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   },
 }
+
+export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  FAKE_STAGING_AREA_RIGHT_SLOT,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
+]

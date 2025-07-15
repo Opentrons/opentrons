@@ -2,13 +2,19 @@ import { css } from 'styled-components'
 
 import {
   getAALocationForCutoutAndFixtureId,
+  isModuleAllowedOnAA,
   SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
+import {
+  ALIGN_CENTER,
+  DISPLAY_FLEX,
+  JUSTIFY_CENTER,
+  SPACING_4,
+} from '../../styles'
 import { RESPONSIVENESS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -24,12 +30,15 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutId,
   DeckDefinition,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
 interface EmptyConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   addressableAreaId: AddressableAreaNamesWithFakes
+  editableCutoutIds: CutoutId[]
+  moduleModel?: ModuleModel
   handleClickAdd: (
     fixtureLocation: CutoutId,
     addressableArea: AddressableAreaNamesWithFakes
@@ -42,11 +51,17 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     handleClickAdd,
     fixtureLocation,
     addressableAreaId,
+    editableCutoutIds,
+    moduleModel,
   } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
+
+  const isAllowedOnSlot = moduleModel
+    ? isModuleAllowedOnAA(fixtureLocation, addressableAreaId, moduleModel)
+    : true
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
@@ -70,6 +85,9 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
     : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const disableButton =
+    !editableCutoutIds.includes(fixtureLocation) || !isAllowedOnSlot
+
   return (
     <RobotCoordsForeignObject
       width={width}
@@ -85,8 +103,11 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
           handleClickAdd(fixtureLocation, addressableAreaId)
         }}
         data-testid={addressableAreaId}
+        disabled={disableButton}
       >
-        <Icon name="add-circle" color={COLORS.blue50} size="2rem" />
+        {!disableButton && (
+          <Icon name="add-circle" color={COLORS.blue50} size={SPACING_4} />
+        )}
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -117,6 +138,14 @@ const EMPTY_CONFIG_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.blue35};
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey35};
+    box-shadow: none;
+    border-color: transparent;
   }
 
   &:focus-visible {
