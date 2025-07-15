@@ -50,6 +50,27 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=False,
         description="Use temperature module in protocol.",
     )
+    parameters.add_int(
+        display_name="# of PCR Plates",
+        variable_name="num_pcr_plates",
+        default=6,
+        maximum=40,
+        minimum=1,
+    )
+    parameters.add_int(
+        display_name="# of 384 Plates",
+        variable_name="num_384_plates",
+        default=6,
+        maximum=40,
+        minimum=1,
+    )
+    parameters.add_int(
+        display_name="# of NEST Deep Well Plates",
+        variable_name="num_nest_plates",
+        default=6,
+        maximum=40,
+        minimum=1,
+    )
 
 
 def move_plates_to_deck_fill_and_store(
@@ -125,24 +146,29 @@ def run(ctx: ProtocolContext) -> None:
         temp_mod.set_temperature(4)
         DECK_SLOTS.remove("D1")
     stackers = []
-    labware = [
-        "opentrons_96_wellplate_200ul_pcr_full_skirt",
-        "appliedbiosystemsmicroamp_384_wellplate_40ul",
-        "nest_96_wellplate_2ml_deep",
-    ]
-    stacker_slots = ["A4", "B4", "C4", "D4"]
-    for i in range(4):
+    # Use tuples for labware name and count
+    labware_dict = {
+        "A4": ("opentrons_flex_96_tiprack_50ul", 6),
+        "B4": (
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            ctx.params.num_pcr_plates,  # type: ignore[attr-defined]
+        ),
+        "C4": (
+            "appliedbiosystemsmicroamp_384_wellplate_40ul",
+            ctx.params.num_384_plates,  # type: ignore[attr-defined]
+        ),
+        "D4": (
+            "nest_96_wellplate_2ml_deep",
+            ctx.params.num_nest_plates,  # type: ignore[attr-defined]
+        ),
+    }
+
+    for slot, (labware_name, count) in labware_dict.items():
         stacker: FlexStackerContext = ctx.load_module(
             "flexStackerModuleV1",
-            stacker_slots[i],
+            slot,
         )  # type: ignore[assignment]
-        if i == 0:
-            stacker.set_stored_labware(
-                "opentrons_flex_96_tiprack_50ul",
-                count=6,
-            )
-        else:
-            stacker.set_stored_labware(labware[i - 1], count=6)
+        stacker.set_stored_labware(labware_name, count=count)
         stackers.append(stacker)
     stacker_50ul = stackers[0]
     stacker_pcrplates = stackers[1]
