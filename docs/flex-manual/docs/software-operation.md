@@ -233,7 +233,7 @@ Labware offsets are fine-tuned positional coordinates that help your robot align
 This illustration shows how the different types of offsets appear as you're configuring a protocol on the Flex touchscreen.
 
 <figure class="screenshot" markdown>
-![LPC touchscreen features with labels showing offset types](images/lpc-features-labeled.png)
+![](images/lpc-features-labeled.svg)
 </figure>
 
 You create offsets by running Labware Position Check on attached instruments and deck-mounted labware.
