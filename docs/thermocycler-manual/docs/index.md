@@ -1,17 +1,27 @@
-# Welcome to MkDocs
+---
+Title: "Thermocycler GEN2 Instruction Manual"
+hide: toc
+---
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+<div style="text-align: center;" markdown>
 
-## Commands
+![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+# Thermocycler GEN2 Instruction Manual
 
-## Project layout
+![Thermocycler hero cover image](images/thermocycler-hero-cover.png){style="width: 60%"}
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+**Opentrons Labworks Inc.**
+
+December 2024
+
+</div>
+
+## Product Description
+
+The Opentrons Thermocycler Module is a fully automated on-deck
+thermocycler, providing hands-free PCR in a 96-well plate format.
+Its heated lid works in combination with Opentrons single-use PCR
+lids or reusable rubber seals to help ensure efficient plate heating,
+protect samples against contamination, and reduce sample loss
+from evaporation.
