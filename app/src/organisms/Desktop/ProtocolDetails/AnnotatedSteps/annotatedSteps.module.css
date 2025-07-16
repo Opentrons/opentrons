@@ -84,8 +84,8 @@
 .annotated_steps_error_container {
   display: flex;
   align-items: center;
-  gap: var(--spacing-8);
-  padding: 0 var(--spacing-16);
+  gap: var(--spacing-4);
+  padding: 0 var(--spacing-12);
   flex-direction: column;
 }
 

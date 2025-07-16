@@ -4,10 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
+import QuickTransferState from '../__fixtures__/QuickTransferState.json'
 import { ResetAdvancedSettingsModal } from '../ResetAdvancedSettingsModal'
 
 import type { ComponentProps } from 'react'
 import type { LiquidClass } from '@opentrons/shared-data'
+
+vi.mock('../../utils/retrieveLiquidClassValues')
 
 const render = (props: ComponentProps<typeof ResetAdvancedSettingsModal>) => {
   return renderWithProviders(<ResetAdvancedSettingsModal {...props} />, {
@@ -21,10 +24,14 @@ describe('ResetAdvancedSettingsModal', () => {
   beforeEach(() => {
     props = {
       kind: 'aspirate',
-      liquidClass: {
-        displayName: 'Water',
-        liquidClassName: 'water',
-      } as LiquidClass,
+      state: {
+        ...QuickTransferState,
+        liquidClass: {
+          displayName: 'Water',
+          liquidClassName: 'water',
+        } as LiquidClass,
+      } as any,
+      dispatch: vi.fn(),
       onClose: vi.fn(),
     }
   })
@@ -40,7 +47,7 @@ describe('ResetAdvancedSettingsModal', () => {
   })
 
   it('renders the modal with correct title and description - aspirate', () => {
-    props.liquidClass = {
+    props.state.liquidClass = {
       displayName: '',
       liquidClassName: 'none',
     } as LiquidClass
@@ -66,7 +73,7 @@ describe('ResetAdvancedSettingsModal', () => {
 
   it('renders the modal with correct title and description - dispense', () => {
     props.kind = 'dispense'
-    props.liquidClass = {
+    props.state.liquidClass = {
       displayName: '',
       liquidClassName: 'none',
     } as LiquidClass
@@ -85,5 +92,11 @@ describe('ResetAdvancedSettingsModal', () => {
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
   })
-  // Todo add continue button test
+
+  it('calls a mock function when the continue button is clicked', () => {
+    render(props)
+
+    fireEvent.click(screen.getByText('Continue'))
+    expect(props.dispatch).toHaveBeenCalled()
+  })
 })

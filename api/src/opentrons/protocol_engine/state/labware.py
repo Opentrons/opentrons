@@ -1029,6 +1029,10 @@ class LabwareView:
             self.get(labware_id).loadName
         )
 
+    def is_lid(self, labware_id: str) -> bool:
+        """Check if labware is a lid."""
+        return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
+
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""
         labware = self.get(labware_id)
@@ -1179,7 +1183,9 @@ class LabwareView:
                 " on other labware."
             )
         below_labware = self.get(bottom_labware_id)
-        if not labware_validation.validate_labware_can_be_stacked(
+        if isinstance(
+            top_labware_definition, LabwareDefinition2
+        ) and not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,
             below_labware_load_name=below_labware.loadName,
         ):

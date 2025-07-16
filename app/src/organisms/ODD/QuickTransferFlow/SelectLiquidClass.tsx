@@ -58,6 +58,7 @@ export function SelectLiquidClass({
       type: 'SET_LIQUID_CLASS',
       liquidClass: selectedLiquidClass ?? noLiquidClass,
     })
+
     onNext()
   }
 
@@ -105,7 +106,6 @@ export function SelectLiquidClass({
         <StyledText oddStyle="level4HeaderRegular">
           {t('apply_predefined_settings')}
         </StyledText>
-        {/* radio buttons */}
         {liquidClassOptions.map(option => (
           <RadioButton
             key={option.liquidClassName}

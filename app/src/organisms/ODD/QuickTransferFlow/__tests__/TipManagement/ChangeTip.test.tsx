@@ -57,8 +57,8 @@ describe('ChangeTip', () => {
   it('calls dispatch when you select a new option and save', () => {
     render(props)
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
-    const perSource = screen.getByText('Before every aspirate')
+    screen.getByText('Once')
+    const perSource = screen.getByText('Always')
     fireEvent.click(perSource)
     const saveBtn = screen.getByText('Save')
     fireEvent.click(saveBtn)
@@ -71,23 +71,23 @@ describe('ChangeTip', () => {
   it('renders correct change tip options when single transfer of less than 96 wells', () => {
     render(props)
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
-    screen.getByText('Before every aspirate')
-    screen.getByText('Per source well')
+    screen.getByText('Once')
+    screen.getByText('Always')
+    screen.getByText('Per source')
   })
   it('renders correct change tip options for consolidate with less than 96 wells', () => {
     render({ ...props, state: { ...props.state, transferType: 'consolidate' } })
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
-    screen.getByText('Before every aspirate')
-    screen.getByText('Per source well')
+    screen.getByText('Once')
+    screen.getByText('Always')
+    screen.getByText('Per source')
   })
   it('renders correct change tip options for distribute with less than 96 wells', () => {
     render({ ...props, state: { ...props.state, transferType: 'distribute' } })
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
-    screen.getByText('Before every aspirate')
-    screen.getByText('Per destination well')
+    screen.getByText('Once')
+    screen.getByText('Always')
+    screen.getByText('Per destination')
   })
   it('renders correct change tip options any transfer with more than 96 wells', () => {
     render({
@@ -211,6 +211,6 @@ describe('ChangeTip', () => {
       },
     })
     screen.getByText('Change tip')
-    screen.getByText('Once at the start of the transfer')
+    screen.getByText('Once')
   })
 })

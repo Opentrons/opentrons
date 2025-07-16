@@ -80,6 +80,7 @@ export function useDispenseSettingsConfig({
         state.submergeDispense !== undefined
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
+              delayDuration: state.submergeDispense.delayDuration,
               position: state.submergeDispense.positionFromBottom,
             })
           : '',
@@ -130,8 +131,8 @@ export function useDispenseSettingsConfig({
       option: 'dispense_push_out',
       copy: t('push_out'),
       value:
-        state.pushOut != null && state.pushOut
-          ? t('option_enabled')
+        state.pushOutDispense != null && state.pushOutDispense.volume != null
+          ? t('push_out_value', { volume: state.pushOutDispense.volume })
           : t('option_disabled'),
       enabled: true,
       onClick: () => {
@@ -145,6 +146,7 @@ export function useDispenseSettingsConfig({
         state.retractDispense !== undefined
           ? t('retract_value', {
               speed: state.retractDispense.speed,
+              delayDuration: state.retractDispense.delayDuration,
               position: state.retractDispense.positionFromBottom,
             })
           : '',

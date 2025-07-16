@@ -1,7 +1,14 @@
+/**
+ * Code to deal with fixtures in the sense of deck configuration.
+ * Not to be confused with fixtures in the sense of dummy test data.
+ */
+
 import isEqual from 'lodash/isEqual'
 
 import {
+  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
+  FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1031,6 +1038,27 @@ export const getAAsToFixtureIdFromDeckDefWithFakes = (
   >
 }
 
+export const getAAForModuleFixture = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureIdsWithFakes,
+  moduleModel: ModuleModel
+): AddressableAreaNamesWithFakes => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
+  const aa = aaList?.find(
+    aa =>
+      getAAByAAId(aa, deckDef).areaType ===
+      FLEX_MODULE_AA_TYPE_BY_MODEL[moduleModel]
+  )
+  if (!aa) {
+    console.error(
+      `Was not able to find a aa match for module ${moduleModel} in cutout ${cutoutId}`
+    )
+    return A1_ADDRESSABLE_AREA
+  }
+  return aa
+}
+
 /**
  * get relevent aa name that match with cutoutId and fixtureId.
  *
@@ -1060,6 +1088,40 @@ export const getMainAAForAFixture = (
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
+}
+
+export const isModuleAllowedOnAA = (
+  cutoutId: CutoutId,
+  aa: AddressableAreaNamesWithFakes,
+  moduleModel: ModuleModel
+): boolean => {
+  const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
+  const aaForFixture = getAAWithFakesFromCutoutFixtureId(
+    cutoutId,
+    fixtureId[0],
+    getDeckDefFromRobotType('OT-3 Standard')
+  )
+  const aaWithSlotLikeId = aaForFixture?.map(item => {
+    return {
+      aa: item,
+      slotLikeId: getAAWithFakesFromVSId(
+        getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
+      ),
+    }
+  })
+  if (
+    SINGLE_RIGHT_CUTOUTS.includes(cutoutId) &&
+    moduleModel === FLEX_STACKER_MODULE_V1
+  ) {
+    return (
+      aaWithSlotLikeId?.some(
+        aaItem =>
+          FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES.includes(aaItem.aa) &&
+          aa === aaItem.slotLikeId
+      ) ?? false
+    )
+  }
+  return aaWithSlotLikeId?.some(item => item.slotLikeId === aa) ?? false
 }
 
 export const getVisualSlotIdForAA = (
@@ -1207,5 +1269,33 @@ export const isFixtureInUsbModules = (fixtureId: CutoutFixtureId): boolean => {
     Object.values(moduleFixturesWithoutMagBlock).some(fixtures =>
       fixtures?.includes(fixtureId)
     )
+  )
+}
+
+export const getCutoutConfigReplacmentForModule = (
+  cutoutId: CutoutId,
+  fixtureId: CutoutFixtureId,
+  moduleModel: ModuleModel,
+  deckConfig: CutoutConfig[]
+): CutoutFixtureId => {
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
+  const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
+  const addedCutoutConfigs: CutoutConfigMap[] = [
+    {
+      addressableAreaId: mainAA,
+      cutoutFixtureId: fixtureId,
+      cutoutId: cutoutId,
+    },
+  ]
+  const replacmentFixture = replaceCutoutFixtureWithComboFixture(
+    addedCutoutConfigs,
+    deckConfigWithAA,
+    cutoutId
+  )
+
+  return getReplacementFixtureForFakeFixture(
+    replacmentFixture[0].cutoutFixtureId
   )
 }

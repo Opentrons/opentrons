@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -23,6 +25,10 @@ export function useApplyOffsets(runId: string): ApplyOffsetsResult {
   )
   const { makeSnackbar } = useToaster()
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
+  const { reportApplyOffsets } = useLPCAnalytics({
+    runId,
+    robotType: FLEX_ROBOT_TYPE,
+  })
   const [isApplyingOffsets, setIsApplyingOffsets] = useState(false)
 
   const applyOffsets = (): Promise<void> => {
@@ -39,6 +45,9 @@ export function useApplyOffsets(runId: string): ApplyOffsetsResult {
       return Promise.all(
         lwOffsetsForRun.map(data => createLabwareOffset({ runId, data }))
       )
+        .then(() => {
+          reportApplyOffsets(lwOffsetsForRun)
+        })
         .catch(error => {
           makeSnackbar(t('failed_to_apply_offsets') as string)
           throw error // Re-throw to allow chaining

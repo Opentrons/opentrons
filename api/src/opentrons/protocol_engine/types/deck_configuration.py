@@ -1,7 +1,7 @@
 """Protocol engine types to do with deck configuration."""
 
 from dataclasses import dataclass
-from typing import FrozenSet, List, Tuple, Optional, Union
+from typing import FrozenSet, List, Tuple, Optional, Union, Literal
 from enum import Enum
 
 from opentrons.types import DeckSlotName
@@ -50,6 +50,7 @@ class AddressableArea:
 
     area_name: str
     area_type: AreaType
+    mating_surface_unit_vector: Optional[List[Union[Literal[1], Literal[-1]]]]
     base_slot: DeckSlotName
     display_name: str
     bounding_box: Dimensions
