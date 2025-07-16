@@ -1,31 +1,31 @@
 .annotated_group_container {
   display: flex;
+  overflow: hidden;
   width: 100%;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .annotated_group_header {
   display: flex;
-  cursor: pointer;
-  padding: 0 var(--spacing-16);
   width: 100%;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
+  padding: 0 var(--spacing-16);
   border-bottom: 1px solid var(--grey-30);
-  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .annotated_group_expanded {
   display: flex;
-  padding: var(--spacing-8);
-  flex-direction: column;
 
   /* TODO: make max height dynamic based on amount of space left */
   max-height: 18.75rem;
+  flex-direction: column;
+  padding: var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
-  overflow-y: auto;
   gap: var(--spacing-4);
+  overflow-y: auto;
 }
 
 .annotated_group_expanded::-webkit-scrollbar {
@@ -34,24 +34,24 @@
 
 .individual_command_container {
   display: flex;
-  gap: var(--spacing-8);
   padding: 0 var(--spacing-12);
+  gap: var(--spacing-8);
 }
 
 .rogue_individual_command_container {
-  border-bottom: 1px solid var(--grey-30);
   padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--grey-30);
 }
 
 .individual_command_wrap {
   display: flex;
-  gap: var(--spacing-4);
   width: 100%;
-  color: var(--black-90);
-  border-radius: var(--border-radius-4);
   padding: var(--spacing-8);
-  cursor: pointer;
+  border-radius: var(--border-radius-4);
   background-color: var(--grey-20);
+  color: var(--black-90);
+  cursor: pointer;
+  gap: var(--spacing-4);
   transition: background-color 500ms ease-out, border-color 500ms ease-out;
 }
 
@@ -83,28 +83,28 @@
 
 .annotated_steps_error_container {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-4);
-  padding: 0 var(--spacing-12);
   flex-direction: column;
+  align-items: center;
+  padding: 0 var(--spacing-12);
+  gap: var(--spacing-4);
 }
 
 .annotated_steps_error_header {
   display: flex;
-  gap: var(--spacing-4);
   width: 100%;
-  background-color: var(--red-20);
-  border-radius: var(--border-radius-4);
-  padding: var(--spacing-8);
   align-items: center;
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--red-20);
+  gap: var(--spacing-4);
   transition: background-color 500ms ease-out, border-color 500ms ease-out;
 }
 
 .annotated_steps_final_command {
   display: flex;
   width: 100%;
-  background-color: var(--grey-20);
-  border-radius: var(--border-radius-4);
   padding: var(--spacing-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
   transition: background-color 500ms ease-out, border-color 500ms ease-out;
 }
