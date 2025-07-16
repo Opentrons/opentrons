@@ -200,7 +200,7 @@ describe('getRunLabwareRenderInfo', () => {
   })
 })
 
-describe('getCurrentRunModuleRenderInfo', () => {
+describe('getRunModuleRenderInfo', () => {
   it('returns an empty array if there is no loaded module for the run', () => {
     const res = getRunModuleRenderInfo({ modules: [] } as any, {} as any, {})
     expect(res).toBeInstanceOf(Array)
@@ -219,6 +219,8 @@ describe('getCurrentRunModuleRenderInfo', () => {
     expect(moduleInfo.y).toEqual(0)
     expect(moduleInfo.moduleDef.moduleType).toEqual('heaterShakerModuleType')
     expect(moduleInfo.moduleId).toEqual('mockModuleID')
+    expect(moduleInfo.targetDeckId).toEqual(ot2DeckDefV5.otId)
+    expect(moduleInfo.targetSlotId).toEqual('3') // taken from mockRunData
     expect(moduleInfo.nestedLabwareDef).not.toEqual(null)
     expect(moduleInfo.nestedLabwareId).toEqual('mockLabwareID')
   })

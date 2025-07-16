@@ -197,6 +197,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
     features=LocatingFeatures(),
+    mating_surface_unit_vector=[-1, 1, -1],
 )
 
 
@@ -964,7 +965,7 @@ def test_get_all_obstacle_highest_z_with_modules(
     # Note: since no labware are loaded on the modules, the thermocycler
     # lid is considered open, so the thermocycler lid height is not included
     # in the thermocycler height
-    assert isclose(subject.get_all_obstacle_highest_z(), 44.725)
+    assert isclose(subject.get_all_obstacle_highest_z(), 35.0)
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -2995,6 +2996,7 @@ def test_get_slot_item(
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
         features=LocatingFeatures(),
+        mating_surface_unit_vector=[-1, 1, -1],
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(

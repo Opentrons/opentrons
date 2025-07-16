@@ -46,7 +46,6 @@ def ot2_hardware_api(decoy: Decoy) -> API:
     return mock
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""

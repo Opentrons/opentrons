@@ -2,19 +2,9 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import styled, { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
 import { SendButton } from '/ai-client/atoms/SendButton'
 import {
@@ -39,7 +29,16 @@ import {
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '/ai-client/resources/utils'
+import {
+  getFileType,
+  MAX_FILES_PER_MESSAGE,
+  validateFile,
+} from '/ai-client/resources/utils/fileUtils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
+
+import { AttachedFileItem } from '../../atoms/AttachedFileItem'
+import { AttachFileButton } from '../../atoms/AttachFileButton'
+import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -97,6 +96,39 @@ export function InputPrompt(): JSX.Element {
   }
 
   const [requestId, setRequestId] = useState<string>(uuidv4())
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [fileError, setFileError] = useState<string | null>(null)
+
+  const handleFileSelect = (files: FileList): void => {
+    setFileError(null)
+    const fileArray = Array.from(files)
+
+    // Check total file count
+    if (attachedFiles.length + fileArray.length > MAX_FILES_PER_MESSAGE) {
+      setFileError(
+        `You can attach a maximum of ${MAX_FILES_PER_MESSAGE} files per message.`
+      )
+      return
+    }
+
+    // Validate each file
+    const validFiles: File[] = []
+    for (const file of fileArray) {
+      const validation = validateFile(file)
+      if (!validation.isValid) {
+        setFileError(validation.error || 'Invalid file')
+        return
+      }
+      validFiles.push(file)
+    }
+
+    setAttachedFiles(prev => [...prev, ...validFiles])
+  }
+
+  const handleRemoveFile = (index: number): void => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
+    setFileError(null)
+  }
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
   useEffect(() => {
@@ -141,8 +173,18 @@ export function InputPrompt(): JSX.Element {
       role: 'user',
       reply: watchUserPrompt,
       protocol_format: currentProtocolFormat,
+      attachments:
+        attachedFiles.length > 0
+          ? attachedFiles.map(file => ({
+              name: file.name,
+              type: getFileType(file),
+              content: '', // Content will be read separately if needed
+              size: file.size,
+            }))
+          : undefined,
     }
     reset()
+    setAttachedFiles([]) // Clear attached files after sending
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -285,22 +327,69 @@ export function InputPrompt(): JSX.Element {
   }, [data, isLoading, submitted])
 
   return (
-    <StyledForm id="User_Prompt">
-      <Flex css={CONTAINER_STYLE}>
-        <LegacyStyledTextarea
-          rows={calcTextAreaHeight(watchUserPrompt)}
-          placeholder={t('type_your_prompt')}
-          {...register('userPrompt')}
-        />
-        <SendButton
-          disabled={watchUserPrompt.length === 0}
-          isLoading={isLoading}
-          handleClick={() => {
-            handleClick()
-          }}
-        />
-      </Flex>
-    </StyledForm>
+    <form id="User_Prompt" className={styles.form}>
+      {/* Error message */}
+      {fileError && (
+        <div className={styles.error_container}>
+          <StyledText
+            color={COLORS.red50}
+            fontSize={TYPOGRAPHY.fontSizeH3}
+            lineHeight={TYPOGRAPHY.lineHeight20}
+          >
+            {fileError}
+          </StyledText>
+        </div>
+      )}
+
+      {/* Main input container */}
+      <div className={styles.main_input_container}>
+        {/* Display attached files above the input */}
+        {attachedFiles.length > 0 && (
+          <div className={styles.attached_files_section}>
+            <div className={styles.attached_files_list}>
+              {attachedFiles.map((file, index) => (
+                <AttachedFileItem
+                  key={`${file.name}-${index}`}
+                  file={file}
+                  onRemove={() => {
+                    handleRemoveFile(index)
+                  }}
+                  showRemoveButton={true}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Text input area - separate row */}
+        <div className={styles.text_input_section}>
+          <textarea
+            rows={calcTextAreaHeight(watchUserPrompt)}
+            placeholder={t('type_your_prompt')}
+            className={styles.textarea}
+            {...register('userPrompt')}
+          />
+        </div>
+
+        {/* Bottom row with attach button and send button */}
+        <div className={styles.button_row_container}>
+          <AttachFileButton
+            onFileSelect={handleFileSelect}
+            disabled={
+              isLoading || attachedFiles.length >= MAX_FILES_PER_MESSAGE
+            }
+          />
+          <div className={styles.spacer} />
+          <SendButton
+            disabled={watchUserPrompt.length === 0}
+            isLoading={isLoading}
+            handleClick={() => {
+              handleClick()
+            }}
+          />
+        </div>
+      </div>
+    </form>
   )
 }
 
@@ -336,46 +425,3 @@ const getUpdateEndpoint = (): string => {
       return STAGING_UPDATE_PROTOCOL_END_POINT
   }
 }
-
-const StyledForm = styled.form`
-  width: 100%;
-`
-
-const CONTAINER_STYLE = css`
-  padding: ${SPACING.spacing40};
-  grid-gap: ${SPACING.spacing40};
-  flex-direction: ${DIRECTION_ROW};
-  background-color: ${COLORS.white};
-  border-radius: ${BORDERS.borderRadius4};
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-  max-height: 21.25rem;
-
-  &:focus-within {
-    border: 1px ${BORDERS.styleSolid}${COLORS.blue50};
-  }
-`
-
-const LegacyStyledTextarea = styled.textarea`
-  resize: none;
-  min-height: 3.75rem;
-  max-height: 17.25rem;
-  overflow-y: auto;
-  background-color: ${COLORS.white};
-  border: none;
-  outline: none;
-  padding: 0;
-  box-shadow: none;
-  color: ${COLORS.black90};
-  width: 100%;
-  font-size: ${TYPOGRAPHY.fontSize20};
-  line-height: ${TYPOGRAPHY.lineHeight24};
-  padding: 1.2rem 0;
-  font-size: 1rem;
-
-  ::placeholder {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-`

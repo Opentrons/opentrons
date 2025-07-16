@@ -194,6 +194,7 @@ export function SetupLabwareStackView({
             >
               <LabwareRender
                 definition={labwareDefinition}
+                positioningMode="offsetInSlot"
                 wellFill={wellFill}
               />
             </g>

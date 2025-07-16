@@ -303,11 +303,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   slotPosition[0]
                 )}
                 innerProps={innerProps}
+                targetDeckId={deckDef.otId}
+                targetSlotId={moduleLocation.slotName}
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
                     <LabwareRender
                       definition={nestedLabwareDef}
+                      positioningMode="offsetInSlot"
                       onLabwareClick={onLabwareClick}
                       wellFill={nestedLabwareWellFill}
                       shouldRotateAdapterOrientation={
@@ -361,6 +364,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     slotPosition[0]
                   )}
                   innerProps={innerProps}
+                  targetDeckId={deckDef.otId}
+                  targetSlotId={moduleLocation.slotName}
                 >
                   {nestedLabwareDef != null ? (
                     <g
@@ -369,6 +374,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     >
                       <LabwareRender
                         definition={nestedLabwareDef}
+                        positioningMode="offsetInSlot"
                         onLabwareClick={onLabwareClick}
                         wellFill={nestedLabwareWellFill}
                         shouldRotateAdapterOrientation={
@@ -423,6 +429,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               >
                 <LabwareRender
                   definition={definition}
+                  positioningMode="offsetInSlot"
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}

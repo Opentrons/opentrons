@@ -1,6 +1,7 @@
-site_name: Opentrons Flex Instruction Manual
+site_name: flex-manual
 
 nav:
+  - index.md
   - Preface: preface.md
   - Introduction: introduction.md
   - Installation and Relocation: installation-relocation.md

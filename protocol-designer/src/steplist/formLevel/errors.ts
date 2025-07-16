@@ -1,4 +1,5 @@
 import {
+  getMaxPushOutVolume,
   getMinXYDimension,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
@@ -31,11 +32,7 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import {
-  canPipetteUseLabware,
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../utils'
+import { canPipetteUseLabware, getMaxConditioningVolume } from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
@@ -614,6 +611,14 @@ const DISPENSE_SUBMERGE_SPEED_REQUIRED: FormError = {
 const DISPENSE_RETRACT_SPEED_REQUIRED: FormError = {
   title: 'Retract speed required',
   dependentFields: ['dispense_retract_speed'],
+  location: 'field',
+  page: 2,
+  showOnReopen: true,
+  tab: 'dispense',
+}
+const DISPOSAL_VOLUME_REQUIRED: FormError = {
+  title: 'Disposal volume required',
+  dependentFields: ['disposalVolume_checkbox', 'disposalVolume_volume'],
   location: 'field',
   page: 2,
   showOnReopen: true,
@@ -1575,7 +1580,14 @@ export const dispenseRetractSpeedRequired = (
     ? DISPENSE_RETRACT_SPEED_REQUIRED
     : null
 }
-
+export const disposalVolumeRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { disposalVolume_checkbox, disposalVolume_volume } = fields
+  return disposalVolume_checkbox && !disposalVolume_volume
+    ? DISPOSAL_VOLUME_REQUIRED
+    : null
+}
 /*******************
  **     Helpers    **
  ********************/

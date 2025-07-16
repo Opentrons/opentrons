@@ -44,7 +44,6 @@ const mockLocationInfo = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 const mockAttachedModuleInfo = {
   x: 1,

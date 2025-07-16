@@ -74,7 +74,6 @@ const mockAttachedProtocolModuleMatches = [
         ot3_standard: {},
       },
       compatibleWith: [],
-      twoDimensionalRendering: {},
     },
     nestedLabwareDef: null,
     nestedLabwareDisplayName: null,
