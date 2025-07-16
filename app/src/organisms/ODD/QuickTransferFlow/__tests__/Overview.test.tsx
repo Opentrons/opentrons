@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -144,5 +143,4 @@ describe('Overview', () => {
     screen.getByText('Liquid class')
     screen.getByText('Dummy liquid class')
   })
-  // ToDo(kk:04/03) add another test  later for the liquid class
 })
