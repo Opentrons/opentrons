@@ -1,0 +1,25 @@
+.headingSmallBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 1.125rem/1.5rem Public Sans;
+  }
+}
+
+.captionBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 700 0.8125rem/1rem 'Public Sans', sans-serif;
+  }
+}
+
+.bodyDefaultSemiBold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: 600 0.875rem/1.25rem 'Public Sans', sans-serif;
+  }
+}
+
+.smallBodyTextBold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-20);
+    line-height: var(--font-height-24);
+    font-weight: var(--font-weight-bold);
+  }
+}

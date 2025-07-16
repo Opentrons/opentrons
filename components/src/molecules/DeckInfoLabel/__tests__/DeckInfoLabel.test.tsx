@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { DeckInfoLabel } from '../index'
@@ -17,15 +17,6 @@ describe('DeckInfoLabel', () => {
     props = {
       deckLabel: 'A1',
     }
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation(query => {
-        return {
-          matches: query === '(height: 610px) and (width: 1024px)',
-          media: query,
-        }
-      }),
-    })
   })
 
   it('should render the proper styles - web style', () => {
