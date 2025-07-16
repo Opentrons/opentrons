@@ -16,6 +16,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { LegacyStyledText, PrimaryButton } from '../../atoms'
+import { BaseDeck } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import {
@@ -42,7 +43,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { ModuleTemporalProperties } from '@opentrons/step-generation'
-import type { BaseDeck, LabwareOnDeck, Module } from '../../hardware-sim'
+import type { LabwareOnDeck, Module } from '../../hardware-sim'
 
 export * from './types'
 export * from './utils'

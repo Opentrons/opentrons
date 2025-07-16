@@ -1,4 +1,4 @@
-import { LabwareDefinition } from '../types'
+import type { LabwareDefinition } from '../types'
 
 export function getLabwareHasQuirk(
   labwareDef: LabwareDefinition,

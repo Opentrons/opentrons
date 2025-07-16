@@ -1,4 +1,9 @@
-import type { LoadedLabwareLocation, RunTimeCommand } from '../command/types'
+import type {
+  LoadedLabwareLocation,
+  LoadLidParams,
+  LoadLidRunTimeCommand,
+  RunTimeCommand,
+} from '../command/types'
 import type { CommandAnnotation } from '../commandAnnotation/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type {
@@ -1130,3 +1135,38 @@ export type NozzleLayoutConfig =
   | 'row'
   | 'full'
   | 'subrect'
+
+export interface LabwareInStack {
+  definitionUri: string
+  displayName: string
+  labwareId: string
+  lidId?: string
+  lidDisplayName?: string
+}
+export interface ModuleInStack {
+  moduleModel: ModuleModel
+  moduleId: string
+  moduleSlotName: string
+}
+
+export type StackItem = LabwareInStack | ModuleInStack
+
+export interface StackedItemsOnDeck {
+  [slotName: string]: StackItem[]
+}
+
+export interface LoadLidOnLabwareParams
+  extends Omit<LoadLidParams, 'location'> {
+  location: {
+    labwareId: string
+  }
+}
+export interface LoadLidOnLabwareCommad
+  extends Omit<LoadLidRunTimeCommand, 'params'> {
+  params: LoadLidOnLabwareParams
+}
+
+export interface LabwareLiquidRenderInfo extends LabwareInStack {
+  quantity: number
+  liquids: number
+}

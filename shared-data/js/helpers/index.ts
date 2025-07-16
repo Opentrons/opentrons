@@ -62,6 +62,11 @@ export * from './getDeckDefFromRobotType'
 export * from './sortWells'
 export * from './getLabwareHasQuirk'
 export * from './getMaxPushOutVolume'
+export * from './getLabwareOnDeck'
+export * from './getModuleFromStack'
+export * from './getStacksOnModules'
+export * from './getTopLabwareFromStack'
+export * from './getStacksWithLabware'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

@@ -10,7 +10,7 @@ import { getCutoutDisplayName } from '../fixtures'
 import { getModuleType } from '../modules'
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 import { getLabwareDefURI } from './getLabwareDefURI'
-import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
+import { getStackerLocationFromSlotName } from './getStackerLocationFromSlotName'
 import { getSlotFromAddressableAreaName } from './parseAddressableArea'
 
 import type { CutoutId } from '../../deck'
@@ -18,8 +18,6 @@ import type {
   FlexStackerFillRunTimeCommand,
   FlexStackerSetStoredLabwareRunTimeCommand,
   LoadLabwareRunTimeCommand,
-  LoadLidParams,
-  LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
   OnAddressableAreaLocationSequenceComponent,
   OnCutoutFixtureLocationSequenceComponent,
@@ -27,48 +25,14 @@ import type {
 } from '../../protocol'
 import type {
   LabwareDefinition,
+  LabwareInStack,
   LoadedLabware,
   LoadedModule,
-  ModuleModel,
+  LoadLidOnLabwareCommad,
+  ModuleInStack,
+  StackedItemsOnDeck,
+  StackItem,
 } from '../types'
-import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
-
-export interface LabwareInStack {
-  definitionUri: string
-  displayName: string
-  labwareId: string
-  lidId?: string
-  lidDisplayName?: string
-}
-export interface ModuleInStack {
-  moduleModel: ModuleModel
-  moduleId: string
-  moduleSlotName: string
-}
-
-export type StackItem = LabwareInStack | ModuleInStack
-
-export interface StackedItemsOnDeck {
-  [slotName: string]: StackItem[]
-}
-
-interface LoadLidOnLabwareParams extends Omit<LoadLidParams, 'location'> {
-  location: {
-    labwareId: string
-  }
-}
-interface LoadLidOnLabwareCommad extends Omit<LoadLidRunTimeCommand, 'params'> {
-  params: LoadLidOnLabwareParams
-}
-
-export interface LabwareLiquidRenderInfo extends LabwareInStack {
-  quantity: number
-  liquids: number
-}
-
-export function getStackerLocationFromSlotName(slotName: string): string {
-  return `STACKER ${slotName.charAt(0)}`
-}
 
 /**
  * This function parses all commands that load labware in reverse order and makes a map of
@@ -420,118 +384,4 @@ export function getStackedItemsOnStartingDeck(
     allLabwareOnDeck
   )
   return labwareAndModulesOnDeck
-}
-
-export function getLabwareLiquidRenderInfoFromStack(
-  labwareInStack: LabwareInStack[],
-  labwareByLiquidId?: LabwareByLiquidId
-): LabwareLiquidRenderInfo[] {
-  return labwareInStack.reduce<LabwareLiquidRenderInfo[]>((acc, stackItem) => {
-    const liquidInfo =
-      labwareByLiquidId != null
-        ? getLiquidsByIdForLabware(stackItem.labwareId, labwareByLiquidId)
-        : {}
-    const liquidCount = Object.keys(liquidInfo).length
-    const matchingLabwareIndex = acc.findIndex(
-      lw =>
-        lw.definitionUri === stackItem.definitionUri &&
-        (lw.lidDisplayName == null ||
-          lw.lidDisplayName === stackItem.lidDisplayName)
-    )
-    if (
-      matchingLabwareIndex !== -1 &&
-      matchingLabwareIndex === acc.length - 1
-    ) {
-      acc[matchingLabwareIndex].quantity += 1
-      acc[matchingLabwareIndex].liquids += liquidCount
-    } else {
-      acc.push({
-        ...stackItem,
-        quantity: 1,
-        liquids: liquidCount,
-      })
-    }
-    return acc
-  }, [])
-}
-
-// filter function to get stacks with no modules and on deck
-export function getLabwareOnDeck(
-  itemsOnDeck: StackedItemsOnDeck
-): {
-  [slotName: string]: LabwareInStack[]
-} {
-  // @ts-expect-error this filter should act as a type narrower
-  const labwareOnDeckEntries: Array<
-    [string, LabwareInStack[]]
-  > = Object.entries(itemsOnDeck).filter(
-    ([key, value]) =>
-      key !== 'offDeck' &&
-      value.every(
-        (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-      )
-  )
-  return Object.fromEntries(labwareOnDeckEntries)
-}
-
-// filter function to get stacks that include labware
-export function getStacksWithLabware(
-  itemsOnDeck: StackedItemsOnDeck
-): { [slotName: string]: StackItem[] } {
-  const stacksWithLabwareEntries = Object.entries(
-    itemsOnDeck
-  ).filter(([key, value]) =>
-    value.some(
-      (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-    )
-  )
-  return Object.fromEntries(stacksWithLabwareEntries)
-}
-
-// filter function to get stacks that include modules
-export function getStacksOnModules(
-  itemsOnDeck: StackedItemsOnDeck
-): {
-  [slotName: string]: {
-    // This could be typed more cleverly as:
-    // [ModuleInStack, ...StackItem[]]
-    // if we're sure that the module is always the first element in the array,
-    // but I'm not sure if that's actually the case.
-    allItemsInStack: StackItem[]
-    moduleInStack: ModuleInStack
-  }
-} {
-  return Object.entries(itemsOnDeck).reduce((acc, entry) => {
-    const [slotName, stack] = entry
-    const moduleInStack = stack.find(
-      (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
-    )
-    return moduleInStack != null
-      ? {
-          ...acc,
-          [slotName]: {
-            allItemsInStack: stack,
-            moduleInStack,
-          },
-        }
-      : acc
-  }, {})
-}
-
-export function getTopLabwareFromStack(
-  itemsOnDeck: StackItem[]
-): LabwareInStack | null {
-  const topLabwareInStack = itemsOnDeck.find(
-    (stackedItem): stackedItem is LabwareInStack => 'labwareId' in stackedItem
-  )
-  return topLabwareInStack ?? null
-}
-
-export function getModuleFromStack(
-  itemsOnDeck: StackItem[]
-): ModuleInStack | null {
-  const moduleInStack = itemsOnDeck.find(
-    (stackedItem): stackedItem is ModuleInStack => 'moduleId' in stackedItem
-  )
-  return moduleInStack ?? null
 }
