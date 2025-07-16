@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Labware"
+---
+
 # Labware 
 
 This chapter covers items in the [Opentrons Labware Library](https://labware.opentrons.com/) you can use with Opentrons Flex and the Opentrons Flex Gripper. It also covers custom labware and, for our power users, links labware components to their corresponding JSON file definitions. 
