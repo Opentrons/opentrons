@@ -39,14 +39,16 @@ async def test_platform_sensors_for_direction(
     """Test platform sensors for a given direction."""
     ui.print_header(f"Platform Sensor - {direction} direction")
     sensor_result = await stacker._driver.get_platform_sensor(direction)
+    polarity = direction.polarity()
+    opposite_polarity = direction.opposite().polarity()
     opposite_result = not await stacker._driver.get_platform_sensor(
         direction.opposite()
     )
-    print(f"{direction} sensor triggered: {sensor_result}")
-    print(f"{direction.opposite()} sensor untriggered: {opposite_result}")
+    print(f"{polarity} sensor triggered: {sensor_result}")
+    print(f"{opposite_polarity} sensor untriggered: {opposite_result}")
     report(
         section,
-        f"platform-sensor-trigger-{direction}-untrigger-{direction.opposite()}",
+        f"platform-sensor-trigger-{polarity}-untrigger-{opposite_polarity}",
         [
             sensor_result,
             opposite_result,
