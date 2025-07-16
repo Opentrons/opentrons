@@ -237,10 +237,16 @@ def _shim_does_locating_feature_pair_exist(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> bool:
     """Temporary util."""
-    return (
+    slot_footprint_exists = (
         parent_deck_item.features.get("slotFootprintAsParent") is not None
         and child_labware.features.get("slotFootprintAsChild") is not None
     )
+    flex_tiprack_lid_exists = (
+        parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
+        and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
+    )
+
+    return slot_footprint_exists or flex_tiprack_lid_exists
 
 
 def _parent_deck_item_with_features(
@@ -360,6 +366,13 @@ def _parent_deck_item_to_child_labware_feature_offset(
 ) -> Point:
     """Get the offset vector from the parent entity origin to the child labware origin."""
     if (
+        parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
+        and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
+    ):
+        return _parent_origin_flex_tip_rack_lid_feature(
+            parent_deck_item
+        ) + _flex_tip_rack_lid_feature_to_child_origin(child_labware)
+    elif (
         parent_deck_item.features.get("slotFootprintAsParent") is not None
         and child_labware.features.get("slotFootprintAsChild") is not None
     ):
@@ -407,10 +420,22 @@ def _get_spring_force(
     return parent_spring_force or child_spring_force
 
 
+def _parent_origin_flex_tip_rack_lid_feature(
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> Point:
+    """Returns the offset from a deck item's origin to the Flex tip rack lid locating feature."""
+    flex_tip_rack_lid_as_parent = parent_deck_item.features.get(
+        "opentronsFlexTipRackLidAsParent"
+    )
+    assert flex_tip_rack_lid_as_parent is not None
+
+    return Point(x=0, y=0, z=flex_tip_rack_lid_as_parent["matingZ"])
+
+
 def _parent_origin_to_slot_bottom_center(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
-    """Returns the offset from something's origin to the bottom center of the slot that it provides."""
+    """Returns the offset from a deck item's origin to the bottom center of the slot that it provides."""
     slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
     assert slot_footprint_as_parent is not None
 
@@ -430,7 +455,7 @@ def _parent_origin_to_slot_bottom_center(
 def _parent_origin_to_slot_back_left_bottom(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
-    """Returns the offset from something's origin to the back left bottom of the slot that it provides."""
+    """Returns the offset from a deck item's origin to the back left bottom of the slot that it provides."""
     slot_footprint_as_parent = parent_deck_item.features.get("slotFootprintAsParent")
     assert slot_footprint_as_parent is not None
 
@@ -439,6 +464,18 @@ def _parent_origin_to_slot_back_left_bottom(
     z = slot_footprint_as_parent["z"]
 
     return Point(x, y, z)
+
+
+def _flex_tip_rack_lid_feature_to_child_origin(
+    child_labware: LabwareDefinition3,
+) -> Point:
+    """Returns the offset from a parent lid's Flex tip rack lid locating feature to the child origin."""
+    flex_tip_rack_lid_as_child = child_labware.features.get(
+        "opentronsFlexTipRackLidAsChild"
+    )
+    assert flex_tip_rack_lid_as_child is not None
+
+    return Point(x=0, y=0, z=flex_tip_rack_lid_as_child["matingZ"])
 
 
 def slot_bottom_center_to_child_origin(
