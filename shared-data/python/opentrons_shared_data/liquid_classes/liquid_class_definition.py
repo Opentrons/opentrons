@@ -508,7 +508,7 @@ class TransferProperties(BaseLiquidClassModel):
     )
     multiDispense: MultiDispenseProperties | SkipJsonSchema[None] = Field(
         None,
-        alias="multi-dispense",
+        alias="multi_dispense",
         description="Optional multi-dispense parameters for this tip type.",
         json_schema_extra=_remove_default,
     )
