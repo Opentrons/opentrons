@@ -1,17 +1,17 @@
 .button {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-8);
   width: 5.6875rem;
   height: 2.25rem;
-  background-color: var(--blue-50);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-12);
   border: none;
   border-radius: var(--border-radius-8);
+  background-color: var(--blue-50);
   cursor: pointer;
+  gap: var(--spacing-8);
   opacity: 1;
   transition: all 0.2s ease;
-  padding: 0 var(--spacing-12);
 }
 
 .button:disabled {
@@ -21,8 +21,8 @@
 }
 
 .button:focus {
-  outline: none;
   box-shadow: 0 0 0 var(--spacing-2) var(--blue-50);
+  outline: none;
 }
 
 .button:hover:not(:disabled) {
@@ -34,15 +34,15 @@
 }
 
 .button_text {
+  overflow: hidden;
+  color: var(--white);
   font-size: var(--font-size-h3);
+  font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
-  color: var(--white);
   text-align: center;
-  font-style: normal;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .loading_icon {

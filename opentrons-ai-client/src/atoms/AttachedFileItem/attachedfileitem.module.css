@@ -1,15 +1,15 @@
 .container {
   position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-8);
-  padding: var(--spacing-8);
-  background-color: #16212d33;
-  border-radius: var(--border-radius-8);
-  border: none;
   width: fit-content;
   min-width: 10rem;
   max-width: 100%;
+  align-items: flex-start;
+  padding: var(--spacing-8);
+  border: none;
+  border-radius: var(--border-radius-8);
+  background-color: #16212d33;
+  gap: var(--spacing-8);
 }
 
 .container_with_remove {
@@ -24,16 +24,16 @@
   position: absolute;
   top: var(--spacing-2);
   right: var(--spacing-2);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--spacing-2);
-  border-radius: var(--border-radius-4);
   display: flex;
-  align-items: center;
-  justify-content: center;
   width: 2rem;
   height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2);
+  border: none;
+  border-radius: var(--border-radius-4);
+  background: none;
+  cursor: pointer;
 }
 
 .remove_button:hover {
@@ -41,53 +41,53 @@
 }
 
 .remove_button:focus {
-  outline: none;
   box-shadow: 0 0 0 2px var(--blue-50);
+  outline: none;
 }
 
 .file_icon_container {
   display: flex;
-  align-items: center;
-  justify-content: center;
   width: 2.125rem;
   height: 2.125rem;
-  background-color: var(--white);
-  border-radius: var(--border-radius-4);
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-4);
+  background-color: var(--white);
 }
 
 .file_extension {
-  font-size: var(--font-size-p);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-20);
   color: #000;
   font-family: 'Reddit Mono', monospace;
+  font-size: var(--font-size-p);
   font-style: normal;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
   text-align: center;
 }
 
 .file_details_container {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
+  overflow: hidden;
   min-width: 0;
   flex: 1;
-  overflow: hidden;
+  flex-direction: column;
+  gap: var(--spacing-4);
 }
 
 .file_name {
+  overflow: hidden;
   font-size: var(--font-size-p);
+  font-style: normal;
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
-  font-style: normal;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .file_details {
   font-size: var(--font-size-p);
+  font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-16);
-  font-style: normal;
 }
