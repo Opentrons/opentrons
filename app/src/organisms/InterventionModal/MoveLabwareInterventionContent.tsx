@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  AlignLabwareToModule,
   BORDERS,
   Box,
   COLORS,
@@ -225,7 +226,17 @@ export function MoveLabwareInterventionContent({
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={nestedLabwareDef} />
+                          <AlignLabwareToModule
+                            deckId={targetDeckId}
+                            slotId={targetSlotId}
+                            moduleDefinition={moduleDef}
+                            labwareDefinition={nestedLabwareDef}
+                          >
+                            <LabwareRender
+                              definition={nestedLabwareDef}
+                              positioningMode="passThrough"
+                            />
+                          </AlignLabwareToModule>
                         ) : null}
                       </Module>
                     )

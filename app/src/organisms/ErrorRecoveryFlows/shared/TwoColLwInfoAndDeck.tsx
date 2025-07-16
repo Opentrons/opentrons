@@ -1,13 +1,17 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  AlignLabwareToModule,
   COLORS,
   Flex,
   LabwareRender,
   Module,
   MoveLabwareOnDeck,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
+import {
+  getDeckDefFromRobotType,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -24,6 +28,7 @@ export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
+    robotType,
     routeUpdateActions,
     failedPipetteUtils,
     failedLabwareUtils,
@@ -48,6 +53,8 @@ export function TwoColLwInfoAndDeck(
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
+
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const {
     displayNameCurrentLoc: slot,
@@ -148,6 +155,7 @@ export function TwoColLwInfoAndDeck(
                     x,
                     y,
                     moduleId,
+                    slotName,
                     moduleDef,
                     nestedLabwareDef,
                     nestedLabwareId,
@@ -165,7 +173,17 @@ export function TwoColLwInfoAndDeck(
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
+                        <AlignLabwareToModule
+                          deckId={deckDef.otId}
+                          slotId={slotName}
+                          moduleDefinition={moduleDef}
+                          labwareDefinition={nestedLabwareDef}
+                        >
+                          <LabwareRender
+                            definition={nestedLabwareDef}
+                            positioningMode="passThrough"
+                          />
+                        </AlignLabwareToModule>
                       ) : null}
                     </Module>
                   )

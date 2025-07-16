@@ -29,7 +29,7 @@ import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { LabwareRender } from '../Labware'
-import { Module } from '../Module'
+import { AlignLabwareToModule, Module } from '../Module'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
@@ -307,20 +307,28 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 targetSlotId={moduleLocation.slotName}
               >
                 {nestedLabwareDef != null ? (
-                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
-                    <LabwareRender
-                      definition={nestedLabwareDef}
-                      onLabwareClick={onLabwareClick}
-                      wellFill={nestedLabwareWellFill}
-                      shouldRotateAdapterOrientation={
-                        inferModuleOrientationFromXCoordinate(
-                          slotPosition[0]
-                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                      }
-                      highlight={highlightLabware}
-                      highlightShadow={highlightShadowLabware}
-                    />
-                  </g>
+                  <AlignLabwareToModule
+                    deckId={deckDef.otId}
+                    slotId={moduleLocation.slotName}
+                    moduleDefinition={moduleDef}
+                    labwareDefinition={nestedLabwareDef}
+                  >
+                    <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                      <LabwareRender
+                        definition={nestedLabwareDef}
+                        positioningMode="passThrough"
+                        onLabwareClick={onLabwareClick}
+                        wellFill={nestedLabwareWellFill}
+                        shouldRotateAdapterOrientation={
+                          inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                        }
+                        highlight={highlightLabware}
+                        highlightShadow={highlightShadowLabware}
+                      />
+                    </g>
+                  </AlignLabwareToModule>
                 ) : null}
                 {moduleChildren}
               </Module>
@@ -367,23 +375,34 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   targetSlotId={moduleLocation.slotName}
                 >
                   {nestedLabwareDef != null ? (
-                    <g
-                      cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
+                    <AlignLabwareToModule
+                      // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use in the face of
+                      // STACKER_MODULE_Y_OFFSET / STACKER_HOPPER_LABWARE_X_OFFSET / STACKER_HOPPER_LABWARE_Y_OFFSET.
+                      deckId={deckDef.otId}
+                      slotId={moduleLocation.slotName}
+                      moduleDefinition={moduleDef}
+                      labwareDefinition={nestedLabwareDef}
                     >
-                      <LabwareRender
-                        definition={nestedLabwareDef}
-                        onLabwareClick={onLabwareClick}
-                        wellFill={nestedLabwareWellFill}
-                        shouldRotateAdapterOrientation={
-                          inferModuleOrientationFromXCoordinate(
-                            slotPosition[0]
-                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                        }
-                        highlight={highlightLabware}
-                        highlightShadow={highlightShadowLabware}
-                      />
-                    </g>
+                      <g
+                        cursor={onLabwareClick != null ? 'pointer' : ''}
+                        transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
+                      >
+                        <LabwareRender
+                          definition={nestedLabwareDef}
+                          positioningMode="passThrough"
+                          onLabwareClick={onLabwareClick}
+                          wellFill={nestedLabwareWellFill}
+                          shouldRotateAdapterOrientation={
+                            inferModuleOrientationFromXCoordinate(
+                              slotPosition[0]
+                            ) === 'left' &&
+                            moduleModel === HEATERSHAKER_MODULE_V1
+                          }
+                          highlight={highlightLabware}
+                          highlightShadow={highlightShadowLabware}
+                        />
+                      </g>
+                    </AlignLabwareToModule>
                   ) : null}
                   {moduleChildren}
                 </Module>
