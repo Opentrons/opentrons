@@ -46,7 +46,7 @@ export function EditInstrumentsModal(
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const pipetteEntities = useSelector(getPipetteEntities)
-  const [didClickBadSave, setDidClickBadSave] = useState<boolean>(false)
+  const [saveAttemptFailed, setSaveAttemptFailed] = useState<boolean>(false)
   const { pipettes, labware } = initialDeckSetup
   const pipettesOnDeck = Object.values(pipettes)
   const has96Channel = getHas96Channel(pipetteEntities)
@@ -80,7 +80,7 @@ export function EditInstrumentsModal(
     (page === 'overview' && pipettesOnDeck.length > 0)
   const handleOnSave = (): void => {
     if (!canSave) {
-      setDidClickBadSave(true)
+      setSaveAttemptFailed(true)
       return
     }
 
@@ -146,8 +146,8 @@ export function EditInstrumentsModal(
             rightPipette={rightPipette}
             gripper={gripper}
             pipetteConfig={pipetteConfig}
-            showNoPipetteError={didClickBadSave && !canSave}
-            setDidClickBadSave={setDidClickBadSave}
+            showNoPipetteError={saveAttemptFailed && !canSave}
+            setSaveAttemptFailed={setSaveAttemptFailed}
           />
         ) : (
           <PipetteConfiguration

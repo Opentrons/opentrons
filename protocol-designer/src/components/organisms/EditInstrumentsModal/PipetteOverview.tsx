@@ -30,6 +30,7 @@ import { LINK_BUTTON_STYLE } from '../../atoms'
 import { PipetteInfoItem } from '../PipetteInfoItem'
 import { getSectionsFromPipetteName } from './utils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
@@ -52,7 +53,7 @@ interface PipetteOverviewProps {
   robotType: RobotType
   pipetteConfig: PipetteConfig
   showNoPipetteError: boolean
-  setDidClickBadSave: React.Dispatch<React.SetStateAction<boolean>>
+  setSaveAttemptFailed: Dispatch<SetStateAction<boolean>>
   leftPipette?: PipetteOnDeck
   rightPipette?: PipetteOnDeck
   gripper?: Gripper
@@ -65,7 +66,7 @@ export function PipetteOverview({
   robotType,
   pipetteConfig,
   showNoPipetteError,
-  setDidClickBadSave,
+  setSaveAttemptFailed,
   leftPipette,
   rightPipette,
   gripper,
@@ -114,7 +115,7 @@ export function PipetteOverview({
   const handleAddPipette = (): void => {
     setPage('add')
     setMount(targetPipetteMount)
-    setDidClickBadSave(false)
+    setSaveAttemptFailed(false)
   }
 
   return (
