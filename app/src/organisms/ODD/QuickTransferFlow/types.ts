@@ -122,6 +122,8 @@ export interface QuickTransferSummaryState {
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+  // Note this is used to apply liquid class values to the state only once
+  liquidClassValuesInitialized: boolean
 }
 
 export type TransferType =
@@ -167,6 +169,7 @@ export type QuickTransferSummaryAction =
   | SetPushOut
   | SetConditionAspirate
   | SetDisposalVolumeDispense
+  | SetLiquidClassValues
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -334,4 +337,8 @@ interface SetDisposalVolumeDispense {
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+}
+interface SetLiquidClassValues {
+  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUES
+  liquidClassValues: QuickTransferSummaryState
 }

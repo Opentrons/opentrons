@@ -112,6 +112,7 @@ export function getInitialSummaryState(
     changeTip,
     dropTipLocation: trashConfigCutout,
     liquidClass: state.liquidClass,
+    liquidClassValuesInitialized: false,
     pushOutDispense: state.pushOutDispense,
   }
 }
