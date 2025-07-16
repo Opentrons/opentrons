@@ -8,7 +8,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .utils import test_limit_switches_per_direction
+from .utils import test_limit_switches_per_direction, verify_platform_location
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
@@ -59,6 +59,8 @@ async def test_platform_sensors_for_direction(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
+    await verify_platform_location(stacker)
+
     await test_limit_switches_per_direction(
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )

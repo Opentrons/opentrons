@@ -4,6 +4,7 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 
 from opentrons.drivers.flex_stacker.driver import FlexStackerDriver
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
+from opentrons.hardware_control.modules.types import PlatformState
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -77,3 +78,14 @@ async def test_limit_switches_per_direction(
         f"limit-switch-trigger-{polarity}-untrigger-{opposite_polarity}",
         [result, opposite_result, CSVResult.from_bool(result and opposite_result)],
     )
+
+
+async def verify_platform_location(stacker: FlexStacker) -> None:
+    """Make sure the platform is in the Extended direction."""
+    await stacker.home_all()
+    if stacker.platform_state != PlatformState.EXTENDED:
+        ui.get_user_ready("Place the platform on the X carrier")
+        await stacker._reader.get_platform_sensor_state()
+        assert (
+            stacker.platform_state == PlatformState.EXTENDED
+        ), "FAILURE - Cannot start test without the platform on the carrier."
