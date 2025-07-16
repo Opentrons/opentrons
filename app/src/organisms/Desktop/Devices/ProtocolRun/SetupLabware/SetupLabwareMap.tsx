@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import {
+  AlignControlToModule,
   BaseDeck,
   Box,
   DIRECTION_COLUMN,
@@ -12,6 +13,8 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  getDeckDefFromRobotType,
+  getModuleDef,
   getModuleType,
   getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
@@ -75,6 +78,7 @@ export function SetupLabwareMap({
   if (protocolAnalysis == null) return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
@@ -94,7 +98,9 @@ export function SetupLabwareMap({
               labwareByLiquidId
             )
           : undefined
+
       const moduleType = getModuleType(module.moduleModel)
+      const moduleDefinition = getModuleDef(module.moduleModel)
 
       return {
         moduleModel: module.moduleModel,
@@ -130,25 +136,34 @@ export function SetupLabwareMap({
             cursor="pointer"
           >
             {topLabwareDefinition != null && topLabwareInfo != null ? (
-              <LabwareInfoOverlay
-                definition={topLabwareDefinition}
-                labwareId={topLabwareInfo.labwareId}
-                displayName={topLabwareInfo.displayName}
-                runId={runId}
-                labwareHasLiquid={
-                  wellFill != null && Object.values(wellFill).length > 0
-                }
-                xOffset={
-                  moduleType === FLEX_STACKER_MODULE_TYPE
-                    ? STACKER_HOPPER_LABWARE_X_OFFSET
-                    : 0
-                }
-                yOffset={
-                  moduleType === FLEX_STACKER_MODULE_TYPE
-                    ? STACKER_HOPPER_LABWARE_Y_OFFSET
-                    : 0
-                }
-              />
+              <AlignControlToModule
+                // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be an
+                // <AlignLabwareToModule>. Right now, this will misalign the overlay
+                // for schema-3 labware definitions.
+                deckId={deckDef.otId}
+                slotId={slotName}
+                moduleDefinition={moduleDefinition}
+              >
+                <LabwareInfoOverlay
+                  definition={topLabwareDefinition}
+                  labwareId={topLabwareInfo.labwareId}
+                  displayName={topLabwareInfo.displayName}
+                  runId={runId}
+                  labwareHasLiquid={
+                    wellFill != null && Object.values(wellFill).length > 0
+                  }
+                  xOffset={
+                    moduleType === FLEX_STACKER_MODULE_TYPE
+                      ? STACKER_HOPPER_LABWARE_X_OFFSET
+                      : 0
+                  }
+                  yOffset={
+                    moduleType === FLEX_STACKER_MODULE_TYPE
+                      ? STACKER_HOPPER_LABWARE_Y_OFFSET
+                      : 0
+                  }
+                />
+              </AlignControlToModule>
             ) : null}
           </g>
         ),
