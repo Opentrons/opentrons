@@ -106,6 +106,7 @@ export interface LabwareEntity {
   labwareDefURI: string
   def: LabwareDefinition2
   pythonName: string
+  //  used specifically for protocol viz at the moment
   labwareNickName?: string
 }
 export interface LabwareEntities {
