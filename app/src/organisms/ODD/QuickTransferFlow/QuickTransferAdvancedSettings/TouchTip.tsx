@@ -144,8 +144,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     )
   }
 
-  // the allowed range for touch tip is half the height of the well to 1x the height
-  const positionRange = { min: -Math.round(wellHeight / 2), max: 0 }
+  const positionRange = { min: -parseFloat(wellHeight.toFixed(1)), max: 0 }
   const positionError =
     position !== null &&
     (position === '-' ||
@@ -154,7 +153,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
       Number(position) > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
-          max: Math.floor(positionRange.max),
+          max: positionRange.max,
         })
       : null
 
@@ -247,6 +246,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              isDecimal
               initialValue={String(speed ?? '')}
               onChange={e => {
                 handleSpeedChange(e)
@@ -288,6 +288,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               hasHyphen
+              isDecimal
               keyboardRef={keyboardRef}
               initialValue={String(position ?? '')}
               onChange={e => {
