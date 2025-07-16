@@ -79,6 +79,7 @@ export interface FormError {
 }
 
 const RANGE_TITLE = 'Enter a value within the specified range'
+const TIME_TITLE = 'Enter a value that uses the specified format'
 
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
@@ -208,12 +209,12 @@ const SHAKE_SPEED_REQUIRED: FormError = {
   location: 'field',
 }
 const SHAKE_TIME_REQUIRED: FormError = {
-  title: 'Duration required',
+  title: TIME_TITLE,
   dependentFields: ['heaterShakerSetTimer', 'heaterShakerTimer'],
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: 'Must be a valid time (mm:ss)',
+  title: TIME_TITLE,
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
