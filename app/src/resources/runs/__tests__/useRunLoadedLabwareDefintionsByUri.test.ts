@@ -1,16 +1,16 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useRunLoadedLabwareDefinitions } from '@opentrons/react-api-client'
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 
-const mockLabwareDef = fixture96Plate as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition
 
 describe('useRunLoadedLabwareDefinitionsByUri', () => {
   beforeEach(() => {

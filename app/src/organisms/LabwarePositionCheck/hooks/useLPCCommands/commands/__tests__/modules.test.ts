@@ -1,10 +1,10 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
-  modulePrepCommands,
+  moduleCleanupDuringLPCCommands,
   moduleInitBeforeAnyLPCCommands,
   moduleInitDuringLPCCommands,
-  moduleCleanupDuringLPCCommands,
+  modulePrepCommands,
 } from '../modules'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

@@ -1,18 +1,18 @@
 import omit from 'lodash/omit'
 import range from 'lodash/range'
-import { describe, it, expect, beforeEach } from 'vitest'
-import { splitWellsOnColumn, sortWells } from '../../helpers/index'
-import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  createIrregularLabware,
-  _irregularWellName,
-  _generateIrregularLoadName,
   _calculateWellCoord,
+  _generateIrregularLoadName,
+  _irregularWellName,
+  createIrregularLabware,
 } from '..'
+import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
+import { sortWells, splitWellsOnColumn } from '../../helpers/index'
 
-import type { LabwareDefinition2, LabwareWellProperties } from '../../types'
 import type { IrregularLabwareProps } from '..'
+import type { LabwareDefinition, LabwareWellProperties } from '../../types'
 
 // NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
 const exampleLabware1 = {
@@ -21,7 +21,7 @@ const exampleLabware1 = {
     ...fixture_irregular_example_1.parameters,
     loadName: 'generic_55_tuberack_50x3ml_5x10ml',
   },
-} as LabwareDefinition2
+} as LabwareDefinition
 
 describe('test helper functions', () => {
   it('Well name generated correctly', () => {
@@ -97,7 +97,7 @@ describe('test helper functions', () => {
 })
 
 describe('test createIrregularLabware function', () => {
-  let labware1: LabwareDefinition2
+  let labware1: LabwareDefinition
   let labware1Args: IrregularLabwareProps
 
   beforeEach(() => {

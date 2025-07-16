@@ -18,18 +18,19 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { LEFT } from '/app/redux/pipettes'
-import { ChangePipette } from '../ChangePipette'
-import { PipetteOverflowMenu } from './PipetteOverflowMenu'
-import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
-import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
+import { LEFT } from '/app/redux/pipettes'
+
+import { ChangePipette } from '../ChangePipette'
+import { AboutPipetteSlideout } from './AboutPipetteSlideout'
+import { PipetteOverflowMenu } from './PipetteOverflowMenu'
+import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'

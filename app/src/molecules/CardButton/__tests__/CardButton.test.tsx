@@ -1,10 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { COLORS } from '@opentrons/components'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { CardButton } from '..'
 
 import type { ComponentProps } from 'react'

@@ -9,8 +9,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InterventionModal } from '/app/molecules/InterventionModal'
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
+import { InterventionModal } from '/app/molecules/InterventionModal'
 
 import type { ComponentProps } from 'react'
 import type { ModalType } from '/app/molecules/InterventionModal'

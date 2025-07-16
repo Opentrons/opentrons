@@ -1,12 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
 import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
+
 import type {
-  ThermocyclerStateStepArgs,
   ThermocyclerProfileStepArgs,
+  ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
 import type { HydratedThermocyclerFormData } from '../../../../form-types'
+
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {
@@ -39,6 +42,7 @@ describe('thermocyclerFormToArgs', () => {
         profileVolume: '10',
         stepName: 'mock name',
         stepDetails: 'mock details',
+        stepNumber: 1,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
@@ -55,7 +59,7 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-
+        stepNumber: 1,
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: false,
@@ -101,6 +105,7 @@ describe('thermocyclerFormToArgs', () => {
         profileVolume: '4',
         profileTargetLidTemp: '40',
         orderedProfileItems: ['profileItem1', 'profileItem2'],
+        stepNumber: 1,
         profileItemsById: {
           profileItem1: {
             type: 'profileStep',

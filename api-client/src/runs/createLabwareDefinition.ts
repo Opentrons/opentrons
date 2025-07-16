@@ -1,6 +1,6 @@
 import { POST, request } from '../request'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 
@@ -11,10 +11,10 @@ export interface CreateLabwareDefinitionResponsePayload {
 export function createLabwareDefinition(
   config: HostConfig,
   runId: string,
-  data: LabwareDefinition2
+  data: LabwareDefinition
 ): ResponsePromise<CreateLabwareDefinitionResponsePayload> {
   return request<
     CreateLabwareDefinitionResponsePayload,
-    { data: LabwareDefinition2 }
+    { data: LabwareDefinition }
   >(POST, `/runs/${runId}/labware_definitions`, { data }, config)
 }

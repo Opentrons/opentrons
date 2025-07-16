@@ -1,11 +1,12 @@
-import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
+
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 import { SetWifiCred } from '../SetWifiCred'

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -10,15 +10,16 @@ import {
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
   RadioButton,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getLocalRobot } from '/app/redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '/app/redux/networking'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { ChangeEvent } from 'react'

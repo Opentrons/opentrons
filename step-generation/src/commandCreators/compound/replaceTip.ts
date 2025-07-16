@@ -5,23 +5,25 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE,
 } from '@opentrons/shared-data'
-import { getNextTiprack } from '../../robotStateSelectors'
+
 import * as errorCreators from '../../errorCreators'
-import { dropTipInTrash } from './dropTipInTrash'
+import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
+  curryWithoutPython,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
-  reduceCommandCreators,
   PRIMARY_NOZZLE,
+  reduceCommandCreators,
 } from '../../utils'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
-import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
@@ -31,6 +33,9 @@ interface ReplaceTipArgs {
   dropTipLocation: string
   tipRack: string | null
   nozzles?: NozzleConfigurationStyle
+  //  we need to emit atomic commands for python
+  //  if this replaceTip is for the mix compound command
+  isFromMixCommand?: boolean
 }
 
 /**
@@ -43,8 +48,15 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation, nozzles, tipRack } = args
+  const {
+    pipette,
+    dropTipLocation,
+    nozzles,
+    tipRack,
+    isFromMixCommand = false,
+  } = args
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles
+  const stateTiprack = prevRobotState.pipettes[pipette].tiprackId
   if (tipRack == null) {
     return {
       errors: [errorCreators.noTipSelected()],
@@ -98,10 +110,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (!labwareDef) {
     return {
@@ -113,10 +125,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -133,11 +142,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const slotName = getLabwareSlot(
-    nextTiprack.tiprackId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(nextTiprack.tiprackId, prevRobotState.labware)
   if (
     pipetteAdjacentHeaterShakerWhileShaking(
       prevRobotState.modules,
@@ -178,11 +183,15 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     primaryNozzle = 'H1'
   }
 
+  const curryCommand = isFromMixCommand
+    ? curryCommandCreator
+    : curryWithoutPython
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-    //  only emit the command if previous nozzle state is different
-    (channels === 96 || channels === 8) &&
+    //  only emit the command if previous nozzle state and tiprack state are different
+    //  only check for the 96-channel since we do not support 8-channel partial tip yet
+    channels === 96 &&
     args.nozzles != null &&
-    args.nozzles !== stateNozzles
+    (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
       ? [
           curryCommandCreator(configureNozzleLayout, {
             configurationParams: {
@@ -190,17 +199,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
               style: args.nozzles,
             },
             pipetteId: args.pipette,
+            tiprackId: nextTiprack.tiprackId,
           }),
         ]
       : []
 
   let commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(dropTip, {
+    curryCommand(dropTip, {
       pipette,
       dropTipLocation,
     }),
     ...configureNozzleLayoutCommand,
-    curryCommandCreator(pickUpTip, {
+    curryCommand(pickUpTip, {
       pipetteId: pipette,
       labwareId: nextTiprack.tiprackId,
       wellName: nextTiprack.well,
@@ -209,12 +219,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      curryCommandCreator(dropTipInWasteChute, {
+      curryCommand(dropTipInWasteChute, {
         pipetteId: args.pipette,
-        wasteChuteId: dropTipEntity.id,
+        wasteChuteId:
+          invariantContext.wasteChuteEntities[args.dropTipLocation].id,
       }),
       ...configureNozzleLayoutCommand,
-      curryCommandCreator(pickUpTip, {
+      curryCommand(pickUpTip, {
         pipetteId: pipette,
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,
@@ -224,12 +235,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      curryCommandCreator(dropTipInTrash, {
+      curryCommand(dropTipInTrash, {
         pipetteId: pipette,
-        trashLocation: dropTipEntity.location as CutoutId,
+        trashLocation: invariantContext.trashBinEntities[args.dropTipLocation]
+          .location as CutoutId,
       }),
       ...configureNozzleLayoutCommand,
-      curryCommandCreator(pickUpTip, {
+      curryCommand(pickUpTip, {
         pipetteId: pipette,
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,

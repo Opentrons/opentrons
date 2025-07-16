@@ -11,26 +11,26 @@ import {
   NO_WRAP,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+
 import { analyticsEvent } from '../../../../analytics/actions'
+import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
+import {
+  getBatchEditFormHasUnsavedChanges,
+  getCurrentFormHasUnsavedChanges,
+  getSavedStepForms,
+  getUnsavedForm,
+} from '../../../../step-forms/selectors'
 import { actions as stepsActions } from '../../../../ui/steps'
 import {
   hoverOnStep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
-import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
-import {
-  getBatchEditFormHasUnsavedChanges,
-  getCurrentFormHasUnsavedChanges,
-  getPipetteEntities,
-  getSavedStepForms,
-  getUnsavedForm,
-} from '../../../../step-forms/selectors'
 
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
-import type { StepIdType } from '../../../../form-types'
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 
 interface StepOverflowMenuProps {
   stepId: string
@@ -68,7 +68,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const formData = useSelector(getUnsavedForm)
   const savedStepFormData = useSelector(getSavedStepForms)[stepId]
-  const pipetteEntities = useSelector(getPipetteEntities)
 
   const isPipetteStep =
     savedStepFormData.stepType === 'moveLiquid' ||
@@ -76,8 +75,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const isThermocyclerProfile =
     savedStepFormData.stepType === 'thermocycler' &&
     savedStepFormData.thermocyclerFormType === 'thermocyclerProfile'
-  const is96Channel =
-    pipetteEntities[savedStepFormData.pipette]?.name === 'p1000_96'
 
   const duplicateStep = (
     stepId: StepIdType
@@ -143,8 +140,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             {formData != null ? null : (
               <MenuItem onClick={handleEdit}>{t('edit_step')}</MenuItem>
             )}
-            {/* Note the following 96-channel check is temp */}
-            {(isPipetteStep && !is96Channel) || isThermocyclerProfile ? (
+            {isPipetteStep || isThermocyclerProfile ? (
               <MenuItem
                 disabled={formData != null}
                 onClick={() => {

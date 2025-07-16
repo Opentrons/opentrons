@@ -1,6 +1,7 @@
+import isEqual from 'lodash/isEqual'
+
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
-import isEqual from 'lodash/isEqual'
 
 // Given run record offsets, update the LPC store with those supplied vectors details.
 // All run record supplied offsets will either match location-specific offsets or default offsets

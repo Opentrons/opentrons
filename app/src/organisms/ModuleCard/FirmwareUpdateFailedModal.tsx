@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -7,12 +7,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  PrimaryButton,
-  SPACING,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 

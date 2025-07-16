@@ -1,9 +1,12 @@
 import last from 'lodash/last'
+
 import {
-  useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
 } from '@opentrons/react-api-client'
+
 import { useRequiredProtocolHardwareFromAnalysis } from '/app/transformations/commands'
+
 import type { ProtocolHardware } from '/app/transformations/commands'
 
 /**

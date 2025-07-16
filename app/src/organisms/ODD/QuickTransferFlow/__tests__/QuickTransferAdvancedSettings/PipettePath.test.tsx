@@ -1,13 +1,14 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
+
 import { useBlowOutLocationOptions } from '../../QuickTransferAdvancedSettings/BlowOut'
+import { PipettePath } from '../../QuickTransferAdvancedSettings/PipettePath'
 
 import type { ComponentProps } from 'react'
 import type { QuickTransferSummaryState } from '../../types'
@@ -156,7 +157,10 @@ describe('PipettePath', () => {
         ...props.state,
         transferType: 'distribute',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          flowRate: 10,
+        },
       },
     }
     render(props)
@@ -185,7 +189,10 @@ describe('PipettePath', () => {
         transferType: 'distribute',
         path: 'multiDispense',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          flowRate: 10,
+        },
       },
     }
     render(props)
@@ -215,7 +222,10 @@ describe('PipettePath', () => {
         transferType: 'distribute',
         path: 'multiDispense',
         disposalVolume: 20,
-        blowOut: 'source_well',
+        blowOutDispense: {
+          location: 'source_well',
+          flowRate: 10,
+        },
       },
     }
     render(props)

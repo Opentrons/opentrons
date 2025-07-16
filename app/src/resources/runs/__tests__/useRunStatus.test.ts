@@ -1,14 +1,15 @@
-import { describe, it, vi, expect } from 'vitest'
-import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
-import { useRunStatus } from '../useRunStatus'
-import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import { describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import {
-  RUN_ID_2,
-  mockRunningRun,
-  mockIdleUnstartedRun,
   mockIdleStartedRun,
+  mockIdleUnstartedRun,
+  mockRunningRun,
+  RUN_ID_2,
 } from '../__fixtures__'
+import { useNotifyRunQuery } from '../useNotifyRunQuery'
+import { useRunStatus } from '../useRunStatus'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'

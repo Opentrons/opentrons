@@ -1,12 +1,12 @@
-import { when } from 'vitest-when'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
-  useHost,
-  useCreateRunMutation,
   useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
 } from '@opentrons/react-api-client'
 
 import { useCloneRun } from '../useCloneRun'

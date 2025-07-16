@@ -1,15 +1,15 @@
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
-import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
+import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
-import { formatTimestamp } from '/app/transformations/runs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
+import { formatTimestamp } from '/app/transformations/runs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 import type { TFunction } from 'i18next'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -36,7 +36,7 @@ const OffsetTableDatum = styled('td')`
 
 interface LegacyLabwareOffsetTableProps {
   offsetCandidates: OffsetCandidate[]
-  labwareDefinitions: LabwareDefinition2[]
+  labwareDefinitions: LabwareDefinition[]
 }
 
 export function LegacyLabwareOffsetTable(

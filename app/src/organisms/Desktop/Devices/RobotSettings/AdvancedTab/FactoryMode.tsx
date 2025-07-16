@@ -5,9 +5,9 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_AUTO,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
 

@@ -1,41 +1,42 @@
-import { css } from 'styled-components'
+import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLayoutEffect, useState } from 'react'
+import { css } from 'styled-components'
 
 import {
-  Flex,
-  StyledText,
-  SPACING,
-  COLORS,
-  ListButton,
-  TextListTableContent,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  Icon,
-  RESPONSIVENESS,
-  DISPLAY_NONE,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
-  RadioButton,
+  DISPLAY_NONE,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  ListButton,
   NO_WRAP,
-  DIRECTION_COLUMN,
+  RadioButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TextListTableContent,
+  truncateString,
 } from '@opentrons/components'
 
-import {
-  setSelectedLabwareUri,
-  proceedEditOffsetSubstep,
-  selectIsNecessaryDefaultOffsetMissing,
-  selectAllLabwareInfoAndDefaultStatusSorted,
-  selectTotalOrMissingOffsetRequiredCountForLwCopy,
-} from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
+import {
+  proceedEditOffsetSubstep,
+  selectAllLabwareInfoAndDefaultStatusSorted,
+  selectIsNecessaryDefaultOffsetMissing,
+  selectTotalOrMissingOffsetRequiredCountForLwCopy,
+  setSelectedLabwareUri,
+} from '/app/redux/protocol-runs'
 
+import type { TFunction } from 'i18next'
+import type { LPCContentContainerProps } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LwGeometryDetails } from '/app/redux/protocol-runs'
-import type { LPCContentContainerProps } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import type { TFunction } from 'i18next'
 
 export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
@@ -50,19 +51,26 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
 
   const primaryButtonProps = (): Pick<
     LPCContentContainerProps,
-    'onClickButton' | 'buttonText'
+    | 'onClickButton'
+    | 'desktopFooterBtnCopy'
+    | 'desktopHeaderBtnCopy'
+    | 'oddHeaderBtnCopy'
   > => {
     if (isOnDevice) {
       return {
-        buttonText: t('exit'),
+        oddHeaderBtnCopy: t('save_and_exit'),
         onClickButton: props.commandUtils.headerCommands.handleNavToDetachProbe,
+        desktopHeaderBtnCopy: '',
+        desktopFooterBtnCopy: '',
       }
     } else {
       return {
-        buttonText: t('continue'),
+        desktopHeaderBtnCopy: t('save_and_exit'),
+        desktopFooterBtnCopy: t('continue'),
         onClickButton: () => {
           handlePrimaryOnClick(selectedUri)
         },
+        oddHeaderBtnCopy: '',
       }
     }
   }
@@ -71,7 +79,6 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('exit')}
       {...primaryButtonProps()}
       containerStyle={isOnDevice ? undefined : DESKTOP_CONTAINER_STYLE}
       contentStyle={isOnDevice ? undefined : DESKTOP_CONTENT_CONTAINER_STYLE}
@@ -193,9 +200,10 @@ function LabwareItem({
     >
       <Flex css={CONTENT_CONTAINER_STYLE}>
         <Flex css={TEXT_CONTAINER_STYLE}>
-          <StyledText oddStyle="level4HeaderSemiBold">
-            {info.displayName}
-          </StyledText>
+          <LabwareInfoCopy
+            displayName={info.displayName}
+            version={info.version}
+          />
           <StyledText oddStyle="bodyTextRegular" css={SUBTEXT_STYLE}>
             {offsetCopy}
           </StyledText>
@@ -205,7 +213,12 @@ function LabwareItem({
     </ListButton>
   ) : (
     <RadioButton
-      buttonLabel={info.displayName}
+      buttonLabel={
+        <LabwareInfoCopy
+          displayName={info.displayName}
+          version={info.version}
+        />
+      }
       buttonValue={info.displayName}
       largeDesktopBorderRadius={true}
       buttonSubLabel={{ label: offsetCopy }}
@@ -217,10 +230,41 @@ function LabwareItem({
   )
 }
 
+function LabwareInfoCopy({
+  displayName,
+  version,
+}: {
+  displayName: LwGeometryDetails['displayName']
+  version: LwGeometryDetails['version']
+}): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
+  const isOnDevice = useSelector(getIsOnDevice)
+  const nameString = isOnDevice ? truncateString(displayName, 40) : displayName
+
+  return (
+    <Flex css={LABWARE_COPY_CONTAINER_STYLE}>
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        oddStyle="level4HeaderSemiBold"
+      >
+        {nameString}
+      </StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextRegular">
+        {t('version_number', { version })}
+      </StyledText>
+    </Flex>
+  )
+}
+
 const CONTENT_CONTAINER_STYLE = css`
   width: 100%;
   grid-gap: ${SPACING.spacing24};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
+`
+
+const LABWARE_COPY_CONTAINER_STYLE = css`
+  gap: ${SPACING.spacing8};
   align-items: ${ALIGN_CENTER};
 `
 

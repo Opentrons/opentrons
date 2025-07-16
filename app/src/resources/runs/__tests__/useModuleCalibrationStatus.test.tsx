@@ -1,15 +1,15 @@
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
+
+import { useIsFlex } from '/app/redux-resources/robots'
+import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
-import { useIsFlex } from '/app/redux-resources/robots'
-
-import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -33,7 +33,6 @@ const mockMagneticModuleDefinition = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 
 const MAGNETIC_MODULE_INFO = {
@@ -62,7 +61,7 @@ const mockOffsetData = {
 describe('useModuleCalibrationStatus hook', () => {
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const store = createStore(vi.fn(), {})
+    const store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     store.getState = vi.fn(() => {})
 

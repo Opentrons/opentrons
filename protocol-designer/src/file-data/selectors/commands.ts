@@ -1,12 +1,15 @@
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniqBy from 'lodash/uniqBy'
+import { createSelector } from 'reselect'
+
 import * as StepGeneration from '@opentrons/step-generation'
-import { getAllWellsForLabware } from '../../constants'
+
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+
+import type { StepIdType } from '../../form-types'
 import type {
   LabwareOnDeck,
   LabwareTemporalProperties,
@@ -17,7 +20,6 @@ import type {
 } from '../../step-forms'
 import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
-import type { StepIdType } from '../../form-types'
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
@@ -31,7 +33,9 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
         labwareId
       ): StepGeneration.LabwareLiquidState => {
         const labwareDef = labwareEntities[labwareId].def
-        const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
+        const allWells = labwareDef
+          ? StepGeneration.getAllWellsForLabware(labwareDef)
+          : []
         const liquidStateForLabwareAllWells = allWells.reduce(
           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
             ...innerAcc,
@@ -64,7 +68,7 @@ export const getInitialRobotState: (
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck): LabwareTemporalProperties => ({
-        slot: l.slot,
+        stack: l.stack,
       })
     )
     const modules: Record<string, ModuleTemporalProperties> = mapValues(

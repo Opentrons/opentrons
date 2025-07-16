@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import {
   DROP_TIP_SPECIAL_ERROR_TYPES,
@@ -8,22 +11,21 @@ import {
   MANAGED_PIPETTE_ID,
 } from '../constants'
 import { getAddressableAreaFromConfig } from '../utils'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
-  CreateCommand,
   AddressableAreaName,
+  CreateCommand,
   PipetteModelSpecs,
   RunCommandError,
 } from '@opentrons/shared-data'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type {
   DropTipFlowsRoute,
   FixitCommandTypeUtils,
   IssuedCommandsType,
 } from '../types'
-import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { RunCommandByCommandTypeParams } from './useDropTipCreateCommands'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000

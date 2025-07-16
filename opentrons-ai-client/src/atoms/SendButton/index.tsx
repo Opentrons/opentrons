@@ -1,17 +1,9 @@
-import { css } from 'styled-components'
-
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  Btn,
-  COLORS,
-  DISPLAY_FLEX,
-  Icon,
-  JUSTIFY_SPACE_AROUND,
-  StyledText,
-} from '@opentrons/components'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import { COLORS, Icon } from '@opentrons/components'
+
+import styles from './sendbutton.module.css'
 
 interface SendButtonProps {
   handleClick: () => void
@@ -32,33 +24,6 @@ export function SendButton({
     t('progressGenerating'),
     t('progressFinalizing'),
   ]
-
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:hover {
-      background-color: ${COLORS.blue50};
-      color: ${COLORS.white};
-    }
-
-    &:focus-visible {
-      background-color: ${COLORS.blue50};
-    }
-
-    &:active {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
-    }
-  `
 
   const [buttonText, setButtonText] = useState(progressTexts[0])
   const [, setProgressIndex] = useState(0)
@@ -84,32 +49,22 @@ export function SendButton({
   }, [isLoading])
 
   return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.grey35 : COLORS.blue50}
-      borderRadius={BORDERS.borderRadiusFull}
-      display={DISPLAY_FLEX}
-      justifyContent={JUSTIFY_SPACE_AROUND}
-      paddingX="20px"
-      width={isLoading ? 'wrap' : '4.25rem'}
-      height="4.25rem"
-      disabled={disabled || isLoading}
+    <button
+      type="button"
       onClick={handleClick}
-      aria-label="play"
-      css={playButtonStyle}
+      disabled={disabled || isLoading}
+      aria-label="Send"
+      className={styles.button}
     >
-      {isLoading ? (
-        <StyledText paddingLeft="0px" paddingRight="24px" as="i">
-          {buttonText}
-        </StyledText>
-      ) : null}
-      <Icon
-        color={disabled ? COLORS.grey50 : COLORS.white}
-        name={isLoading ? 'ot-spinner' : 'send'}
-        spin={isLoading}
-        size="2rem"
-        data-testid={`SendButton_icon_${isLoading ? 'ot-spinner' : 'send'}`}
-      />
-    </Btn>
+      <Icon name="send" size="1.25rem" color="white" />
+      <span className={styles.button_text}>
+        {isLoading ? buttonText : t('send')}
+      </span>
+      {isLoading && (
+        <div className={styles.loading_icon}>
+          <Icon name="ot-spinner" spin size="1rem" color={COLORS.white} />
+        </div>
+      )}
+    </button>
   )
 }

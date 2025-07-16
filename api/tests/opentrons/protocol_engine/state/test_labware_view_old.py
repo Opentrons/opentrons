@@ -7,10 +7,9 @@ tested together, treating LabwareState as a private implementation detail.
 
 import pytest
 from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union, NamedTuple, List
+from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
 
-from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
@@ -20,14 +19,10 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
     GripperOffsets,
-    Vector,
+    Vector3D,
     labware_definition_type_adapter,
 )
 
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
-)
 from opentrons.types import DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
@@ -44,7 +39,6 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     AddressableAreaLocation,
     OFF_DECK_LOCATION,
-    OverlapOffset,
     LabwareMovementOffsetData,
     OnAddressableAreaOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
@@ -111,6 +105,14 @@ adapter_plate = LoadedLabware(
     loadName="adapter-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-adapter-uri",
+    offsetId=None,
+)
+
+tiprack_lid = LoadedLabware(
+    id="tiprack-lid-id",
+    loadName="tiprack-lid-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    definitionUri="some-tiprack-lid-uri",
     offsetId=None,
 )
 
@@ -728,6 +730,24 @@ def test_is_tiprack(
     assert subject.is_tiprack(labware_id="reservoir-id") is False
 
 
+def test_is_lid(
+    reservoir_def: LabwareDefinition, tiprack_lid_def: LabwareDefinition
+) -> None:
+    """It should return True if labware is a lid."""
+    subject = get_labware_view(
+        labware_by_id={
+            "reservoir-id": reservoir,
+            "tiprack-lid-id": tiprack_lid,
+        },
+        definitions_by_uri={
+            "some-reservoir-uri": reservoir_def,
+            "some-tiprack-lid-uri": tiprack_lid_def,
+        },
+    )
+    assert subject.is_lid(labware_id="reservoir-id") is False
+    assert subject.is_lid(labware_id="tiprack-lid-id") is True
+
+
 def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
     """It should return the load name."""
     subject = get_labware_view(
@@ -749,102 +769,12 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
 
     result = subject.get_dimensions(labware_id="plate-id")
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     assert result == Dimensions(
         x=well_plate_def.dimensions.xDimension,
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
-
-
-def test_get_labware_overlap_offsets() -> None:
-    """It should get the labware overlap offsets."""
-    subject = get_labware_view()
-    result = subject.get_labware_overlap_offsets(
-        definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-            stackingOffsetWithLabware={"bottom-labware-name": Vector(x=1, y=2, z=3)}
-        ),
-        below_labware_name="bottom-labware-name",
-    )
-
-    assert result == OverlapOffset(x=1, y=2, z=3)
-
-
-class ModuleOverlapSpec(NamedTuple):
-    """Spec data to test LabwareView.get_module_overlap_offsets."""
-
-    spec_deck_definition: DeckDefinitionV5
-    module_model: ModuleModel
-    stacking_offset_with_module: Dict[str, Vector]
-    expected_offset: OverlapOffset
-
-
-module_overlap_specs: List[ModuleOverlapSpec] = [
-    ModuleOverlapSpec(
-        # Labware on temp module on OT2, with stacking overlap for temp module
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_model=ModuleModel.TEMPERATURE_MODULE_V2,
-        stacking_offset_with_module={
-            str(ModuleModel.TEMPERATURE_MODULE_V2.value): Vector(x=1, y=2, z=3),
-        },
-        expected_offset=OverlapOffset(x=1, y=2, z=3),
-    ),
-    ModuleOverlapSpec(
-        # Labware on TC Gen1 on OT2, with stacking overlap for TC Gen1
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_model=ModuleModel.THERMOCYCLER_MODULE_V1,
-        stacking_offset_with_module={
-            str(ModuleModel.THERMOCYCLER_MODULE_V1.value): Vector(x=11, y=22, z=33),
-        },
-        expected_offset=OverlapOffset(x=11, y=22, z=33),
-    ),
-    ModuleOverlapSpec(
-        # Labware on TC Gen2 on OT2, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
-        stacking_offset_with_module={},
-        expected_offset=OverlapOffset(x=0, y=0, z=10.7),
-    ),
-    ModuleOverlapSpec(
-        # Labware on TC Gen2 on Flex, with no stacking overlap
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
-        stacking_offset_with_module={},
-        expected_offset=OverlapOffset(x=0, y=0, z=0),
-    ),
-    ModuleOverlapSpec(
-        # Labware on TC Gen2 on Flex, with stacking overlap for TC Gen2
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        module_model=ModuleModel.THERMOCYCLER_MODULE_V2,
-        stacking_offset_with_module={
-            str(ModuleModel.THERMOCYCLER_MODULE_V2.value): Vector(x=111, y=222, z=333),
-        },
-        expected_offset=OverlapOffset(x=111, y=222, z=333),
-    ),
-]
-
-
-@pytest.mark.parametrize(
-    argnames=ModuleOverlapSpec._fields,
-    argvalues=module_overlap_specs,
-)
-def test_get_module_overlap_offsets(
-    spec_deck_definition: DeckDefinitionV5,
-    module_model: ModuleModel,
-    stacking_offset_with_module: Dict[str, Vector],
-    expected_offset: OverlapOffset,
-) -> None:
-    """It should get the labware overlap offsets."""
-    subject = get_labware_view(
-        deck_definition=spec_deck_definition,
-    )
-    result = subject.get_module_overlap_offsets(
-        definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-            stackingOffsetWithModule=stacking_offset_with_module
-        ),
-        module_model=module_model,
-    )
-
-    assert result == expected_offset
 
 
 def test_get_default_magnet_height(
@@ -1464,7 +1394,7 @@ def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
         subject.raise_if_labware_cannot_be_stacked(
             top_labware_definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 parameters=Parameters2.model_construct(loadName="name"),  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"test": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"test": Vector3D(x=0, y=0, z=0)},
             ),
             bottom_labware_id="labware-id",
         )
@@ -1504,14 +1434,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
         subject.raise_if_labware_cannot_be_stacked(
             top_labware_definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 parameters=Parameters2.model_construct(loadName="name"),  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"test": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"test": Vector3D(x=0, y=0, z=0)},
             ),
             bottom_labware_id="labware-id",
         )
 
 
 @pytest.mark.parametrize(
-    argnames=["primary_def", "lid_def", "adapter_def", "exception"],
+    argnames=["primary_def", "lid_def", "adapter_def", "exception", "ordered_list"],
     argvalues=[
         pytest.param(
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -1519,14 +1449,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.lid],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"primary": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"primary": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
@@ -1535,6 +1465,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             does_not_raise(),
+            ["lid", "primary", "adapter"],
             id="all-valid-and-present",
         ),
         pytest.param(
@@ -1543,7 +1474,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             None,
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -1553,6 +1484,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             does_not_raise(),
+            ["primary", "adapter"],
             id="adapter-valid-and-present",
         ),
         pytest.param(
@@ -1561,17 +1493,18 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.lid],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"primary": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"primary": Vector3D(x=0, y=0, z=0)},
             ),
             None,
             does_not_raise(),
+            ["lid", "primary"],
             id="lid-valid-and-present",
         ),
         pytest.param(
@@ -1580,11 +1513,12 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             None,
             None,
             does_not_raise(),
+            ["primary"],
             id="primary-only",
         ),
         pytest.param(
@@ -1593,14 +1527,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.lid],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"uhoh": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"uhoh": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
@@ -1609,6 +1543,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="lid-may-not-stack-on-primary",
         ),
         pytest.param(
@@ -1617,14 +1552,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"uhoh": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"uhoh": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.lid],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"primary": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"primary": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
@@ -1633,6 +1568,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="primary-may-not-stack-on-adapter",
         ),
         pytest.param(
@@ -1641,14 +1577,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.lid],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"primary": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"primary": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
@@ -1657,6 +1593,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="adapter-wrong-role",
         ),
         pytest.param(
@@ -1665,14 +1602,14 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="primary"
                 ),
-                stackingOffsetWithLabware={"adapter": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"adapter": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
                 parameters=Parameters2.model_construct(  # type: ignore[call-arg]
                     loadName="lid"
                 ),
-                stackingOffsetWithLabware={"primary": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"primary": Vector3D(x=0, y=0, z=0)},
             ),
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
@@ -1681,6 +1618,7 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
                 ),
             ),
             pytest.raises(errors.LabwareCannotBeStackedError),
+            None,
             id="lid-wrong-role",
         ),
     ],
@@ -1690,6 +1628,7 @@ def test_stacker_labware_pool_passes_or_raises(
     lid_def: LabwareDefinition | None,
     adapter_def: LabwareDefinition | None,
     exception: ContextManager[None],
+    ordered_list: List[str] | None,
 ) -> None:
     """It should raise if a stacker labware pool configuration is invalid."""
     subject = get_labware_view()
@@ -1697,6 +1636,12 @@ def test_stacker_labware_pool_passes_or_raises(
         subject.raise_if_stacker_labware_pool_is_not_valid(
             primary_def, lid_def, adapter_def
         )
+    if exception is does_not_raise():
+        result = subject.stacker_labware_pool_to_ordered_list(
+            primary_def, lid_def, adapter_def
+        )
+        result_load_names = [labware_def.parameters.loadName for labware_def in result]
+        assert result_load_names == ordered_list
 
 
 @pytest.mark.parametrize(
@@ -1774,7 +1719,7 @@ def test_labware_stacking_height_passes_or_raises(
                     loadName="name",
                     isMagneticModuleCompatible=False,
                 ),
-                stackingOffsetWithLabware={"test": Vector(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"test": Vector3D(x=0, y=0, z=0)},
                 stackLimit=stack_limit,
             ),
             bottom_labware_id="labware-id4",
@@ -1835,8 +1780,8 @@ def test_get_labware_gripper_offsets_default_no_slots(
             "some-labware-uri": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 gripperOffsets={
                     "default": GripperOffsets(
-                        pickUpOffset=Vector(x=1, y=2, z=3),
-                        dropOffset=Vector(x=4, y=5, z=6),
+                        pickUpOffset=Vector3D(x=1, y=2, z=3),
+                        dropOffset=Vector3D(x=4, y=5, z=6),
                     )
                 }
             ),

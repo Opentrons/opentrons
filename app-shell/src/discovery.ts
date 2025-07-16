@@ -5,35 +5,35 @@ import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
 
 import {
-  createDiscoveryClient,
-  DEFAULT_PORT,
-} from '@opentrons/discovery-client'
+  CLEAR_CACHE,
+  DISCOVERY_FINISH,
+  DISCOVERY_REMOVE,
+  DISCOVERY_START,
+} from '@opentrons/app/src/redux/discovery/actions'
+import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
 import {
   UI_INITIALIZED,
   USB_HTTP_REQUESTS_START,
   USB_HTTP_REQUESTS_STOP,
 } from '@opentrons/app/src/redux/shell/actions'
 import {
-  DISCOVERY_START,
-  DISCOVERY_FINISH,
-  DISCOVERY_REMOVE,
-  CLEAR_CACHE,
-} from '@opentrons/app/src/redux/discovery/actions'
-import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
+  createDiscoveryClient,
+  DEFAULT_PORT,
+} from '@opentrons/discovery-client'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
-import { getSerialPortHttpAgent } from './usb'
 import { handleNotificationConnectionsFor } from './notifications'
+import { getSerialPortHttpAgent } from './usb'
 
+import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 import type {
   Address,
+  DiscoveryClient,
   DiscoveryClientRobot,
   LegacyService,
-  DiscoveryClient,
 } from '@opentrons/discovery-client'
 import type { Action, Dispatch } from './types'
-import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 
 const log = createLogger('discovery')
 

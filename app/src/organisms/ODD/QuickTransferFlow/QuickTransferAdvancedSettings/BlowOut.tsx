@@ -1,37 +1,56 @@
-import { useState } from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
+
 import {
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  InputField,
   POSITION_FIXED,
   RadioButton,
-  COLORS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
-  WASTE_CHUTE_FIXTURES,
+  ETHANOL_LIQUID_CLASS_NAME,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  getTipTypeFromTipRackDefinition,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  linearInterpolate,
+  LOW_VOLUME_PIPETTES,
+  NONE_LIQUID_CLASS_NAME,
   TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
-import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
+
 import { getTopPortalEl } from '/app/App/portal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
 import { ACTIONS } from '../constants'
+import { getMaxUiFlowRate, getPipetteName } from '../utils'
+import { getExtractTiprackTypeFromURI } from '../utils/getExtractTiprackTypeFromURI'
 
 import type { Dispatch } from 'react'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration, SupportedTip } from '@opentrons/shared-data'
 import type {
-  QuickTransferSummaryState,
-  QuickTransferSummaryAction,
-  FlowRateKind,
   BlowOutLocation,
+  FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
   TransferType,
 } from '../types'
-import { i18n } from '/app/i18n'
 
 interface BlowOutProps {
   onBack: () => void
@@ -97,27 +116,31 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const [isBlowOutEnabled, setisBlowOutEnabled] = useState<boolean>(
-    state.blowOut != null
+  const keyboardRef = useRef(null)
+  const [isBlowOutEnabled, setIsBlowOutEnabled] = useState<boolean>(
+    state.blowOutDispense != null
   )
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOut)
+  >(state.blowOutDispense?.location as BlowOutLocation | undefined)
+  const [speed, setSpeed] = useState<number | null>(
+    (state.blowOutDispense?.flowRate as number) ?? null
+  )
 
   const enableBlowOutDisplayItems = [
     {
       option: true,
       description: t('option_enabled'),
       onClick: () => {
-        setisBlowOutEnabled(true)
+        setIsBlowOutEnabled(true)
       },
     },
     {
       option: false,
       description: t('option_disabled'),
       onClick: () => {
-        setisBlowOutEnabled(false)
+        setIsBlowOutEnabled(false)
       },
     },
   ]
@@ -136,27 +159,37 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       if (!isBlowOutEnabled) {
         dispatch({
           type: ACTIONS.SET_BLOW_OUT,
-          location: undefined,
+          blowOutSettings: {
+            location: undefined,
+            flowRate: 0,
+          },
         })
         trackEventWithRobotSerial({
           name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
           properties: {
-            settting: `BlowOut`,
+            setting: `BlowOut`,
           },
         })
         onBack()
       } else {
         setCurrentStep(currentStep + 1)
       }
+    } else if (currentStep === 2) {
+      if (blowOutLocation != null) {
+        setCurrentStep(currentStep + 1)
+      }
     } else {
       dispatch({
         type: ACTIONS.SET_BLOW_OUT,
-        location: blowOutLocation,
+        blowOutSettings: {
+          location: blowOutLocation,
+          flowRate: speed ?? 1,
+        },
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
         properties: {
-          settting: `BlowOut`,
+          setting: `BlowOut`,
         },
       })
       onBack()
@@ -164,13 +197,119 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   }
 
   const saveOrContinueButtonText =
-    isBlowOutEnabled && currentStep < 2
+    isBlowOutEnabled && currentStep < 3
       ? t('shared:continue')
       : t('shared:save')
 
   let buttonIsDisabled = false
-  if (currentStep === 2) {
+  if (currentStep === 3) {
     buttonIsDisabled = blowOutLocation == null
+  }
+
+  const pipetteName = getPipetteName(state.pipette)
+  const liquidSpecs = state.pipette.liquids
+  const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
+  const flowRatesForSupportedTip: SupportedTip | undefined =
+    state.volume < 5 &&
+    `lowVolumeDefault` in liquidSpecs &&
+    LOW_VOLUME_PIPETTES.includes(pipetteName as string)
+      ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
+      : liquidSpecs.default.supportedTips[tipType]
+
+  const allLiquidClassDefs = getAllLiquidClassDefs()
+  const liquidClassMap = new Map<string, string>([
+    ['none', NONE_LIQUID_CLASS_NAME],
+    ['water', WATER_LIQUID_CLASS_NAME],
+    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
+    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
+  ])
+
+  const selectedLiquidClass = liquidClassMap.get(
+    state.liquidClass?.liquidClassName ?? 'none'
+  )
+  const liquidClassDef =
+    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
+  const convertedPipetteName =
+    state.pipette != null ? getFlexNameConversion(state.pipette) : null
+
+  const minFlowRate = 1
+  const { loadName: currentTiprackLoadName } = state.tipRack.parameters
+
+  const tipTypeSettings = liquidClassDef?.byPipette
+    ?.find(({ pipetteModel }) => convertedPipetteName === pipetteModel)
+    ?.byTipType.find(tipObject => {
+      const tiprackLoadName = tipObject.tiprack.split('/')[1]
+      return tiprackLoadName === currentTiprackLoadName
+    })
+
+  const correctionByVolume = tipTypeSettings?.singleDispense?.correctionByVolume
+  const retract = tipTypeSettings?.singleDispense?.retract
+
+  const referenceVolumesForByVolumeInterpolation = getTransferPlanAndReferenceVolumes(
+    {
+      pipetteSpecs: state.pipette,
+      volume: state.volume,
+      tiprackDefinition: state.tipRack,
+      path: state.path,
+      numDispenseWells: state.destinationWells.length,
+      aspirateAirGapByVolume:
+        (retract?.airGapByVolume as Array<[number, number]>) ?? null,
+      conditioningByVolume:
+        (correctionByVolume as Array<[number, number]>) ?? null,
+      disposalByVolume: null, // note always null because blowout is available only for single dispense
+    }
+  )
+
+  const [referenceVolumeFlowRate, referenceVolumeCorrection] = [
+    referenceVolumesForByVolumeInterpolation.referenceVolumes?.flowRate
+      .dispense,
+    referenceVolumesForByVolumeInterpolation.referenceVolumes?.correction
+      .dispense,
+  ]
+
+  const liquidClassValuesForPipette = liquidClassDef?.byPipette?.find(
+    ({ pipetteModel }) => convertedPipetteName === pipetteModel
+  )
+  const liquidClassValuesForTip = getExtractTiprackTypeFromURI(
+    liquidClassValuesForPipette,
+    currentTiprackLoadName
+  )
+
+  const correctionVolume =
+    referenceVolumeCorrection != null &&
+    (liquidClassValuesForTip?.singleDispense?.correctionByVolume?.length ?? 0) >
+      0
+      ? linearInterpolate(
+          referenceVolumeCorrection,
+          liquidClassValuesForTip?.singleDispense?.correctionByVolume as Array<
+            [number, number]
+          >
+        )
+      : 0
+
+  const maxFlowRate = getMaxUiFlowRate({
+    targetVolume: referenceVolumeFlowRate,
+    channels: state.pipette.channels,
+    tipLiquidSpecs: flowRatesForSupportedTip,
+    flowRateType: 'blowout',
+    correctionVolume: correctionVolume ?? 0,
+    shaftULperMM: state.pipette.shaftULperMM,
+  })
+
+  const speedError =
+    speed != null && (speed < minFlowRate || speed > maxFlowRate)
+      ? t(`value_out_of_range`, {
+          min: minFlowRate,
+          max: maxFlowRate,
+        })
+      : null
+
+  const handleFlowRateChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    }
+    const parsedFlowRate = parseInt(userInput)
+    setSpeed(!isNaN(parsedFlowRate) ? parsedFlowRate : null)
   }
 
   return createPortal(
@@ -188,19 +327,24 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableBlowOutDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={isBlowOutEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('blow_out_description')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableBlowOutDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={isBlowOutEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
@@ -208,26 +352,72 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {blowOutLocationItems.map(blowOutLocationItem => (
-            <RadioButton
-              key={blowOutLocationItem.description}
-              isSelected={
-                isEqual(blowOutLocation, blowOutLocationItem.location) ||
-                blowOutLocation === blowOutLocationItem.location
-              }
-              onChange={() => {
-                setBlowOutLocation(
-                  blowOutLocationItem.location as BlowOutLocation
-                )
-              }}
-              buttonValue={blowOutLocationItem.description}
-              buttonLabel={blowOutLocationItem.description}
-              radioButtonType="large"
+          <StyledText oddStyle="level4HeaderRegular">
+            {t('select_blow_out_location')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {blowOutLocationItems.map(blowOutLocationItem => (
+              <RadioButton
+                key={blowOutLocationItem.description}
+                isSelected={
+                  isEqual(blowOutLocation, blowOutLocationItem.location) ||
+                  blowOutLocation === blowOutLocationItem.location
+                }
+                onChange={() => {
+                  setBlowOutLocation(
+                    blowOutLocationItem.location as BlowOutLocation
+                  )
+                }}
+                buttonValue={blowOutLocationItem.description}
+                buttonLabel={blowOutLocationItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
+        </Flex>
+      ) : null}
+      {currentStep === 3 ? (
+        <Flex
+          alignSelf={ALIGN_CENTER}
+          gridGap={SPACING.spacing48}
+          paddingX={SPACING.spacing40}
+          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          alignItems={ALIGN_CENTER}
+          height="22rem"
+        >
+          <Flex
+            width="30.5rem"
+            height="100%"
+            gridGap={SPACING.spacing24}
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing68}
+          >
+            <InputField
+              type="text"
+              value={String(speed ?? '')}
+              title={t('blow_out_speed')}
+              error={speedError}
+              readOnly
             />
-          ))}
+          </Flex>
+          <Flex
+            paddingX={SPACING.spacing24}
+            height="21.25rem"
+            marginTop="7.75rem"
+            borderRadius="0"
+          >
+            <NumericalKeyboard
+              keyboardRef={keyboardRef}
+              initialValue={String(speed ?? '')}
+              onChange={e => {
+                handleFlowRateChange(e)
+              }}
+            />
+          </Flex>
         </Flex>
       ) : null}
     </Flex>,

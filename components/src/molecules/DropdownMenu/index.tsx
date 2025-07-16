@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import type { FocusEventHandler } from 'react'
 import { css } from 'styled-components'
-import type { FlattenSimpleInterpolation } from 'styled-components'
+
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/StyledText'
 import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
@@ -26,6 +25,9 @@ import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { DeckInfoLabel } from '../DeckInfoLabel'
 import { LiquidIcon } from '../LiquidIcon'
+
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { FocusEventHandler } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -290,6 +292,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onFocus={onFocus}
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
+          data-testid="dropdownMenu"
           tabIndex={tabIndex}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
@@ -307,12 +310,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   : TYPOGRAPHY.pRegular};
               `}
             >
-              <StyledText
-                desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
-              >
-                {currentOption.name}
-              </StyledText>
+              {currentOption.deckLabel !== currentOption.name ? (
+                <StyledText
+                  desktopStyle="captionRegular"
+                  css={LINE_CLAMP_TEXT_STYLE(1)}
+                >
+                  {currentOption.name}
+                </StyledText>
+              ) : null}
             </Flex>
           </Flex>
           <Icon
@@ -360,12 +365,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={option.subtext != null ? SPACING.spacing4 : '0'}
                     >
-                      <StyledText
-                        desktopStyle="captionRegular"
-                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
-                      >
-                        {option.name}
-                      </StyledText>
+                      {option.deckLabel !== option.name ? (
+                        <StyledText
+                          desktopStyle="captionRegular"
+                          css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                        >
+                          {option.name}
+                        </StyledText>
+                      ) : null}
                       <StyledText
                         desktopStyle="captionRegular"
                         color={COLORS.grey60}

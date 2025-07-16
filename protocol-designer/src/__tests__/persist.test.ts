@@ -1,7 +1,8 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
-import type { MockInstance } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as persist from '../persist'
+
+import type { MockInstance } from 'vitest'
 
 describe('persist', () => {
   let getItemSpy: MockInstance<(key: string) => string | null>

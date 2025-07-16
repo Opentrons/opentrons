@@ -1,9 +1,13 @@
 import { useTranslation } from 'react-i18next'
+
 import { LegacyStyledText } from '@opentrons/components'
+
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
+
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachProbeProps extends PipetteWizardStepProps {

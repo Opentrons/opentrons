@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { robotSettingsReducer } from '../reducer'
 import * as Fixtures from '../__fixtures__'
+import { robotSettingsReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { RobotSettingsState } from '../types'

@@ -1,10 +1,9 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import { getIsShellReady } from '/app/redux/shell'
 
 import { InitialLoadingScreen } from '..'

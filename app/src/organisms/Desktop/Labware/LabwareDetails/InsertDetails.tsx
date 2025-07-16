@@ -1,17 +1,18 @@
 import {
   BORDERS,
   Box,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { getWellLabel } from './helpers/labels'
-import { WellProperties } from './WellProperties'
-import { WellDimensions } from './WellDimensions'
-import { ManufacturerDetails } from './ManufacturerDetails'
 
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import { getWellLabel } from './helpers/labels'
+import { ManufacturerDetails } from './ManufacturerDetails'
+import { WellDimensions } from './WellDimensions'
+import { WellProperties } from './WellProperties'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface InsertDetailsProps {
   definition: LabwareDefinition

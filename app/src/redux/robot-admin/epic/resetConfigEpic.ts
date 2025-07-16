@@ -1,23 +1,23 @@
 import { ofType } from 'redux-observable'
+import { forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
-import { POST, DELETE } from '../../robot-api/constants'
+import { fetchRobotApi } from '../../robot-api'
+import { DELETE, POST } from '../../robot-api/constants'
 import { withRobotHost } from '../../robot-api/operators'
-import * as Constants from '../constants'
 import * as Actions from '../actions'
+import * as Constants from '../constants'
 
-import type { Epic, Action } from '../../types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiResponse,
+} from '../../robot-api/types'
+import type { Action, Epic } from '../../types'
 import type {
   ResetConfigAction,
   ResetConfigSuccessAction,
   RestartRobotAction,
 } from '../types'
-import { forkJoin } from 'rxjs'
-import { fetchRobotApi } from '../../robot-api'
-import type {
-  RobotApiResponse,
-  RobotApiRequestOptions,
-} from '../../robot-api/types'
 
 function mapActionToRequests(
   action: ResetConfigAction

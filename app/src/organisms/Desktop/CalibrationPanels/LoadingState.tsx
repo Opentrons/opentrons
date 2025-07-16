@@ -5,8 +5,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SIZE_4,
   LegacyStyledText,
+  SIZE_4,
 } from '@opentrons/components'
 
 interface LoadingStateProps {

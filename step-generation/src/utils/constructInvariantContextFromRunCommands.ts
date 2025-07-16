@@ -1,23 +1,25 @@
 import {
-  getModuleType,
   getLabwareDefURI,
+  getModuleType,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
+
+import { uuid } from '.'
+import { GRIPPER_LOCATION } from '../constants'
+
 import type {
   LoadLabwareRunTimeCommand,
-  RunTimeCommand,
   PickUpTipRunTimeCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
-  PipetteEntities,
   ModuleEntities,
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentName,
+  PipetteEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '../types'
-import { uuid } from '.'
-import { GRIPPER_LOCATION } from '../constants'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -26,19 +28,29 @@ export function constructInvariantContextFromRunCommands(
     (acc: InvariantContext, command: RunTimeCommand) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
         const result = command.result
-        const labwareEntities: LabwareEntities = {
-          ...acc.labwareEntities,
-          [result.labwareId]: {
-            id: result.labwareId,
-            labwareDefURI: getLabwareDefURI(result.definition),
-            def: result.definition,
-            //  ProtocolTimelineScrubber won't need access to pythonNames
-            pythonName: 'n/a',
-          },
-        }
-        return {
-          ...acc,
-          labwareEntities,
+
+        if (result.definition.schemaVersion === 2) {
+          const labwareEntities: LabwareEntities = {
+            ...acc.labwareEntities,
+            [result.labwareId]: {
+              id: result.labwareId,
+              labwareDefURI: getLabwareDefURI(result.definition),
+              def: result.definition,
+              //  ProtocolTimelineScrubber won't need access to pythonNames
+              pythonName: 'n/a',
+            },
+          }
+          return {
+            ...acc,
+            labwareEntities,
+          }
+        } else {
+          // todo(mm, 2025-05-16):
+          // loadLabware commands from the backend can have schema 3 labware definitions.
+          // step-generation, and this function by extension, are not prepared to handle
+          // schema 3 yet. Just ignore those definitions for now.
+          // See also the loadPipette handling, below.
+          return acc
         }
       } else if (
         command.commandType === 'loadModule' &&
@@ -77,10 +89,11 @@ export function constructInvariantContextFromRunCommands(
               c.result.labwareId === labwareId
           ) ?? null
 
-        const tiprackLabwareDef =
-          matchingCommand != null && matchingCommand.result != null
-            ? matchingCommand.result.definition ?? null
-            : null
+        let tiprackLabwareDef = matchingCommand?.result?.definition ?? null
+        // We're not prepared to handle labware schema 3 yet. See the todo comment
+        // in the loadLabware handling, above.
+        if (tiprackLabwareDef?.schemaVersion === 3) tiprackLabwareDef = null
+
         const specs: any = getPipetteSpecsV2(command.params.pipetteName)
 
         const pipetteEntities: PipetteEntities = {
@@ -108,27 +121,42 @@ export function constructInvariantContextFromRunCommands(
       ) {
         const addressableAreaName = command.params.addressableAreaName
         const id = `${uuid()}:${addressableAreaName}`
-        let name: AdditionalEquipmentName = 'trashBin'
         let location: string = GRIPPER_LOCATION
         if (addressableAreaName === 'fixedTrash') {
-          location = '12'
+          location = 'cutout12'
         } else if (addressableAreaName.includes('WasteChute')) {
-          location = 'D3'
-          name = 'wasteChute'
+          location = 'cutoutD3'
         } else if (addressableAreaName.includes('movableTrash')) {
-          location = addressableAreaName.split('movableTrash')[1]
+          location = `cutout${addressableAreaName.split('movableTrash')[1]}`
         }
-        const additionalEquipmentEntities: AdditionalEquipmentEntities = {
-          ...acc.additionalEquipmentEntities,
+        let trashBinEntities: TrashBinEntities = acc.trashBinEntities
+        if (
+          !Object.values(acc.trashBinEntities).some(
+            entity => entity.location === location
+          )
+        ) {
+          trashBinEntities = {
+            ...acc.trashBinEntities,
+            [id]: {
+              pythonName: 'trash_bin_1',
+              id,
+              location,
+            },
+          }
+        }
+
+        const wasteChuteEntities: WasteChuteEntities = {
+          ...acc.wasteChuteEntities,
           [id]: {
-            name,
+            pythonName: 'waste_chute',
             id,
             location,
           },
         }
         return {
           ...acc,
-          additionalEquipmentEntities,
+          trashBinEntities,
+          wasteChuteEntities,
         }
       }
 
@@ -138,7 +166,12 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {},
       moduleEntities: {},
       pipetteEntities: {},
-      additionalEquipmentEntities: {},
+      wasteChuteEntities: {},
+      trashBinEntities: {},
+      //  this util is used for the timeline scrubber. It grabs staging area info from
+      //  command analysis. Also, it does not visualize the gripper right now
+      stagingAreaEntities: {},
+      gripperEntities: {},
       //  this util is used for the timeline scrubber. It grabs liquid info from analysis
       //  so this will not be wired up right now
       liquidEntities: {},

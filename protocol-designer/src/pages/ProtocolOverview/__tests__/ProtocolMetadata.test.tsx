@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
 import { ProtocolMetadata } from '../ProtocolMetadata'
 
 import type { ComponentProps } from 'react'
@@ -45,7 +45,7 @@ describe('ProtocolMetadata', () => {
     screen.getByText('Protocol Metadata')
     screen.getByText('Edit')
     screen.getByText('Required app version')
-    screen.getByText('8.3.0 or higher')
+    screen.getByText('8.5.0 or higher')
   })
 
   it('should render protocol metadata', () => {

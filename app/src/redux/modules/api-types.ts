@@ -1,14 +1,14 @@
 import type {
-  TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  ModuleType,
-  MagneticModuleModel,
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
-  HeaterShakerModuleModel,
   AbsorbanceReaderModel,
+  HeaterShakerModuleModel,
+  MAGDECK,
+  MagneticModuleModel,
   ModuleModel,
+  ModuleType,
+  TEMPDECK,
+  TemperatureModuleModel,
+  THERMOCYCLER,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
@@ -87,10 +87,9 @@ export interface AbsorbanceReaderData {
 }
 export interface FlexStackerData {
   latchState: 'opened' | 'closed' | 'unknown'
-  platformState: 'extended' | 'retracted' | 'unknown'
+  platformState: 'extended' | 'retracted' | 'unknown' | 'missing'
   hopperDoorState: 'opened' | 'closed' | 'unknown'
-  axisStateX: 'extended' | 'retracted' | 'unknown'
-  axisStateZ: 'extended' | 'retracted' | 'unknown'
+  installDetected: boolean
   status: FlexStackerStatus
 }
 

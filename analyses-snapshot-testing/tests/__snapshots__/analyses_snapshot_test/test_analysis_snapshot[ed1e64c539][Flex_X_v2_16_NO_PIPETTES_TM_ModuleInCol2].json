@@ -24,7 +24,7 @@
         "errorInfo": {
           "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
           "class": "ValueError",
-          "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    raise ValueError(\n"
+          "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
         },
         "errorType": "PythonException",
         "id": "UUID",
@@ -85,7 +85,7 @@
               "errorInfo": {
                 "args": "('A temperatureModuleType cannot be loaded into slot C2',)",
                 "class": "ValueError",
-                "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    raise ValueError(\n"
+                "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
               },
               "errorType": "PythonException",
               "id": "UUID",
@@ -97,12 +97,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_16_NO_PIPETTES_TM_ModuleInCol2.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [],
   "liquidClasses": [],
   "liquids": [],

@@ -1,10 +1,11 @@
-import { describe, it, vi, expect } from 'vitest'
-import { when } from 'vitest-when'
+import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
-import { readdir, writeFile, mkdir, readFile } from 'fs/promises'
+import { describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { fetchJson as _fetchJson } from '../../../http'
-import { ensureCacheDir, getOrDownloadManifest } from '../release-manifest'
 import { directoryWithCleanup } from '../../utils'
+import { ensureCacheDir, getOrDownloadManifest } from '../release-manifest'
 
 vi.mock('../../../http')
 // note: this doesn't look like it's needed but it is because http uses log

@@ -1,18 +1,20 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { dispenseInPlace } from '../commandCreators/atomic'
 import {
-  makeContext,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeContext,
 } from '../fixtures'
-import { dispenseInPlace } from '../commandCreators/atomic'
-import type { RobotState, InvariantContext } from '../types'
+
 import type { DispenseInPlaceParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('dispenseInPlace', () => {
   let invariantContext: InvariantContext
   let robotStateWithTip: RobotState
 
-  const mockId = 'mockId'
+  const mockId = 'p300SingleId'
   const mockFlowRate = 10
   const mockVolume = 10
   beforeEach(() => {
@@ -38,5 +40,6 @@ describe('dispenseInPlace', () => {
         },
       },
     ])
+    expect(res.python).toBe(`mock_pipette.dispense(volume=10, flow_rate=10)`)
   })
 })

@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../testing/utils'
 import { COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 import { LargeButton } from '../LargeButton'
 
 import type { ComponentProps } from 'react'

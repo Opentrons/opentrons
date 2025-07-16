@@ -10,38 +10,40 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
+  getLoadedLabware,
+  getLoadedModule,
   Icon,
   LabwareRender,
+  LegacyStyledText,
   Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
-  getLoadedLabware,
-  getLoadedModule,
 } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleType,
+  inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
-  inferModuleOrientationFromXCoordinate,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleType,
 } from '@opentrons/shared-data'
 
-import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-  getLabwareNameFromRunData,
-  getModuleModelFromRunData,
-} from './utils'
 import { Divider } from '/app/atoms/structure'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import {
+  getLabwareNameFromRunData,
+  getModuleModelFromRunData,
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+} from './utils'
+
+import type { RunData } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinitionsByUri,
@@ -49,7 +51,6 @@ import type {
   MoveLabwareRunTimeCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type { RunData } from '@opentrons/api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -196,6 +197,7 @@ export function MoveLabwareInterventionContent({
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
+              labwareDefinitions={Object.values(labwareDefsByUri)}
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}
@@ -209,6 +211,8 @@ export function MoveLabwareInterventionContent({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
+                      targetDeckId,
+                      targetSlotId,
                     }) => (
                       <Module
                         key={moduleId}
@@ -216,6 +220,8 @@ export function MoveLabwareInterventionContent({
                         x={x}
                         y={y}
                         orientation={inferModuleOrientationFromXCoordinate(x)}
+                        targetDeckId={targetDeckId}
+                        targetSlotId={targetSlotId}
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
@@ -226,12 +232,15 @@ export function MoveLabwareInterventionContent({
                   )}
                   {labwareRenderInfo
                     .filter(l => l.labwareId !== command.params.labwareId)
-                    .map(({ x, y, labwareDef, labwareId }) => (
-                      <g key={labwareId} transform={`translate(${x},${y})`}>
-                        {labwareDef != null &&
-                        labwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={labwareDef} />
-                        ) : null}
+                    .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                      <g
+                        key={labwareId}
+                        transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                      >
+                        <LabwareRender
+                          definition={labwareDef}
+                          positioningMode="passThrough"
+                        />
                       </g>
                     ))}
                 </>

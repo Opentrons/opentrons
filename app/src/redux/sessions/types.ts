@@ -1,44 +1,41 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
-import type {
-  CREATE_SESSION,
-  CREATE_SESSION_SUCCESS,
-  CREATE_SESSION_FAILURE,
-  DELETE_SESSION,
-  DELETE_SESSION_SUCCESS,
-  DELETE_SESSION_FAILURE,
-  FETCH_SESSION,
-  FETCH_SESSION_SUCCESS,
-  FETCH_SESSION_FAILURE,
-  FETCH_ALL_SESSIONS,
-  FETCH_ALL_SESSIONS_SUCCESS,
-  FETCH_ALL_SESSIONS_FAILURE,
-  ENSURE_SESSION,
-  CLEAR_ALL_SESSIONS,
-  CREATE_SESSION_COMMAND,
-  CREATE_SESSION_COMMAND_SUCCESS,
-  CREATE_SESSION_COMMAND_FAILURE,
-  SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-  SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-  SESSION_TYPE_DECK_CALIBRATION,
-  SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-} from './constants'
-
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   RobotApiRequestMeta,
-  RobotApiV2ResponseBody,
   RobotApiV2ErrorResponseBody,
+  RobotApiV2ResponseBody,
 } from '../robot-api/types'
-
-import type * as CalCheckTypes from './calibration-check/types'
-import type * as TipLengthCalTypes from './tip-length-calibration/types'
-import type * as DeckCalTypes from './deck-calibration/types'
-import type * as PipOffsetCalTypes from './pipette-offset-calibration/types'
 import type * as CalCheckConstants from './calibration-check/constants'
-import type * as TipCalConstants from './tip-length-calibration/constants'
-import type * as DeckCalConstants from './deck-calibration/constants'
-import type * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
+import type * as CalCheckTypes from './calibration-check/types'
 import type * as CommonCalConstants from './common-calibration/constants'
+import type {
+  CLEAR_ALL_SESSIONS,
+  CREATE_SESSION,
+  CREATE_SESSION_COMMAND,
+  CREATE_SESSION_COMMAND_FAILURE,
+  CREATE_SESSION_COMMAND_SUCCESS,
+  CREATE_SESSION_FAILURE,
+  CREATE_SESSION_SUCCESS,
+  DELETE_SESSION,
+  DELETE_SESSION_FAILURE,
+  DELETE_SESSION_SUCCESS,
+  ENSURE_SESSION,
+  FETCH_ALL_SESSIONS,
+  FETCH_ALL_SESSIONS_FAILURE,
+  FETCH_ALL_SESSIONS_SUCCESS,
+  FETCH_SESSION,
+  FETCH_SESSION_FAILURE,
+  FETCH_SESSION_SUCCESS,
+  SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+  SESSION_TYPE_DECK_CALIBRATION,
+  SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+  SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+} from './constants'
+import type * as DeckCalConstants from './deck-calibration/constants'
+import type * as DeckCalTypes from './deck-calibration/types'
+import type * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
+import type * as PipOffsetCalTypes from './pipette-offset-calibration/types'
+import type * as TipCalConstants from './tip-length-calibration/constants'
+import type * as TipLengthCalTypes from './tip-length-calibration/types'
 
 export * from './calibration-check/types'
 export * from './tip-length-calibration/types'
@@ -78,7 +75,7 @@ export type VectorTuple = [number, number, number]
 export type SessionCommandData =
   | { vector: VectorTuple }
   | { hasBlock: boolean }
-  | { tiprackDefinition: LabwareDefinition2 }
+  | { tiprackDefinition: LabwareDefinition }
   | {}
 
 export interface SessionCommandParams {
@@ -329,5 +326,5 @@ export interface CalibrationLabware {
   namespace: string
   version: number
   isTiprack: boolean
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }

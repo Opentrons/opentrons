@@ -1,8 +1,10 @@
-import { Footer } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { i18n } from '../../../i18n'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
+import { Footer } from '..'
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<Footer />, {

@@ -1,21 +1,27 @@
-import type {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  splitLabwareDefURI,
 } from '@opentrons/shared-data'
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
-import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
 import {
   getTotalCountNonHardCodedLocationSpecificOffsets,
   OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs'
-import type { UseLPCLabwareInfoProps } from '..'
+
+import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
+import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
+
 import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 import type {
   LabwareLocationInfo,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
+import type { UseLPCLabwareInfoProps } from '..'
 
 interface GetLPCLabwareInfoParams {
   currentOffsets: StoredLabwareOffset[] | undefined
@@ -62,6 +68,7 @@ function getLabwareInfoRecords(
       labwareDetails[uri] = {
         id: getALabwareIdFromUri({ ...params, uri }),
         displayName: getDisplayNameFromUri({ ...params, uri }),
+        version: splitLabwareDefURI(uri).version,
         defaultOffsetDetails: getDefaultOffsetDetailsForLabware({
           ...params,
           uri,
@@ -92,7 +99,7 @@ function getDisplayNameFromUri({
 }: GetLPCLabwareInfoForURI): string {
   const matchedDef = labwareDefs?.find(
     def => getLabwareDefURI(def) === uri
-  ) as LabwareDefinition2
+  ) as LabwareDefinition
 
   if (!!!matchedDef) {
     console.warn(

@@ -1,22 +1,23 @@
-import type * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { legacy_createStore } from 'redux'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { configReducer } from '/app/redux/config/reducer'
-import { mockRunData } from './__fixtures__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { InterventionModal as InterventionModalComponent } from './'
 
+import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
+import { InterventionModal as InterventionModalComponent } from './'
+import { mockRunData } from './__fixtures__'
+
+import type { Meta, Story } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type * as React from 'react'
 
 const dummyConfig = {
   discovery: {
@@ -44,7 +45,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

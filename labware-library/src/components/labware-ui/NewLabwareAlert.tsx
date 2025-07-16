@@ -1,4 +1,5 @@
-import { Box, AlertItem } from '@opentrons/components'
+import { AlertItem, Box } from '@opentrons/components'
+
 import { NEW_LABWARE_MESSAGE } from '../../localization'
 
 export function NewLabwareAlert(): JSX.Element {

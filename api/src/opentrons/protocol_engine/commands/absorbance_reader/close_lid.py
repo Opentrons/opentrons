@@ -12,6 +12,7 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from ...state.update_types import StateUpdate
 
+from opentrons.types import Point
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
 
@@ -113,7 +114,10 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, SuccessData[CloseLidResul
                 labware_definition=lid_definition,
                 current_location=current_location,
                 new_location=new_location,
-                user_offset_data=lid_gripper_offsets,
+                user_pick_up_offset=Point.from_xyz_attrs(
+                    lid_gripper_offsets.pickUpOffset
+                ),
+                user_drop_offset=Point.from_xyz_attrs(lid_gripper_offsets.dropOffset),
                 post_drop_slide_offset=None,
             )
             state_update.set_absorbance_reader_lid(

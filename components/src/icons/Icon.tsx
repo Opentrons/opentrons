@@ -1,5 +1,5 @@
-import { css, keyframes } from 'styled-components'
 import cx from 'classnames'
+import { css, keyframes } from 'styled-components'
 
 import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'

@@ -53,6 +53,7 @@ class HardwareRevision(Enum):
     NFF = "nff"
     EVT = "a1"
     DVT = "b1"
+    PVT = "b2"
 
 
 @dataclass
@@ -98,6 +99,23 @@ class LEDColor(Enum):
     BLUE = 3
     YELLOW = 4
 
+    @classmethod
+    def from_name(cls, name: str) -> "LEDColor":
+        match (name.lower()):
+            case "red":
+                return cls.RED
+            case "green":
+                return cls.GREEN
+            case "blue":
+                return cls.BLUE
+            case "yellow":
+                return cls.YELLOW
+            case _:
+                return cls.WHITE
+
+    def to_name(self) -> "str":
+        return self.name.lower()
+
 
 class LEDPattern(Enum):
     """Stacker LED Pattern."""
@@ -116,7 +134,7 @@ class Direction(Enum):
 
     def __str__(self) -> str:
         """Convert to tag for clear logging."""
-        return "negative" if self == Direction.RETRACT else "positive"
+        return self.name.lower()
 
     def opposite(self) -> "Direction":
         """Get opposite direction."""
@@ -319,7 +337,17 @@ class TOFMeasurementResult:
 
     sensor: TOFSensor
     kind: MeasurementKind
-    bins: Dict[int, List[int]]
+    bins: Dict[int, List[float]]
+
+
+@dataclass
+class TOFDetection:
+    """Labware detection parameters."""
+
+    sensor: TOFSensor
+    zones: List[int]
+    bins: list[int]
+    threshold: int
 
 
 @dataclass

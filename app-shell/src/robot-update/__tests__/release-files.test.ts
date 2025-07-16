@@ -1,9 +1,9 @@
 // TODO(mc, 2020-06-11): test all release-files functions
-import path from 'path'
 import { promises as fs } from 'fs'
+import path from 'path'
 import fse from 'fs-extra'
 import tempy from 'tempy'
-import { vi, describe, it, afterAll, expect } from 'vitest'
+import { afterAll, describe, expect, it, vi } from 'vitest'
 
 import { cleanupReleaseFiles } from '../release-files'
 

@@ -1,16 +1,19 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_CONFIG } from '../fixtures'
 import {
-  getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
+  getNextRobotStateAndWarningsSingleCommand,
 } from '../getNextRobotStateAndWarnings'
 import {
+  commandCreatorsTimeline,
   curryCommandCreator,
   curryWithoutPython,
   reduceCommandCreators,
-  commandCreatorsTimeline,
 } from '../utils'
-import { DEFAULT_CONFIG } from '../fixtures'
+
 import type { InvariantContext } from '../types'
+
 vi.mock('../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext
@@ -191,7 +194,10 @@ beforeEach(() => {
     labwareEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
-    additionalEquipmentEntities: {},
+    trashBinEntities: {},
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    gripperEntities: {},
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

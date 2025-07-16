@@ -1,10 +1,11 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
+import { FLEX_STANDARD_MODEL, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 
 import type { ComponentProps } from 'react'

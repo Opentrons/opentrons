@@ -1,14 +1,14 @@
-import { describe, beforeEach, afterEach, it, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { StepMeter } from '/app/atoms/StepMeter'
 import { i18n } from '/app/i18n'
+import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { StepMeter } from '/app/atoms/StepMeter'
-import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 
 import type { ComponentProps } from 'react'
 
@@ -36,6 +36,9 @@ describe('LPCContentContainer', () => {
       header: 'MOCK_HEADER',
       ...mockLPCContentProps,
       children: <div>MOCK_CHILDREN</div>,
+      desktopHeaderBtnCopy: '',
+      desktopFooterBtnCopy: '',
+      oddHeaderBtnCopy: '',
     }
 
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAV</div>)

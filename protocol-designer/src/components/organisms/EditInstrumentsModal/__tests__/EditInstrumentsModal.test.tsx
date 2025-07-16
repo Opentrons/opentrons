@@ -1,22 +1,20 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { EditInstrumentsModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-
 import { getRobotType } from '../../../../file-data/selectors'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
 } from '../../../../step-forms/selectors'
 import { getHas96Channel } from '../../../../utils'
-import { usePipetteConfig } from '../usePipetteConfig'
-import { PipetteOverview } from '../PipetteOverview'
 import { PipetteConfiguration } from '../PipetteConfiguration'
-
-import { EditInstrumentsModal } from '..'
+import { PipetteOverview } from '../PipetteOverview'
+import { usePipetteConfig } from '../usePipetteConfig'
 
 import type { ComponentProps } from 'react'
 

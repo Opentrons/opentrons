@@ -1,24 +1,28 @@
 // labware display card
 import uniq from 'lodash/uniq'
+
 import { Icon } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+
 import { isNewLabware } from '../../definitions'
-import { Link } from '../ui'
-import {
-  getWellLabel,
-  Gallery,
-  LoadName,
-  Tags,
-  WellCount,
-  AllWellProperties,
-  NewLabwareAlert,
-} from '../labware-ui'
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
+import {
+  AllWellProperties,
+  Gallery,
+  getWellLabel,
+  LoadName,
+  NewLabwareAlert,
+  Tags,
+  WellCount,
+} from '../labware-ui'
+import { Link } from '../ui'
+import styles from './styles.module.css'
+
 import type { LabwareDefinition } from '../../types'
 
-import styles from './styles.module.css'
 export interface LabwareCardProps {
   definition: LabwareDefinition
 }
@@ -71,11 +75,11 @@ function TopBar(props: LabwareCardProps): JSX.Element {
 }
 
 function Title(props: LabwareCardProps): JSX.Element {
-  const { loadName } = props.definition.parameters
-  const { displayName } = props.definition.metadata
+  const { definition } = props
+  const displayName = getLabwareDisplayName(definition)
 
   return (
-    <Link to={'/'} search={`loadName=${loadName}`}>
+    <Link to={'/'} search={`loadName=${definition.parameters.loadName}`}>
       <h2 className={styles.title}>
         <span className={styles.title_text}>{displayName}</span>
         <Icon className={styles.title_icon} name="chevron-right" />

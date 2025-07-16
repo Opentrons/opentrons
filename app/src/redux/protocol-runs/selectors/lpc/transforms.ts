@@ -1,33 +1,33 @@
 import isEqual from 'lodash/isEqual'
 
+import { getLabwareDisplayLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDefURI,
   THERMOCYCLER_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
-import { getLabwareDisplayLocation } from '@opentrons/components'
 
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
 } from '/app/redux/protocol-runs/constants'
 
+import type { TFunction } from 'i18next'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
-import type { State } from '/app/redux/types'
 import type {
-  LwGeometryDetails,
-  LocationSpecificOffsetDetails,
-  LPCLabwareInfo,
-  LocationSpecificOffsetLocationDetails,
-  WorkingOffset,
-  LPCOffsetKind,
   DefaultOffsetDetails,
+  LocationSpecificOffsetDetails,
+  LocationSpecificOffsetLocationDetails,
+  LPCLabwareInfo,
+  LPCOffsetKind,
+  LwGeometryDetails,
   OffsetLocationDetails,
+  WorkingOffset,
 } from '/app/redux/protocol-runs'
-import type { TFunction } from 'i18next'
+import type { State } from '/app/redux/types'
 
 export const getFlexSlotNameOnly = (
   details: OffsetLocationDetails | null,
@@ -58,14 +58,14 @@ export const getFlexSlotNameOnly = (
 export interface GetLabwareDefsForLPCParams {
   labwareId: string
   loadedLabware: CompletedProtocolAnalysis['labware']
-  labwareDefs: LabwareDefinition2[]
+  labwareDefs: LabwareDefinition[]
 }
 
 export const getItemLabwareDef = ({
   labwareId,
   loadedLabware,
   labwareDefs,
-}: GetLabwareDefsForLPCParams): LabwareDefinition2 | null => {
+}: GetLabwareDefsForLPCParams): LabwareDefinition | null => {
   const labwareDefUri =
     loadedLabware.find(l => l.id === labwareId)?.definitionUri ?? null
 
@@ -105,7 +105,7 @@ export const getSelectedLabwareWithOffsetDetails = (
 export const getSelectedLabwareDefFrom = (
   runId: string,
   state: State
-): LabwareDefinition2 | null => {
+): LabwareDefinition | null => {
   const selectedLabware =
     state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware
   const labwareDefs = state?.protocolRuns[runId]?.lpc?.labwareDefs

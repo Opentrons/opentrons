@@ -1,5 +1,8 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { getInitialSummaryState } from '../../utils'
+
+vi.mock('../../utils/retrieveLiquidClassValues')
 
 describe('getInitialSummaryState', () => {
   const props = {
@@ -36,6 +39,8 @@ describe('getInitialSummaryState', () => {
       destinationWells: ['A1'],
       transferType: 'transfer',
       volume: 25,
+      path: 'single',
+      liquidClassValuesInitialized: false,
     } as any,
     deckConfig: [
       {
@@ -140,7 +145,10 @@ describe('getInitialSummaryState', () => {
         cutoutFixtureId: 'trashBinAdapter',
       },
       disposalVolume: 10,
-      blowOut: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+      blowOutDispense: {
+        location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+        flowRate: 75,
+      },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {

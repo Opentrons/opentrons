@@ -2797,6 +2797,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
 
+    @publisher.publish(command=cmds.configure_for_volume)
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
         """Configure a pipette to handle a specific volume of liquid, measured in µL.
@@ -2891,6 +2892,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @publisher.publish(command=cmds.configure_nozzle_layout)
     @requires_version(2, 16)
     def configure_nozzle_layout(
         self,

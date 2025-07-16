@@ -1,12 +1,14 @@
 // A hook for analytics opt in/out components (eg modals or toggles)
 // Uses cookie as initial source of truth. Will write a cookie if none exists.
+import { useCallback, useEffect, useState } from 'react'
+
 import {
-  initializeAnalytics,
   getAnalyticsState,
   getDefaultAnalyticsState,
+  initializeAnalytics,
   persistAnalyticsState,
 } from './utils'
-import { useState, useCallback, useEffect } from 'react'
+
 import type { AnalyticsState } from './types'
 
 interface UseAnalyticsOptInOrOutResult {

@@ -1,14 +1,15 @@
 import {
-  Flex,
+  ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   JUSTIFY_CENTER,
   JUSTIFY_END,
-  ALIGN_FLEX_END,
-  PrimaryButton,
   Modal,
+  PrimaryButton,
+  SPACING,
 } from '@opentrons/components'
+
 import { Skeleton as SkeletonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'

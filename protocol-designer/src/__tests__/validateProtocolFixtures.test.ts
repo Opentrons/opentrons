@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import path from 'path'
 import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
-import path from 'path'
+import { describe, expect, it } from 'vitest'
+
 import {
+  commandSchemaV7,
+  labwareSchemaV2,
   protocolSchemaV1,
   protocolSchemaV3,
   protocolSchemaV4,
@@ -11,8 +14,6 @@ import {
   protocolSchemaV6,
   protocolSchemaV7,
   protocolSchemaV8,
-  labwareSchemaV2,
-  commandSchemaV7,
 } from '@opentrons/shared-data'
 
 // TODO: copied from createFile.test.js

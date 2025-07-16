@@ -1,47 +1,47 @@
-import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  RESPONSIVENESS,
-  SPACING,
-  POSITION_FIXED,
-  ModalShell,
-  PrimaryButton,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  AlertPrimaryButton,
-  SecondaryButton,
-  Box,
   Icon,
-  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
   Link,
+  ModalShell,
+  POSITION_FIXED,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SecondaryButton,
+  SPACING,
   StyledText,
   truncateString,
 } from '@opentrons/components'
 
+import { getModalPortalEl } from '/app/App/portal'
 import { StepMeter } from '/app/atoms/StepMeter'
+import { LPC_HREF } from '/app/local-resources/offsets'
+import { WizardHeader } from '/app/molecules/WizardHeader'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   HANDLE_LW_SUBSTEP,
   LPC_STEP,
   selectCurrentStep,
   selectStepInfo,
 } from '/app/redux/protocol-runs'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { getModalPortalEl } from '/app/App/portal'
-import { getIsOnDevice } from '/app/redux/config'
-import { LPC_HREF } from '/app/local-resources/offsets'
 
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 interface LPCContentContainerTertiaryBtnProps {
   onClick: () => void
@@ -49,10 +49,22 @@ interface LPCContentContainerTertiaryBtnProps {
 }
 
 export type LPCContentContainerProps = LPCWizardContentProps &
-  Partial<ChildNavigationProps> & {
+  Pick<
+    ChildNavigationProps,
+    | 'onClickButton'
+    | 'buttonIsDisabled'
+    | 'secondaryButtonProps'
+    | 'onClickBack'
+  > & {
     children: JSX.Element
     /* The ODD view header. The desktop header is hard-coded. */
     header: string
+    /* The copy for the ODD header button. */
+    oddHeaderBtnCopy: string
+    /* The copy for the desktop header button. */
+    desktopHeaderBtnCopy: string
+    /* The copy for the desktop footer button. */
+    desktopFooterBtnCopy: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
     /* An optional style override for the container. */
@@ -67,7 +79,16 @@ export function LPCContentContainer(
   props: LPCContentContainerProps
 ): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const { runId, children, contentStyle, containerStyle, ...rest } = props
+  const {
+    runId,
+    children,
+    contentStyle,
+    containerStyle,
+    oddHeaderBtnCopy,
+    desktopHeaderBtnCopy,
+    desktopFooterBtnCopy,
+    ...rest
+  } = props
   const { commandUtils } = rest
   const { currentStepIndex, totalStepCount, currentSubstep } = useSelector(
     selectStepInfo(runId)
@@ -100,6 +121,7 @@ export function LPCContentContainer(
             />
             <ChildNavigation
               {...rest}
+              buttonText={oddHeaderBtnCopy}
               css={CHILD_NAV_STYLE}
               buttonIsDisabled={rest.buttonIsDisabled}
               header={truncateString(rest.header, 40)}
@@ -125,6 +147,7 @@ export function LPCContentContainer(
                 currentStep={currentStepIndex + 1}
                 totalSteps={totalStepCount}
                 hideStepText={true}
+                exitButtonCopy={desktopHeaderBtnCopy}
               />
             }
           >
@@ -142,13 +165,13 @@ export function LPCContentContainer(
 
 function DesktopFooterContent({
   runId,
-  buttonText,
   buttonIsDisabled,
   tertiaryBtnProps,
   onClickButton,
   primaryBtnAlert,
   commandUtils,
-}: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
+  desktopFooterBtnCopy,
+}: Omit<LPCContentContainerProps, 'children' | 'buttonText'>): JSX.Element {
   const step = useSelector(selectCurrentStep(runId))
   const { currentSubstep } = useSelector(selectStepInfo(runId))
   const showHelpLink =
@@ -170,11 +193,11 @@ function DesktopFooterContent({
             disabled={buttonIsDisabled}
             onClick={onClickButton}
           >
-            {buttonText}
+            {desktopFooterBtnCopy}
           </AlertPrimaryButton>
         ) : (
           <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
-            {buttonText}
+            {desktopFooterBtnCopy}
           </PrimaryButton>
         )}
       </Flex>

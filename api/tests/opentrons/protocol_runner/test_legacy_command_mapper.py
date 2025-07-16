@@ -456,7 +456,6 @@ def test_map_module_load(
             result=pe_commands.LoadModuleResult.model_construct(
                 moduleId=matchers.IsA(str),
                 serialNumber="module-serial",
-                definition=test_definition,
                 model=ModuleModel.TEMPERATURE_MODULE_V2,
             ),
             notes=[],

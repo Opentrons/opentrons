@@ -85,7 +85,6 @@ from opentrons_shared_data.deck import (
 )
 
 from opentrons import config
-from opentrons import hardware_control as hc
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
@@ -424,19 +423,6 @@ def hardware_controller_lockfile(
     monkeypatch.setitem(config.CONFIG, "hardware_controller_lockfile", lockfile)
 
     return lockfile_dir
-
-
-@pytest.mark.skipif(
-    not hc.Controller,
-    reason="hardware controller not available (probably windows)",
-)
-@pytest.fixture()
-def cntrlr_mock_connect(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def mock_connect(obj: object, port: Any = None) -> None:
-        return
-
-    monkeypatch.setattr(hc.Controller, "connect", mock_connect)
-    monkeypatch.setattr(hc.Controller, "fw_version", "virtual")
 
 
 @pytest.fixture()
@@ -787,11 +773,20 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
         "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
+        "features": {},
+        "extents": {
+            "total": {
+                "backLeftBottom": {"x": -5, "y": -10, "z": -15},
+                "frontRightTop": {"x": 15, "y": -20, "z": 30},
+            },
+        },
         "dimensions": {
             "bareOverallHeight": 84,
             "overLabwareHeight": 0,
             "xDimension": 123,
             "yDimension": 321,
+            "labwareInterfaceXDimension": 123,
+            "labwareInterfaceYDimension": 321,
         },
         "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
         "config": {},
@@ -800,7 +795,6 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
-        "twoDimensionalRendering": {},
     }
 
 
@@ -1157,9 +1151,9 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
 
 
 @pytest.fixture
-def custom_pip_n_tip_transfer_properties_dict() -> Dict[
-    str, Dict[str, TransferPropertiesDict]
-]:
+def custom_pip_n_tip_transfer_properties_dict() -> (
+    Dict[str, Dict[str, TransferPropertiesDict]]
+):
     """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
     return {
         "a_custom_pipette_type": {

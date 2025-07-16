@@ -1,17 +1,18 @@
 import { css } from 'styled-components'
-import { Btn, Flex } from '../../primitives'
-import { Icon } from '../../icons'
+
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Icon } from '../../icons'
+import { Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
-import type { StyleProps } from '../../primitives'
 import type { IconProps } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 export type BannerType =
   | 'success'

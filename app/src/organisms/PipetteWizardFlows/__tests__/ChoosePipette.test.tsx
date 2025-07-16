@@ -1,18 +1,19 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
-
-import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '/app/redux/config'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
 

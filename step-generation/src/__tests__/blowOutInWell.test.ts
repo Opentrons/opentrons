@@ -1,18 +1,20 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  getErrorResult,
-  getSuccessResult,
   DEFAULT_PIPETTE,
+  getErrorResult,
+  getInitialRobotStateStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+
 import type { BlowoutParams } from '@opentrons/shared-data'
-import type { RobotState, InvariantContext } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 
@@ -61,8 +63,8 @@ describe('blowOutInWell', () => {
     ])
     expect(res.python).toBe(
       `
-mockPythonName.flow_rate.blow_out = 21.1
-mockPythonName.blow_out(mockPythonName["A1"].top(z=-1.3))
+mock_pipette.flow_rate.blow_out = 21.1
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=-1.3))
 `.trim()
     )
   })

@@ -1,10 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useTrackEvent, ANALYTICS_JUPYTER_OPEN } from '/app/redux/analytics'
+import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
+
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
 import type { ComponentProps } from 'react'

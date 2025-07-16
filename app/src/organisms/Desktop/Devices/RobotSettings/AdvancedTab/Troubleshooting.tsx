@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -9,21 +9,21 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   Box,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING_AUTO,
   ERROR_TOAST,
+  Flex,
   INFO_TOAST,
-  SPACING,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  SPACING,
+  SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { CONNECTABLE } from '/app/redux/discovery'
 import { useRobot } from '/app/redux-resources/robots'
+import { CONNECTABLE } from '/app/redux/discovery'
 
 import type { MouseEventHandler } from 'react'
 import type { IconProps } from '@opentrons/components'

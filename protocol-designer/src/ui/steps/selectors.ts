@@ -1,30 +1,28 @@
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import uniq from 'lodash/uniq'
+import { createSelector } from 'reselect'
+
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-
 import { getLabwareOnModule } from '../modules/utils'
 import {
   initialSelectedItemState,
+  MULTI_STEP_SELECTION_TYPE,
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
-
 import {
   getAspirateLabwareDisabledFields,
   getDispenseLabwareDisabledFields,
+  getLabwareDisabledFields,
   getMultiAspiratePathDisabledFields,
   getMultiDispensePathDisabledFields,
   getPipetteDifferentAndMultiAspiratePathFields,
   getPipetteDifferentAndMultiDispensePathFields,
   getPipetteDifferentDisabledFields,
-  getLabwareDisabledFields,
 } from './utils'
-import type { BaseState, Selector } from '../../types'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+
 import type {
   CountPerStepType,
   FormData,
@@ -32,13 +30,15 @@ import type {
   StepIdType,
   StepType,
 } from '../../form-types'
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type { BaseState, Selector } from '../../types'
+import type { Selection } from './actions/types'
 import type {
-  SelectableItem,
-  StepsState,
   CollapsedStepsState,
   HoverableItem,
+  SelectableItem,
+  StepsState,
 } from './reducers'
-import type { Selection } from './actions/types'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // ======= Selectors ===============================================
@@ -241,6 +241,10 @@ export type MultiselectFieldValues = Record<
     isIndeterminate: boolean
   }
 >
+
+const getUniqueValues = (key: string, forms: FormData[]): string[] =>
+  Array.from(new Set(forms.map(form => form[key])))
+
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
@@ -259,6 +263,20 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
       return null
     }
 
+    const uniqueTipRackFieldValues = getUniqueValues('tipRack', forms)
+    const uniquePipetteFieldValues = getUniqueValues('pipette', forms)
+
+    //  since a lot liquid class advanced settings rely on
+    //  knowing the pipette and tiprack, we can't support
+    //  batch edit if the steps have multiple tiprack types
+    //  or multiple pipette types
+    if (
+      uniqueTipRackFieldValues.length > 1 ||
+      uniquePipetteFieldValues.length > 1
+    ) {
+      return null
+    }
+
     const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
     return allFieldNames.reduce(
       (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
@@ -266,7 +284,6 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
         const isFieldValueIndeterminant = forms.some(
           form => form[fieldName] !== firstFieldValue
         )
-
         if (isFieldValueIndeterminant) {
           acc[fieldName] = {
             isIndeterminate: true,

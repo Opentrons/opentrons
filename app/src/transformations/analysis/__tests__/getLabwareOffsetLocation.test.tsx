@@ -1,27 +1,30 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
 import {
   getLabwareDefURI,
   multiple_tipacks_with_tc,
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
-import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocation'
+
 import {
-  getModuleInitialLoadInfo,
   getLabwareLocation,
+  getModuleInitialLoadInfo,
 } from '/app/transformations/commands'
+
+import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocation'
+
 import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
   LoadedLabware,
   LoadedModule,
-  LabwareDefinition2,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 vi.mock('/app/transformations/commands')
 
 const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
-const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const TCModelInProtocol = 'thermocyclerModuleV1'
 const MOCK_SLOT = '2'

@@ -3,12 +3,12 @@ import { useSelector } from 'react-redux'
 
 import { LegacyStyledText } from '@opentrons/components'
 
+import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
-import type { State } from '/app/redux/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import type { State } from '/app/redux/types'
 
 export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -33,7 +33,9 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('move_gantry_to_front')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('move_gantry_to_front')}
+      oddHeaderBtnCopy={t('move_gantry_to_front')}
       onClickButton={commandUtils.headerCommands.handleProceed}
       secondaryButtonProps={{
         buttonText: t('exit'),

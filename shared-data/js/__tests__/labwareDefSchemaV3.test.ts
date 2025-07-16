@@ -1,11 +1,11 @@
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import { describe, expect, it, test } from 'vitest'
 
-import Ajv from 'ajv'
+import schema from '../../labware/schemas/3.json'
 
 import type { LabwareDefinition3 } from '../types'
-import schema from '../../labware/schemas/3.json'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
 const definitionsDir = path.join(__dirname, '../../labware/definitions/3')
@@ -52,6 +52,42 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
   })
 }
 
+const checkExtents = (labwareDef: LabwareDefinition3): void => {
+  test('extents.total should be oriented correctly', () => {
+    const {
+      total: { backLeftBottom, frontRightTop },
+    } = labwareDef.extents
+    expect(backLeftBottom.x).toBeLessThanOrEqual(frontRightTop.x)
+    expect(backLeftBottom.y).toBeGreaterThanOrEqual(frontRightTop.y)
+    expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
+  })
+  test('slotFootprintAsChild feature should be oriented correctly', () => {
+    if (labwareDef.features.slotFootprintAsChild) {
+      const { backLeft, frontRight } = labwareDef.features.slotFootprintAsChild
+      expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+      expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+    }
+  })
+  test('extents.footprint should be contained inside extents.total', () => {
+    if (labwareDef.features.slotFootprintAsChild) {
+      const {
+        backLeft,
+        frontRight,
+        z,
+      } = labwareDef.features.slotFootprintAsChild
+      const {
+        total: { backLeftBottom, frontRightTop },
+      } = labwareDef.extents
+      expect(backLeft.x).toBeGreaterThanOrEqual(backLeftBottom.x)
+      expect(backLeft.y).toBeLessThanOrEqual(backLeftBottom.y)
+      expect(frontRight.x).toBeLessThanOrEqual(frontRightTop.x)
+      expect(frontRight.y).toBeGreaterThanOrEqual(frontRightTop.y)
+      expect(z).toBeGreaterThanOrEqual(backLeftBottom.z)
+      expect(z).toBeLessThanOrEqual(frontRightTop.z)
+    }
+  })
+}
+
 describe(`test labware definitions with schema v3`, () => {
   const definitionPaths = glob.sync(globPattern, {
     cwd: definitionsDir,
@@ -64,9 +100,7 @@ describe(`test labware definitions with schema v3`, () => {
   const allPaths = definitionPaths.concat(fixturePaths)
 
   test("paths didn't break, which would give false positives", () => {
-    // todo(mm, 2025-03-17): Update this to .toBeGreaterThan(0) when some
-    // schema 3 definitions exist.
-    expect(definitionPaths.length).toStrictEqual(0)
+    expect(definitionPaths.length).toBeGreaterThan(0)
 
     expect(fixturePaths.length).toBeGreaterThan(0)
   })
@@ -82,6 +116,35 @@ describe(`test labware definitions with schema v3`, () => {
       expect(valid).toBe(true)
     })
 
+    checkExtents(labwareDef)
     checkGeometryDefinitions(labwareDef)
+  })
+
+  describe.each(allPaths)('%s', labwarePath => {
+    const labwareDef = require(labwarePath) as LabwareDefinition3
+
+    test('slotFootprintAsChild properly uses back-left bottom origin with quadrant IV coordinates', () => {
+      if (labwareDef.features.slotFootprintAsChild) {
+        const {
+          backLeft,
+          frontRight,
+        } = labwareDef.features.slotFootprintAsChild
+
+        expect(backLeft.x).toBe(0)
+        expect(backLeft.y).toBe(0)
+        expect(frontRight.x).toBeGreaterThan(0)
+        expect(frontRight.y).toBeLessThan(0)
+      }
+    })
+
+    test('all wells have quadrant IV coordinates', () => {
+      for (const wellName in labwareDef.wells) {
+        const well = labwareDef.wells[wellName]
+
+        expect(well.x).toBeGreaterThan(0)
+        expect(well.y).toBeLessThan(0)
+        expect(well.z).toBeGreaterThan(0)
+      }
+    })
   })
 })

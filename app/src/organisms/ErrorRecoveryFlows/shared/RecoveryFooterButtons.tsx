@@ -2,18 +2,18 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
-  Icon,
+  ALIGN_FLEX_END,
   Box,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   COLORS,
-  SecondaryButton,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_STICKY,
   PrimaryButton,
   RESPONSIVENESS,
-  POSITION_STICKY,
+  SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
 
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'

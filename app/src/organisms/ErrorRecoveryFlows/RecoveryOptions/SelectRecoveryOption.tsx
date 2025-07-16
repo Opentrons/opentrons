@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react'
-import head from 'lodash/head'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import head from 'lodash/head'
 import { css } from 'styled-components'
 
 import {
-  RESPONSIVENESS,
   DIRECTION_COLUMN,
   Flex,
+  RadioButton,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  RadioButton,
 } from '@opentrons/components'
 
 import {
-  RECOVERY_MAP,
   ERROR_KINDS,
   ODD_SECTION_TITLE_STYLE,
+  RECOVERY_MAP,
 } from '../constants'
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
-import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 import type { PipetteWithTip } from '/app/resources/instruments'
+import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
@@ -189,8 +189,39 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return GENERAL_ERROR_OPTIONS
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
+    case ERROR_KINDS.STACKER_STALLED:
+      return STACKER_STALLED_OPTIONS
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
+      return STACKER_HOPPER_EMPTY_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+      return STACKER_SHUTTLE_MISSING_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
+      return STACKER_SHUTTLE_EMPTY_OPTIONS
   }
 }
+
+export const STACKER_SHUTTLE_EMPTY_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_SHUTTLE_MISSING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_HOPPER_EMPTY_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_STALLED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
 
 export const STALL_OR_COLLISION_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.HOME_AND_RETRY.ROUTE,

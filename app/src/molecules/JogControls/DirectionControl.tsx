@@ -27,14 +27,15 @@ import {
   TEXT_ALIGN_LEFT,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ControlContainer } from './ControlContainer'
+
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import { ControlContainer } from './ControlContainer'
 import { TouchControlButton } from './TouchControlButton'
 
-import type { MouseEvent } from 'react'
 import type { CSSProperties } from 'styled-components'
+import type { MouseEvent } from 'react'
 import type { IconName } from '@opentrons/components'
-import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
+import type { Axis, Bearing, Jog, Plane, Sign, StepSize } from './types'
 
 interface Control {
   bearing: Bearing

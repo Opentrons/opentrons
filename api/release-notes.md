@@ -39,9 +39,10 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 ### New Features
 
-- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck.
-- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper.
-- Aspirate or dispense in a well based on the liquid meniscus.
+- Use new ``transfer_liquid``, ``distribute_liquid``, and ``consolidate_liquid`` commands on Flex to optimize liquid handling based on Opentrons-verified liquid classes. 
+- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck. 
+- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper. 
+- Aspirate or dispense in a well based on the liquid meniscus. 
 
 ### Improvements
 

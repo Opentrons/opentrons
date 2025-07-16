@@ -1,8 +1,9 @@
 import {
-  navigateToUrl,
   fileHelper,
+  navigateToUrl,
   wellBottomImageLocator,
 } from '../../support/e2e'
+
 const fileHolder = fileHelper('somerackbrand_24_tuberack_1500ul')
 
 context('Tubes and Rack', () => {

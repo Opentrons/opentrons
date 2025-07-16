@@ -5,8 +5,10 @@ import commandSchemaV10 from './schemas/10.json'
 import commandSchemaV11 from './schemas/11.json'
 import commandSchemaV12 from './schemas/12.json'
 import commandSchemaV13 from './schemas/13.json'
+import commandSchemaV14 from './schemas/14.json'
+
 export * from './types/index'
-export const commandSchemaLatest = commandSchemaV13
+export const commandSchemaLatest = commandSchemaV14
 
 export {
   commandSchemaV7,
@@ -16,4 +18,5 @@ export {
   commandSchemaV11,
   commandSchemaV12,
   commandSchemaV13,
+  commandSchemaV14,
 }

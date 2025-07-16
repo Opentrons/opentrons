@@ -1,6 +1,6 @@
 // config migration tests
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import uuid from 'uuid/v4'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   MOCK_CONFIG_V0,

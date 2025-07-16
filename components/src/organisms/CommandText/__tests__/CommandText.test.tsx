@@ -1,8 +1,18 @@
+import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import {
   FLEX_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
+import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../testing/utils'
+import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
+import { mockRobotSideAnalysis } from '../fixtures'
+import { CommandText } from '../index'
+
 import type {
   AspirateInPlaceRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
@@ -13,7 +23,7 @@ import type {
   DispenseRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   DropTipRunTimeCommand,
-  LabwareDefinition2,
+  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLiquidClassRunTimeCommand,
   LoadLiquidRunTimeCommand,
@@ -23,14 +33,7 @@ import type {
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../testing/utils'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber'
-import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
-import { mockRobotSideAnalysis } from '../fixtures'
-import { CommandText } from '../index'
 
 const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,
@@ -586,7 +589,7 @@ describe('CommandText', () => {
             labwareId: 'mockId',
             definition: {
               metadata: { displayName: 'mock displayName' },
-            } as LabwareDefinition2,
+            } as LabwareDefinition,
             offset: { x: 0, y: 0, z: 0 },
           },
           status: 'queued',

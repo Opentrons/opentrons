@@ -1,9 +1,10 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
-import { useHandleClose } from '../useHandleClose'
+
 import { retractSafelyAndHomeCommands } from '../commands'
+import { useHandleClose } from '../useHandleClose'
 
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('../commands')

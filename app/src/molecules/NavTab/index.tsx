@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components'
 import { NavLink } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 

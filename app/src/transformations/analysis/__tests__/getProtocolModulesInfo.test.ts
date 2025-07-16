@@ -1,15 +1,18 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
-  transfer_settings,
+  getModuleDef,
   multiple_temp_modules,
   ot2DeckDefV5,
-  getModuleDef2,
+  transfer_settings,
 } from '@opentrons/shared-data'
+
 import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
+
 import type {
-  ProtocolAnalysisOutput,
   LoadedLabware,
   LoadedModule,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = ({
@@ -207,7 +210,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_1_COORDS[0],
         y: SLOT_1_COORDS[1],
         z: SLOT_1_COORDS[2],
-        moduleDef: getModuleDef2('magneticModuleV2'),
+        moduleDef: getModuleDef('magneticModuleV2'),
         nestedLabwareDef:
           transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
@@ -222,7 +225,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_3_COORDS[0],
         y: SLOT_3_COORDS[1],
         z: SLOT_3_COORDS[2],
-        moduleDef: getModuleDef2('temperatureModuleV2'),
+        moduleDef: getModuleDef('temperatureModuleV2'),
         nestedLabwareDef:
           transfer_settings.labwareDefinitions[
             'opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1'
@@ -238,7 +241,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_7_COORDS[0],
         y: SLOT_7_COORDS[1],
         z: SLOT_7_COORDS[2],
-        moduleDef: getModuleDef2('thermocyclerModuleV1'),
+        moduleDef: getModuleDef('thermocyclerModuleV1'),
         nestedLabwareDef:
           transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
@@ -283,7 +286,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_1_COORDS[0],
         y: SLOT_1_COORDS[1],
         z: SLOT_1_COORDS[2],
-        moduleDef: getModuleDef2('magneticModuleV2'),
+        moduleDef: getModuleDef('magneticModuleV2'),
         nestedLabwareDef:
           multiple_temp_modules.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
@@ -298,7 +301,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_3_COORDS[0],
         y: SLOT_3_COORDS[1],
         z: SLOT_3_COORDS[2],
-        moduleDef: getModuleDef2('temperatureModuleV2'),
+        moduleDef: getModuleDef('temperatureModuleV2'),
         nestedLabwareDef:
           multiple_temp_modules.labwareDefinitions[
             'opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1'
@@ -314,7 +317,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_7_COORDS[0],
         y: SLOT_7_COORDS[1],
         z: SLOT_7_COORDS[2],
-        moduleDef: getModuleDef2('temperatureModuleV2'),
+        moduleDef: getModuleDef('temperatureModuleV2'),
         nestedLabwareDef:
           multiple_temp_modules.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
@@ -347,7 +350,7 @@ describe('getProtocolModulesInfo', () => {
         x: SLOT_1_COORDS[0],
         y: SLOT_1_COORDS[1],
         z: SLOT_1_COORDS[2],
-        moduleDef: getModuleDef2('magneticModuleV2'),
+        moduleDef: getModuleDef('magneticModuleV2'),
         nestedLabwareDef:
           transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'

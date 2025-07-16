@@ -1,5 +1,6 @@
-import round from 'lodash/round'
 import { useTranslation } from 'react-i18next'
+import round from 'lodash/round'
+
 import {
   Box,
   COLORS,
@@ -8,11 +9,12 @@ import {
   POSITION_RELATIVE,
   StyledText,
 } from '@opentrons/components'
+
 import BOTTOM_LAYER from '../../../assets/images/tip_top_bottom_layer.svg'
 import MID_LAYER from '../../../assets/images/tip_top_mid_layer.svg'
 import TOP_LAYER from '../../../assets/images/tip_top_top_layer.svg'
 
-const WELL_WIDTH_PIXELS = 70
+const WELL_WIDTH_PIXELS = 110
 const PIXEL_DECIMALS = 2
 
 interface TipPositionAllVizProps {
@@ -35,8 +37,8 @@ export function TipPositionTopView(props: TipPositionAllVizProps): JSX.Element {
   return (
     <Box
       position={POSITION_RELATIVE}
-      width="15.8125rem"
-      height="18rem"
+      width="20.75rem"
+      height="22.75rem"
       overflow={OVERFLOW_HIDDEN}
     >
       <img
@@ -58,7 +60,7 @@ export function TipPositionTopView(props: TipPositionAllVizProps): JSX.Element {
         alt="top layer"
       />
       {xWidthMm !== null && (
-        <Box position={POSITION_ABSOLUTE} bottom="2rem" right="7rem">
+        <Box position={POSITION_ABSOLUTE} bottom="3.5rem" right="9.2rem">
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {xWidthMm}
             {t('units.millimeter')}

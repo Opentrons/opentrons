@@ -1,18 +1,21 @@
-import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   Link,
   OVERFLOW_AUTO,
   POSITION_FIXED,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { PromptButton } from '../../organisms/PromptButton'
+
+import { PromptButton } from '/ai-client/organisms/PromptButton'
+
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 
 const IMAGE_ALT = 'Opentrons logo'

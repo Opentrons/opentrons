@@ -1,11 +1,12 @@
+import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  Btn,
+  BasicButton,
   COLORS,
   CURSOR_POINTER,
   Flex,
@@ -13,10 +14,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { toggleNewProtocolModal } from '../../../navigation/actions'
+
 import { actions as loadFileActions } from '../../../load-file'
-import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getHasUnsavedChanges } from '../../../load-file/selectors'
+import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { SettingsIcon } from '../SettingsIcon'
 
 import type { ChangeEvent } from 'react'
@@ -27,6 +28,7 @@ export function Navigation(): JSX.Element | null {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch: ThunkDispatch<any> = useDispatch()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     dispatch(toggleNewProtocolModal(false))
@@ -39,13 +41,17 @@ export function Navigation(): JSX.Element | null {
       !hasUnsavedChanges ||
       window.confirm(t('alert:confirm_create_new') as string)
     ) {
-      dispatch(toggleNewProtocolModal(true))
-      navigate('/createNew')
+      navigate('/createNew', { state: { modalResetKey: Date.now() } })
     }
   }
 
-  return location.pathname === '/designer' ||
-    location.pathname === '/liquids' ? null : (
+  const handleImport = (): void => {
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click()
+    }
+  }
+
+  return (
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing12} ${SPACING.spacing40}`}
@@ -57,25 +63,17 @@ export function Navigation(): JSX.Element | null {
         <StyledText desktopStyle="bodyLargeSemiBold" color={COLORS.purple50}>
           {t('protocol_designer')}
         </StyledText>
-        <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
-          {t('version', { version: process.env.OT_PD_VERSION })}
-        </StyledText>
       </Flex>
       <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-        {location.pathname === '/createNew' ? null : (
-          <Btn onClick={handleCreateNew} css={LINK_BUTTON_STYLE}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('create_new')}
-            </StyledText>
-          </Btn>
-        )}
+        <BasicButton onClick={handleCreateNew}>{t('create_new')}</BasicButton>
         <StyledLabel>
-          <Flex css={LINK_BUTTON_STYLE}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('import')}
-            </StyledText>
-          </Flex>
-          <input type="file" onChange={loadFile} aria-label={t('import')} />
+          <BasicButton onClick={handleImport}>{t('import')}</BasicButton>
+          <input
+            type="file"
+            onChange={loadFile}
+            aria-label={t('import')}
+            ref={fileInputRef}
+          />
         </StyledLabel>
         {location.pathname === '/createNew' ? null : <SettingsIcon />}
       </Flex>
@@ -84,7 +82,6 @@ export function Navigation(): JSX.Element | null {
 }
 
 const StyledLabel = styled.label`
-  height: 1.25rem;
   cursor: ${CURSOR_POINTER};
   input[type='file'] {
     display: none;

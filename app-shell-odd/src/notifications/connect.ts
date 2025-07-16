@@ -1,13 +1,13 @@
 import mqtt from 'mqtt'
 
-import { connectionStore } from './store'
 import {
+  deserializeExpectedMessages,
   sendDeserialized,
   sendDeserializedGenericError,
-  deserializeExpectedMessages,
 } from './deserialize'
-import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { unsubscribe } from './unsubscribe'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 

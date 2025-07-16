@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,79 +7,28 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
-import { getLiquidEntities } from '../../../../../../step-forms/selectors'
-import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import type { LiquidClassOption } from './hooks/useAssignLiquidClass'
 
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
+  formData: FormData
+  orderedLiquidClassOptions: LiquidClassOption[]
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
+  type: 'mix' | 'transfer'
 }
+
 export const LiquidClassesStepTools = ({
   propsForFields,
+  formData,
   setShowFormErrors,
+  type,
+  orderedLiquidClassOptions,
 }: LiquidClassesStepToolsProps): JSX.Element => {
-  const { t } = useTranslation(['liquids'])
-  const liquids = useSelector(getLiquidEntities)
-  const sortedLiquidClassDefs = getSortedLiquidClassDefs()
-
-  const liquidClassToLiquidsMap: Record<string, string[]> = {}
-  Object.values(liquids).forEach(({ displayName, liquidClass }) => {
-    if (liquidClass !== undefined) {
-      if (!liquidClassToLiquidsMap[liquidClass]) {
-        liquidClassToLiquidsMap[liquidClass] = []
-      }
-      liquidClassToLiquidsMap[liquidClass].push(displayName)
-    }
-  })
-
-  const assignedLiquidClasses = Object.values(liquids)
-    .map(liquid => liquid.liquidClass)
-    .filter(Boolean)
-  const hasAssignedLiquidClasses = assignedLiquidClasses.length > 0
-
-  const defaultSelectedLiquidClass = hasAssignedLiquidClasses
-    ? getLiquidClassDisplayName(assignedLiquidClasses[0] ?? null)
-    : t('dont_use_liquid_class')
-
-  const [selectedLiquidClass, setSelectedLiquidClass] = useState(
-    defaultSelectedLiquidClass
-  )
-
-  useMemo(() => {
-    setSelectedLiquidClass(defaultSelectedLiquidClass)
-  }, [defaultSelectedLiquidClass])
-
-  const liquidClassOptions = [
-    ...Object.entries(sortedLiquidClassDefs).map(
-      ([liquidClassDefName, { displayName, description }]) => ({
-        name: displayName,
-        value: liquidClassDefName,
-        subButtonLabel:
-          liquidClassToLiquidsMap[liquidClassDefName] != null
-            ? t('assigned_liquid', {
-                liquidName: liquidClassToLiquidsMap[liquidClassDefName].join(
-                  ', '
-                ),
-              })
-            : description,
-      })
-    ),
-    {
-      name: t('dont_use_liquid_class'),
-      value: '',
-      subButtonLabel: '',
-    },
-  ]
-  if (!hasAssignedLiquidClasses) {
-    const poppedOption = liquidClassOptions.pop()
-    if (poppedOption !== undefined) {
-      liquidClassOptions.unshift(poppedOption)
-    }
-  }
+  const { t } = useTranslation('liquids')
 
   return (
     <Flex
@@ -91,7 +39,7 @@ export const LiquidClassesStepTools = ({
     >
       <Flex padding={`0 ${SPACING.spacing16}`}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('apply_liquid_classes')}
+          {t('apply_liquid_classes', { command: t(type) })}
         </StyledText>
       </Flex>
       <Flex
@@ -100,19 +48,18 @@ export const LiquidClassesStepTools = ({
         width="100%"
         padding={`0 ${SPACING.spacing16}`}
       >
-        {liquidClassOptions.map(options => {
-          const { name, subButtonLabel, value } = options
+        {orderedLiquidClassOptions.map(option => {
+          const { name, subButtonLabel, value } = option
           return (
             <RadioButton
               key={name}
               onChange={(e: ChangeEvent<any>) => {
-                propsForFields.liquidClass.updateValue(e.currentTarget.value)
-                setSelectedLiquidClass(name)
+                propsForFields.liquidClass.updateValue(e.target.value)
                 setShowFormErrors?.(false)
               }}
               buttonLabel={name}
               buttonValue={value}
-              isSelected={selectedLiquidClass === name}
+              isSelected={formData.liquidClass === value}
               buttonSubLabel={{
                 label: subButtonLabel ?? undefined,
                 align: 'vertical',

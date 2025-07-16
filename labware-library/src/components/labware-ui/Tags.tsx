@@ -1,7 +1,8 @@
-import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
-import type { LabwareDefinition } from '../../types'
+import { LABEL_LEFT, LabelText, Value } from '../ui'
 import styles from './styles.module.css'
+
+import type { LabwareDefinition } from '../../types'
 
 export interface TagsProps {
   definition: LabwareDefinition

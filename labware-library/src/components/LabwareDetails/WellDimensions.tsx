@@ -1,18 +1,20 @@
 // well dimensions and spacing for details page
 import round from 'lodash/round'
+
 import { getMeasurementDiagram } from '@opentrons/components'
+
 import {
+  DEPTH,
+  DIAMETER,
   MEASUREMENTS,
+  MM,
+  TOTAL_LENGTH,
   WELL_X_DIM,
   WELL_Y_DIM,
-  DIAMETER,
-  DEPTH,
-  TOTAL_LENGTH,
-  MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 
-import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
+import type { LabwareParameters, LabwareWellGroupProperties } from '../../types'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

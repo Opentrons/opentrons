@@ -1,9 +1,9 @@
 import { combineEpics } from 'redux-observable'
 
 import { fetchLightsEpic } from './fetchLightsEpic'
-import { updateLightsEpic } from './updateLightsEpic'
 import { homeEpic } from './homeEpic'
 import { moveEpic } from './moveEpic'
+import { updateLightsEpic } from './updateLightsEpic'
 
 import type { Epic } from '../../types'
 

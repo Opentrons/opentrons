@@ -1,3 +1,5 @@
-export interface DeckSetupTabType {
-  tab: 'startingDeck' | 'protocolSteps'
+import type { TerminalItemId } from '../../steplist'
+
+export interface DeckSetupTerminalIdType {
+  terminalItemId: TerminalItemId | null
 }

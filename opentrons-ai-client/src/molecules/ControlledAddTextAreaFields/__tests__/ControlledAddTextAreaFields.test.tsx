@@ -1,10 +1,12 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { ControlledAddTextAreaFields } from '..'
 import { FormProvider, useForm } from 'react-hook-form'
-import { LIQUIDS_FIELD_NAME } from '../../../organisms/LabwareLiquidsSection'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+import { LIQUIDS_FIELD_NAME } from '/ai-client/organisms/LabwareLiquidsSection'
+
+import { ControlledAddTextAreaFields } from '..'
 
 const TestFormProviderComponent = ({
   liquidsMock = [''],

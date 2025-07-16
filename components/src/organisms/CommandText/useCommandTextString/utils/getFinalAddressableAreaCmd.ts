@@ -1,5 +1,7 @@
 import { findLastAt } from './helpers'
+
 import type { RunTimeCommand } from '@opentrons/shared-data'
+
 /**
  * given a list of commands and a labwareId, calculate the resulting location
  * of the corresponding labware after all given commands are executed

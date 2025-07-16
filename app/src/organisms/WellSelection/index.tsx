@@ -1,26 +1,28 @@
 import { useState } from 'react'
-import reduce from 'lodash/reduce'
 import pick from 'lodash/pick'
+import reduce from 'lodash/reduce'
 
 import { COLORS, Labware, RobotCoordinateSpace } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
+
+import { Selection384Wells } from './Selection384Wells'
+import { SelectionRect } from './SelectionRect'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from './utils'
-import { Selection384Wells } from './Selection384Wells'
-import { SelectionRect } from './SelectionRect'
 
 import type { WellFill, WellGroup, WellStroke } from '@opentrons/components'
 import type {
-  LabwareDefinition2,
-  PipetteChannels,
+  LabwareDefinition,
   NozzleLayoutDetails,
+  PipetteChannels,
 } from '@opentrons/shared-data'
 import type { GenericRect } from './types'
 
 interface WellSelectionProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   deselectWells: (wells: string[]) => void
   /* The actual wells that are clicked. */
   selectedPrimaryWells: WellGroup
@@ -161,10 +163,14 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     wellStroke[wellName] = COLORS.transparent
   })
 
+  const viewBox = getLabwareViewBox(definition)
   const labwareRender = (
-    <RobotCoordinateSpace viewBox="0 0 128 86">
+    <RobotCoordinateSpace
+      viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.xDimension} ${viewBox.yDimension}`}
+    >
       <Labware
         definition={definition}
+        positioningMode="passThrough"
         hideOutline
         isInteractive
         showLabels={true}

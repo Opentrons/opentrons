@@ -33,7 +33,7 @@ export const KitchenContext = createContext<KitchenContextType>({
 
 export type MakeSnackbarOptions = Omit<SnackbarProps, 'message'>
 
-type MakeSnackbar = (
+export type MakeSnackbar = (
   message: string,
   duration?: number,
   options?: MakeSnackbarOptions

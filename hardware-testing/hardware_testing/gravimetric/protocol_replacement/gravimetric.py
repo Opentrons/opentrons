@@ -25,7 +25,7 @@ from opentrons.config import infer_config_base_dir
 from opentrons.types import Point, DeckSlotName
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 

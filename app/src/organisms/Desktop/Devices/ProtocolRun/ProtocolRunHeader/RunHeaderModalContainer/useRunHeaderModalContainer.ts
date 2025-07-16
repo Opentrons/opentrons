@@ -1,38 +1,49 @@
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
-import {
-  useConfirmCancelModal,
-  useHeaterShakerIsRunningModal,
-  useProtocolAnalysisErrorsModal,
-  useRunFailedModal,
-} from './modals'
-import {
-  useHeaterShakerConfirmationModal,
-  useMissingStepsModal,
-  useRunHeaderDropTip,
-} from './hooks'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
-import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
-import { getFallbackRobotSerialNumber } from '../utils'
+import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
+import {
+  useRobotAnalyticsData,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
 import {
-  useRobotAnalyticsData,
-  useTrackProtocolRunEvent,
-} from '/app/redux-resources/analytics'
-import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
+  OFFSETS_CONFLICT,
+  selectAreOffsetsApplied,
+  selectOffsetSource,
+} from '/app/redux/protocol-runs'
+import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
-import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
+import { getFallbackRobotSerialNumber } from '../utils'
+import {
+  useHeaterShakerConfirmationModal,
+  useMissingStepsModal,
+  useRunHeaderDropTip,
+} from './hooks'
+import {
+  useConfirmCancelModal,
+  useHeaterShakerIsRunningModal,
+  useProtocolAnalysisErrorsModal,
+  useRunFailedModal,
+} from './modals'
+
+import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
+import type { RunControls } from '/app/organisms/RunTimeControl'
+import type { ProtocolRunHeaderProps } from '..'
+import type { UseRunErrorsResult } from '../hooks'
 import type {
-  UseRunHeaderDropTipResult,
-  UseMissingStepsModalResult,
   UseHeaterShakerConfirmationModalResult,
+  UseMissingStepsModalResult,
+  UseRunHeaderDropTipResult,
 } from './hooks'
 import type {
   UseAnalysisErrorsModalResult,
@@ -40,9 +51,6 @@ import type {
   UseHeaterShakerIsRunningModalResult,
   UseRunFailedModalResult,
 } from './modals'
-import type { ProtocolRunHeaderProps } from '..'
-import type { RunControls } from '/app/organisms/RunTimeControl'
-import type { UseRunErrorsResult } from '../hooks'
 
 interface OffsetCOnflictModalUtils {
   showModal: boolean
@@ -92,8 +100,10 @@ export function useRunHeaderModalContainer({
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
   const isThisRunCurrent = runId === useCurrentRunId()
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
-  function handleProceedToRunClick(): void {
+  function proceedToRun(): void {
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -104,6 +114,15 @@ export function useRunHeaderModalContainer({
       properties: robotAnalyticsData ?? {},
     })
     protocolRunControls.play()
+  }
+
+  function handleProceedToRunClick(): Promise<void> {
+    if (robotType === FLEX_ROBOT_TYPE && !flexOffsetsApplied) {
+      return applyOffsets().then(proceedToRun)
+    } else {
+      proceedToRun()
+      return Promise.resolve()
+    }
   }
 
   const confirmCancelModalUtils = useConfirmCancelModal()
@@ -127,6 +146,7 @@ export function useRunHeaderModalContainer({
     runStatus,
     runId,
     handleProceedToRunClick,
+    isRunStarting: isApplyingOffsets,
   })
 
   const dropTipUtils = useRunHeaderDropTip({

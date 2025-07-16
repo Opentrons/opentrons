@@ -42,16 +42,33 @@ LabwareRoles = Literal[
     "system",
 ]
 
+SpringDirectionalForce = Literal["backLeftBottom"]
 
-class Vector(TypedDict):
+
+class Vector2D(TypedDict):
+    x: float
+    y: float
+
+
+class Vector3D(TypedDict):
     x: float
     y: float
     z: float
 
 
+class AxisAlignedBoundingBox2D(TypedDict):
+    backLeft: Vector2D
+    frontRight: Vector2D
+
+
+class AxisAlignedBoundingBox3D(TypedDict):
+    backLeftBottom: Vector3D
+    frontRightTop: Vector3D
+
+
 class GripperOffsets(TypedDict):
-    pickUpOffset: Vector
-    dropOffset: Vector
+    pickUpOffset: Vector3D
+    dropOffset: Vector3D
 
 
 class LabwareParameters2(TypedDict):
@@ -137,6 +154,32 @@ class WellGroup(TypedDict):
     brand: NotRequired[LabwareBrandData]
 
 
+class Extents(TypedDict):
+    total: AxisAlignedBoundingBox3D
+
+
+class SlotFootprintAsChildFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
+
+
+class SlotFootprintAsParentFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
+
+
+class LocatingFeatures(TypedDict):
+    """A dictionary of locating features."""
+
+    slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
+    slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
+    springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
+
+
 class LabwareDefinition2(TypedDict):
     schemaVersion: Literal[2]
     version: int
@@ -144,13 +187,13 @@ class LabwareDefinition2(TypedDict):
     metadata: LabwareMetadata
     brand: LabwareBrandData
     parameters: LabwareParameters2
-    cornerOffsetFromSlot: Vector
+    cornerOffsetFromSlot: Vector3D
     ordering: list[list[str]]
     dimensions: LabwareDimensions
     wells: dict[str, WellDefinition2]
     groups: list[WellGroup]
-    stackingOffsetWithLabware: NotRequired[dict[str, Vector]]
-    stackingOffsetWithModule: NotRequired[dict[str, Vector]]
+    stackingOffsetWithLabware: NotRequired[dict[str, Vector3D]]
+    stackingOffsetWithModule: NotRequired[dict[str, Vector3D]]
     allowedRoles: NotRequired[list[LabwareRoles]]
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
@@ -178,13 +221,13 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     metadata: LabwareMetadata
     brand: LabwareBrandData
     parameters: LabwareParameters3
-    cornerOffsetFromSlot: Vector
     ordering: list[list[str]]
-    dimensions: LabwareDimensions
+    features: LocatingFeatures
+    extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[WellGroup]
-    stackingOffsetWithLabware: NotRequired[dict[str, Vector]]
-    stackingOffsetWithModule: NotRequired[dict[str, Vector]]
+    stackingOffsetWithLabware: NotRequired[dict[str, Vector3D]]
+    stackingOffsetWithModule: NotRequired[dict[str, Vector3D]]
     allowedRoles: NotRequired[list[LabwareRoles]]
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]

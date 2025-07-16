@@ -1,7 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,9 +15,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getMainPagePortalEl } from '../Portal'
+
 import { actions, selectors as fileSelectors } from '../../../file-data'
 import { TextAreaField } from '../../molecules'
+import { getMainPagePortalEl } from '../Portal'
+
 import type { FileMetadataFields } from '../../../file-data'
 
 interface EditProtocolMetadataModalProps {
@@ -27,7 +30,7 @@ export function EditProtocolMetadataModal(
 ): JSX.Element {
   const { onClose } = props
   const dispatch = useDispatch()
-  const { t } = useTranslation(['create_new_protocol', 'shared'])
+  const { t } = useTranslation(['onboarding', 'shared'])
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const {
     handleSubmit,
@@ -51,7 +54,6 @@ export function EditProtocolMetadataModal(
       marginLeft="0"
       title={t('shared:edit_protocol_metadata')}
       type="info"
-      closeOnOutsideClick
       onClose={onClose}
       childrenPadding={SPACING.spacing24}
       footer={

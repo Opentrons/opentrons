@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import type { LabwareUploadMessage } from '../../../labware-defs'
 
 export function LabwareUploadModalBody(props: {

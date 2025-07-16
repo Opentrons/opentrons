@@ -4,15 +4,15 @@ import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
 
 import { getAllDefs } from './getAllDefs'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const getOnlyLatestDefs = (
-  labwareList: LabwareDefinition2[]
-): LabwareDefinition2[] => {
+  labwareList: LabwareDefinition[]
+): LabwareDefinition[] => {
   // group by namespace + loadName
   const labwareDefGroups: {
-    [groupKey: string]: LabwareDefinition2[]
-  } = groupBy<LabwareDefinition2>(
+    [groupKey: string]: LabwareDefinition[]
+  } = groupBy<LabwareDefinition>(
     labwareList,
     d => `${d.namespace}/${d.parameters.loadName}`
   )
@@ -25,9 +25,9 @@ const getOnlyLatestDefs = (
   })
 }
 
-export function getAllDefinitions(): LabwareDefinition2[] {
+export function getAllDefinitions(): LabwareDefinition[] {
   const allDefs = getAllDefs().filter(
-    (d: LabwareDefinition2) =>
+    (d: LabwareDefinition) =>
       // eslint-disable-next-line @typescript-eslint/prefer-includes
       LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
   )

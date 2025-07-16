@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import last from 'lodash/last'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import last from 'lodash/last'
 
 import {
   AlertPrimaryButton,
@@ -10,23 +10,24 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  SUCCESS,
-  PENDING,
-} from '/app/redux/robot-api'
-import { resetConfig } from '/app/redux/robot-admin'
 
-import type { State } from '/app/redux/types'
+import { resetConfig } from '/app/redux/robot-admin'
+import {
+  getRequestById,
+  PENDING,
+  SUCCESS,
+  useDispatchApiRequest,
+} from '/app/redux/robot-api'
+
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type { State } from '/app/redux/types'
 
 interface DeviceResetModalProps {
   closeModal: () => void

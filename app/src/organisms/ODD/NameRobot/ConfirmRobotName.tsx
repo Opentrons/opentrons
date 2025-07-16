@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -7,14 +7,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StepMeter } from '/app/atoms/StepMeter'
-import { MediumButton } from '/app/atoms/buttons'
 import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
+import { MediumButton } from '/app/atoms/buttons'
+import { StepMeter } from '/app/atoms/StepMeter'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

@@ -1,10 +1,13 @@
 // jotai's atoms
 import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
+
 import type {
   Chat,
   ChatData,
   CreatePrompt,
   CreateProtocolAtomProps,
+  FeatureFlags,
   HeaderWithMeterAtomProps,
   Mixpanel,
   UpdatePrompt,
@@ -25,9 +28,9 @@ export const createProtocolChatAtom = atom<CreatePrompt>({
   modules: [],
   labware: [],
   liquids: [],
+  runtime_parameters: '',
   steps: [],
-  fake: false,
-  fake_id: 0,
+  fake: true,
 })
 
 /** CreateProtocolChatAtom is for the prefilled userprompt when navigating to the chat page from Update Protocol page */
@@ -38,7 +41,6 @@ export const updateProtocolChatAtom = atom<UpdatePrompt>({
   update_type: 'adapt_python_protocol',
   update_details: '',
   fake: false,
-  fake_id: 0,
 })
 
 /** Regenerate protocol atom */
@@ -59,8 +61,17 @@ export const feedbackModalAtom = atom<boolean>(false)
 
 export const tokenAtom = atom<string | null>(null)
 
+// feature flag atoms are a bit more fancy
+// they leverage local storage to persist settings across browser refreshes
+
+const DEFAULT_FEATURE_FLAG_STATE = {
+  enablePrereleaseMode: false,
+  enablePDProtocolGeneration: true,
+  enableAnalytics: true,
+}
+
 export const mixpanelAtom = atom<Mixpanel | null>({
-  analytics: { hasOptedIn: true }, // TODO: set to false when we have the opt-in modal
+  analytics: { hasOptedIn: DEFAULT_FEATURE_FLAG_STATE.enableAnalytics },
   isInitialized: false,
 })
 
@@ -75,3 +86,23 @@ export const createProtocolAtom = atom<CreateProtocolAtomProps>({
 })
 
 export const displayExitConfirmModalAtom = atom<boolean>(false)
+
+const rawFeatureFlagsAtom = atomWithStorage<FeatureFlags>(
+  'opentrons_ai_feature_flags',
+  { ...DEFAULT_FEATURE_FLAG_STATE }
+)
+
+export const featureFlagsAtom = atom(
+  get => get(rawFeatureFlagsAtom),
+  (get, set, update: Partial<FeatureFlags>) => {
+    // reset all feature flags to false if turning off prerelease mode
+    if (update.enablePrereleaseMode === false) {
+      set(rawFeatureFlagsAtom, { ...DEFAULT_FEATURE_FLAG_STATE })
+    } else {
+      set(rawFeatureFlagsAtom, {
+        ...get(rawFeatureFlagsAtom),
+        ...update,
+      })
+    }
+  }
+)

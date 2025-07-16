@@ -1,12 +1,11 @@
 import * as http from 'http'
-import agent from 'agent-base'
 import { Duplex } from 'stream'
-
+import agent from 'agent-base'
 import { SerialPort } from 'serialport'
 
+import type { PortInfo } from '@serialport/bindings-cpp'
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
-import type { PortInfo } from '@serialport/bindings-cpp'
 import type { Logger, LogLevel } from './types'
 
 const MAX_SOCKET_CREATE_RETRIES = 10

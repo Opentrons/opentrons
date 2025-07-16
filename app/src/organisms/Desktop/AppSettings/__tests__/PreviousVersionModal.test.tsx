@@ -1,12 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '/app/i18n'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import {
+  PREVIOUS_RELEASES_URL,
   PreviousVersionModal,
   UNINSTALL_APP_URL,
-  PREVIOUS_RELEASES_URL,
 } from '../PreviousVersionModal'
 
 import type { ComponentProps } from 'react'

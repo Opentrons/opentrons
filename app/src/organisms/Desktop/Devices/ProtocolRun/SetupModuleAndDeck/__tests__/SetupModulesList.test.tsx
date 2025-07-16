@@ -1,30 +1,33 @@
-import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
-import { renderWithProviders } from '/app/__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  mockMagneticModule as mockMagneticModuleFixture,
-  mockHeaterShaker,
-} from '/app/redux/modules/__fixtures__/index'
+import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
+import {
+  mockHeaterShaker,
+  mockMagneticModule as mockMagneticModuleFixture,
+} from '/app/redux/modules/__fixtures__/index'
 import {
   useChainLiveCommands,
-  useRunCalibrationStatus,
   useModuleRenderInfoForProtocolById,
+  useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
-import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
-import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
 import type { ComponentProps } from 'react'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -55,7 +58,6 @@ const mockMagneticModule = {
   calibrationPoint: { x: 0, y: 0 },
   displayName: 'Magnetic Module',
   dimensions: {},
-  twoDimensionalRendering: { children: [] },
   quirks: [],
 }
 
@@ -84,18 +86,18 @@ const render = (props: ComponentProps<typeof SetupModulesList>) => {
 }
 
 describe('SetupModulesList', () => {
-  let props: ComponentProps<typeof SetupModulesList>
   let mockChainLiveCommands = vi.fn()
+  let props: ComponentProps<typeof SetupModulesList>
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
+    mockChainLiveCommands = vi.fn()
+    mockChainLiveCommands.mockResolvedValue(null)
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
-    mockChainLiveCommands = vi.fn()
-    mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     vi.mocked(UnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
@@ -225,7 +227,7 @@ describe('SetupModulesList', () => {
     render(props)
     screen.getByText('Thermocycler Module')
     screen.getByText('A1+B1')
-    fireEvent.click(screen.getByRole('button', { name: 'Calibrate now' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Setup now' }))
     await waitFor(() => {
       screen.getByText('mock ModuleWizardFlows')
     })
@@ -259,7 +261,7 @@ describe('SetupModulesList', () => {
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     render(props)
-    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Setup now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {

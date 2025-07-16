@@ -1,61 +1,42 @@
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { useFormContext } from 'react-hook-form'
+import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
+import { useAtom } from 'jotai'
+import delay from 'lodash/delay'
+
 import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   Icon,
-  JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_FLEX_START,
-  POSITION_RELATIVE,
-  SPACING,
   LegacyStyledText,
-  TYPOGRAPHY,
+  Link,
+  SPACING,
   StyledText,
-  DIRECTION_ROW,
-  OVERFLOW_AUTO,
+  TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 
-import type { ChatData } from '../../resources/types'
-import { useAtom } from 'jotai'
+import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
+import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
 import {
   chatDataAtom,
+  createProtocolChatAtom,
   feedbackModalAtom,
   regenerateProtocolAtom,
   scrollToBottomAtom,
-  createProtocolChatAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
-import { delay } from 'lodash'
-import { useFormContext } from 'react-hook-form'
-import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
+} from '/ai-client/resources/atoms'
+import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
+import styles from './chatdisplay.module.css'
+
+import type { ChatData } from '/ai-client/resources/types'
 
 interface ChatDisplayProps {
   chat: ChatData
   chatId: string
 }
 
-const HoverShadow = styled(Flex)`
-  alignitems: ${ALIGN_CENTER};
-  justifycontent: ${JUSTIFY_CENTER};
-  padding: ${SPACING.spacing8};
-  transition: box-shadow 0.3s ease;
-  border-radius: ${BORDERS.borderRadius8};
-
-  &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: ${BORDERS.borderRadius8};
-  }
-`
-
-const StyledIcon = styled(Icon)`
-  color: ${COLORS.blue50};
-`
+const PD_URL = 'https://designer.opentrons.com'
 
 export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -68,7 +49,15 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   const { setValue } = useFormContext()
   const [chatdata] = useAtom(chatDataAtom)
   const [scrollToBottom, setScrollToBottom] = useAtom(scrollToBottomAtom)
-  const { role, reply, requestId } = chat
+
+  const [showProtocolContent, setShowProtocolContent] = useState(false)
+  const {
+    role,
+    reply,
+    requestId,
+    protocol_content: protocolContent,
+    attachments,
+  } = chat
   const isUser = role === 'user'
 
   const setInputFieldToCorrespondingRequest = (): void => {
@@ -105,10 +94,24 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleFileDownload = (): void => {
+    if (protocolContent != null) {
+      const blob = new Blob([JSON.stringify(protocolContent, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
+
+      // Use a temporary anchor
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'protocol.json'
+      anchor.click()
+
+      URL.revokeObjectURL(url)
+    }
     const lastCodeBlock = document.querySelector(`#${chatId}`)
     const code = lastCodeBlock?.textContent?.trim() ?? ''
     // Don't proceed if code is empty, no need to download as a python file
-    if (!code) {
+    if (code === '') {
       return
     }
     // Make sure python protocol is valid
@@ -137,9 +140,14 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   const handleClickCopy = async (): Promise<void> => {
-    const lastCodeBlock = document.querySelector(`#${chatId}`)
-    const code = lastCodeBlock?.textContent ?? ''
-    await navigator.clipboard.writeText(code)
+    if (protocolContent != null) {
+      await navigator.clipboard.writeText(JSON.stringify(protocolContent))
+    } else {
+      const lastCodeBlock = document.querySelector(`#${chatId}`)
+      const code = lastCodeBlock?.textContent ?? ''
+      await navigator.clipboard.writeText(code)
+    }
+
     setIsCopied(true)
     trackEvent({
       name: 'copy-protocol',
@@ -154,92 +162,252 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       }, 2000)
   }, [isCopied])
 
+  // ToDo this nested component definition should be resolved
+  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
   function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
-    return <CodeWrapper {...props} id={chatId} />
+    return <div {...props} id={chatId} className={styles.code_wrapper} />
+  }
+
+  const protocolName =
+    chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
+      ?.metadata.protocolName ?? 'protocol.json'
+
+  // ToDo this nested component definition should be resolved
+  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
+  const ProtocolContentBadge = (props: {
+    onClick: () => void
+  }): JSX.Element => {
+    const { onClick } = props
+    return (
+      <div className={styles.outer_container}>
+        <div className={styles.file_container} onClick={onClick}>
+          <div className={styles.badge_container}>
+            <div className={styles.icon_wrapper}>
+              <img
+                src={smallLogo}
+                alt="Opentrons logo"
+                width="1.5rem"
+                height="1.5rem"
+              />
+            </div>
+            <span className={styles.file_name}>{protocolName}</span>
+          </div>
+
+          <div className={styles.button_container}>
+            <div
+              className={styles.hover_shadow}
+              onClick={e => {
+                e.stopPropagation()
+                setShowFeedbackModal(true)
+              }}
+            >
+              <Icon
+                size={SPACING.spacing20}
+                name="thumbs-down"
+                className={styles.styled_icon}
+              />
+            </div>
+            <div
+              className={styles.hover_shadow}
+              onClick={e => {
+                e.stopPropagation()
+                void handleClickCopy()
+              }}
+            >
+              <Icon
+                size={SPACING.spacing20}
+                name={isCopied ? 'check' : 'content-copy'}
+                className={styles.styled_icon}
+              />
+            </div>
+            <div
+              className={styles.hover_shadow}
+              onClick={e => {
+                e.stopPropagation()
+                handleFileDownload()
+              }}
+            >
+              <Icon
+                size={SPACING.spacing20}
+                name="download"
+                className={styles.styled_icon}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-      <Flex justifyContent={isUser ? JUSTIFY_FLEX_END : JUSTIFY_FLEX_START}>
+    <div className={styles.main_container}>
+      <div
+        className={`${styles.header_container} ${
+          isUser ? styles.header_container_user : styles.header_container_ai
+        }`}
+      >
         <StyledText paddingTop={SPACING.spacing12}>
           {isUser ? t('you') : t('opentronsai')}
         </StyledText>
-      </Flex>
+      </div>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
-      <Flex
-        padding={`${SPACING.spacing40} ${SPACING.spacing40} ${
-          isUser ? SPACING.spacing40 : SPACING.spacing12
-        } ${SPACING.spacing40}`}
-        backgroundColor={isUser ? COLORS.blue30 : COLORS.grey30}
+      <div
+        className={`${styles.message_container} ${
+          isUser ? styles.message_container_user : styles.message_container_ai
+        }`}
         data-testid={`ChatDisplay_from_${isUser ? 'user' : 'backend'}`}
-        borderRadius={SPACING.spacing12}
-        width="100%"
-        overflowY={OVERFLOW_AUTO}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        position={POSITION_RELATIVE}
       >
-        <Markdown
-          components={{
-            div: undefined,
-            ul: UnnumberedListText,
-            h2: HeaderText,
-            li: ListItemText,
-            p: ParagraphText,
-            a: isUser ? ParagraphText : ExternalLink,
-            code: CodeText,
-          }}
-        >
-          {reply}
-        </Markdown>
+        {protocolContent == null && (
+          <div className={styles.content_wrapper}>
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
+          </div>
+        )}
 
-        {!isUser ? (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_FLEX_END}
-            gridGap={SPACING.spacing20}
-            paddingTop={SPACING.spacing12}
+        {/* Display file attachments for user messages */}
+        {isUser && attachments != null && attachments.length > 0 && (
+          <div className={styles.attachments_container}>
+            {attachments.map((attachment, index) => (
+              <AttachedFileItem
+                key={`${attachment.name}-${index}`}
+                file={attachment}
+                showRemoveButton={false}
+              />
+            ))}
+          </div>
+        )}
+        {protocolContent != null && (
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize20}
+            lineHeight={TYPOGRAPHY.lineHeight24}
+            whiteSpace={WHITE_SPACE_PRE_WRAP}
           >
-            <HoverShadow
+            <Trans
+              t={t}
+              i18nKey="pd_protocol_reply"
+              components={{
+                a: <ExternalLink href={PD_URL} />,
+              }}
+            />
+            <Link href={PD_URL} external>
+              <Icon
+                name="open-in-new"
+                size="1.125rem"
+                className={`${styles.styled_icon} ${styles.open_in_new_icon}`}
+              />
+            </Link>
+          </StyledText>
+        )}
+
+        {/* Display protocol_content badge and content */}
+        {!isUser && protocolContent != null && (
+          <>
+            <ProtocolContentBadge
+              onClick={() => {
+                setShowProtocolContent(!showProtocolContent)
+              }}
+            ></ProtocolContentBadge>
+
+            {showProtocolContent && (
+              <div className={styles.code_wrapper}>
+                {JSON.stringify(protocolContent, null, 2)}
+              </div>
+            )}
+            <Markdown
+              components={{
+                div: undefined,
+                ul: UnnumberedListText,
+                h2: HeaderText,
+                li: ListItemText,
+                p: ParagraphText,
+                a: isUser ? ParagraphText : ExternalLink,
+                code: CodeText,
+              }}
+            >
+              {reply}
+            </Markdown>
+          </>
+        )}
+
+        {!isUser && protocolContent == null ? (
+          <div className={styles.actions_container}>
+            <div
+              className={styles.hover_shadow}
               onClick={() => {
                 setInputFieldToCorrespondingRequest()
               }}
             >
-              <StyledIcon size={SPACING.spacing20} name="reload" />
-            </HoverShadow>
-            <HoverShadow
+              <Icon
+                size={SPACING.spacing20}
+                name="reload"
+                className={styles.styled_icon}
+              />
+            </div>
+            <div
+              className={styles.hover_shadow}
               onClick={() => {
                 setShowFeedbackModal(true)
               }}
             >
-              <StyledIcon size={SPACING.spacing20} name="thumbs-down" />
-            </HoverShadow>
-            <HoverShadow
-              onClick={async () => {
-                await handleClickCopy()
+              <Icon
+                size={SPACING.spacing20}
+                name="thumbs-down"
+                className={styles.styled_icon}
+              />
+            </div>
+            <div
+              className={styles.hover_shadow}
+              onClick={() => {
+                void handleClickCopy()
               }}
             >
-              <StyledIcon
+              <Icon
                 size={SPACING.spacing20}
                 name={isCopied ? 'check' : 'content-copy'}
+                className={styles.styled_icon}
               />
-            </HoverShadow>
-            <HoverShadow
+            </div>
+            <div
+              className={styles.hover_shadow}
               onClick={() => {
                 handleFileDownload()
               }}
             >
-              <StyledIcon size={SPACING.spacing20} name="download" />
-            </HoverShadow>
-          </Flex>
+              <Icon
+                size={SPACING.spacing20}
+                name="download"
+                className={styles.styled_icon}
+              />
+            </div>
+          </div>
         ) : null}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 }
 // Note (05/08/2024) the following styles are temp
-function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <a {...props} target="_blank" rel="noopener noreferrer" />
+function ExternalLink(
+  props: JSX.IntrinsicAttributes & { href?: string }
+): JSX.Element {
+  return (
+    <a
+      {...props}
+      className={styles.external_link}
+      target="_blank"
+      rel="noopener noreferrer"
+    />
+  )
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
@@ -258,19 +426,9 @@ function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="li" marginLeft={SPACING.spacing16} />
+  return <LegacyStyledText {...props} as="li" className={styles.list_item} />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <LegacyStyledText {...props} as="ul" />
 }
-
-const CodeWrapper = styled(Flex)`
-  display: inline-flex;
-  font-family: monospace;
-  padding: ${SPACING.spacing4};
-  color: ${COLORS.black80};
-  background-color: ${COLORS.grey20};
-  border-radius: ${BORDERS.borderRadius4};
-  overflow: auto;
-`

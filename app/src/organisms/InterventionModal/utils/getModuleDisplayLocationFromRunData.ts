@@ -1,4 +1,5 @@
 import { getLoadedModule } from '@opentrons/components'
+
 import type { RunData } from '@opentrons/api-client'
 
 export function getModuleDisplayLocationFromRunData(

@@ -1,15 +1,17 @@
-import type * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { uploadCsvFile } from '@opentrons/api-client'
+
 import { useHost } from '../../api'
 import { useUploadCsvFileMutation } from '../useUploadCsvFileMutation'
 
+import type * as React from 'react'
 import type {
   HostConfig,
-  UploadedCsvFileResponse,
   Response,
+  UploadedCsvFileResponse,
 } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')

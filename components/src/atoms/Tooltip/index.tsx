@@ -1,11 +1,11 @@
 import { COLORS } from '../../helix-design-system'
-import { TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyTooltip } from '../../tooltips'
 import { FLEX_MAX_CONTENT } from '../../styles'
+import { LegacyTooltip } from '../../tooltips'
+import { TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
-import type { UseTooltipResultTooltipProps } from '../../tooltips'
 import type { StyleProps } from '../../primitives'
+import type { UseTooltipResultTooltipProps } from '../../tooltips'
 
 export interface TooltipProps extends StyleProps {
   children: ReactNode

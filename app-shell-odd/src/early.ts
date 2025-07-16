@@ -2,6 +2,7 @@
 // do as little as possible in this file and do none of it at import time
 
 import { app } from 'electron'
+
 import { ODD_DATA_DIR } from './constants'
 
 let path: string

@@ -14,25 +14,27 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { selectIsAnyNecessaryDefaultOffsetMissing } from '/app/redux/protocol-runs'
+import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
+  useModuleCalibrationStatus,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
-  useModuleCalibrationStatus,
 } from '/app/resources/runs'
-import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
+
 import {
   getFallbackRobotSerialNumber,
   isValidRunAgainStatus,
 } from '../../utils'
-import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
+import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
 import type { RunHeaderContentProps } from '..'
+
 export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {
@@ -70,14 +72,16 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName
   )
   const currentRunId = useCurrentRunId()
-  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const isRequiredOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
 
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
     missingModuleIds.length === 0
   const isRobotTypeSetupComplete = isFlex
-    ? isSetupComplete && areOffsetsApplied
+    ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
 
   const isCurrentRun = currentRunId === runId

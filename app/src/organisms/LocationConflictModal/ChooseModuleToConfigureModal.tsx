@@ -1,39 +1,46 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useModulesQuery } from '@opentrons/react-api-client'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  FixtureOption,
   Flex,
   Icon,
-  SPACING,
-  SecondaryButton,
   LegacyStyledText,
+  Modal,
+  SecondaryButton,
+  SPACING,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
-  Modal,
 } from '@opentrons/components'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
-  getFixtureDisplayName,
   getCutoutFixturesForModuleModel,
-  MAGNETIC_BLOCK_V1,
+  getFixtureDisplayName,
   getModuleDisplayName,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
-import { FixtureOption } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
-import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
+
 import type { AttachedModule } from '@opentrons/api-client'
+import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const EQUIPMENT_POLL_MS = 5000
+const MODULE_IDENTIFY_TIME_MS = 10000
+
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
   usbPort?: number | string
@@ -81,6 +88,20 @@ export const ChooseModuleToConfigureModal = (
       [[], []]
     ) ?? []
 
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
+  const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
+
+  const stackerIdentifyHandler = (module: AttachedModule): void => {
+    sendIdentifyStacker(module, true, 'blue')
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
+  }
+
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
     attachedMod => {
       const portDisplay =
@@ -94,6 +115,31 @@ export const ChooseModuleToConfigureModal = (
       }
     }
   )
+  const handleIdentifyFixture = (module: AttachedModule): void => {
+    if (identifyInUse === null) {
+      stackerIdentifyHandler(module)
+    } else if (identifyInUse !== null) {
+      const previousModule =
+        unconfiguredModuleMatches.find(m => m.serialNumber === identifyInUse) ??
+        null
+      if (previousModule !== null && module !== null) {
+        sendIdentifyStacker(previousModule, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+        stackerIdentifyHandler(module)
+      }
+    }
+  }
+  const handleStackerClearAndConfigureModule = (
+    module: AttachedModule
+  ): void => {
+    sendIdentifyStacker(module, false)
+    if (identifyTimeout !== null) {
+      clearTimeout(identifyTimeout)
+    }
+    handleConfigureModule(module.serialNumber)
+  }
   const passiveOptions: ModuleFixtureOption[] =
     requiredModuleModel === MAGNETIC_BLOCK_V1
       ? [{ moduleModel: MAGNETIC_BLOCK_V1 }]
@@ -104,17 +150,41 @@ export const ChooseModuleToConfigureModal = (
         moduleModel,
         deckDef
       )
-      return (
-        <FixtureOption
-          key={serialNumber}
-          onClickHandler={() => {
-            handleConfigureModule(serialNumber)
-          }}
-          optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
-          buttonText={i18n.format(t('shared:add'), 'capitalize')}
-          isOnDevice={isOnDevice}
-        />
-      )
+      const selectedModule =
+        unconfiguredModuleMatches.find(m => m.serialNumber === serialNumber) ??
+        null
+      if (moduleModel === 'flexStackerModuleV1' && selectedModule !== null) {
+        return (
+          <FixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleStackerClearAndConfigureModule(selectedModule)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            secondaryButtonText={i18n.format(
+              t('shared:identify'),
+              'capitalize'
+            )}
+            secondaryOnClickHandler={() => {
+              handleIdentifyFixture(selectedModule)
+            }}
+            isOnDevice={isOnDevice}
+          />
+        )
+      } else {
+        return (
+          <FixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleConfigureModule(serialNumber)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            isOnDevice={isOnDevice}
+          />
+        )
+      }
     }
   )
 

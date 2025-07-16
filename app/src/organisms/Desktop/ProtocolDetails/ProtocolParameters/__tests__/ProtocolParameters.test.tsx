@@ -1,13 +1,14 @@
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { ProtocolParameters } from '..'
 
 import type { ComponentProps } from 'react'
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()

@@ -4,14 +4,14 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SecondaryButton,
   SPACING,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { ProgressBar } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/ProgressBar',

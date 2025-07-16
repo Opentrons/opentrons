@@ -7,8 +7,8 @@ import { PIPETTE_OFFSET_CALIBRATIONS_PATH } from '../constants'
 
 import type { ResponseFixtures } from '../../../robot-api/__fixtures__'
 import type {
-  PipetteOffsetCalibration,
   AllPipetteOffsetCalibrations,
+  PipetteOffsetCalibration,
 } from '../../api-types'
 
 export const mockPipetteOffsetCalibration1: PipetteOffsetCalibration = {

@@ -1,15 +1,15 @@
-import { it, describe, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
+import { fullHomeCommands } from '../gantry'
 import {
-  savePositionCommands,
-  moveToWellCommands,
-  retractSafelyAndHomeCommands,
-  retractPipetteAxesSequentiallyCommands,
   moveRelativeCommand,
   moveToMaintenancePosition,
+  moveToWellCommands,
+  retractPipetteAxesSequentiallyCommands,
+  retractSafelyAndHomeCommands,
+  savePositionCommands,
   verifyProbeAttachmentAndHomeCommands,
 } from '../pipettes'
-import { fullHomeCommands } from '../gantry'
 
 import type { LoadedPipette } from '@opentrons/shared-data'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'

@@ -1,6 +1,8 @@
-import type * as React from 'react'
 import { AlertModal } from '@opentrons/components'
+
 import styles from '../styles.module.css'
+
+import type * as React from 'react'
 import type { ImportError, ImportErrorKey } from '../fields'
 
 const ERROR_MAP: Record<ImportErrorKey, React.ReactNode> = {

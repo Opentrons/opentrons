@@ -1,19 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
-
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
 
 import type { Dispatch } from '/app/redux/types'
 

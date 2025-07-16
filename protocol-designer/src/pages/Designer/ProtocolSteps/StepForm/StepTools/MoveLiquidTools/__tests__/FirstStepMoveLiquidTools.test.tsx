@@ -1,29 +1,30 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { fixture96Plate } from '@opentrons/shared-data'
 
+import formDataForSingleStep from '../../../../../../../__fixtures__/formDataForSingleStep.json'
+import propsForFieldsForSingleStep from '../../../../../../../__fixtures__/propsForFieldsForSingleStep.json'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import { i18n } from '../../../../../../../assets/localization'
+import { getEnableReturnTip } from '../../../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../../step-forms/selectors'
 import {
-  PipetteField,
-  TiprackField,
-  LabwareField,
-  WellSelectionField,
-  VolumeField,
-  PathField,
   ChangeTipField,
   DropTipField,
+  LabwareField,
+  PathField,
   PickUpTipField,
+  PipetteField,
+  TiprackField,
   TipWellSelectionField,
+  VolumeField,
+  WellSelectionField,
 } from '../../../PipetteFields'
-import { getEnableReturnTip } from '../../../../../../../feature-flags/selectors'
-import propsForFieldsForSingleStep from '../../../../../../../__fixtures__/propsForFieldsForSingleStep.json'
-import formDataForSingleStep from '../../../../../../../__fixtures__/formDataForSingleStep.json'
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
@@ -48,7 +49,6 @@ describe('FirstStepMoveLiquidTools', () => {
     props = {
       propsForFields: propsForFieldsForSingleStep as any,
       formData: formDataForSingleStep as any,
-      visibleFormErrors: [] as any,
     }
 
     vi.mocked(getLabwareEntities).mockReturnValue({

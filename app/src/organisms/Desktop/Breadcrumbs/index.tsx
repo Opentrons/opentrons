@@ -1,29 +1,29 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link, useParams, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { useRunCreatedAtTimestamp } from '/app/resources/runs'
-import { getProtocolDisplayName } from '/app/transformations/protocols'
+import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRunCreatedAtTimestamp } from '/app/resources/runs'
+import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
@@ -94,6 +94,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
     '/protocols': t('protocols'),
     [`/protocols/${protocolKey}`]: protocolDisplayName,
+    [`/protocols/${protocolKey}/preview`]: t('preview'),
   }
 
   // create an array of crumbs based on the pathname and defined names by path

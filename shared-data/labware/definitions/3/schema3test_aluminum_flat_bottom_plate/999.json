@@ -1,0 +1,70 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Aluminum Flat Bottom Plate",
+    "displayCategory": "aluminumBlock",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": -3,
+        "y": 3,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 131,
+        "y": -89,
+        "z": 11.2
+      }
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 128,
+        "y": -86
+      }
+    },
+    "slotFootprintAsParent": {
+      "z": 11.2,
+      "backLeft": {
+        "x": 0,
+        "y": 0
+      },
+      "frontRight": {
+        "x": 134,
+        "y": -92
+      }
+    }
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "schema3test_aluminum_flat_bottom_plate"
+  },
+  "namespace": "opentrons",
+  "version": 999,
+  "schemaVersion": 3,
+  "allowedRoles": ["adapter"],
+  "$otSharedSchema": "#/labware/schemas/3"
+}

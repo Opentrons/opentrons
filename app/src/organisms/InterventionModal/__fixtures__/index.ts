@@ -1,13 +1,13 @@
 import {
+  getModuleDef,
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_V1,
-  getModuleDef2,
 } from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
+  LabwareDefinition,
   LabwareDefinitionsByUri,
-  LabwareDefinition2,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -98,7 +98,21 @@ export const mockMoveLabwareCommandToOffDeck = {
     labwareId: 'offDeckMove',
     newLocation: 'offDeck',
   },
-  strategy: 'manualMoveWithPause',
+} as any
+
+export const mockEmptyStackerCommand = {
+  commandType: 'flexStacker/empty',
+  params: {
+    moduleId: 'mockModuleID',
+  },
+} as any
+
+export const mockFillStackerCommand = {
+  commandType: 'flexStacker/fill',
+  params: {
+    moduleId: 'mockModuleID',
+    quantity: 4,
+  },
 } as any
 
 export const mockLabwareOnModule: LoadedLabware = {
@@ -153,7 +167,7 @@ export const mockLabwareDefinition = ({
     zDimension: 15.7,
     xDimension: 127.76,
   },
-} as unknown) as LabwareDefinition2
+} as unknown) as LabwareDefinition
 
 export const mockLabwareDefinitionsByUri = {
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockLabwareDefinition,
@@ -214,7 +228,7 @@ export const mockModuleRenderInfoWithLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
   },
@@ -225,7 +239,7 @@ export const mockModuleRenderInfoWithoutLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: null,
     nestedLabwareId: null,
   },

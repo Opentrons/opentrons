@@ -1,21 +1,22 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getRobotType } from '../../../../../../file-data/selectors'
+
 import { CheckboxStepFormField } from '../../../../../../components/molecules'
+import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipment,
   getCurrentFormCanBeSaved,
 } from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import { MoveLabwareField } from './MoveLabwareField'
 import { LabwareLocationField } from './LabwareLocationField'
+import { MoveLabwareField } from './MoveLabwareField'
 
 import type { StepFormProps } from '../../types'
 
 export function MoveLabwareTools(props: StepFormProps): JSX.Element {
-  const { propsForFields, visibleFormErrors } = props
+  const { propsForFields } = props
   const { t, i18n } = useTranslation(['application', 'form', 'tooltip'])
   const robotType = useSelector(getRobotType)
   const canSave = useSelector(getCurrentFormCanBeSaved)
@@ -23,8 +24,6 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
-
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
     <Flex
@@ -53,7 +52,7 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
       ) : null}
       <MoveLabwareField
         {...propsForFields.labware}
-        errorToShow={getFormLevelError('labware', mappedErrorsToField)}
+        useGripper={propsForFields.useGripper.value === true}
       />
       <Divider marginY="0" />
       <LabwareLocationField
@@ -61,7 +60,6 @@ export function MoveLabwareTools(props: StepFormProps): JSX.Element {
         useGripper={propsForFields.useGripper.value === true}
         canSave={canSave}
         labware={String(propsForFields.labware.value)}
-        errorToShow={getFormLevelError('newLocation', mappedErrorsToField)}
       />
     </Flex>
   )

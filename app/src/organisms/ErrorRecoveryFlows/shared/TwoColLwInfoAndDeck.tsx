@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   Flex,
@@ -7,16 +9,16 @@ import {
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
-import { useTranslation } from 'react-i18next'
-import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
-import { RecoveryFooterButtons } from './RecoveryFooterButtons'
-import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+
 import { RECOVERY_MAP } from '../constants'
+import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
+import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { ComponentProps } from 'react'
-import type { RecoveryContentProps } from '../types'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { RecoveryContentProps } from '../types'
 
 export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
@@ -28,6 +30,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -42,13 +45,9 @@ export function TwoColLwInfoAndDeck(
     relevantPickUpTipWellName,
     relevantPickUpTipLabware,
   } = failedLabwareUtils
-  const { proceedNextStep } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
-
-  const primaryOnClick = (): void => {
-    void proceedNextStep()
-  }
 
   const {
     displayNameCurrentLoc: slot,
@@ -85,7 +84,7 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildBannerText = (): string => {
+  const buildBannerText = (): string | null => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
@@ -113,7 +112,6 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return 'location-arrow-location'
       default:
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
         return 'location'
     }
   }
@@ -141,6 +139,7 @@ export function TwoColLwInfoAndDeck(
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
             backgroundItems={
               <>
@@ -152,6 +151,8 @@ export function TwoColLwInfoAndDeck(
                     moduleDef,
                     nestedLabwareDef,
                     nestedLabwareId,
+                    targetDeckId,
+                    targetSlotId,
                   }) => (
                     <Module
                       key={moduleId}
@@ -159,6 +160,8 @@ export function TwoColLwInfoAndDeck(
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
+                      targetDeckId={targetDeckId}
+                      targetSlotId={targetSlotId}
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
@@ -169,11 +172,15 @@ export function TwoColLwInfoAndDeck(
                 )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>
@@ -195,11 +202,15 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
+          layout={'default'}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
-      <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
+      <RecoveryFooterButtons
+        primaryBtnOnClick={proceedNextStep}
+        secondaryBtnOnClick={goBackPrevStep}
+      />
     </RecoverySingleColumnContentWrapper>
   )
 }

@@ -14,31 +14,40 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   Link,
   SIZE_4,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import {
-  getCutoutDisplayName,
-  getFixtureDisplayName,
-  SINGLE_SLOT_FIXTURES,
-  getDeckDefFromRobotType,
+  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
+  getAAByAAId,
+  getAAComboFixtureDisplayName,
+  getAASlotDisplayName,
+  getAAWithFakesFromVSId,
+  getCutoutDisplayName,
+  getDeckDefFromRobotType,
+  getFixtureDisplayName,
+  getVisualSlotIdForAA,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
-import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import { useRunStatuses } from '/app/resources/runs'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useRunStatuses } from '/app/resources/runs'
 
+import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
+
+import type { TFunction } from 'i18next'
 import type { CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -55,7 +64,7 @@ function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
 export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
-  const { t, i18n } = useTranslation('device_details')
+  const { t, i18n } = useTranslation(['device_details', 'deck_configuration'])
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -66,6 +75,10 @@ export function DeviceDetailsDeckConfiguration({
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
+
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -82,14 +95,28 @@ export function DeviceDetailsDeckConfiguration({
   } = useDeckConfigurationEditingTools(false)
 
   // do not show standard slot in fixture display list
-  const { displayList: fixtureDisplayList } = deckConfig.reduce<{
+  const { displayList: fixtureDisplayList } = deckConfigWithAA.reduce<{
     displayList: Array<{ displayLocation: string; displayName: string }>
     groupedCutoutIds: CutoutId[]
   }>(
-    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
+    (
+      acc,
+      {
+        cutoutId,
+        cutoutFixtureId,
+        opentronsModuleSerialNumber,
+        addressableAreaId,
+      }
+    ) => {
+      const areaInCheck = getAAByAAId(addressableAreaId, deckDef)
+      const shouldShowAA =
+        areaInCheck.areaType !== 'slot' &&
+        areaInCheck.areaType !== 'fakeStagingSlot'
       if (
         cutoutFixtureId == null ||
-        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+        FAKE_STAGING_AREA_RIGHT_SLOT === cutoutFixtureId ||
+        !shouldShowAA
       ) {
         return acc
       }
@@ -100,7 +127,14 @@ export function DeviceDetailsDeckConfiguration({
         usbPort?.hubPort != null
           ? `${usbPort.port}.${usbPort.hubPort}`
           : usbPort?.port
-      const displayName = getFixtureDisplayName(cutoutFixtureId, portDisplay)
+      const displayName =
+        getAAComboFixtureDisplayName(
+          cutoutFixtureId,
+          addressableAreaId,
+          deckDef,
+          t as TFunction,
+          portDisplay
+        ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
@@ -125,12 +159,21 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
+      const vsId = getVisualSlotIdForAA(
+        cutoutId,
+        cutoutFixtureId,
+        addressableAreaId
+      )
       return {
         ...acc,
         displayList: [
           ...acc.displayList,
           {
-            displayLocation: getDisplayLocationForCutoutIds([cutoutId]),
+            displayLocation: vsId
+              ? getAASlotDisplayName(
+                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+                )
+              : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
         ],

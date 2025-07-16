@@ -1,10 +1,12 @@
 import {
+  HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
+import { uuid } from '../../utils'
+
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 

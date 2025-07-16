@@ -1,10 +1,11 @@
-import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
+import { appliedOffsetsToRun } from '/app/redux/protocol-runs'
 import {
   useClientDataLPC,
   useUpdateClientLPC,
 } from '/app/resources/client_data/'
-import { appliedOffsetsToRun } from '/app/redux/protocol-runs'
 import { useIsRunCurrent } from '/app/resources/runs'
 
 const CLIENT_DATA_INTERVAL_MS = 5000

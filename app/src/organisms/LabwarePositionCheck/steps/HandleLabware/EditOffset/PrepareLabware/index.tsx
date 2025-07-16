@@ -1,23 +1,24 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { TwoColumn } from '/app/molecules/InterventionModal'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   selectActivePipette,
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   setInitialPosition,
 } from '/app/redux/protocol-runs'
+
 import { LPCDeck } from './LPCDeck'
+import { PlaceItemInstruction } from './PlaceItemInstruction'
 
 import type { LoadedPipette } from '@opentrons/shared-data'
+import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type {
   OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
-import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import { PlaceItemInstruction } from './PlaceItemInstruction'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { TwoColumn } from '/app/molecules/InterventionModal'
 
 export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const {
@@ -69,7 +70,9 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={contentHeader}
-      buttonText={t('confirm_placement')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('confirm_placement')}
+      oddHeaderBtnCopy={t('confirm_placement')}
       onClickButton={handleConfirmPlacement}
       onClickBack={goBackSubstep}
       tertiaryBtnProps={{ text: t('go_back'), onClick: goBackSubstep }}

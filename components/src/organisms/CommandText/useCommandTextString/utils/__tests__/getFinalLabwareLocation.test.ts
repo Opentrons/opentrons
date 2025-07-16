@@ -1,7 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { fixtureTiprack10ul } from '@opentrons/shared-data'
+
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 describe('getFinalLabwareLocation', () => {
   it('calculates labware location after only load_labware', () => {
@@ -20,7 +23,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixtureTiprack10ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',
@@ -48,7 +51,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixtureTiprack10ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',
@@ -90,7 +93,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixtureTiprack10ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',

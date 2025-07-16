@@ -1,26 +1,30 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+
 import {
+  AnimationVideo,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
-import { RobotMotionLoader } from './RobotMotionLoader'
+
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
+
+import { RobotMotionLoader } from './RobotMotionLoader'
 
 import type { Dispatch } from 'react'
+import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
 import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
@@ -29,7 +33,7 @@ import type {
   WorkingOffset,
 } from './types'
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   padding-top: ${SPACING.spacing4};
   width: 100%;
   min-height: 18rem;
@@ -170,9 +174,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={
-        <StyledVideo autoPlay loop controls={false}>
+        <AnimationVideo css={VIDEO_STYLE}>
           <source src={probeVideoSrc} />
-        </StyledVideo>
+        </AnimationVideo>
       }
       bodyText={
         <StyledBody>

@@ -1,10 +1,13 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { absorbanceReaderFormToArgs } from '../absorbanceReaderFormToArgs'
+
 import type { HydratedAbsorbanceReaderFormData } from '../../../../form-types'
 
 describe('absorbanceReaderFormToArgs', () => {
   it('returns absorbance reader initialize command creator for single mode with reference', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderInitialize',
       fileName: null,
       id: 'stepId',
@@ -32,6 +35,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader initialize command creator for single mode with reference, ignorning wavelengths for i > 0', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderInitialize',
       fileName: null,
       id: 'stepId',
@@ -59,6 +63,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader initialize command creator for single mode without reference active', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderInitialize',
       fileName: null,
       id: 'stepId',
@@ -85,6 +90,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader initialize command creator for multi mode', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderInitialize',
       fileName: null,
       id: 'stepId',
@@ -111,6 +117,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader read command creator', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderRead',
       fileName: 'output_path.csv',
       id: 'stepId',
@@ -136,6 +143,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader lid command creator to open lid', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderLid',
       fileName: null,
       id: 'stepId',
@@ -160,6 +168,7 @@ describe('absorbanceReaderFormToArgs', () => {
   })
   it('returns absorbance reader lid command creator to close lid', () => {
     const formData: HydratedAbsorbanceReaderFormData = {
+      stepNumber: 1,
       absorbanceReaderFormType: 'absorbanceReaderLid',
       fileName: null,
       id: 'stepId',

@@ -4,12 +4,13 @@
 // be fairly broken; make sure you have unit tests in place when changing
 
 import omit from 'lodash/omit'
+
 import {
+  DISMISS_ALL_REQUESTS,
+  DISMISS_REQUEST,
+  FAILURE,
   PENDING,
   SUCCESS,
-  FAILURE,
-  DISMISS_REQUEST,
-  DISMISS_ALL_REQUESTS,
 } from './constants'
 
 import type { Action } from '../types'

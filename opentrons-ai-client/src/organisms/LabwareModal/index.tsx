@@ -1,4 +1,9 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { reduce } from 'lodash'
+
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -12,21 +17,19 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { createPortal } from 'react-dom'
-import { reduce } from 'lodash'
-import { ListButtonCheckbox } from '../../atoms/ListButtonCheckbox/ListButtonCheckbox'
+
+import { ListButtonCheckbox } from '/ai-client/atoms/ListButtonCheckbox/ListButtonCheckbox'
+import { getOnlyLatestDefs } from '/ai-client/resources/utils'
+
 import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
-import { getOnlyLatestDefs } from '../../resources/utils'
 
 import type { ChangeEvent } from 'react'
-import type { DisplayLabware } from '../LabwareLiquidsSection'
 import type {
   LabwareDefByDefURI,
-  LabwareDefinition2,
+  LabwareDefinition,
 } from '@opentrons/shared-data'
+import type { DisplayLabware } from '../LabwareLiquidsSection'
 
 const ORDERED_CATEGORIES: string[] = [
   'tipRack',
@@ -58,15 +61,14 @@ export function LabwareModal({
 
   const defs = getOnlyLatestDefs()
 
-  const labwareByCategory: Record<
-    string,
-    LabwareDefinition2[]
-  > = useMemo(() => {
-    return reduce<LabwareDefByDefURI, Record<string, LabwareDefinition2[]>>(
+  const labwareByCategory: Record<string, LabwareDefinition[]> = useMemo(() => {
+    const groupedLabware = reduce<
+      LabwareDefByDefURI,
+      Record<string, LabwareDefinition[]>
+    >(
       defs,
-      (acc, def: typeof defs[keyof typeof defs]) => {
-        const category: string = def.metadata.displayCategory
-
+      (acc, def) => {
+        const category = def.metadata.displayCategory
         return {
           ...acc,
           [category]: [...(acc[category] ?? []), def],
@@ -74,6 +76,15 @@ export function LabwareModal({
       },
       {}
     )
+
+    // Sort each category's labware by display name in place
+    for (const category in groupedLabware) {
+      groupedLabware[category].sort((a, b) =>
+        a.metadata.displayName.localeCompare(b.metadata.displayName)
+      )
+    }
+
+    return groupedLabware
   }, [])
 
   const populatedCategories: Record<string, boolean> = useMemo(

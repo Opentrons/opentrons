@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -9,9 +9,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,6 +35,9 @@ export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
       {...props}
       header={t('labware_position_check_title')}
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
+      oddHeaderBtnCopy="NO_COPY"
+      desktopHeaderBtnCopy="NO_COPY"
+      desktopFooterBtnCopy="NO_COPY"
     >
       <Flex css={CONTAINER_STYLE}>
         <Icon name="ot-spinner" css={SPINNER_STYLE} spin />

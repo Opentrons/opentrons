@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
@@ -10,8 +10,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
-import { DefaultLocationOffset } from './DefaultLocationOffset'
+import {
+  useLPCSnackbars,
+  useLPCToasts,
+} from '/app/organisms/LabwarePositionCheck/hooks'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import {
+  handleUnsavedOffsetsModalODD,
+  UnsavedOffsetsDesktop,
+} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
@@ -19,17 +27,10 @@ import {
   selectSnackbarStatus,
   selectWorkingOffsetsByUri,
 } from '/app/redux/protocol-runs'
-import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import {
-  handleUnsavedOffsetsModalODD,
-  UnsavedOffsetsDesktop,
-} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
-import { getIsOnDevice } from '/app/redux/config'
+
+import { DefaultLocationOffset } from './DefaultLocationOffset'
+import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
-import {
-  useLPCSnackbars,
-  useLPCToasts,
-} from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -86,7 +87,9 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
         <LPCContentContainer
           {...props}
           header={selectedLwName}
-          buttonText={t('save')}
+          oddHeaderBtnCopy={t('save')}
+          desktopFooterBtnCopy={t('save')}
+          desktopHeaderBtnCopy={t('exit')}
           onClickButton={onHeaderSave}
           onClickBack={onHeaderGoBack}
           buttonIsDisabled={!doWorkingOffsetsExist}

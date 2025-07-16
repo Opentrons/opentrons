@@ -1,31 +1,33 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
-  OT2_STANDARD_DECKID,
+  multiplyMatrices,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import {
+  ALIGN_CENTER,
   C_DARK_GRAY,
   C_MED_LIGHT_GRAY,
-  SPACING_1,
-  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
   DISPLAY_FLEX,
   FONT_WEIGHT_SEMIBOLD,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_1,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-import { multiplyMatrices } from '../utils'
-import { Thermocycler } from './Thermocycler'
+import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
-import { Temperature } from './Temperature'
 import { MagneticBlock } from './MagneticBlock'
 import { MagneticModule } from './MagneticModule'
 import { PlateReader } from './PlateReader'
+import { Temperature } from './Temperature'
+import { Thermocycler } from './Thermocycler'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type {
@@ -49,8 +51,17 @@ interface Props {
     | {}
   statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
   children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
-  targetSlotId?: string
-  targetDeckId?: string
+
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetSlotId: string | null
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetDeckId: string | null
 }
 
 const statusInfoWrapperProps = {
@@ -77,8 +88,9 @@ export const Module = (props: Props): JSX.Element => {
     statusInfo,
     children,
     targetSlotId,
-    targetDeckId = OT2_STANDARD_DECKID,
+    targetDeckId,
   } = props
+
   const moduleType = getModuleType(def.model)
 
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
@@ -107,19 +119,16 @@ export const Module = (props: Props): JSX.Element => {
   let nestedLabwareOffsetY = labwareOffsetY
 
   // additional transforms to apply to vectors in certain deck/slot combinations
-  const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
+  const transformsForDeckBySlot =
+    (targetDeckId != null ? def?.slotTransforms?.[targetDeckId] : null) ?? {}
   const slotTransformsForDeckSlot =
-    targetSlotId != null &&
-    transformsForDeckBySlot != null &&
-    targetSlotId in transformsForDeckBySlot
-      ? transformsForDeckBySlot[targetSlotId]
-      : null
-  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
-  if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
+    (targetSlotId != null ? transformsForDeckBySlot[targetSlotId] : null) ?? {}
+
+  if (slotTransformsForDeckSlot.cornerOffsetFromSlot != null) {
     const [
       [slotTranslateX],
       [slotTranslateY],
-    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.cornerOffsetFromSlot, [
       [translateX],
       [translateY],
       [translateZ],
@@ -127,11 +136,11 @@ export const Module = (props: Props): JSX.Element => {
     ])
     offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
-  if (deckSpecificTransforms?.labwareOffset != null) {
+  if (slotTransformsForDeckSlot.labwareOffset != null) {
     const [
       [slotLabwareOffsetX],
       [slotLabwareOffsetY],
-    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.labwareOffset, [
       [labwareOffsetX],
       [labwareOffsetY],
       [1],
@@ -146,7 +155,9 @@ export const Module = (props: Props): JSX.Element => {
   const rotationCenterY = (footprintYDimension ?? yDimension) / 2
 
   const orientationTransform =
-    orientation === 'left' || moduleType === ABSORBANCE_READER_TYPE
+    orientation === 'left' ||
+    moduleType === ABSORBANCE_READER_TYPE ||
+    moduleType === FLEX_STACKER_MODULE_TYPE
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
@@ -206,6 +217,8 @@ export const Module = (props: Props): JSX.Element => {
     )
   } else if (moduleType === ABSORBANCE_READER_TYPE) {
     moduleViz = <PlateReader />
+  } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
+    moduleViz = <FlexStacker />
   }
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>

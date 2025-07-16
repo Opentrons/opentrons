@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 
 import {
   ALIGN_CENTER,
@@ -10,8 +10,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { EmptyFile } from '../EmptyFile'
 

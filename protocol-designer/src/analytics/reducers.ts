@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import type { Reducer } from 'redux'
+import type { RehydratePersistedAction } from '../persist'
 import type { Action } from '../types'
 import type { SetOptIn } from './actions'
-import type { RehydratePersistedAction } from '../persist'
+
 export interface OptInState {
   hasOptedIn: boolean
   appVersion?: string

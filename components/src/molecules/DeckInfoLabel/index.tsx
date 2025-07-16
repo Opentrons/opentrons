@@ -13,7 +13,11 @@ import type { StyleProps } from '../../primitives'
 interface DeckLabelProps extends StyleProps {
   /** deck label to display */
   deckLabel: string
+  /** deck info label icon name */
   iconName?: IconName
+  /** deck info label size large is for header text */
+  /** when use large, need to set svgSize to 1.25rem */
+  size?: 'default' | 'large'
 }
 
 interface HardwareIconProps extends StyleProps {
@@ -32,18 +36,20 @@ export const DeckInfoLabel = styled(DeckInfoLabelComponent)`
   align-items: ${ALIGN_CENTER};
   background-color: ${props =>
     props.highlight ?? false ? COLORS.blue50 : 'inherit'};
-  border: 1px solid
+  border: ${props => (props.size === 'large' ? '2px' : '1px')} solid
     ${props => (props.highlight ?? false ? 'transparent' : COLORS.black90)};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing2} ${SPACING.spacing4};
   border-radius: ${BORDERS.borderRadius8};
   justify-content: ${JUSTIFY_CENTER};
   height: ${props =>
-    props.height ?? SPACING.spacing20}; // prevents the icon from being squished
+    props.height ?? (props.size === 'large' ? '1.75rem' : '1.25rem')};
 
-  > svg {
-    height: ${props => props.svgSize ?? '0.875rem'};
-    width: ${props => props.svgSize ?? '0.875rem'};
+  svg {
+    height: ${props =>
+      props.svgSize ?? (props.size === 'large' ? '1.5rem' : '0.875rem')};
+    width: ${props =>
+      props.svgSize ?? (props.size === 'large' ? '1.5rem' : '0.875rem')};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -64,6 +70,7 @@ function DeckInfoLabelComponent({
   deckLabel,
   iconName,
   highlight = false,
+  size = 'default',
   ...styleProps
 }: DeckInfoLabelProps): JSX.Element {
   return (
@@ -83,7 +90,7 @@ function DeckInfoLabelComponent({
         />
       ) : (
         <StyledText
-          desktopStyle="captionBold"
+          desktopStyle={size === 'large' ? 'headingSmallBold' : 'captionBold'}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >

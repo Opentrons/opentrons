@@ -2,21 +2,26 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  StyledText,
-  AlertPrimaryButton,
-} from '@opentrons/components'
-import {
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
+import {
+  AlertPrimaryButton,
+  COLORS,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
-import { useUpdateClientDataRecovery } from '/app/resources/client_data'
 import { TakeoverModal } from '/app/organisms/TakeoverModal/TakeoverModal'
+import { useUpdateClientDataRecovery } from '/app/resources/client_data'
+
+import {
+  BANNER_TEXT_CONTAINER_STYLE,
+  BANNER_TEXT_CONTENT_STYLE,
+} from './constants'
 import { RecoveryInterventionModal } from './shared'
 
 import type {
@@ -24,10 +29,6 @@ import type {
   UseUpdateClientDataRecoveryResult,
 } from '/app/resources/client_data'
 import type { ErrorRecoveryFlowsProps } from '.'
-import {
-  BANNER_TEXT_CONTAINER_STYLE,
-  BANNER_TEXT_CONTENT_STYLE,
-} from './constants'
 
 // The takeover view, functionally similar to MaintenanceRunTakeover
 export function RecoveryTakeover(props: {

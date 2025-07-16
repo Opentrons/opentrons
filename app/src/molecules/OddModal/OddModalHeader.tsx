@@ -4,13 +4,14 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
-  Tag,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   LegacyStyledText,
+  SPACING,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import type { OddModalHeaderBaseProps } from './types'
 
 export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {

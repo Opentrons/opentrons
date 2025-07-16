@@ -1,9 +1,11 @@
-import { describe, it, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../testing/utils'
+
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { PrimaryButton } from '../PrimaryButton'
 
 import type { ComponentProps } from 'react'
@@ -28,7 +30,7 @@ describe('PrimaryButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
+    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
@@ -52,7 +54,7 @@ describe('PrimaryButton', () => {
     render(props)
     const button = screen.getByText('primary button')
     fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue55}`)
   })
 
   it('renders primary button with text and different background color', () => {

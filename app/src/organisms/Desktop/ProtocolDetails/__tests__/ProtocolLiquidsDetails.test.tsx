@@ -1,9 +1,11 @@
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
 
 import type { ComponentProps } from 'react'

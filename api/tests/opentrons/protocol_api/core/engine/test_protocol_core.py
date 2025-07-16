@@ -45,7 +45,6 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
-    ModuleDefinition,
     LabwareMovementStrategy,
     LoadedLabware,
     LoadedModule,
@@ -1038,9 +1037,9 @@ def test_move_labware(
                 labwareId="labware-id",
                 newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
                 strategy=expected_strategy,
-                pickUpOffset=LabwareOffsetVector(x=4, y=5, z=6)
-                if pick_up_offset
-                else None,
+                pickUpOffset=(
+                    LabwareOffsetVector(x=4, y=5, z=6) if pick_up_offset else None
+                ),
                 dropOffset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
             )
         ),
@@ -1112,6 +1111,7 @@ def test_move_labware_on_non_connected_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
+        protocol_core=subject,
     )
     subject.move_labware(
         labware_core=labware,
@@ -1232,6 +1232,7 @@ def test_load_labware_on_module(
         engine_client=mock_engine_client,
         api_version=api_version,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=subject,
     )
 
     result = subject.load_labware(
@@ -1309,6 +1310,7 @@ def test_load_labware_on_non_connected_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
+        protocol_core=subject,
     )
 
     result = subject.load_labware(
@@ -1426,8 +1428,6 @@ def test_load_module(
     robot_type: RobotType,
 ) -> None:
     """It should issue a load module engine command."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
     mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
 
@@ -1449,7 +1449,6 @@ def test_load_module(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=engine_model,
             serialNumber="xyz789",
         )
@@ -1498,8 +1497,6 @@ def test_load_mag_block(
     subject: ProtocolCore,
 ) -> None:
     """It should issue a load module engine command."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
 
     decoy.when(
@@ -1512,7 +1509,6 @@ def test_load_mag_block(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=EngineModuleModel.MAGNETIC_BLOCK_V1,
             serialNumber=None,
         )
@@ -1578,8 +1574,6 @@ def test_load_module_thermocycler_with_no_location(
     expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     mock_hw_mod = decoy.mock(cls=AbstractModule)
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
@@ -1595,7 +1589,6 @@ def test_load_module_thermocycler_with_no_location(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=engine_model,
             serialNumber="xyz789",
         )

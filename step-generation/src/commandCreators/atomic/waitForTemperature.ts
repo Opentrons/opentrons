@@ -2,15 +2,17 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
-import { getModuleState } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
+import { getModuleState } from '../../robotStateSelectors'
+import { uuid } from '../../utils'
 import * as warningCreators from '../../warningCreators'
+
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorWarning } from '../../types'
 
@@ -56,7 +58,9 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
 
   if (
     unreachableTemp ||
-    ('status' in moduleState && moduleState.status === TEMPERATURE_DEACTIVATED)
+    ('status' in moduleState &&
+      moduleState.status === TEMPERATURE_DEACTIVATED) ||
+    ('targetTemp' in moduleState && moduleState.targetTemp == null)
   ) {
     return {
       errors: [errorCreators.missingTemperatureStep()],

@@ -342,6 +342,7 @@ def test_move_to_well(
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
             location_type=WellLocationFunction.LIQUID_HANDLING,
+            meniscus_tracking=location._meniscus_tracking,
         )
     ).then_return(
         (
@@ -2216,6 +2217,7 @@ def test_aspirate_liquid_class_using_volume_config(
             well_name="source-well",
             absolute_point=liquid_probe_start_point,
             location_type=WellLocationFunction.LIQUID_HANDLING,
+            meniscus_tracking=None,
         )
     ).then_return((LiquidHandlingWellLocation(origin=WellOrigin.BOTTOM), True))
     decoy.when(

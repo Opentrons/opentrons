@@ -1,9 +1,11 @@
 //
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../testing/utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { COLORS } from '../../helix-design-system'
+import { renderWithProviders } from '../../testing/utils'
 import { Modal } from '../Modal'
 
 import type { ComponentProps } from 'react'

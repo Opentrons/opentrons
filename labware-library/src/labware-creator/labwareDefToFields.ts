@@ -1,10 +1,11 @@
 import { getUniqueWellProperties } from '@opentrons/shared-data'
+
 import type {
-  Coordinates,
   LabwareDefinition2,
   LabwareWellGroup,
+  Vector3D,
 } from '@opentrons/shared-data'
-import type { LabwareFields, BooleanString } from './fields'
+import type { BooleanString, LabwareFields } from './fields'
 
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
@@ -31,7 +32,7 @@ export function labwareDefToFields(
     metadata,
     totalLiquidVolume,
     xOffsetFromLeft,
-    yOffsetFromTop,
+    yOffsetFromBack,
   } = allUniqueWellGroupProps[0]
 
   const homogeneousWells =
@@ -86,7 +87,7 @@ export function labwareDefToFields(
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
       ? Object.entries(
-          def.stackingOffsetWithLabware as Record<string, Coordinates>
+          def.stackingOffsetWithLabware as Record<string, Vector3D>
         ).reduce<Record<string, number>>((acc, [loadName, offset]) => {
           const adapterZDimension = Object.values(adapterDefinitions).find(
             def => def.parameters.loadName === loadName
@@ -101,7 +102,7 @@ export function labwareDefToFields(
   const compatibleModules: Record<string, number> =
     def.stackingOffsetWithModule != null
       ? Object.entries(
-          def.stackingOffsetWithModule as Record<string, Coordinates>
+          def.stackingOffsetWithModule as Record<string, Vector3D>
         ).reduce<Record<string, number>>((acc, [moduleModel, offset]) => {
           acc[moduleModel] = zDimension - offset.z
           return acc
@@ -129,7 +130,7 @@ export function labwareDefToFields(
     gridSpacingY: ySpacing == null || ySpacing === 0 ? null : String(ySpacing),
 
     gridOffsetX: String(xOffsetFromLeft),
-    gridOffsetY: String(yOffsetFromTop),
+    gridOffsetY: String(yOffsetFromBack),
 
     homogeneousWells: boolToBoolString(homogeneousWells),
     regularRowSpacing: boolToBoolString(regularRowSpacing),

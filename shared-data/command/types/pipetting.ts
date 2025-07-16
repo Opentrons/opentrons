@@ -1,6 +1,7 @@
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { DropTipWellLocation, WellLocation } from './support'
+
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
@@ -68,7 +69,9 @@ export interface ConfigureForVolumeRunTimeCommand
 
 export type AirGapInPlaceParams = FlowRateParams &
   PipetteIdentityParams &
-  VolumeParams
+  VolumeParams & {
+    correctionVolume?: number
+  }
 
 export interface AirGapInPlaceCreateCommand extends CommonCommandCreateInfo {
   commandType: 'airGapInPlace'
@@ -235,9 +238,10 @@ export interface VerifyTipPresenceRunTimeCommand
   result?: any
 }
 
+export type LiquidProbeParams = WellLocationParam & PipetteAccessParams
 export interface LiquidProbeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'liquidProbe'
-  params: WellLocationParam & PipetteAccessParams
+  params: LiquidProbeParams
 }
 export interface LiquidProbeRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -342,12 +346,14 @@ export interface DispenseInPlaceParams {
   volume: number
   flowRate: number // µL/s
   pushOut?: number
+  correctionVolume?: number
 }
 
 export interface AspirateInPlaceParams {
   pipetteId: string
   volume: number
   flowRate: number // µL/s
+  correctionVolume?: number
 }
 interface FlowRateParams {
   flowRate: number // µL/s

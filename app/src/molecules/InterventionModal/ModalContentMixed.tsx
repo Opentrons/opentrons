@@ -1,13 +1,13 @@
 import {
-  Icon,
-  Flex,
-  Box,
-  LegacyStyledText,
-  DIRECTION_COLUMN,
-  SPACING,
-  COLORS,
   ALIGN_CENTER,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  LegacyStyledText,
   RESPONSIVENESS,
+  SPACING,
 } from '@opentrons/components'
 
 export type ModalContentMixedType =

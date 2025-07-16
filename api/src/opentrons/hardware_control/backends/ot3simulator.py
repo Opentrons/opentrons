@@ -230,12 +230,6 @@ class OT3Simulator(FlexBackend):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._sim_gantry_load = gantry_load
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._sim_gantry_load = gantry_load
-
     def update_constraints_for_plunger_acceleration(
         self,
         mount: OT3Mount,
@@ -815,6 +809,9 @@ class OT3Simulator(FlexBackend):
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await asyncio.sleep(0)
+
+    def get_status_bar_enabled(self) -> bool:
+        return True
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._sim_status_bar_state

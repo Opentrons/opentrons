@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -10,10 +11,8 @@ import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'
 
 interface ThermocyclerStateProps {
@@ -21,7 +20,6 @@ interface ThermocyclerStateProps {
   formData: FormData
   propsForFields: FieldPropsByName
   isHold?: boolean
-  visibleFormErrors: StepFormErrors
   showFormErrors?: boolean
   focusedField?: string | null
   paddingY?: string
@@ -33,12 +31,9 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
     propsForFields,
     formData,
     isHold = false,
-    visibleFormErrors,
     paddingY = '0',
   } = props
   const { i18n, t } = useTranslation(['application', 'form'])
-
-  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   const {
     blockFieldActive,
@@ -83,7 +78,6 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         isSelected={formData[blockFieldActive] === true}
         onLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOn')}
         offLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOff')}
-        formLevelError={getFormLevelError(blockTempField, mappedErrorsToField)}
       />
       <ToggleExpandStepFormField
         {...propsForFields[lidTempField]}
@@ -97,7 +91,6 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         offLabel={t(
           'form:step_edit_form.field.thermocyclerState.lid.toggleOff'
         )}
-        formLevelError={getFormLevelError(lidTempField, mappedErrorsToField)}
       />
       <ToggleStepFormField
         isDisabled={propsForFields[lidPositionField].disabled}

@@ -9,9 +9,9 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { CalibrationStatus, FetchCalibrationStatusAction } from '../types'
-import type { RobotApiErrorResponse } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchCalibrationStatusAction> = action => ({
   method: GET,

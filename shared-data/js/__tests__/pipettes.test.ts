@@ -1,10 +1,12 @@
 // tests for pipette info accessors in `shared-data/js/pipettes.js`
 import { describe, expect, it } from 'vitest'
+
 import {
-  getPipetteSpecsV2,
-  getPipetteNameSpecs,
   getPipetteModelSpecs,
+  getPipetteNameSpecs,
+  getPipetteSpecsV2,
 } from '../pipettes'
+
 import type { PipetteV2LiquidSpecs, PipetteV2Specs } from '../types'
 
 const PIPETTE_NAMES = [
@@ -83,12 +85,12 @@ describe('pipette data accessors', () => {
             $otSharedSchema:
               '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
             defaultTipracks: [
-              'opentrons/opentrons_flex_96_tiprack_1000ul/1',
-              'opentrons/opentrons_flex_96_tiprack_200ul/1',
-              'opentrons/opentrons_flex_96_tiprack_50ul/1',
-              'opentrons/opentrons_flex_96_filtertiprack_1000ul/1',
-              'opentrons/opentrons_flex_96_filtertiprack_200ul/1',
-              'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+              'opentrons/opentrons_flex_96_tiprack_1000ul/2',
+              'opentrons/opentrons_flex_96_tiprack_200ul/2',
+              'opentrons/opentrons_flex_96_tiprack_50ul/2',
+              'opentrons/opentrons_flex_96_filtertiprack_1000ul/2',
+              'opentrons/opentrons_flex_96_filtertiprack_200ul/2',
+              'opentrons/opentrons_flex_96_filtertiprack_50ul/2',
             ],
             minVolume: 5,
             maxVolume: 1000,
@@ -123,6 +125,12 @@ describe('pipette data accessors', () => {
                       'opentrons/opentrons_flex_96_filtertiprack_1000ul/1': 9.65,
                       'opentrons/opentrons_flex_96_filtertiprack_200ul/1': 9.76,
                       'opentrons/opentrons_flex_96_filtertiprack_50ul/1': 10.09,
+                      'opentrons/opentrons_flex_96_tiprack_1000ul/2': 9.65,
+                      'opentrons/opentrons_flex_96_tiprack_200ul/2': 9.76,
+                      'opentrons/opentrons_flex_96_tiprack_50ul/2': 10.09,
+                      'opentrons/opentrons_flex_96_filtertiprack_1000ul/2': 9.65,
+                      'opentrons/opentrons_flex_96_filtertiprack_200ul/2': 9.76,
+                      'opentrons/opentrons_flex_96_filtertiprack_50ul/2': 10.09,
                     },
                   },
                 },
@@ -173,8 +181,8 @@ describe('pipette data accessors', () => {
     const mockLiquidDefault = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipracks: [
-        'opentrons/opentrons_flex_96_tiprack_50ul/1',
-        'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        'opentrons/opentrons_flex_96_tiprack_50ul/2',
+        'opentrons/opentrons_flex_96_filtertiprack_50ul/2',
       ],
       maxVolume: 50,
       minVolume: 5,
@@ -254,8 +262,8 @@ describe('pipette data accessors', () => {
     const mockLiquidLowVolume = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipracks: [
-        'opentrons/opentrons_flex_96_tiprack_50ul/1',
-        'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+        'opentrons/opentrons_flex_96_tiprack_50ul/2',
+        'opentrons/opentrons_flex_96_filtertiprack_50ul/2',
       ],
       maxVolume: 30,
       minVolume: 1,

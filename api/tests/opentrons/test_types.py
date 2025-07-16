@@ -3,6 +3,17 @@ from opentrons.types import DeckSlotName, Point, Location, MeniscusTrackingTarge
 from opentrons.protocol_api.labware import Labware
 
 
+def test_point_from_xyz_attrs() -> None:
+    class Original:
+        def __init__(self) -> None:
+            self.x = 1
+            self.y = 2
+            self.z = 3
+
+    point = Point.from_xyz_attrs(Original())
+    assert point == Point(1, 2, 3)
+
+
 def test_point_mul() -> None:
     a = Point(1, 2, 3)
     b: float = 2

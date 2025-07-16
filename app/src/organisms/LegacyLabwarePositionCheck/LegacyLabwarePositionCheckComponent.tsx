@@ -1,9 +1,9 @@
-import type {
-  CommandData,
-  LabwareOffset,
-  LegacyLabwareOffsetCreateData,
-  LegacyLabwareOffsetLocation,
-} from '@opentrons/api-client'
+import { useEffect, useMemo, useReducer, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
+
 import { ModalShell, useConditionalConfirm } from '@opentrons/components'
 import {
   useAddLabwareOffsetToRunMutation,
@@ -16,28 +16,16 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import type {
-  CompletedProtocolAnalysis,
-  Coordinates,
-  CreateCommand,
-  DropTipCreateCommand,
-  RobotType,
-} from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '/app/App/portal'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import { WizardHeader } from '/app/molecules/WizardHeader'
-import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import isEqual from 'lodash/isEqual'
-import { useEffect, useMemo, useReducer, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+
 import { AttachProbe } from './AttachProbe'
 import { CheckItem } from './CheckItem'
 import { DetachProbe } from './DetachProbe'
@@ -49,6 +37,22 @@ import { PickUpTip } from './PickUpTip'
 import { ResultsSummary } from './ResultsSummary'
 import { ReturnTip } from './ReturnTip'
 import { RobotMotionLoader } from './RobotMotionLoader'
+
+import type {
+  CommandData,
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  CreateCommand,
+  DropTipCreateCommand,
+  RobotType,
+  Vector3D,
+} from '@opentrons/shared-data'
+import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -127,7 +131,7 @@ export const LegacyLabwarePositionCheckComponent = (
     (
       state: {
         workingOffsets: WorkingOffset[]
-        tipPickUpOffset: Coordinates | null
+        tipPickUpOffset: Vector3D | null
       },
       action: RegisterPositionAction
     ) => {
@@ -217,8 +221,8 @@ export const LegacyLabwarePositionCheckComponent = (
 
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const calculateAndApplyOffset = (
-    initialPosition: Coordinates | null,
-    finalPosition: Coordinates | null,
+    initialPosition: Vector3D | null,
+    finalPosition: Vector3D | null,
     labwareId: string,
     location: LegacyLabwareOffsetLocation
   ): Promise<void> => {
@@ -345,7 +349,7 @@ export const LegacyLabwarePositionCheckComponent = (
     axis: Axis,
     dir: Sign,
     step: StepSize,
-    onSuccess?: (position: Coordinates | null) => void
+    onSuccess?: (position: Vector3D | null) => void
   ): void => {
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
@@ -359,9 +363,7 @@ export const LegacyLabwarePositionCheckComponent = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)

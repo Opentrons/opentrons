@@ -1,26 +1,28 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  getLoadedLabwareDefinitionsByUri,
-  getPositionFromSlotId,
-  fixture96Plate,
-  TEMPERATURE_MODULE_V2,
-  getModuleDef2,
-} from '@opentrons/shared-data'
 import { getLabwareLocation } from '@opentrons/components'
-import { mockPickUpTipLabware } from '../../__fixtures__'
+import {
+  fixture96Plate,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDef,
+  getPositionFromSlotId,
+  TEMPERATURE_MODULE_V2,
+} from '@opentrons/shared-data'
+
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
+
+import { mockPickUpTipLabware } from '../../__fixtures__'
 import {
   getIsLabwareMatch,
-  getSlotNameAndLwLocFrom,
   getRunCurrentLabwareInfo,
-  getRunCurrentModulesInfo,
   getRunCurrentLabwareOnDeck,
+  getRunCurrentModulesInfo,
   getRunCurrentModulesOnDeck,
+  getSlotNameAndLwLocFrom,
   updateLabwareInModules,
 } from '../useDeckMapUtils'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
@@ -28,14 +30,14 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     ...actual,
     getLoadedLabwareDefinitionsByUri: vi.fn(),
     getPositionFromSlotId: vi.fn(),
-    getModuleDef2: vi.fn(),
+    getModuleDef: vi.fn(),
   }
 })
 vi.mock('@opentrons/components')
 
 describe('getRunCurrentModulesOnDeck', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -57,7 +59,7 @@ describe('getRunCurrentModulesOnDeck', () => {
   ]
 
   beforeEach(() => {
-    vi.mocked(getModuleDef2).mockReturnValue({ model: 'MOCK_MODEL' } as any)
+    vi.mocked(getModuleDef).mockReturnValue({ model: 'MOCK_MODEL' } as any)
     vi.mocked(getLabwareLocation).mockReturnValue({ slotName: 'A1' })
   })
 
@@ -117,8 +119,8 @@ describe('getRunCurrentModulesOnDeck', () => {
 })
 
 describe('getRunCurrentLabwareOnDeck', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -272,7 +274,7 @@ describe('getRunCurrentModulesInfo', () => {
       'opentrons/opentrons_96_pcr_adapter/1': 'MOCK_LW_DEF',
     } as any)
     vi.mocked(getPositionFromSlotId).mockReturnValue('position' as any)
-    vi.mocked(getModuleDef2).mockReturnValue('MOCK_MODULE_DEF' as any)
+    vi.mocked(getModuleDef).mockReturnValue('MOCK_MODULE_DEF' as any)
   })
 
   it('should return an empty array if runRecord is null', () => {
@@ -339,8 +341,8 @@ describe('getRunCurrentModulesInfo', () => {
 })
 
 describe('getRunCurrentLabwareInfo', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',
@@ -569,8 +571,8 @@ describe('getIsLabwareMatch', () => {
 })
 
 describe('updateLabwareInModules', () => {
-  const mockLabwareDef: LabwareDefinition2 = {
-    ...(fixture96Plate as LabwareDefinition2),
+  const mockLabwareDef: LabwareDefinition = {
+    ...(fixture96Plate as LabwareDefinition),
     metadata: {
       displayName: 'Mock Labware Definition',
       displayCategory: 'wellPlate',

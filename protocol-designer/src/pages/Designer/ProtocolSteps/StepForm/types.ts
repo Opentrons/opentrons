@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { FormData, StepFieldName } from '../../../../form-types'
-import type { StepFormErrors } from '../../../../steplist'
+
 export interface FocusHandlers {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]
@@ -18,6 +18,7 @@ export interface FieldProps {
   isIndeterminate?: boolean
   tooltipContent?: string | null
   padding?: string // needed to accommodate full-width divider in toolbox
+  caption?: string
 }
 export type FieldPropsByName = Record<StepFieldName, FieldProps>
 
@@ -28,7 +29,6 @@ export interface StepFormProps {
   focusHandlers: FocusHandlers
   propsForFields: FieldPropsByName
   toolboxStep: number
-  visibleFormErrors: StepFormErrors
   showFormErrors: boolean
   focusedField?: string | null
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>

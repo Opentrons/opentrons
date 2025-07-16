@@ -1,7 +1,7 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useCreateLiveCommandMutation,
@@ -14,10 +14,12 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
+
 import { ProtocolSetupLabware } from '..'
 import {
   mockProtocolModuleInfo,
@@ -28,7 +30,6 @@ import {
   mockUseModulesQueryOpening,
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type * as AppCommandTransformations from '/app/transformations/commands'
@@ -144,6 +145,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId:
             'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
           moduleModel: 'heaterShakerModuleV1',
+          moduleSlotName: 'B2',
         },
       ],
     })

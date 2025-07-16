@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next'
+
+import { Chip, Flex, StyledText } from '@opentrons/components'
+
 import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import { StatusLabel } from '/app/atoms/StatusLabel'
+  MODULE_INFO_DETAIL_CONTAINER_STYLE,
+  MODULE_INFO_DETAIL_TEXT_STYLE,
+} from './constants'
+
 import type { TemperatureStatus } from '/app/redux/modules/api-types'
 
 interface TemperatureModuleProps {
@@ -22,54 +21,31 @@ export const TemperatureModuleData = (
   const { moduleStatus, targetTemp, currentTemp } = props
   const { t } = useTranslation('device_details')
 
-  let backgroundColor: string = COLORS.grey30
-  let iconColor: string = COLORS.grey60
-  let textColor
-  let pulse
-  switch (moduleStatus) {
-    case 'idle': {
-      textColor = COLORS.grey60
-      break
-    }
-    case 'holding at target': {
-      backgroundColor = COLORS.blue30
-      iconColor = COLORS.blue60
-      textColor = COLORS.blue60
-      break
-    }
-    case 'cooling':
-    case 'heating': {
-      backgroundColor = COLORS.blue30
-      iconColor = COLORS.blue60
-      textColor = COLORS.blue60
-      pulse = true
-      break
-    }
-  }
+  const chipType = moduleStatus === 'idle' ? 'neutral' : 'info'
+  const shouldPulse = moduleStatus === 'cooling' || moduleStatus === 'heating'
 
   return (
-    <>
-      <StatusLabel
-        status={moduleStatus}
-        backgroundColor={backgroundColor}
-        iconColor={iconColor}
-        textColor={textColor}
-        pulse={pulse}
+    <Flex
+      css={MODULE_INFO_DETAIL_CONTAINER_STYLE}
+      data-testid="temp_module_data"
+    >
+      <Chip
+        text={moduleStatus}
+        chipSize="small"
+        type={chipType}
+        hasIcon={true}
+        pulseIcon={shouldPulse}
+        iconName="connection-status"
+        textTransform="capitalize"
       />
-      <Flex
-        fontSize={TYPOGRAPHY.fontSizeCaption}
-        flexDirection={DIRECTION_COLUMN}
-        data-testid="temp_module_data"
-      >
-        <LegacyStyledText marginBottom={SPACING.spacing2}>
-          {t(targetTemp == null ? 'na_temp' : 'target_temp', {
-            temp: targetTemp,
-          })}
-        </LegacyStyledText>
-        <LegacyStyledText>
-          {t('current_temp', { temp: currentTemp })}
-        </LegacyStyledText>
-      </Flex>
-    </>
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+        {t(targetTemp == null ? 'na_temp' : 'target_temp', {
+          temp: targetTemp,
+        })}
+      </StyledText>
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+        {t('current_temp', { temp: currentTemp })}
+      </StyledText>
+    </Flex>
   )
 }

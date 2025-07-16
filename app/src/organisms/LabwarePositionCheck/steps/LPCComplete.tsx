@@ -1,20 +1,19 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  Flex,
   RESPONSIVENESS,
   SPACING,
-  Flex,
   StyledText,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
+import SuccessIcon from '/app/assets/images/icon_success.png'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
-
-import SuccessIcon from '/app/assets/images/icon_success.png'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -26,7 +25,9 @@ export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('exit')}
+      oddHeaderBtnCopy={t('exit')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('exit')}
       onClickButton={props.commandUtils.headerCommands.handleCloseAndHome}
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
     >

@@ -1,17 +1,17 @@
 // pipette offset calibration types
+import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
 import type {
-  PIP_OFFSET_STEP_SESSION_STARTED,
-  PIP_OFFSET_STEP_LABWARE_LOADED,
-  PIP_OFFSET_STEP_PREPARING_PIPETTE,
+  PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
   PIP_OFFSET_STEP_INSPECTING_TIP,
   PIP_OFFSET_STEP_JOGGING_TO_DECK,
+  PIP_OFFSET_STEP_LABWARE_LOADED,
+  PIP_OFFSET_STEP_PREPARING_PIPETTE,
   PIP_OFFSET_STEP_SAVING_POINT_ONE,
-  PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
-  PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE,
   PIP_OFFSET_STEP_SESSION_EXITED,
+  PIP_OFFSET_STEP_SESSION_STARTED,
+  PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE,
 } from '../constants'
 import type { CalibrationLabware, SessionCommandString } from '../types'
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 export type PipetteOffsetCalibrationStep =
   | typeof PIP_OFFSET_STEP_SESSION_STARTED
@@ -30,7 +30,7 @@ export interface PipetteOffsetCalibrationInstrument {
   tipLength: number
   mount: string
   serial: string
-  defaultTipracks: LabwareDefinition2[]
+  defaultTipracks: LabwareDefinition[]
 }
 
 export interface PipetteOffsetCalibrationSessionParams {
@@ -38,7 +38,7 @@ export interface PipetteOffsetCalibrationSessionParams {
   // this will be false for pipette offset cal
   shouldRecalibrateTipLength: boolean
   hasCalibrationBlock: boolean
-  tipRackDefinition: LabwareDefinition2 | null
+  tipRackDefinition: LabwareDefinition | null
 }
 
 export interface PipetteOffsetCalibrationSessionDetails {

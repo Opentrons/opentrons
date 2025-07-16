@@ -4,9 +4,10 @@ import {
   MANUFACTURER_NO,
   MANUFACTURER_VALUES,
 } from '../../localization'
-import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
-import type { LabwareBrand } from '../../types'
+import { ExternalLink, LABEL_TOP, LabelText, Value } from '../ui'
 import styles from './styles.module.css'
+
+import type { LabwareBrand } from '../../types'
 
 export interface ManufacturerStatsProps {
   brand: LabwareBrand

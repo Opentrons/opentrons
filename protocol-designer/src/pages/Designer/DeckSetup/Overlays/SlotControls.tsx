@@ -1,7 +1,8 @@
-import { useTranslation } from 'react-i18next'
 import { useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useDrop, useDrag } from 'react-dnd'
+import { useDrag, useDrop } from 'react-dnd'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,29 +15,31 @@ import {
 } from '@opentrons/components'
 import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
 
+import { DND_TYPES } from '../../../../constants'
+import { selectors as labwareDefSelectors } from '../../../../labware-defs'
+import { moveDeckItem } from '../../../../labware-ingred/actions'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../../utils/labwareModuleCompatibility'
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
-import { DND_TYPES } from '../../../../constants'
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
 import type { DropTargetMonitor } from 'react-dnd'
 import type {
+  AddressableAreaName,
+  CutoutId,
+  DeckDefinition,
   Dimensions,
   ModuleType,
-  DeckDefinition,
-  CutoutId,
-  AddressableAreaName,
 } from '@opentrons/shared-data'
-import type { SharedControlsType, DroppedItem } from '../types'
+import type { DroppedItem, SharedControlsType } from '../types'
 
 interface SlotControlsProps extends SharedControlsType {
+  addEquipment: (slotId: string) => void
   stagingAreaAddressableAreas: AddressableAreaName[]
   deckDef: DeckDefinition
   slotBoundingBox: Dimensions
@@ -55,9 +58,9 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     hover,
     handleDragHover,
     setHover,
-    setShowMenuListForId,
+    addEquipment,
     itemId,
-    tab,
+    terminalItemId,
     isSelected,
     deckDef,
     stagingAreaAddressableAreas,
@@ -111,8 +114,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       drop: (item: DroppedItem) => {
         const droppedLabware = item
         if (droppedLabware.labwareOnDeck != null) {
-          const droppedSlot = droppedLabware.labwareOnDeck.slot
-          dispatch(moveDeckItem(droppedSlot, slotId))
+          dispatch(moveDeckItem(droppedLabware.labwareOnDeck.stack[1], slotId))
         }
       },
       hover: () => {
@@ -132,7 +134,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   if (
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
     slotPosition == null ||
-    tab === 'protocolSteps' ||
+    terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected
   )
     return null
@@ -176,7 +178,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
         },
         onClick: () => {
           if (!isOver) {
-            setShowMenuListForId(itemId)
+            addEquipment(itemId)
           }
         },
       }}
@@ -189,7 +191,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       >
         <Link role="button">
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('starting_deck_state:edit_slot')}
+            {t('starting_deck_state:add_labware')}
           </StyledText>
         </Link>
       </Flex>

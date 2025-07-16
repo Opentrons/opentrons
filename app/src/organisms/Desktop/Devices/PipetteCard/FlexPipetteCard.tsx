@@ -1,31 +1,27 @@
-import { useState, useEffect } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import {
-  CURSOR_POINTER,
-  Banner,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import {
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-  FLEX_ROBOT_TYPE,
-  LEFT,
-} from '@opentrons/shared-data'
+
+import { InlineNotification } from '@opentrons/components'
 import {
   useCurrentSubsystemUpdateQuery,
   useHost,
 } from '@opentrons/react-api-client'
+import {
+  FLEX_ROBOT_TYPE,
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
+
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
-import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
+import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
+import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
@@ -49,11 +45,6 @@ interface FlexPipetteCardProps {
   isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
-const BANNER_LINK_CSS = css`
-  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-  cursor: ${CURSOR_POINTER};
-  margin-left: ${SPACING.spacing8};
-`
 
 const INSTRUMENT_CARD_STYLE = css`
   p {
@@ -205,27 +196,13 @@ export function FlexPipetteCard({
           banner={
             attachedPipette?.ok &&
             attachedPipette.data.calibratedOffset?.last_modified == null ? (
-              <Banner type="error" marginBottom={SPACING.spacing4} width="100%">
-                {isEstopNotDisengaged ? (
-                  <LegacyStyledText as="p">
-                    {t('calibration_needed_without_link')}
-                  </LegacyStyledText>
-                ) : (
-                  <Trans
-                    t={t}
-                    i18nKey={'calibration_needed'}
-                    components={{
-                      calLink: (
-                        <LegacyStyledText
-                          as="p"
-                          css={BANNER_LINK_CSS}
-                          onClick={handleCalibrate}
-                        />
-                      ),
-                    }}
-                  />
-                )}
-              </Banner>
+              <InlineNotification
+                type="error"
+                message={t('calibration_needed_without_link')}
+                linkText={isEstopNotDisengaged ? undefined : t('calibrate_now')}
+                onLinkClick={isEstopNotDisengaged ? undefined : handleCalibrate}
+                minWidth="12.625rem"
+              />
             ) : null
           }
           label={
@@ -246,19 +223,15 @@ export function FlexPipetteCard({
           css={INSTRUMENT_CARD_STYLE}
           description={t('instrument_attached')}
           banner={
-            <Banner
-              type={subsystemUpdateData != null ? 'warning' : 'error'}
-              marginBottom={SPACING.spacing4}
-            >
-              <Trans
-                t={t}
-                i18nKey={
-                  subsystemUpdateData != null
-                    ? 'firmware_update_occurring'
-                    : 'firmware_update_needed'
-                }
-              />
-            </Banner>
+            <InlineNotification
+              type={subsystemUpdateData != null ? 'alert' : 'error'}
+              message={
+                subsystemUpdateData != null
+                  ? t('firmware_update_occurring')
+                  : t('firmware_update_needed')
+              }
+              minWidth="12.625rem"
+            />
           }
           isEstopNotDisengaged={isEstopNotDisengaged}
         />

@@ -1,29 +1,20 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { getDeckDefinitions } from '@opentrons/shared-data'
-
 import { i18n } from '/app/i18n'
+import {
+  CalibrationError,
+  useCalibrationError,
+} from '/app/organisms/Desktop/CalibrationError'
 import * as Sessions from '/app/redux/sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '/app/redux/sessions/__fixtures__'
+
 import { CalibrateTipLength } from '../index'
-import {
-  useCalibrationError,
-  CalibrationError,
-} from '/app/organisms/Desktop/CalibrationError'
 
 import type { ComponentProps, ComponentType } from 'react'
 import type { TipLengthCalibrationStep } from '/app/redux/sessions/types'
 
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getDeckDefinitions>()
-  return {
-    ...actual,
-    getDeckDefinitions: vi.fn(),
-  }
-})
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux/config')
@@ -81,7 +72,6 @@ describe('CalibrateTipLength', () => {
   ]
 
   beforeEach(() => {
-    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
     vi.mocked(useCalibrationError).mockReturnValue(null)
     vi.mocked(CalibrationError).mockReturnValue(
       <div>MOCK_CALIBRATION_ERROR</div>

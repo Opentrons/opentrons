@@ -1,9 +1,9 @@
-import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../testing/utils'
 import { TextListTableContent } from '..'
 import { ListTable } from '../../../atoms/ListTable'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

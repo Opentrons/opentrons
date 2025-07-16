@@ -1,6 +1,7 @@
 // Table Title with expandable measurement diagrams
 import cx from 'classnames'
-import { LabelText, LABEL_LEFT } from './LabelText'
+
+import { LABEL_LEFT, LabelText } from './LabelText'
 // import { ClickableIcon } from './ClickableIcon'
 import styles from './styles.module.css'
 

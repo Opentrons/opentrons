@@ -1,41 +1,42 @@
 import { useState } from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
+import { css } from 'styled-components'
 
 import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   BORDERS,
-  COLORS,
   Chip,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '/app/redux/analytics'
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useMissingProtocolHardware } from '/app/transformations/commands'
+import {
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { useCloneRun } from '/app/resources/runs'
+import { useMissingProtocolHardware } from '/app/transformations/commands'
+
 import { useRerunnableStatusText } from './hooks'
 
 import type { RunData, RunStatus } from '@opentrons/api-client'

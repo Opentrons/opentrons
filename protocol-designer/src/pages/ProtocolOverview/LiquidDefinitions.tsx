@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -12,8 +12,8 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+
 import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
-import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
 import type {
@@ -21,14 +21,11 @@ import type {
   IngredInputs,
 } from '../../labware-ingred/types'
 
-const getLiquidDescription = (
-  liquid: IngredInputs,
-  enableLiquidClasses: boolean
-): JSX.Element | null => {
+const getLiquidDescription = (liquid: IngredInputs): JSX.Element | null => {
   const { description, liquidClass } = liquid
   const liquidClassDisplayName = getLiquidClassDisplayName(liquidClass ?? null)
   const liquidClassInfo =
-    !enableLiquidClasses || liquidClassDisplayName == null ? null : (
+    liquidClassDisplayName == null ? null : (
       <Tag text={liquidClassDisplayName} type="default" shrinkToContent />
     )
 
@@ -55,7 +52,6 @@ export function LiquidDefinitions({
   allIngredientGroupFields,
 }: LiquidDefinitionsProps): JSX.Element {
   const { t } = useTranslation('protocol_overview')
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
@@ -90,7 +86,7 @@ export function LiquidDefinitions({
                     </Flex>
                   }
                   content={
-                    getLiquidDescription(liquid, enableLiquidClasses) ?? (
+                    getLiquidDescription(liquid) ?? (
                       <StyledText
                         desktopStyle="bodyDefaultRegular"
                         alignSelf={ALIGN_CENTER}

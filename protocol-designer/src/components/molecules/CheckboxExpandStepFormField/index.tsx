@@ -1,8 +1,8 @@
 import {
   ALIGN_CENTER,
   Btn,
-  COLORS,
   Check,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,32 +14,30 @@ import {
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 
 interface CheckboxExpandStepFormFieldProps {
   title: string
-  checkboxUpdateValue: (value: unknown) => void
-  checkboxValue: unknown
-  isChecked: boolean
+  fieldProps: FieldProps
+  tooltipOverride?: string
   children?: ReactNode
-  tooltipText?: string | null
-  disabled?: boolean
   testId?: string
 }
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps
 ): JSX.Element {
-  const {
-    checkboxUpdateValue,
-    checkboxValue,
-    children,
-    isChecked,
-    title,
-    tooltipText,
-    disabled = false,
-    testId,
-  } = props
+  const { children, title, tooltipOverride, testId, fieldProps } = props
 
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const {
+    value,
+    updateValue,
+    tooltipContent = tooltipOverride,
+    disabled = false,
+  } = fieldProps
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top-start',
+  })
   return (
     <>
       <ListButton
@@ -48,7 +46,7 @@ export function CheckboxExpandStepFormField(
         disabled={disabled}
         onClick={() => {
           if (!disabled) {
-            checkboxUpdateValue(!checkboxValue)
+            updateValue(!value)
           }
         }}
         color={disabled ? COLORS.grey40 : COLORS.black90}
@@ -57,24 +55,24 @@ export function CheckboxExpandStepFormField(
           width="100%"
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
+          {...targetProps}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
             <>
-              <StyledText desktopStyle="bodyDefaultRegular" {...targetProps}>
-                {title}
-              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
               <Btn
                 data-testid={testId}
                 onClick={() => {
-                  checkboxUpdateValue(!checkboxValue)
+                  updateValue(!value)
                 }}
+                disabled={disabled}
               >
                 <Check
                   color={COLORS.blue50}
-                  isChecked={isChecked}
+                  isChecked={value === true}
                   disabled={disabled}
                 />
               </Btn>
@@ -83,8 +81,8 @@ export function CheckboxExpandStepFormField(
           {children}
         </Flex>
       </ListButton>
-      {tooltipText != null ? (
-        <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+      {tooltipContent != null ? (
+        <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       ) : null}
     </>
   )

@@ -4,27 +4,29 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as PipetteConstants from '/app/redux/pipettes/constants'
-import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
-import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
+import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
+import * as PipetteConstants from '/app/redux/pipettes/constants'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { isGripperInCommands } from '/app/resources/protocols/utils'
+import {
+  useMostRecentCompletedAnalysis,
+  useRunPipetteInfoByMount,
+} from '/app/resources/runs'
+import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+
+import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
-import {
-  useRunPipetteInfoByMount,
-  useMostRecentCompletedAnalysis,
-} from '/app/resources/runs'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { isGripperInCommands } from '/app/resources/protocols/utils'
+import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
 import type { GripperData } from '@opentrons/api-client'
-import { i18n } from '/app/i18n'
 
 const EQUIPMENT_POLL_MS = 5000
 

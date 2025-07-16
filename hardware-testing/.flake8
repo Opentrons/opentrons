@@ -1,5 +1,7 @@
 [flake8]
 
+extend-exclude = venv .venv
+
 # max cyclomatic complexity
 # NOTE: (andy s) increasing this from 9 to 15 b/c test scripts often handle all logic in main
 max-complexity = 15

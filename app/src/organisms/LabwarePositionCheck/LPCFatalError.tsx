@@ -1,6 +1,6 @@
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -8,11 +8,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
   SPACING,
   StyledText,
-  JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
@@ -31,7 +31,9 @@ export function LPCFatalError(props: LPCWizardContentProps): JSX.Element {
       header={t('labware_position_check_title')}
       onClickButton={headerCommands.handleCloseWithoutHome}
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
-      buttonText={t('exit')}
+      oddHeaderBtnCopy={t('exit')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('exit')}
     >
       <Flex css={CONTAINER_STYLE}>
         <Icon name="alert-circle" css={ICON_STYLE} />

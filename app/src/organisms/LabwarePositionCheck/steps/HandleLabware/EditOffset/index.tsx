@@ -1,8 +1,9 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { PrepareLabware } from './PrepareLabware'
 import { CheckLabware } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware'
+import { DesktopOffsetSuccess } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/DesktopOffsetSuccess'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   goBackEditOffsetSubstep,
   HANDLE_LW_SUBSTEP,
@@ -14,14 +15,14 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   setFinalPosition,
 } from '/app/redux/protocol-runs'
-import { DesktopOffsetSuccess } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/DesktopOffsetSuccess'
-import { getIsOnDevice } from '/app/redux/config'
 
-import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import { PrepareLabware } from './PrepareLabware'
+
 import type { LoadedPipette } from '@opentrons/shared-data'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
-  SelectedLwOverview,
   OffsetLocationDetails,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
 export function EditOffset(props: LPCWizardContentProps): JSX.Element {

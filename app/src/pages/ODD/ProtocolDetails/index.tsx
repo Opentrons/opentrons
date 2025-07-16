@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import last from 'lodash/last'
+
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,13 +18,13 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
-  LegacyStyledText,
+  Tabs,
   truncateString,
   TYPOGRAPHY,
-  Tabs,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -31,32 +32,34 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
+
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
-  ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
+  ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
+import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
-import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 import { useRunTimeParameters } from '/app/resources/protocols'
+import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
-import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
-import { Parameters } from './Parameters'
+
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-import { formatTimeWithUtcLabel } from '/app/resources/runs'
-import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { Parameters } from './Parameters'
 
 import type { Protocol } from '@opentrons/api-client'
+import type { OnDeviceRouteParams } from '/app/App/types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
-import type { OnDeviceRouteParams } from '/app/App/types'
 
 interface ProtocolHeaderProps {
   title?: string | null

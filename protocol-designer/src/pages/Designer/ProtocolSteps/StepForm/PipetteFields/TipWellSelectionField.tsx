@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { createPortal } from 'react-dom'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -10,11 +11,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
+
 import {
-  SelectWellsModal,
   getMainPagePortalEl,
+  SelectWellsModal,
 } from '../../../../../components/organisms'
+import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

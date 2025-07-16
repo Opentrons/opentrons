@@ -1,12 +1,12 @@
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  LegacyStyledText,
   DeckConfigurator,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'

@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+
 import { usePrevious } from '@opentrons/components'
+
 import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
-import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
+import type { ConnectFormFieldProps, ConnectFormValues } from '../types'
 
 export const useResetFormOnSecurityChange = (): void => {
   const {

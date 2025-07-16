@@ -1,8 +1,8 @@
 import type {
-  LabwareDefinition2 as LabwareDefinition,
-  LabwareWellShapeProperties,
-  LabwareWellGroupMetadata,
   LabwareBrand,
+  LabwareDefinition,
+  LabwareWellGroupMetadata,
+  LabwareWellShapeProperties,
   LoadedLabware,
 } from '@opentrons/shared-data'
 
@@ -27,7 +27,7 @@ export type LabwareSort = 'alphabetical' | 'reverse'
 
 export interface LabwareWellGroupProperties {
   xOffsetFromLeft: number
-  yOffsetFromTop: number
+  yOffsetFromBack: number
   xSpacing: number | null
   ySpacing: number | null
   wellCount: number

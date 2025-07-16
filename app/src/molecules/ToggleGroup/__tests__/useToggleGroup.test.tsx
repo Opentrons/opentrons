@@ -1,13 +1,17 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
+
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, render, fireEvent, screen } from '@testing-library/react'
+
+import { fireEvent, render, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useTrackEvent } from '/app/redux/analytics'
+
 import { useToggleGroup } from '../useToggleGroup'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/analytics')
@@ -15,7 +19,7 @@ vi.mock('/app/redux/analytics')
 let mockTrackEvent: any
 
 describe('useToggleGroup', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)

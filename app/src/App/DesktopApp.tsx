@@ -1,6 +1,8 @@
-import { useState, Fragment } from 'react'
-import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
+import { Fragment, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
+
 import {
   Box,
   COLORS,
@@ -8,37 +10,37 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import NiceModal from '@ebay/nice-modal-react'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
 import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
+import {
+  EmergencyStopContext,
+  EstopTakeover,
+} from '/app/organisms/EmergencyStop'
+import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ToasterOven } from '/app/organisms/ToasterOven'
+import { AppSettings } from '/app/pages/Desktop/AppSettings'
 import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
-import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
-import { AppSettings } from '/app/pages/Desktop/AppSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
-import { useSoftwareUpdatePoll } from './hooks'
-import { Navbar } from './Navbar'
-import {
-  EstopTakeover,
-  EmergencyStopContext,
-} from '/app/organisms/EmergencyStop'
-import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
+import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useRobot, useIsFlex } from '/app/redux-resources/robots'
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
-import { PortalRoot as ModalPortalRoot } from './portal'
-import { DesktopAppFallback } from './DesktopAppFallback'
-import { ReactQueryDevtools } from './tools'
+
 import { useFeatureFlag } from '../redux/config'
+import { DesktopAppFallback } from './DesktopAppFallback'
+import { useSoftwareUpdatePoll } from './hooks'
+import { Navbar } from './Navbar'
+import { PortalRoot as ModalPortalRoot } from './portal'
+import { ReactQueryDevtools } from './tools'
 
 import type { RouteProps } from './types'
 
@@ -78,9 +80,9 @@ export const DesktopApp = (): JSX.Element => {
       path: '/protocols/:protocolKey',
     },
     {
-      Component: ProtocolTimeline,
-      name: 'Protocol Timeline',
-      path: '/protocols/:protocolKey/timeline',
+      Component: ProtocolPreview,
+      name: 'Preview',
+      path: '/protocols/:protocolKey/preview',
     },
     {
       Component: Labware,

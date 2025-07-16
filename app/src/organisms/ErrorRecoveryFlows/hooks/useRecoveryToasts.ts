@@ -1,9 +1,12 @@
-import { useCommandTextString } from '/app/local-resources/commands'
-import type { UseCommandTextStringParams } from '/app/local-resources/commands'
-import type { StepCounts } from '/app/resources/protocols/hooks'
 import { useTranslation } from 'react-i18next'
+
+import { useCommandTextString } from '/app/local-resources/commands'
+
 import { useToaster } from '../../ToasterOven'
 import { RECOVERY_MAP } from '../constants'
+
+import type { UseCommandTextStringParams } from '/app/local-resources/commands'
+import type { StepCounts } from '/app/resources/protocols/hooks'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 
 export type BuildToast = Omit<UseCommandTextStringParams, 'command'> & {
@@ -166,6 +169,9 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
     case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       return nextStepReturnVal
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
@@ -175,6 +181,10 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
     case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
     case RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE:
+    case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
       return currentStepReturnVal
     default: {
       console.error('Unhandled recovery toast case. Handle explicitly.')

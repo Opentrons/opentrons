@@ -1,28 +1,29 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getLabwareDefURI,
   getCutoutDisplayName,
+  getLabwareDefURI,
   getSlotFromAddressableAreaName,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
+
+import { getLabwareDefinitionsByURIForProtocol } from '../getLabwareDefinitionsByURIForProtocol'
 import { getStackedItemsOnStartingDeck } from '../getStackedItemsOnStartingDeck'
 
 import type {
-  RunTimeCommand,
+  LabwareDefinition2,
+  LoadedLabware,
+  LoadedModule,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
-  LoadedLabware,
-  LoadedModule,
-  LabwareDefinition2,
   ModuleModel,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async () => {
@@ -34,7 +35,7 @@ vi.mock('@opentrons/shared-data', async () => {
     getLabwareDefURI: vi.fn(),
   }
 })
-vi.mock('@opentrons/components')
+vi.mock('../getLabwareDefinitionsByURIForProtocol')
 
 const MOCK_LABWARE_DEF = mockDefinition
 const MOCK_ADAPTER_DEF: LabwareDefinition2 = {
@@ -47,7 +48,7 @@ const MOCK_ADAPTER_DEF: LabwareDefinition2 = {
     ...MOCK_LABWARE_DEF.parameters,
     loadName: 'mock_adapter',
   },
-}
+} as any
 const MOCK_LID_DEF: LabwareDefinition2 = {
   ...MOCK_LABWARE_DEF,
   metadata: {
@@ -58,7 +59,7 @@ const MOCK_LID_DEF: LabwareDefinition2 = {
     ...MOCK_LABWARE_DEF.parameters,
     loadName: 'mock_lid',
   },
-}
+} as any
 const LABWARE_ID = 'labware-1'
 const ADAPTER_ID = 'adapter-1'
 const LID_ID = 'lid-1'
@@ -356,11 +357,11 @@ describe('getStackedItemsOnStartingDeck', () => {
       }
     })
 
-    vi.mocked(getLabwareDefinitionsFromCommands).mockReturnValue([
-      MOCK_LABWARE_DEF,
-      MOCK_ADAPTER_DEF,
-      MOCK_LID_DEF,
-    ])
+    vi.mocked(getLabwareDefinitionsByURIForProtocol).mockReturnValue({
+      'mock:labware/1': MOCK_LABWARE_DEF,
+      'mock:adapter/1': MOCK_ADAPTER_DEF,
+      'mock:lid/1': MOCK_LID_DEF,
+    })
 
     vi.mocked(getCutoutDisplayName).mockReturnValue('A1')
     vi.mocked(getSlotFromAddressableAreaName).mockReturnValue('A1')
@@ -499,6 +500,7 @@ describe('getStackedItemsOnStartingDeck', () => {
       {
         moduleId: MODULE_ID,
         moduleModel: 'heaterShakerModuleV1',
+        moduleSlotName: SLOT_NAME,
       },
     ])
   })
@@ -521,6 +523,7 @@ describe('getStackedItemsOnStartingDeck', () => {
     expect(result[TC_MODULE_LOCATION_OT2][1]).toEqual({
       moduleId: MODULE_ID,
       moduleModel: THERMOCYCLER_MODULE_V1,
+      moduleSlotName: '7',
     })
   })
 

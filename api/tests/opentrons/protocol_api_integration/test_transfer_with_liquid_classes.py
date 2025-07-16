@@ -2082,13 +2082,11 @@ def test_transfers_do_not_perform_lpd(
     )
     water = simulated_protocol_context.get_liquid_class("water")
 
-    with (
-        mock.patch.object(
-            InstrumentCore,
-            "liquid_probe_with_recovery",
-            autospec=True,
-        ) as patched_liquid_probe
-    ):
+    with mock.patch.object(
+        InstrumentCore,
+        "liquid_probe_with_recovery",
+        autospec=True,
+    ) as patched_liquid_probe:
         mock_manager = mock.Mock()
         mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
         pipette_1k.transfer_with_liquid_class(

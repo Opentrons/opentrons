@@ -3,7 +3,10 @@ import re
 import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import NoResponse
+from opentrons.drivers.asyncio.communication.errors import (
+    NoResponse,
+    TaskNotReady,
+)
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
@@ -22,7 +25,6 @@ from .types import (
     StackerInfo,
     HardwareRevision,
     MoveParams,
-    AxisParams,
     LimitSwitchStatus,
     LEDColor,
     StallGuardParams,
@@ -35,96 +37,28 @@ from .types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from .utils import validate_histogram_frame
+from .utils import (
+    NUMBER_OF_BINS,
+    validate_histogram_frame,
+)
 
 
 FS_BAUDRATE = 115200
-DEFAULT_FS_TIMEOUT = 1
+DEFAULT_FS_TIMEOUT = 5
 FS_MOVE_TIMEOUT = 20
 FS_TOF_TIMEOUT = 20
+FS_TOF_FRAME_RETRIES = 1
+FS_TOF_INIT_TIMEOUT = 5
 FS_ACK = "OK\n"
 FS_ERROR_KEYWORD = "err"
 FS_ASYNC_ERROR_ACK = "async"
-DEFAULT_COMMAND_RETRIES = 0
+DEFAULT_COMMAND_RETRIES = 2
 GCODE_ROUNDING_PRECISION = 2
 
 # LED animation range values
 MIN_DURATION_MS = 25  # 25ms
 MAX_DURATION_MS = 10000  # 10s
 MAX_REPS = 10
-
-# TOF Sensor
-TOF_FRAME_RETRIES = 1
-NUMBER_OF_BINS = 128
-
-# Stallguard defaults
-STALLGUARD_CONFIG = {
-    StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
-}
-
-STACKER_MOTION_CONFIG = {
-    StackerAxis.X: {
-        "home": AxisParams(
-            run_current=1.5,  # mAmps
-            hold_current=0.75,
-            move_params=MoveParams(
-                max_speed=10.0,  # mm/s
-                acceleration=100.0,  # mm/s^2
-                max_speed_discont=40.0,  # mm/s
-            ),
-        ),
-        "move": AxisParams(
-            run_current=1.0,
-            hold_current=0.75,
-            move_params=MoveParams(
-                max_speed=200.0,
-                acceleration=1500.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-    },
-    StackerAxis.Z: {
-        "home": AxisParams(
-            run_current=1.5,
-            hold_current=1.8,
-            move_params=MoveParams(
-                max_speed=10.0,
-                acceleration=100.0,
-                max_speed_discont=25.0,
-            ),
-        ),
-        "move": AxisParams(
-            run_current=1.5,
-            hold_current=0.5,
-            move_params=MoveParams(
-                max_speed=150.0,
-                acceleration=500.0,
-                max_speed_discont=25.0,
-            ),
-        ),
-    },
-    StackerAxis.L: {
-        "home": AxisParams(
-            run_current=0.8,
-            hold_current=0.15,
-            move_params=MoveParams(
-                max_speed=100.0,
-                acceleration=800.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-        "move": AxisParams(
-            run_current=0.6,
-            hold_current=0.15,
-            move_params=MoveParams(
-                max_speed=100.0,
-                acceleration=800.0,
-                max_speed_discont=40.0,
-            ),
-        ),
-    },
-}
 
 
 class FlexStackerDriver(AbstractFlexStackerDriver):
@@ -527,7 +461,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         data_len = 0
         next_frame_id = 0
         resend = False
-        retries = TOF_FRAME_RETRIES
+        retries = FS_TOF_FRAME_RETRIES
 
         # Cancel any ongoing measurements
         status = await self.get_tof_sensor_status(sensor)
@@ -552,7 +486,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
                 assert (
                     not data_len > start.total_bytes
                 ), f"Invalid number of bytes, expected {start.total_bytes} got {data_len}."
-                retries = TOF_FRAME_RETRIES
+                retries = FS_TOF_FRAME_RETRIES
                 next_frame_id += 1
                 resend = False
             except (ValueError, NoResponse):
@@ -592,7 +526,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             msb = data[ch + 20]
             # combine lsb, mid, and msb bytes to generate bin count for the ch
             bins[ch] = [
-                (msb[b] << 16) | (mid[b] << 8) | lsb[b] for b in range(NUMBER_OF_BINS)
+                float((msb[b] << 16) | (mid[b] << 8) | lsb[b])
+                for b in range(NUMBER_OF_BINS)
             ]
         return TOFMeasurementResult(start.sensor, start.kind, bins)
 
@@ -640,10 +575,18 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
 
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        response = await self._connection.send_command(
-            GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name)
-        )
-        return self.parse_tof_sensor_status(response)
+        # This can fail early because the TOF sensor task cannot respond to messages
+        # while the TOF sensors are initializing.
+        try:
+            response = await self._connection.send_command(
+                GCODE.GET_TOF_SENSOR_STATUS.build_command().add_element(sensor.name),
+                timeout=FS_TOF_INIT_TIMEOUT,
+            )
+            return self.parse_tof_sensor_status(response)
+        except (TaskNotReady):
+            return TOFSensorStatus(
+                sensor, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
+            )
 
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""

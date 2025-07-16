@@ -1,23 +1,26 @@
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
+import * as errorCreators from '../../errorCreators'
 import {
-  uuid,
-  getLabwareSlot,
-  modulePipetteCollision,
-  thermocyclerPipetteCollision,
   absorbanceReaderCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  pipetteAdjacentHeaterShakerWhileShaking,
+  formatPyStr,
+  formatPyWellLocation,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  formatPyStr,
-  formatPyWellLocation,
+  getLabwareSlot,
+  getSlotInLocationStack,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+  uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
-import * as errorCreators from '../../errorCreators'
-import type { CreateCommand, BlowoutParams } from '@opentrons/shared-data'
-import type { CommandCreatorError, CommandCreator } from '../../types'
+
+import type { BlowoutParams, CreateCommand } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const blowOutInWell: CommandCreator<BlowoutParams> = (
   args,
@@ -36,11 +39,7 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
     false
   const pipetteData = prevRobotState.pipettes[pipetteId]
   const labwareState = prevRobotState.labware
-  const slotName = getLabwareSlot(
-    labwareId,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).
   // You can probably make higher-level error creator util fns to be more DRY
@@ -60,7 +59,7 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
@@ -78,14 +77,17 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
         labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labwareId]?.slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
   if (COLUMN_4_SLOTS.includes(slotName)) {
     errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   } else if (labwareState[slotName] != null) {
-    const adapterSlot = labwareState[slotName].slot
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
     if (COLUMN_4_SLOTS.includes(adapterSlot)) {
       errors.push(
         errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })

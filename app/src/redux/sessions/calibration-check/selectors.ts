@@ -1,7 +1,8 @@
-import type { State } from '../../types'
 import { SESSION_TYPE_CALIBRATION_HEALTH_CHECK } from '../constants'
-import type { Session, CalibrationCheckSession } from '../types'
 import { getRobotSessionOfType } from '../selectors'
+
+import type { State } from '../../types'
+import type { CalibrationCheckSession, Session } from '../types'
 
 export const getCalibrationCheckSession: (
   state: State,

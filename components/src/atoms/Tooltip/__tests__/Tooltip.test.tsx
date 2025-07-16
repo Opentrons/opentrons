@@ -1,14 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
 
+import { Tooltip } from '..'
 import { COLORS } from '../../../helix-design-system'
+import { POSITION_ABSOLUTE } from '../../../styles'
+import { renderWithProviders } from '../../../testing/utils'
 import { TOOLTIP_TOP } from '../../../tooltips'
 import { SPACING } from '../../../ui-style-constants'
-import { POSITION_ABSOLUTE } from '../../../styles'
-
-import { renderWithProviders } from '../../../testing/utils'
-import { Tooltip } from '..'
 
 import type { ComponentProps, ReactNode } from 'react'
 

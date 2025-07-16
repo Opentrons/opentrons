@@ -1,13 +1,13 @@
 import { css } from 'styled-components'
 
-import { StyledText } from '../StyledText'
-import { DIRECTION_COLUMN, DISPLAY_GRID } from '../../styles'
-import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
+import { DIRECTION_COLUMN, DISPLAY_GRID } from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { StyledText } from '../StyledText'
 
-import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 
 export interface SubListTableProps {
   children: ReactNode

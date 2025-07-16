@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import type { ErrorKind, RecoveryRoute } from '../types'
 import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
+
+import type { ErrorKind, RecoveryRoute } from '../types'
 
 // Return user-friendly recovery option copy from a given route. Only routes that are
 // recovery options are handled.
@@ -46,6 +47,19 @@ export function useRecoveryOptionCopy(): (
         return t('manually_move_lw_and_skip')
       case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
         return t('manually_replace_lw_and_retry')
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+        return t('clear_obstruction_in_stacker_and_retry_step')
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
+        return t('load_labware_into_stacker_and_retry_step')
+      case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+        return t('manually_load_labware_into_labware_shuttle_and_skip_step')
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+        return t('load_labware_shuttle_and_retry_step')
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+        return t('manually_load_labware_into_shuttle_and_skip')
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+        return t('replace_labware_in_stacker_and_retry')
       default:
         return 'Unknown action'
     }

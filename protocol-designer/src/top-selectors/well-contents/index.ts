@@ -1,68 +1,27 @@
-import { createSelector } from 'reselect'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
 import pick from 'lodash/pick'
-import reduce from 'lodash/reduce'
-import omitBy from 'lodash/omitBy'
+import { createSelector } from 'reselect'
+
+import { _wellContentsForLabware } from '@opentrons/step-generation'
+
+import { getMaxVolumes } from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 import { getSelectedWells } from '../../well-selection/selectors'
-import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
+import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'
+
 import type * as StepGeneration from '@opentrons/step-generation'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  WellContents,
-  WellContentsByLabware,
-  ContentsByWell,
-} from '../../labware-ingred/types'
+import type { WellContentsByLabware } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
 
 export { getWellContentsAllLabware }
 export type { WellContentsByLabware }
 
-function _wellContentsForWell(
-  liquidVolState: StepGeneration.LocationLiquidState,
-  well: string
-): WellContents {
-  // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
-  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
-    groupId => liquidVolState[groupId] && liquidVolState[groupId].volume > 0
-  )
-  return {
-    wellName: well,
-    groupIds: ingredGroupIdsWithContent,
-    // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
-    ingreds: omitBy(
-      liquidVolState,
-      ingredData => !ingredData || ingredData.volume <= 0
-    ),
-  }
-}
-
-export function _wellContentsForLabware(
-  labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-  labwareDef: LabwareDefinition2
-): ContentsByWell {
-  const allWellsForContainer = getAllWellsForLabware(labwareDef)
-  return reduce(
-    allWellsForContainer,
-    (wellAcc, well: string): Record<string, WellContents> => {
-      const wellHasContents = labwareLiquids && labwareLiquids[well]
-      return {
-        ...wellAcc,
-        [well]: wellHasContents
-          ? _wellContentsForWell(labwareLiquids[well], well)
-          : {},
-      }
-    },
-    {}
-  )
-}
 export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | null> = createSelector(
   stepFormSelectors.getLabwareEntities,
   timelineFrameBeforeActiveItem,

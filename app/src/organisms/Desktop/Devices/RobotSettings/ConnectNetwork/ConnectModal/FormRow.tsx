@@ -1,5 +1,6 @@
 // presentational components for the wifi connect form
 import styled from 'styled-components'
+
 import { FONT_WEIGHT_SEMIBOLD, SPACING } from '@opentrons/components'
 
 import type { ReactNode } from 'react'

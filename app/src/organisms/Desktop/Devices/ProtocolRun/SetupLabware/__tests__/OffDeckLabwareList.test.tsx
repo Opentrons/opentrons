@@ -1,14 +1,15 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
 import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 
@@ -48,7 +49,7 @@ describe('OffDeckLabwareList', () => {
         },
       ],
       isFlex: false,
-      definitionsByURI: { 'mock def uri': {} as LabwareDefinition2 },
+      definitionsByURI: { 'mock def uri': {} as LabwareDefinition },
       setSelectedStack: vi.fn(),
     })
     screen.getByText('Additional Off-Deck Labware')

@@ -2,25 +2,25 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  updateRunSetupStepsRequired,
   getSetupStepsRequired,
-  ROBOT_CALIBRATION_STEP_KEY,
-  MODULE_SETUP_STEP_KEY,
-  LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
+  MODULE_SETUP_STEP_KEY,
+  ROBOT_CALIBRATION_STEP_KEY,
   selectTotalCountLocationSpecificOffsets,
+  updateRunSetupStepsRequired,
 } from '/app/redux/protocol-runs'
 
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import type {
   StepKey,
   StepMap,
   UpdateRunSetupStepsRequiredAction,
 } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
 
 export interface UseRequiredSetupStepsInOrderProps {
   runId: string
@@ -101,7 +101,7 @@ export function useRequiredSetupStepsInOrder({
         ),
       })
     )
-  }, [runId, keyFor(protocolAnalysis), dispatch])
+  }, [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun])
   return protocolAnalysis == null
     ? {
         orderedSteps: NO_ANALYSIS_STEPS_IN_ORDER,

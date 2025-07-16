@@ -1,22 +1,32 @@
 import * as React from 'react'
 
 import { Toast } from '.'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { Flex } from '../../primitives'
+import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   POSITION_FIXED,
 } from '../../styles'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
-import { LegacyStyledText } from '../StyledText'
-import type { Story, Meta } from '@storybook/react'
+import { StyledText } from '../StyledText'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
   parameters: VIEWPORT.touchScreenViewport,
+  argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Toast>> = args => {
@@ -31,14 +41,14 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
         <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
-          <LegacyStyledText as="p">
+          <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
-          </LegacyStyledText>
-          <LegacyStyledText as="p">
+          </StyledText>
+          <StyledText as="p">
             Unless you set a duration or disable the timeout, the Toast will
             disappear between 2 and 7 seconds depending on the length of the
             text.
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       {isShowToast && (

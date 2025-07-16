@@ -2,17 +2,18 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  Flex,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
+  SPACING,
 } from '@opentrons/components'
+
 import { BackgroundOverlay } from '../BackgroundOverlay'
 import { OddModalHeader } from './OddModalHeader'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
-import type { OddModalHeaderBaseProps, ModalSize } from './types'
+import type { ModalSize, OddModalHeaderBaseProps } from './types'
 
 interface OddModalProps extends StyleProps {
   /** clicking anywhere outside of the modal closes it  */

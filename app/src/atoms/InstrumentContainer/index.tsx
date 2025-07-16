@@ -2,8 +2,8 @@ import {
   BORDERS,
   COLORS,
   Flex,
-  SPACING,
   LegacyStyledText,
+  SPACING,
 } from '@opentrons/components'
 
 interface InstrumentContainerProps {

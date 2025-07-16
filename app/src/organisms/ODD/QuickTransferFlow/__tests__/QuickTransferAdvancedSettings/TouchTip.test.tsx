@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { InputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+
 import { TouchTip } from '../../QuickTransferAdvancedSettings/TouchTip'
 
 import type { ComponentProps } from 'react'
@@ -78,6 +79,7 @@ describe('TouchTip', () => {
       trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
     })
   })
+
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -99,7 +101,7 @@ describe('TouchTip', () => {
       kind: 'dispense',
     }
     render(props)
-    screen.getByText('Touch tip before dispensing')
+    screen.getByText('Touch tip after dispensing')
   })
 
   it('renders save button if you select enabled, then moves to second screen', () => {
@@ -107,6 +109,8 @@ describe('TouchTip', () => {
     const enabledBtn = screen.getByText('Enabled')
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
+    fireEvent.click(continueBtn)
+    fireEvent.click(screen.getByText('1'))
     fireEvent.click(continueBtn)
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
@@ -135,6 +139,9 @@ describe('TouchTip', () => {
     const enabledBtn = screen.getByText('Enabled')
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
+    fireEvent.click(continueBtn)
+    const numOneButton = screen.getByText('1')
+    fireEvent.click(numOneButton)
     fireEvent.click(continueBtn)
     const negButton = screen.getByText('-')
     fireEvent.click(negButton)
@@ -166,6 +173,9 @@ describe('TouchTip', () => {
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
+    const numOneButton = screen.getByText('1')
+    fireEvent.click(numOneButton)
+    fireEvent.click(continueBtn)
     const numButton = screen.getByText('1')
     fireEvent.click(numButton)
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
@@ -188,10 +198,12 @@ describe('TouchTip', () => {
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    const numButton = screen.getByText('0')
+    const numButton = screen.getByText('1')
     fireEvent.click(numButton)
-    fireEvent.click(numButton)
+    fireEvent.click(continueBtn)
     const saveBtn = screen.getByText('Save')
+    const zeroButton = screen.getByText('0')
+    fireEvent.click(zeroButton)
     fireEvent.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
@@ -207,6 +219,9 @@ describe('TouchTip', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
+    fireEvent.click(continueBtn)
+    const numButton = screen.getByText('0')
+    fireEvent.click(numButton)
     fireEvent.click(continueBtn)
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
@@ -231,6 +246,9 @@ describe('TouchTip', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
+    fireEvent.click(continueBtn)
+    const numButton = screen.getByText('0')
+    fireEvent.click(numButton)
     fireEvent.click(continueBtn)
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {

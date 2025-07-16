@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -6,9 +7,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   Link,
   SPACING,
-  LegacyStyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'

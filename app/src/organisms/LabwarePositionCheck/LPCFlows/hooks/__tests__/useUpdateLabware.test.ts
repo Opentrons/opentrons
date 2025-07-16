@@ -1,9 +1,11 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { updateLPCLabware } from '/app/redux/protocol-runs'
 
 import { useUpdateLabware } from '../useUpdateLabware'
-import { updateLPCLabware } from '/app/redux/protocol-runs'
+
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 vi.mock('react-redux')

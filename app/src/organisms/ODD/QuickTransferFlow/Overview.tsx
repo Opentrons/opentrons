@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -6,11 +7,18 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   ListItem,
+  NO_WRAP,
   SPACING,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  TRASH_BIN_ADAPTER_FIXTURE,
+} from '@opentrons/shared-data'
+
 import { useToaster } from '/app/organisms/ToasterOven'
+
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
 import type { QuickTransferSummaryState } from './types'
@@ -58,13 +66,39 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       option: transferCopy,
       value: `${state.volume}µL`,
     },
+    {
+      option: t('pipette_path'),
+      value: state.path,
+    },
+    {
+      option: t('tip_change_frequency'),
+      value: state.changeTip,
+    },
+    {
+      option: t('tip_drop_location'),
+      value: t(
+        `${
+          state.dropTipLocation?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+            ? 'trashBin'
+            : 'wasteChute'
+        }_location`,
+        {
+          slotName:
+            FLEX_SINGLE_SLOT_BY_CUTOUT_ID[state.dropTipLocation?.cutoutId],
+        }
+      ),
+    },
+    {
+      option: t('liquid_class'),
+      value: state?.liquidClass?.displayName,
+    },
   ]
 
   return (
     <Flex
       gridGap={SPACING.spacing8}
       flexDirection={DIRECTION_COLUMN}
-      marginTop="192px"
+      paddingTop="12rem"
     >
       {displayItems.map(displayItem => (
         <ListItem type="default" key={displayItem.option} onClick={onClick}>
@@ -72,6 +106,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
             <LegacyStyledText
               css={TYPOGRAPHY.level4HeaderSemiBold}
               width="20rem"
+              whiteSpace={NO_WRAP}
             >
               {displayItem.option}
             </LegacyStyledText>

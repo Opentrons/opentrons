@@ -1,12 +1,15 @@
 import path from 'path'
-import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
+
 import { versionForProject } from '../scripts/git-version.mjs'
+
 import type { UserConfig } from 'vite'
 
 // eslint-disable-next-line import/no-default-export
@@ -14,12 +17,15 @@ export default defineConfig(
   async (): Promise<UserConfig> => {
     const OT_PD_VERSION = await versionForProject('protocol-designer')
     const OT_PD_BUILD_DATE = new Date().toUTCString()
+    const mode = process.env.NODE_ENV ?? 'development'
     return {
       // this makes imports relative rather than absolute
       base: '',
       build: {
         // Relative to the root
         outDir: 'dist',
+        // sourcemap for Sentry
+        sourcemap: true,
       },
       plugins: [
         react({
@@ -37,6 +43,18 @@ export default defineConfig(
             }
           },
         },
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: 'protocol-designer',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -74,7 +92,7 @@ export default defineConfig(
         port: 5178,
         watch: {
           ignored: ['**/cypress/downloads/**'],
-        }
+        },
       },
     }
   }

@@ -1,8 +1,9 @@
-import type * as React from 'react'
-import { Card as CardComponent } from './Card'
-import { Box, Text, SIZE_4, SPACING_3 } from '@opentrons/components'
+import { Box, SIZE_4, SPACING_3, Text } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
+import { Card as CardComponent } from './Card'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Card',

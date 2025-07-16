@@ -1,20 +1,22 @@
 import last from 'lodash/last'
+
 import { analyticsEvent } from '../../../analytics/actions'
-import { PRESAVED_STEP_ID } from '../../../steplist/types'
-import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   DESELECT_ALL_STEPS_EVENT,
   EXIT_BATCH_EDIT_MODE_EVENT,
   SELECT_ALL_STEPS_EVENT,
 } from '../../../analytics/constants'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
+
 import type { Timeline } from '@opentrons/step-generation'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import type { AnalyticsEvent } from '../../../analytics/mixpanel'
 import type { AnalyticsEventAction } from '../../../analytics/actions'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type { AnalyticsEvent } from '../../../analytics/mixpanel'
+import type { StepIdType, StepType } from '../../../form-types'
+import type { SubstepIdentifier, TerminalItemId } from '../../../steplist/types'
+import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type {
   AddStepAction,
   ClearWellSelectionLabwareKeyAction,

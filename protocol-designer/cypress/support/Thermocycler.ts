@@ -18,7 +18,7 @@ enum ThermoContent {
   Lid = 'Lid',
   Temperature = 'temperature',
   Position = 'position',
-  Deactivate = 'Deactivate',
+  Off = 'Off',
   Active = 'Active',
   Open = 'Open',
   Closed = 'Closed',
@@ -81,7 +81,7 @@ export const ThermocyclerEditor = {
    */
   BackButton: (): StepThunk => ({
     call: () => {
-      cy.get(ThermoLocators.Back).should('be.visible').click()
+      cy.get(ThermoLocators.Back).eq(1).should('be.visible').click()
     },
   }),
 
@@ -141,11 +141,11 @@ export const ThermocyclerEditor = {
    * @param input - 'active' to activate, 'deactivate' to deactivate the Block Temperature
    * @returns Cypress StepThunk
    */
-  BlockTempOnOff: (input: 'active' | 'deactivate'): StepThunk => ({
+  BlockTempOnOff: (input: 'on' | 'off'): StepThunk => ({
     call: () => {
-      const shouldBeActive = input === 'active'
+      const shouldBeActive = input === 'on'
 
-      cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
+      cy.contains(ThermoContent.Block)
         .parents(ThermoLocators.ListButton)
         .find(ThermoLocators.ButtonSwitch)
         .as('blockTempSwitch')
@@ -168,12 +168,12 @@ export const ThermocyclerEditor = {
    * @param input - 'active' to activate, 'deactivate' to deactivate the Lid Temperature
    * @returns Cypress StepThunk
    */
-  LidTempOnOff: (input: 'active' | 'deactivate'): StepThunk => ({
+  LidTempOnOff: (input: 'on' | 'off'): StepThunk => ({
     call: () => {
-      const shouldBeActive = input === 'active'
+      const shouldBeActive = input === 'on'
 
       cy.get(ThermoLocators.ListButton)
-        .contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
+        .contains(ThermoContent.Lid)
         .parents(ThermoLocators.ListButton)
         .find(ThermoLocators.ButtonSwitch)
         .as('lidTempSwitch')
@@ -531,18 +531,12 @@ export const ThermoVerifications = {
       cy.contains(`${ThermoContent.Thermocycler} ${ThermoContent.State}`)
         .should('exist')
         .should('be.visible')
-      cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
+      cy.contains(`${ThermoContent.Block}`)
         .should('exist')
         .should('be.visible')
         .parent()
         .find('p')
-        .contains(ThermoContent.Deactivate)
-      cy.contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
-        .should('exist')
-        .should('be.visible')
-        .parent()
-        .find('p')
-        .contains(ThermoContent.Deactivate)
+        .contains(`${ThermoContent.Off}`)
 
       cy.get(ThermoLocators.ListButton)
         .find('p')
@@ -554,7 +548,7 @@ export const ThermoVerifications = {
         .contains(`${ThermoContent.Open}`)
         .should('exist')
         .should('be.visible')
-      cy.get('button[aria-label="Deactivate"]').each(($btn, index) => {
+      cy.get('button[aria-label="Off"]').each(($btn, index) => {
         cy.wrap($btn)
           .should('be.visible')
           .and('have.attr', 'aria-checked', 'false')
@@ -579,22 +573,19 @@ export const ThermoVerifications = {
         .should('exist')
         .should('be.visible')
       cy.contains(ThermoContent.WellVolume).should('exist').should('be.visible')
-      cy.contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
-        .should('exist')
-        .should('be.visible')
-      cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
+      cy.contains(`${ThermoContent.Block}`)
         .should('exist')
         .should('be.visible')
         .parent()
         .find('p')
-        .contains(ThermoContent.Deactivate)
+        .contains(`${ThermoContent.Off}`)
       cy.get(ThermoLocators.ListButton)
-        .contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
+        .contains(`${ThermoContent.Lid}`)
         .should('exist')
         .should('be.visible')
         .parent()
         .find('p')
-        .contains(ThermoContent.Deactivate)
+        .contains(`${ThermoContent.Off}`)
       cy.get(ThermoLocators.ListButton)
         .contains(`${ThermoContent.Lid} ${ThermoContent.Position}`)
         .should('exist')

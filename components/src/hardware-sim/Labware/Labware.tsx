@@ -1,32 +1,37 @@
 import { Fragment, memo } from 'react'
-import styled from 'styled-components'
 import map from 'lodash/map'
+import styled from 'styled-components'
+
+import {
+  getSchema2CornerOffsetFromSlot,
+  getSchema2Dimensions,
+} from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-
+import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 import {
   LabwareOutline,
   LabwareWellLabels,
   STYLE_BY_WELL_CONTENTS,
   Well,
 } from './labwareInternals'
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { RefObject } from 'react'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
+import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
-  WellMouseEvent,
   WellFill,
+  WellMouseEvent,
   WellStroke,
 } from './labwareInternals/types'
 
-import type { RefObject } from 'react'
-import type { LabwareAdapterLoadName } from './LabwareAdapter'
-
 export interface LabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
-  /** Opional Prop for labware on heater shakers sitting on right side of the deck */
+  definition: LabwareDefinition
+  /* See docs on LabwareRender. */
+  positioningMode?: 'passThrough' | 'offsetInSlot'
+  /** See docs on LabwareRender. */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
   showLabels?: boolean
@@ -77,15 +82,14 @@ const LabwareDetailGroup = styled.g`
 `
 
 /**
- * a refactor of the legacy LabwareRender component intended to provide predictable styling
- * initial use in ODD well selection component with ODD-specific well label styling
- * consider adding additional styled wells props if used elsewhere
- * @param props
- * @returns
+ * Similar to the LabwareRender component, but with ODD-specific styling.
+ *
+ * For example, hiding the outline of the labware for certain ODD flows.
  */
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
     definition,
+    positioningMode = 'offsetInSlot',
     gRef,
     hideOutline = false,
     highlight,
@@ -100,23 +104,28 @@ export const Labware = (props: LabwareProps): JSX.Element => {
     wellStroke = {},
   } = props
 
-  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
+  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
 
-  if (labwareAdapterLoadNames.includes(labwareLoadName)) {
+  if (isAdapter) {
     const { shouldRotateAdapterOrientation = false } = props
-    const { xDimension, yDimension } = definition.dimensions
+    const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
     return (
       <g
         transform={
-          shouldRotateAdapterOrientation
+          positioningMode === 'offsetInSlot' && shouldRotateAdapterOrientation
             ? `rotate(180, ${xDimension / 2}, ${yDimension / 2})`
-            : 'rotate(0, 0, 0)'
+            : undefined
         }
       >
         <g
-          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+          transform={
+            positioningMode === 'offsetInSlot'
+              ? `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+              : undefined
+          }
           ref={gRef}
         >
           <LabwareAdapter
@@ -131,7 +140,11 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   return (
     <g
-      transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+      transform={
+        positioningMode === 'offsetInSlot'
+          ? `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+          : undefined
+      }
       ref={gRef}
     >
       <g onClick={onLabwareClick}>

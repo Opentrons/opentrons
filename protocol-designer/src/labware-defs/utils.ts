@@ -1,10 +1,12 @@
 import groupBy from 'lodash/groupBy'
+
 import {
-  getLabwareDefURI,
-  PD_DO_NOT_LIST,
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,
+  getLabwareDefURI,
+  PD_DO_NOT_LIST,
 } from '@opentrons/shared-data'
+
 import type {
   LabwareDefinition1,
   LabwareDefinition2,

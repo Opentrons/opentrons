@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -14,25 +15,27 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
-import { prefixMap } from '../../../../../resources/utils'
+import { getWellDimension, getWellsDepth } from '@opentrons/shared-data'
+
 import {
   TipPositionModal,
   ZTipPositionModal,
 } from '../../../../../components/organisms'
-import { getIsDelayPositionField } from '../../../../../form-types'
+import { MoveLiquidPrefixToAction } from '../../../../../components/organisms/TipPositionModal/constants'
 import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
+import { getIsDelayPositionField } from '../../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
+import type { PositionSpecs } from '../../../../../components/organisms'
 import type {
+  FormData,
   ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../components/organisms'
-import type { FieldPropsByName } from '../types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { FieldPropsByName } from '../types'
 
 interface PositionFieldProps {
   prefix: MoveLiquidPrefixType
@@ -45,10 +48,12 @@ interface PositionFieldProps {
   showButton?: boolean
   isNested?: boolean
   referenceField?: ReferenceFields
+  formData?: FormData
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
   const {
+    formData,
     labwareId,
     propsForFields,
     zField,
@@ -154,18 +159,19 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
       },
       x: {
         name: xName,
-        value: rawXValue != null ? Number(rawXValue) : null,
+        value: rawXValue != null ? Number(rawXValue) : 0,
         updateValue: xUpdateValue,
       },
       y: {
         name: yName,
-        value: rawYValue != null ? Number(rawYValue) : null,
+        value: rawYValue != null ? Number(rawYValue) : 0,
         updateValue: yUpdateValue,
       },
     }
 
     modal = (
       <TipPositionModal
+        formData={formData}
         closeModal={handleClose}
         wellDepthMm={wellDepthMm}
         wellXWidthMm={wellXWidthMm}
@@ -180,7 +186,11 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     )
   }
 
-  const isRetract = prefixMap[prefix] === 'retract'
+  const referencePosition =
+    referenceField != null ? propsForFields[referenceField].value : null
+  const referencePositionText = t(
+    `protocol_steps:reference_positions.${referencePosition}`
+  )
 
   return (
     <>
@@ -196,7 +206,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
               t('protocol_steps:tip_position', {
-                prefix: prefixMap[prefix],
+                prefix: MoveLiquidPrefixToAction[prefix],
               }),
               'capitalize'
             )}
@@ -215,9 +225,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             <StyledText desktopStyle="bodyDefaultRegular">
               {xField != null && yField != null
                 ? t(
-                    isRetract
-                      ? 'protocol_steps:well_position_xyz'
-                      : 'protocol_steps:well_position',
+                    isNested
+                      ? 'protocol_steps:well_position_with_reference_nested'
+                      : 'protocol_steps:well_position_with_reference',
                     {
                       x:
                         propsForFields[xField].value != null
@@ -228,6 +238,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
                           ? Number(propsForFields[yField].value)
                           : 0,
                       z: zValue,
+                      reference: referencePositionText,
                     }
                   )
                 : t('protocol_steps:well_position_z_only', {

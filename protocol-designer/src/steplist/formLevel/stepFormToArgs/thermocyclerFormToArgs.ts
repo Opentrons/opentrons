@@ -1,5 +1,6 @@
-import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
 import { PROFILE_STEP } from '../../../form-types'
+
 import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
@@ -9,6 +10,7 @@ import type {
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
 const _flattenProfileSteps = (args: {

@@ -1,11 +1,13 @@
 import { Fragment } from 'react'
+
 import { getAllLabwareDefs, getAllPipetteNames } from '@opentrons/shared-data'
-import { LabwareRender } from '../Labware'
+
 import { RobotWorkSpace } from '../Deck'
+import { LabwareRender } from '../Labware'
 import { PipetteRender } from './'
 
-import type { Story, Meta } from '@storybook/react'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type { Meta, Story } from '@storybook/react'
+import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 const DECK_MAP_VIEWBOX = '0 -140 230 230'
 
@@ -16,7 +18,7 @@ const axygenReservoir90ml = getAllLabwareDefs().axygen1Reservoir90MlV1
 const opentrons6TuberackNest50mlConical = getAllLabwareDefs()
   .opentrons6TuberackNest50MlConicalV1
 
-const labwareDefMap: Record<string, LabwareDefinition2> = {
+const labwareDefMap: Record<string, LabwareDefinition> = {
   [opentrons300UlTiprack.metadata.displayName]: opentrons300UlTiprack,
   [opentrons10UlTiprack.metadata.displayName]: opentrons10UlTiprack,
   [nest12Reservoir15ml.metadata.displayName]: nest12Reservoir15ml,

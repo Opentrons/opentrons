@@ -13,11 +13,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ANALYTICS_LANGUAGE_UPDATED_ODD_UNBOXING_FLOW } from '/app/redux/analytics'
-import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { MediumButton } from '/app/atoms/buttons'
 import { LANGUAGES, US_ENGLISH } from '/app/i18n'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_LANGUAGE_UPDATED_ODD_UNBOXING_FLOW } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
 
 import type { Dispatch } from '/app/redux/types'

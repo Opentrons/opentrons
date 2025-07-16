@@ -1,21 +1,24 @@
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
+  Banner,
   Btn,
   DIRECTION_COLUMN,
   Flex,
-  Banner,
-  SPACING,
   LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '/app/redux/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
 
 interface UpdateRobotBannerProps extends StyleProps {
   robot: DiscoveredRobot

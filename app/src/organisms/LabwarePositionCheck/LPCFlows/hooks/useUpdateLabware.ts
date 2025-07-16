@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { updateLPCLabware } from '/app/redux/protocol-runs'
 import { useDispatch } from 'react-redux'
+
+import { updateLPCLabware } from '/app/redux/protocol-runs'
 
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 

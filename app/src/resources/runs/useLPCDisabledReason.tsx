@@ -1,21 +1,24 @@
+import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
-import { useTranslation } from 'react-i18next'
+
 import {
   FLEX_ROBOT_TYPE,
   getLoadedLabwareDefinitionsByUri,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
-import { useRunCalibrationStatus } from './useRunCalibrationStatus'
-import { useRunHasStarted } from './useRunHasStarted'
-import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol'
+
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   getIsFixtureMismatch,
   useDeckConfigurationCompatibility,
 } from '/app/resources/deck_configuration'
+
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
+import { useRunCalibrationStatus } from './useRunCalibrationStatus'
+import { useRunHasStarted } from './useRunHasStarted'
+import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol'
 
 interface LPCDisabledReasonProps {
   runId: string

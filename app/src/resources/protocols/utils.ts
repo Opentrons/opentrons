@@ -1,5 +1,5 @@
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { StepCounts } from '/app/resources/protocols/hooks'
 
 export function isGripperInCommands(commands: RunTimeCommand[]): boolean {

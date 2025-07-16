@@ -1,24 +1,29 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+
 import {
-  FLEX_MAX_CONTENT,
+  COLORS,
   Flex,
+  FLEX_MAX_CONTENT,
   Icon,
   PrimaryButton,
   StyledText,
   Toolbox,
 } from '@opentrons/components'
+
+import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
+import { THERMOCYCLER_PROFILE } from '../../../../constants'
 import { getSubsteps } from '../../../../file-data/selectors'
+import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { getHoveredSubstep } from '../../../../ui/steps'
 import {
   hoverOnStep,
   hoverOnSubstep,
   toggleViewSubstep,
 } from '../../../../ui/steps/actions/actions'
-import { THERMOCYCLER_PROFILE } from '../../../../constants'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
+
 import type { SubstepIdentifier } from '../../../../steplist'
 import type { HoverOnSubstepAction } from '../../../../ui/steps'
 
@@ -58,7 +63,8 @@ export function SubStepsToolbox(
       substeps.commandCreatorFnName === 'mix')) ||
     substeps.substepType === THERMOCYCLER_PROFILE ? (
     <Toolbox
-      height="calc(100vh - 6rem)"
+      maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 1.5rem)`}
+      height="100%"
       width={FLEX_MAX_CONTENT}
       closeButton={<Icon size="2rem" name="close" />}
       onCloseClick={handleClose}
@@ -66,6 +72,15 @@ export function SubStepsToolbox(
         <PrimaryButton onClick={handleClose} width="100%">
           {t('shared:done')}
         </PrimaryButton>
+      }
+      subHeader={
+        substeps.substepType === THERMOCYCLER_PROFILE ? null : (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {'commandCreatorFnName' in substeps
+              ? t(`protocol_steps:${substeps.commandCreatorFnName}`)
+              : ''}
+          </StyledText>
+        )
       }
       title={
         <StyledText desktopStyle="bodyLargeSemiBold">

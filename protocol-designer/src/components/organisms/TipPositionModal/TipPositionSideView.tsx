@@ -1,5 +1,6 @@
-import round from 'lodash/round'
 import { useTranslation } from 'react-i18next'
+import round from 'lodash/round'
+
 import {
   Box,
   COLORS,
@@ -8,12 +9,13 @@ import {
   POSITION_RELATIVE,
   StyledText,
 } from '@opentrons/components'
+
 import BOTTOM_LAYER from '../../../assets/images/tip_side_bottom_layer.svg'
 import MID_LAYER from '../../../assets/images/tip_side_mid_layer.svg'
 import TOP_LAYER from '../../../assets/images/tip_side_top_layer.svg'
 
-const WELL_HEIGHT_PIXELS = 71
-const WELL_WIDTH_PIXELS = 70
+const WELL_HEIGHT_PIXELS = 78
+const WELL_WIDTH_PIXELS = 80
 const PIXEL_DECIMALS = 2
 
 interface TipPositionAllVizProps {
@@ -42,8 +44,8 @@ export function TipPositionSideView(
   return (
     <Box
       position={POSITION_RELATIVE}
-      width="15.8125rem"
-      height="18rem"
+      width="20.75rem"
+      height="22.75rem"
       overflow={OVERFLOW_HIDDEN}
     >
       <img
@@ -56,7 +58,7 @@ export function TipPositionSideView(
         style={{
           position: POSITION_ABSOLUTE,
           transform: `translate(${roundedXPositionPixels}px)`,
-          bottom: `calc(${bottomPx}px + 33px)`,
+          bottom: `calc(${bottomPx}px + 10px)`,
         }}
         alt="mid layer"
       />
@@ -66,7 +68,7 @@ export function TipPositionSideView(
         alt="top layer"
       />
       {wellDepthMm !== null && (
-        <Box position={POSITION_ABSOLUTE} bottom="7.3rem" right="2rem">
+        <Box position={POSITION_ABSOLUTE} top="12.5rem" right="3.5rem">
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {round(wellDepthMm, 0)}
             {t('units.millimeter')}
@@ -74,7 +76,7 @@ export function TipPositionSideView(
         </Box>
       )}
       {xWidthMm !== null && (
-        <Box position={POSITION_ABSOLUTE} bottom="2rem" right="7rem">
+        <Box position={POSITION_ABSOLUTE} bottom="2rem" right="9.6rem">
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {xWidthMm}
             {t('units.millimeter')}

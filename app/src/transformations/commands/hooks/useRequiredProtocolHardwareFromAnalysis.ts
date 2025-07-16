@@ -4,27 +4,30 @@ import {
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  getCutoutFixturesForModuleModel,
-  getCutoutFixtureIdsForModuleModel,
   getModuleType,
-  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
-  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 import {
-  useNotifyDeckConfigurationQuery,
   useDeckConfigurationCompatibility,
+  useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
+
+import { getProtocolUsesGripper } from '../transformations'
+
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
-  ProtocolHardware,
   ProtocolGripper,
+  ProtocolHardware,
   ProtocolModule,
   ProtocolPipette,
 } from './types'
-import { getProtocolUsesGripper } from '../transformations'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 

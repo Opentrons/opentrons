@@ -5,8 +5,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { home } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
-import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
+
 import { NavigationMenu } from '../NavigationMenu'
+import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

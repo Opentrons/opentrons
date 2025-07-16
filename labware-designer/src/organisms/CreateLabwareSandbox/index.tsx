@@ -1,21 +1,22 @@
 import * as React from 'react'
 import styled from 'styled-components'
+
 import {
-  Flex,
-  Text,
-  RobotWorkSpace,
-  LabwareRender,
   ALIGN_CENTER,
+  C_LIGHT_GRAY,
   DIRECTION_COLUMN,
-  JUSTIFY_SPACE_AROUND,
-  FONT_STYLE_ITALIC,
+  Flex,
   FONT_BODY_2_DARK,
+  FONT_STYLE_ITALIC,
+  JUSTIFY_SPACE_AROUND,
+  LabwareRender,
+  RadioGroup,
+  RobotWorkSpace,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   SPACING_4,
-  RadioGroup,
-  SPACING_1,
-  C_LIGHT_GRAY,
+  Text,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {

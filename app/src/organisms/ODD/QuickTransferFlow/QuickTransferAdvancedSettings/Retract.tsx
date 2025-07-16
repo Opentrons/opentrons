@@ -1,0 +1,363 @@
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+
+import {
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  POSITION_FIXED,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+
+import { ACTIONS } from '../constants'
+
+import type { Dispatch } from 'react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type {
+  FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+} from '../types'
+
+interface RetractProps {
+  onBack: () => void
+  state: QuickTransferSummaryState
+  dispatch: Dispatch<QuickTransferSummaryAction>
+  kind: FlowRateKind
+}
+
+export function Retract({
+  onBack,
+  state,
+  dispatch,
+  kind,
+}: RetractProps): JSX.Element {
+  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+  const [currentStep, setCurrentStep] = useState<number>(1)
+  const retractSettings =
+    kind === 'aspirate' ? state.retractAspirate : state.retractDispense
+  const [speed, setSpeed] = useState<number | null>(
+    retractSettings?.speed ?? null
+  )
+  const [delayDuration, setDelayDuration] = useState<number | null>(
+    retractSettings?.delayDuration ?? null
+  )
+  const [position, setPosition] = useState<number | null>(
+    retractSettings?.positionFromBottom ?? null
+  )
+
+  const action =
+    kind === 'aspirate'
+      ? ACTIONS.SET_RETRACT_ASPIRATE
+      : ACTIONS.SET_RETRACT_DISPENSE
+
+  const handleClickBackOrExit = (): void => {
+    currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
+  }
+
+  const handleClickSaveOrContinue = (): void => {
+    switch (currentStep) {
+      case 1:
+        setCurrentStep(2)
+        break
+      case 2:
+        setCurrentStep(3)
+        break
+      case 3:
+        if (speed !== null && position !== null && delayDuration !== null) {
+          dispatch({
+            type: action,
+            retractSettings: {
+              speed,
+              delayDuration,
+              positionFromBottom: position,
+            },
+          })
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+            properties: {
+              setting: `Retract_${kind}`,
+            },
+          })
+          onBack()
+        }
+        break
+    }
+  }
+
+  const setSaveOrContinueButtonText =
+    currentStep === 1 || currentStep === 2
+      ? t('shared:continue')
+      : t('shared:save')
+
+  let buttonIsDisabled = false
+  if (speed == null && currentStep === 1) {
+    buttonIsDisabled = true
+  }
+  if (delayDuration == null && currentStep === 2) {
+    buttonIsDisabled = true
+  }
+  if (position == null && currentStep === 3) {
+    buttonIsDisabled = true
+  }
+
+  return createPortal(
+    <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
+      <ChildNavigation
+        header={
+          kind === 'aspirate'
+            ? t('retract_after_aspirating')
+            : t('retract_after_dispensing')
+        }
+        buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
+        onClickBack={handleClickBackOrExit}
+        onClickButton={handleClickSaveOrContinue}
+        top={SPACING.spacing8}
+        buttonIsDisabled={buttonIsDisabled}
+      />
+      <Flex
+        alignSelf={ALIGN_CENTER}
+        gridGap={SPACING.spacing48}
+        paddingX={SPACING.spacing40}
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+        alignItems={ALIGN_CENTER}
+        height="22rem"
+      >
+        <RetractSettingComponent
+          kind={kind}
+          state={state}
+          speed={speed}
+          setSpeed={setSpeed}
+          delayDuration={delayDuration}
+          setDelayDuration={setDelayDuration}
+          position={position}
+          setPosition={setPosition}
+          currentStep={currentStep}
+        />
+      </Flex>
+    </Flex>,
+    getTopPortalEl()
+  )
+}
+
+interface RetractSettingComponentProps {
+  kind: FlowRateKind
+  state: QuickTransferSummaryState
+  setSpeed: (speed: number | null) => void
+  setPosition: (position: number | null) => void
+  delayDuration: number | null
+  setDelayDuration: (delayDuration: number | null) => void
+  speed: number | null
+  position: number | null
+  currentStep: number
+}
+
+function RetractSettingComponent({
+  kind,
+  state,
+  speed,
+  setSpeed,
+  delayDuration,
+  setDelayDuration,
+  position,
+  setPosition,
+  currentStep,
+}: RetractSettingComponentProps): JSX.Element {
+  const { t } = useTranslation(['quick_transfer'])
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+
+  let wellHeight = 1
+  if (
+    kind === 'aspirate' &&
+    state.sourceWells != null &&
+    state.sourceWells.length > 0
+  ) {
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source != null ? state.source.wells[well].depth : 0
+      )
+    )
+  } else if (
+    kind === 'dispense' &&
+    state.destinationWells != null &&
+    state.destinationWells.length > 0
+  ) {
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition != null
+          ? destLabwareDefinition.wells[well].depth
+          : 0
+      )
+    )
+  }
+  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
+  const positionError =
+    position != null &&
+    (position < positionRange.min || position > positionRange.max)
+      ? t(`value_out_of_range`, {
+          min: positionRange.min,
+          max: positionRange.max,
+        })
+      : null
+
+  const handleSpeedChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setSpeed(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handleDelayDurationChange = (userInput: string): void => {
+    if (userInput === '') {
+      setDelayDuration(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setDelayDuration(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handlePositionChange = (userInput: string): void => {
+    if (userInput === '') {
+      setPosition(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setPosition(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const speedSetting = (): JSX.Element => {
+    return (
+      <>
+        <Flex
+          width="30.5rem"
+          height="100%"
+          gridGap={SPACING.spacing24}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop={SPACING.spacing68}
+        >
+          <StyledText oddStyle="level4HeaderRegular">
+            {kind === 'aspirate'
+              ? t('withdraw_tip_from_liquid_aspirate')
+              : t('withdraw_tip_from_liquid_dispense')}
+          </StyledText>
+          <InputField type="number" value={speed} title={t('speed')} readOnly />
+        </Flex>
+        <Flex
+          paddingX={SPACING.spacing24}
+          height="21.25rem"
+          marginTop="7.75rem"
+          borderRadius="0"
+        >
+          <NumericalKeyboard
+            key={`${kind}_speed_keyboard`}
+            keyboardRef={keyboardRef}
+            isDecimal
+            initialValue={String(speed ?? '')}
+            onChange={handleSpeedChange}
+          />
+        </Flex>
+      </>
+    )
+  }
+
+  const delayDurationSetting = (): JSX.Element => {
+    return (
+      <>
+        <Flex
+          width="30.5rem"
+          height="100%"
+          gridGap={SPACING.spacing24}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop={SPACING.spacing68}
+        >
+          <InputField
+            type="number"
+            value={delayDuration}
+            title={t('delay_duration_s')}
+            readOnly
+          />
+        </Flex>
+        <Flex
+          paddingX={SPACING.spacing24}
+          height="21.25rem"
+          marginTop="7.75rem"
+        >
+          <NumericalKeyboard
+            key={`${kind}_delay_duration_keyboard`}
+            keyboardRef={keyboardRef}
+            isDecimal
+            initialValue={String(delayDuration ?? '')}
+            onChange={handleDelayDurationChange}
+          />
+        </Flex>
+      </>
+    )
+  }
+
+  const positionSetting = (): JSX.Element => {
+    return (
+      <>
+        <Flex
+          width="30.5rem"
+          height="100%"
+          gridGap={SPACING.spacing8}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop={SPACING.spacing68}
+        >
+          <InputField
+            type="number"
+            value={position}
+            error={positionError}
+            title={t('distance_bottom_of_well_mm')}
+            readOnly
+          />
+          {positionError == null ? (
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('from_bottom', { max: positionRange.max })}
+            </StyledText>
+          ) : null}
+        </Flex>
+        <Flex
+          paddingX={SPACING.spacing24}
+          height="21.25rem"
+          marginTop="7.75rem"
+        >
+          <NumericalKeyboard
+            key={`${kind}_position_keyboard`}
+            keyboardRef={keyboardRef}
+            initialValue={String(position ?? '')}
+            onChange={handlePositionChange}
+          />
+        </Flex>
+      </>
+    )
+  }
+
+  switch (currentStep) {
+    case 1:
+      return speedSetting()
+    case 2:
+      return delayDurationSetting()
+    case 3:
+      return positionSetting()
+    default:
+      console.error('step not found')
+      return speedSetting()
+  }
+}

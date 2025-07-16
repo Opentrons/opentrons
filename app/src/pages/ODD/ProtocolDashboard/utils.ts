@@ -1,5 +1,5 @@
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
+import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 
 const DUMMY_FOR_NO_DATE_CASE = -8640000000000000

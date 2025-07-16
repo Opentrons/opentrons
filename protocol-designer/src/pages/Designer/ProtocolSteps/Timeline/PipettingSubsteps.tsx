@@ -1,15 +1,18 @@
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { Substep } from './Substep'
-import { MultichannelSubstep } from './MultichannelSubstep'
-import type {
-  SourceDestSubstepItem,
-  SubstepIdentifier,
-} from '../../../../steplist'
 import { useSelector } from 'react-redux'
+
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
 import {
   getAdditionalEquipment,
   getSavedStepForms,
 } from '../../../../step-forms/selectors'
+import { MultichannelSubstep } from './MultichannelSubstep'
+import { Substep } from './Substep'
+
+import type {
+  SourceDestSubstepItem,
+  SubstepIdentifier,
+} from '../../../../steplist'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem
@@ -22,21 +25,16 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
   const stepId = substeps.parentStepId
   const formData = useSelector(getSavedStepForms)[stepId]
   const additionalEquipment = useSelector(getAdditionalEquipment)
+
   const destLocationId = formData.dispense_labware
   const trashName =
     additionalEquipment[destLocationId] != null
       ? additionalEquipment[destLocationId]?.name
       : null
 
-  const isSameLabware = formData.aspirate_labware === formData.dispense_labware
-
+  const isSameLabware = formData.aspirate_labware === destLocationId
   const renderSubsteps = substeps.multichannel
     ? substeps.multiRows.map((rowGroup, groupKey) => {
-        const filteredRowGroup = rowGroup.filter(
-          item => item.source !== undefined
-        )
-        if (filteredRowGroup.length === 0) return null
-
         return (
           <MultichannelSubstep
             trashName={trashName}
@@ -46,7 +44,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
               hoveredSubstep.stepId === substeps.parentStepId &&
               hoveredSubstep.substepIndex === groupKey
             }
-            rowGroup={filteredRowGroup}
+            rowGroup={rowGroup}
             stepId={substeps.parentStepId}
             substepIndex={groupKey}
             selectSubstep={selectSubstep}
@@ -62,6 +60,8 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
           stepId={substeps.parentStepId}
           substepIndex={substepIndex}
           volume={row.volume}
+          aspirateVolume={row.aspirateVolume}
+          dispenseVolume={row.dispenseVolume}
           source={row.source}
           dest={row.dest}
           isSameLabware={isSameLabware}

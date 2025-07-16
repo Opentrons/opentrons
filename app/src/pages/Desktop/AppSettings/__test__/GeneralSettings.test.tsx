@@ -1,9 +1,8 @@
 import { MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-
 import {
   i18n,
   SIMPLIFIED_CHINESE,
@@ -18,6 +17,7 @@ import {
 } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
 import * as Shell from '/app/redux/shell'
+
 import { GeneralSettings } from '../GeneralSettings'
 
 vi.mock('/app/redux/config')

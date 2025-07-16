@@ -1,18 +1,23 @@
+import { useEffect, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
   InfoScreen,
+  JUSTIFY_FLEX_START,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useFormContext } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
+
+import { ControlledAddTextAreaFields } from '/ai-client/molecules/ControlledAddTextAreaFields'
+import { ControlledLabwareListItems } from '/ai-client/molecules/ControlledLabwareListItems'
+
 import { LabwareModal } from '../LabwareModal'
-import { ControlledLabwareListItems } from '../../molecules/ControlledLabwareListItems'
-import { ControlledAddTextAreaFields } from '../../molecules/ControlledAddTextAreaFields'
 
 export interface DisplayLabware {
   labwareURI: string
@@ -24,11 +29,16 @@ export const LIQUIDS_FIELD_NAME = 'liquids'
 
 export function LabwareLiquidsSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { setValue, watch } = useFormContext()
+  const { setValue, watch, trigger } = useFormContext()
   const [displayLabwareModal, setDisplayLabwareModal] = useState(false)
 
   const labwares: DisplayLabware[] = watch(LABWARES_FIELD_NAME) ?? []
   const liquids: string[] = watch(LIQUIDS_FIELD_NAME) ?? []
+
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([LABWARES_FIELD_NAME, LIQUIDS_FIELD_NAME])
+  })
 
   return (
     <Flex
@@ -43,14 +53,18 @@ export function LabwareLiquidsSection(): JSX.Element | null {
         {t('labware_section_textbody')}
       </StyledText>
 
-      <EmptySelectorButton
-        onClick={() => {
-          setDisplayLabwareModal(true)
-        }}
-        text={t('add_opentrons_labware')}
-        textAlignment="left"
-        iconName="plus"
-      />
+      <Flex justifyContent={JUSTIFY_FLEX_START}>
+        <ButtonWrapper>
+          <EmptySelectorButton
+            onClick={() => {
+              setDisplayLabwareModal(true)
+            }}
+            text={t('add_opentrons_labware')}
+            textAlignment="left"
+            iconName="plus"
+          />
+        </ButtonWrapper>
+      </Flex>
 
       <LabwareModal
         displayLabwareModal={displayLabwareModal}
@@ -72,14 +86,18 @@ export function LabwareLiquidsSection(): JSX.Element | null {
         {t('liquid_section_textbody')}
       </StyledText>
 
-      <EmptySelectorButton
-        onClick={() => {
-          setValue(LIQUIDS_FIELD_NAME, [...liquids, ''])
-        }}
-        text={t('add_opentrons_liquid')}
-        textAlignment="left"
-        iconName="plus"
-      />
+      <Flex justifyContent={JUSTIFY_FLEX_START}>
+        <ButtonWrapper>
+          <EmptySelectorButton
+            onClick={() => {
+              setValue(LIQUIDS_FIELD_NAME, [...liquids, ''])
+            }}
+            text={t('add_opentrons_liquid')}
+            textAlignment="left"
+            iconName="plus"
+          />
+        </ButtonWrapper>
+      </Flex>
 
       <ControlledAddTextAreaFields
         fieldName={LIQUIDS_FIELD_NAME}
@@ -89,3 +107,9 @@ export function LabwareLiquidsSection(): JSX.Element | null {
     </Flex>
   )
 }
+
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 1;
+`

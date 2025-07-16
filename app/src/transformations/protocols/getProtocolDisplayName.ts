@@ -1,4 +1,5 @@
 import first from 'lodash/first'
+
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export function getProtocolDisplayName(

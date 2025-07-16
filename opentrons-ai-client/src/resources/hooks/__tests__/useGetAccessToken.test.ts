@@ -1,8 +1,10 @@
-import { describe, it, vi, expect } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useAuth0 } from '@auth0/auth0-react'
-import { useGetAccessToken } from '../useGetAccessToken'
+import { renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
 import { STAGING_AUTH0_AUDIENCE } from '../../constants'
+import { useGetAccessToken } from '../useGetAccessToken'
+
 import type { Mock } from 'vitest'
 
 vi.mock('@auth0/auth0-react')

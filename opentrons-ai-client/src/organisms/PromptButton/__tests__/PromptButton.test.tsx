@@ -1,8 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { reagentTransfer } from '../../../assets/prompts'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { reagentTransfer } from '/ai-client/assets/prompts'
+
 import { PromptButton } from '../index'
 
 import type { ComponentProps } from 'react'

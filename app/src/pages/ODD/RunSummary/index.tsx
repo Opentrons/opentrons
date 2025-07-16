@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUSES_TERMINAL,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -18,6 +24,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  LargeButton,
   OVERFLOW_HIDDEN,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
@@ -25,52 +32,46 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
-  LargeButton,
   WRAP,
 } from '@opentrons/components'
 import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUSES_TERMINAL,
-} from '@opentrons/api-client'
-import {
+  useDeleteRunMutation,
+  useErrorRecoverySettings,
   useHost,
   useProtocolQuery,
-  useDeleteRunMutation,
   useRunCommandErrors,
-  useErrorRecoverySettings,
 } from '@opentrons/react-api-client'
-import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
-import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
+
+import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { RunTimer } from '/app/molecules/RunTimer'
+import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
+import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
+import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
-  useTrackProtocolRunEvent,
-  useTrackEventWithRobotSerial,
-  useRobotAnalyticsData,
   useRecoveryAnalytics,
+  useRobotAnalyticsData,
+  useTrackEventWithRobotSerial,
+  useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
 import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_QUICK_TRANSFER_RERUN,
+  useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
-import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
+import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
+  EMPTY_TIMESTAMP,
   formatTimeWithUtcLabel,
+  useCloseCurrentRun,
+  useCurrentRunCommands,
   useIsRunCurrent,
   useNotifyRunQuery,
-  useRunTimestamps,
   useRunCreatedAtTimestamp,
-  useCloseCurrentRun,
-  EMPTY_TIMESTAMP,
-  useCurrentRunCommands,
+  useRunTimestamps,
 } from '/app/resources/runs'
-import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
-import { useTipAttachmentStatus } from '/app/resources/instruments'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'

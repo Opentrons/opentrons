@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  COLORS,
+  Flex,
   POSITION_FIXED,
-  ALIGN_CENTER,
-  Tabs,
   RadioButton,
+  SPACING,
+  Tabs,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
@@ -20,8 +22,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { LabwareFilter } from '/app/local-resources/labware'
 import type {
-  QuickTransferWizardState,
   QuickTransferWizardAction,
+  QuickTransferWizardState,
 } from './types'
 
 interface SelectDestLabwareProps {
@@ -52,7 +54,7 @@ export function SelectDestLabware(
 
   if (state.pipette == null) return null
 
-  const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
+  const compatibleLabwareDefinition2s = getCompatibleLabwareByCategory(
     state.pipette.channels,
     selectedCategory
   )
@@ -124,7 +126,7 @@ export function SelectDestLabware(
               }}
             />
           ) : null}
-          {compatibleLabwareDefinitions?.map(definition => {
+          {compatibleLabwareDefinition2s?.map(definition => {
             return definition.metadata.displayName != null ? (
               <RadioButton
                 key={`${selectedCategory}-${definition.metadata.displayName}`}

@@ -1,28 +1,28 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
-  MockLPCContentContainer,
   mockLabwareInfo,
+  MockLPCContentContainer,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCLabwareList } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareList'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectIsDefaultOffsetAbsent,
-  selectStepInfo,
-  setSelectedLabwareUri,
-  selectIsNecessaryDefaultOffsetMissing,
   proceedEditOffsetSubstep,
   selectAllLabwareInfoAndDefaultStatusSorted,
+  selectIsDefaultOffsetAbsent,
+  selectIsNecessaryDefaultOffsetMissing,
+  selectStepInfo,
   selectTotalOrMissingOffsetRequiredCountForLwCopy,
+  setSelectedLabwareUri,
 } from '/app/redux/protocol-runs'
 
-import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
@@ -150,7 +150,7 @@ describe('LPCLabwareList', () => {
     expect(header).toHaveTextContent('Labware Position Check')
 
     const primaryButton = screen.getByTestId('primary-button')
-    expect(primaryButton).toHaveAttribute('data-button-text', 'Exit')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Save & exit')
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 

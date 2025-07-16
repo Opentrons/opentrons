@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { describe, expect, it } from 'vitest'
+
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
 
 import { PromptGuide } from '../index'
 

@@ -1,16 +1,16 @@
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { useTrackEvent } from '/app/redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
 } from '/app/redux/discovery'
-import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -18,6 +18,7 @@ import {
 } from '/app/redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
+
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('/app/redux/discovery/selectors')

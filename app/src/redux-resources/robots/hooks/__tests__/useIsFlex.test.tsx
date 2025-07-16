@@ -1,20 +1,20 @@
-import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { getRobotModelByName } from '/app/redux/discovery'
 
 import { useIsFlex } from '..'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery/selectors')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useIsFlex hook', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

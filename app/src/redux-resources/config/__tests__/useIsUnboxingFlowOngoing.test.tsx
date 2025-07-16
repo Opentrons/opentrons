@@ -1,18 +1,19 @@
-import { renderHook } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getIsOnDevice, getOnDeviceDisplaySettings } from '/app/redux/config'
+
 import { useIsUnboxingFlowOngoing } from '../useIsUnboxingFlowOngoing'
 
-import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
+import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 
-const store: Store<State> = createStore(vi.fn(), {})
+const store: Store<State> = legacy_createStore(vi.fn(), {})
 
 const mockDisplaySettings = {
   sleepMs: 604800000,

@@ -1,8 +1,11 @@
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { ControlledDropdownMenu } from '../../atoms/ControlledDropdownMenu'
-import { ControlledInputField } from '../../atoms/ControlledInputField'
+
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
+import { ControlledDropdownMenu } from '/ai-client/atoms/ControlledDropdownMenu'
+import { ControlledInputField } from '/ai-client/atoms/ControlledInputField'
 
 export const BASIC_ALIQUOTING = 'basic_aliquoting'
 export const PCR = 'pcr'
@@ -15,7 +18,7 @@ export const APPLICATION_DESCRIBE = 'application.description'
 
 export function ApplicationSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
-  const { watch } = useFormContext()
+  const { watch, trigger } = useFormContext()
 
   const options = [
     { name: t(BASIC_ALIQUOTING), value: BASIC_ALIQUOTING },
@@ -25,6 +28,15 @@ export function ApplicationSection(): JSX.Element | null {
   ]
 
   const isOtherSelected = watch(APPLICATION_SCIENTIFIC_APPLICATION) === OTHER
+
+  // trigger form validation on mount for when users come back to this section after moving on
+  useEffect(() => {
+    void trigger([
+      APPLICATION_SCIENTIFIC_APPLICATION,
+      APPLICATION_OTHER_APPLICATION,
+      APPLICATION_DESCRIBE,
+    ])
+  })
 
   return (
     <Flex

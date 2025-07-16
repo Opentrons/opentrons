@@ -1,20 +1,21 @@
-import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
+  fixture96Plate,
   fixtureTiprack10ul,
   fixtureTiprack300ul,
-  fixture96Plate,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
+
 import { Labware } from '../Labware'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/protocols')
 
@@ -36,20 +37,20 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {
-          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition,
           lidDisplayName: 'tiprack lid',
           quantity: 1,
         },
         {
-          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition,
           quantity: 2,
         },
         {
-          labwareDef: fixture96Plate as LabwareDefinition2,
+          labwareDef: fixture96Plate as LabwareDefinition,
           quantity: 1,
         },
         {
-          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition,
           quantity: 1,
         },
       ])
