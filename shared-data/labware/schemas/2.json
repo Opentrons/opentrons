@@ -33,7 +33,8 @@
     },
     "dogEars": {
       "type": "string",
-      "enum": ["bottomRight", "bottomLeft", "topRight", "topLeft"]
+      "enum": ["bottomRight", "bottomLeft", "topRight", "topLeft"],
+      "description": "Location of cut-off corners on physical labware."
     },
     "displayCategory": {
       "type": "string",
