@@ -66,3 +66,21 @@ The Thermocycler is compatible with full-skirted, 96-well PCR plates. Performanc
 ## Safety Warning Labels
 
 Warning symbols posted on the Opentrons Thermocycler and in this manual warn you about sources of potential injury or harm. The following table lists and defines each safety warning symbol.
+
+<table>
+    <head>
+        <tr>
+            <th>Symbol</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><img src="../images/caution-yellow.svg"></td>
+            <td><strong>CAUTION: Risk of danger!</strong><br>
+                This symbol identifies instrument components that pose a risk of personal injury or instrument damage if improperly handled. Wherever this symbol appears, please consult the manual for further information on safe handling before proceeding.
+            </td>
+        </tr>
+        <tr>
+            <td>
+
+
+</table>
