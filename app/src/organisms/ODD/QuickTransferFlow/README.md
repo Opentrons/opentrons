@@ -156,14 +156,13 @@ export interface QuickTransferSummaryState {
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
   liquidClass: LiquidClass // this has been added
-  pushOut: boolean // this has been added
   conditionAspirate?: number // this has been added
-  liquidClassValuesInitialized: boolean // this has been added
   disposalVolumeDispenseSettings?: {
-    // this has been added
     volume: number
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+  conditionAspirate?: number // this has been added
+  liquidClassValuesInitialized: boolean // this has been added
 }
 ```
