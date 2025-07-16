@@ -135,6 +135,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                       <>
                         <LabwareRender
                           definition={definition}
+                          positioningMode="offsetInSlot"
                           wellFill={wellFillFromWellContents(
                             wellContents,
                             liquidDisplayColors
