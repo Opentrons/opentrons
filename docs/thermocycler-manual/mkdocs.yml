@@ -1,1 +1,7 @@
-site_name: My Docs
+site_name: thermocycler-manual
+
+theme:
+  name: material
+
+nav:
+  - Product Description: index.md
