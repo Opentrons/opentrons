@@ -306,6 +306,9 @@
   height: 85.48px; /* STANDARD_Y_HEIGHT */
   padding: var(--spacing-8);
   background-color: transparent;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .dont_show_render_slot_box {

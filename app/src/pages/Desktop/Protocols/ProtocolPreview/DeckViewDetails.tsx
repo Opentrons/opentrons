@@ -183,8 +183,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   >
                     {isActiveLayerVisible
                       ? copy
-                      : labwareEntities[labwareLoadedOnModuleId].def.metadata
-                          .displayName}
+                      : labwareEntities[labwareLoadedOnModuleId]
+                          .labwareNickName}
                   </StyledText>
                 </div>
               </RobotCoordsForeignDiv>
@@ -429,7 +429,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     desktopStyle="captionRegular"
                     color={COLORS.white}
                   >
-                    {labwareEntities[id].def.metadata.displayName}
+                    {labwareEntities[id].labwareNickName}
                   </StyledText>
                 )}
               </div>
@@ -548,7 +548,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     desktopStyle="captionRegular"
                     color={COLORS.white}
                   >
-                    {labwareEntities[id].def.metadata.displayName}
+                    {labwareEntities[id].labwareNickName}
                   </StyledText>
                 )}
               </div>

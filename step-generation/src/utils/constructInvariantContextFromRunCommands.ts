@@ -38,6 +38,9 @@ export function constructInvariantContextFromRunCommands(
               def: result.definition,
               //  ProtocolTimelineScrubber won't need access to pythonNames
               pythonName: 'n/a',
+              labwareNickName:
+                command.params.displayName ??
+                result.definition.metadata.displayName,
             },
           }
           return {
@@ -92,7 +95,9 @@ export function constructInvariantContextFromRunCommands(
         let tiprackLabwareDef = matchingCommand?.result?.definition ?? null
         // We're not prepared to handle labware schema 3 yet. See the todo comment
         // in the loadLabware handling, above.
-        if (tiprackLabwareDef?.schemaVersion === 3) tiprackLabwareDef = null
+        if (tiprackLabwareDef?.schemaVersion === 3) {
+          tiprackLabwareDef = null
+        }
 
         const specs: any = getPipetteSpecsV2(command.params.pipetteName)
 
