@@ -53,22 +53,15 @@ export * from './getWellRangeForLiquidLabwarePair'
 export * from './positionMath'
 export * from './pairsFromArray'
 export * from './getMaxPushOutVolume'
+export * from './getLabwareDefinitionsByURIForProtocol'
+export * from './getLabwareDefURI'
+// export * from './getLabwareInfoByLiquidId'
+export * from './getLiquidsByIdForLabware'
+export * from'./getStackedItemsOnStartingDeck'
+
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
-
-export const getLabwareDefURI = (def: LabwareDefinition): string =>
-  constructLabwareDefURI(
-    def.namespace,
-    def.parameters.loadName,
-    String(def.version)
-  )
-
-export const constructLabwareDefURI = (
-  namespace: string,
-  loadName: string,
-  version: string
-): string => `${namespace}/${loadName}/${version}`
 
 export interface URIDetails {
   loadName: string
@@ -138,9 +131,7 @@ export const getLabwareDisplayName = (
 export const getTiprackVolume = (labwareDef: LabwareDefinition): number => {
   console.assert(
     labwareDef.parameters.isTiprack,
-    `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
-      labwareDef
-    )}, but 'isTiprack' isn't true`
+    `getTiprackVolume expected a tiprack labware ${labwareDef.parameters.loadName}, but 'isTiprack' isn't true`
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
   const volume = labwareDef.wells.A1.totalLiquidVolume
@@ -246,9 +237,9 @@ export const getWellsDepth = (
     console.warn(
       `expected wells ${JSON.stringify(
         wells
-      )} to all have same offset, but they were different. Labware def is ${getLabwareDefURI(
-        labwareDef
-      )}`
+      )} to all have same offset, but they were different. Labware def is ${
+        labwareDef.parameters.loadName
+      }`
     )
   }
 
