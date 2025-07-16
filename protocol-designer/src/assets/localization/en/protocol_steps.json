@@ -1,4 +1,14 @@
 {
+  "absorbance_reader": {
+    "closed": "closed",
+    "initialize_lid": "<text>Plate reader changing lid position to</text><tag/>",
+    "initialize_multi": "Initializing plate reader wavelength to",
+    "initialize_single": "<text>Initializing plate reader wavelength to</text><tag/>",
+    "initialize_single_with_reference": "<text>Initializing plate reader wavelength to</text><tag/><text>with reference wavelength</text><tag2/>",
+    "open": "open",
+    "read": "<text>Plate reader reading</text><tag/><text>Saving file as</text><tag2/>",
+    "reference": "<text>with reference wavelength</text><tag/>"
+  },
   "add_details": "Add step details",
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
