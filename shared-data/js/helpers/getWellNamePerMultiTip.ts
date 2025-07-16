@@ -1,7 +1,7 @@
 import range from 'lodash/range'
 
-import { getLabwareHasQuirk } from '././getLabwareHasQuirk'
 import { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+import { getLabwareHasQuirk } from './getLabwareHasQuirk'
 import { orderWells } from './orderWells'
 import { sortWells } from './sortWells'
 
