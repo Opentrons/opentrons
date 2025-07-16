@@ -1,0 +1,265 @@
+/* this is global CSS for the components package and all other opentrons projects */
+:root {
+  /* colors */
+
+  /* currently we follow the order of colors.ts file */
+
+  /* green */
+  --green-60: #03683e;
+  --green-35: #afedd3;
+  --green-20: #e8f7ed;
+  --green-50-non-touchscreen: #04aa65;
+  --green-50-touchscreen: #1ca850;
+  --green-50: var(--green-50-non-touchscreen);
+  --green-40-non-touchscreen: #91e2c0;
+  --green-40-touchscreen: #8ef3a8;
+  --green-40: var(--green-40-non-touchscreen);
+  --green-30-non-touchscreen: #c4f6e0;
+  --green-30-touchscreen: #8afbab;
+  --green-30: var(--green-30-non-touchscreen);
+
+  /* red */
+  --red-60: #941313;
+  --red-55: #c71a1b;
+  --red-50: #de1b1b;
+  --red-40: #f5b2b3;
+  --red-35: #f8c8c9;
+  --red-30: #fad6d6;
+  --red-20: #fce9e9;
+
+  /* yellow */
+  --yellow-60: #825512;
+  --yellow-50: #f09d20;
+  --yellow-40: #fcd48b;
+  --yellow-35: #ffe1a4;
+  --yellow-30: #ffe9be;
+  --yellow-20: #fdf3e2;
+
+  /* purple */
+  --purple-60-non-touchscreen: #562566;
+  --purple-60-touchscreen: #612367;
+  --purple-60: var(--purple-60-non-touchscreen);
+  --purple-55-non-touchscreen: #713187;
+  --purple-55-touchscreen: #822e89;
+  --purple-55: var(--purple-55-non-touchscreen);
+  --purple-50-non-touchscreen: #893ba4;
+  --purple-50-touchscreen: #9e39a8;
+  --purple-50: var(--purple-50-non-touchscreen);
+  --purple-40-non-touchscreen: #cea4df;
+  --purple-40-touchscreen: #e2a9ea;
+  --purple-40: var(--purple-40-non-touchscreen);
+  --purple-30-non-touchscreen: #efd8f2;
+  --purple-30-touchscreen: #efb7f2;
+  --purple-30: var(--purple-30-non-touchscreen);
+
+  /* blue */
+  --blue-60: #1b4190;
+  --blue-55: #1952b2;
+  --blue-50: #1d5bc5;
+  --blue-40: #94b9ed;
+  --blue-35: #c4d9f0;
+  --blue-30: #d6e4f3;
+  --blue-20: #e5f0f8;
+  --blue-10: #f2f7fb;
+
+  /* light blue */
+  --light-blue-60: #0d5f7a;
+  --light-blue-50: #1a85a3;
+  --light-blue-40: #8fbfcf;
+  --light-blue-35: #a4dde4;
+  --light-blue-30: #b8e6ea;
+  --light-blue-20: #d8f0f3;
+
+  /* grey */
+  --grey-60: #16212d;
+  --grey-55: #2d3f50;
+  --grey-50: #475969;
+  --grey-40: #96a6b3;
+  --grey-35: #c4cdd5;
+  --grey-30: #d6dce2;
+  --grey-20: #e6ebf0;
+  --grey-10: #f5f6f8;
+
+  /* white */
+  --white: #ffffff;
+
+  /* black */
+  --black-90: #16212d;
+  --black-80: #2d3f50;
+  --black-70: #475969;
+  --black-60: #5e6c7a;
+  --black-50: #7a8591;
+  --black-40: #96a6b3;
+  --black-30: #b3c1cc;
+  --black-20: #d0dae6;
+  --black-10: #ecf2f7;
+
+  /* opacity */
+  --opacity-disabled: 0.3;
+  --opacity-40: 0.4;
+  --opacity-50: 0.5;
+  --opacity-60: 0.6;
+  --opacity-70: 0.7;
+
+  /* font weights */
+  --font-weight-regular: 400;
+  --font-weight-semi-bold: 600;
+  --font-weight-bold: 700;
+
+  /* line heights */
+  --line-height-12: 0.75rem;
+  --line-height-16: 1rem;
+  --line-height-20: 1.25rem;
+  --line-height-24: 1.5rem;
+  --line-height-28: 1.75rem;
+  --line-height-32: 2rem;
+  --line-height-36: 2.25rem;
+  --line-height-40: 2.5rem;
+  --line-height-44: 2.75rem;
+  --line-height-48: 3rem;
+  --line-height-56: 3.5rem;
+  --line-height-64: 4rem;
+  --line-height-72: 4.5rem;
+  --line-height-80: 5rem;
+  --line-height-88: 5.5rem;
+  --line-height-96: 6rem;
+
+  /* font sizes */
+  --font-size-caption: 0.6875rem;
+  --font-size-p: 0.875rem;
+  --font-size-h3: 1rem;
+  --font-size-h2: 1.25rem;
+  --font-size-h1: 1.5rem;
+
+  /* legacy typography */
+  --fs-h1: 2.25rem;
+  --fs-h2: 1.5rem;
+  --fs-h3: 1.25rem;
+  --fs-h4: 1rem;
+  --fs-h5: 0.875rem;
+  --fs-h6: 0.75rem;
+  --fs-body-1: 1rem;
+  --fs-body-2: 0.875rem;
+  --fs-caption: 0.6875rem;
+  --fs-micro: 0.5rem;
+
+  /* border radius */
+  --border-radius-2: 0.125rem;
+  --border-radius-4: 0.25rem;
+  --border-radius-6: 0.375rem;
+  --border-radius-8: 0.5rem;
+  --border-radius-12: 0.75rem;
+  --border-radius-16: 1rem;
+  --border-radius-20: 1.25rem;
+  --border-radius-24: 1.5rem;
+  --border-radius-28: 1.75rem;
+  --border-radius-32: 2rem;
+  --border-radius-36: 2.25rem;
+  --border-radius-40: 2.5rem;
+  --border-radius-44: 2.75rem;
+  --border-radius-48: 3rem;
+  --border-radius-56: 3.5rem;
+  --border-radius-64: 4rem;
+  --border-radius-72: 4.5rem;
+  --border-radius-80: 5rem;
+  --border-radius-88: 5.5rem;
+  --border-radius-96: 6rem;
+
+  /* spacing */
+  --spacing-1: 0.0625rem;
+  --spacing-2: 0.125rem;
+  --spacing-3: 0.1875rem;
+  --spacing-4: 0.25rem;
+  --spacing-5: 0.3125rem;
+  --spacing-6: 0.375rem;
+  --spacing-7: 0.4375rem;
+  --spacing-8: 0.5rem;
+  --spacing-9: 0.5625rem;
+  --spacing-10: 0.625rem;
+  --spacing-11: 0.6875rem;
+  --spacing-12: 0.75rem;
+  --spacing-13: 0.8125rem;
+  --spacing-14: 0.875rem;
+  --spacing-15: 0.9375rem;
+  --spacing-16: 1rem;
+  --spacing-17: 1.0625rem;
+  --spacing-18: 1.125rem;
+  --spacing-19: 1.1875rem;
+  --spacing-20: 1.25rem;
+  --spacing-21: 1.3125rem;
+  --spacing-22: 1.375rem;
+  --spacing-23: 1.4375rem;
+  --spacing-24: 1.5rem;
+  --spacing-25: 1.5625rem;
+  --spacing-26: 1.625rem;
+  --spacing-27: 1.6875rem;
+  --spacing-28: 1.75rem;
+  --spacing-29: 1.8125rem;
+  --spacing-30: 1.875rem;
+  --spacing-31: 1.9375rem;
+  --spacing-32: 2rem;
+  --spacing-33: 2.0625rem;
+  --spacing-34: 2.125rem;
+  --spacing-35: 2.1875rem;
+  --spacing-36: 2.25rem;
+  --spacing-37: 2.3125rem;
+  --spacing-38: 2.375rem;
+  --spacing-39: 2.4375rem;
+  --spacing-40: 2.5rem;
+  --spacing-41: 2.5625rem;
+  --spacing-42: 2.625rem;
+  --spacing-43: 2.6875rem;
+  --spacing-44: 2.75rem;
+  --spacing-45: 2.8125rem;
+  --spacing-46: 2.875rem;
+  --spacing-47: 2.9375rem;
+  --spacing-48: 3rem;
+  --spacing-49: 3.0625rem;
+  --spacing-50: 3.125rem;
+  --spacing-51: 3.1875rem;
+  --spacing-52: 3.25rem;
+  --spacing-53: 3.3125rem;
+  --spacing-54: 3.375rem;
+  --spacing-55: 3.4375rem;
+  --spacing-56: 3.5rem;
+  --spacing-57: 3.5625rem;
+  --spacing-58: 3.625rem;
+  --spacing-59: 3.6875rem;
+  --spacing-60: 3.75rem;
+  --spacing-61: 3.8125rem;
+  --spacing-62: 3.875rem;
+  --spacing-63: 3.9375rem;
+  --spacing-64: 4rem;
+  --spacing-65: 4.0625rem;
+  --spacing-66: 4.125rem;
+  --spacing-67: 4.1875rem;
+  --spacing-68: 4.25rem;
+  --spacing-69: 4.3125rem;
+  --spacing-70: 4.375rem;
+  --spacing-71: 4.4375rem;
+  --spacing-72: 4.5rem;
+  --spacing-73: 4.5625rem;
+  --spacing-74: 4.625rem;
+  --spacing-75: 4.6875rem;
+  --spacing-76: 4.75rem;
+  --spacing-77: 4.8125rem;
+  --spacing-78: 4.875rem;
+  --spacing-79: 4.9375rem;
+  --spacing-80: 5rem;
+  --spacing-81: 5.0625rem;
+  --spacing-82: 5.125rem;
+  --spacing-83: 5.1875rem;
+  --spacing-84: 5.25rem;
+  --spacing-85: 5.3125rem;
+  --spacing-86: 5.375rem;
+  --spacing-87: 5.4375rem;
+  --spacing-88: 5.5rem;
+  --spacing-89: 5.5625rem;
+  --spacing-90: 5.625rem;
+  --spacing-91: 5.6875rem;
+  --spacing-92: 5.75rem;
+  --spacing-93: 5.8125rem;
+  --spacing-94: 5.875rem;
+  --spacing-95: 5.9375rem;
+  --spacing-96: 6rem;
+}
