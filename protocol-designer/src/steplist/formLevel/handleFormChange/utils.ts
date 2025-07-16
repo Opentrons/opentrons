@@ -456,8 +456,6 @@ const getSubmergeRetractFields = (args: {
     isConditioningVolumeEnabled = false,
   } = args
 
-  console.log('additionalEquipmentEntities', additionalEquipmentEntities)
-
   // all common submerge and retract fields
   const { delay, speed } = submergeRetractLookup
   const { positionReference, offset } =
