@@ -11,6 +11,35 @@ code, pre {
   font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
 }
 
+/* Font sizes */
+
+.admonition p, .admonition li {
+  font-size: 0.75rem;
+}
+
+th, td {
+  font-size: 0.75rem;
+}
+
+/* Headers */
+
+.md-typeset h1 {
+  font-weight: 700;
+  color: black;
+}
+
+.md-typeset h2 {
+  font-weight: 700;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+}
+
+.md-typeset h4 {
+  font-weight: 600;
+}
+
 /* Colors */
 
 :root {
@@ -44,40 +73,6 @@ article ul li {
 
 article ul li::marker {
   color: #006CFA;
-}
-
-/* Circular bullets for instruction lists */
-
-.instruction-list > ol {
-  list-style: none; 
-  padding-left: 0; 
-}
-
-
-.instruction-list > ol > li {
-  margin-bottom: 0.5em; 
-  position: relative; 
-  padding-left: 2.5em; 
-}
-
-
-.instruction-list > ol > li::before {
-  content: counter(list-item); 
-  background-color: #006CFA; 
-  color: white; 
-  border-radius: 50%; 
-  width: 1.8em; 
-  height: 1.8em; 
-  line-height: 1.8em; 
-  text-align: center; 
-  display: inline-flex; 
-  justify-content: center; 
-  align-items: center; 
-  position: absolute; 
-  left: 0; 
-  top: 0; 
-  font-weight: bold; 
-  font-size: 0.9em; 
 }
 
 /* Caption styling */
