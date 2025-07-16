@@ -95,6 +95,7 @@ export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={handleRemoveClick}
         height="100%"
+        data-testid={addressableAreaId}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"
