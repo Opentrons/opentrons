@@ -12,6 +12,7 @@ from abr_testing.data_collection import (
     get_run_logs,
     abr_google_drive,
     abr_calibration_logs,
+    abr_hepauv,
 )
 from abr_testing.tools import sync_abr_sheet
 
@@ -50,7 +51,7 @@ def clean_sheet(sheet_name: str, credentials: str) -> Any:
         return
     print(f"Rows to be removed: {rem_rows}")
     try:
-        sheet.batch_delete_rows(rem_rows)
+        sheet.batch_delete_rows(rem_rows, "0")
         print("deleted rows")
     except Exception:
         print("could not delete rows")
@@ -64,6 +65,15 @@ def run_sync_abr_sheet(
 ) -> None:
     """Sync ABR sheet with temp and lifetime percents."""
     sync_abr_sheet.run(storage_directory, abr_data_sheet, room_conditions_sheet)
+
+
+def run_hepa_uv(
+    turning_hepa_fan: str,
+    google_sheet_name: str,
+    storage_directory: str,
+) -> None:
+    """Record HEPA UVs."""
+    abr_hepauv.run(turning_hepa_fan, google_sheet_name, storage_directory)
 
 
 def run_temp_sensor(ambient_conditions_sheet: str, credentials: str) -> None:
@@ -127,7 +137,10 @@ def main(configurations: configparser.ConfigParser) -> None:
             credentials = default["Credentials"]
         except KeyError as e:
             print("Cannot read config file\n" + str(e))
-
+    # Record HEPA/UV Tracking
+    storage_directory = configurations["RUN-LOG"]["Storage"]
+    sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
+    run_hepa_uv("on", sheet_name, storage_directory)
     # Run Temperature Sensors
     ambient_conditions_sheet = configurations["TEMP-SENSOR"]["Sheet_Url"]
     ambient_conditions_sheet_name = configurations["TEMP-SENSOR"]["Sheet_Name"]
@@ -135,7 +148,6 @@ def main(configurations: configparser.ConfigParser) -> None:
     run_temp_sensor(ambient_conditions_sheet_name, credentials)
     print("Temp Sensors Started")
     # Get Run Logs and Record
-    storage_directory = configurations["RUN-LOG"]["Storage"]
     email = configurations["RUN-LOG"]["Email"]
     drive_folder = configurations["RUN-LOG"]["Drive_Folder"]
     sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
