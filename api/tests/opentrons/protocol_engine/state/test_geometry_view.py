@@ -36,6 +36,7 @@ from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     InnerWellGeometry,
     UserDefinedVolumes,
+    HeightVolumePair,
     LabwareDefinition,
     LabwareDefinition2,
     Dimensions as LabwareDimensions,
@@ -122,7 +123,11 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
 )
+
+# from opentrons.protocol_engine.state.geometry import inner_well_math_utils as utils_import
+from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state import inner_well_math_utils
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
@@ -371,6 +376,17 @@ def nice_labware_definition() -> LabwareDefinition:
 
 
 @pytest.fixture
+def inner_labware_geometry_fixture() -> LabwareDefinition:
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data("labware/fixtures/3/fixture_corning_24_plate.json").decode(
+                "utf-8"
+            )
+        )
+    )
+
+
+@pytest.fixture
 def user_volumes_fixture() -> LabwareDefinition:
     """Load a labware definition with a P dictionary."""
     return labware_definition_type_adapter.validate_python(
@@ -379,6 +395,18 @@ def user_volumes_fixture() -> LabwareDefinition:
                 "utf-8"
             )
         )
+    )
+
+
+@pytest.fixture
+def user_defined_volumes_obj() -> UserDefinedVolumes:
+    return UserDefinedVolumes(
+        heightToVolumeMap=[
+            HeightVolumePair(height=0.4, volume=2.0),
+            HeightVolumePair(height=2.3, volume=9.8),
+            HeightVolumePair(height=4.5, volume=12.2),
+            HeightVolumePair(height=7.8, volume=50.1),
+        ]
     )
 
 
@@ -392,6 +420,34 @@ def nice_adapter_definition() -> LabwareDefinition:
             ).decode("utf-8")
         )
     )
+
+
+@pytest.fixture
+def mock_well_math_utils(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> Dict[str, Any]:
+    mocks = {}
+    mocks["volume_user_volumes"] = decoy.mock(func=find_volume_user_defined_volumes)
+    mocks["height_user_volumes"] = decoy.mock(func=find_height_user_defined_volumes)
+    mocks["volume_inner_well_geometry"] = decoy.mock(
+        func=find_volume_inner_well_geometry
+    )
+    mocks["height_inner_well_geometry"] = decoy.mock(
+        func=find_height_inner_well_geometry
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_user_defined_volumes", mocks["volume_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_user_defined_volumes", mocks["height_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_inner_well_geometry", mocks["volume_inner_well_geometry"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_inner_well_geometry", mocks["height_inner_well_geometry"]
+    )
+    return mocks
 
 
 _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
@@ -4451,26 +4507,85 @@ def test_virtual_find_height_and_volume(
 
 
 @pytest.mark.parametrize("use_mocks", [False])
-@given(target_height_volume_st=st.data())
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
-def test_get_user_volumes(
+def test_find_well_height_and_volume(
     labware_store: LabwareStore,
+    mock_well_math_utils: Dict[str, Any],
     user_volumes_fixture: LabwareDefinition,
+    inner_labware_geometry_fixture: LabwareDefinition,
+    decoy: Decoy,
     subject: GeometryView,
-    target_height_volume_st: Any,
 ) -> None:
-    """Test linear interpolation math for user-defined volumes."""
-    load_labware = load_labware_action(
-        labware_id="labware-id-1",
+    """Test that find_volume_at_well_height and find_height_at_well_volume call the correct functions."""
+    iwg_labware_id = "iwg"
+    udv_labware_id = "udv"
+
+    load_labware_1 = load_labware_action(
+        labware_id=udv_labware_id,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
         labware_def=user_volumes_fixture,
     )
+    load_labware_2 = load_labware_action(
+        labware_id=iwg_labware_id,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
+        labware_def=inner_labware_geometry_fixture,
+    )
+    labware_store.handle_action(load_labware_1)
+    labware_store.handle_action(load_labware_2)
 
-    labware_store.handle_action(load_labware)
-    well_def = subject._labware.get_well_definition("labware-id-1", "A1")
-    well_geometry = subject._labware.get_well_geometry("labware-id-1", "A1")
-    assert isinstance(well_geometry, UserDefinedVolumes)
+    arbitrary_height = 1.1
+    arbitrary_volume = 2.2
+    inner_well_geometry = subject._labware.get_well_geometry(iwg_labware_id, "A1")
+    user_defined_volumes = subject._labware.get_well_geometry(udv_labware_id, "A1")
 
+    volume_estimate_iwg = subject.find_volume_at_well_height(
+        labware_id=iwg_labware_id, well_name="A1", target_height=arbitrary_height
+    )
+    decoy.verify(
+        mock_well_math_utils["volume_inner_well_geometry"](
+            target_height=arbitrary_height, well_geometry=inner_well_geometry
+        )
+    )
+
+    volume_estimate_udv = subject.find_volume_at_well_height(
+        labware_id=udv_labware_id, well_name="A1", target_height=arbitrary_height
+    )
+    decoy.verify(
+        mock_well_math_utils["volume_user_volumes"](
+            target_height=arbitrary_height, well_geometry=user_defined_volumes
+        )
+    )
+
+    height_estimate_iwg = subject.find_height_at_well_volume(
+        labware_id=iwg_labware_id, well_name="A1", target_volume=arbitrary_volume
+    )
+    decoy.verify(
+        mock_well_math_utils["height_inner_well_geometry"](
+            target_volume=arbitrary_volume, well_geometry=inner_well_geometry
+        )
+    )
+
+    height_estimate_udv = subject.find_height_at_well_volume(
+        labware_id=udv_labware_id, well_name="A1", target_volume=arbitrary_volume
+    )
+    decoy.verify(
+        mock_well_math_utils["height_user_volumes"](
+            target_volume=arbitrary_volume, well_geometry=user_defined_volumes
+        )
+    )
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+@given(target_height_volume_st=st.data())
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+def test_get_user_volumes(
+    subject: GeometryView,
+    target_height_volume_st: Any,
+    user_defined_volumes_obj: UserDefinedVolumes,
+) -> None:
+    """Test linear interpolation math for user-defined volumes."""
+    # NOTE: This doesnt actually test the accuracy of the linear
+    #   interpolation math, this test just serves to protect against
+    #   accidental changes in functionality from refactoring or smth.
     def _expected_volume_result(
         target_height: float, well_geometry: UserDefinedVolumes
     ) -> float:
@@ -4493,19 +4608,20 @@ def test_get_user_volumes(
             prev_volume = pair.volume
         raise ValueError("test function unable to find volume.")
 
+    well_depth = user_defined_volumes_obj.heightToVolumeMap[0].height
     target_height_volume = target_height_volume_st.draw(
         st.floats(
             min_value=0,
-            max_value=well_def.depth,
+            max_value=well_depth,
             allow_infinity=False,
             allow_nan=False,
         )
     )
     volume_estimate = find_volume_user_defined_volumes(
-        target_height=target_height_volume, well_geometry=well_geometry
+        target_height=target_height_volume, well_geometry=user_defined_volumes_obj
     )
     expected_volume_estimate = _expected_volume_result(
-        target_height=target_height_volume, well_geometry=well_geometry
+        target_height=target_height_volume, well_geometry=user_defined_volumes_obj
     )
     # TODO: make sure this also works with SimulatedProbeResult
     assert volume_estimate == expected_volume_estimate
@@ -4515,23 +4631,14 @@ def test_get_user_volumes(
 @given(target_height_volume_st=st.data())
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 def test_get_user_heights(
-    labware_store: LabwareStore,
-    user_volumes_fixture: LabwareDefinition,
     subject: GeometryView,
     target_height_volume_st: Any,
+    user_defined_volumes_obj: UserDefinedVolumes,
 ) -> None:
     """Test linear interpolation math for user-defined volumes."""
-    load_labware = load_labware_action(
-        labware_id="labware-id-1",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
-        labware_def=user_volumes_fixture,
-    )
-
-    labware_store.handle_action(load_labware)
-    well_def = subject._labware.get_well_definition("labware-id-1", "A1")
-    well_geometry = subject._labware.get_well_geometry("labware-id-1", "A1")
-    assert isinstance(well_geometry, UserDefinedVolumes)
-
+    # NOTE: This doesnt actually test the accuracy of the linear
+    #   interpolation math, this test just serves to protect against
+    #   accidental changes in functionality from refactoring or smth.
     def _expected_height_result(
         target_volume: float, well_geometry: UserDefinedVolumes
     ) -> float:
@@ -4554,19 +4661,20 @@ def test_get_user_heights(
             prev_height = pair.height
         raise ValueError("test function unable to find volume.")
 
+    well_depth = user_defined_volumes_obj.heightToVolumeMap[0].height
     target_height_volume = target_height_volume_st.draw(
         st.floats(
             min_value=0,
-            max_value=well_def.depth,
+            max_value=well_depth,
             allow_infinity=False,
             allow_nan=False,
         )
     )
     height_estimate = find_height_user_defined_volumes(
-        target_volume=target_height_volume, well_geometry=well_geometry
+        target_volume=target_height_volume, well_geometry=user_defined_volumes_obj
     )
     expected_height_estimate = _expected_height_result(
-        target_volume=target_height_volume, well_geometry=well_geometry
+        target_volume=target_height_volume, well_geometry=user_defined_volumes_obj
     )
     # TODO: make sure this also works with SimulatedProbeResult
     assert height_estimate == expected_height_estimate

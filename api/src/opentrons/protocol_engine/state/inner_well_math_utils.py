@@ -366,7 +366,10 @@ def find_volume_user_defined_volumes(
     """Return a linear interpolation of volume based on target height."""
     if isinstance(target_height, SimulatedProbeResult):
         return target_height
-    max_height = well_geometry.heightToVolumeMap[-1].height
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    max_height = sorted_volume_map[-1].height
     if target_height < 0 or target_height > max_height:
         raise InvalidLiquidHeightFound(
             f"Invalid target height {target_height} mm; max well height is {max_height} mm."
@@ -375,10 +378,7 @@ def find_volume_user_defined_volumes(
     prev_volume = 0.0
     if target_height == 0.0:
         return 0.0
-    sorted_volume_map = sorted(
-        well_geometry.heightToVolumeMap, key=lambda section: section.height
-    )
-    # TODO: need to make this work for between last userDefinedVolumes entry and well depth 
+    # TODO: need to make this work for between last userDefinedVolumes entry and well depth
     for pair in sorted_volume_map:
         if target_height == pair.height:
             return pair.volume
@@ -404,7 +404,10 @@ def find_height_user_defined_volumes(
     """Return a linear interpolation of height based on target volume."""
     if isinstance(target_volume, SimulatedProbeResult):
         return target_volume
-    max_volume = well_geometry.heightToVolumeMap[-1].volume
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    max_volume = sorted_volume_map[-1].volume
     if target_volume < 0 or target_volume > max_volume:
         raise InvalidLiquidHeightFound(
             f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
@@ -414,9 +417,6 @@ def find_height_user_defined_volumes(
     prev_height = 0.0
     if target_volume == 0.0:
         return 0.0
-    sorted_volume_map = sorted(
-        well_geometry.heightToVolumeMap, key=lambda section: section.height
-    )
     for pair in sorted_volume_map:
         if target_volume == pair.volume:
             return pair.height

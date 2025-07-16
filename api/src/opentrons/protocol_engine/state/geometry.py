@@ -2093,7 +2093,7 @@ class GeometryView:
         well_name: str,
         target_volume: LiquidTrackingType,
     ) -> LiquidTrackingType:
-        """Call the correct height from volume function based on well geoemtry type."""
+        """Call the correct height from volume function based on well geometry type."""
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
