@@ -203,7 +203,7 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   page: 1,
 }
 const SHAKE_SPEED_REQUIRED: FormError = {
-  title: 'Speed required',
+  title: RANGE_TITLE,
   dependentFields: ['setShake', 'targetSpeed'],
   location: 'field',
 }
@@ -235,7 +235,7 @@ const PAUSE_TEMP_REQUIRED: FormError = {
   location: 'field',
 }
 const HS_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: [
     'targetHeaterShakerTemperature',
     'setHeaterShakerTemperature',
