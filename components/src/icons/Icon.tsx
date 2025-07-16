@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { css, keyframes } from 'styled-components'
 
-import { Svg } from '../primitives'
+import { withStyleProps } from '../utils'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
 import type { ReactNode } from 'react'
@@ -28,7 +28,8 @@ export interface IconProps extends SvgProps {
   style?: Record<string, string | number>
   /** optional children */
   children?: ReactNode
-  id?: string
+  /** optional data-testid */
+  dataTestId?: string
 }
 
 const spinAnimation = keyframes`
@@ -52,9 +53,23 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps): JSX.Element | null {
-  const { name, children, className, spin, id, ...svgProps } = props
+function IconComponent(props: IconProps): JSX.Element | null {
+  const {
+    name,
+    className,
+    spin,
+    size,
+    height: rawHeight,
+    width: rawWidth,
+    color,
+    transform,
+    dataTestId,
+    opacity,
+    ...svgProps
+  } = props
 
+  const height = size ?? rawHeight
+  const width = size ?? rawWidth
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
     return null
@@ -62,18 +77,30 @@ export function Icon(props: IconProps): JSX.Element | null {
 
   const { viewBox, path } = ICON_DATA_BY_NAME[name]
 
+  const style = Object.fromEntries(
+    Object.entries({
+      color,
+      height,
+      width,
+      transform,
+      //  filter undefined props
+    }).filter(([_, value]) => value != null)
+  )
+
   return (
-    <Svg
+    <svg
       aria-hidden="true"
       fill="currentColor"
       viewBox={viewBox}
       className={cx(className, { spin })}
       css={spinStyle}
       {...svgProps}
-      id={id}
+      data-testid={dataTestId}
     >
       <path aria-roledescription={name} fillRule="evenodd" d={path} />
       {props.children}
-    </Svg>
+    </svg>
   )
 }
+
+export const Icon = withStyleProps(IconComponent)
