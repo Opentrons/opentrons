@@ -1,6 +1,6 @@
 import { animated } from '@react-spring/web'
 
-import styles from './robotCoordinateSpace.module.css'
+import styles from './robotcoordinatespace.module.css'
 
 import type { ComponentType, ReactNode, SVGProps } from 'react'
 

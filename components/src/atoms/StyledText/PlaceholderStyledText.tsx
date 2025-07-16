@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import styles from './placeholderStyledText.module.css'
+import styles from './placeholderstyledtext.module.css'
 
 import type { ReactNode } from 'react'
 

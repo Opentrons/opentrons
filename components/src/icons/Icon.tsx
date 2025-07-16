@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 
 import { ICON_DATA_BY_NAME } from './icon-data'
-import styles from './icons.module.css'
+import styles from './icon.module.css'
 
 import type { ReactNode, SVGProps } from 'react'
 

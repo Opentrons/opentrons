@@ -3,7 +3,7 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { DeckLabelSet } from '../../organisms'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
-import styles from './baseDeck.module.css'
+import styles from './basedeck.module.css'
 import { SlotBase } from './SlotBase'
 
 import type { SVGProps } from 'react'

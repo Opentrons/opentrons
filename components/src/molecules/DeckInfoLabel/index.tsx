@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import styles from './deckInfoLabel.module.css'
+import styles from './deckinfolabel.module.css'
 
 export interface DeckInfoLabelProps {
   deckLabel?: string
