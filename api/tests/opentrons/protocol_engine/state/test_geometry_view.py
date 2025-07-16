@@ -4539,41 +4539,48 @@ def test_find_well_height_and_volume(
     inner_well_geometry = subject._labware.get_well_geometry(iwg_labware_id, "A1")
     user_defined_volumes = subject._labware.get_well_geometry(udv_labware_id, "A1")
 
-    volume_estimate_iwg = subject.find_volume_at_well_height(
-        labware_id=iwg_labware_id, well_name="A1", target_height=arbitrary_height
+    math_function_calls = []
+    math_function_calls.append(
+        subject.find_volume_at_well_height(
+            labware_id=iwg_labware_id, well_name="A1", target_height=arbitrary_height
+        )
     )
     decoy.verify(
         mock_well_math_utils["volume_inner_well_geometry"](
             target_height=arbitrary_height, well_geometry=inner_well_geometry
         )
     )
-
-    volume_estimate_udv = subject.find_volume_at_well_height(
-        labware_id=udv_labware_id, well_name="A1", target_height=arbitrary_height
+    math_function_calls.append(
+        subject.find_volume_at_well_height(
+            labware_id=udv_labware_id, well_name="A1", target_height=arbitrary_height
+        )
     )
     decoy.verify(
         mock_well_math_utils["volume_user_volumes"](
             target_height=arbitrary_height, well_geometry=user_defined_volumes
         )
     )
-
-    height_estimate_iwg = subject.find_height_at_well_volume(
-        labware_id=iwg_labware_id, well_name="A1", target_volume=arbitrary_volume
+    math_function_calls.append(
+        subject.find_height_at_well_volume(
+            labware_id=iwg_labware_id, well_name="A1", target_volume=arbitrary_volume
+        )
     )
     decoy.verify(
         mock_well_math_utils["height_inner_well_geometry"](
             target_volume=arbitrary_volume, well_geometry=inner_well_geometry
         )
     )
-
-    height_estimate_udv = subject.find_height_at_well_volume(
-        labware_id=udv_labware_id, well_name="A1", target_volume=arbitrary_volume
+    math_function_calls.append(
+        subject.find_height_at_well_volume(
+            labware_id=udv_labware_id, well_name="A1", target_volume=arbitrary_volume
+        )
     )
     decoy.verify(
         mock_well_math_utils["height_user_volumes"](
             target_volume=arbitrary_volume, well_geometry=user_defined_volumes
         )
     )
+    assert all([call is None for call in math_function_calls])
 
 
 @pytest.mark.parametrize("use_mocks", [False])
