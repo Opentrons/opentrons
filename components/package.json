@@ -8,7 +8,7 @@
   "main": "src/index.ts",
   "module": "src/index.ts",
   "exports": {
-    "./styles": "./src/styles/global.module.css"
+    "./styles": "./src/styles/global.css"
   },
   "repository": {
     "type": "git",
