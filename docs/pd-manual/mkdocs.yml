@@ -1,8 +1,8 @@
 site_name: Protocol Designer Instruction Manual
 
-theme: 
+theme:
   name: material
-  palette: 
+  palette:
     primary: custom
     accent: custom
   favicon: images/favicon.png
@@ -18,26 +18,23 @@ markdown_extensions:
   - admonition # call-outs
   - abbr # tooltip
   - pymdownx.blocks.caption # image captions
-  - md_in_html # combining MD and HTML 
+  - md_in_html # combining MD and HTML
   - attr_list # grids (for parts lists)
-  - pymdownx.blocks.caption ## add captions to images? 
-
-
+  - pymdownx.blocks.caption ## add captions to images?
 
 plugins:
- - glightbox # for zoom functionality on images
+  - glightbox # for zoom functionality on images
 
-
-nav: 
-## index.md includes About PD through the bulleted list
+nav:
+  ## index.md includes About PD through the bulleted list
   - About Protocol Designer: about-pd.md ## second half of About PD + PD Requirements + PD Settings... open to just putting all this in index.md
   - Create a protocol:
       - Robot and instruments: robot-instruments.md
       - Modules and fixtures: modules-fixtures.md
       - Protocol metadata and overview: overview.md
   - Protocol starting deck: starting-deck.md ## includes "define and add liquids;" must include mention of hardware configurations
-  - Protocol steps: 
-      - Transfer steps: transfer-steps.md 
+  - Protocol steps:
+      - Transfer steps: transfer-steps.md
       - Mix steps: mix-steps.md
       - Move steps: move-steps.md
       - Module steps: module-steps.md ## can't include a third subsection; but want to include the table
@@ -47,9 +44,3 @@ nav:
   - Warnings and errors: warnings-errors.md
   - Export a protocol: export-protocol.md
   - Modify an existing protocol: existing-protocol.md
-
-      
-
-
-
-
