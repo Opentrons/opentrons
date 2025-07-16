@@ -8,13 +8,15 @@ from opentrons_shared_data.errors.exceptions import CANBusBusError
 from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
 
 
+pytestmark = pytest.mark.slow
+
+
 @pytest.fixture
 def bus_channel() -> str:
     """The virtual can bus channel."""
     return "test_channel"
 
 
-@pytest.mark.slow
 @pytest.fixture
 def can_bus(bus_channel: str) -> Iterator[Bus]:
     """A virtual can bus fixture."""

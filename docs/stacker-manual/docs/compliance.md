@@ -1,3 +1,7 @@
+---
+title: "Flex Stacker: Safety and Compliance"
+---
+
 # Safety Information and Regulatory Compliance
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
@@ -16,7 +20,7 @@ Various labels on the Stacker or in this manual warn you about sources of potent
         <th>Description</th>
     </tr>
     <tr>
-        <td><img src="/images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
+        <td><img src="../images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
         <td><strong>Warning</strong> or <strong>Caution</strong> alerts users about:
             <ul>
                 <li>Potentially hazardous conditions.</li>
@@ -28,11 +32,11 @@ Various labels on the Stacker or in this manual warn you about sources of potent
         </td>
     </tr>
     <tr>
-        <td><img src="/images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
+        <td><img src="../images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
         <td><strong>Electrical shock</strong>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
     </tr>
     <tr>
-        <td><img src="/images/iso-warnings/heavy-lift.png" alt="Yellow heavy object warning triangle"></td>
+        <td><img src="../images/iso-warnings/heavy-lift.png" alt="Yellow heavy object warning triangle"></td>
         <td><strong>Heavy object</strong>: alerts users about potentially heavy objects that may require 2 people to lift properly.</td>
     </tr>
 </table>
@@ -62,7 +66,7 @@ Always observe the following electrical safety warnings.
         <th>Symbol</th>
         <th>Description</th>
     </tr>
-    <tr> <td><img src="/images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
+    <tr> <td><img src="../images/iso-warnings/caution.png" alt="Yellow warning or caution triangle"></td>
         <td>Plug the Stacker into a grounded, Class 1 circuit. The module is grounded through the grounding conductor of the power cable. Do not:
             <ul>
                 <li>Damage, disable, or remove the ground connection on the power cable.</li>
@@ -71,7 +75,7 @@ Always observe the following electrical safety warnings.
         </td>
     </tr>
     <tr>
-        <td><img src="/images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
+        <td><img src="../images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
         <td>Do not connect (plug in), disconnect (unplug), or use AC power cables if:
             <ul>
                 <li>The cable is frayed or damaged.</li>
@@ -81,7 +85,7 @@ Always observe the following electrical safety warnings.
         </td>
     </tr>
     <tr>
-        <td><img src="/images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
+        <td><img src="../images/iso-warnings/electrical.png" alt="Yellow electrical warning triangle"></td>
         <td>Risk of electric shock. Power/data hub components can remain charged even after the unit is disconnected from mains power. Do not attempt to open or repair the power/data hub.</td>
     </tr>
 </table>
