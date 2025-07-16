@@ -28,7 +28,7 @@
     "yDimension": 85.34,
     "zDimension": 14.35
   },
-  "dogEars": ["bottomLeft", "bottomRight"],
+  "displayNotches": ["bottomLeft", "bottomRight"],
   "wells": {
     "A1": {
       "depth": 12.43,

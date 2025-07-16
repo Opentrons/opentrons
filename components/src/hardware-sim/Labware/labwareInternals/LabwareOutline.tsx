@@ -5,23 +5,23 @@ import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
 import type { CSSProperties } from 'styled-components'
 import type { SVGProps } from 'react'
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, DisplayNotches} from '@opentrons/shared-data'
 
-function buildDogearPath(
+function buildLabwareNotchPath(
   w: number,
   h: number,
-  dogears: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>,
+  displayNotches: DisplayNotches,
   notchSize: number
 ): string {
   const path: string[] = []
 
-  if (dogears.length === 0) {
+  if (displayNotches.length === 0) {
     path.push(`M 0 0 H ${w} V ${h} H 0 Z`)
     return path.join(' ')
   }
 
   // topLeft
-  if (dogears.includes('topLeft')) {
+  if (displayNotches.includes('bottomLeft')) {
     path.push(`M 0 ${notchSize}`)
     path.push(`L ${notchSize} 0`)
   } else {
@@ -29,7 +29,7 @@ function buildDogearPath(
   }
 
   // TopRight
-  if (dogears.includes('topRight')) {
+  if (displayNotches.includes('bottomRight')) {
     path.push(`L ${w - notchSize} 0`)
     path.push(`L ${w} ${notchSize}`)
   } else {
@@ -37,7 +37,7 @@ function buildDogearPath(
   }
 
   // BottomRight
-  if (dogears.includes('bottomRight')) {
+  if (displayNotches.includes('topRight')) {
     path.push(`L ${w} ${h - notchSize}`)
     path.push(`L ${w - notchSize} ${h}`)
   } else {
@@ -45,7 +45,7 @@ function buildDogearPath(
   }
 
   // BottomLeft
-  if (dogears.includes('bottomLeft')) {
+  if (displayNotches.includes('topLeft')) {
     path.push(`L ${notchSize} ${h}`)
     path.push(`L 0 ${h - notchSize}`)
   } else {
@@ -110,11 +110,9 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           yDimension: props.height,
         }
 
-  const { parameters = { isTiprack, loadName: '', dogears: [] } } = definition ?? {}
-  const dogEars = 
-        Array.isArray(parameters.dogears) && parameters.dogears.length > 0
-        ? parameters.dogears
-        : []
+  const { parameters = { isTiprack, loadName: '', displayNotches: [] } } = definition ?? {}
+  const displayNotches = definition?.displayNotches ?? null
+
   let backgroundFill
   if (fill != null) {
     backgroundFill = fill
@@ -166,6 +164,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             ry="8"
             showRadius={showRadius}
             fill={backgroundFill}
+            displayNotches = {displayNotches ?? []}
           />
         </>
       ) : (
@@ -178,6 +177,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black90)}
           fill={backgroundFill}
           showRadius={showRadius}
+          displayNotches = {displayNotches ?? []}
         />
       )}
     </>
@@ -191,7 +191,7 @@ interface LabwareBorderProps extends SVGProps<SVGRectElement> {
   xDimension: number
   yDimension: number
   showRadius?: boolean
-  dogEars?: Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
+  displayNotches?: DisplayNotches
 }
 function LabwareBorder(props: LabwareBorderProps): JSX.Element {
   const {
@@ -204,11 +204,11 @@ function LabwareBorder(props: LabwareBorderProps): JSX.Element {
     ...svgProps
   } = props
 
-  const dogears = props.dogEars ?? []
-  const notchSize = 3
+  const displayNotches = props.displayNotches ?? []
+  const notchSize = 10
 
-  if (dogears.length > 0) {
-    const pathD = buildDogearPath(xDimension, yDimension, dogears, notchSize)
+  if (displayNotches.length > 0) {
+    const pathD = buildLabwareNotchPath(xDimension, yDimension, displayNotches, notchSize)
     return (
       <path
         d={pathD}

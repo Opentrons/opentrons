@@ -31,10 +31,10 @@
         }
       }
     },
-    "dogEars": {
+    "displayNotches": {
       "type": "string",
       "enum": ["bottomRight", "bottomLeft", "topRight", "topLeft"],
-      "description": "Location of cut-off corners on physical labware."
+      "description": "Location of corner notches on physical labware."
     },
     "displayCategory": {
       "type": "string",
@@ -529,7 +529,7 @@
             "type": "string"
           }
         },
-        "dogEars": {
+        "displayNotches": {
           "description": "Locations of cut out corners on labware and lids",
           "type": "string",
           "enum": ["bottomLeft", "bottomRight", "topLeft", "topRight"]

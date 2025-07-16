@@ -142,7 +142,7 @@ export interface LabwareParameters {
   isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
-  dogears?: string[]
+  displayNotches?: string[]
 }
 
 export interface LabwareBrand {
@@ -289,6 +289,8 @@ export type LabwareRoles =
   | 'lid'
   | 'system'
 
+export type DisplayNotches = Array<'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'>
+
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
   version: number
@@ -308,6 +310,7 @@ export interface LabwareDefinition2 {
   stackLimit?: number
   compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
+  displayNotches?: DisplayNotches
 }
 
 export interface LabwareDefinition3 {
@@ -329,6 +332,7 @@ export interface LabwareDefinition3 {
   stackLimit?: number
   compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
+  displayNotches?: DisplayNotches
 }
 
 // LabwareDefinition1 deliberately excluded.
