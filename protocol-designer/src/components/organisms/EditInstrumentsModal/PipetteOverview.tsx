@@ -111,7 +111,7 @@ export function PipetteOverview({
     setSelectedTips,
   } = pipetteConfig
 
-  const handleAddPipette = () => {
+  const handleAddPipette = (): void => {
     setPage('add')
     setMount(targetPipetteMount)
     setDidClickBadSave(false)
