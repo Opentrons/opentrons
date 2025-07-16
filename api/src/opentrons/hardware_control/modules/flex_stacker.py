@@ -85,7 +85,7 @@ PLATFORM_OFFSET = 2.25
 LATCH_CLEARANCE = 2.5
 
 # TOF Baseline Configs
-# These are generated manually with the help of the tof_analysys.py tool
+# These are generated manually with the help of the tof_analysis.py tool
 # Which can be found in `hardware_testing/tools/tof-analysis/README.md` where
 # it goes over using use the tool.
 TOF_DETECTION_CONFIG = {
@@ -130,7 +130,7 @@ STALLGUARD_CONFIG = {
 STACKER_MOTION_CONFIG = {
     StackerAxis.X: {
         "home": AxisParams(
-            run_current=1.5,  # mAmps
+            run_current=1.5,  # Amps RMS
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=10.0,  # mm/s
