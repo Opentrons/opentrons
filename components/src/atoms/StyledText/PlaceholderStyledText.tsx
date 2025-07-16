@@ -4,6 +4,12 @@ import styles from './placeholderStyledText.module.css'
 
 import type { ReactNode } from 'react'
 
+type StyleKey =
+  | 'headingSmallBold'
+  | 'captionBold'
+  | 'bodyDefaultSemiBold'
+  | 'smallBodyTextBold'
+
 interface PlaceholderStyledTextProps {
   children: ReactNode
   color?: string
@@ -21,9 +27,15 @@ export const PlaceholderStyledText = (
 ): JSX.Element => {
   const { children, color, desktopStyle, oddStyle } = props
 
+  const styleMap: Record<StyleKey, string> = {
+    headingSmallBold: styles.heading_small_bold,
+    captionBold: styles.caption_bold,
+    bodyDefaultSemiBold: styles.body_default_semi_bold,
+    smallBodyTextBold: styles.small_body_text_bold,
+  }
   const combinedClassName = clsx(
-    desktopStyle ? styles[desktopStyle] : null,
-    oddStyle ? styles[oddStyle] : null
+    desktopStyle != null ? styleMap[desktopStyle as StyleKey] : null,
+    oddStyle != null ? styleMap[oddStyle as StyleKey] : null
   )
 
   return (
