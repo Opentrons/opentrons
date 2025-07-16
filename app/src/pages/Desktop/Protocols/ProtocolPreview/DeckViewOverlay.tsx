@@ -1,14 +1,6 @@
 import { useMemo } from 'react'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  CURSOR_POINTER,
-  Flex,
-  JUSTIFY_CENTER,
-  RobotCoordsForeignObject,
-  SPACING,
-} from '@opentrons/components'
+import { CURSOR_POINTER, RobotCoordsForeignObject } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForAddressableArea,
@@ -16,6 +8,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import styles from './preview.module.css'
 import { getFlexHoverDimensions } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -109,16 +102,12 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
         },
       }}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={slotFillColor}
-        borderRadius={BORDERS.borderRadius4}
-        gridGap={SPACING.spacing8}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
+      <div
+        className={styles.deck_overlay}
+        style={{ backgroundColor: slotFillColor }}
       >
         {children}
-      </Flex>
+      </div>
     </RobotCoordsForeignObject>
   )
 }

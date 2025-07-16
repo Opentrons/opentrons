@@ -16,7 +16,22 @@ export const PlaceholderStyledText = (
   props: PlaceholderStyledTextProps
 ): JSX.Element => {
   const { children, color, desktopStyle, oddStyle } = props
-  return <text style={{ color: color ?? '' }}>{children}</text>
+
+  let font
+  if (desktopStyle === 'headingSmallBold') {
+    font = '700 1.125rem/1.5rem Public Sans'
+  } else if (desktopStyle === 'captionBold') {
+    font = '700 0.8125rem/1rem Public Sans'
+  } else if (desktopStyle === 'bodyDefaultSemiBold') {
+    font = '600 0.875rem/1.25rem Public Sans'
+  }
+
+  const isTouchscreen = window.matchMedia('(height: 600px) and (width: 1024px)')
+    .matches
+
+  if (isTouchscreen && oddStyle === 'smallBodyTextBold') {
+    font = '400 1.25rem'
+  }
+
+  return <text style={{ color: color ?? '', font }}>{children}</text>
 }
-// desktop style = headingSmallBold, captionBold
-//    oddStyle="smallBodyTextBold"

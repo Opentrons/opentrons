@@ -20,7 +20,7 @@ import {
   JUSTIFY_CENTER,
   SPACING_1,
 } from '../../styles'
-import { FlexDirection, RobotCoordsForeignObject } from '../Deck'
+import { RobotCoordsForeignObject } from '../Deck'
 import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
 import { MagneticBlock } from './MagneticBlock'
@@ -34,6 +34,7 @@ import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
 export * from './Thermocycler'
 

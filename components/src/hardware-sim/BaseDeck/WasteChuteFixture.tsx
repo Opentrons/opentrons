@@ -110,7 +110,7 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
         x={WASTE_CHUTE_X}
         y={-51}
         flexProps={{ flex: '1' }}
-        foreignObjectProps={{ opacity: opacity ?? '1.0', flex: '1' }}
+        foreignObjectProps={{ opacity: opacity ?? 1, flex: '1' }}
       >
         {overlay != null ? (
           overlay

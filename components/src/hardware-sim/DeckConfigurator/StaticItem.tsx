@@ -47,7 +47,12 @@ export function StaticItem(props: StaticFixtureProps): JSX.Element {
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Btn css={CONFIG_STYLE_READ_ONLY} cursor={'default'} onClick={() => {}}>
+      <Btn
+        css={CONFIG_STYLE_READ_ONLY}
+        height="100%"
+        cursor={'default'}
+        onClick={() => {}}
+      >
         <StyledText
           oddStyle="smallBodyTextSemiBold"
           desktopStyle="bodyDefaultSemiBold"

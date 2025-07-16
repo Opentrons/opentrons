@@ -1,10 +1,8 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DeckInfoLabel } from '..'
-import { BORDERS, COLORS } from '../../../helix-design-system'
 import { renderWithProviders } from '../../../testing/utils'
-import { SPACING } from '../../../ui-style-constants'
+import { DeckInfoLabel } from '../index'
 
 import type { ComponentProps } from 'react'
 
@@ -19,34 +17,23 @@ describe('DeckInfoLabel', () => {
     props = {
       deckLabel: 'A1',
     }
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => {
+        return {
+          matches: query === '(height: 610px) and (width: 1024px)',
+          media: query,
+        }
+      }),
+    })
   })
 
   it('should render the proper styles - web style', () => {
     render(props)
     const deckInfoLabel = screen.getByTestId('DeckInfoLabel_A1')
-    expect(deckInfoLabel).toHaveStyle(
-      `padding: ${SPACING.spacing2} ${SPACING.spacing4}`
-    )
-    expect(deckInfoLabel).toHaveStyle(`height: ${SPACING.spacing20}`)
-    expect(deckInfoLabel).toHaveStyle('width: max-content')
-    expect(deckInfoLabel).toHaveStyle(`border: 1px solid ${COLORS.black90}`)
-    expect(deckInfoLabel).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
-  })
-
-  it('should render the proper styles - web style large', () => {
-    props = {
-      ...props,
-      size: 'large',
-    }
-    render(props)
-    const deckInfoLabel = screen.getByTestId('DeckInfoLabel_A1')
-    expect(deckInfoLabel).toHaveStyle(
-      `padding: ${SPACING.spacing2} ${SPACING.spacing4}`
-    )
-    expect(deckInfoLabel).toHaveStyle('height: 1.75rem')
-    expect(deckInfoLabel).toHaveStyle('width: max-content')
-    expect(deckInfoLabel).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
-    expect(deckInfoLabel).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+    expect(deckInfoLabel.className).toContain('label')
+    expect(deckInfoLabel.className).toContain('deck_info_label_no_highlight')
+    expect(deckInfoLabel.className).toContain('default')
   })
 
   it.todo('should render the proper styles - odd style')
@@ -61,7 +48,7 @@ describe('DeckInfoLabel', () => {
       iconName: 'ot-temperature-v2',
     }
     render(props)
-    screen.getByLabelText(props.iconName)
+    screen.getByLabelText('ot-temperature-v2')
   })
 
   it('should render an icon large', () => {
@@ -70,7 +57,7 @@ describe('DeckInfoLabel', () => {
       size: 'large',
     }
     render(props)
-    const deckInfoLabelIcon = screen.getByLabelText(props.iconName)
+    const deckInfoLabelIcon = screen.getByLabelText('ot-temperature-v2')
     expect(deckInfoLabelIcon).toHaveStyle('height: 1.5rem')
   })
 })

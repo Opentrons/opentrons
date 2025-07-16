@@ -6,7 +6,6 @@ import { DeckInfoLabel } from '../../molecules'
 import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
-import type { CSSProperties } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotLabelsProps {
@@ -35,6 +34,18 @@ export const SlotLabels = ({
     ? `${widthSmallRem}rem`
     : `${widthLargeRem}rem`
 
+  const rowStyle: Record<string, string> = {
+    '--dynamic-width': rowDynamicWidth,
+  }
+  const simpleItemWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthLargeRem}rem`,
+  }
+  const nextTo4thWidthStyle: Record<string, string> = {
+    '--dynamic-width': itemDynamicWidth,
+  }
+  const fourthWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthSmallRem}rem`,
+  }
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
@@ -68,44 +79,29 @@ export const SlotLabels = ({
         x="-100"
         y="-55"
       >
-        <div
-          className={clsx(styles.deck_labels_row)}
-          style={{ '--dynamic-width': rowDynamicWidth } as CSSProperties}
-        >
+        <div className={clsx(styles.deck_labels_row)} style={rowStyle}>
           <div
             className={styles.deck_label_row_container}
-            style={
-              {
-                '--dynamic-width': `${widthLargeRem}rem`,
-              } as CSSProperties
-            }
+            style={simpleItemWidthStyle}
           >
             <DeckInfoLabel deckLabel="1" height="100%" />
           </div>
           <div
             className={styles.deck_label_row_container}
-            style={
-              {
-                '--dynamic-width': `${widthLargeRem}rem`,
-              } as CSSProperties
-            }
+            style={simpleItemWidthStyle}
           >
             <DeckInfoLabel deckLabel="2" height="100%" />
           </div>
           <div
             className={styles.deck_label_row_container}
-            style={{ '--dynamic-width': itemDynamicWidth } as CSSProperties}
+            style={nextTo4thWidthStyle}
           >
             <DeckInfoLabel deckLabel="3" height="100%" />
           </div>
           {show4thColumn ? (
             <div
               className={styles.deck_label_row_container}
-              style={
-                {
-                  '--dynamic-width': `${widthSmallRem}rem`,
-                } as CSSProperties
-              }
+              style={fourthWidthStyle}
             >
               <DeckInfoLabel deckLabel="4" height="100%" />
             </div>

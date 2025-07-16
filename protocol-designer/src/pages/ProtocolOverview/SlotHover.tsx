@@ -62,7 +62,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId)))
     return null
 
-  const hoverOpacity = hover != null && hover === slotId ? '1' : '0'
+  const hoverOpacity = hover != null && hover === slotId ? 1 : 0
   const slotFill = (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -72,6 +72,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
       gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
+      height="100%"
     />
   )
 

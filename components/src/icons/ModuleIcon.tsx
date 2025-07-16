@@ -11,7 +11,6 @@ import {
 import { Icon } from './Icon'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { StyleProps } from '../primitives/types'
 
 export type ModuleIconName =
   | 'ot-magnet-v2'
@@ -34,8 +33,17 @@ export const MODULE_ICON_NAME_BY_TYPE: {
   [FLEX_STACKER_MODULE_TYPE]: 'ot-flex-stacker',
 }
 
-interface ModuleIconProps extends StyleProps {
+interface ModuleIconProps {
   moduleType: ModuleType
+  size?: string
+  marginTop?: string
+  marginRight?: string
+  color?: string
+  height?: string
+  alignSelf?: string
+  minWidth?: string
+  minHeight?: string
+  marginLeft?: string
 }
 
 export function ModuleIcon(props: ModuleIconProps): JSX.Element {

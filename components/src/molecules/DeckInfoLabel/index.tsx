@@ -5,7 +5,7 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './deckInfoLabel.module.css'
 
-interface DeckInfoLabelProps {
+export interface DeckInfoLabelProps {
   deckLabel?: string
   iconName?: string
   highlight?: boolean
@@ -13,6 +13,7 @@ interface DeckInfoLabelProps {
   height?: string | number
   width?: string | number
   svgSize?: string | number
+  transform?: string
 }
 
 export function DeckInfoLabel({
@@ -22,21 +23,24 @@ export function DeckInfoLabel({
   size = 'default',
   height,
   width,
+  transform,
   svgSize,
 }: DeckInfoLabelProps): JSX.Element {
   const labelClass = clsx(
     styles.label,
-    highlight ? styles.highlight : styles.noHighlight,
+    highlight
+      ? styles.deck_info_label_highlight
+      : styles.deck_info_label_no_highlight,
     styles[size],
     {
-      [styles.hasDeckLabel]: deckLabel != null,
+      [styles.has_deck_label]: deckLabel != null,
     }
   )
 
   return (
     <div
       className={labelClass}
-      style={{ height, width }}
+      style={{ height, width, transform }}
       data-testid={
         deckLabel != null
           ? `DeckInfoLabel_${deckLabel}`

@@ -15,11 +15,15 @@ export interface ForeignObjectProps {
  */
 
 export const ForeignObject = ({
-  ...rest
+  width,
+  height,
+  x,
+  y,
+  children,
 }: ForeignObjectProps): ReactElement => {
   return (
-    <foreignObject
-      {...rest} // forwards things like x, y, etc.
-    />
+    <foreignObject x={x} y={y} width={width} height={height}>
+      {children}
+    </foreignObject>
   )
 }

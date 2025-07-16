@@ -1,21 +1,21 @@
 .label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--border-radius-8);
   border-style: solid;
   border-width: 1px;
   background-color: inherit;
   width: max-content;
 }
 
-.highlight {
+.deck_info_label_highlight {
   background-color: var(--color-blue50);
   border-color: transparent;
 }
 
-.noHighlight {
+.deck_info_label_no_highlight {
   border-color: var(--color-black90);
 }
 
@@ -28,32 +28,15 @@
   height: 1.25rem;
 }
 
-.svg {
-  height: 0.875rem;
-  width: 0.875rem;
-}
-
-.largeSvg {
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-/* Touchscreen media query */
-@media (hover: none) and (pointer: coarse) {
+@media (height: 600px) and (width: 1024px) {
   .label {
     border-width: 2px;
-    border-radius: 12px;
+    border-radius: var(--border-radius-12);
     height: var(--spacing-32);
     padding: var(--spacing-4) var(--spacing-6);
   }
 
-  .hasDeckLabel {
+  .has_deck_label {
     padding-right: var(--spacing-8);
-  }
-
-  .svg,
-  .largeSvg {
-    height: 1.25rem !important;
-    width: 1.25rem !important;
   }
 }

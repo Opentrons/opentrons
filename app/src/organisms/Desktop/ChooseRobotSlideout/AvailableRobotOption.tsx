@@ -151,7 +151,7 @@ export function AvailableRobotOption(
             >
               {robotName}
               <Icon
-                aria-label={iconName}
+                data-testid={iconName}
                 marginBottom={`-${SPACING.spacing4}`}
                 marginLeft={SPACING.spacing8}
                 name={iconName ?? 'wifi'}
