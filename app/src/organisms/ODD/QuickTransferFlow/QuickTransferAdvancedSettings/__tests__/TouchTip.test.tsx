@@ -73,6 +73,7 @@ describe('TouchTip', () => {
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
     screen.getByText('Continue')
   })
 
@@ -85,6 +86,7 @@ describe('TouchTip', () => {
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
   })
@@ -105,6 +107,8 @@ describe('TouchTip', () => {
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: '.' })
+    screen.getByRole('button', { name: '-' })
     screen.getByRole('button', { name: 'del' })
     fireEvent.click(screen.getByRole('button', { name: '0' }))
   })
@@ -125,6 +129,8 @@ describe('TouchTip', () => {
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+    screen.getByRole('button', { name: '-' })
     fireEvent.click(screen.getByRole('button', { name: '0' }))
     fireEvent.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
@@ -157,6 +163,8 @@ describe('TouchTip', () => {
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+    screen.getByRole('button', { name: '-' })
     fireEvent.click(screen.getByRole('button', { name: '0' }))
     fireEvent.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
