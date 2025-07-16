@@ -84,8 +84,10 @@ PLATFORM_OFFSET = 2.25
 # Should put the bottom of the plate this mm below the latch when storing.
 LATCH_CLEARANCE = 2.5
 
-
-# Configs
+# TOF Baseline Configs
+# These are generated manually with the help of the tof_analysis.py tool
+# Which can be found in `hardware_testing/tools/tof-analysis/README.md` where
+# it goes over using use the tool.
 TOF_DETECTION_CONFIG = {
     TOFSensor.X: {
         Direction.EXTEND: TOFDetection(
@@ -124,10 +126,11 @@ STALLGUARD_CONFIG = {
     StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
 }
 
+# Motion Parameter defaults
 STACKER_MOTION_CONFIG = {
     StackerAxis.X: {
         "home": AxisParams(
-            run_current=1.5,  # mAmps
+            run_current=1.5,  # Amps RMS
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=10.0,  # mm/s
