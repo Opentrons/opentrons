@@ -51,6 +51,8 @@ interface PipetteOverviewProps {
   labware: AllTemporalPropertiesForTimelineFrame['labware']
   robotType: RobotType
   pipetteConfig: PipetteConfig
+  showNoPipetteError: boolean
+  setDidClickBadSave: React.Dispatch<React.SetStateAction<boolean>>
   leftPipette?: PipetteOnDeck
   rightPipette?: PipetteOnDeck
   gripper?: Gripper
@@ -62,6 +64,8 @@ export function PipetteOverview({
   labware,
   robotType,
   pipetteConfig,
+  showNoPipetteError,
+  setDidClickBadSave,
   leftPipette,
   rightPipette,
   gripper,
@@ -106,6 +110,12 @@ export function PipetteOverview({
     setPipetteVolume,
     setSelectedTips,
   } = pipetteConfig
+
+  const handleAddPipette = () => {
+    setPage('add')
+    setMount(targetPipetteMount)
+    setDidClickBadSave(false)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
@@ -189,10 +199,7 @@ export function PipetteOverview({
           (leftPipette != null && rightPipette != null) ? null : (
             <Flex width={FLEX_MAX_CONTENT}>
               <EmptySelectorButton
-                onClick={() => {
-                  setPage('add')
-                  setMount(targetPipetteMount)
-                }}
+                onClick={handleAddPipette}
                 text={t('add_pipette')}
                 textAlignment="left"
                 iconName="plus"
@@ -200,6 +207,11 @@ export function PipetteOverview({
             </Flex>
           )}
         </Flex>
+        {showNoPipetteError ? (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
+            {t('pipette_required')}
+          </StyledText>
+        ) : null}
       </Flex>
       {robotType === FLEX_ROBOT_TYPE ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
