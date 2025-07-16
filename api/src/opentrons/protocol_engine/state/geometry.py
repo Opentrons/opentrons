@@ -23,6 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -90,6 +91,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
+    AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -1038,25 +1040,51 @@ class GeometryView:
         grip_height_from_labware_bottom = (
             self._labware.get_grip_height_from_labware_bottom(labware_definition)
         )
-        location_name = self._get_underlying_addressable_area_name(location)
+        aa_name = self._get_underlying_addressable_area_name(location)
         parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
             location=location,
             definition=labware_definition,
             is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
         )
-        mod_cal_offset = self._get_calibrated_module_offset(location)
-        location_center = self._addressable_areas.get_addressable_area_center(
-            location_name
+        addressable_area = self._addressable_areas.get_addressable_area(aa_name)
+        lw_origin_to_parent = self._get_lw_origin_to_parent(
+            labware_definition=labware_definition, addressable_area=addressable_area
         )
+        mod_cal_offset = self._get_calibrated_module_offset(location)
+        location_center = self._addressable_areas.get_addressable_area_center(aa_name)
 
         return Point(
-            x=location_center.x + parent_to_lw_offset.x + mod_cal_offset.x,
-            y=location_center.y + parent_to_lw_offset.y + mod_cal_offset.y,
+            x=location_center.x
+            + parent_to_lw_offset.x
+            + lw_origin_to_parent.x
+            + mod_cal_offset.x,
+            y=location_center.y
+            + parent_to_lw_offset.y
+            + lw_origin_to_parent.y
+            + mod_cal_offset.y,
             z=location_center.z
             + parent_to_lw_offset.z
+            + lw_origin_to_parent.z
             + mod_cal_offset.z
             + grip_height_from_labware_bottom,
         )
+
+    def _get_lw_origin_to_parent(
+        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
+    ) -> Point:
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Point(0, 0, 0)
+        else:
+            bb_y = addressable_area.bounding_box.y
+            bb_z = addressable_area.bounding_box.z
+            return (
+                Point(
+                    x=0,
+                    y=bb_y,
+                    z=bb_z,
+                )
+                * -1
+            )
 
     def get_extra_waypoints(
         self,
