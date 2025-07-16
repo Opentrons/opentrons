@@ -198,21 +198,26 @@ export function PipetteOverview({
           ) : null}
           {has96Channel ||
           (leftPipette != null && rightPipette != null) ? null : (
-            <Flex width={FLEX_MAX_CONTENT}>
-              <EmptySelectorButton
-                onClick={handleAddPipette}
-                text={t('add_pipette')}
-                textAlignment="left"
-                iconName="plus"
-              />
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex width={FLEX_MAX_CONTENT}>
+                <EmptySelectorButton
+                  onClick={handleAddPipette}
+                  text={t('add_pipette')}
+                  textAlignment="left"
+                  iconName="plus"
+                />
+              </Flex>
+              {showNoPipetteError ? (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.red50}
+                >
+                  {t('pipette_required')}
+                </StyledText>
+              ) : null}
             </Flex>
           )}
         </Flex>
-        {showNoPipetteError ? (
-          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
-            {t('pipette_required')}
-          </StyledText>
-        ) : null}
       </Flex>
       {robotType === FLEX_ROBOT_TYPE ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
