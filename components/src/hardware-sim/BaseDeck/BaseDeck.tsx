@@ -88,14 +88,14 @@ export interface HopperLabwareProps {
 
 // these ugly consts are unfortunately necessary as the hopper location exists
 // outside of our deck definition so the render doesn't follow our normal conventions
-export const STACKER_MODULE_Y_OFFSET = -6
+//
 // todo(mm, 2025-07-16): 17.5 mm is a by-eye adjustment that takes us from a little bit
 // left of the hopper to inside the hopper. The fact that we were 17.5 mm left in the
 // first place is weird, and suggests we're doing wrong math somewhere. A more normal
 // thing to expect here would be starting at the extended shuttle position and needing
 // an offset of hundreds of mm to go from there to inside the hopper.
 export const STACKER_HOPPER_LABWARE_X_OFFSET = 17.5
-export const STACKER_HOPPER_LABWARE_Y_OFFSET = 6
+export const STACKER_HOPPER_LABWARE_Y_OFFSET = 0
 export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
 
 interface BaseDeckProps {
@@ -365,7 +365,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   key={`${moduleModel} ${moduleLocation.slotName}`}
                   def={moduleDef}
                   x={slotPosition[0]}
-                  y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
+                  y={slotPosition[1]}
                   orientation={inferModuleOrientationFromXCoordinate(
                     slotPosition[0]
                   )}
