@@ -114,7 +114,7 @@ test-integration:
 	$(python) -m integration_testing.labware_stackup
 
 .PHONY: test
-test: test-unit test-integration
+test: test-unit
 
 .PHONY: test-cov
 test-cov:

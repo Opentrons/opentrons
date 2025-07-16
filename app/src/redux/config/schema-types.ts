@@ -17,6 +17,7 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferExportPython'
+  | 'camera'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

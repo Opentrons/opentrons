@@ -101,9 +101,15 @@ class GripperOffsets(TypedDict):
     dropOffset: NamedOffset
 
 
+class TOFBaseline(TypedDict):
+    extend: Dict[int, List[float]]
+    retract: Dict[int, List[float]]
+
+
 class TOFSensorBaseline(TypedDict):
-    X: Dict[int, List[float]]
-    Z: Dict[int, List[float]]
+    version: str
+    X: TOFBaseline
+    Z: TOFBaseline
 
 
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
@@ -126,7 +132,6 @@ ModuleDefinitionV3 = TypedDict(
         "compatibleWith": List[ModuleModel],
         "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
-        "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
     },
     total=False,

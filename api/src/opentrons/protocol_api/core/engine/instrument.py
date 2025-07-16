@@ -30,6 +30,9 @@ from opentrons.protocols.advanced_control.transfers.common import (
     NoLiquidClassPropertyError,
 )
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    check_current_volume_before_dispensing,
+)
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
     DeckPoint,
@@ -754,10 +757,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 absolute_point=location.point,
                 location_type=WellLocationFunction.LIQUID_HANDLING,
+                meniscus_tracking=location._meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
-            if well_location.volumeOffset and well_location.volumeOffset != 0:
-                raise ValueError("volume offset not supported with move_to")
+            # specifying a static volume offset isn't implemented yet
+            # well locations at this point will be default have been assigned a
+            # volume offset of operationVolume
+            if well_location.volumeOffset:
+                if (
+                    well_location.volumeOffset != 0
+                    and well_location.volumeOffset != "operationVolume"
+                ):
+                    raise ValueError(
+                        f"volume offset {well_location.volumeOffset} not supported with move_to"
+                    )
             if check_for_movement_conflicts:
                 pipette_movement_conflict.check_safe_for_pipette_movement(
                     engine_state=self._engine_client.state,
@@ -2143,9 +2156,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Remove an air gap that was previously added during a transfer."""
         if last_air_gap == 0:
             return
-
+        current_vol = self.get_current_volume()
+        check_current_volume_before_dispensing(
+            current_volume=current_vol, dispense_volume=last_air_gap
+        )
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            self.get_current_volume() - last_air_gap
+            current_vol - last_air_gap
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(

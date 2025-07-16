@@ -12,10 +12,6 @@ import type { WellVolumes } from './types'
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
-/** All wells for labware, in arbitrary order. */
-export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
-  return Object.keys(def.wells)
-}
 export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
 // Standard slot dims FOR VISUALIZATION ONLY
 export const STD_SLOT_X_DIM = 128

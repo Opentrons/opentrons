@@ -69,7 +69,6 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
   quirks: [],
 }
 
