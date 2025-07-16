@@ -127,7 +127,6 @@ from opentrons.protocol_engine.state.addressable_areas import (
 # from opentrons.protocol_engine.state.geometry import inner_well_math_utils as utils_import
 from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
-from opentrons.protocol_engine.state import inner_well_math_utils
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
@@ -377,6 +376,7 @@ def nice_labware_definition() -> LabwareDefinition:
 
 @pytest.fixture
 def inner_labware_geometry_fixture() -> LabwareDefinition:
+    """Load a labware def containing an InnerWellGeometry object."""
     return labware_definition_type_adapter.validate_python(
         json.loads(
             load_shared_data("labware/fixtures/3/fixture_corning_24_plate.json").decode(
@@ -388,7 +388,7 @@ def inner_labware_geometry_fixture() -> LabwareDefinition:
 
 @pytest.fixture
 def user_volumes_fixture() -> LabwareDefinition:
-    """Load a labware definition with a P dictionary."""
+    """Load a labware def containing a UserDefinedVolumes object."""
     return labware_definition_type_adapter.validate_python(
         json.loads(
             load_shared_data("labware/fixtures/2/user_volumes_prototype.json").decode(
@@ -400,6 +400,7 @@ def user_volumes_fixture() -> LabwareDefinition:
 
 @pytest.fixture
 def user_defined_volumes_obj() -> UserDefinedVolumes:
+    """Return a UserDefinedVolumes BaseModel."""
     return UserDefinedVolumes(
         heightToVolumeMap=[
             HeightVolumePair(height=0.4, volume=2.0),
@@ -426,13 +427,14 @@ def nice_adapter_definition() -> LabwareDefinition:
 def mock_well_math_utils(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> Dict[str, Any]:
+    """Patch inner_well_math_utils functions."""
     mocks = {}
     mocks["volume_user_volumes"] = decoy.mock(func=find_volume_user_defined_volumes)
-    mocks["height_user_volumes"] = decoy.mock(func=find_height_user_defined_volumes)
-    mocks["volume_inner_well_geometry"] = decoy.mock(
+    mocks["height_user_volumes"] = decoy.mock(func=find_height_user_defined_volumes)  # type: ignore[assignment]
+    mocks["volume_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
         func=find_volume_inner_well_geometry
     )
-    mocks["height_inner_well_geometry"] = decoy.mock(
+    mocks["height_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
         func=find_height_inner_well_geometry
     )
     monkeypatch.setattr(
