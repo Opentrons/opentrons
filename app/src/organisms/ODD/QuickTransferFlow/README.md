@@ -155,7 +155,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  iquidClass: LiquidClass // this has been added
+  liquidClass: LiquidClass // this has been added
   conditionAspirate?: number // this has been added
   disposalVolumeDispenseSettings?: {
     volume: number
