@@ -62,6 +62,8 @@ touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
 
+Now using command schema 14
+
 ```ts
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
