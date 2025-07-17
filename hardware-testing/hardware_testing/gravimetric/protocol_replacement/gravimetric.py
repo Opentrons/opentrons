@@ -152,6 +152,7 @@ class FixtureSettings:
     tips: Dict[int, List[str]]
     liquid_source: Well
     volumes: Dict[int, List[float]]
+    extra_volumes: Dict[int, List[float]]
     scale: Scale
     recorder: GravimetricRecorder
     env_sensor: AsairDriver.AsairSensorBase
@@ -225,6 +226,18 @@ class FixtureSettings:
         volumes_to_test_1000ul = [
             float(volume) for volume in lookup_key("volumes_to_test_1000ul", csv_params)
         ]
+        extra_volumes_to_test_20ul = [
+            float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
+        ]
+        extra_volumes_to_test_50ul = [
+            float(volume) for volume in lookup_key("volumes_to_test_50ul", csv_params)
+        ]
+        extra_volumes_to_test_200ul = [
+            float(volume) for volume in lookup_key("volumes_to_test_200ul", csv_params)
+        ]
+        extra_volumes_to_test_1000ul = [
+            float(volume) for volume in lookup_key("volumes_to_test_1000ul", csv_params)
+        ]
         extra = bool(lookup_key("is_extra", csv_params)[0] == "TRUE")
 
         retract_discontinuity = float(
@@ -243,7 +256,18 @@ class FixtureSettings:
             + volumes_to_test_50ul
             + volumes_to_test_200ul
             + volumes_to_test_1000ul
+            + extra_volumes_to_test_20ul
+            + extra_volumes_to_test_50ul
+            + extra_volumes_to_test_200ul
+            + extra_volumes_to_test_1000ul
         )
+
+        extra_volumes = {
+            20: extra_volumes_to_test_20ul,
+            50: extra_volumes_to_test_50ul,
+            200: extra_volumes_to_test_200ul,
+            1000: extra_volumes_to_test_1000ul,
+        }
 
         tips = {
             20: tipracks_20ul,
@@ -370,6 +394,7 @@ class FixtureSettings:
             tips=tips,
             liquid_source=source_well,
             volumes=volumes,
+            extra_volumes=extra_volumes,
             scale=scale,
             recorder=recorder,
             env_sensor=env_sensor,
@@ -1032,6 +1057,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
     print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    last_probed_tip_size = fixture_settings.tip_sizes[0]
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
@@ -1081,9 +1107,22 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     remove_tip(fixture_settings)
 
     last_measurement = blank_measurments[-1][-1]
-
+    tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
-        for volume in fixture_settings.volumes[tip]:
+        if tip != last_probed_tip_size:
+            probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
+            pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+            fixture_settings.pipette.require_liquid_presence(
+                fixture_settings.liquid_source
+            )
+            last_probed_tip_size = fixture_settings.tip_sizes[0]
+            remove_tip(fixture_settings)
+        volumes_to_tests = (
+            fixture_settings.volumes[tip]
+            if tip not in tip_sizes_done
+            else fixture_settings.extra_volumes[tip]
+        )
+        for volume in volumes_to_tests:
             trial_asp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
             }
@@ -1249,6 +1288,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 d=dispense_d,
                 flag="",
             )
+        tip_sizes_done.append(tip)
 
 
 def _override_check(
