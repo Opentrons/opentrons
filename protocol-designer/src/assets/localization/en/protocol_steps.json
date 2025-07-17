@@ -15,8 +15,8 @@
   "blowout_location": "Blowout location",
   "blowout_position": "Blowout position from top",
   "captions_for_fields": {
-    "blockTargetTemp": "Must be between 4 and 99˚C",
-    "lidTargetTemp": "Must be between 37 and 110˚C",
+    "blockTargetTemp": "Valid range between 4 and 99˚C",
+    "lidTargetTemp": "Valid range between 37 and 110˚C",
     "targetSpeed": "Must be between 200 and 3000 rpm",
     "targetTemperature": "Must be between 4 and 95˚C",
     "targetHeaterShakerTemperature": "Must be between 37 and 95˚C",
