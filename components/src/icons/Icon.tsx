@@ -27,8 +27,6 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
   style?: Record<string, string | number>
   /** optional children */
   children?: ReactNode
-  /** optional id */
-  id?: string
 }
 
 /**
@@ -44,7 +42,6 @@ function IconComponent(props: IconProps): JSX.Element | null {
     name,
     className,
     spin,
-    id,
     size,
     height: rawHeight,
     width: rawWidth,
@@ -81,7 +78,6 @@ function IconComponent(props: IconProps): JSX.Element | null {
       className={clsx(className, { [styles.spin]: spin })}
       style={{ ...style }}
       {...svgProps}
-      id={id}
     >
       <path aria-roledescription={name} fillRule="evenodd" d={path} />
       {props.children}
