@@ -8,11 +8,13 @@ import re
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import uuid
 
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor
+from opentrons.drivers.flex_stacker.driver import NUMBER_OF_BINS
 from opentrons.hardware_control.ot3api import OT3API
 
 
@@ -70,18 +72,30 @@ class Stacker_TOF_Data_Collection:
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.stackers: List[str] = []
         self.test_files: List[str] = []
+
         self.test_data = {
-            "Time": "None",
+            "Hash_id": "None",
+            "Date": "None",
+            "Test": "None",
+            "Labware_Name": "None",
+            "Stacker_SN": "None",
+            "Axis": "None",
+            "Platform_Position": "None",
+            "Labware_Num_X": "None",
+            "Labware_Num_Z": "None",
             "Sample": "None",
             "Zone": "None",
+            "Time": "None",
         }
+        self.test_data.update({str(bin): "None" for bin in range(1, NUMBER_OF_BINS)})
+
         self.tof_axes = {
-            "X-Axis": TOFSensor.X,
-            "Z-Axis": TOFSensor.Z,
+            "x": TOFSensor.X,
+            "z": TOFSensor.Z,
         }
         self.directions = {
-            "Retract": Direction.RETRACT,
-            "Extend": Direction.EXTEND,
+            "retract": Direction.RETRACT,
+            "extend": Direction.EXTEND,
         }
 
     async def test_setup(self) -> None:
@@ -186,6 +200,7 @@ class Stacker_TOF_Data_Collection:
         """Read the stacker TOF Sensor data."""
         for i in range(len(self.stackers)):
             print(f"\n>> Stacker = {self.stackers[i]}")
+            serial = self.api.attached_modules[i].device_info["serial"]  # type: ignore
             for axis, tof_axis in self.tof_axes.items():
                 for pos, direction in self.directions.items():
                     for k in range(self.samples):
@@ -198,12 +213,23 @@ class Stacker_TOF_Data_Collection:
                             )
                             hist = await self.api.attached_modules[  # type: ignore
                                 i
-                            ]._driver.get_tof_histogram(tof_axis)
+                            ]._driver.get_tof_histogram(tof_axis)  # type: ignore
                             for zone, bins_list in hist.bins.items():
+                                date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
                                 test_data = self.test_data.copy()
-                                test_data["Time"] = str(elapsed_time)
+                                test_data["Hash_id"] = str(uuid.uuid4())
+                                test_data["Date"] = str(date)
+                                test_data["Test"] = self.test_name
+                                test_data["Labware_Name"] = self.labware_name
+                                test_data["Stacker_SN"] = serial
+                                test_data["Axis"] = str(axis.lower())
+                                test_data["Platform_Position"] = pos.lower()
+                                test_data["Labware_Num_X"] = str(self.labware_amount)
+                                test_data["Labware_Num_Z"] = str(self.labware_amount_z)
                                 test_data["Sample"] = str(sample)
                                 test_data["Zone"] = str(zone)
+                                test_data["Time"] = str(elapsed_time)
+
                                 bins_dict = {
                                     index: str(value)
                                     for index, value in enumerate(bins_list)
