@@ -360,6 +360,29 @@ def _find_volume_in_partial_frustum(
     )
 
 
+def _linear_interpolation(
+    interpolating_from: List[float], to_interpolate: List[float], target_val: float
+) -> float:
+    assert len(interpolating_from) == len(to_interpolate), "Invalid height/volume data"
+    assert (
+        interpolating_from[0] == to_interpolate[0] == 0.0
+    ), "height and volume data must start with 0.0"
+
+    if target_val == 0.0:
+        return 0.0
+    for i in range(1, len(interpolating_from)):
+        if target_val == interpolating_from[i]:
+            return to_interpolate[i]
+        if interpolating_from[i - 1] < target_val < interpolating_from[i]:
+            proportional_diff = (target_val - interpolating_from[i - 1]) / (
+                interpolating_from[i] - interpolating_from[i - 1]
+            )
+            addend = proportional_diff * (to_interpolate[i] - to_interpolate[i - 1])
+            result = to_interpolate[i - 1] + addend
+            return result
+    raise ValueError("linear interpolation failed")
+
+
 def find_volume_user_defined_volumes(
     target_height: LiquidTrackingType, well_geometry: UserDefinedVolumes
 ) -> LiquidTrackingType:
@@ -374,27 +397,20 @@ def find_volume_user_defined_volumes(
         raise InvalidLiquidHeightFound(
             f"Invalid target height {target_height} mm; max well height is {max_height} mm."
         )
-    prev_height = 0.0
-    prev_volume = 0.0
-    if target_height == 0.0:
-        return 0.0
-    # TODO: need to make this work for between last userDefinedVolumes entry and well depth
+    volumes = [0.0]
+    heights = [0.0]
     for pair in sorted_volume_map:
-        if target_height == pair.height:
-            return pair.volume
-        if target_height > prev_height and target_height < pair.height:
-            proportional_diff = (target_height - prev_height) / (
-                pair.height - prev_height
-            )
-            target_volume = (
-                prev_volume + (pair.volume - prev_height) * proportional_diff
-            )
-            return target_volume
-        prev_height = pair.height
-        prev_volume = pair.volume
-    raise InvalidLiquidHeightFound(
-        f"Unable to find volume at target height {target_height}."
-    )
+        volumes.append(pair.volume)
+        heights.append(pair.height)
+
+    try:
+        return _linear_interpolation(
+            interpolating_from=heights, to_interpolate=volumes, target_val=target_height
+        )
+    except ValueError:
+        raise InvalidLiquidHeightFound(
+            f"Unable to find volume at target volume {target_height}."
+        )
 
 
 def find_height_user_defined_volumes(
@@ -413,26 +429,20 @@ def find_height_user_defined_volumes(
             f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
         )
 
-    prev_volume = 0.0
-    prev_height = 0.0
-    if target_volume == 0.0:
-        return 0.0
+    volumes = [0.0]
+    heights = [0.0]
     for pair in sorted_volume_map:
-        if target_volume == pair.volume:
-            return pair.height
-        if target_volume > prev_volume and target_volume < pair.volume:
-            proportional_diff = (target_volume - prev_volume) / (
-                pair.volume - prev_volume
-            )
-            target_height = (
-                prev_height + (pair.height - prev_height) * proportional_diff
-            )
-            return target_height
-        prev_volume = pair.volume
-        prev_height = pair.height
-    raise InvalidLiquidHeightFound(
-        f"Unable to find volume at target volume {target_volume}."
-    )
+        volumes.append(pair.volume)
+        heights.append(pair.height)
+
+    try:
+        return _linear_interpolation(
+            interpolating_from=volumes, to_interpolate=heights, target_val=target_volume
+        )
+    except ValueError:
+        raise InvalidLiquidHeightFound(
+            f"Unable to find volume at target volume {target_volume}."
+        )
 
 
 def find_volume_inner_well_geometry(

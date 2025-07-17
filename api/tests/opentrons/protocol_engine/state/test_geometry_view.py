@@ -10,7 +10,6 @@ from os import listdir, path
 
 import pytest
 from decoy import Decoy
-from hypothesis import given, strategies as st, HealthCheck, settings
 
 from opentrons.protocol_engine.state.update_types import (
     LoadedLabwareUpdate,
@@ -35,8 +34,6 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     InnerWellGeometry,
-    UserDefinedVolumes,
-    HeightVolumePair,
     LabwareDefinition,
     LabwareDefinition2,
     Dimensions as LabwareDimensions,
@@ -4504,47 +4501,53 @@ def test_find_well_height_and_volume(
     inner_labware_geometry_fixture: LabwareDefinition,
     decoy: Decoy,
     subject: GeometryView,
-    target_measurement: str, 
+    target_measurement: str,
     well_def_type: str,
 ) -> None:
     """Test that find_volume_at_well_height and find_height_at_well_volume call the correct functions."""
+    assert inner_labware_geometry_fixture.innerLabwareGeometry is not None
+    assert user_volumes_fixture.innerLabwareGeometry is not None
     inner_well_geometry = [
         well for well in inner_labware_geometry_fixture.innerLabwareGeometry.values()
     ][0]
     user_defined_volumes = [
         well for well in user_volumes_fixture.innerLabwareGeometry.values()
     ][0]
-    geometry_def = None
     if well_def_type == "inner_well_geometry":
         labware_id = "iwg"
         geometry_def = inner_well_geometry
     else:
         labware_id = "udv"
-        geoemtry_def = user_defined_volumes
+        geometry_def = user_defined_volumes
 
-    decoy.when(
-        mock_labware_view.get_well_geometry(labware_id, "A1")
-    ).then_return(geometry_def)
+    decoy.when(mock_labware_view.get_well_geometry(labware_id, "A1")).then_return(
+        geometry_def
+    )
     # mock the correct inner_well_math_utils functions
     decoy.when(
-        mock_well_math_utils[target_measurement+'_'+well_def_type](
-            sentinel.arbitrary_height_volume,
-            geometry_def 
+        mock_well_math_utils[target_measurement + "_" + well_def_type](
+            sentinel.arbitrary_height_volume, geometry_def
         )
     ).then_return(sentinel.arbitrary_return_val)
 
     if target_measurement == "height":
-        assert subject.find_height_at_well_volume(
-            labware_id=labware_id,
-            well_name="A1",
-            target_volume=sentinel.arbitrary_height_volume,
-        ) == sentinel.arbitrary_return_val
+        assert (
+            subject.find_height_at_well_volume(
+                labware_id=labware_id,
+                well_name="A1",
+                target_volume=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
     elif target_measurement == "volume":
-        assert subject.find_volume_at_well_height(
-            labware_id=labware_id,
-            well_name="A1",
-            target_height=sentinel.arbitrary_height_volume
-        )  == sentinel.arbitrary_return_val
+        assert (
+            subject.find_volume_at_well_height(
+                labware_id=labware_id,
+                well_name="A1",
+                target_height=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
     decoy.reset()
 
 
