@@ -94,7 +94,6 @@ export interface HopperLabwareProps {
 // thing to expect here would be starting at the extended shuttle position and needing
 // an offset of hundreds of mm to go from there to inside the hopper.
 export const STACKER_HOPPER_LABWARE_X_OFFSET = 17.5
-export const STACKER_HOPPER_LABWARE_Y_OFFSET = 0
 export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
 
 interface BaseDeckProps {
@@ -375,7 +374,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   {nestedLabwareDef != null ? (
                     <g
                       cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
+                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, 0)`}
                     >
                       <LabwareRender
                         definition={nestedLabwareDef}
