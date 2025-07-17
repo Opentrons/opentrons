@@ -1,4 +1,4 @@
-import { LabwareDefinition } from '../types'
+import type { LabwareDefinition } from '../types'
 
 export const getLabwareDefURI = (def: LabwareDefinition): string =>
   constructLabwareDefURI(

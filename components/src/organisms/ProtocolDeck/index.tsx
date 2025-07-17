@@ -13,13 +13,14 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
-import { BaseDeck, LabwareOnDeck } from '../../hardware-sim/BaseDeck'
+import { BaseDeck } from '../../hardware-sim/BaseDeck'
 
 import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { LabwareOnDeck } from '../../hardware-sim/BaseDeck'
 
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null

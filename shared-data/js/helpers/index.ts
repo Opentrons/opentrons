@@ -55,10 +55,11 @@ export * from './pairsFromArray'
 export * from './getMaxPushOutVolume'
 export * from './getLabwareDefinitionsByURIForProtocol'
 export * from './getLabwareDefURI'
-// export * from './getLabwareInfoByLiquidId'
+export * from './getLabwareInfoByLiquidId'
 export * from './getLiquidsByIdForLabware'
-export * from'./getStackedItemsOnStartingDeck'
-
+export * from './getStackedItemsOnStartingDeck'
+export * from './getStandardDeckViewLayerBlockList'
+export * from './getWellFillFromLabwareId'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

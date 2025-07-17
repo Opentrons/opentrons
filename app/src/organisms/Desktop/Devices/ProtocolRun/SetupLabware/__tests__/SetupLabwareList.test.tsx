@@ -2,22 +2,30 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { multiple_tipacks_with_tc } from '@opentrons/shared-data'
+import {
+  getStacksWithLabware,
+  multiple_tipacks_with_tc,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getStacksWithLabware } from '/app/transformations/commands'
 
 import { LabwareListItem } from '../LabwareListItem'
 import { SetupLabwareList } from '../SetupLabwareList'
 
 import type { ComponentProps } from 'react'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type * as OpentronsSharedData from '@opentrons/shared-data'
 
-vi.mock('/app/transformations/commands')
 vi.mock('../LabwareListItem')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsSharedData>()
+  return {
+    ...actual,
+    getStacksWithLabware: vi.fn(),
+  }
+})
 
-const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
+const protocolWithTC = (multiple_tipacks_with_tc as unknown) as OpentronsSharedData.CompletedProtocolAnalysis
 
 const render = (props: ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(

@@ -392,14 +392,14 @@ interface LabwareLiquidInfo {
 }
 
 /** @deprecated instead use LabwareByLiquidId from components/src/hardware-sim/ProtocolDeck/types */
-export interface LabwareByLiquidId {
+interface DeprecatedLabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
 /** @deprecated instead use getLabwareInfoByLiquidId from components/src/hardware-sim/ProtocolDeck/utils */
 export function parseLabwareInfoByLiquidId(
   commands: RunTimeCommand[]
-): LabwareByLiquidId {
+): DeprecatedLabwareByLiquidId {
   const loadLiquidCommands =
     commands.length !== 0
       ? commands.filter(
@@ -408,7 +408,7 @@ export function parseLabwareInfoByLiquidId(
         )
       : []
 
-  return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
+  return reduce<LoadLiquidRunTimeCommand, DeprecatedLabwareByLiquidId>(
     loadLiquidCommands,
     (acc, command) => {
       if (!(command.params.liquidId in acc)) {
