@@ -1,6 +1,6 @@
 import pytest
 from math import pi, isclose
-from typing import Any, List, cast
+from typing import Any, List, cast, Dict
 from hypothesis import given, strategies as st
 
 from opentrons_shared_data.labware.labware_definition import (
@@ -8,6 +8,8 @@ from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     SphericalSegment,
     InnerWellGeometry,
+    UserDefinedVolumes,
+    HeightVolumePair
 )
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _cross_section_area_rectangular,
@@ -22,10 +24,39 @@ from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_spherical,
     find_height_inner_well_geometry,
     find_volume_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_user_defined_volumes,
     _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
+@pytest.fixture
+def user_defined_volumes_params() -> Dict[str, Any]:
+    """Return a UserDefinedVolumes BaseModel."""
+    params = {}
+    params["obj"] = UserDefinedVolumes(
+        heightToVolumeMap=[
+            HeightVolumePair(height=0.4, volume=2.0),
+            HeightVolumePair(height=2.3, volume=9.8),
+            HeightVolumePair(height=4.5, volume=12.2),
+            HeightVolumePair(height=7.8, volume=50.1),
+        ]
+    )
+    params["height_inputs_expected_outputs"] = [
+        (0.2, 1.0),
+        (2.1, 8.06666),
+        (2.5, 10.01818),
+        (4.5, 12.2),
+        (6.0, 17.7656)
+    ]
+    params["volume_inputs_expected_outputs"] = [
+        (),
+        (),
+        (),
+        (),
+        ()
+    ]
+    return params
 
 def fake_frusta() -> List[List[Any]]:
     """A bunch of weird fake well shapes."""
@@ -368,3 +399,77 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
         )
         tot_ul += _get_segment_capacity(segment)
         assert isclose(cast(float, top_ul), tot_ul)
+
+
+@given(target_height_volume_st=st.data())
+# @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+def test_get_user_volumes(
+    target_height_volume_st: Any,
+    user_defined_volumes_params: Dict[str, Any]
+) -> None:
+    """Test linear interpolation math for user-defined volumes."""
+    # NOTE: This doesnt actually test the accuracy of the linear
+    #   interpolation math, this test just serves to protect against
+    #   accidental changes in functionality from refactoring or smth.
+
+    # move this to test_inner_well_math_utils
+    user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    inputs_expected_outputs = user_defined_volumes_params["volume_inputs_expected_outputs"]
+    # def _expected_volume_result(
+    #     target_height: float, well_geometry: UserDefinedVolumes
+    # ) -> float:
+    #     prev_height = 0.0
+    #     prev_volume = 0.0
+    #     if target_height == 0.0:
+    #         return 0.0
+    #     for pair in well_geometry.heightToVolumeMap:
+    #         if target_height == pair.height:
+    #             return pair.volume
+    #         if target_height > prev_height and target_height < pair.height:
+    #             proportional_diff = (target_height - prev_height) / (
+    #                 pair.height - prev_height
+    #             )
+    #             target_volume = (
+    #                 prev_volume + (pair.volume - prev_height) * proportional_diff
+    #             )
+    #             return target_volume
+    #         prev_height = pair.height
+    #         prev_volume = pair.volume
+    #     raise ValueError("test function unable to find volume.")
+
+    well_depth = user_defined_volumes_obj().heightToVolumeMap[0].height
+    target_height_volume = target_height_volume_st.draw(
+        st.floats(
+            min_value=0,
+            max_value=well_depth,
+            allow_infinity=False,
+            allow_nan=False,
+        )
+    )
+    volume_estimate = find_volume_user_defined_volumes(
+        target_height=target_height_volume, well_geometry=user_defined_volumes_obj()
+    )
+    expected_volume_estimate = _expected_volume_result(
+        target_height=target_height_volume, well_geometry=user_defined_volumes_obj()
+    )
+    # TODO: make sure this also works with SimulatedProbeResult
+    assert volume_estimate == expected_volume_estimate
+
+def test_get_user_heights(
+    user_defined_volumes_params: Dict[str, Any],
+) -> None:
+    """Test linear interpolation math for user-defined volumes."""
+    # NOTE: This doesnt actually test the accuracy of the linear
+    #   interpolation math, this test just serves to protect against
+    #   accidental changes in functionality from refactoring or smth.
+    
+    user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    inputs_expected_outputs = user_defined_volumes_params["height_inputs_expected_outputs"]
+
+    for vol, expected_height in inputs_expected_outputs:
+        assert find_height_user_defined_volumes(
+            target_volume=vol, well_geometry=user_defined_volumes_obj
+        ) == expected_height
+
+    # TODO: make sure this also works with SimulatedProbeResult
+    assert height_estimate == expected_height_estimate
