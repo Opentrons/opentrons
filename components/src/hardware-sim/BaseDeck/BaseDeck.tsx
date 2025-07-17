@@ -88,7 +88,6 @@ export interface HopperLabwareProps {
 
 // these ugly consts are unfortunately necessary as the hopper location exists
 // outside of our deck definition so the render doesn't follow our normal conventions
-//
 // todo(mm, 2025-07-16): 17.5 mm is a by-eye adjustment that takes us from a little bit
 // left of the hopper to inside the hopper. The fact that we were 17.5 mm left in the
 // first place is weird, and suggests we're doing wrong math somewhere. A more normal
