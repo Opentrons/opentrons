@@ -1,5 +1,4 @@
-import * as React from 'react'
-import styled from 'styled-components'
+import { useState } from 'react'
 
 import {
   ALIGN_CENTER,
@@ -12,11 +11,8 @@ import {
   LabwareRender,
   RadioGroup,
   RobotWorkSpace,
-  SPACING_1,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  Text,
+  SPACING,
+  StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
@@ -26,6 +22,7 @@ import {
   ot2StandardDeckV4,
 } from '@opentrons/shared-data'
 
+import styles from './createlabwaresandbox.module.css'
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
 import type {
@@ -40,26 +37,14 @@ const SLOT_OPTIONS = ot2StandardDeckV4.locations.addressableAreas.map(
 )
 const DEFAULT_LABWARE_SLOT = SLOT_OPTIONS[0]
 
-const SlotSelect = styled.select`
-  height: 1.5rem;
-  width: 2rem;
-`
-const JsonTextArea = styled.textarea`
-  min-height: 84vh;
-  width: 100%;
-`
-
 export function CreateLabwareSandbox(): JSX.Element {
-  const [labwareSlot, setLabwareSlot] = React.useState(DEFAULT_LABWARE_SLOT)
-  const [isLabwareRegular, setIsLabwareRegular] = React.useState(false)
-  const [viewOnDeck, setViewOnDeck] = React.useState(true)
-  const [rawOptions, setRawOptions] = React.useState(
+  const [labwareSlot, setLabwareSlot] = useState(DEFAULT_LABWARE_SLOT)
+  const [isLabwareRegular, setIsLabwareRegular] = useState(false)
+  const [viewOnDeck, setViewOnDeck] = useState(true)
+  const [rawOptions, setRawOptions] = useState(
     JSON.stringify(IRREGULAR_OPTIONS, undefined, 2)
   )
-  const [
-    labwareToRender,
-    setLabwareToRender,
-  ] = React.useState<LabwareDefinition2>(
+  const [labwareToRender, setLabwareToRender] = useState<LabwareDefinition2>(
     createIrregularLabware(IRREGULAR_OPTIONS)
   )
 
@@ -113,9 +98,9 @@ export function CreateLabwareSandbox(): JSX.Element {
   return (
     <Flex height="100%" width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex flex={2} alignItems={ALIGN_CENTER} backgroundColor={C_LIGHT_GRAY}>
-        <Text as="h1" margin={SPACING_3}>
+        <StyledText as="h1" margin={SPACING.spacing16}>
           Create
-        </Text>
+        </StyledText>
         <RadioGroup
           onChange={handleRegularityChange}
           value={isLabwareRegular ? 'regular' : 'irregular'}
@@ -124,14 +109,14 @@ export function CreateLabwareSandbox(): JSX.Element {
             { name: 'Irregular', value: 'irregular' },
           ]}
         />
-        <Text as="h1" margin={SPACING_3}>
+        <StyledText as="h1" margin={SPACING.spacing16}>
           Labware
-        </Text>
+        </StyledText>
       </Flex>
       <Flex
         flex={8}
         justifyContent={JUSTIFY_SPACE_AROUND}
-        marginTop={SPACING_2}
+        marginTop={SPACING.spacing8}
       >
         <Flex
           flex={2}
@@ -139,15 +124,16 @@ export function CreateLabwareSandbox(): JSX.Element {
           alignItems={ALIGN_CENTER}
         >
           <Flex alignItems={ALIGN_CENTER}>
-            <Text as="h2" margin={SPACING_2}>
+            <StyledText as="h2" margin={SPACING.spacing8}>
               Input
-            </Text>
-            <Text
+            </StyledText>
+            <StyledText
               css={FONT_BODY_2_DARK}
               fontStyle={FONT_STYLE_ITALIC}
-            >{` (${regularityLabel} Labware Options)`}</Text>
+            >{` (${regularityLabel} Labware Options)`}</StyledText>
           </Flex>
-          <JsonTextArea
+          <textarea
+            className={styles.json_text_area}
             title="input options"
             value={optionsTextAreaValue}
             onChange={handleInputOptionChange}
@@ -155,13 +141,13 @@ export function CreateLabwareSandbox(): JSX.Element {
         </Flex>
         <Flex flex={5} flexDirection={DIRECTION_COLUMN}>
           <Flex
-            marginX={SPACING_4}
-            marginY={SPACING_1}
+            marginX={SPACING.spacing32}
+            marginY={SPACING.spacing4}
             alignItems={ALIGN_CENTER}
           >
-            <Text as="h2" marginRight={SPACING_2}>
+            <StyledText as="h2" marginRight={SPACING.spacing8}>
               {`Render ${regularityLabel} Labware`}
-            </Text>
+            </StyledText>
             <RadioGroup
               onChange={handleOnDeckChange}
               value={viewOnDeck ? 'deck' : 'standalone'}
@@ -173,12 +159,14 @@ export function CreateLabwareSandbox(): JSX.Element {
 
             {viewOnDeck ? (
               <Flex alignItems={ALIGN_CENTER}>
-                <Text as="h2" marginX={SPACING_3}>
+                <StyledText as="h2" marginX={SPACING.spacing16}>
                   {' '}
                   In Slot:
-                </Text>
-                <SlotSelect
+                </StyledText>
+                <select
+                  className={styles.slot_select}
                   defaultValue={labwareSlot}
+                  title="Select slot for labware placement"
                   onChange={e => {
                     setLabwareSlot(e.target.value)
                   }}
@@ -188,7 +176,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                       {slot}
                     </option>
                   ))}
-                </SlotSelect>
+                </select>
               </Flex>
             ) : null}
           </Flex>
@@ -237,15 +225,16 @@ export function CreateLabwareSandbox(): JSX.Element {
         </Flex>
         <Flex flex={2} flexDirection={DIRECTION_COLUMN}>
           <Flex alignItems={ALIGN_CENTER}>
-            <Text as="h2" margin={SPACING_2}>
+            <StyledText as="h2" margin={SPACING.spacing8}>
               Output
-            </Text>
-            <Text
+            </StyledText>
+            <StyledText
               css={FONT_BODY_2_DARK}
               fontStyle={FONT_STYLE_ITALIC}
-            >{` (${regularityLabel} Labware Definition)`}</Text>
+            >{` (${regularityLabel} Labware Definition)`}</StyledText>
           </Flex>
-          <JsonTextArea
+          <textarea
+            className={styles.json_text_area}
             title="output definition"
             value={JSON.stringify(labwareToRender, undefined, 2)}
             disabled
