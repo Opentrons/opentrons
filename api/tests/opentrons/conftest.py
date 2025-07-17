@@ -85,7 +85,6 @@ from opentrons_shared_data.deck import (
 )
 
 from opentrons import config
-from opentrons import hardware_control as hc
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
@@ -424,19 +423,6 @@ def hardware_controller_lockfile(
     monkeypatch.setitem(config.CONFIG, "hardware_controller_lockfile", lockfile)
 
     return lockfile_dir
-
-
-@pytest.mark.skipif(
-    not hc.Controller,
-    reason="hardware controller not available (probably windows)",
-)
-@pytest.fixture()
-def cntrlr_mock_connect(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def mock_connect(obj: object, port: Any = None) -> None:
-        return
-
-    monkeypatch.setattr(hc.Controller, "connect", mock_connect)
-    monkeypatch.setattr(hc.Controller, "fw_version", "virtual")
 
 
 @pytest.fixture()
@@ -809,7 +795,6 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
-        "twoDimensionalRendering": {},
     }
 
 
@@ -961,7 +946,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=10, y=20, z=30),
                             ),
                             flowRateByVolume=[(1.0, 35.0), (10.0, 24.0), (50.0, 35.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             preWet=True,
                             mix=MixProperties(
                                 enable=True, params=MixParams(repetitions=1, volume=50)
@@ -1010,7 +999,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=33, y=22, z=11),
                             ),
                             flowRateByVolume=[(1.0, 50.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             mix=MixProperties(
                                 enable=True, params=MixParams(repetitions=1, volume=50)
                             ),
@@ -1065,7 +1058,11 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=1, y=3, z=2),
                             ),
                             flowRateByVolume=[(50.0, 50.0)],
-                            correctionByVolume=[(0.0, 0.0)],
+                            correctionByVolume=[
+                                (0.0, 0.0),
+                                (10.0, -1.0),
+                                (50.0, -10.0),
+                            ],
                             conditioningByVolume=[(1.0, 5.0), (45.0, 5.0), (50.0, 0.0)],
                             disposalByVolume=[(1.0, 5.0), (45.0, 5.0), (50.0, 0.0)],
                             delay=DelayProperties(

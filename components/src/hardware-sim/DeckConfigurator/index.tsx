@@ -28,6 +28,7 @@ import type {
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
 export * from './constants'
@@ -51,6 +52,7 @@ interface DeckConfiguratorProps {
   additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
   height?: string
   selectedCutoutId?: CutoutId
+  moduleModel?: ModuleModel
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -64,6 +66,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     darkFill = COLORS.black90,
     editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
     height = '455px',
+    moduleModel,
   } = props
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -158,11 +161,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {emptySlotLikeItems.map(({ cutoutId, addressableAreaId }) => (
         <EmptyConfigItem
           data-testid={addressableAreaId}
+          editableCutoutIds={editableCutoutIds ?? []}
           key={addressableAreaId}
           addressableAreaId={addressableAreaId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
+          moduleModel={moduleModel}
         />
       ))}
       {wasteChuteItems.map(

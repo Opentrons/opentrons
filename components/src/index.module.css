@@ -3,7 +3,7 @@
 @import './styles/colors.module.css';
 @import './styles/typography.module.css';
 @import './styles/borders.module.css';
-@import './styles/spacing.module.css';
+@import './styles/global.module.css';
 
 :global(*) {
   box-sizing: border-box;

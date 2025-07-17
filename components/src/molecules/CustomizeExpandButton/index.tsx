@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CheckboxField } from '../../atoms/CheckboxField'
@@ -8,7 +9,12 @@ import { Flex } from '../../primitives'
 import { CURSOR_POINTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ChangeEvent, ChangeEventHandler, MouseEvent } from 'react'
+import type {
+  ChangeEvent,
+  ChangeEventHandler,
+  MemoExoticComponent,
+  MouseEvent,
+} from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
@@ -38,7 +44,7 @@ interface CustomizeExpandButtonProps extends StyleProps {
 }
 
 //  used for helix and as a child button to ListButtonAccordion
-export function CustomizeExpandButton(
+export function CustomizeExpandButtonComponent(
   props: CustomizeExpandButtonProps
 ): JSX.Element {
   const {
@@ -134,6 +140,10 @@ export function CustomizeExpandButton(
     </Flex>
   )
 }
+
+export const CustomizeExpandButton: MemoExoticComponent<
+  typeof CustomizeExpandButtonComponent
+> = memo(CustomizeExpandButtonComponent)
 
 const SettingButton = styled.input`
   display: none;

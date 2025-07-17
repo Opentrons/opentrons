@@ -1,10 +1,12 @@
 import {
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 
+import type { ComponentProps } from 'react'
 import type { RunData } from '@opentrons/api-client'
+import type { Module } from '@opentrons/components'
 import type {
   DeckDefinition,
   LabwareDefinition,
@@ -19,6 +21,8 @@ export interface RunModuleInfo {
   moduleDef: ModuleDefinition
   nestedLabwareDef: LabwareDefinition | null
   nestedLabwareId: string | null
+  targetDeckId: ComponentProps<typeof Module>['targetDeckId']
+  targetSlotId: ComponentProps<typeof Module>['targetSlotId']
 }
 
 export function getRunModuleRenderInfo(
@@ -28,7 +32,7 @@ export function getRunModuleRenderInfo(
 ): RunModuleInfo[] {
   if (runData.modules.length > 0) {
     return runData.modules.reduce<RunModuleInfo[]>((acc, module) => {
-      const moduleDef = getModuleDef2(module.model)
+      const moduleDef = getModuleDef(module.model)
       const nestedLabware = runData.labware.find(
         labware =>
           typeof labware.location === 'object' &&
@@ -52,6 +56,8 @@ export function getRunModuleRenderInfo(
           moduleDef,
           nestedLabwareDef,
           nestedLabwareId: nestedLabware?.id ?? null,
+          targetDeckId: deckDef.otId,
+          targetSlotId: slotName,
         },
       ]
     }, [])

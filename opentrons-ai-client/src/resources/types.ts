@@ -1,10 +1,20 @@
 import type { FC } from 'react'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { Flags } from '../feature-flags/types'
 
 export type ProtocolFormat = 'Protocol Designer' | 'Python'
 
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
+
+export type ValidFileType = 'pdf' | 'csv' | 'python'
+
+export interface FileAttachment {
+  name: string
+  type: ValidFileType
+  content: string
+  size: number
+}
 
 export interface ChatData {
   /** assistant: ChatGPT API, user: user */
@@ -19,6 +29,8 @@ export interface ChatData {
   protocol_content?: ProtocolFile
   /** The format of the protocol */
   protocol_format?: ProtocolFormat
+  /** attached files */
+  attachments?: FileAttachment[]
 }
 
 export interface CreatePrompt {
@@ -125,7 +137,4 @@ export interface PromptData {
   }
 }
 
-export interface FeatureFlags {
-  enablePrereleaseMode: boolean
-  enablePDProtocolGeneration: boolean
-}
+export type FeatureFlags = Flags

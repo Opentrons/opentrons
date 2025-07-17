@@ -208,6 +208,13 @@ describe('getFixtureOptions', () => {
           addressableAreaId: 'movableTrashD3',
         },
       ],
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
+          addressableAreaId: '96ChannelWasteChute',
+        },
+      ],
     ])
   })
   it('Should get staging area for cutoutD3 and aa fakeD4', () => {

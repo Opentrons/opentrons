@@ -20,10 +20,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { SlotDetailsContainer } from '../../../components/organisms'
-import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
@@ -62,9 +64,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
       <Flex
         backgroundColor={COLORS.white}
         borderRadius={BORDERS.borderRadius12}
-        width="100%"
-        height="100%"
-        padding={`${SPACING.spacing40} ${SPACING.spacing40} 0 ${SPACING.spacing40}`}
+        padding={SPACING.spacing40}
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_FLEX_END}
@@ -72,7 +72,6 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
         <Flex
           flex="0 0 auto"
           width={OFF_DECK_MAP_WIDTH}
-          height="100%"
           maxHeight={OFF_DECK_MAP_HEIGHT_FOR_STEP}
           minHeight={OFF_DECK_MAP_HEIGHT_FOR_STEP}
           alignItems={ALIGN_CENTER}
@@ -83,11 +82,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
         >
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            width="100%"
-            color={COLORS.grey60}
-          >
+          <Flex justifyContent={JUSTIFY_CENTER} color={COLORS.grey60}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {i18n.format(t('off_deck_labware'), 'upperCase')}
             </StyledText>
@@ -117,12 +112,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 zDimension: dimensions.zDimension ?? 0,
               }
               return (
-                <Flex
-                  id={lw.id}
-                  flexDirection={DIRECTION_COLUMN}
-                  key={lw.id}
-                  paddingBottom="0"
-                >
+                <Flex id={lw.id} flexDirection={DIRECTION_COLUMN} key={lw.id}>
                   <RobotWorkSpace
                     key={lw.id}
                     viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
@@ -133,6 +123,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                       <>
                         <LabwareRender
                           definition={definition}
+                          positioningMode="offsetInSlot"
                           wellFill={wellFillFromWellContents(
                             wellContents,
                             liquidDisplayColors
@@ -181,7 +172,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
         </Flex>
       </Flex>
       {hoverSlot != null && terminalItemId === START_TERMINAL_ITEM_ID ? (
-        <Flex width="100%" height="8rem">
+        <Flex>
           <SlotDetailsContainer
             robotType={robotType}
             slot="offDeck"

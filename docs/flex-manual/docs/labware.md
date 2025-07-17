@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Labware"
+---
+
 # Labware 
 
 This chapter covers items in the [Opentrons Labware Library](https://labware.opentrons.com/) you can use with Opentrons Flex and the Opentrons Flex Gripper. It also covers custom labware and, for our power users, links labware components to their corresponding JSON file definitions. 
@@ -396,7 +400,7 @@ Here are some diagrams that help you visualize the examples described above.
 | ![Labware with 3 square wells and 9 circular wells.](images/labware-layout-irregular-wells-not-identical.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
 | ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](images/labware-layout-irregular-multiple-grids.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
 
-Our labware team will work to understand your needs and design custom labware definitions for you. Contact Opentrons Support for more information. This is a fee-based service. 
+If you need help creating custom labware definitions, contact Opentrons Support (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service.
 
 #### Python API 
 

@@ -62,23 +62,49 @@ describe('Retract', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
+  it('renders test, buttons, input field, and keyboard for retract after dispense - delay duration', () => {
+    props.kind = 'dispense'
+    render(props)
+    screen.getByText('Retract after dispensing')
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Continue')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+    screen.getByText('Continue')
+    screen.getByText('Delay duration (seconds)')
+  })
+
   it('renders test, buttons, input field, and keyboard for retract after aspirating - position', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
-    screen.getByText('Save')
+    screen.getByText('Continue')
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '6' }))
+    fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Distance from bottom of well (mm)')
     screen.getByText('Between 0 and 2 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Save')
   })
   it('calls dispatch with correct action and settings when save is clicked', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
     fireEvent.click(screen.getByText('Continue'))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
@@ -87,6 +113,7 @@ describe('Retract', () => {
       type: 'SET_RETRACT_ASPIRATE',
       retractSettings: {
         speed: 11,
+        delayDuration: 0.5,
         positionFromBottom: 22,
       },
     })

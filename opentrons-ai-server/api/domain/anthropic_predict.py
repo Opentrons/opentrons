@@ -3,14 +3,15 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, cast
+from typing import Any, ContextManager, Dict, Iterable, List, Literal, cast
 
 import requests
 import structlog
-import weave  # type: ignore
+import weave
 from anthropic import Anthropic
 from anthropic.types import Message, MessageParam, TextBlockParam
 from ddtrace import tracer
+from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
@@ -18,7 +19,36 @@ from api.settings import Settings
 
 MessageType = Literal["create", "update"]
 
-weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+
+# Global variable to track Weave initialization
+_weave_initialized = False
+
+
+@tracer.wrap()
+def setup_weave_analytics(enable_analytics: bool) -> None:
+    """Setup Weave initialization only (thread-safe, request-agnostic)."""
+    global _weave_initialized
+
+    logger.debug(f"Analytics {'enabled' if enable_analytics else 'disabled'} for this request")
+
+    # Initialize Weave on first call (regardless of analytics preference)
+    if not _weave_initialized:
+        try:
+            weave.init("opentronsai/OpentronsAI-Phase-May-23-25")
+            logger.info("Weave initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Weave: {e}")
+        finally:
+            # Mark as initialized regardless of success/failure to prevent retries
+            _weave_initialized = True
+
+
+@tracer.wrap()
+def get_tracing_context(enable_analytics: bool) -> ContextManager[None]:
+    """Get context manager that controls Weave tracing for this specific request."""
+    return set_tracing_enabled(enable_analytics)
+
+
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -343,6 +373,7 @@ class AnthropicPredict:
     def create_pd(self, user_id: str, prompt: str, history: List[MessageParam] | None = None) -> str | None:
         return self.process_message_pd(user_id, prompt, history, "create")
 
+    @tracer.wrap()
     def deep_get(self, data: Dict[str, Any], *keys: str, default: Any = None) -> Any:
         """
         Safely navigate nested dictionaries using a sequence of keys.

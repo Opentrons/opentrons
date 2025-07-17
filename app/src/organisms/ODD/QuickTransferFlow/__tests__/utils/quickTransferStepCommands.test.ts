@@ -242,11 +242,9 @@ pipette.transfer_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 0},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 80)],
                 "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {
@@ -264,6 +262,8 @@ pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
                 },
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -395,11 +395,9 @@ pipette.consolidate_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 0},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 80)],
                 "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {
@@ -417,6 +415,8 @@ pipette.consolidate_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 50},
                 },
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -549,11 +549,9 @@ pipette.distribute_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 0},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 80)],
                 "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {
@@ -570,9 +568,37 @@ pipette.distribute_with_liquid_class(
                     },
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
-                    "conditioning_by_volume": [(0, 0)],
-                    "disposal_by_volume": [(0, 0)],
                 },
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
+            },
+            "multi_dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 0},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 80)],
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {
+                        "offset": {"x": 0, "y": 0, "z": 0},
+                        "position_reference": "well-bottom",
+                    },
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 0, "y": 0, "z": 0},
+                        "position_reference": "well-bottom",
+                    },
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
+                },
+                "conditioning_by_volume": [(0, 0)],
+                "disposal_by_volume": [(0, 0)],
             },
         }}},
     ),

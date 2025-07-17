@@ -2,6 +2,9 @@
 @import '../index.module.css';
 
 .modal {
+  position: fixed;
+  z-index: 1;
+
   /* from legacy --absolute-fill */
   top: 0;
 
@@ -18,16 +21,14 @@
   display: flex;
 
   /* from legacy --center-children */
-  justify-content: center;
-
-  /* from legacy --center-children */
   align-items: center;
 
   /* from legacy --center-children */
 
   align-items: flex-start;
-  position: fixed;
-  z-index: 1;
+
+  /* from legacy --center-children */
+  justify-content: center;
   padding: 4rem;
 }
 
@@ -51,14 +52,14 @@
   display: flex;
 
   /* from legacy --flex-start */
-  justify-content: flex-start;
+
+  flex-direction: column;
 
   /* from legacy --flex-start */
   align-items: center;
 
   /* from legacy --flex-start */
-
-  flex-direction: column;
+  justify-content: flex-start;
   padding: 4.5rem 3rem 1rem 3rem;
 }
 
@@ -84,11 +85,11 @@
 
 .title_bar {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   z-index: 3;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
 }
 
 .modal_contents {
@@ -101,13 +102,13 @@
   max-width: 38rem;
 
   /* from legacy --modal-contents */
-  margin: 0 auto;
-
-  /* from legacy --modal-contents */
   padding: 1rem;
 
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
+
+  /* from legacy --modal-contents */
+  margin: 0 auto;
 
   /* from legacy --modal-contents */
 
@@ -122,37 +123,36 @@
 
   /* from legacy --modal-contents */
   max-width: 38rem;
-
-  /* from legacy --modal-contents */
-  margin: 0 auto;
+  max-height: 100%;
 
   /* from legacy --modal-contents */
   padding: 1rem;
+  padding-top: 1rem;
 
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
 
   /* from legacy --modal-contents */
+  margin: 0 auto;
+
+  /* from legacy --modal-contents */
 
   background-color: white;
-  max-height: 100%;
   overflow-y: auto;
-  padding-top: 1rem;
 }
 
 .modal_heading {
-  font-size: var(--fs-header);
-
-  /* from legacy --font-header-dark */
-  font-weight: var(--fw-semibold);
-
-  /* from legacy --font-header-dark */
-  color: var(--c-font-dark);
-
   /* from legacy --font-header-dark */
 
   margin-top: 0;
   margin-bottom: 1rem;
+
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-header);
+
+  /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold);
   text-transform: capitalize;
 }
 
@@ -172,36 +172,37 @@
 }
 
 .spinner_modal_contents {
+  z-index: 4;
+
   /* from legacy --modal-contents */
   width: 100%;
 
-  /* from legacy --modal-contents */
-  margin: 0 auto;
+  /* from legacy --font-body-2-light */
+
+  max-width: 30rem;
+  flex-direction: column;
 
   /* from legacy --modal-contents */
   padding: 1rem;
+  padding-top: 3rem;
 
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
 
   /* from legacy --modal-contents */
-  font-size: var(--fs-body-2);
-
-  /* from legacy --font-body-2-light */
-  font-weight: var(--fw-regular);
+  margin: 0 auto;
+  background-color: transparent;
 
   /* from legacy --font-body-2-light */
   color: var(--c-font-light);
 
-  /* from legacy --font-body-2-light */
-
-  max-width: 30rem;
-  padding-top: 3rem;
-  background-color: transparent;
-  flex-direction: column;
+  /* from legacy --modal-contents */
+  font-size: var(--fs-body-2);
   font-style: italic;
+
+  /* from legacy --font-body-2-light */
+  font-weight: var(--fw-regular);
   text-align: center;
-  z-index: 4;
 }
 
 .spinner_modal_icon {
@@ -222,19 +223,18 @@
 }
 
 .alert_modal_contents {
-  font-size: var(--fs-body-2);
-
-  /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular);
-
-  /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark);
-
   /* from legacy --font-body-2-dark */
 
   width: 100%;
   max-height: 100%;
   padding: 1rem;
+
+  /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-body-2);
+
+  /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular);
 
   & > p {
     padding-bottom: 1rem;
@@ -242,22 +242,22 @@
 }
 
 .alert_modal_heading {
-  font-size: var(--fs-header);
-
-  /* from legacy --font-header-dark */
-  color: var(--c-font-dark);
-
-  /* from legacy --font-header-dark */
-
-  font-weight: normal;
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
+  left: 0;
   display: flex;
   align-items: center;
   padding: 1rem;
   background-color: #e0e0e0;
+
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-header);
+
+  /* from legacy --font-header-dark */
+
+  font-weight: normal;
 }
 
 .alert_modal_icon {
@@ -266,8 +266,8 @@
 }
 
 .alert_modal_buttons {
-  float: right;
   margin-top: 1rem;
+  float: right;
 }
 
 .alert_button {

@@ -1,4 +1,5 @@
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '@opentrons/step-generation'
+
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
 

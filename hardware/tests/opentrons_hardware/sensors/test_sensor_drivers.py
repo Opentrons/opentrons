@@ -2,7 +2,7 @@
 import pytest
 import mock
 from typing import Union, List
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from unittest.mock import patch
 from mock.mock import AsyncMock

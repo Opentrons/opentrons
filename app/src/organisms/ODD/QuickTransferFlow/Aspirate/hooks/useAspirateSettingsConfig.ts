@@ -60,6 +60,7 @@ export function useAspirateSettingsConfig({
         state.submergeAspirate !== undefined
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
+              delayDuration: state.submergeAspirate.delayDuration,
               position: state.submergeAspirate.positionFromBottom,
             })
           : '',
@@ -120,7 +121,6 @@ export function useAspirateSettingsConfig({
         state.delayAspirate !== undefined
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -135,6 +135,7 @@ export function useAspirateSettingsConfig({
         state.retractAspirate !== undefined
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
+              delayDuration: state.retractAspirate.delayDuration,
               position: state.retractAspirate.positionFromBottom,
             })
           : '',
