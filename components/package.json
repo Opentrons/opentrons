@@ -35,7 +35,6 @@
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
-    "clsx": "2.1.1",
     "interactjs": "^1.10.27",
     "i18next": "^19.8.3",
     "lodash": "4.17.21",
