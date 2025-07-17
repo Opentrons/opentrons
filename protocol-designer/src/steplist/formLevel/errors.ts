@@ -174,31 +174,31 @@ const PROFILE_VOLUME_REQUIRED: FormError = {
   page: 1,
 }
 const PROFILE_LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActive', 'lidTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
   location: 'field',
   page: 1,
