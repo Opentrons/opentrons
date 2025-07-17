@@ -123,7 +123,7 @@ TOF_DETECTION_CONFIG = {
 # Stallguard defaults
 STALLGUARD_CONFIG = {
     StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
 }
 
 # Motion Parameter defaults
@@ -657,11 +657,19 @@ class FlexStacker(mod_abc.AbstractModule):
             for bin in config.bins:
                 # We need to ignore raw photon count below N photons as
                 # it becomes inconsistent to detect labware given false positives.
+                raw_value = raw_data[bin]
+                base_value = baseline_data[bin]
+                log.warning(
+                    f"sensor:{sensor}, zone:{zone}, bin:{bin}, photon:{raw_value}, base:{base_value}, threshold:{config.threshold}"
+                )
                 if raw_data[bin] < config.threshold:
                     continue
                 delta = raw_data[bin] - baseline_data[bin]
                 if delta > 0:
+                    log.warning(f"DETECTED! delta:{delta}")
                     return True
+
+        log.warning("FAILED DETECTION!")
         return False
 
     async def verify_shuttle_location(self, expected: PlatformState) -> None:

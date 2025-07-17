@@ -12,6 +12,7 @@ from opentrons.hardware_control.modules.flex_stacker import (
     FlexStacker,
     STACKER_MOTION_CONFIG,
     STALLGUARD_CONFIG,
+    MAX_TRAVEL,
 )
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 from opentrons.drivers.flex_stacker.types import (
@@ -19,15 +20,18 @@ from opentrons.drivers.flex_stacker.types import (
     Direction,
 )
 
-# The distance from limit switch to limit switch, mm
-TEST_DISTANCE = {StackerAxis.X: 193.5, StackerAxis.Z: 137}
+# SGT Test range will be -n 1st index and +n 2nd index
+SGT_TEST_RANGE = (2, 3)
+# SGT threshold above this value should be ignored
+SGT_TEST_CUTOFF = 2
 
 
 def generate_test_thresholds(test_axis: StackerAxis) -> List[int]:
     """Generate test thresholds."""
     thresholds = []
+    low, high = SGT_TEST_RANGE
     default_threshold = STALLGUARD_CONFIG[test_axis].threshold
-    for sgt in range(default_threshold - 2, default_threshold + 3):
+    for sgt in range(default_threshold - low, default_threshold + high):
         thresholds.append(sgt)
     return thresholds
 
@@ -42,7 +46,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     lines: List[Union[CSVLine, CSVLineRepeating]] = []
     for axis in [StackerAxis.X, StackerAxis.Z]:
         for sgt in generate_test_thresholds(axis):
-            lines.append(CSVLine(_get_test_tag(axis, sgt), [CSVResult]))
+            lines.append(CSVLine(_get_test_tag(axis, sgt), ["Stalled", CSVResult]))
     return lines
 
 
@@ -60,7 +64,7 @@ async def test_stallguard(
             await stacker.move_axis(
                 test_axis,
                 Direction.RETRACT,
-                TEST_DISTANCE[test_axis],
+                MAX_TRAVEL[test_axis],
                 STACKER_MOTION_CONFIG[test_axis]["move"].move_params.max_speed,
                 STACKER_MOTION_CONFIG[test_axis]["move"].move_params.acceleration,
                 STACKER_MOTION_CONFIG[test_axis]["move"].run_current,
@@ -72,10 +76,11 @@ async def test_stallguard(
 
         await stacker.home_axis(test_axis, Direction.EXTEND)
 
+        result = stall_detected or sgt > SGT_TEST_CUTOFF
         report(
             section,
             _get_test_tag(test_axis, sgt),
-            [CSVResult.from_bool(stall_detected)],
+            [stall_detected, CSVResult.from_bool(result)],
         )
 
     # Restore default stallguard threshold
