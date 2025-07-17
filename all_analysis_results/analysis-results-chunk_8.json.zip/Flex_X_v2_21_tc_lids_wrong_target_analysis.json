@@ -1,0 +1,2862 @@
+{
+  "createdAt": "2025-07-17T17:17:30.049049Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_21_tc_lids_wrong_target.py",
+      "role": "main"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Illumina-Stranded_total_RNA_Ribo-Zero_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-A_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "seqwell-expressplex-library-prep_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "custom_opentrons_tough_pcr_auto_sealing_lid.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "Twist-EF-2_0_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "omega-bio-tek-mag-bind-environmental-dna-96_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "3e0bef_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "quickr_2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "greiner_384_wellplate_240ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "MN_DNA_Flex_Multi-Cells_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_1.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      21
+    ]
+  },
+  "metadata": {},
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "c8e45b3c-a3fc-4047-91d0-55f7b5273ebe",
+      "createdAt": "2025-07-17T17:17:29.855237Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-07-17T17:17:29.855497Z",
+      "completedAt": "2025-07-17T17:17:29.855623Z",
+      "notes": []
+    },
+    {
+      "id": "e75d87a0-bdda-400e-9908-d303e27e17de",
+      "createdAt": "2025-07-17T17:17:29.868548Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "succeeded",
+      "params": {
+        "model": "temperatureModuleV2",
+        "location": {
+          "slotName": "D1"
+        }
+      },
+      "result": {
+        "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66",
+        "model": "temperatureModuleV2",
+        "serialNumber": "fake-serial-number-e1aa98cd-b626-4fb1-bed3-e3440e703520"
+      },
+      "startedAt": "2025-07-17T17:17:29.868758Z",
+      "completedAt": "2025-07-17T17:17:29.869347Z",
+      "notes": []
+    },
+    {
+      "id": "b13bc0a4-7a71-478d-8970-5b44bcdd8d92",
+      "createdAt": "2025-07-17T17:17:29.881136Z",
+      "commandType": "loadLabware",
+      "key": "b9563ff54d4bfe61c469a7da06e79f42",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66"
+        },
+        "loadName": "opentrons_96_deep_well_temp_mod_adapter",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "temperatureModuleV2D1"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "temperatureModuleV2"
+            ],
+            "cutoutId": "cutoutD1"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons 96 Deep Well Temperature Module Adapter",
+            "displayCategory": "adapter",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_96_deep_well_temp_mod_adapter",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0.125,
+            "y": 0.25,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.5,
+            "zDimension": 21.4,
+            "xDimension": 127.75
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [
+            "adapter"
+          ],
+          "gripperOffsets": {}
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.881332Z",
+      "completedAt": "2025-07-17T17:17:29.890184Z",
+      "notes": []
+    },
+    {
+      "id": "1dd4abd9-6b2b-48d6-b749-486004834be9",
+      "createdAt": "2025-07-17T17:17:29.900548Z",
+      "commandType": "loadLabware",
+      "key": "07af6536632377008ed92723cc8c5072",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "A1"
+        },
+        "loadName": "nest_96_wellplate_2ml_deep",
+        "namespace": "opentrons",
+        "version": 2
+      },
+      "result": {
+        "labwareId": "be17c46e-1171-430a-8e90-919477f5a581",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "A1"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ],
+            "cutoutId": "cutoutA1"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 2,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "NEST 96 Deep Well Plate 2mL",
+            "displayCategory": "wellPlate",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "503001",
+              "503501"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/deep-well-plates/59253726.html"
+            ]
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "nest_96_wellplate_2ml_deep",
+            "isMagneticModuleCompatible": true,
+            "magneticModuleEngageHeight": 6.8
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.3,
+            "zDimension": 41,
+            "xDimension": 127.6
+          },
+          "wells": {
+            "A1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 3,
+              "y": 11.15
+            },
+            "A12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 74.15
+            },
+            "B12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 65.15
+            },
+            "C12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 56.15
+            },
+            "D12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 47.15
+            },
+            "E12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 38.15
+            },
+            "F12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 29.15
+            },
+            "G12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 20.15
+            },
+            "H12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 3,
+              "y": 11.15
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "E1",
+                "F1",
+                "G1",
+                "H1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "E2",
+                "F2",
+                "G2",
+                "H2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+                "E3",
+                "F3",
+                "G3",
+                "H3",
+                "A4",
+                "B4",
+                "C4",
+                "D4",
+                "E4",
+                "F4",
+                "G4",
+                "H4",
+                "A5",
+                "B5",
+                "C5",
+                "D5",
+                "E5",
+                "F5",
+                "G5",
+                "H5",
+                "A6",
+                "B6",
+                "C6",
+                "D6",
+                "E6",
+                "F6",
+                "G6",
+                "H6",
+                "A7",
+                "B7",
+                "C7",
+                "D7",
+                "E7",
+                "F7",
+                "G7",
+                "H7",
+                "A8",
+                "B8",
+                "C8",
+                "D8",
+                "E8",
+                "F8",
+                "G8",
+                "H8",
+                "A9",
+                "B9",
+                "C9",
+                "D9",
+                "E9",
+                "F9",
+                "G9",
+                "H9",
+                "A10",
+                "B10",
+                "C10",
+                "D10",
+                "E10",
+                "F10",
+                "G10",
+                "H10",
+                "A11",
+                "B11",
+                "C11",
+                "D11",
+                "E11",
+                "F11",
+                "G11",
+                "H11",
+                "A12",
+                "B12",
+                "C12",
+                "D12",
+                "E12",
+                "F12",
+                "G12",
+                "H12"
+              ],
+              "metadata": {
+                "displayName": "NEST 96 Deep Well Plate 2mL",
+                "displayCategory": "wellPlate",
+                "wellBottomShape": "v"
+              },
+              "brand": {
+                "brand": "NEST",
+                "brandId": []
+              }
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "opentrons_96_deep_well_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
+            },
+            "evotips_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 102
+            }
+          },
+          "stackingOffsetWithModule": {
+            "magneticBlockV1": {
+              "x": 0,
+              "y": 0,
+              "z": 2.66
+            }
+          },
+          "allowedRoles": [],
+          "gripperOffsets": {},
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 21.9
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.900756Z",
+      "completedAt": "2025-07-17T17:17:29.915294Z",
+      "notes": []
+    },
+    {
+      "id": "018d1192-f6f8-47ad-a917-b1c95acdd9fa",
+      "createdAt": "2025-07-17T17:17:29.918243Z",
+      "commandType": "loadLabware",
+      "key": "8eec906a29ce38c4567cc9831a24cd13",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "B2"
+        },
+        "loadName": "opentrons_flex_deck_riser",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Flex Deck Riser",
+            "displayCategory": "adapter",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_flex_deck_riser",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": -6.125,
+            "y": -6.125,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 98,
+            "zDimension": 55,
+            "xDimension": 140
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [
+            "adapter"
+          ],
+          "gripperOffsets": {}
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.918434Z",
+      "completedAt": "2025-07-17T17:17:29.929392Z",
+      "notes": []
+    },
+    {
+      "id": "a8502218-a4ce-421b-b30f-9459ec96981f",
+      "createdAt": "2025-07-17T17:17:29.938757Z",
+      "commandType": "moveLabware",
+      "key": "b96aaea662be1cd49d7d9b93dedfdd76",
+      "status": "succeeded",
+      "params": {
+        "labwareId": "be17c46e-1171-430a-8e90-919477f5a581",
+        "newLocation": {
+          "labwareId": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2"
+        },
+        "strategy": "manualMoveWithPause"
+      },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "temperatureModuleV2D1"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "temperatureModuleV2"
+            ],
+            "cutoutId": "cutoutD1"
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "temperatureModuleV2D1"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "temperatureModuleV2"
+            ],
+            "cutoutId": "cutoutD1"
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "A1"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ],
+            "cutoutId": "cutoutA1"
+          }
+        ]
+      },
+      "startedAt": "2025-07-17T17:17:29.938966Z",
+      "completedAt": "2025-07-17T17:17:29.939498Z",
+      "notes": []
+    },
+    {
+      "id": "df78777e-72c8-43cf-a4cf-088542d02a21",
+      "createdAt": "2025-07-17T17:17:29.952190Z",
+      "commandType": "loadLabware",
+      "key": "48dfe520259476c2688c469837455156",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+        },
+        "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "D2"
+      },
+      "result": {
+        "labwareId": "35c59001-237c-45d1-be1a-1324215721cf",
+        "locationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
+            "displayCategory": "lid",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "irregular",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 12.8,
+            "xDimension": 127.7
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "default": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_tough_pcr_auto_sealing_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 6.492
+            },
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "biorad_96_wellplate_200ul_pcr": {
+              "x": 0,
+              "y": 0,
+              "z": 8.08
+            },
+            "opentrons_flex_deck_riser": {
+              "x": 0,
+              "y": 0,
+              "z": 34
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "stackingOffsetWithModule": {
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "allowedRoles": [
+            "labware",
+            "lid"
+          ],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 1.5
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 0.52,
+                "z": -6
+              }
+            },
+            "lidOffsets": {
+              "pickUpOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -5
+              },
+              "dropOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -1
+              }
+            },
+            "lidDisposalOffsets": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 5.0,
+                "z": 50.0
+              }
+            }
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 7.91,
+          "stackLimit": 5,
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_flex_deck_riser",
+            "protocol_engine_lid_stack_object"
+          ]
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.952411Z",
+      "completedAt": "2025-07-17T17:17:29.955996Z",
+      "notes": []
+    },
+    {
+      "id": "ae665dfa-246b-41c0-b92f-5b4753c465bf",
+      "createdAt": "2025-07-17T17:17:29.957606Z",
+      "commandType": "loadLabware",
+      "key": "dbb90de7194277dcb8565653c9e086cf",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+        },
+        "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee",
+        "locationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
+            "displayCategory": "lid",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "irregular",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 12.8,
+            "xDimension": 127.7
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "default": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_tough_pcr_auto_sealing_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 6.492
+            },
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "biorad_96_wellplate_200ul_pcr": {
+              "x": 0,
+              "y": 0,
+              "z": 8.08
+            },
+            "opentrons_flex_deck_riser": {
+              "x": 0,
+              "y": 0,
+              "z": 34
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "stackingOffsetWithModule": {
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "allowedRoles": [
+            "labware",
+            "lid"
+          ],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 1.5
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 0.52,
+                "z": -6
+              }
+            },
+            "lidOffsets": {
+              "pickUpOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -5
+              },
+              "dropOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -1
+              }
+            },
+            "lidDisposalOffsets": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 5.0,
+                "z": 50.0
+              }
+            }
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 7.91,
+          "stackLimit": 5,
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_flex_deck_riser",
+            "protocol_engine_lid_stack_object"
+          ]
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.957776Z",
+      "completedAt": "2025-07-17T17:17:29.958126Z",
+      "notes": []
+    },
+    {
+      "id": "07aafe42-3971-43e8-bbef-aba4adf6ed64",
+      "createdAt": "2025-07-17T17:17:29.968434Z",
+      "commandType": "loadLabware",
+      "key": "a02dfd0c2994ad8f36030bc7d6a9d9b4",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee"
+        },
+        "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "8c1a291b-9dfc-4933-8226-954311114921",
+        "locationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
+            "displayCategory": "lid",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "irregular",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 12.8,
+            "xDimension": 127.7
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "default": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_tough_pcr_auto_sealing_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 6.492
+            },
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "biorad_96_wellplate_200ul_pcr": {
+              "x": 0,
+              "y": 0,
+              "z": 8.08
+            },
+            "opentrons_flex_deck_riser": {
+              "x": 0,
+              "y": 0,
+              "z": 34
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "stackingOffsetWithModule": {
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "allowedRoles": [
+            "labware",
+            "lid"
+          ],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 1.5
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 0.52,
+                "z": -6
+              }
+            },
+            "lidOffsets": {
+              "pickUpOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -5
+              },
+              "dropOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -1
+              }
+            },
+            "lidDisposalOffsets": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 5.0,
+                "z": 50.0
+              }
+            }
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 7.91,
+          "stackLimit": 5,
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_flex_deck_riser",
+            "protocol_engine_lid_stack_object"
+          ]
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.968635Z",
+      "completedAt": "2025-07-17T17:17:29.969038Z",
+      "notes": []
+    },
+    {
+      "id": "9198b571-dbdc-49fc-a767-8b30d7f4888d",
+      "createdAt": "2025-07-17T17:17:29.976076Z",
+      "commandType": "loadLabware",
+      "key": "78e449de1478e61a7fcd82e5ceb3d0da",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "labwareId": "8c1a291b-9dfc-4933-8226-954311114921"
+        },
+        "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "6ac375e2-3155-4a9a-bcca-5c8c6a8b24ba",
+        "locationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "8c1a291b-9dfc-4933-8226-954311114921"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
+            "displayCategory": "lid",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "irregular",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 12.8,
+            "xDimension": 127.7
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "default": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_tough_pcr_auto_sealing_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 6.492
+            },
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "biorad_96_wellplate_200ul_pcr": {
+              "x": 0,
+              "y": 0,
+              "z": 8.08
+            },
+            "opentrons_flex_deck_riser": {
+              "x": 0,
+              "y": 0,
+              "z": 34
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "stackingOffsetWithModule": {
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "allowedRoles": [
+            "labware",
+            "lid"
+          ],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 1.5
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 0.52,
+                "z": -6
+              }
+            },
+            "lidOffsets": {
+              "pickUpOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -5
+              },
+              "dropOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -1
+              }
+            },
+            "lidDisposalOffsets": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 5.0,
+                "z": 50.0
+              }
+            }
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 7.91,
+          "stackLimit": 5,
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_flex_deck_riser",
+            "protocol_engine_lid_stack_object"
+          ]
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.976245Z",
+      "completedAt": "2025-07-17T17:17:29.976584Z",
+      "notes": []
+    },
+    {
+      "id": "58294b36-744e-4162-b36b-d7572c6418fd",
+      "createdAt": "2025-07-17T17:17:29.984693Z",
+      "commandType": "loadLabware",
+      "key": "8b34edfc427771290ae5069fb3e17178",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "labwareId": "6ac375e2-3155-4a9a-bcca-5c8c6a8b24ba"
+        },
+        "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "871bbdd2-e29d-4280-91b4-dc514bb6e3c9",
+        "locationSequence": [
+          {
+            "kind": "onLabware",
+            "labwareId": "6ac375e2-3155-4a9a-bcca-5c8c6a8b24ba"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "8c1a291b-9dfc-4933-8226-954311114921"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+          },
+          {
+            "kind": "onLabware",
+            "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+          },
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutB2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
+            "displayCategory": "lid",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "irregular",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 12.8,
+            "xDimension": 127.7
+          },
+          "wells": {},
+          "groups": [
+            {
+              "wells": [],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "default": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_tough_pcr_auto_sealing_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 6.492
+            },
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 8.193
+            },
+            "biorad_96_wellplate_200ul_pcr": {
+              "x": 0,
+              "y": 0,
+              "z": 8.08
+            },
+            "opentrons_flex_deck_riser": {
+              "x": 0,
+              "y": 0,
+              "z": 34
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "stackingOffsetWithModule": {
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          },
+          "allowedRoles": [
+            "labware",
+            "lid"
+          ],
+          "gripperOffsets": {
+            "default": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 1.5
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 0.52,
+                "z": -6
+              }
+            },
+            "lidOffsets": {
+              "pickUpOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -5
+              },
+              "dropOffset": {
+                "x": 0.5,
+                "y": 0,
+                "z": -1
+              }
+            },
+            "lidDisposalOffsets": {
+              "pickUpOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "dropOffset": {
+                "x": 0,
+                "y": 5.0,
+                "z": 50.0
+              }
+            }
+          },
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 7.91,
+          "stackLimit": 5,
+          "compatibleParentLabware": [
+            "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "opentrons_tough_pcr_auto_sealing_lid",
+            "biorad_96_wellplate_200ul_pcr",
+            "opentrons_flex_deck_riser",
+            "protocol_engine_lid_stack_object"
+          ]
+        }
+      },
+      "startedAt": "2025-07-17T17:17:29.984901Z",
+      "completedAt": "2025-07-17T17:17:29.985306Z",
+      "notes": []
+    },
+    {
+      "id": "6ed657f1-e6d6-48b1-aee5-7bc93681e2b2",
+      "createdAt": "2025-07-17T17:17:29.992128Z",
+      "commandType": "moveLabware",
+      "key": "5b419658c58e3cd2794830de913fb88c",
+      "status": "failed",
+      "params": {
+        "labwareId": "871bbdd2-e29d-4280-91b4-dc514bb6e3c9",
+        "newLocation": {
+          "labwareId": "be17c46e-1171-430a-8e90-919477f5a581"
+        },
+        "strategy": "usingGripper"
+      },
+      "error": {
+        "id": "ca008e5e-3865-45a0-848b-3eafeb370db6",
+        "createdAt": "2025-07-17T17:17:29.997054Z",
+        "isDefined": false,
+        "errorType": "LabwareCannotBeStackedError",
+        "errorCode": "4000",
+        "detail": "Labware opentrons_tough_pcr_auto_sealing_lid cannot be loaded onto labware nest_96_wellplate_2ml_deep",
+        "errorInfo": {},
+        "wrappedErrors": []
+      },
+      "startedAt": "2025-07-17T17:17:29.992283Z",
+      "completedAt": "2025-07-17T17:17:29.997054Z",
+      "notes": [
+        {
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ]
+    }
+  ],
+  "labware": [
+    {
+      "id": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2",
+      "loadName": "opentrons_96_deep_well_temp_mod_adapter",
+      "definitionUri": "opentrons/opentrons_96_deep_well_temp_mod_adapter/1",
+      "location": {
+        "moduleId": "fa784fb4-065b-472f-84bb-e74af875ec66"
+      }
+    },
+    {
+      "id": "be17c46e-1171-430a-8e90-919477f5a581",
+      "loadName": "nest_96_wellplate_2ml_deep",
+      "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
+      "location": {
+        "labwareId": "7f1e9a2a-b1ea-4f57-8294-e4132cbc15a2"
+      }
+    },
+    {
+      "id": "1b79853b-9d7d-46a5-9016-3049f68c7591",
+      "loadName": "opentrons_flex_deck_riser",
+      "definitionUri": "opentrons/opentrons_flex_deck_riser/1",
+      "location": {
+        "slotName": "B2"
+      }
+    },
+    {
+      "id": "35c59001-237c-45d1-be1a-1324215721cf",
+      "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+      "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
+      "location": {
+        "labwareId": "1b79853b-9d7d-46a5-9016-3049f68c7591"
+      },
+      "displayName": "D2"
+    },
+    {
+      "id": "be71bcd6-8f34-445e-856c-db3980d2baee",
+      "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+      "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
+      "location": {
+        "labwareId": "35c59001-237c-45d1-be1a-1324215721cf"
+      }
+    },
+    {
+      "id": "8c1a291b-9dfc-4933-8226-954311114921",
+      "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+      "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
+      "location": {
+        "labwareId": "be71bcd6-8f34-445e-856c-db3980d2baee"
+      }
+    },
+    {
+      "id": "6ac375e2-3155-4a9a-bcca-5c8c6a8b24ba",
+      "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+      "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
+      "location": {
+        "labwareId": "8c1a291b-9dfc-4933-8226-954311114921"
+      }
+    },
+    {
+      "id": "871bbdd2-e29d-4280-91b4-dc514bb6e3c9",
+      "loadName": "opentrons_tough_pcr_auto_sealing_lid",
+      "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
+      "location": {
+        "labwareId": "6ac375e2-3155-4a9a-bcca-5c8c6a8b24ba"
+      }
+    }
+  ],
+  "pipettes": [],
+  "modules": [
+    {
+      "id": "fa784fb4-065b-472f-84bb-e74af875ec66",
+      "model": "temperatureModuleV2",
+      "location": {
+        "slotName": "D1"
+      },
+      "serialNumber": "fake-serial-number-e1aa98cd-b626-4fb1-bed3-e3440e703520"
+    }
+  ],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "d1c65812-69f1-448e-ad96-585966a3ad6d",
+      "createdAt": "2025-07-17T17:17:30.008000Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ProtocolCommandFailedError [line 22]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LabwareCannotBeStackedError: Labware opentrons_tough_pcr_auto_sealing_lid cannot be loaded onto labware nest_96_wellplate_2ml_deep",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "d1c65812-69f1-448e-ad96-585966a3ad6d",
+          "createdAt": "2025-07-17T17:17:30.008000Z",
+          "isDefined": false,
+          "errorType": "ProtocolCommandFailedError",
+          "errorCode": "4000",
+          "detail": "LabwareCannotBeStackedError: Labware opentrons_tough_pcr_auto_sealing_lid cannot be loaded onto labware nest_96_wellplate_2ml_deep",
+          "errorInfo": {},
+          "wrappedErrors": [
+            {
+              "id": "ca008e5e-3865-45a0-848b-3eafeb370db6",
+              "createdAt": "2025-07-17T17:17:29.997054Z",
+              "isDefined": false,
+              "errorType": "LabwareCannotBeStackedError",
+              "errorCode": "4000",
+              "detail": "Labware opentrons_tough_pcr_auto_sealing_lid cannot be loaded onto labware nest_96_wellplate_2ml_deep",
+              "errorInfo": {},
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

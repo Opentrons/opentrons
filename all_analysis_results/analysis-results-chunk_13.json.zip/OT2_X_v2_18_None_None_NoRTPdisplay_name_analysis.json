@@ -1,0 +1,264 @@
+{
+  "createdAt": "2025-07-17T17:17:24.337602Z",
+  "files": [
+    {
+      "name": "OT2_X_v2_18_None_None_NoRTPdisplay_name.py",
+      "role": "main"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Illumina-Stranded_total_RNA_Ribo-Zero_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-A_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "seqwell-expressplex-library-prep_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "custom_opentrons_tough_pcr_auto_sealing_lid.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "Twist-EF-2_0_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "omega-bio-tek-mag-bind-environmental-dna-96_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "3e0bef_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "quickr_2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "greiner_384_wellplate_240ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "MN_DNA_Flex_Multi-Cells_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_1.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      18
+    ]
+  },
+  "metadata": {
+    "protocolName": "No RTP Display Name"
+  },
+  "result": "not-ok",
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": [],
+  "commands": [],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "analysis-setup-error",
+      "createdAt": "2025-07-17T17:17:24.336045Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "TypeError [line 11]: ParameterContext.add_int() missing 1 required positional argument: 'display_name'",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "analysis-setup-error",
+          "createdAt": "2025-07-17T17:17:24.336045Z",
+          "isDefined": false,
+          "errorType": "PythonException",
+          "errorCode": "4000",
+          "detail": "TypeError: ParameterContext.add_int() missing 1 required positional argument: 'display_name'",
+          "errorInfo": {
+            "args": "(\"ParameterContext.add_int() missing 1 required positional argument: 'display_name'\",)",
+            "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line 89, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_18_None_None_NoRTPdisplay_name.py\", line 11, in add_parameters\n",
+            "class": "TypeError"
+          },
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

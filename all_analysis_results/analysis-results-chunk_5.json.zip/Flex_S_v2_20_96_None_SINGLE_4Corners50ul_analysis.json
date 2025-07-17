@@ -1,0 +1,3259 @@
+{
+  "createdAt": "2025-07-17T17:17:27.899750Z",
+  "files": [
+    {
+      "name": "Flex_S_v2_20_96_None_SINGLE_4Corners50ul.py",
+      "role": "main"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Illumina-Stranded_total_RNA_Ribo-Zero_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-A_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "seqwell-expressplex-library-prep_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "custom_opentrons_tough_pcr_auto_sealing_lid.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "Twist-EF-2_0_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "omega-bio-tek-mag-bind-environmental-dna-96_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "3e0bef_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "quickr_2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "greiner_384_wellplate_240ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "MN_DNA_Flex_Multi-Cells_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_1.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      20
+    ]
+  },
+  "metadata": {
+    "protocolName": "96Channel SINGLE Pickup on all 4 corners 2 pickups",
+    "description": "96 2 tips picked up on all 4 corners of the tip rack"
+  },
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "d7025f65-6c40-4c11-b7d5-799db8f1bafb",
+      "createdAt": "2025-07-17T17:17:26.896137Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-07-17T17:17:26.896441Z",
+      "completedAt": "2025-07-17T17:17:26.896597Z",
+      "notes": []
+    },
+    {
+      "id": "d19dcdc2-84e1-4793-91bb-19c0ef54d093",
+      "createdAt": "2025-07-17T17:17:26.932985Z",
+      "commandType": "loadLabware",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "C2"
+        },
+        "loadName": "opentrons_flex_96_tiprack_50ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Partial Tip Rack"
+      },
+      "result": {
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "C2"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ],
+            "cutoutId": "cutoutC2"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Flex 96 Tip Rack 50 \u00b5L",
+            "displayCategory": "tipRack",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": true,
+            "tipLength": 57.9,
+            "tipOverlap": 10.5,
+            "loadName": "opentrons_flex_96_tiprack_50ul",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.75,
+            "zDimension": 99,
+            "xDimension": 127.75
+          },
+          "wells": {
+            "A1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H1": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H2": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H3": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H4": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H5": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H6": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H7": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H8": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H9": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H10": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H11": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H12": {
+              "shape": "circular",
+              "diameter": 5.58,
+              "depth": 97.5,
+              "totalLiquidVolume": 50,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 11.38
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "E1",
+                "F1",
+                "G1",
+                "H1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "E2",
+                "F2",
+                "G2",
+                "H2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+                "E3",
+                "F3",
+                "G3",
+                "H3",
+                "A4",
+                "B4",
+                "C4",
+                "D4",
+                "E4",
+                "F4",
+                "G4",
+                "H4",
+                "A5",
+                "B5",
+                "C5",
+                "D5",
+                "E5",
+                "F5",
+                "G5",
+                "H5",
+                "A6",
+                "B6",
+                "C6",
+                "D6",
+                "E6",
+                "F6",
+                "G6",
+                "H6",
+                "A7",
+                "B7",
+                "C7",
+                "D7",
+                "E7",
+                "F7",
+                "G7",
+                "H7",
+                "A8",
+                "B8",
+                "C8",
+                "D8",
+                "E8",
+                "F8",
+                "G8",
+                "H8",
+                "A9",
+                "B9",
+                "C9",
+                "D9",
+                "E9",
+                "F9",
+                "G9",
+                "H9",
+                "A10",
+                "B10",
+                "C10",
+                "D10",
+                "E10",
+                "F10",
+                "G10",
+                "H10",
+                "A11",
+                "B11",
+                "C11",
+                "D11",
+                "E11",
+                "F11",
+                "G11",
+                "H11",
+                "A12",
+                "B12",
+                "C12",
+                "D12",
+                "E12",
+                "F12",
+                "G12",
+                "H12"
+              ],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [],
+          "gripperOffsets": {},
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9
+        }
+      },
+      "startedAt": "2025-07-17T17:17:26.933236Z",
+      "completedAt": "2025-07-17T17:17:26.941706Z",
+      "notes": []
+    },
+    {
+      "id": "4270e068-e736-4ad6-a781-eabfdfe6eb88",
+      "createdAt": "2025-07-17T17:17:26.953747Z",
+      "commandType": "loadPipette",
+      "key": "bd403a1c851a75b4b68ce34796d713fa",
+      "status": "succeeded",
+      "params": {
+        "pipetteName": "p1000_96",
+        "mount": "left",
+        "tipOverlapNotAfterVersion": "v3",
+        "liquidPresenceDetection": false
+      },
+      "result": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "startedAt": "2025-07-17T17:17:26.953997Z",
+      "completedAt": "2025-07-17T17:17:26.971978Z",
+      "notes": []
+    },
+    {
+      "id": "29efe32b-1571-4f46-9163-d39d90ba91a8",
+      "createdAt": "2025-07-17T17:17:26.986521Z",
+      "commandType": "configureNozzleLayout",
+      "key": "2c37ad797da7df791b57a7843a203e88",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "configurationParams": {
+          "style": "SINGLE",
+          "primaryNozzle": "A1"
+        }
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:26.986727Z",
+      "completedAt": "2025-07-17T17:17:26.987880Z",
+      "notes": []
+    },
+    {
+      "id": "d49a1916-540d-4a7f-b4fb-83e34981f287",
+      "createdAt": "2025-07-17T17:17:27.016807Z",
+      "commandType": "pickUpTip",
+      "key": "5004162d048e1cc084a75b87850217a3",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "H12",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 118.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.017122Z",
+      "completedAt": "2025-07-17T17:17:27.017812Z",
+      "notes": []
+    },
+    {
+      "id": "bfcb0223-4a65-4306-8d31-c59c7789a73f",
+      "createdAt": "2025-07-17T17:17:27.033304Z",
+      "commandType": "comment",
+      "key": "9fc4c9944b197642c13d249062ca5979",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.033567Z",
+      "completedAt": "2025-07-17T17:17:27.033674Z",
+      "notes": []
+    },
+    {
+      "id": "effb48b1-eda0-4d18-aea1-55f224490758",
+      "createdAt": "2025-07-17T17:17:27.039958Z",
+      "commandType": "comment",
+      "key": "a6ffca005d40b5a10794c2fdabb52108",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.040125Z",
+      "completedAt": "2025-07-17T17:17:27.040208Z",
+      "notes": []
+    },
+    {
+      "id": "0a6b8fde-720f-4a9f-85f7-f2aee5626993",
+      "createdAt": "2025-07-17T17:17:27.046172Z",
+      "commandType": "comment",
+      "key": "dfab6c9318cbf3663895698e14365582",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.046315Z",
+      "completedAt": "2025-07-17T17:17:27.046389Z",
+      "notes": []
+    },
+    {
+      "id": "cc9b86c5-b9f2-426f-832e-106be0abf7f3",
+      "createdAt": "2025-07-17T17:17:27.054266Z",
+      "commandType": "comment",
+      "key": "bf4cafdf2e1ef7ee3f65c575c2cfeff9",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.054444Z",
+      "completedAt": "2025-07-17T17:17:27.054533Z",
+      "notes": []
+    },
+    {
+      "id": "a25ec6db-ad2b-4ea0-8cf0-bc631b6a8092",
+      "createdAt": "2025-07-17T17:17:27.057157Z",
+      "commandType": "comment",
+      "key": "2a3270bda2ade196171484b198d427a6",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.057336Z",
+      "completedAt": "2025-07-17T17:17:27.057416Z",
+      "notes": []
+    },
+    {
+      "id": "b3d63025-934d-463d-babf-0c742ac29154",
+      "createdAt": "2025-07-17T17:17:27.060277Z",
+      "commandType": "comment",
+      "key": "010ca51ab88e06fa5895fa1c49d918f0",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.060419Z",
+      "completedAt": "2025-07-17T17:17:27.060497Z",
+      "notes": []
+    },
+    {
+      "id": "c25accd3-bba5-4f55-951d-0fd83596bb6f",
+      "createdAt": "2025-07-17T17:17:27.065549Z",
+      "commandType": "comment",
+      "key": "a8f7708560dfc4d6aa3d51181e46ba7a",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.065691Z",
+      "completedAt": "2025-07-17T17:17:27.065766Z",
+      "notes": []
+    },
+    {
+      "id": "ef01f292-9f51-4c49-a513-13a7a6f0f4df",
+      "createdAt": "2025-07-17T17:17:27.072412Z",
+      "commandType": "comment",
+      "key": "0ceaaa482eb16e9d121e3fd897ff81d4",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \ud83d\udfe2  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.072573Z",
+      "completedAt": "2025-07-17T17:17:27.072661Z",
+      "notes": []
+    },
+    {
+      "id": "773fcd8a-ad77-4b50-9375-68d67cff7018",
+      "createdAt": "2025-07-17T17:17:27.079081Z",
+      "commandType": "comment",
+      "key": "2c2b08bb2435f6c7a32eec54446508d3",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \ud83d\udfe2  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.079267Z",
+      "completedAt": "2025-07-17T17:17:27.079360Z",
+      "notes": []
+    },
+    {
+      "id": "fd5ddbce-43a4-4b40-bbdd-921880551c06",
+      "createdAt": "2025-07-17T17:17:27.083074Z",
+      "commandType": "waitForResume",
+      "key": "fd7e80febf2f61e42c57cd370d1d7066",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of first tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.083234Z",
+      "completedAt": "2025-07-17T17:17:27.083313Z",
+      "notes": []
+    },
+    {
+      "id": "541e3c70-f80a-4bdf-b657-4e19a32b70a7",
+      "createdAt": "2025-07-17T17:17:27.085803Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "c791613d10ad485c1bc13c6835ae8420",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.087175Z",
+      "completedAt": "2025-07-17T17:17:27.087667Z",
+      "notes": []
+    },
+    {
+      "id": "cb5e28ed-953e-41b3-a76c-940ed46d13de",
+      "createdAt": "2025-07-17T17:17:27.102702Z",
+      "commandType": "dropTipInPlace",
+      "key": "dbf86704f69aa819c2924aab5dc0d65f",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.102996Z",
+      "completedAt": "2025-07-17T17:17:27.103153Z",
+      "notes": []
+    },
+    {
+      "id": "df159f29-0e8b-4b30-a160-b2ee87c0c400",
+      "createdAt": "2025-07-17T17:17:27.118589Z",
+      "commandType": "pickUpTip",
+      "key": "f50c5f0c7f13871a9c2d9e83442caca8",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "G12",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 127.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.118838Z",
+      "completedAt": "2025-07-17T17:17:27.119440Z",
+      "notes": []
+    },
+    {
+      "id": "9244f914-4a3d-4bf2-a653-e891cb748eb8",
+      "createdAt": "2025-07-17T17:17:27.138497Z",
+      "commandType": "comment",
+      "key": "4a2de6c8e9b444a1216c6ace932ade40",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.138750Z",
+      "completedAt": "2025-07-17T17:17:27.138863Z",
+      "notes": []
+    },
+    {
+      "id": "9cb62583-2055-4cfd-b6d4-ce236bf72a8e",
+      "createdAt": "2025-07-17T17:17:27.148105Z",
+      "commandType": "comment",
+      "key": "94c16af28b0ab6bbb740b25b939dab76",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.148315Z",
+      "completedAt": "2025-07-17T17:17:27.148406Z",
+      "notes": []
+    },
+    {
+      "id": "40d1c7f1-09cd-4b18-b711-c240859b6110",
+      "createdAt": "2025-07-17T17:17:27.159137Z",
+      "commandType": "comment",
+      "key": "131dfb328e7b4ff1491bbac20e93f66a",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.159363Z",
+      "completedAt": "2025-07-17T17:17:27.159460Z",
+      "notes": []
+    },
+    {
+      "id": "eb8321ab-fc6d-4c67-a05e-097fc09424b4",
+      "createdAt": "2025-07-17T17:17:27.161684Z",
+      "commandType": "comment",
+      "key": "38185054c14a8bb90a0747c922f6f729",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.161822Z",
+      "completedAt": "2025-07-17T17:17:27.161893Z",
+      "notes": []
+    },
+    {
+      "id": "d40c8cc8-7f9d-4f98-8062-da5c4c21d432",
+      "createdAt": "2025-07-17T17:17:27.166605Z",
+      "commandType": "comment",
+      "key": "bc53785b7d0ebcda5af6c9536c2793f6",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.166747Z",
+      "completedAt": "2025-07-17T17:17:27.166823Z",
+      "notes": []
+    },
+    {
+      "id": "9fa3d057-11f9-493f-8893-63793e405db1",
+      "createdAt": "2025-07-17T17:17:27.171169Z",
+      "commandType": "comment",
+      "key": "b92cd9129eb6c8b26454528f2f2f8d48",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.171302Z",
+      "completedAt": "2025-07-17T17:17:27.171374Z",
+      "notes": []
+    },
+    {
+      "id": "e179fff9-10d6-4a71-a531-8facf012a5d6",
+      "createdAt": "2025-07-17T17:17:27.182418Z",
+      "commandType": "comment",
+      "key": "8c28b8123d8bb0502cfa282f8578336d",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.182637Z",
+      "completedAt": "2025-07-17T17:17:27.182731Z",
+      "notes": []
+    },
+    {
+      "id": "5df7359d-b172-491c-9e13-5e890dbabe07",
+      "createdAt": "2025-07-17T17:17:27.184674Z",
+      "commandType": "comment",
+      "key": "bfe92dc01d8ac2866e8b26c71491a38e",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \ud83d\udfe2  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.184835Z",
+      "completedAt": "2025-07-17T17:17:27.184909Z",
+      "notes": []
+    },
+    {
+      "id": "db3a9659-bfeb-43ec-a264-c53cd291e723",
+      "createdAt": "2025-07-17T17:17:27.191660Z",
+      "commandType": "comment",
+      "key": "7f7b97535cb1281376bce6751b27e199",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \ud83d\udfe2  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.191805Z",
+      "completedAt": "2025-07-17T17:17:27.191877Z",
+      "notes": []
+    },
+    {
+      "id": "e0f79810-9d34-4ade-80eb-31ce9180aefa",
+      "createdAt": "2025-07-17T17:17:27.198843Z",
+      "commandType": "waitForResume",
+      "key": "8ad452640dfdd3dec226f2f2584a5241",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of second tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.199041Z",
+      "completedAt": "2025-07-17T17:17:27.199132Z",
+      "notes": []
+    },
+    {
+      "id": "b436df98-de34-4273-8c09-f9d8bb76e6a0",
+      "createdAt": "2025-07-17T17:17:27.206388Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "b666f0e497ca1739a0c2dc88524d61ae",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.206574Z",
+      "completedAt": "2025-07-17T17:17:27.207101Z",
+      "notes": []
+    },
+    {
+      "id": "dae0aea4-b45c-4802-9e27-eaab2aceb3f9",
+      "createdAt": "2025-07-17T17:17:27.210560Z",
+      "commandType": "dropTipInPlace",
+      "key": "d63a9e89abf89d43c469036b9fcb7780",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.210700Z",
+      "completedAt": "2025-07-17T17:17:27.210786Z",
+      "notes": []
+    },
+    {
+      "id": "64ba7ff9-a1ee-4fb7-8d0e-1a051258a316",
+      "createdAt": "2025-07-17T17:17:27.215068Z",
+      "commandType": "configureNozzleLayout",
+      "key": "4be5c184815438d4e445cb0604d3f73d",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "configurationParams": {
+          "style": "SINGLE",
+          "primaryNozzle": "A12"
+        }
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.215229Z",
+      "completedAt": "2025-07-17T17:17:27.215428Z",
+      "notes": []
+    },
+    {
+      "id": "5222c878-4a8e-4ce5-a300-00551bbcd18f",
+      "createdAt": "2025-07-17T17:17:27.228492Z",
+      "commandType": "pickUpTip",
+      "key": "07e987e7981167d01af748c7205daae3",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "H1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 118.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.228704Z",
+      "completedAt": "2025-07-17T17:17:27.229228Z",
+      "notes": []
+    },
+    {
+      "id": "6ccb77ad-4e7f-4108-abbd-59543a261aa5",
+      "createdAt": "2025-07-17T17:17:27.253680Z",
+      "commandType": "comment",
+      "key": "647ed047d62ffea3ac07ec09f3b99aad",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.253943Z",
+      "completedAt": "2025-07-17T17:17:27.254045Z",
+      "notes": []
+    },
+    {
+      "id": "4d619420-fcb1-4688-8e63-95d44b9f2aac",
+      "createdAt": "2025-07-17T17:17:27.262237Z",
+      "commandType": "comment",
+      "key": "aec729059ae187594ef5ee2fe04ad494",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.262418Z",
+      "completedAt": "2025-07-17T17:17:27.262507Z",
+      "notes": []
+    },
+    {
+      "id": "b471aa0a-33d4-4d36-b01b-fa10c05d13c4",
+      "createdAt": "2025-07-17T17:17:27.270071Z",
+      "commandType": "comment",
+      "key": "9f1942670724bd284f0ac3dc91049cd0",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.270228Z",
+      "completedAt": "2025-07-17T17:17:27.270311Z",
+      "notes": []
+    },
+    {
+      "id": "b3c63282-1cdf-4f94-99ea-d176a4620301",
+      "createdAt": "2025-07-17T17:17:27.277263Z",
+      "commandType": "comment",
+      "key": "efb371e7e29b0e5dfbcd981f97fd0d7d",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.277427Z",
+      "completedAt": "2025-07-17T17:17:27.277509Z",
+      "notes": []
+    },
+    {
+      "id": "1dfa9efd-8970-4836-a0a0-4f3f9f9fa073",
+      "createdAt": "2025-07-17T17:17:27.285132Z",
+      "commandType": "comment",
+      "key": "a3adddba4c64935bfe3da7e668db93e1",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.285293Z",
+      "completedAt": "2025-07-17T17:17:27.285378Z",
+      "notes": []
+    },
+    {
+      "id": "e33c8a7a-fac4-4bbb-98bd-73ac72326c58",
+      "createdAt": "2025-07-17T17:17:27.291938Z",
+      "commandType": "comment",
+      "key": "cbd39523c831c305f6e0069931b47242",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.292088Z",
+      "completedAt": "2025-07-17T17:17:27.292169Z",
+      "notes": []
+    },
+    {
+      "id": "404d5840-eac7-4cb0-9bdd-3303153dac4c",
+      "createdAt": "2025-07-17T17:17:27.299887Z",
+      "commandType": "comment",
+      "key": "057c96943ac0b7ce5354ccc0d8f4ce45",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.300084Z",
+      "completedAt": "2025-07-17T17:17:27.300170Z",
+      "notes": []
+    },
+    {
+      "id": "6de9e484-834e-436b-b81a-e397e8593ca2",
+      "createdAt": "2025-07-17T17:17:27.307721Z",
+      "commandType": "comment",
+      "key": "5cbb2782d57281b118615e70b4a621c5",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \ud83d\udfe2  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.307883Z",
+      "completedAt": "2025-07-17T17:17:27.307983Z",
+      "notes": []
+    },
+    {
+      "id": "418d441e-1d31-43c6-92ed-ed3d0bf0efd5",
+      "createdAt": "2025-07-17T17:17:27.314363Z",
+      "commandType": "comment",
+      "key": "8ed048de249e3846ed1ff9f9dde9e958",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.314514Z",
+      "completedAt": "2025-07-17T17:17:27.314595Z",
+      "notes": []
+    },
+    {
+      "id": "964e3a8a-622b-414c-9c5a-65ad9ac4c1ad",
+      "createdAt": "2025-07-17T17:17:27.331230Z",
+      "commandType": "waitForResume",
+      "key": "088fc5669755ca9feda62067aad18bb6",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of first tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.331474Z",
+      "completedAt": "2025-07-17T17:17:27.331586Z",
+      "notes": []
+    },
+    {
+      "id": "c7ab3c0d-f898-4b51-bacf-3cd83ac42438",
+      "createdAt": "2025-07-17T17:17:27.339715Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "420d4d12bba5d32163ffccb372149d6d",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.339894Z",
+      "completedAt": "2025-07-17T17:17:27.340404Z",
+      "notes": []
+    },
+    {
+      "id": "6ed1e398-8787-43cb-a50e-e3e545501d02",
+      "createdAt": "2025-07-17T17:17:27.350665Z",
+      "commandType": "dropTipInPlace",
+      "key": "c7e588a2d068d26512751a524a673dd5",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.350837Z",
+      "completedAt": "2025-07-17T17:17:27.350973Z",
+      "notes": []
+    },
+    {
+      "id": "cc9344db-18c1-4e3b-b256-2812fe48b878",
+      "createdAt": "2025-07-17T17:17:27.360864Z",
+      "commandType": "pickUpTip",
+      "key": "35f00006858a8224a48ed2b4658eb31d",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "G1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 127.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.361097Z",
+      "completedAt": "2025-07-17T17:17:27.361669Z",
+      "notes": []
+    },
+    {
+      "id": "536b172f-70b0-43e1-a8eb-14a104869411",
+      "createdAt": "2025-07-17T17:17:27.393279Z",
+      "commandType": "comment",
+      "key": "b9095eaf1cec85439a30507e970c5ec8",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.393535Z",
+      "completedAt": "2025-07-17T17:17:27.393639Z",
+      "notes": []
+    },
+    {
+      "id": "ac08f9e0-9cbb-4b71-9319-2a33837f6a5e",
+      "createdAt": "2025-07-17T17:17:27.401074Z",
+      "commandType": "comment",
+      "key": "26d5394915048a3b06e3c8db3835e403",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.401249Z",
+      "completedAt": "2025-07-17T17:17:27.401339Z",
+      "notes": []
+    },
+    {
+      "id": "b728a7b4-f973-4740-940a-81e7e3b8a294",
+      "createdAt": "2025-07-17T17:17:27.409740Z",
+      "commandType": "comment",
+      "key": "2a42306216276031ddfbb8c037d69762",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.409963Z",
+      "completedAt": "2025-07-17T17:17:27.410056Z",
+      "notes": []
+    },
+    {
+      "id": "29075754-48a6-4ddd-9d03-7a7057b3a129",
+      "createdAt": "2025-07-17T17:17:27.426363Z",
+      "commandType": "comment",
+      "key": "a93de6ba19974caebb98dc855fecaa2c",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.426621Z",
+      "completedAt": "2025-07-17T17:17:27.426728Z",
+      "notes": []
+    },
+    {
+      "id": "af29b827-b4f0-4ee2-8ad6-d1d0ef51bc9a",
+      "createdAt": "2025-07-17T17:17:27.436876Z",
+      "commandType": "comment",
+      "key": "d2201d99961e2ddf7f858f2b07e349a2",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.437116Z",
+      "completedAt": "2025-07-17T17:17:27.437215Z",
+      "notes": []
+    },
+    {
+      "id": "eafc9137-b75f-4010-97d1-a72593806e62",
+      "createdAt": "2025-07-17T17:17:27.448181Z",
+      "commandType": "comment",
+      "key": "5978947a6e4feb2ca63e4bb41deb026a",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.448391Z",
+      "completedAt": "2025-07-17T17:17:27.448487Z",
+      "notes": []
+    },
+    {
+      "id": "e2bca719-4150-48f8-9c81-65e65dc1ac20",
+      "createdAt": "2025-07-17T17:17:27.456454Z",
+      "commandType": "comment",
+      "key": "54c2f016d243e3701cc85475d0f551ca",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.456681Z",
+      "completedAt": "2025-07-17T17:17:27.456783Z",
+      "notes": []
+    },
+    {
+      "id": "69dfa246-76c7-44c8-8534-7904f4f3e52d",
+      "createdAt": "2025-07-17T17:17:27.464139Z",
+      "commandType": "comment",
+      "key": "adddb6d5d8e1b893cbc966607ffcee8e",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \u274c  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.464320Z",
+      "completedAt": "2025-07-17T17:17:27.464413Z",
+      "notes": []
+    },
+    {
+      "id": "3e6e85cd-e2eb-4866-bd02-b7553d825f73",
+      "createdAt": "2025-07-17T17:17:27.468560Z",
+      "commandType": "comment",
+      "key": "eafd8cc150933ced28ebe9704242e9f2",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.468717Z",
+      "completedAt": "2025-07-17T17:17:27.468799Z",
+      "notes": []
+    },
+    {
+      "id": "7965ee5e-51e8-4cb7-9740-a04a906c54ab",
+      "createdAt": "2025-07-17T17:17:27.470736Z",
+      "commandType": "waitForResume",
+      "key": "955b215bf9943422b14459eeb214394e",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of second tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.470884Z",
+      "completedAt": "2025-07-17T17:17:27.470980Z",
+      "notes": []
+    },
+    {
+      "id": "5e7a4b81-4a94-45ef-b37f-0c29edb183ed",
+      "createdAt": "2025-07-17T17:17:27.473684Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "3b7baa90531229fcbbbb66600fd9e5ff",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.473831Z",
+      "completedAt": "2025-07-17T17:17:27.474341Z",
+      "notes": []
+    },
+    {
+      "id": "dba2b3d6-701e-446b-8159-d39499833c3a",
+      "createdAt": "2025-07-17T17:17:27.479230Z",
+      "commandType": "dropTipInPlace",
+      "key": "ba40f38807c65e6d2a594596b93752de",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.479383Z",
+      "completedAt": "2025-07-17T17:17:27.479481Z",
+      "notes": []
+    },
+    {
+      "id": "1d8b68bd-4512-4eab-ab21-8742bfc7c8d0",
+      "createdAt": "2025-07-17T17:17:27.481528Z",
+      "commandType": "configureNozzleLayout",
+      "key": "e4e50e837bb760932ffe81967a020e57",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "configurationParams": {
+          "style": "SINGLE",
+          "primaryNozzle": "H1"
+        }
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.481673Z",
+      "completedAt": "2025-07-17T17:17:27.481854Z",
+      "notes": []
+    },
+    {
+      "id": "225c7447-7eb3-4d10-bd43-ef610e5b03b9",
+      "createdAt": "2025-07-17T17:17:27.490475Z",
+      "commandType": "pickUpTip",
+      "key": "8146a5669f32a337d2f055d88cf93990",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "A12",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.490663Z",
+      "completedAt": "2025-07-17T17:17:27.491227Z",
+      "notes": []
+    },
+    {
+      "id": "c6efa724-0e0a-404c-b711-9d5be23f2508",
+      "createdAt": "2025-07-17T17:17:27.503140Z",
+      "commandType": "comment",
+      "key": "47260134446d37223f07a6526c0c51b7",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.503376Z",
+      "completedAt": "2025-07-17T17:17:27.503480Z",
+      "notes": []
+    },
+    {
+      "id": "fdf09f4c-4234-4bf8-bf33-9e4eacf9d284",
+      "createdAt": "2025-07-17T17:17:27.510544Z",
+      "commandType": "comment",
+      "key": "b5c7d13b59576454c9f9c0330d46d3d0",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.510725Z",
+      "completedAt": "2025-07-17T17:17:27.510817Z",
+      "notes": []
+    },
+    {
+      "id": "f7d62691-a58a-415f-8c0a-c8b771b93606",
+      "createdAt": "2025-07-17T17:17:27.517012Z",
+      "commandType": "comment",
+      "key": "452d83610ef5a88948a9f1421146a12e",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.517193Z",
+      "completedAt": "2025-07-17T17:17:27.517281Z",
+      "notes": []
+    },
+    {
+      "id": "2bc27856-c2f9-4625-89e1-a7a7dbfee2a9",
+      "createdAt": "2025-07-17T17:17:27.520153Z",
+      "commandType": "comment",
+      "key": "7cda495949f04758c9b2eb6ffb7789ac",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.520302Z",
+      "completedAt": "2025-07-17T17:17:27.520383Z",
+      "notes": []
+    },
+    {
+      "id": "a1900f4e-2635-4575-88f2-aedc4d5ccbdc",
+      "createdAt": "2025-07-17T17:17:27.523394Z",
+      "commandType": "comment",
+      "key": "2ac3af6f86c891bfe48c2302b6b145dd",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.523528Z",
+      "completedAt": "2025-07-17T17:17:27.523601Z",
+      "notes": []
+    },
+    {
+      "id": "4f38dad1-032a-40dc-a867-972b88b86022",
+      "createdAt": "2025-07-17T17:17:27.526954Z",
+      "commandType": "comment",
+      "key": "69baf96e06ebeb336b497dd77f70e516",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.527096Z",
+      "completedAt": "2025-07-17T17:17:27.527169Z",
+      "notes": []
+    },
+    {
+      "id": "6e02f1fa-4114-46ae-935e-b5b79e7ef488",
+      "createdAt": "2025-07-17T17:17:27.530771Z",
+      "commandType": "comment",
+      "key": "e72d50738b553791e7b687acf79a3737",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.530907Z",
+      "completedAt": "2025-07-17T17:17:27.531004Z",
+      "notes": []
+    },
+    {
+      "id": "1c78dd3f-23f7-44d8-a0e6-b702e7eae2e0",
+      "createdAt": "2025-07-17T17:17:27.534623Z",
+      "commandType": "comment",
+      "key": "f7e4d98241adac5a61b9505ed22ecfd5",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \u274c  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.534758Z",
+      "completedAt": "2025-07-17T17:17:27.534834Z",
+      "notes": []
+    },
+    {
+      "id": "b47aec41-4ad8-4e30-9965-975ecee15a4f",
+      "createdAt": "2025-07-17T17:17:27.538364Z",
+      "commandType": "comment",
+      "key": "2955f8a9f87e8924613ee9a912b073eb",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.538493Z",
+      "completedAt": "2025-07-17T17:17:27.538568Z",
+      "notes": []
+    },
+    {
+      "id": "538246a5-a6ce-4566-9940-11807391aeaf",
+      "createdAt": "2025-07-17T17:17:27.541828Z",
+      "commandType": "waitForResume",
+      "key": "e3d92abb0c0caaffc28b6a11c60eaf17",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of first tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.541988Z",
+      "completedAt": "2025-07-17T17:17:27.542067Z",
+      "notes": []
+    },
+    {
+      "id": "a2c00b0e-479c-4b07-8f13-0ca272f8552c",
+      "createdAt": "2025-07-17T17:17:27.545651Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "3ce4c9c7192047016e8b0746d2f1322e",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.545795Z",
+      "completedAt": "2025-07-17T17:17:27.546299Z",
+      "notes": []
+    },
+    {
+      "id": "dabbf5f2-87ec-4828-bf65-c089f5cee84b",
+      "createdAt": "2025-07-17T17:17:27.551130Z",
+      "commandType": "dropTipInPlace",
+      "key": "b539abdb1c9d2dc53d121e1c962bfe67",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.551285Z",
+      "completedAt": "2025-07-17T17:17:27.551385Z",
+      "notes": []
+    },
+    {
+      "id": "1d059315-ac3e-4079-b34b-e1d932bf3b60",
+      "createdAt": "2025-07-17T17:17:27.557047Z",
+      "commandType": "pickUpTip",
+      "key": "2af175b6498ba6680a02b11dda3bfa4d",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "B12",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 277.38,
+          "y": 172.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.557192Z",
+      "completedAt": "2025-07-17T17:17:27.557645Z",
+      "notes": []
+    },
+    {
+      "id": "e4cf37fb-0514-47a6-8a4d-826fae1f6b9f",
+      "createdAt": "2025-07-17T17:17:27.569149Z",
+      "commandType": "comment",
+      "key": "1245c9671b60ca4f1f1e777f08251551",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.569341Z",
+      "completedAt": "2025-07-17T17:17:27.569430Z",
+      "notes": []
+    },
+    {
+      "id": "2f597853-cab4-4821-887f-70c00e8b13c5",
+      "createdAt": "2025-07-17T17:17:27.572351Z",
+      "commandType": "comment",
+      "key": "e0db1665721e9acf28e990a4ac3c5ad2",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \ud83d\udfe2  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.572498Z",
+      "completedAt": "2025-07-17T17:17:27.572576Z",
+      "notes": []
+    },
+    {
+      "id": "3c4ba1d3-ae35-4c9f-a81c-734b183389ae",
+      "createdAt": "2025-07-17T17:17:27.575115Z",
+      "commandType": "comment",
+      "key": "494daeb134a1ad3f18274a28cfa9e603",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.575254Z",
+      "completedAt": "2025-07-17T17:17:27.575333Z",
+      "notes": []
+    },
+    {
+      "id": "49fc788c-4097-49d1-a0f8-d8c6a71a06b6",
+      "createdAt": "2025-07-17T17:17:27.577242Z",
+      "commandType": "comment",
+      "key": "f7aeb5bf8931dd1f8c8510ec9841029e",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.577382Z",
+      "completedAt": "2025-07-17T17:17:27.577459Z",
+      "notes": []
+    },
+    {
+      "id": "1a8ea441-efed-4d76-8c45-b9ba1a9f4f9f",
+      "createdAt": "2025-07-17T17:17:27.582025Z",
+      "commandType": "comment",
+      "key": "6e92e3c228c340bc887ebe00f54c97bb",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.582158Z",
+      "completedAt": "2025-07-17T17:17:27.582226Z",
+      "notes": []
+    },
+    {
+      "id": "795d8499-2801-4281-b0af-3f49cb1a9ed6",
+      "createdAt": "2025-07-17T17:17:27.592537Z",
+      "commandType": "comment",
+      "key": "bc7254b7d9ee662539a347220b2cfad2",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.592761Z",
+      "completedAt": "2025-07-17T17:17:27.592865Z",
+      "notes": []
+    },
+    {
+      "id": "1c500ec8-0f6f-4a75-aae7-58dc117e0b1a",
+      "createdAt": "2025-07-17T17:17:27.594130Z",
+      "commandType": "comment",
+      "key": "1d23a5de6fe0ceb9c8f587df3b95c4b4",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.594267Z",
+      "completedAt": "2025-07-17T17:17:27.594348Z",
+      "notes": []
+    },
+    {
+      "id": "c91248a4-e294-49b0-85af-a4f4d219fc84",
+      "createdAt": "2025-07-17T17:17:27.598465Z",
+      "commandType": "comment",
+      "key": "3745aa86b134f77617935475e6c80233",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \u274c  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.598602Z",
+      "completedAt": "2025-07-17T17:17:27.598679Z",
+      "notes": []
+    },
+    {
+      "id": "043e6ae1-2b8b-4b88-93f4-695271a821ed",
+      "createdAt": "2025-07-17T17:17:27.603804Z",
+      "commandType": "comment",
+      "key": "e2e750ff48384221169e390a0702336b",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.603953Z",
+      "completedAt": "2025-07-17T17:17:27.604031Z",
+      "notes": []
+    },
+    {
+      "id": "875b78d0-c060-467d-94f4-1737ccb1f804",
+      "createdAt": "2025-07-17T17:17:27.607418Z",
+      "commandType": "waitForResume",
+      "key": "6576254c746c4b37f925e21136e80d66",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of second tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.607563Z",
+      "completedAt": "2025-07-17T17:17:27.607646Z",
+      "notes": []
+    },
+    {
+      "id": "f4d28406-43bc-4c6b-8f55-4f030f451863",
+      "createdAt": "2025-07-17T17:17:27.610654Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "3320c7bbc09a2db56056072a8a798222",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.610802Z",
+      "completedAt": "2025-07-17T17:17:27.611312Z",
+      "notes": []
+    },
+    {
+      "id": "92e35bfc-b575-46a3-b140-1b65fb637042",
+      "createdAt": "2025-07-17T17:17:27.615167Z",
+      "commandType": "dropTipInPlace",
+      "key": "ddfc7464522cdf2a38108bf34424b24e",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.615314Z",
+      "completedAt": "2025-07-17T17:17:27.615413Z",
+      "notes": []
+    },
+    {
+      "id": "1032f3ba-3cff-4f71-87ff-8a8558c4a4c9",
+      "createdAt": "2025-07-17T17:17:27.621786Z",
+      "commandType": "configureNozzleLayout",
+      "key": "39ec099a8923888b7871ad6019cb21e5",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "configurationParams": {
+          "style": "SINGLE",
+          "primaryNozzle": "H12"
+        }
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.621982Z",
+      "completedAt": "2025-07-17T17:17:27.622167Z",
+      "notes": []
+    },
+    {
+      "id": "3d8ff5a9-e6a0-4776-8436-dd6aad92e09f",
+      "createdAt": "2025-07-17T17:17:27.628745Z",
+      "commandType": "pickUpTip",
+      "key": "58f8109f80ebb45883ec594256cfaab7",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.628986Z",
+      "completedAt": "2025-07-17T17:17:27.629514Z",
+      "notes": []
+    },
+    {
+      "id": "a7445cbf-0e90-4349-b2a6-c99bc9a9dfdc",
+      "createdAt": "2025-07-17T17:17:27.644498Z",
+      "commandType": "comment",
+      "key": "aca3d4366a03a9b30c948084a1dc83c6",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.644751Z",
+      "completedAt": "2025-07-17T17:17:27.644858Z",
+      "notes": []
+    },
+    {
+      "id": "c01126e2-6a69-460e-85b0-e24be5c8148c",
+      "createdAt": "2025-07-17T17:17:27.651255Z",
+      "commandType": "comment",
+      "key": "2d0328802bcc36ff9f2557453f58f3cc",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \u274c  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.651461Z",
+      "completedAt": "2025-07-17T17:17:27.651560Z",
+      "notes": []
+    },
+    {
+      "id": "314de845-4da2-4ee2-bc3f-f6709406f822",
+      "createdAt": "2025-07-17T17:17:27.660440Z",
+      "commandType": "comment",
+      "key": "888901bffca0415d644a7036b0e720a7",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \ud83d\udfe2  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.660656Z",
+      "completedAt": "2025-07-17T17:17:27.660748Z",
+      "notes": []
+    },
+    {
+      "id": "0f1570df-026c-48c0-913b-dfbd60c848d6",
+      "createdAt": "2025-07-17T17:17:27.666223Z",
+      "commandType": "comment",
+      "key": "6c823b5aef8fc8eb5b7049a451d7b1c2",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.666384Z",
+      "completedAt": "2025-07-17T17:17:27.666472Z",
+      "notes": []
+    },
+    {
+      "id": "67f53299-7352-43b5-a5e0-704da66f9f3a",
+      "createdAt": "2025-07-17T17:17:27.675264Z",
+      "commandType": "comment",
+      "key": "eaeb0bf5aa918cd4d96f93ca6400a8fa",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.675489Z",
+      "completedAt": "2025-07-17T17:17:27.675585Z",
+      "notes": []
+    },
+    {
+      "id": "7ed84c8c-044b-4460-a79f-69467428a20b",
+      "createdAt": "2025-07-17T17:17:27.685072Z",
+      "commandType": "comment",
+      "key": "94a770a2b92f11dba0d84afce8c3602f",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.685261Z",
+      "completedAt": "2025-07-17T17:17:27.685352Z",
+      "notes": []
+    },
+    {
+      "id": "88a0da8d-27f2-4d54-83d8-2cc8dc9fa2ef",
+      "createdAt": "2025-07-17T17:17:27.687521Z",
+      "commandType": "comment",
+      "key": "e9e038409a1fb4a96271ecd2c6618fcd",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.687672Z",
+      "completedAt": "2025-07-17T17:17:27.687756Z",
+      "notes": []
+    },
+    {
+      "id": "d2c4c62a-7dfe-49b0-afc4-d8d76b39a951",
+      "createdAt": "2025-07-17T17:17:27.692288Z",
+      "commandType": "comment",
+      "key": "3a1aac2fea7e7b9bdf2d7e84b7f21da4",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \u274c  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.692432Z",
+      "completedAt": "2025-07-17T17:17:27.692509Z",
+      "notes": []
+    },
+    {
+      "id": "f4cbe7ee-7e60-43ac-ab40-31c2f82f8899",
+      "createdAt": "2025-07-17T17:17:27.701070Z",
+      "commandType": "comment",
+      "key": "91ce7f5d52090cc10d0e2e408d00ed4e",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.701247Z",
+      "completedAt": "2025-07-17T17:17:27.701332Z",
+      "notes": []
+    },
+    {
+      "id": "90f1ec00-a55e-4be0-9270-6734655ba611",
+      "createdAt": "2025-07-17T17:17:27.711091Z",
+      "commandType": "waitForResume",
+      "key": "753c2a13c45947dace595307c8ea26ba",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of first tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.711301Z",
+      "completedAt": "2025-07-17T17:17:27.711399Z",
+      "notes": []
+    },
+    {
+      "id": "29c65016-274c-4804-8ebe-a712576a58e5",
+      "createdAt": "2025-07-17T17:17:27.712443Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "d3ae7f2314841b95ca8d3cf230bf9b21",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 466.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.712591Z",
+      "completedAt": "2025-07-17T17:17:27.713083Z",
+      "notes": []
+    },
+    {
+      "id": "a1b306ae-e32d-4d97-971a-91c06a166aac",
+      "createdAt": "2025-07-17T17:17:27.718547Z",
+      "commandType": "dropTipInPlace",
+      "key": "7c837909b8d1552c14cef715260f917f",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.718721Z",
+      "completedAt": "2025-07-17T17:17:27.718835Z",
+      "notes": []
+    },
+    {
+      "id": "fc400977-69c0-4899-ae52-d113405a9063",
+      "createdAt": "2025-07-17T17:17:27.729074Z",
+      "commandType": "pickUpTip",
+      "key": "0565d26cc002454d430a61f4e5eed7d5",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "labwareId": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+        "wellName": "B1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 178.38,
+          "y": 172.38,
+          "z": 99.0
+        },
+        "tipVolume": 50.0,
+        "tipLength": 47.4,
+        "tipDiameter": 5.58
+      },
+      "startedAt": "2025-07-17T17:17:27.729269Z",
+      "completedAt": "2025-07-17T17:17:27.729786Z",
+      "notes": []
+    },
+    {
+      "id": "b746be83-2044-4fb8-9bcd-b7b442cb7f5c",
+      "createdAt": "2025-07-17T17:17:27.749128Z",
+      "commandType": "comment",
+      "key": "5fa7e910997fd1cac987e0b04c00da65",
+      "status": "succeeded",
+      "params": {
+        "message": "Tip rack in C2"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.749369Z",
+      "completedAt": "2025-07-17T17:17:27.749469Z",
+      "notes": []
+    },
+    {
+      "id": "6a651997-3bfe-4543-b402-8c5f6a4fc35b",
+      "createdAt": "2025-07-17T17:17:27.754418Z",
+      "commandType": "comment",
+      "key": "152c49aafb865e40fb4f15761f50398f",
+      "status": "succeeded",
+      "params": {
+        "message": "A: A1 \u274c  A2 \ud83d\udfe2  A3 \ud83d\udfe2  A4 \ud83d\udfe2  A5 \ud83d\udfe2  A6 \ud83d\udfe2  A7 \ud83d\udfe2  A8 \ud83d\udfe2  A9 \ud83d\udfe2  A10 \ud83d\udfe2  A11 \ud83d\udfe2  A12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.754574Z",
+      "completedAt": "2025-07-17T17:17:27.754658Z",
+      "notes": []
+    },
+    {
+      "id": "e7b8117d-4b62-41e9-89be-47d09acc23a0",
+      "createdAt": "2025-07-17T17:17:27.764191Z",
+      "commandType": "comment",
+      "key": "1594fe6c20d551ef93ee1bf1feaee836",
+      "status": "succeeded",
+      "params": {
+        "message": "B: B1 \u274c  B2 \ud83d\udfe2  B3 \ud83d\udfe2  B4 \ud83d\udfe2  B5 \ud83d\udfe2  B6 \ud83d\udfe2  B7 \ud83d\udfe2  B8 \ud83d\udfe2  B9 \ud83d\udfe2  B10 \ud83d\udfe2  B11 \ud83d\udfe2  B12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.764384Z",
+      "completedAt": "2025-07-17T17:17:27.764470Z",
+      "notes": []
+    },
+    {
+      "id": "0befa7c7-3652-470b-9638-497cc2ac5cef",
+      "createdAt": "2025-07-17T17:17:27.769691Z",
+      "commandType": "comment",
+      "key": "86e47d92270a0cabf1e3c697f57ed316",
+      "status": "succeeded",
+      "params": {
+        "message": "C: C1 \ud83d\udfe2  C2 \ud83d\udfe2  C3 \ud83d\udfe2  C4 \ud83d\udfe2  C5 \ud83d\udfe2  C6 \ud83d\udfe2  C7 \ud83d\udfe2  C8 \ud83d\udfe2  C9 \ud83d\udfe2  C10 \ud83d\udfe2  C11 \ud83d\udfe2  C12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.769835Z",
+      "completedAt": "2025-07-17T17:17:27.769912Z",
+      "notes": []
+    },
+    {
+      "id": "7a60755b-9ea6-438d-b74b-de38ede1af3f",
+      "createdAt": "2025-07-17T17:17:27.777845Z",
+      "commandType": "comment",
+      "key": "2ee1065ee2102df00b147cfa2808d70c",
+      "status": "succeeded",
+      "params": {
+        "message": "D: D1 \ud83d\udfe2  D2 \ud83d\udfe2  D3 \ud83d\udfe2  D4 \ud83d\udfe2  D5 \ud83d\udfe2  D6 \ud83d\udfe2  D7 \ud83d\udfe2  D8 \ud83d\udfe2  D9 \ud83d\udfe2  D10 \ud83d\udfe2  D11 \ud83d\udfe2  D12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.778058Z",
+      "completedAt": "2025-07-17T17:17:27.778149Z",
+      "notes": []
+    },
+    {
+      "id": "53b2777b-99b0-4c6d-bebe-7aa6a67cf0a6",
+      "createdAt": "2025-07-17T17:17:27.786068Z",
+      "commandType": "comment",
+      "key": "99209bbb3a02c522ce8c527107f68260",
+      "status": "succeeded",
+      "params": {
+        "message": "E: E1 \ud83d\udfe2  E2 \ud83d\udfe2  E3 \ud83d\udfe2  E4 \ud83d\udfe2  E5 \ud83d\udfe2  E6 \ud83d\udfe2  E7 \ud83d\udfe2  E8 \ud83d\udfe2  E9 \ud83d\udfe2  E10 \ud83d\udfe2  E11 \ud83d\udfe2  E12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.786234Z",
+      "completedAt": "2025-07-17T17:17:27.786320Z",
+      "notes": []
+    },
+    {
+      "id": "b010d89a-1c8c-4798-b6eb-384a84dd0d69",
+      "createdAt": "2025-07-17T17:17:27.789765Z",
+      "commandType": "comment",
+      "key": "2b1cc8d326be53cd99b3f66a72ebcb41",
+      "status": "succeeded",
+      "params": {
+        "message": "F: F1 \ud83d\udfe2  F2 \ud83d\udfe2  F3 \ud83d\udfe2  F4 \ud83d\udfe2  F5 \ud83d\udfe2  F6 \ud83d\udfe2  F7 \ud83d\udfe2  F8 \ud83d\udfe2  F9 \ud83d\udfe2  F10 \ud83d\udfe2  F11 \ud83d\udfe2  F12 \ud83d\udfe2  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.789898Z",
+      "completedAt": "2025-07-17T17:17:27.789995Z",
+      "notes": []
+    },
+    {
+      "id": "a81b27f7-e4af-44fe-8584-bf0e98b5a2b6",
+      "createdAt": "2025-07-17T17:17:27.797054Z",
+      "commandType": "comment",
+      "key": "baeccd755cbd60b4b599785aae367cdf",
+      "status": "succeeded",
+      "params": {
+        "message": "G: G1 \u274c  G2 \ud83d\udfe2  G3 \ud83d\udfe2  G4 \ud83d\udfe2  G5 \ud83d\udfe2  G6 \ud83d\udfe2  G7 \ud83d\udfe2  G8 \ud83d\udfe2  G9 \ud83d\udfe2  G10 \ud83d\udfe2  G11 \ud83d\udfe2  G12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.797205Z",
+      "completedAt": "2025-07-17T17:17:27.797281Z",
+      "notes": []
+    },
+    {
+      "id": "ad76854c-a576-41fd-a826-564b349228d1",
+      "createdAt": "2025-07-17T17:17:27.804276Z",
+      "commandType": "comment",
+      "key": "cfce1cc227da66b2a97d39a809c8d214",
+      "status": "succeeded",
+      "params": {
+        "message": "H: H1 \u274c  H2 \ud83d\udfe2  H3 \ud83d\udfe2  H4 \ud83d\udfe2  H5 \ud83d\udfe2  H6 \ud83d\udfe2  H7 \ud83d\udfe2  H8 \ud83d\udfe2  H9 \ud83d\udfe2  H10 \ud83d\udfe2  H11 \ud83d\udfe2  H12 \u274c  "
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.804444Z",
+      "completedAt": "2025-07-17T17:17:27.804527Z",
+      "notes": []
+    },
+    {
+      "id": "e88a0088-589d-4a17-a5c5-55452197d8d7",
+      "createdAt": "2025-07-17T17:17:27.809254Z",
+      "commandType": "waitForResume",
+      "key": "60827a1c0612f57a09e2fc451994bfb8",
+      "status": "succeeded",
+      "params": {
+        "message": "How was the pickup of second tip?"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.809406Z",
+      "completedAt": "2025-07-17T17:17:27.809490Z",
+      "notes": []
+    },
+    {
+      "id": "4ca14d7b-c5fe-4736-b64e-e2d34670af06",
+      "createdAt": "2025-07-17T17:17:27.817306Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "9dc4d2143f1fbaf0fbb2490637e897d1",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 402.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2025-07-17T17:17:27.817515Z",
+      "completedAt": "2025-07-17T17:17:27.818030Z",
+      "notes": []
+    },
+    {
+      "id": "634067d5-4deb-4035-ae8b-89837f57a338",
+      "createdAt": "2025-07-17T17:17:27.823976Z",
+      "commandType": "dropTipInPlace",
+      "key": "aeb6bc7180eb824eaebf6a9ee96d222e",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "c065dd9c-11a4-41dc-983b-48e14c8345f3"
+      },
+      "result": {},
+      "startedAt": "2025-07-17T17:17:27.824121Z",
+      "completedAt": "2025-07-17T17:17:27.824214Z",
+      "notes": []
+    }
+  ],
+  "labware": [
+    {
+      "id": "4098f4c1-9cff-4f19-b7c7-9f2a30074f77",
+      "loadName": "opentrons_flex_96_tiprack_50ul",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "location": {
+        "slotName": "C2"
+      },
+      "displayName": "Partial Tip Rack"
+    }
+  ],
+  "pipettes": [
+    {
+      "id": "c065dd9c-11a4-41dc-983b-48e14c8345f3",
+      "pipetteName": "p1000_96",
+      "mount": "left"
+    }
+  ],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": []
+}

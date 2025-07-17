@@ -1,0 +1,326 @@
+{
+  "createdAt": "2025-07-17T17:17:32.321699Z",
+  "files": [
+    {
+      "name": "Flex_X_v2_16_NO_PIPETTES_MM_MagneticModuleInFlexProtocol.py",
+      "role": "main"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Illumina-Stranded_total_RNA_Ribo-Zero_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-A_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "seqwell-expressplex-library-prep_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "custom_opentrons_tough_pcr_auto_sealing_lid.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "Twist-EF-2_0_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "omega-bio-tek-mag-bind-environmental-dna-96_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "3e0bef_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "quickr_2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "greiner_384_wellplate_240ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "MN_DNA_Flex_Multi-Cells_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_1.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      16
+    ]
+  },
+  "metadata": {
+    "protocolName": "QA Protocol - Analysis Error - Magnetic Module in Flex Protocol",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>"
+  },
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "e7f6d5aa-5ab1-448f-8346-bc04309f2c5b",
+      "createdAt": "2025-07-17T17:17:32.185817Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-07-17T17:17:32.186091Z",
+      "completedAt": "2025-07-17T17:17:32.186224Z",
+      "notes": []
+    },
+    {
+      "id": "f4116550-a650-47af-bc97-5e0153a754aa",
+      "createdAt": "2025-07-17T17:17:32.203846Z",
+      "commandType": "loadModule",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "status": "failed",
+      "params": {
+        "model": "magneticModuleV2",
+        "location": {
+          "slotName": "C1"
+        }
+      },
+      "error": {
+        "id": "f06fe38b-b423-4349-9994-2df00aa92ae8",
+        "createdAt": "2025-07-17T17:17:32.217304Z",
+        "isDefined": false,
+        "errorType": "PythonException",
+        "errorCode": "4000",
+        "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+        "errorInfo": {
+          "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+          "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 122, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 193, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/hardware_control/modules/types.py\", line 210, in to_module_fixture_id\n    raise ValueError(\n",
+          "class": "ValueError"
+        },
+        "wrappedErrors": []
+      },
+      "startedAt": "2025-07-17T17:17:32.204125Z",
+      "completedAt": "2025-07-17T17:17:32.217304Z",
+      "notes": [
+        {
+          "noteKind": "debugErrorRecovery",
+          "shortMessage": "Handling this command failure with FAIL_RUN.",
+          "longMessage": "Handling this command failure with FAIL_RUN.",
+          "source": "execution"
+        }
+      ]
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "5adf1c20-1e50-4205-8975-36394223210c",
+      "createdAt": "2025-07-17T17:17:32.241565Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "ProtocolCommandFailedError [line 15]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "5adf1c20-1e50-4205-8975-36394223210c",
+          "createdAt": "2025-07-17T17:17:32.241565Z",
+          "isDefined": false,
+          "errorType": "ProtocolCommandFailedError",
+          "errorCode": "4000",
+          "detail": "PythonException: ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+          "errorInfo": {},
+          "wrappedErrors": [
+            {
+              "id": "f06fe38b-b423-4349-9994-2df00aa92ae8",
+              "createdAt": "2025-07-17T17:17:32.217304Z",
+              "isDefined": false,
+              "errorType": "PythonException",
+              "errorCode": "4000",
+              "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
+              "errorInfo": {
+                "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
+                "traceback": "  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line 148, in execute\n    result = await command_impl.execute(\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 122, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line 193, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/home/runner/work/opentrons/opentrons/api/src/opentrons/hardware_control/modules/types.py\", line 210, in to_module_fixture_id\n    raise ValueError(\n",
+                "class": "ValueError"
+              },
+              "wrappedErrors": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}

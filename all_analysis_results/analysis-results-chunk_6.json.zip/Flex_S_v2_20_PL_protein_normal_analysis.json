@@ -1,0 +1,460 @@
+{
+  "createdAt": "2025-07-17T17:17:26.475731Z",
+  "files": [
+    {
+      "name": "Flex_S_v2_20_PL_protein_normal.py",
+      "role": "main"
+    },
+    {
+      "name": "Eppendorf_96_Well_Plate_150_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "eppendorf_96_well_plate_150.json",
+      "role": "labware"
+    },
+    {
+      "name": "Illumina-Stranded_total_RNA_Ribo-Zero_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-A_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "agar_plate_method_bacteria_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Axygen_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "seqwell-expressplex-library-prep_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Plate_with_Tilt_Adapter.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-size-select_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "BioRad_96_Well_Plate_200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "evercode-whole-transcriptomeWT-kit-Parse-Biosciences-protocol1_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "Macherey_Nagel_deepwell_plate_2200ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "custom_opentrons_tough_pcr_auto_sealing_lid.json",
+      "role": "labware"
+    },
+    {
+      "name": "Thermo_96_Well_Plate_2200_uL.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "Twist-EF-2_0_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "omega-bio-tek-mag-bind-environmental-dna-96_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-food_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-tissue_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "3e0bef_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "sci-phytip-protein-puri_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-rna_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-clean-up_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_3.json",
+      "role": "labware"
+    },
+    {
+      "name": "quickr_2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "Omni_Tray_Single_Well_Plate.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "greiner_384_wellplate_240ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-dna-microbiome_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-pathogen_labware_2.json",
+      "role": "labware"
+    },
+    {
+      "name": "MN_DNA_Flex_Multi-Cells_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "6d901d-2_labware_1.json",
+      "role": "labware"
+    },
+    {
+      "name": "macherey-nagel-nucleomag-virus_labware_1.json",
+      "role": "labware"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      20
+    ]
+  },
+  "metadata": {
+    "protocolName": "Protein Quantification and Normalization - Part 2: Normalized Sample Preparation",
+    "author": "Boren Lin, Opentrons",
+    "description": "Protein samples normalized to a set volume and concentration using data colleted from BCA assay 1"
+  },
+  "result": "parameter-value-required",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "displayName": "Readings of Samples",
+      "variableName": "csv_data",
+      "description": "Absorbance reading of each sample",
+      "type": "csv_file"
+    },
+    {
+      "displayName": "Number of Samples",
+      "variableName": "num_sample",
+      "description": "Number of samples to be assayed (maximum: 40)",
+      "type": "int",
+      "min": 1.0,
+      "max": 40.0,
+      "value": 40.0,
+      "default": 40.0
+    },
+    {
+      "displayName": "Sample Labware",
+      "variableName": "sample_labware",
+      "description": "Labware used for samples?",
+      "type": "int",
+      "choices": [
+        {
+          "displayName": "24 Tube Rack with 1.5mL Tubes",
+          "value": 1
+        },
+        {
+          "displayName": "2mL 96-Well Plate ",
+          "value": 2
+        }
+      ],
+      "value": 1,
+      "default": 1
+    },
+    {
+      "displayName": "Standard #1",
+      "variableName": "std_1",
+      "description": "1st standard concentration (highest)",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 1000.0,
+      "default": 1000.0
+    },
+    {
+      "displayName": "Standard #2",
+      "variableName": "std_2",
+      "description": "2nd standard concentration",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 500.0,
+      "default": 500.0
+    },
+    {
+      "displayName": "Standard #3",
+      "variableName": "std_3",
+      "description": "3rd standard concentration",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 250.0,
+      "default": 250.0
+    },
+    {
+      "displayName": "Standard #4",
+      "variableName": "std_4",
+      "description": "4th standard concentration",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 125.0,
+      "default": 125.0
+    },
+    {
+      "displayName": "Standard #5",
+      "variableName": "std_5",
+      "description": "5th standard concentration",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 62.5,
+      "default": 62.5
+    },
+    {
+      "displayName": "Standard #6",
+      "variableName": "std_6",
+      "description": "6th standard concentration (lowest)",
+      "suffix": "ng/\u00b5L",
+      "type": "float",
+      "min": 20.0,
+      "max": 2000.0,
+      "value": 31.5,
+      "default": 31.5
+    },
+    {
+      "displayName": "First Dilution",
+      "variableName": "dilution_1",
+      "description": "Samples will be diluted for 1x, 0.5x, 0.2x?",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "1x",
+          "value": 1.0
+        },
+        {
+          "displayName": "0.5x",
+          "value": 0.5
+        },
+        {
+          "displayName": "0.2x",
+          "value": 0.2
+        }
+      ],
+      "value": 1.0,
+      "default": 1.0
+    },
+    {
+      "displayName": "Second Dilution",
+      "variableName": "dilution_2",
+      "description": "Samples will be diluted for 1x, 0.5x, 0.2x?",
+      "type": "float",
+      "choices": [
+        {
+          "displayName": "1x",
+          "value": 1.0
+        },
+        {
+          "displayName": "0.5x",
+          "value": 0.5
+        },
+        {
+          "displayName": "0.2x",
+          "value": 0.2
+        }
+      ],
+      "value": 0.5,
+      "default": 0.5
+    },
+    {
+      "displayName": "Normalized Sample Volume",
+      "variableName": "vol_final",
+      "description": "Target volume of each sample after normalization?",
+      "suffix": "\u00b5L",
+      "type": "int",
+      "min": 10.0,
+      "max": 100.0,
+      "value": 100.0,
+      "default": 100.0
+    },
+    {
+      "displayName": "Protein Amount",
+      "variableName": "amount_final",
+      "description": "Amount of protein in each sample after normalization?",
+      "suffix": "\u00b5g",
+      "type": "int",
+      "min": 1.0,
+      "max": 190.0,
+      "value": 100.0,
+      "default": 100.0
+    },
+    {
+      "displayName": "P1000 1-ch Position",
+      "variableName": "pipet_location",
+      "description": "How P1000 single channel pipette is mounted?",
+      "type": "int",
+      "choices": [
+        {
+          "displayName": "on the right",
+          "value": 1
+        },
+        {
+          "displayName": "on the left",
+          "value": 2
+        }
+      ],
+      "value": 1,
+      "default": 1
+    }
+  ],
+  "commands": [
+    {
+      "id": "09eac4f4-860e-4faa-8ae5-bc5e48c56a74",
+      "createdAt": "2025-07-17T17:17:26.184891Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2025-07-17T17:17:26.185122Z",
+      "completedAt": "2025-07-17T17:17:26.185249Z",
+      "notes": []
+    }
+  ],
+  "labware": [],
+  "pipettes": [],
+  "modules": [],
+  "liquids": [],
+  "liquidClasses": [],
+  "errors": [
+    {
+      "id": "42d8ca9f-94b8-413c-b512-78f5a3846a13",
+      "createdAt": "2025-07-17T17:17:26.214997Z",
+      "isDefined": false,
+      "errorType": "ExceptionInProtocolError",
+      "errorCode": "4000",
+      "detail": "RuntimeParameterRequired [line 146]: Error 4010 RUNTIME_PARAMETER_VALUE_REQUIRED (RuntimeParameterRequired): CSV parameter needs to be set to a file for full analysis or run.",
+      "errorInfo": {},
+      "wrappedErrors": [
+        {
+          "id": "42d8ca9f-94b8-413c-b512-78f5a3846a13",
+          "createdAt": "2025-07-17T17:17:26.214997Z",
+          "isDefined": false,
+          "errorType": "RuntimeParameterRequired",
+          "errorCode": "4010",
+          "detail": "CSV parameter needs to be set to a file for full analysis or run.",
+          "errorInfo": {},
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "commandAnnotations": []
+}
