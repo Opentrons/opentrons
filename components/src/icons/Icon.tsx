@@ -1,21 +1,20 @@
-import cx from 'classnames'
-import { css, keyframes } from 'styled-components'
+import clsx from 'clsx'
 
 import { withStyleProps } from '../utils'
 import { ICON_DATA_BY_NAME } from './icon-data'
+import styles from './icon.module.css'
 
-import type { ReactNode } from 'react'
-import type { SvgProps } from '../primitives'
+import type { ReactNode, SVGProps } from 'react'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 
-export interface IconProps extends SvgProps {
+export interface IconProps extends SVGProps<SVGSVGElement> {
   /** name constant of the icon to display */
   name: IconName
-  /** classes to apply */
-  className?: string
   /** spin the icon with a CSS animation */
   spin?: boolean
+  /** override default size */
+  size?: string | number
   /** x attribute as a number or string (for nesting inside another SVG) */
   x?: number | string
   /** y attribute as a number or string (for nesting inside another SVG) */
@@ -32,19 +31,6 @@ export interface IconProps extends SvgProps {
   dataTestId?: string
 }
 
-const spinAnimation = keyframes`
-  100% {
-    transform: rotate(360deg);
-  }
-`
-
-const spinStyle = css`
-  &.spin {
-    animation: ${spinAnimation} 0.8s steps(8) infinite;
-    transform-origin: center;
-  }
-`
-
 /**
  * Inline SVG icon component
  *
@@ -58,6 +44,7 @@ function IconComponent(props: IconProps): JSX.Element | null {
     name,
     className,
     spin,
+    id,
     size,
     height: rawHeight,
     width: rawWidth,
@@ -92,8 +79,8 @@ function IconComponent(props: IconProps): JSX.Element | null {
       aria-hidden="true"
       fill="currentColor"
       viewBox={viewBox}
-      className={cx(className, { spin })}
-      css={spinStyle}
+      className={clsx(className, { [styles.spin]: spin })}
+      style={{ ...style }}
       {...svgProps}
       data-testid={dataTestId}
     >
