@@ -121,7 +121,6 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaState,
 )
 
-# from opentrons.protocol_engine.state.geometry import inner_well_math_utils as utils_import
 from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from opentrons.protocol_engine.state.inner_well_math_utils import (

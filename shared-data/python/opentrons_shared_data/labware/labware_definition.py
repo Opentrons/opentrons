@@ -583,9 +583,7 @@ class LabwareDefinition2(BaseModel):
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | dict[
-        str, UserDefinedVolumes
-    ] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry | UserDefinedVolumes] | None = None
 
 
 class LabwareDefinition3(BaseModel):
