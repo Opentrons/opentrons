@@ -79,6 +79,7 @@ export interface FormError {
 }
 
 const RANGE_TITLE = 'Enter a value within the specified range'
+const TIME_TITLE = 'Enter a value that uses the specified format'
 
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
@@ -173,47 +174,47 @@ const PROFILE_VOLUME_REQUIRED: FormError = {
   page: 1,
 }
 const PROFILE_LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActive', 'lidTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
   location: 'field',
   page: 1,
 }
 const SHAKE_SPEED_REQUIRED: FormError = {
-  title: 'Speed required',
+  title: RANGE_TITLE,
   dependentFields: ['setShake', 'targetSpeed'],
   location: 'field',
 }
 const SHAKE_TIME_REQUIRED: FormError = {
-  title: 'Duration required',
+  title: TIME_TITLE,
   dependentFields: ['heaterShakerSetTimer', 'heaterShakerTimer'],
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: 'Must be a valid time (mm:ss)',
+  title: TIME_TITLE,
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
@@ -235,7 +236,7 @@ const PAUSE_TEMP_REQUIRED: FormError = {
   location: 'field',
 }
 const HS_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: [
     'targetHeaterShakerTemperature',
     'setHeaterShakerTemperature',
