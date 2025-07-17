@@ -13,8 +13,8 @@ from opentrons.types import Point
 from typing import Union
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
-import math
-from collections import deque
+
+
 
 ###########################################
 #  VARIABLES - START
@@ -467,7 +467,6 @@ def run(ctx: ProtocolContext) -> None:
             )
             volume_dispensed += dispense_volume
 
-            
             height_check = corrected_height
 
             #probe well
@@ -475,7 +474,7 @@ def run(ctx: ProtocolContext) -> None:
             corrected_height = height + tip_z_error
 
             #check if new height greater than old height 
-            if step > 1 and height_check > corrected_height:
+            if height_check > corrected_height:
                 liq_pipette.drop_tip()
                 liq_pipette.pick_up_tip()
                 height = _get_height_of_liquid_in_well(probe_pipette, labware[well_location], ctx.is_simulating())
