@@ -435,8 +435,7 @@ export function generateQuickTransferArgs(
     description: null,
     nozzles,
     pushOut: null,
-    /** TODO: update all values below once quick transfer state is updated */
-    liquidClass: null,
+    liquidClass: quickTransferState.liquidClassName,
     aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateZOffset: 0,
     aspirateSubmergeSpeed: null,
