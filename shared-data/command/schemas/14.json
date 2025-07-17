@@ -260,6 +260,7 @@
       "type": "object"
     },
     "AspirateProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the aspirate function.",
       "properties": {
         "aspiratePosition": {
@@ -566,6 +567,7 @@
       "type": "string"
     },
     "BlowoutParams": {
+      "additionalProperties": false,
       "description": "Parameters for blowout.",
       "properties": {
         "flowRate": {
@@ -592,6 +594,7 @@
       "type": "object"
     },
     "BlowoutProperties": {
+      "additionalProperties": false,
       "description": "Blowout properties.",
       "properties": {
         "enable": {
@@ -1356,6 +1359,7 @@
       "type": "string"
     },
     "DelayParams": {
+      "additionalProperties": false,
       "description": "Parameters for delay.",
       "properties": {
         "duration": {
@@ -1378,6 +1382,7 @@
       "type": "object"
     },
     "DelayProperties": {
+      "additionalProperties": false,
       "description": "Shared properties for delay..",
       "properties": {
         "enable": {
@@ -2304,6 +2309,7 @@
       "type": "object"
     },
     "LiquidClassRecord": {
+      "additionalProperties": false,
       "description": "LiquidClassRecord is our internal representation of an (immutable) liquid class.\n\nConceptually, a liquid class record is the tuple (name, pipette, tip, transfer properties).\nWe consider two liquid classes to be the same if every entry in that tuple is the same; and liquid\nclasses are different if any entry in the tuple is different.\n\nThis class defines the tuple via inheritance so that we can reuse the definitions from shared_data.",
       "properties": {
         "aspirate": {
@@ -2346,6 +2352,7 @@
       "type": "object"
     },
     "LiquidClassTouchTipParams": {
+      "additionalProperties": false,
       "description": "Parameters for touch-tip.",
       "properties": {
         "mmFromEdge": {
@@ -2963,6 +2970,7 @@
       "type": "string"
     },
     "MixParams": {
+      "additionalProperties": false,
       "description": "Parameters for mix.",
       "properties": {
         "repetitions": {
@@ -2991,6 +2999,7 @@
       "type": "object"
     },
     "MixProperties": {
+      "additionalProperties": false,
       "description": "Mixing properties.",
       "properties": {
         "enable": {
@@ -3689,6 +3698,7 @@
       "type": "string"
     },
     "MultiDispenseProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the multi-dispense function.",
       "properties": {
         "conditioningByVolume": {
@@ -4339,6 +4349,7 @@
       "type": "object"
     },
     "RetractAspirate": {
+      "additionalProperties": false,
       "description": "Shared properties for the retract function after aspiration.",
       "properties": {
         "airGapByVolume": {
@@ -4455,6 +4466,7 @@
       "type": "object"
     },
     "RetractDispense": {
+      "additionalProperties": false,
       "description": "Shared properties for the retract function after dispense.",
       "properties": {
         "airGapByVolume": {
@@ -5185,6 +5197,7 @@
       "type": "object"
     },
     "SingleDispenseProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the single-dispense function.",
       "properties": {
         "correctionByVolume": {
@@ -5447,6 +5460,7 @@
       "type": "object"
     },
     "Submerge": {
+      "additionalProperties": false,
       "description": "Shared properties for the submerge function before aspiration or dispense.",
       "properties": {
         "delay": {
@@ -5502,6 +5516,7 @@
       "type": "object"
     },
     "TipPosition": {
+      "additionalProperties": false,
       "description": "Properties for tip position reference and relative offset.",
       "properties": {
         "offset": {
@@ -5595,6 +5610,7 @@
       "type": "object"
     },
     "TouchTipProperties": {
+      "additionalProperties": false,
       "description": "Shared properties for the touch-tip function.",
       "properties": {
         "enable": {
