@@ -9,8 +9,8 @@
 body {
   width: 100%;
   height: 100%;
-  font-family: var(--font-family-main);
   color: var(--black-90);
+  font-family: var(--font-family-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -19,8 +19,8 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 button,
