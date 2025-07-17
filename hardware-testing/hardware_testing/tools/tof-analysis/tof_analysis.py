@@ -105,7 +105,10 @@ def _get_tuple_from_index(
 
 def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
     """Convert a defaultdict to dict."""
-    return {k: convert_to_dict(v) for k, v in obj.items()}
+    return {
+        k: convert_to_dict(v) if isinstance(v, defaultdict) else v
+        for k, v in obj.items()
+    }
 
 
 def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
