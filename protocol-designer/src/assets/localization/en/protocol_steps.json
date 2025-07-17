@@ -16,18 +16,14 @@
   "blowout_position": "Blowout position from top",
   "captions_for_fields": {
     "blockTargetTemp": "Valid range between 4 and 99˚C",
-    "lidTargetTemp": "Valid range between 37 and 110˚C",
-    "targetSpeed": "Must be between 200 and 3000 rpm",
-    "targetTemperature": "Must be between 4 and 95˚C",
-    "targetHeaterShakerTemperature": "Must be between 37 and 95˚C",
-    "blockTargetTempHold": "Must be between 4 and 99˚C",
+    "blockTargetTempHold": "Valid range between 4 and 99˚C",
     "heaterShakerTimer": "Use the format mm:ss",
-    "lidTargetTemp": "Must be between 37 and 110˚C",
-    "lidTargetTempHold": "Must be between 37 and 110˚C",
+    "lidTargetTemp": "Valid range between 37 and 110˚C",
+    "lidTargetTempHold": "Valid range between 37 and 110˚C",
     "targetHeaterShakerTemperature": "Valid range between 37 and 95˚C",
     "targetSpeed": "Valid range between 200 and 3000 rpm",
-    "targetTemperature": "Must be between 4 and 95˚C",
-    "volume": "Must be between 0.1 and {{max}}"
+    "targetTemperature": "Valid range between 4 and 95˚C",
+    "volume": "Valid range between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
   "column": "Column",
