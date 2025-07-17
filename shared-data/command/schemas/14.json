@@ -1383,7 +1383,7 @@
     },
     "DelayProperties": {
       "additionalProperties": false,
-      "description": "Shared properties for delay..",
+      "description": "Shared properties for delay.",
       "properties": {
         "enable": {
           "description": "Whether delay is enabled.",

@@ -106,7 +106,7 @@ class DelayParams(BaseLiquidClassModel):
 
 
 class DelayProperties(BaseLiquidClassModel):
-    """Shared properties for delay.."""
+    """Shared properties for delay."""
 
     enable: StrictBool = Field(..., description="Whether delay is enabled.")
     params: DelayParams | SkipJsonSchema[None] = Field(
