@@ -66,7 +66,7 @@ export function ResetAdvancedSettingsModal({
     })
     onClose()
   }
-  console.log(liquidClassName)
+
   return createPortal(
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing32}>
