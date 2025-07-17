@@ -14,18 +14,17 @@ import { LabwareListItem } from '../LabwareListItem'
 import { SetupLabwareList } from '../SetupLabwareList'
 
 import type { ComponentProps } from 'react'
-import type * as OpentronsSharedData from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof OpentronsSharedData>()
+  const actual = await importOriginal<typeof getStacksWithLabware>()
   return {
     ...actual,
     getStacksWithLabware: vi.fn(),
   }
 })
-
-const protocolWithTC = (multiple_tipacks_with_tc as unknown) as OpentronsSharedData.CompletedProtocolAnalysis
+const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
 
 const render = (props: ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(
