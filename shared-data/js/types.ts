@@ -314,7 +314,10 @@ export interface LabwareDefinition2 {
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
-  innerLabwareGeometry?: Record<string, InnerWellGeometry | UserDefinedVolumes> | null
+  innerLabwareGeometry?: Record<
+    string,
+    InnerWellGeometry | UserDefinedVolumes
+  > | null
 }
 
 export interface LabwareDefinition3 {

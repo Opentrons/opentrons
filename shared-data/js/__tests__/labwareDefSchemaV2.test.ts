@@ -290,7 +290,8 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       const wellGeometryId = well.geometryDefinitionId
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
-      const innerGeometryObject = labwareDef.innerLabwareGeometry?.heightToVolumeMap
+      const innerGeometryObject =
+        labwareDef.innerLabwareGeometry?.heightToVolumeMap
       for (const geometry of Object.values(innerGeometryObject ?? {})) {
         const pairingList = geometry[wellGeometryId].heightToVolumeMap
         const lastEntry = pairingList[pairingList.length - 1]
@@ -336,7 +337,6 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
   test("a well's depth should equal the height of its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
-
       const wellGeometryId = well.geometryDefinitionId
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
