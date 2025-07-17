@@ -26,6 +26,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   CutoutId,
+  Liquid,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -51,6 +52,8 @@ interface DeckViewProps {
   robotType: RobotType
   selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
+  showDeckRenders: boolean
+  liquids: Liquid[]
   selectedRunTimeCommand?: RunTimeCommand
 }
 
@@ -65,6 +68,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,
+    showDeckRenders,
+    liquids,
   } = props
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -188,6 +193,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               <DeckViewDetails
+                liquids={liquids}
+                showDeckRenders={showDeckRenders}
                 hoveredSlot={hoveredSlot}
                 setHoveredSlot={setHoveredSlot}
                 robotType={robotType}

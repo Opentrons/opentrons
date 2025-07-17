@@ -751,6 +751,12 @@ class Protocols:
     Flex_S_v2_24_P50_PAPI_Changes: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P50_PAPI_Changes", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_v2_25_P200_stacker_2: Protocol = Protocol(
+        file_stem="Flex_S_v2_25_P200_stacker_2", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_v2_25_P50_P200_stacker_all_parts: Protocol = Protocol(
+        file_stem="Flex_S_v2_25_P50_P200_stacker_all_parts", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
     Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
         file_stem="Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )

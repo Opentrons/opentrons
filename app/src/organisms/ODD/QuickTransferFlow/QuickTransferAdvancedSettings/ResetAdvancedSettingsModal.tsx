@@ -8,26 +8,40 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
-import type { LiquidClass } from '@opentrons/shared-data'
-import type { FlowRateKind } from '../types'
+import { retrieveLiquidClassValues } from '../utils'
+
+import type { Dispatch } from 'react'
+import type {
+  FlowRateKind,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+} from '../types'
 
 interface ResetAdvancedSettingsModalProps {
+  state: QuickTransferSummaryState
   kind: Omit<FlowRateKind, 'blowout'>
-  liquidClass: LiquidClass
+  dispatch: Dispatch<QuickTransferSummaryAction>
   onClose: () => void
 }
 
 export function ResetAdvancedSettingsModal({
+  state,
   kind,
-  liquidClass,
+  dispatch,
   onClose,
 }: ResetAdvancedSettingsModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { liquidClassName: stateLiquidClassName } = state
+  const liquidClass =
+    stateLiquidClassName != null && stateLiquidClassName !== 'none'
+      ? getAllLiquidClassDefs()[stateLiquidClassName]
+      : { displayName: 'none', liquidClassName: 'none' }
   const { displayName, liquidClassName } = liquidClass
   const modalHeader = {
     title: t('reset_kind_settings', { transferName: kind }),
@@ -39,7 +53,18 @@ export function ResetAdvancedSettingsModal({
   }
 
   const handleClickContinue = (): void => {
-    console.log('todo add hooks to reset settings for', kind)
+    const liquidHandlingAction = kind as 'aspirate' | 'dispense'
+    const liquidClassValues = retrieveLiquidClassValues(
+      state,
+      liquidHandlingAction
+    )
+    dispatch({
+      type: 'SET_LIQUID_CLASS_VALUES',
+      liquidClassValues: {
+        ...liquidClassValues,
+      },
+    })
+    onClose()
   }
 
   return createPortal(

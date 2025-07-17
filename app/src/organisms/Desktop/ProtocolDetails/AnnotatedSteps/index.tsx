@@ -68,31 +68,39 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       <div className={styles.annotated_steps_wrap}>
         {groupedCommandsHighlightedInfo != null &&
         groupedCommandsHighlightedInfo.length > 0
-          ? groupedCommandsHighlightedInfo.map((group, index) =>
-              'annotationIndex' in group ? (
-                <AnnotatedGroup
-                  key={`group_${group.annotationIndex}_${index}`}
-                  analysis={analysis}
-                  annotationType={
-                    annotations[group.annotationIndex]?.machineReadableName
-                  }
-                  subCommands={group.subCommands}
-                  allRunDefs={allRunDefs}
-                  setSelectedCommand={setSelectedCommand}
-                  handlePause={handlePause}
-                />
-              ) : (
-                <IndividualCommand
-                  fromGroup={true}
-                  key={group.command.id}
-                  command={group.command}
-                  isHighlighted={group.isHighlighted}
-                  analysis={analysis}
-                  allRunDefs={allRunDefs}
-                  setSelectedCommand={setSelectedCommand}
-                />
-              )
-            )
+          ? groupedCommandsHighlightedInfo.map((group, index) => {
+              const nextIndex = groupedCommandsHighlightedInfo[index + 1]
+              const nextIsGrouped =
+                nextIndex != null && 'annotationIndex' in nextIndex
+
+              if ('annotationIndex' in group) {
+                return (
+                  <AnnotatedGroup
+                    key={`group_${group.annotationIndex}_${index}`}
+                    analysis={analysis}
+                    annotationType={
+                      annotations[group.annotationIndex]?.machineReadableName
+                    }
+                    subCommands={group.subCommands}
+                    allRunDefs={allRunDefs}
+                    setSelectedCommand={setSelectedCommand}
+                    handlePause={handlePause}
+                  />
+                )
+              } else {
+                return (
+                  <IndividualCommand
+                    fromGroup={nextIsGrouped}
+                    key={group.command.id}
+                    command={group.command}
+                    isHighlighted={group.isHighlighted}
+                    analysis={analysis}
+                    allRunDefs={allRunDefs}
+                    setSelectedCommand={setSelectedCommand}
+                  />
+                )
+              }
+            })
           : analysis.commands.map((command, index) => (
               <IndividualCommand
                 fromGroup={false}

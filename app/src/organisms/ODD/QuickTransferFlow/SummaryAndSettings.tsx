@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -31,11 +31,13 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { Aspirate } from './Aspirate'
 import { Dispense } from './Dispense'
 import { Overview } from './Overview'
-import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { TipManagement } from './TipManagement'
-import { createQuickTransferFile, getInitialSummaryState } from './utils'
+import {
+  createQuickTransferFile,
+  getInitialSummaryState,
+  retrieveLiquidClassValues,
+} from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
@@ -59,13 +61,8 @@ export function SummaryAndSettings(
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
   const enableExportPython = useFeatureFlag('quickTransferExportPython')
-  const enableLiquidClassesForQT = useFeatureFlag(
-    'liquidClassesForQuickTransfer'
-  )
 
-  const displayCategory: string[] = enableLiquidClassesForQT
-    ? ['overview', 'aspirate', 'dispense']
-    : ['overview', 'advanced_settings', 'tip_management']
+  const displayCategory: string[] = ['overview', 'aspirate', 'dispense']
 
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -94,6 +91,19 @@ export function SummaryAndSettings(
     },
     host
   )
+
+  useEffect(() => {
+    if (!state.liquidClassValuesInitialized) {
+      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+      dispatch({
+        type: 'SET_LIQUID_CLASS_VALUES',
+        liquidClassValues: {
+          ...liquidClassValues,
+          liquidClassValuesInitialized: true,
+        },
+      })
+    }
+  })
 
   const isMultiTransferAspirate = state?.path === 'multiAspirate'
   const isMultiTransferDispense = state?.path === 'multiDispense'
@@ -181,36 +191,22 @@ export function SummaryAndSettings(
           />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
-        {enableLiquidClassesForQT ? (
-          <>
-            {selectedCategory === 'aspirate' ? (
-              <Aspirate
-                state={state}
-                dispatch={dispatch}
-                isMultiTransfer={isMultiTransferAspirate}
-              />
-            ) : null}
-            {selectedCategory === 'dispense' ? (
-              <Dispense
-                state={state}
-                dispatch={dispatch}
-                isMultiTransfer={isMultiTransferDispense}
-              />
-            ) : null}
-          </>
-        ) : (
-          <>
-            {selectedCategory === 'advanced_settings' ? (
-              <QuickTransferAdvancedSettings
-                state={state}
-                dispatch={dispatch}
-              />
-            ) : null}
-            {selectedCategory === 'tip_management' ? (
-              <TipManagement state={state} dispatch={dispatch} />
-            ) : null}
-          </>
-        )}
+        <>
+          {selectedCategory === 'aspirate' ? (
+            <Aspirate
+              state={state}
+              dispatch={dispatch}
+              isMultiTransfer={isMultiTransferAspirate}
+            />
+          ) : null}
+          {selectedCategory === 'dispense' ? (
+            <Dispense
+              state={state}
+              dispatch={dispatch}
+              isMultiTransfer={isMultiTransferDispense}
+            />
+          ) : null}
+        </>
       </Flex>
     </Flex>
   )

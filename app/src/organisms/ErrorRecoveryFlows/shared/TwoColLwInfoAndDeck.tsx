@@ -165,7 +165,10 @@ export function TwoColLwInfoAndDeck(
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
+                        <LabwareRender
+                          definition={nestedLabwareDef}
+                          positioningMode="offsetInSlot"
+                        />
                       ) : null}
                     </Module>
                   )
