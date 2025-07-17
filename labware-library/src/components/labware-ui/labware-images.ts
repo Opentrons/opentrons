@@ -383,6 +383,9 @@ export const labwareImages: Record<string, string[]> = {
   opentrons_universal_flat_adapter: [
     new URL('../../images/universal_flat_adapter.jpg', import.meta.url).href,
   ],
+  opentrons_universal_flat_adapter_type_b: [
+    new URL('../../images/opentrons_universal_flat_adapter_type_b.png', import.meta.url).href,
+  ],
   opentrons_aluminum_flat_bottom_plate: [
     new URL('../../images/flat_bottom_aluminum.png', import.meta.url).href,
   ],
