@@ -11,7 +11,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
-import { getMinXYDimension } from '@opentrons/shared-data'
+import { getMaxPushOutVolume, getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -28,10 +28,7 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
-import {
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../../../../../utils'
+import { getMaxConditioningVolume } from '../../../../../../utils'
 import {
   BlowoutLocationField,
   DisposalField,

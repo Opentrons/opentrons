@@ -129,7 +129,7 @@ describe('ProtocolSteps', () => {
   it('renders the toggle when formData is null', () => {
     render()
     screen.getByText('mock DeckSetupContainer')
-    fireEvent.click(screen.getByText('Off deck'))
+    fireEvent.click(screen.getByText('Off-deck'))
     screen.getByText('mock OffDeck')
   })
 

@@ -212,6 +212,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                     >
                       <LabwareRender
                         definition={labwareToRender}
+                        positioningMode="offsetInSlot"
                         wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
                       />
                     </g>
@@ -227,6 +228,7 @@ export function CreateLabwareSandbox(): JSX.Element {
               >
                 <LabwareRender
                   definition={labwareToRender}
+                  positioningMode="offsetInSlot"
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
                 />
               </svg>

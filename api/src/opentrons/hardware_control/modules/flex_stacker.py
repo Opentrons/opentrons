@@ -78,9 +78,16 @@ HOME_OFFSET_MD = 10.0
 
 # The labware platform will contact the labware this mm before the platform
 # touches the +Z endstop.
-PLATFORM_OFFSET = 4
+PLATFORM_OFFSET = 2.25
 
-# Configs
+# Should put the bottom of the plate above this mm above the latch when dispensing.
+# Should put the bottom of the plate this mm below the latch when storing.
+LATCH_CLEARANCE = 2.5
+
+# TOF Baseline Configs
+# These are generated manually with the help of the tof_analysis.py tool
+# Which can be found in `hardware_testing/tools/tof-analysis/README.md` where
+# it goes over using use the tool.
 TOF_DETECTION_CONFIG = {
     TOFSensor.X: {
         Direction.EXTEND: TOFDetection(
@@ -119,10 +126,11 @@ STALLGUARD_CONFIG = {
     StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
 }
 
+# Motion Parameter defaults
 STACKER_MOTION_CONFIG = {
     StackerAxis.X: {
         "home": AxisParams(
-            run_current=1.5,  # mAmps
+            run_current=1.5,  # Amps RMS
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=10.0,  # mm/s
@@ -521,16 +529,12 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Transfer
         await self.open_latch()
-        # NOTE: When moving from the +Z limit switch down, the PLATFORM_OFFSET makes
-        # sure the bottom of the next labware is sitting N mm above the latch.
-        # So when moving the labware_height we dont need to add an additional
-        # offset to make sure we arent cutting it too close since the labware
-        # will always be above the latch.
-        await self.move_axis(StackerAxis.Z, Direction.RETRACT, labware_height)
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        await self.move_axis(StackerAxis.Z, Direction.RETRACT, latch_clear_distance)
         await self.close_latch()
 
         # Move Z down the rest of the way
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
         await self.move_axis(StackerAxis.Z, Direction.RETRACT, z_distance)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
@@ -553,12 +557,13 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
         # Move the Z so the labware sits right under any labware already stored
-        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
+        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         await self.open_latch()
         # Move the labware the rest of the way at half move speed to increase torque.
-        remaining_z = labware_height + PLATFORM_OFFSET - HOME_OFFSET_SM
+        remaining_z = latch_clear_distance - HOME_OFFSET_SM
         speed_z = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, remaining_z, speed_z)
         await self.home_axis(StackerAxis.Z, Direction.EXTEND, speed_z)

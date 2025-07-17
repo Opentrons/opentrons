@@ -3,19 +3,19 @@
 }
 
 .labware_ui_wrapper {
-  height: 100%;
-  width: 100%;
   display: flex;
+  width: 100%;
+  height: 100%;
   flex-direction: column;
   justify-content: flex-end;
 }
 
 .confirm_crash_modal {
-  padding: 1rem;
   max-width: 64rem;
+  padding: 1rem;
 }
 
 .select_tiprack_menu :global(.ot_select__menu) {
-  max-height: 200px;
   overflow: scroll;
+  max-height: 200px;
 }
