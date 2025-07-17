@@ -32,6 +32,7 @@ import {
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
 import type {
+  AddressableAreaName,
   IrregularLabwareProps,
   LabwareDefinition,
   RegularLabwareProps,
@@ -185,7 +186,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                 <SlotSelect
                   defaultValue={labwareSlot}
                   onChange={e => {
-                    setLabwareSlot(e.target.value)
+                    setLabwareSlot(e.target.value as AddressableAreaName)
                   }}
                 >
                   {SLOT_OPTIONS.map(slot => (
