@@ -34,6 +34,8 @@ from .constants import (
     Rectangular,
 )
 
+import type { DisplayNotches} from '@opentrons/shared-data'
+
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
 
@@ -575,6 +577,7 @@ class LabwareDefinition2(BaseModel):
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+    displayNotches: DisplayNotches | None = None
 
 
 class LabwareDefinition3(BaseModel):
