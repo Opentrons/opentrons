@@ -145,7 +145,9 @@ def main(configurations: configparser.ConfigParser) -> None:
     hepa_on = input("Are you turning HEPA Fans on or off? ")
     run_hepa_uv(hepa_on.lower(), sheet_name, storage_directory)
     if hepa_on == "off":
-        continue_str = input("Type 'continue' to continue with the rest of the set up script.")
+        continue_str = input(
+            "Type 'continue' to continue with the rest of the set up script."
+        )
         if continue_str == "continue":
             print("Script will continue.")
         else:
