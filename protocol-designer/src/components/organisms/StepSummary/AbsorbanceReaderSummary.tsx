@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -53,8 +54,12 @@ export function AbsorbanceReaderSummary(
       stepSummaryContent = (
         <StyledTrans
           i18nKey="protocol_steps:absorbance_reader.read"
-          tagText={labwareOnAbsorbanceReaderNickname ?? undefined}
-          tagText2={`${fileName}`}
+          {...(labwareOnAbsorbanceReaderNickname != null
+            ? {
+                tagText: labwareOnAbsorbanceReaderNickname,
+              }
+            : {})}
+          tagText2={fileName}
         />
       )
       break
@@ -62,8 +67,8 @@ export function AbsorbanceReaderSummary(
     case ABSORBANCE_READER_INITIALIZE: {
       const wavelengthsComponents = (
         <Flex gridGap={SPACING.spacing4}>
-          {wavelengths.map((wavelength: number, index: number) => (
-            <>
+          {wavelengths.map((wavelength: string, index: number) => (
+            <Fragment key={`${wavelength}-${index}`}>
               <Tag
                 text={`${wavelength} ${t('application:units.nanometer')}`}
                 type="default"
@@ -71,7 +76,7 @@ export function AbsorbanceReaderSummary(
               {index < wavelengths.length - 1 ? (
                 <StyledText>,</StyledText>
               ) : null}
-            </>
+            </Fragment>
           ))}
         </Flex>
       )
