@@ -11,6 +11,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
+  getLiquidClassName,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
@@ -26,7 +27,7 @@ export const retrieveLiquidClassValues = (
   const { pipette } = state
   const convertedPipetteName = getFlexNameConversion(pipette)
 
-  if (state.liquidClass.liquidClassName === NONE_LIQUID_CLASS_NAME) {
+  if (state.liquidClassName === NONE_LIQUID_CLASS_NAME) {
     return getNoLiquidClassValues(
       state,
       convertedPipetteName,
@@ -257,7 +258,7 @@ const getLiquidClassValues = (
     ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
   ])
   const selectedLiquidClass = liquidClassMap.get(
-    state.liquidClass?.liquidClassName ?? 'none'
+    getLiquidClassName(state.liquidClassName) ?? 'none'
   )
   const liquidClassDef =
     allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]

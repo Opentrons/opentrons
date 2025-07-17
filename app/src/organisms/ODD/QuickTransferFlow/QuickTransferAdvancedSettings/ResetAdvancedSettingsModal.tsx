@@ -8,6 +8,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
@@ -36,7 +37,11 @@ export function ResetAdvancedSettingsModal({
   onClose,
 }: ResetAdvancedSettingsModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const { liquidClass } = state
+  const { liquidClassName: stateLiquidClassName } = state
+  const liquidClass =
+    stateLiquidClassName != null && stateLiquidClassName !== 'none'
+      ? getAllLiquidClassDefs()[stateLiquidClassName]
+      : { displayName: 'none', liquidClassName: 'none' }
   const { displayName, liquidClassName } = liquidClass
   const modalHeader = {
     title: t('reset_kind_settings', { transferName: kind }),
@@ -61,7 +66,7 @@ export function ResetAdvancedSettingsModal({
     })
     onClose()
   }
-
+  console.log(liquidClassName)
   return createPortal(
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing32}>
