@@ -26,9 +26,9 @@ def turning_uv_and_hepa_on(
 ) -> None:
     """Create set of lines to add to google sheet."""
     today = datetime.date.today()
-    formatted_date = today.strftime("%-m/%-d/%Y")
+    formatted_date = today.strftime("%m/%d/%Y")
     timestamp = datetime.datetime.now()
-    formatted_timestamp = timestamp.strftime("%-m/%-d/%Y %H:%M:%S")
+    formatted_timestamp = timestamp.strftime("%m/%d/%Y %H:%M:%S")
     num_robots = len(all_robots[0])
     blank_column = [""] * num_robots
     date_column = [formatted_date] * num_robots
@@ -81,9 +81,9 @@ def turning_hepa_off_and_uv_on(
 
     # Timestamp formatting
     today = datetime.date.today()
-    formatted_date = today.strftime("%-m/%-d/%Y")
+    formatted_date = today.strftime("%m/%d/%Y")
     timestamp = datetime.datetime.now()
-    formatted_timestamp = timestamp.strftime("%-m/%-d/%Y %H:%M:%S")
+    formatted_timestamp = timestamp.strftime("%m/%d/%Y %H:%M:%S")
 
     # Process matching rows
     for row in all_data:
@@ -153,9 +153,16 @@ def run(
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    hepa_uv_sheet = google_sheets_tool.google_sheet(credentials_path, "ABR-run-data", 5)
+    hepa_uv_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 5
+    )
     robot_names_and_hepa_serials = get_hepa_serials(storage_directory)
-    answer = input("Do you want to exclude any robots?")
+    if turning_hepa_fan == "on":
+        print("𖣘 TIME STAMPING START OF HEPA FANS & UV LIGHT.")
+    else:
+        print("𖣘 TIME STAMPING END OF HEPA FANS & UV LIGHT.")
+
+    answer = input("Do you want to exclude any robots (y/n)?")
     if answer.lower == "y":
         robots_to_exclude = input(
             "Enter robots you want to exclude in a comma separated list: "
@@ -172,7 +179,8 @@ def run(
             zip(*filtered_pairs) if filtered_pairs else ([], [])
         )
         robot_names_and_hepa_serials = [list(filtered_robots), list(filtered_serials)]
-
+    else:
+        robot_names_and_hepa_serials = robot_names_and_hepa_serials
     if turning_hepa_fan == "on":
         turning_uv_and_hepa_on(hepa_uv_sheet, robot_names_and_hepa_serials)
     else:

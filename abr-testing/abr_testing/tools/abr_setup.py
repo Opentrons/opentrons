@@ -76,11 +76,13 @@ def run_hepa_uv(
     abr_hepauv.run(turning_hepa_fan, google_sheet_name, storage_directory)
 
 
-def run_temp_sensor(ambient_conditions_sheet: str, credentials: str) -> None:
+def run_temp_sensor(
+    ambient_conditions_sheet: str, credentials: str, storage_directory: str
+) -> None:
     """Run temperature sensors on all robots."""
     # Remove entries > 60 days
     clean_sheet(ambient_conditions_sheet, credentials)
-    processes = ABRAsairScript.run()
+    processes = ABRAsairScript.run(storage_directory)
     for process in processes:
         process.start()
         time.sleep(20)
@@ -140,13 +142,19 @@ def main(configurations: configparser.ConfigParser) -> None:
     # Record HEPA/UV Tracking
     storage_directory = configurations["RUN-LOG"]["Storage"]
     sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
-    run_hepa_uv("on", sheet_name, storage_directory)
+    hepa_on = input("Are you turning HEPA Fans on or off? ")
+    run_hepa_uv(hepa_on.lower(), sheet_name, storage_directory)
+    if hepa_on == "off":
+        continue_str = input("Type 'continue' to continue with the rest of the set up script.")
+        if continue_str == "continue":
+            print("Script will continue.")
+        else:
+            sys.exit()
     # Run Temperature Sensors
     ambient_conditions_sheet = configurations["TEMP-SENSOR"]["Sheet_Url"]
     ambient_conditions_sheet_name = configurations["TEMP-SENSOR"]["Sheet_Name"]
-    print("Starting temp sensors...")
-    run_temp_sensor(ambient_conditions_sheet_name, credentials)
-    print("Temp Sensors Started")
+    print("Starting 🌡️ temp sensors 🌡️...")
+    run_temp_sensor(ambient_conditions_sheet_name, credentials, storage_directory)
     # Get Run Logs and Record
     email = configurations["RUN-LOG"]["Email"]
     drive_folder = configurations["RUN-LOG"]["Drive_Folder"]
@@ -154,11 +162,11 @@ def main(configurations: configparser.ConfigParser) -> None:
     sheet_url = configurations["RUN-LOG"]["Sheet_Url"]
     print(sheet_name)
     if storage_directory and drive_folder and sheet_name and email:
-        print("Retrieving robot run logs...")
+        print("🤖 Retrieving robot run logs...")
         get_abr_logs(storage_directory, drive_folder, email)
-        print("Recording robot run logs...")
+        print("📄 Recording robot run logs...")
         record_abr_logs(storage_directory, drive_folder, sheet_name, email)
-        print("Run logs updated")
+        print("✅ Run logs updated")
     else:
         print("Storage, Email, or Drive Folder is missing, please fix configs")
         sys.exit(1)
