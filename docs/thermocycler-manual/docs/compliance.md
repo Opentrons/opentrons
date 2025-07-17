@@ -22,7 +22,7 @@ The Thermocycler has the following power input requirements, which are met by th
 - **Current**: 8.5–5 A
 - **Overvoltage**: Category II
 
-### Environmental Conditions
+### Environmental Conditions { #thermocycler-environmental-conditions }
 
 The Thermocycler should only be used indoors on a sturdy, dry, flat horizontal surface. It must be installed in a low-vibration environment with stable ambient conditions. Keep the Thermocycler away from direct sunlight or HVAC systems that may cause significant temperature or humidity changes.
 
@@ -74,13 +74,112 @@ Warning symbols posted on the Opentrons Thermocycler and in this manual warn you
             <th>Description</th>
         </tr>
         <tr>
-            <td><img src="../images/caution-yellow.svg"></td>
+            <td><img src="../images/caution-yellow.svg" alt="Exclamation mark caution symbol"></td>
             <td><strong>CAUTION: Risk of danger!</strong><br>
                 This symbol identifies instrument components that pose a risk of personal injury or instrument damage if improperly handled. Wherever this symbol appears, please consult the manual for further information on safe handling before proceeding.
             </td>
         </tr>
         <tr>
-            <td>
-
-
+            <td><img src="../images/electric-shock-yellow.svg" alt="Electric shock caution symbol"></td>
+            <td><strong>CAUTION: Risk of electrical shock!</strong><br>
+                This symbol identifies instrument components that pose a risk of electrical shock if handled improperly.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/hot-surface-yellow.svg" alt="Hot surface caution symbol"></td>
+            <td><strong>CAUTION: Hot surface!</strong><br>
+                This symbol identifies instrument components that pose a risk of burning or heat damage if handled improperly.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/pinch-yellow.svg" alt="Pinch point caution symbol"></td>
+            <td><strong>CAUTION: Pinch point!</strong><br>
+                This symbol identifies instrument components which can pose a risk of personal injury due to a closing mechanism. Please do not touch the lid while it is in operation.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/explosive-yellow.svg" alt="Explosion warning symbol"></td>
+            <td><strong>CAUTION: Risk of explosion!</strong><br>
+                This symbol identifies instrument components that pose a risk of creating an explosion if handled improperly.
+            </td>
+        </tr>
 </table>
+
+## Instrument Safety Warnings
+
+Warning symbols posted on the Opentrons Thermocycler refer directly to the safe use of the instrument. Refer to the previous table for symbol definitions.
+
+<table>
+    <head>
+        <tr>
+            <th>Symbol</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><img src="../images/caution-yellow.svg" alt="Exclamation mark caution symbol"></td>
+            <td><strong>CAUTION: Warning about risk of harm to body or equipment.</strong><br>
+                Operating the Opentrons Thermocycler before reading this manual poses a risk of personal injury or instrument damage. Only qualified laboratory personnel should operate this equipment.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/electric-shock-yellow.svg" alt="Electric shock caution symbol"></td>
+            <td><strong>CAUTION: Warning about risk of harm to body or equipment from electrical shock.</strong><br>
+                Do not attempt to repair or remove the outer case of the Opentrons Thermocycler or its power supply unless directed by Opentrons Support. Attempting to do so puts you at risk of electrical shock.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/hot-surface-yellow.svg" alt="Hot surface caution symbol"></td>
+            <td><strong>CAUTION: Warning about risk of burning.</strong><br>
+                The Opentrons Thermocycler generates enough heat to cause serious burns. Wear safety goggles or other eye protection at all times during operation. Always ensure the sample block returns to idle temperature before opening the lid and removing samples. Always allow maximum clearance to avoid accidental burns. The seal on the lid can also be hot when opened. Unplug the unit after use, if possible.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/pinch-yellow.svg" alt="Pinch point caution symbol"></td>
+            <td><strong>CAUTION: Warning about moving parts.</strong><br>
+                The lid on the Opentrons Thermocycler presents a pinch point hazard. Keep hands and fingers away from the module while the lid is opening or closing.
+            </td>
+        </tr>
+        <tr>
+            <td><img src="../images/explosive-yellow.svg" alt="Explosion warning symbol"></td>
+            <td><strong>CAUTION: Warning about risk of explosion.</strong><br>
+                Do not operate the Opentrons Thermocycler in areas used for working with explosive substances. Do not process explosive or highly reactive materials in the module or use it with substances that could generate explosive gases.
+            </td>
+        </tr>
+</table>
+
+## Standards Compliance
+
+The Thermocycler has been tested and found to be in compliance with all applicable requirements of the following safety and electromagnetic standards.
+
+### Safety
+
+- IEC/UL/CSA 61010-1 Safety­ Requirements­ for­ Electrical Equipment­ for Measurement­ Control­ and­ Laboratory Use–­Part­ 1:­ General Requirements
+- IEC/UL/CSA ­ 61010-2-010­ Particular­ Requirements­ for Laboratory­ Equipment for­ the Heating­ of­ Materials
+
+### Electromagnetic Compatibility
+
+- EN/BSI 61326-1­ Electrical ­ Equipment­ for Measurement Control­ and­ Laboratory­ Use­–EMC Requirements–
+­ Part­ 1: General­ Requirements
+- EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency­ Disturbance Characteristics–Limits­ and­ Methods of­ Measurement
+- FCC 47CFR Part 15 Subpart B Class A: Unintentional Radiators
+- IC ICES–003 Spectrum Management and Telecommunications Interference Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus)
+
+FCC Warnings and Notes
+
+**Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules. Operation is subject to the following two conditions:
+
+- This device may not cause harmful interference.
+- This device must accept any interference received, including interference that may cause undesired operation.
+
+**Note:** This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to part 15 of the FCC rules. These limits are designed to provide a reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
+
+### Canada ISED
+
+Canada ICES–003(A)/NMB–003(A)
+This­ product­ meets­ the­ applicable­ Innovation,­ Science­ and EconomicDevelopment Canada technical specifications.
+
+Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
+
+### CISPR 11 Class A
+
+**Caution:** This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
