@@ -190,7 +190,7 @@ jobs:
           title: 'fix(analyses-snapshot-testing): heal ${{ github.event.pull_request.head.ref }} snapshots'
           body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           branch: 'analyses-snapshot-testing/heal-${{ github.event.pull_request.head.ref }}'
-          base: ${{ github.event.pull_request.base.ref }}
+          base: ${{ github.event.pull_request.head.ref }}
 
       - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
