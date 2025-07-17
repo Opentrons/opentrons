@@ -221,7 +221,7 @@ jobs:
           echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
           echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
           echo "Done configuring Windows code signing environment."
-
+          echo "A change to trigger."
       - name: 'Setup Windows code signing helpers'
         if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
         shell: cmd
