@@ -106,6 +106,7 @@ describe('AddStepButton', () => {
   beforeEach(() => {
     props = {
       hasText: true,
+      sidebarWidth: 10,
     }
     vi.mocked(getEnableComment).mockReturnValue(true)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)

@@ -157,6 +157,7 @@ export function LabwareSlotDetails(
                 <g>
                   <LabwareRender
                     definition={labwareDef}
+                    positioningMode="offsetInSlot"
                     wellFill={wellFill}
                     missingTips={missingTips}
                     highlightedWells={wellGroup}

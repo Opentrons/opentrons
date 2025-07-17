@@ -33,6 +33,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
+  ProtocolDeck,
   SecondaryButton,
   SIZE_1,
   SIZE_5,
@@ -53,7 +54,6 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
-import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
