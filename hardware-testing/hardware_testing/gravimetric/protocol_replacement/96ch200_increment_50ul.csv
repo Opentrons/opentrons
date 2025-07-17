@@ -1,5 +1,5 @@
 name,gravimetric-ot3-p200-96,,,,,,,,,,,,,,,,
-increment,FALSE,,,,,,,,,,,,,,,,
+increment,TRUE,,,,,,,,,,,,,,,,
 mount,left,,,,,,,,,,,,,,,,
 pipette,200,96,,,,,,,,,,,,,,,
 tips,50,,,,,,,,,,,,,,,,
