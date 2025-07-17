@@ -33,6 +33,10 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             "lidId",
             "liquidClassId",
             "labwareIds",
+            "primaryLabwareId",
+            "lidLabwareId",
+            "stackLabwareId",
+            "lid_id",
         ]
         self.timestamp_keys_to_replace = [
             "createdAt",

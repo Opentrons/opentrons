@@ -364,7 +364,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowoutLocation: blowoutLabwareId,
+      blowoutLocation: 'source_well',
       wells: ['A1', 'B1', 'C1'],
     } as MixArgs
 
@@ -408,6 +408,8 @@ describe('mix: advanced options', () => {
           flowRate: 2.2,
         }),
         blowoutHelper(blowoutLabwareId, {
+          labwareId: 'sourcePlateId',
+          wellName: well,
           wellLocation: {
             origin: 'top',
             offset: {
@@ -425,9 +427,9 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowoutLocation: blowoutLabwareId,
+      blowoutLocation: 'dest_well',
       touchTip: true,
-      wells: ['A1', 'B1', 'C1'],
+      wells: ['A1'],
     } as MixArgs
 
     const result = mix(args, invariantContext, robotStateWithTip)
@@ -470,6 +472,8 @@ describe('mix: advanced options', () => {
           flowRate: 2.2,
         }),
         blowoutHelper(blowoutLabwareId, {
+          labwareId: 'sourcePlateId',
+          wellName: 'A1',
           wellLocation: {
             origin: 'top',
             offset: {
@@ -594,7 +598,7 @@ describe('mix: advanced options', () => {
         touchTip: true,
         aspirateDelaySeconds: 10,
         dispenseDelaySeconds: 12,
-        blowoutLocation: blowoutLabwareId,
+        blowoutLocation: 'source_well',
         volume,
         times,
         changeTip: 'always',
@@ -654,6 +658,8 @@ describe('mix: advanced options', () => {
           }),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
+            labwareId: 'sourcePlateId',
+            wellName: well,
             wellLocation: {
               origin: 'top',
               offset: {
@@ -679,7 +685,7 @@ mock_pipette.mix(
     final_push_out=2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
@@ -695,7 +701,7 @@ mock_pipette.mix(
     final_push_out=2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["B1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
@@ -711,7 +717,7 @@ mock_pipette.mix(
     final_push_out=2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["C1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
 `.trim()
       )
@@ -721,7 +727,7 @@ mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
     const args: MixArgs = {
       ...mixinArgs,
       touchTip: true,
-      blowoutLocation: blowoutLabwareId,
+      blowoutLocation: 'dest_well',
       volume,
       times,
       changeTip: 'always',
@@ -745,7 +751,7 @@ mock_pipette.mix(
     dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
@@ -758,7 +764,7 @@ mock_pipette.mix(
     dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["B1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
 mock_pipette.drop_tip()
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
@@ -771,7 +777,7 @@ mock_pipette.mix(
     dispense_flow_rate=2.2,
 )
 mock_pipette.flow_rate.blow_out = 2.3
-mock_pipette.blow_out(mock_dest_plate["A1"].top(z=3.3))
+mock_pipette.blow_out(mock_source_plate["C1"].top(z=3.3))
 mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
 `.trim()
     )

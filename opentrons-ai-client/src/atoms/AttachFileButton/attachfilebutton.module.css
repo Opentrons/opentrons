@@ -1,17 +1,17 @@
 .button {
   display: flex;
+  height: var(--spacing-40);
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-8);
-  background: transparent;
+  padding: var(--spacing-8) var(--spacing-12);
   border: 1px solid var(--blue-50);
   border-radius: var(--border-radius-8);
-  cursor: pointer;
-  opacity: 1;
-  padding: var(--spacing-8) var(--spacing-12);
+  background: transparent;
   color: var(--blue-50);
+  cursor: pointer;
+  gap: var(--spacing-8);
+  opacity: 1;
   transition: all 0.2s ease;
-  height: var(--spacing-40);
   white-space: nowrap;
 }
 
@@ -21,25 +21,25 @@
 }
 
 .button:focus {
-  outline: none;
-  background: var(--blue-10);
   border-color: var(--blue-60);
+  background: var(--blue-10);
   box-shadow: 0 0 0 var(--spacing-2) var(--blue-50);
+  outline: none;
 }
 
 .button:hover:not(:disabled) {
-  background: var(--blue-10);
   border-color: var(--blue-60);
+  background: var(--blue-10);
   color: var(--blue-60);
 }
 
 .button_text {
+  color: inherit;
   font-size: var(--font-size-h3);
+  font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
-  color: inherit;
   text-align: center;
-  font-style: normal;
 }
 
 .hidden_input {

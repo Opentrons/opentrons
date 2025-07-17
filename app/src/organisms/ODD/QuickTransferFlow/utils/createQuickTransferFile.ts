@@ -24,7 +24,7 @@ import { pythonDef } from './pythonDef'
 import type {
   AddressableAreaName,
   CommandAnnotationV1Mixin,
-  CommandV8Mixin,
+  CommandV14Mixin,
   CreateCommand,
   CutoutId,
   DeckConfiguration,
@@ -242,8 +242,8 @@ export function createQuickTransferFile(
     liquids: {},
   }
 
-  const commandv8Mixin: CommandV8Mixin = {
-    commandSchemaId: 'opentronsCommandSchemaV8',
+  const commandv8Mixin: CommandV14Mixin = {
+    commandSchemaId: 'opentronsCommandSchemaV14',
     commands,
   }
 

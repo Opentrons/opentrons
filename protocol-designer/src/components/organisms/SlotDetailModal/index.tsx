@@ -160,6 +160,7 @@ export const SlotDetailModal = (
                           }
                         }}
                         definition={labwareOnDeck.def}
+                        positioningMode="offsetInSlot"
                         wellFill={allWellFill}
                         highlightedWells={wellContentsWithLiquidId}
                       />
