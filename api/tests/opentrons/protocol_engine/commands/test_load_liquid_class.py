@@ -31,7 +31,7 @@ def liquid_class_record(
     return LiquidClassRecord(
         liquidClassName=minimal_liquid_class_def2.liquidClassName,
         pipetteModel=pipette_0.pipetteModel,
-        tiprack=by_tip_type_0.tiprack,
+        tiprack=by_tip_type_0.tiprack[0],
         aspirate=by_tip_type_0.aspirate,
         singleDispense=by_tip_type_0.singleDispense,
         multiDispense=by_tip_type_0.multiDispense,

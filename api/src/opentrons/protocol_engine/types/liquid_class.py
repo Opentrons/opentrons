@@ -3,11 +3,11 @@ from typing import Any
 from pydantic import Field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    ByTipTypeSetting,
+    TransferProperties,
 )
 
 
-class LiquidClassRecord(ByTipTypeSetting, frozen=True):
+class LiquidClassRecord(TransferProperties, frozen=True):
     """LiquidClassRecord is our internal representation of an (immutable) liquid class.
 
     Conceptually, a liquid class record is the tuple (name, pipette, tip, transfer properties).
@@ -17,6 +17,11 @@ class LiquidClassRecord(ByTipTypeSetting, frozen=True):
     This class defines the tuple via inheritance so that we can reuse the definitions from shared_data.
     """
 
+    tiprack: str = Field(
+        ...,
+        description="The name of tiprack whose tip will be used"
+                    " when handling this specific liquid class with this pipette"
+    )
     liquidClassName: str = Field(
         ...,
         description="Identifier for the liquid of this liquid class, e.g. glycerol50.",

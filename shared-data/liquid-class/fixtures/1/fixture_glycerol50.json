@@ -10,7 +10,7 @@
       "pipetteModel": "p20_single_gen2",
       "byTipType": [
         {
-          "tiprack": "opentrons_96_tiprack_20ul",
+          "tiprack": ["opentrons_96_tiprack_20ul"],
           "aspirate": {
             "submerge": {
               "startPosition": {

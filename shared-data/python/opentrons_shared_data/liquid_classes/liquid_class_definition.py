@@ -517,9 +517,9 @@ class TransferProperties(BaseLiquidClassModel):
 class ByTipTypeSetting(TransferProperties):
     """Settings for each kind of tip this pipette can use."""
 
-    tiprack: str = Field(
+    tiprack: Sequence[str] = Field(
         ...,
-        description="The name of tiprack whose tip will be used when handling this specific liquid class with this pipette",
+        description="The name(s) of tiprack whose tip will be used when handling this specific liquid class with this pipette",
     )
 
 

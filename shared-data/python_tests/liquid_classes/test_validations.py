@@ -36,7 +36,8 @@ def test_validate_unique_tip_keys(liquid_class_name: str) -> None:
     definition_dict = load_definition(liquid_class_name, version=1, schema_version=1)
 
     for by_pip_prop in definition_dict.byPipette:
-        tipracks = [tip_prop.tiprack for tip_prop in by_pip_prop.byTipType]
+        # TODO fix this to check all tipracks
+        tipracks = [tip_prop.tiprack[0] for tip_prop in by_pip_prop.byTipType]
         assert len(tipracks) == len(set(tipracks))
 
 

@@ -54,7 +54,11 @@ class LiquidClass:
         for by_pipette in liquid_class_definition.byPipette:
             tip_settings: Dict[str, TransferProperties] = {}
             for tip_type in by_pipette.byTipType:
-                tip_settings[tip_type.tiprack] = build_transfer_properties(tip_type)
+                # TODO having these refer to the same transfer property object
+                #   but this may change IDK
+                transfer_props = build_transfer_properties(tip_type)
+                for tiprack in tip_type.tiprack:
+                    tip_settings[tiprack] = transfer_props
             by_pipette_settings[by_pipette.pipetteModel] = tip_settings
 
         return cls(

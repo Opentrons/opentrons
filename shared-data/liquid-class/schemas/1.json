@@ -469,8 +469,11 @@
               "type": "object",
               "properties": {
                 "tiprack": {
-                  "type": "string",
-                  "description": "The tiprack name whose tip will be used when handling this specific liquid class with this pipette"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "The tiprack name(s) whose tip will be used when handling this specific liquid class with this pipette"
                 },
                 "aspirate": {
                   "$ref": "#/definitions/aspirateParams"

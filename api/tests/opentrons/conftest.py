@@ -825,7 +825,7 @@ def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
                 pipetteModel="flex_1channel_50",
                 byTipType=[
                     ByTipTypeSetting(
-                        tiprack="opentrons_flex_96_tiprack_50ul",
+                        tiprack=["opentrons_flex_96_tiprack_50ul"],
                         aspirate=AspirateProperties(
                             submerge=Submerge(
                                 startPosition=TipPosition(
@@ -912,7 +912,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                 pipetteModel="flex_1channel_50",
                 byTipType=[
                     ByTipTypeSetting(
-                        tiprack="opentrons_flex_96_tiprack_50ul",
+                        tiprack=["opentrons_flex_96_tiprack_50ul"],
                         aspirate=AspirateProperties(
                             submerge=Submerge(
                                 startPosition=TipPosition(
