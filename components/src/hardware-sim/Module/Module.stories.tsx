@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   fixture96Plate,
   getModuleDef,
