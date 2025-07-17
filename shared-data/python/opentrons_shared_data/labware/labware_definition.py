@@ -22,7 +22,7 @@ from pydantic import (
 )
 from typing_extensions import Annotated, Literal
 
-from .types import LocatingFeatures
+from .types import LocatingFeatures, DisplayNotches
 from .constants import (
     Conical,
     Cuboidal,
@@ -34,7 +34,6 @@ from .constants import (
     Rectangular,
 )
 
-import type { DisplayNotches} from '@opentrons/shared-data'
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001

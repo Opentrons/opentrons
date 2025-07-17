@@ -3,7 +3,7 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import NewType
+from typing import NewType, List
 from typing_extensions import Literal, TypedDict, NotRequired
 from .constants import (
     CircularType,
@@ -41,6 +41,14 @@ LabwareRoles = Literal[
     "lid",
     "system",
 ]
+
+DisplayNotch = Literal[
+    "bottomLeft",
+    "bottomRight",
+    "topLeft",
+    "topRight"
+]
+DisplayNotches = List[DisplayNotch]
 
 SpringDirectionalForce = Literal["backLeftBottom"]
 
