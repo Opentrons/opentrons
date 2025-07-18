@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Open-Source Software"
+---
+
 # Open-Source Software
 
 Opentrons believes that open-source software and hardware make science

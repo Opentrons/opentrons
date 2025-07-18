@@ -94,7 +94,6 @@ If this poses a contamination risk, you can work around it in a few ways:
 
     * Use ``transfer()`` or ``transfer_with_liquid_class()`` with ``new_tip="always"`` instead.
     * Set :py:obj:`.well_bottom_clearance` high enough that the tip doesn't contact liquid in the destination well.
-    * :ref:`Customize your liquid class <customizing-liquid-classes>` to change dispense heights or add touch tip behavior.
     * Use :ref:`building block commands <v2-atomic-commands>` instead of complex commands.
 
 

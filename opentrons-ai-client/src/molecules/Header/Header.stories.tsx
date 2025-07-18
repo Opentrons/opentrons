@@ -1,3 +1,5 @@
+import { MemoryRouter } from 'react-router-dom'
+
 import { COLORS, Flex, SPACING } from '@opentrons/components'
 
 import { Header as HeaderComponent } from '.'
@@ -9,9 +11,11 @@ const meta: Meta<typeof HeaderComponent> = {
   component: HeaderComponent,
   decorators: [
     Story => (
-      <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing40}>
-        <Story />
-      </Flex>
+      <MemoryRouter>
+        <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing40}>
+          <Story />
+        </Flex>
+      </MemoryRouter>
     ),
   ],
 }

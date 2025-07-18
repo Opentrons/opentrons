@@ -1,8 +1,8 @@
 .main_container {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: var(--spacing-12);
-  width: 100%;
 }
 
 .header_container {
@@ -19,15 +19,15 @@
 }
 
 .message_container {
+  position: relative;
+  display: flex;
   width: fit-content;
   max-width: 70%;
+  flex-direction: column;
   padding: var(--spacing-24);
   border-radius: var(--spacing-12);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
   gap: var(--spacing-24);
-  position: relative;
+  overflow-y: auto;
 }
 
 .message_container_user {
@@ -44,22 +44,22 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  gap: var(--spacing-20);
   padding-top: var(--spacing-12);
+  gap: var(--spacing-20);
 }
 
 .hover_shadow {
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-8);
-  transition: box-shadow 0.3s ease;
   border-radius: var(--border-radius-8);
-  display: flex;
+  transition: box-shadow 0.3s ease;
 }
 
 .hover_shadow:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: var(--border-radius-8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .styled_icon {
@@ -79,45 +79,45 @@
 }
 
 .outer_container {
-  background-color: var(--white);
-  border-radius: var(--border-radius-8);
-  padding: var(--spacing-16);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
 }
 
 .file_container {
-  background-color: var(--grey-20);
-  border-radius: var(--border-radius-12);
   display: flex;
+  width: 100%;
   align-items: center;
   padding: var(--spacing-12) var(--spacing-16);
-  width: 100%;
+  border-radius: var(--border-radius-12);
+  background-color: var(--grey-20);
 }
 
 .badge_container {
-  background-color: var(--grey-30);
-  border-radius: var(--border-radius-4);
   display: flex;
-  align-items: center;
-  gap: var(--spacing-12);
-  padding: var(--spacing-12) var(--spacing-16);
   width: 100%;
+  align-items: center;
+  padding: var(--spacing-12) var(--spacing-16);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-30);
+  gap: var(--spacing-12);
 }
 
 .icon_wrapper {
+  display: flex;
   width: 2rem;
   height: 2rem;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .button_container {
+  display: flex;
   flex-direction: row;
   margin-left: auto;
-  display: flex;
 }
 
 .file_name {
@@ -126,12 +126,12 @@
 
 .code_wrapper {
   display: inline-flex;
-  font-family: monospace;
-  padding: var(--spacing-4);
-  color: var(--black-80);
-  background-color: var(--grey-20);
-  border-radius: var(--border-radius-4);
   overflow: auto;
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+  color: var(--black-80);
+  font-family: monospace;
 }
 
 .content_wrapper {
@@ -141,6 +141,6 @@
 .attachments_container {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-8);
   flex-wrap: wrap;
+  gap: var(--spacing-8);
 }

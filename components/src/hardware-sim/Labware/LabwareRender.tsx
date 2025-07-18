@@ -64,10 +64,9 @@ export interface LabwareRenderProps {
    *   how labware are positioned. It's also clunky when rendering a labware on its
    *   own.
    */
-  // todo(mm, 2025-06-09): Make this prop required after the dust settles on
-  // v8.5.0/PD-v8.5.0 mergebacks, to force new callers to consider passThrough mode.
+  // todo(mm, 2025-06-09):
   // Remove uses of offsetInSlot mode as we're able, and delete it when none are left.
-  positioningMode?: 'passThrough' | 'offsetInSlot'
+  positioningMode: 'passThrough' | 'offsetInSlot'
   /**
    * Special handling for opentrons_universal_flat_adapter. Unlike other labware,
    * it rotates to match the underlying module, and that rotation actually matters
@@ -113,7 +112,7 @@ export interface LabwareRenderProps {
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition, positioningMode = 'offsetInSlot' } = props
+  const { gRef, definition, positioningMode } = props
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName

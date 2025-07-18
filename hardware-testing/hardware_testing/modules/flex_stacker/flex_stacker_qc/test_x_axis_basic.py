@@ -8,7 +8,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .utils import test_limit_switches_per_direction
+from .utils import test_limit_switches_per_direction, verify_platform_location
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
@@ -39,14 +39,16 @@ async def test_platform_sensors_for_direction(
     """Test platform sensors for a given direction."""
     ui.print_header(f"Platform Sensor - {direction} direction")
     sensor_result = await stacker._driver.get_platform_sensor(direction)
+    polarity = direction.polarity()
+    opposite_polarity = direction.opposite().polarity()
     opposite_result = not await stacker._driver.get_platform_sensor(
         direction.opposite()
     )
-    print(f"{direction} sensor triggered: {sensor_result}")
-    print(f"{direction.opposite()} sensor untriggered: {opposite_result}")
+    print(f"{polarity} sensor triggered: {sensor_result}")
+    print(f"{opposite_polarity} sensor untriggered: {opposite_result}")
     report(
         section,
-        f"platform-sensor-trigger-{direction}-untrigger-{direction.opposite()}",
+        f"platform-sensor-trigger-{polarity}-untrigger-{opposite_polarity}",
         [
             sensor_result,
             opposite_result,
@@ -57,6 +59,8 @@ async def test_platform_sensors_for_direction(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
+    await verify_platform_location(stacker)
+
     await test_limit_switches_per_direction(
         stacker, StackerAxis.X, Direction.EXTEND, report, section
     )

@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 
+import { withStyleProps } from '../hocs/withStyleProps'
 import { ICON_DATA_BY_NAME } from './icon-data'
 import styles from './icon.module.css'
 
@@ -26,28 +27,6 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
   style?: Record<string, string | number>
   /** optional children */
   children?: ReactNode
-  id?: string
-  color?: string
-  height?: string | number
-  width?: string | number
-  transform?: string
-  transformOrigin?: string | number
-  marginTop?: string
-  maxWidth?: string
-  minWidth?: string
-  marginRight?: string
-  paddingTop?: string
-  minHeight?: string
-  marginBottom?: string
-  opacity?: number
-  marginLeft?: string
-  paddingRight?: string
-  borderRadius?: string
-  margin?: string
-  flex?: string
-  backgroundColor?: string
-  alignSelf?: string
-  paddingBottom?: string
 }
 
 /**
@@ -58,39 +37,22 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps): JSX.Element | null {
+function IconComponent(props: IconProps): JSX.Element | null {
   const {
     name,
     className,
     spin,
-    id,
     size,
     height: rawHeight,
     width: rawWidth,
     color,
     transform,
-    transformOrigin,
-    marginTop,
-    maxWidth,
-    minWidth,
-    marginRight,
-    paddingTop,
-    minHeight,
-    marginBottom,
     opacity,
-    marginLeft,
-    paddingRight,
-    borderRadius,
-    margin,
-    flex,
-    backgroundColor,
-    alignSelf,
-    paddingBottom,
     ...svgProps
   } = props
 
-  const height = size != null ? size : rawHeight
-  const width = size != null ? size : rawWidth
+  const height = size ?? rawHeight
+  const width = size ?? rawWidth
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
     return null
@@ -104,23 +66,6 @@ export function Icon(props: IconProps): JSX.Element | null {
       height,
       width,
       transform,
-      transformOrigin,
-      marginTop,
-      maxWidth,
-      minWidth,
-      marginRight,
-      paddingTop,
-      minHeight,
-      marginBottom,
-      opacity,
-      marginLeft,
-      paddingRight,
-      borderRadius,
-      margin,
-      flex,
-      backgroundColor,
-      alignSelf,
-      paddingBottom,
       //  filter undefined props
     }).filter(([_, value]) => value != null)
   )
@@ -133,10 +78,11 @@ export function Icon(props: IconProps): JSX.Element | null {
       className={clsx(className, { [styles.spin]: spin })}
       style={{ ...style }}
       {...svgProps}
-      id={id}
     >
       <path aria-roledescription={name} fillRule="evenodd" d={path} />
       {props.children}
     </svg>
   )
 }
+
+export const Icon = withStyleProps(IconComponent)

@@ -6,50 +6,50 @@
   padding: 0 0.5rem;
 
   & > h1 {
+    margin-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
     font-size: var(--fs-header); /* from legacy --font-header-dark */
     font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
-    margin-bottom: 1rem;
   }
 
   & > h2 {
-    font-size: var(--fs-header); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
-    font-weight: var(--fw-regular);
     margin-top: 1rem;
     margin-bottom: 0.75rem;
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-regular);
   }
 
   & > h3 {
-    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-semibold);
     margin-top: 0.75rem;
     margin-bottom: 0.5rem;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-semibold);
   }
 
   & ul,
   & ol {
-    margin-left: 1.25rem;
     margin-bottom: 0.25rem;
-    font-size: var(--fs-body-2);
+    margin-left: 1.25rem;
     color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2);
   }
 
   & li {
     margin: 0.25rem 0;
-    font-size: var(--fs-body-2);
     color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2);
   }
 
   & code {
-    font-family: monospace;
     color: var(--c-font-dark);
+    font-family: monospace;
   }
 
   & pre {
-    margin: 0.5rem 0;
     padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
     background-color: var(--c-font-dark);
 
     & code {
@@ -58,9 +58,9 @@
   }
 
   & p {
+    margin-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
     font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
     font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-    margin-bottom: 1rem;
   }
 }

@@ -13,6 +13,7 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
+  DEST_WELL_BLOWOUT_DESTINATION,
   getTransferPlanAndReferenceVolumes,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
@@ -382,13 +383,20 @@ const getBlowoutFields = (args: {
     hardwareMaximumFlowRate = null,
   } = args
   const { enable, params } = blowout
-  // transform location to additional equipment entity ID
-  const transformedLocation =
-    (params?.location === 'trash'
-      ? Object.values(additionalEquipmentEntities).find(
-          ({ name }) => name === 'trashBin' || name === 'wasteChute'
-        )?.id
-      : params?.location) ?? null
+
+  // transform location
+  let transformedLocation: string | null = null
+  if (params?.location === 'trash') {
+    transformedLocation =
+      Object.values(additionalEquipmentEntities).find(
+        ({ name }) => name === 'trashBin' || name === 'wasteChute'
+      )?.id ?? null
+  } else if (params?.location === 'source') {
+    transformedLocation = SOURCE_WELL_BLOWOUT_DESTINATION
+  } else if (params?.location === 'destination') {
+    transformedLocation = DEST_WELL_BLOWOUT_DESTINATION
+  }
+
   const checkedFlowRate =
     params != null
       ? min([

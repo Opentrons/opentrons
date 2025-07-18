@@ -27,7 +27,9 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
+  getLabwareLiquidRenderInfoFromStack,
   getLabwareViewBox,
+  getModuleFromStack,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -36,10 +38,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import {
-  getLabwareLiquidRenderInfoFromStack,
-  getModuleFromStack,
-} from '/app/transformations/commands'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
@@ -47,16 +45,14 @@ import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition,
-  ModuleType,
-} from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type {
   LabwareByLiquidId,
+  LabwareDefinition,
   LabwareDefinitionsByURI,
   LabwareInStack,
+  ModuleType,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface LabwareListItemProps {
