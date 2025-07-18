@@ -8,6 +8,7 @@ import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
 import { OpentronsToughPCRAutoSealingLid } from './OpentronsToughPCRAutoSealingLid'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
 import { OpentronsUniversalFlatAdapterTypeB } from './OpentronsUniversalFlatAdapterTypeB'
+
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const LABWARE_ADAPTER_LOADNAME_PATHS = {
