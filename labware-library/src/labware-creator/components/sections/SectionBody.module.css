@@ -5,7 +5,7 @@
 }
 
 .section_header {
-  border-bottom: 1px solid var(--c-dark-gray);
   padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--c-dark-gray);
   margin-bottom: 1rem;
 }

@@ -3,23 +3,11 @@
   "moduleType": "absorbanceReaderType",
   "model": "absorbanceReaderV1",
   "labwareOffset": {
-    "x": 0.0,
+    "x": 2.0,
     "y": 0.0,
     "z": 0.65
   },
-  "features": {
-    "slotFootprintAsChild": {
-      "z": 0,
-      "backLeft": {
-        "x": 0,
-        "y": 0
-      },
-      "frontRight": {
-        "x": 155.3,
-        "y": -95.5
-      }
-    }
-  },
+  "features": {},
   "dimensions": {
     "bareOverallHeight": 18.5,
     "overLabwareHeight": 0.0,
@@ -61,6 +49,6 @@
     "ot3_standard": {}
   },
   "compatibleWith": [],
-  "incompatibleWithDecks": ["ot2_standard"],
+  "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {}
 }

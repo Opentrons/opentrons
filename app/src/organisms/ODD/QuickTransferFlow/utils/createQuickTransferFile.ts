@@ -3,13 +3,16 @@ import uuidv1 from 'uuid/v4'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
+  getAllLiquidClassDefs,
   getDeckDefFromRobotType,
+  getFlexNameConversion,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import {
   consolidate,
   distribute,
+  getLiquidClassName,
   getSlotInLocationStack,
   getWasteChuteAddressableAreaNamePip,
   pythonImports,
@@ -24,7 +27,7 @@ import { pythonDef } from './pythonDef'
 import type {
   AddressableAreaName,
   CommandAnnotationV1Mixin,
-  CommandV8Mixin,
+  CommandV14Mixin,
   CreateCommand,
   CutoutId,
   DeckConfiguration,
@@ -32,6 +35,7 @@ import type {
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
+  LoadLiquidClassCreateCommand,
   LoadPipetteCreateCommand,
   OT3RobotMixin,
 } from '@opentrons/shared-data'
@@ -51,14 +55,15 @@ export function createQuickTransferFile(
     initialRobotState,
   } = generateQuickTransferArgs(quickTransferState, deckConfig)
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
+  const { name, id, spec } = pipetteEntity
 
   const loadPipetteCommand: LoadPipetteCreateCommand = {
     key: uuid(),
     commandType: 'loadPipette' as const,
     params: {
-      pipetteName: pipetteEntity.name,
+      pipetteName: name,
       mount: quickTransferState.mount,
-      pipetteId: pipetteEntity.id,
+      pipetteId: id,
     },
   }
   const labwareEntities = Object.values(invariantContext.labwareEntities)
@@ -113,6 +118,38 @@ export function createQuickTransferFile(
     })
     return acc
   }, [])
+  const {
+    loadName: currentTiprackLoadName,
+  } = quickTransferState.tipRack.parameters
+
+  const liquidClass =
+    stepArgs?.liquidClass != null ? stepArgs.liquidClass : null
+  const byTipTypeSettings =
+    liquidClass != null
+      ? getAllLiquidClassDefs()
+          [liquidClass]?.byPipette.find(
+            pipetteObject =>
+              pipetteObject.pipetteModel === getFlexNameConversion(spec)
+          )
+          ?.byTipType.find(tipObject => {
+            const tiprackLoadName = tipObject.tiprack.split('/')[1]
+            return tiprackLoadName === currentTiprackLoadName
+          })
+      : null
+  const loadLiquidCommand: LoadLiquidClassCreateCommand | null =
+    liquidClass != null && byTipTypeSettings != null
+      ? {
+          key: uuid(),
+          commandType: 'loadLiquidClass' as const,
+          params: {
+            liquidClassRecord: {
+              ...byTipTypeSettings,
+              liquidClassName: getLiquidClassName(liquidClass),
+              pipetteModel: spec.model,
+            },
+          },
+        }
+      : null
 
   let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
@@ -188,11 +225,11 @@ export function createQuickTransferFile(
       },
     ]
   }
-
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
     ...loadLabwareCommands,
+    ...(loadLiquidCommand != null ? [loadLiquidCommand] : []),
     ...nonLoadCommands,
     ...finalDropTipCommands,
   ]
@@ -242,8 +279,8 @@ export function createQuickTransferFile(
     liquids: {},
   }
 
-  const commandv8Mixin: CommandV8Mixin = {
-    commandSchemaId: 'opentronsCommandSchemaV8',
+  const commandv8Mixin: CommandV14Mixin = {
+    commandSchemaId: 'opentronsCommandSchemaV14',
     commands,
   }
 

@@ -197,6 +197,7 @@ export function MoveLabwareInterventionContent({
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
+              labwareDefinitions={Object.values(labwareDefsByUri)}
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}
@@ -224,7 +225,10 @@ export function MoveLabwareInterventionContent({
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={nestedLabwareDef} />
+                          <LabwareRender
+                            definition={nestedLabwareDef}
+                            positioningMode="offsetInSlot"
+                          />
                         ) : null}
                       </Module>
                     )

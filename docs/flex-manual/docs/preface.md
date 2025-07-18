@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Preface"
+---
+
 # Preface
 
 Welcome to the instruction manual for the Opentrons Flex liquid handling robot. This manual guides you through just about everything you need to know to set up and use Flex, focusing on topics that are most relevant to everyday users of Flex in a lab environment.

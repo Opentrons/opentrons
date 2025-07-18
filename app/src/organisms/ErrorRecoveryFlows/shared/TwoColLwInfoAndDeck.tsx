@@ -30,6 +30,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -138,6 +139,7 @@ export function TwoColLwInfoAndDeck(
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
             backgroundItems={
               <>
@@ -163,7 +165,10 @@ export function TwoColLwInfoAndDeck(
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
+                        <LabwareRender
+                          definition={nestedLabwareDef}
+                          positioningMode="offsetInSlot"
+                        />
                       ) : null}
                     </Module>
                   )
