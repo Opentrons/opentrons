@@ -11,7 +11,6 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
-  TROUGH_LABWARE,
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
   makeContext,
@@ -118,11 +117,11 @@ describe('blowoutLocationHelper', () => {
   it('blowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
     blowoutLocationHelper({
       ...blowoutArgs,
-      blowoutLocation: TROUGH_LABWARE,
+      blowoutLocation: 'source_well',
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
-      labwareId: TROUGH_LABWARE,
+      labwareId: SOURCE_LABWARE,
       wellName: 'A1',
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
