@@ -20,7 +20,7 @@ class LiquidClassRecord(TransferProperties, frozen=True):
     tiprack: str = Field(
         ...,
         description="The name of tiprack whose tip will be used"
-                    " when handling this specific liquid class with this pipette"
+        " when handling this specific liquid class with this pipette",
     )
     liquidClassName: str = Field(
         ...,
@@ -30,7 +30,7 @@ class LiquidClassRecord(TransferProperties, frozen=True):
         ...,
         description="Identifier for the pipette of this liquid class.",
     )
-    # The other fields like tiprack ID, aspirate properties, etc. are pulled in from ByTipTypeSetting.
+    # The other liquid class properties are pulled in from TransferProperties.
 
     def __hash__(self) -> int:
         """Hash function for LiquidClassRecord."""
