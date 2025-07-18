@@ -1909,7 +1909,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ) -> None:
+    ) -> Dict[str, float]:
         """This is a slightly more barebones variation of pick_up_tip. This is only the motor routine
         directly involved in tip pickup, and leaves any state updates and plunger moves to the caller.
         """
@@ -1930,6 +1930,7 @@ class OT3API(
                     realmount, top_types.Point(z=spec.z_distance_to_tiprack)
                 )
             await self._tip_motor_action(realmount, spec.tip_action_moves)
+            enc_pos = None
         else:
             spec = self._pipette_handler.plan_lt_pick_up_tip(
                 realmount,
@@ -1937,7 +1938,7 @@ class OT3API(
                 presses,
                 increment,
             )
-            await self._force_pick_up_tip(realmount, spec)
+            enc_pos = await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1954,6 +1955,7 @@ class OT3API(
             await self.move_rel(
                 realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
+        return enc_pos
 
     async def _move_to_plunger_bottom(
         self,
@@ -2304,20 +2306,24 @@ class OT3API(
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
-    ) -> None:
+    ) -> Dict[str, float]:
+        encoder_pos = {"init": None, "final": None}
         for press in pipette_spec.tip_action_moves:
             async with self._backend.motor_current(run_currents=press.currents):
                 target = target_position_from_relative(
                     mount, top_types.Point(z=press.distance), self._current_position
                 )
                 if press.distance < 0:
+                    encoder_pos.update({"init": (await self._cache_encoder_position())[Axis.by_mount(mount)]})
                     # we expect a stall has happened during a downward movement into the tiprack, so
                     # we want to update the motor estimation
                     await self._move(target, speed=press.speed, expect_stalls=True)
                     await self._update_position_estimation([Axis.by_mount(mount)])
+                    encoder_pos.update({"final": (await self._cache_encoder_position())[Axis.by_mount(mount)]})
                 else:
                     # we should not ignore stalls that happen during the retract part of the routine
                     await self._move(target, speed=press.speed, expect_stalls=False)
+            return encoder_pos
 
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
@@ -2348,7 +2354,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> None:
+    ) -> Dict[str, float]:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
@@ -2359,12 +2365,13 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
-        await self.tip_pickup_moves(mount, presses, increment)
+        enc_pos = await self.tip_pickup_moves(mount, presses, increment)
 
         add_tip_to_instr()
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+        return enc_pos
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
