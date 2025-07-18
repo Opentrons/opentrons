@@ -1,10 +1,3 @@
-import { createElement } from 'react'
-
-import { styleProps } from './primitives'
-
-import type { ComponentProps, ComponentType } from 'react'
-import type { StyleProps } from './primitives'
-
 export const humanizeLabwareType = (labwareType: string): string => {
   return labwareType.replace(/-|_/g, ' ')
 }
@@ -60,27 +53,4 @@ export function truncateString(
       return `${text.slice(0, maxLength - dots.length)}${dots}`
     }
   else return text
-}
-
-export function withStyleProps<T extends ComponentType<any>>(
-  Component: T
-): T & ComponentType<ComponentProps<T> & StyleProps> {
-  const ComponentWithStyleProps = ({
-    style,
-    ...props
-  }: ComponentProps<T> & StyleProps): JSX.Element => {
-    const stylePropsStyles = styleProps(props)
-    const combinedStyles = { ...stylePropsStyles, ...style }
-
-    return createElement(Component, {
-      ...props,
-      style: combinedStyles,
-    })
-  }
-
-  ComponentWithStyleProps.displayName = `withStyleProps(${
-    Component.displayName ?? Component.name
-  })`
-
-  return ComponentWithStyleProps as any
 }

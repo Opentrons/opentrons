@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import { withStyleProps } from '../utils'
+import { withStyleProps } from '../hocs/withStyleProps'
 import { ICON_DATA_BY_NAME } from './icon-data'
 import styles from './icon.module.css'
 
