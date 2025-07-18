@@ -1,5 +1,7 @@
 import {
+  ABSORBANCE_READER_V1,
   fixture96Plate,
+  FLEX_STACKER_MODULE_V1,
   getModuleDef,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
@@ -27,6 +29,8 @@ const moduleModels: ModuleModel[] = [
   MAGNETIC_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
 ]
 
 const moduleModelOptions = {
@@ -38,6 +42,8 @@ const moduleModelOptions = {
   'Magnetic Module V2': MAGNETIC_MODULE_V2,
   'Heater-Shaker Module V1': HEATERSHAKER_MODULE_V1,
   'Magnetic Block V1': MAGNETIC_BLOCK_V1,
+  'Absorbance Reader V1': ABSORBANCE_READER_V1,
+  'Flex Stacker Module V1': FLEX_STACKER_MODULE_V1,
 }
 
 export default {
