@@ -15,7 +15,6 @@ from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 
-
 ###########################################
 #  VARIABLES - START
 ###########################################
@@ -39,11 +38,11 @@ SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C2"
 SLOT_DIAL = "B2"
 
-#below threshold, alpha low. above threshold, alpha high 
+# below threshold, alpha low. above threshold, alpha high
 THRESHOLD = 3.5
-#sensitivity values for bottom and top zones:
-ALPHA_LOW = 0.8     
-ALPHA_HIGH = 0.5     
+# sensitivity values for bottom and top zones:
+ALPHA_LOW = 0.8
+ALPHA_HIGH = 0.5
 
 
 ###########################################
@@ -78,13 +77,18 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
-            {"display_name": "applied24", "value": "appliedbiosystemsmicroamp_384_wellplate_40ul"},
-            {"display_name": "opentrons96", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"},
+            {
+                "display_name": "applied24",
+                "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
+            },
+            {
+                "display_name": "opentrons96",
+                "value": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            },
             {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
             {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
-
         ],
-        default="nest_96_wellplate_2ml_deep",
+        default="corning_24_wellplate_3.4ml_flat",
     )
 
     parameters.add_float(
@@ -93,8 +97,17 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Version of the labware to use.",
         default=3,
         maximum=10,
-        minimum=1.0
+        minimum=1.0,
     )
+    parameters.add_float(
+        variable_name="meniscus_submerge_depth",
+        display_name="Meniscus Submerge Depth",
+        description="Amount of distance tip is below meniscus",
+        default=-2,
+        minimum=-5,
+        maximum=5,
+    )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -107,18 +120,17 @@ def _setup(
     Labware,
     Labware,
     LiquidClass,
-
-]:     
+]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
 
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
 
-    #pipettes
+    # pipettes
     liquid_pip_name = f"flex_1channel_{LIQUID_PIPETTE_SIZE}"
     probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
 
-    #tipracks 
+    # tipracks
     liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
     )
@@ -126,7 +138,7 @@ def _setup(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
 
-    #load pipettes w tipracks 
+    # load pipettes w tipracks
     liq_pipette = ctx.load_instrument(
         liquid_pip_name, LIQUID_MOUNT, tip_racks=[liquid_rack]
     )
@@ -134,29 +146,33 @@ def _setup(
         probing_pip_name, PROBING_MOUNT, tip_racks=[probing_rack]
     )
 
-    #load labware + dial
-    labware = ctx.load_labware(labware_type, SLOT_LABWARE, version=ctx.params.labware_version)
+    # load labware + dial
+    labware = ctx.load_labware(
+        labware_type, SLOT_LABWARE, version=ctx.params.labware_version
+    )
     labware.load_empty(labware.wells())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
-    #liquid classing
+    # liquid classing
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class("ethanol_80")
     lm = "liquid-meniscus"
     props = ethanol.get_for(liq_pipette, liquid_rack)
-    meniscus_z = -0.5
+    meniscus_z = ctx.params.meniscus_submerge_depth  # type: ignore[attr-defined]
     props.aspirate.aspirate_position.position_reference = lm
     props.aspirate.aspirate_position.offset.z = meniscus_z
     props.dispense.dispense_position.position_reference = lm
-    props.dispense.dispense_position.offset.z = meniscus_z
-
+    props.dispense.dispense_position.offset.z = 2
+    props.dispense.dispense_position.offset.x = (labware["A1"].diameter) / 2
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers.mitutoyo_digimatic_indicator import Mitutoyo_Digimatic_Indicator
+        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
+            Mitutoyo_Digimatic_Indicator,
+        )
 
         DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
         DIAL_PORT.connect()
@@ -243,9 +259,6 @@ def _get_tip_z_error(
     return (new_val - baseline) * -1.0
 
 
-
-
-
 def run(ctx: ProtocolContext) -> None:
     """Protocol entry point."""
     (
@@ -258,7 +271,6 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         ethanol,
     ) = _setup(ctx)
- 
 
     # Initialize state
     tip_z_error = 0.0
@@ -281,21 +293,16 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-
-    def write_trial_log(well: str, volume: float, diff: float, corrected_height: float) -> None:
+    def write_trial_log(
+        well: str, volume: float, diff: float, corrected_height: float
+    ) -> None:
         trial_data = [well, volume, diff, corrected_height]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
+    ################ Begin Protocol
 
-    ################ Begin Protocol 
-
-    volumes = [270, 302, 349.392, 415.38536, 497.94305, 580.50075, 663.05844, 745.61613, 840.92899, 936.24185, 1031.5547, 1126.86756, 1222.18042, 1317.49328, 1412.80613, 1508.11899, 1603.43185, 1698.7447, 1794.05756, 1889.37042, 1984.68327]
-    wells = [
-        "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12",
-        "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"
-    ]
-
-
+    volumes = [0.5, 1000] * 5
+    wells = list(labware.wells_by_name().keys())[: len(volumes)]
     liq_pipette.pick_up_tip()
     liq_pipette.measure_liquid_height(src["A1"])
     liq_pipette.drop_tip()
@@ -311,7 +318,7 @@ def run(ctx: ProtocolContext) -> None:
             new_tip="never",
             return_tip=False,
         )
-        #probe well
+        # probe well
         height = probe_pipette.measure_liquid_height(labware[well])
         corrected_height = height + tip_z_error
 
@@ -320,7 +327,3 @@ def run(ctx: ProtocolContext) -> None:
 
         write_trial_log(well, volume, diff, corrected_height)
         drop_tips()
-
-
-
-
