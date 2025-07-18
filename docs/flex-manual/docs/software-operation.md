@@ -223,10 +223,10 @@ Labware offsets are fine-tuned positional coordinates that help your robot align
 
 | Feature | Description |
 |----|----|
-| Protocol independence | Offsets are labware-based and no longer bound to a 20-protocol limit. Each piece of labware requires one default offset and can also be associated with a significantly larger number of applied offsets. |
-| Default offsets | Default offsets are automatically applied to particular piece of labware and to all other identical labware, regardless of deck slot or protocol. This 'measure once, set everywhere' feature means you don’t have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
+| Protocol independence | Offsets are labware-based and no longer bound to a 20-run limit. Each piece of labware requires one default offset and can also be associated with a significantly larger number of applied offsets. |
+| Default offsets | Default offsets are automatically applied to particular piece of labware and to all other identical labware, regardless of deck slot or protocol. This "measure once, set everywhere" feature means you don’t have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
 | Applied offsets | Applied offsets override defaults for a specific piece of labware in a specific deck slot. You can use an applied offset with different protocols, but the labware and deck slot must be the same as the original applied offset. |
-| Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the API code for a protocol to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
+| Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the Python protocol file to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
 
 #### Offsets at-a-glance
 
@@ -242,7 +242,7 @@ You create offsets by running Labware Position Check on attached instruments and
 
 Labware Position Check lets you align a pipette relative to a well plate (or other labware), which helps ensure accurate and reproducible pipetting results.
 
-Flex requires that each piece of labware used in your protocol have a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
+You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
 <figure class="screenshot" markdown>
 ![Touchscreen showing missing labware offset](images/lpc-missing-offsets.png)
@@ -262,10 +262,10 @@ During Labware Position Check, you’ll use the jog controls to align the pipett
 To use the jog controls:
 
 1. Select a jog control option to set the pipette's axis of movement.
-1. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm.  Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette into labware.
-1. Tap an arrow to move the pipette for your selected direction and distance.
-1. Tap **Close** when, in your best judgement, the pipette is optimally aligned with the selected labware.
-1. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
+2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm.  Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette into labware.
+3. Tap an arrow to move the pipette for your selected direction and distance.
+4. Tap **Close** when, in your best judgement, the pipette is optimally aligned with the selected labware.
+5. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
 
 !!! note
     Labware Position Check corrects for minor, millimeter-scale pipette and labware alignment variations. If you find yourself using it to compensate for large, multi-centimeter offsets, this may suggest an alignment problem related to labware manufacturing defects or incorrect labware definitions. Contact Opentrons Support if you encounter persistent, significant instrument or labware misalignments.
