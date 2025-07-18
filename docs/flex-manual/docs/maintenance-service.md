@@ -25,11 +25,11 @@ The following table lists the chemicals you can use to clean your Flex. Diluted 
 !!! warning
     *Do not use acetone.* The robot, pipettes, and modules are made from materials that acetone can damage or dissolve.
 
-| Solution   | Recommendations |
-|------------|-----------------|
-| **Alcohol**    | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
-| **Bleach**     | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.   |
-| **Distilled water** | You can use distilled water to clean or rinse your robot.                  |
+| Solution | Recommendations |
+|----|----|
+| **Alcohol** | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
+| **Bleach** | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
+| **Distilled water** | You can use distilled water to clean or rinse your robot. |
 
 ### Frame and window panel cleaning
 
@@ -47,7 +47,7 @@ To clean the deck, deck slots, and trash bin:
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the deck, deck slots, and trash bin. You can remove the deck slots and trash bin for easier access.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
-4. Let the deck pieces air dry. Replace any pieces that you removed for cleaning.
+4. Let the deck pieces air dry. Replace any items that you removed for cleaning.
 
 ### Gantry cleaning
 
@@ -66,21 +66,22 @@ To clean the waste chute:
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 3. Gently wipe down the exterior of the chute. The interior is powder-coated steel, so you can clean it with mild detergents or surfactants.
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
-5. Let the waste chute air dry and reattach it to the deck.
+5. Let the waste chute air dry.
+6. Reattach the waste chute to its deck plate adapter.
 
 ## Cleaning pipettes and tips
 
 To clean a 1-, 8-, or 96-channel pipette:
 
 1. Remove the pipette from the gantry.
-1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
-1. Gently wipe down the following parts:
+2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
+3. Gently wipe down the following parts:
     - Body
     - Ejector
     - Nozzles
-1. Rinse off any remaining residue using a cloth dampened with distilled water.
-1. Let the pipette air dry and reattach.
-1. Reattach the pipette. During reattachment, you'll be prompted to recalibrate the pipette. This is optional, but recommended.
+4. Rinse off any remaining residue using a cloth dampened with distilled water.
+5. Let the pipette air dry.
+6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 
 ![Cleanable pipette components, including the body, ejector, and nozzles.](images/pipette-components-cleaning.png "Pipette components")
@@ -110,11 +111,11 @@ Refer to the following table for recommended cleaning methods, by contamination 
 Filtered pipette tips help prevent contaminating the barrel or inside of the pipette. But, you cannot disassemble the barrel if it becomes contaminated. If the inside of your pipette gets contaminated, the following steps may help remove the contamination:
 
 1. Remove the pipette from the gantry.
-1. Inject a small amount of cleaning solution into the barrel using a manual pipette or syringe.
-1. Gently shake the pipette to swirl the cleaning solution.
-1. Rinse with distilled water.
-1. Let the pipette air dry.
-1. Reattach the pipette. During reattachment, you'll be prompted to recalibrate the pipette. This is optional, but recommended.
+2. Inject a small amount of cleaning solution into the barrel using a manual pipette or syringe.
+3. Gently shake the pipette to swirl the cleaning solution.
+4. Rinse with distilled water.
+5. Let the pipette air dry.
+6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 
 ### Cleaning pipette tips
@@ -133,7 +134,7 @@ To clean the gripper:
     - Paddles
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
 5. Let the gripper air dry.
-6. Reattach the gripper. During reattachment, you'll be prompted to recalibrate the gripper. This is optional, but recommended.
+6. Reattach the gripper to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 ![Cleanable gripper components, including the body, jaws, and paddles.](images/gripper-components-cleaning.png "Gripper components"){width="50%"}
 
@@ -187,12 +188,38 @@ To set up the Thermocycler with a clean seal:
 
 The following table lists labware sold by Opentrons that we have verified as autoclave-safe. When you can't determine whether a piece of labware is autoclave-safe, just replace it with new, clean labware. You can [purchase replacement labware](https://opentrons.com/products/categories/tips-&-labware) from the Opentrons shop.
 
-| Labware type | Autoclave-safe items |
-|--------------|----------------------|
-| **Reservoirs**        | All NEST reservoirs                                                                                   |
-| **Sample vials**      | Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)                       |
-| **Tip racks and tips**| All Flex tip racks and tips                                                                          |
-| **Well plates**       | <ul><li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li><li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li><li>USA Scientific 96 Deep Well Plate, 2.4 mL</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Labware type</th>
+      <th>Autoclave-safe items</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Reservoirs</strong></td>
+      <td>All NEST reservoirs</td>
+    </tr>
+    <tr>
+      <td><strong>Sample vials</strong></td>
+      <td>Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)</td>
+    </tr>
+    <tr>
+      <td><strong>Tip racks and tips</strong></td>
+      <td>All Flex tip racks and tips</td>
+    </tr>
+    <tr>
+      <td><strong>Well plates</strong></td>
+      <td>
+        <ul>
+          <li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li>
+          <li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li>
+          <li>USA Scientific 96 Deep Well Plate, 2.4 mL</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
 
@@ -214,7 +241,7 @@ In addition, Opentrons Care Plus includes on-site visits for:
 - Preventive maintenance, yearly.
 - Repairs, as needed.
 
-You can also [purchase services](https://opentrons.com/instrument-services) a la carte, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
+You can also [purchase services](https://opentrons.com/instrument-services) individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
 
 ### Installation qualification and operation qualification
 
@@ -275,7 +302,7 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
     <tr>
       <td>Yearly</td>
       <td>Evaluate pipette performance</td>
-      <td>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the <a href="pipette-specifications">published accuracy and precision standards</a>.</td>
+      <td markdown>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the [published accuracy and precision standards][Pipette specifications].</td>
     </tr>
   </tbody>
 </table>
