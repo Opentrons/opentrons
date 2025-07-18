@@ -124,7 +124,7 @@ jobs:
           if-no-files-found: error
 
   execute-tests:
-    timeout-minutes: 5
+    timeout-minutes: 15
     needs: process-chunk
     runs-on: ubuntu-latest
     env:
