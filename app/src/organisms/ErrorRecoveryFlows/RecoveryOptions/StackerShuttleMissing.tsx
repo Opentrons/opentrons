@@ -4,6 +4,7 @@ import {
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerLoadShuttle,
+  TwoColTextAndImage,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
@@ -23,6 +24,8 @@ export function StackerShuttleMissing(
       return <StackerLoadShuttle {...props} />
     case STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER:
       return <StackerHopperLwInfo {...props} />
+    case STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
+      return <TwoColTextAndImage {...props} />
     case STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
     default:

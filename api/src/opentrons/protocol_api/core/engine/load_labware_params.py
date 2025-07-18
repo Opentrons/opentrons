@@ -88,6 +88,14 @@ _APILEVEL_2_25_OT_DEFAULT_VERSIONS: dict[str, int] = deepcopy(
 )
 _APILEVEL_2_25_OT_DEFAULT_VERSIONS.update(
     {
+        "opentrons_flex_96_filtertiprack_1000ul": 2,
+        "opentrons_flex_96_filtertiprack_200ul": 2,
+        "opentrons_flex_96_filtertiprack_20ul": 2,
+        "opentrons_flex_96_filtertiprack_50ul": 2,
+        "opentrons_flex_96_tiprack_1000ul": 2,
+        "opentrons_flex_96_tiprack_200ul": 2,
+        "opentrons_flex_96_tiprack_20ul": 2,
+        "opentrons_flex_96_tiprack_50ul": 2,
         "appliedbiosystemsmicroamp_384_wellplate_40ul": 3,
         "biorad_384_wellplate_50ul": 4,
         "biorad_96_wellplate_200ul_pcr": 4,
