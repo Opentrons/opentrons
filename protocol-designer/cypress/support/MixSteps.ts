@@ -101,16 +101,16 @@ enum MixLocators {
   ZpositionInput = '[id="TipPositionModal_z_custom_input"]',
   SwapView = 'button:contains("Swap view")',
   Checkbox = '[class="Flex-sc-1qhp8l7-0 Checkbox___StyledFlex3-sc-1mvp7vt-0 gZwGCw btdgeU"]',
-  DelaySecondsInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
+  AspirateDelaySecondsInput = '[name="aspirate_delay_seconds"]',
+  DispenseDelaySecondsInput = '[name="dispense_delay_seconds"]',
   DispFlowRate = '[name="dispense_flowRate"]',
-  BlowoutLtnDropdown = '[class="Svg-sc-1lpozsw-0 Icon___StyledSvg-sc-1gt4gyz-0 csSXbR cJpxat"]',
+  BlowoutLtnDropdown = '[data-testid="dropdownMenu"]',
   BlowoutFlowRate = '[name="blowout_flowRate"]',
   BlowoutPos = '[id="TipPositionField_blowout_z_offset"]',
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
-  StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
-  // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
+  StepNameInput = '[name="stepName_input"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
   PushOutVolumeInput = '[name="pushOut_volume"]',
@@ -245,13 +245,36 @@ export const MixSteps = {
         .eq(0)
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
-      cy.get(MixLocators.DelaySecondsInput)
-        .should('exist')
-        .should('be.visible')
-        .should('have.prop', 'value')
-      cy.get(MixLocators.DelaySecondsInput)
-        .eq(1)
-        .type('{selectAll}{backspace}5')
+
+      // Try to find any delay seconds input that exists
+      cy.get('body').then($body => {
+        if ($body.find('[name="aspirate_delay_seconds"]').length > 0) {
+          cy.get(MixLocators.AspirateDelaySecondsInput)
+            .should('exist')
+            .should('be.visible')
+            .should('have.prop', 'value')
+          cy.get(MixLocators.AspirateDelaySecondsInput).type(
+            '{selectAll}{backspace}5'
+          )
+        } else if ($body.find('[name="dispense_delay_seconds"]').length > 0) {
+          cy.get(MixLocators.DispenseDelaySecondsInput)
+            .should('exist')
+            .should('be.visible')
+            .should('have.prop', 'value')
+          cy.get(MixLocators.DispenseDelaySecondsInput).type(
+            '{selectAll}{backspace}5'
+          )
+        } else {
+          // Fallback to the generic selector
+          cy.get('[name$="_delay_seconds"]')
+            .should('exist')
+            .should('be.visible')
+            .should('have.prop', 'value')
+          cy.get('[name$="_delay_seconds"]')
+            .first()
+            .type('{selectAll}{backspace}5')
+        }
+      })
     },
   }),
 
