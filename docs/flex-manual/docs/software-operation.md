@@ -243,7 +243,7 @@ Labware Position Check lets you align a gantry mounted instrument relative to a 
 You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
 <figure class="screenshot" markdown>
-![Touchscreen showing missing labware offset](images/lpc-missing-offsets.png)
+![Touchscreen showing missing labware offset](images/missing-offsets.png)
 </figure>
 
 Tap **Labware Offsets** to see which labware is missing an offset and to start Labware Position Check. Refer to the touchscreen or the Opentrons App when running Labware Position Check. It will provide instructions and animations to guide you through this process.
