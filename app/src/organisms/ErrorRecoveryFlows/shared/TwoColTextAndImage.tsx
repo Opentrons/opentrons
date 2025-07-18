@@ -64,13 +64,16 @@ export function TwoColTextAndImage(
   const buildTitle = (): string => {
     switch (route) {
       case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-        return t('load_labware_shuttle_onto_track')
+        if (step === STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
+          return t('ensure_stacker_shuttle_empty')
+        } else {
+          return t('load_labware_shuttle_onto_track')
+        }
       case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-        if (step === STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY){
+        if (step === STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
           return t('ensure_stacker_shuttle_empty')
-        }
-        else if (REENGAGE_LATCH_ROUTES.includes(step)) {
+        } else if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('prepare_for_stacker_latch_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch')
@@ -79,10 +82,9 @@ export function TwoColTextAndImage(
         return t('clear_track_of_obstructions')
       case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
       case STACKER_STALLED_RETRY.ROUTE:
-        if (step === STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY){
+        if (step === STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
           return t('ensure_stacker_shuttle_empty')
-        }
-        else{
+        } else {
           return t('clear_track_of_obstructions')
         }
       default:
@@ -96,27 +98,28 @@ export function TwoColTextAndImage(
   const buildBody = (): string | null => {
     switch (route) {
       case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-        return t('take_any_necessary_precautions_before_loading_shuttle')
+        if (step === STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
+          return t('empty_shuttle_to_retry_retrieve')
+        } else {
+          return t('take_any_necessary_precautions_before_loading_shuttle')
+        }
       case STACKER_STALLED_SKIP.ROUTE:
         return t('clear_track_of_obstructions_and_close_door')
       case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-        if(STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY){
+        if (STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
           return t('empty_shuttle_to_retry_retrieve')
-
-        }
-        else if (REENGAGE_LATCH_ROUTES.includes(step)) {
+        } else if (REENGAGE_LATCH_ROUTES.includes(step)) {
           return t('stacker_latch_will_reengage')
         } else {
           return t('empty_stacker_of_labware_above_latch_labware_stuck')
         }
       case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
       case STACKER_STALLED_RETRY.ROUTE:
-        if (step === STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY){
-        return t('empty_shuttle_to_retry_retrieve')
-        }
-        else{
-        return t('clear_track_of_obstructions_and_close_door')
+        if (step === STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY) {
+          return t('empty_shuttle_to_retry_retrieve')
+        } else {
+          return t('clear_track_of_obstructions_and_close_door')
         }
       default:
         console.error(
@@ -148,6 +151,7 @@ export function TwoColTextAndImage(
       case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
       case STACKER_STALLED_RETRY.ROUTE:
       case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
+      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return (
           <Flex justifyContent={JUSTIFY_CENTER} width="18.75rem" height="15rem">
             <img src={stackerImage} alt="Stacker shuttle empty" />

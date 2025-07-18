@@ -268,6 +268,7 @@ export const RECOVERY_MAP = {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       LOAD_SHUTTLE: 'manual-load-shuttle',
       CHECK_HOPPER: 'check-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -429,6 +430,7 @@ export const STEP_ORDER: StepOrder = {
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.LOAD_SHUTTLE,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER,
+    STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY,
   ],
   [STACKER_HOPPER_EMPTY_RETRY.ROUTE]: [
@@ -673,6 +675,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
       allowDoorOpen: true,
     },
     [STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY]: { allowDoorOpen: false },

@@ -23,7 +23,7 @@ export function StackerStalledRetry(props: RecoveryContentProps): JSX.Element {
     case STACKER_STALLED_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
     case STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
-      return <TwoColTextAndImage {...props}/>
+      return <TwoColTextAndImage {...props} />
     default:
       console.warn(
         `StackerStalledRetry: ${step} in ${route} not explicitly handled. Rerouting.`
