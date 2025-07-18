@@ -662,7 +662,6 @@ class FlexStacker(mod_abc.AbstractModule):
                 delta = raw_data[bin] - baseline_data[bin]
                 if delta > 0:
                     return True
-
         return False
 
     async def verify_shuttle_location(self, expected: PlatformState) -> None:
