@@ -70,6 +70,12 @@ In general, to install a module caddy:
 
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
 
+!!!warning
+    text
+
+      * Keep the area around the hub free from obstacles that could prevent easy access to the main power switch or Emergency Stop Pendant (E-stop).
+      * To help with heat dissipation, do not place labware or other objects on top of the hub.
+
 ## Module calibration
 
 When you first install a module on Flex, you need to run automated positional calibration. This process is similar to positional calibration for instruments, and ensures that Flex moves to the exact correct locations for optimal protocol performance. During calibration, Flex will move to locations on a module calibration adapter, which looks similar to the calibration squares that are part of removable deck slots.
@@ -318,14 +324,6 @@ Outside of protocols, the Opentrons App can display the current status of the He
       <td>100–240 VAC, 50/60 Hz</td>
     </tr>
     <tr>
-        <td><strong>Power adapter connector</strong></td>
-        <td>
-            4-pin DIN<br><!-- border around image might look odd here -->
-            <img src="../images/module-power-connector.png" alt="4-pin DIN connector with flat side" width="40%"><br>
-            Align the connector's flat side with the flat side of the module's power port.
-        </td>
-    </tr>
-    <tr>
       <td><strong>Mains supply voltage fluctuation</strong></td>
       <td>±10%</td>
     </tr>
@@ -566,14 +564,6 @@ Outside of protocols, the Opentrons App can display the current status of the Te
           <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
           <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
         </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>Power adapter connector</strong></td>
-      <td>
-        4-pin DIN<br>
-        <img src="../images/module-power-connector.png" alt="4-pin DIN connector with flat side" width="40%"><br>
-        Align the connector's flat side with the flat side of the module's power port.
       </td>
     </tr>
     <tr>
