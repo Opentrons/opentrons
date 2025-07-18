@@ -46,7 +46,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     lines: List[Union[CSVLine, CSVLineRepeating]] = []
     for axis in [StackerAxis.X, StackerAxis.Z]:
         for sgt in generate_test_thresholds(axis):
-            lines.append(CSVLine(_get_test_tag(axis, sgt), ["Stalled", CSVResult]))
+            lines.append(CSVLine(_get_test_tag(axis, sgt), [bool, CSVResult]))
     return lines
 
 
