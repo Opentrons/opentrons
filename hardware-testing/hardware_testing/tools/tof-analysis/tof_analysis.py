@@ -105,7 +105,10 @@ def _get_tuple_from_index(
 
 def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
     """Convert a defaultdict to dict."""
-    return {k: convert_to_dict(v) for k, v in obj.items()}
+    return {
+        k: convert_to_dict(v) if isinstance(v, defaultdict) else v
+        for k, v in obj.items()
+    }
 
 
 def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
@@ -339,7 +342,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                     ],
                 ]
                 fig.update_layout(
-                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis}",
+                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis} {args.graph_name}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
                     template="plotly_white",
@@ -638,6 +641,12 @@ if __name__ == "__main__":
         help="The maximum number of samples (rows) to pricess from the dataframe.",
         type=int,
         default=DEFAULT_MAX_SAMPLES,
+    )
+    parser.add_argument(
+        "--graph-name",
+        help="Optional graph tag to add to the name",
+        type=str,
+        default="",
     )
 
     args = parser.parse_args()
