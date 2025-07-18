@@ -9,8 +9,8 @@
 
 .button_text {
   font-size: var(--font-size-16);
-  line-height: var(--line-height-24);
   font-style: normal;
+  line-height: var(--line-height-24);
   font-weight: 600;
 }
 
@@ -26,9 +26,9 @@
 .landing_page {
   display: flex;
   flex-direction: column;
-  background-color: var(--grey-10);
-  align-items: center;
   width: 100%;
+  align-items: center;
+  background-color: var(--grey-10);
   height: calc(100vh - 9rem);
   justify-content: center;
   row-gap: var(--spacing-32);
@@ -43,6 +43,6 @@
 .text_section {
   display: flex;
   flex-direction: column;
-  row-gap: var(--spacing-8);
   align-items: center;
+  row-gap: var(--spacing-8);
 }
