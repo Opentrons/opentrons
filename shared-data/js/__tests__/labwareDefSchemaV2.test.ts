@@ -335,14 +335,28 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
+  function isInnerWellGeometry(
+    def: InnerWellGeometry | UserDefinedVolumes
+    ): def is InnerWellGeometry {
+    return 'sections' in def
+  }
+
+  function isUserDefinedVolumes(
+    def: InnerWellGeometry | UserDefinedVolumes
+  ): def is UserDefinedVolumes {
+    return 'heightToVolumeMap' in def
+  }
+
   test("a well's depth should equal the height of its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
       const wellGeometryId = well.geometryDefinitionId
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
       const innerGeometryObject = labwareDef.innerLabwareGeometry?.sections
+      if (innerGeometryObject == undefined) return
+      if (!(isInnerWellGeometry(innerGeometryObject))) return
       for (const geometry of Object.values(innerGeometryObject ?? {})) {
-        const topFrustumHeight = innerGeometryObject[0].topHeight
+        const topFrustumHeight = innerGeometryObject?.sections[0].topHeight
 
         const labwareWithWellDepthMismatches = [
           // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
@@ -554,7 +568,7 @@ function findLatestDefinition(loadName: string): LabwareDefinition2 {
 function getGeometry(
   loadName: string,
   geometryKey: string | undefined
-): InnerWellGeometry {
+): InnerWellGeometry | UserDefinedVolumes {
   const definition = findLatestDefinition(loadName)
   const availableGeometries = definition.innerLabwareGeometry ?? {}
 
