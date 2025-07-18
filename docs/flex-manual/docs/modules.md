@@ -71,10 +71,14 @@ In general, to install a module caddy:
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
 
 !!!warning
-    text
+    The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
 
-      * Keep the area around the hub free from obstacles that could prevent easy access to the main power switch or Emergency Stop Pendant (E-stop).
-      * To help with heat dissipation, do not place labware or other objects on top of the hub.
+    * Align the connector's flat side with the flat side of the module's power port.
+    * Connect the cable to the module first, before plugging it in to a wall outlet.
+
+    ![DIN power connector](images/module-power-connector.png){width="40%"}
+
+    _Do not_ force cable connections, or you may damage the module.
 
 ## Module calibration
 
