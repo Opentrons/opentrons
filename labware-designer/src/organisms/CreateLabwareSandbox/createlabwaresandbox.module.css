@@ -1,9 +1,9 @@
 .slot_select {
-  height: 1.5rem;
   width: 2rem;
+  height: 1.5rem;
 }
 
 .json_text_area {
-  min-height: 84vh;
   width: 100%;
+  min-height: 84vh;
 }
