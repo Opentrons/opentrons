@@ -83,10 +83,10 @@ def _parse_tuple(arg: str) -> Tuple[int, int]:
 
 def _get_value_from_index(deviations: List[int], axis: str, platform: str) -> int:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return deviations[index_map.get((axis, platform), 0)]
 
@@ -95,10 +95,10 @@ def _get_tuple_from_index(
     bins_list: List[Tuple[int, int]], axis: str, platform: str
 ) -> Tuple[int, int]:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return bins_list[index_map.get((axis, platform), 0)]
 
@@ -379,7 +379,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
 
     baselines = defaultdict(dict)  # type: ignore
     for axis, platform_data in histograms.items():
-        zone_count = zone_count_x if axis == "X" else zone_count_z
+        zone_count = zone_count_x if axis == "x" else zone_count_z
         for platform, zone_data in platform_data.items():
             deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
