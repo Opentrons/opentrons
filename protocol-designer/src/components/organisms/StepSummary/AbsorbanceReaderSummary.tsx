@@ -1,13 +1,7 @@
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  Flex,
-  SPACING,
-  StyledText,
-  Tag,
-} from '@opentrons/components'
+import { StyledText, Tag } from '@opentrons/components'
 
 import {
   ABSORBANCE_READER_INITIALIZE,
@@ -15,6 +9,7 @@ import {
   ABSORBANCE_READER_READ,
 } from '../../../constants'
 import { StyledTrans } from './StyledTrans'
+import styles from './summary.module.css'
 
 import type { RobotState } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
@@ -66,7 +61,7 @@ export function AbsorbanceReaderSummary(
     }
     case ABSORBANCE_READER_INITIALIZE: {
       const wavelengthsComponents = (
-        <Flex gridGap={SPACING.spacing4}>
+        <div className={styles.absorbance_reader}>
           {wavelengths.map((wavelength: string, index: number) => (
             <Fragment key={`${wavelength}-${index}`}>
               <Tag
@@ -78,7 +73,7 @@ export function AbsorbanceReaderSummary(
               ) : null}
             </Fragment>
           ))}
-        </Flex>
+        </div>
       )
       if (mode === 'single') {
         stepSummaryContent =
@@ -100,12 +95,12 @@ export function AbsorbanceReaderSummary(
       }
       // mode is multi
       stepSummaryContent = (
-        <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+        <div className={styles.absorbance_reader}>
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('protocol_steps:absorbance_reader.initialize_multi')}
           </StyledText>
           {wavelengthsComponents}
-        </Flex>
+        </div>
       )
       break
     }
