@@ -8,8 +8,8 @@
 }
 
 .button_text {
-  line-height: var(--line-height-24);
   font-size: var(--font-size-16);
+  line-height: var(--line-height-24);
   font-style: normal;
   font-weight: 600;
 }
@@ -25,12 +25,12 @@
 
 .landing_page {
   display: flex;
-  background-color: var(--grey-10);
   flex-direction: column;
+  background-color: var(--grey-10);
   align-items: center;
-  justify-content: center;
-  height: calc(100vh - 9rem);
   width: 100%;
+  height: calc(100vh - 9rem);
+  justify-content: center;
   row-gap: var(--spacing-32);
 }
 
