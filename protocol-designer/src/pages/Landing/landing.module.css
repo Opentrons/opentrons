@@ -29,8 +29,8 @@
   height: calc(100vh - 9rem);
   flex-direction: column;
   align-items: center;
-  background-color: var(--grey-10);
   justify-content: center;
+  background-color: var(--grey-10);
   row-gap: var(--spacing-32);
 }
 
