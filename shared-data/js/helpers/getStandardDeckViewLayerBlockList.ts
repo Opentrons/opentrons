@@ -1,4 +1,4 @@
-import type { RobotType } from '@opentrons/shared-data'
+import type { RobotType } from '../types'
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',

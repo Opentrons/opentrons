@@ -136,7 +136,7 @@ export function ErrorDetailsModalDesktop(
       name: 'information',
       color: COLORS.grey60,
       size: SPACING.spacing20,
-      marginRight: SPACING.spacing8,
+      style: { marginRight: SPACING.spacing8 },
     }
   }
 

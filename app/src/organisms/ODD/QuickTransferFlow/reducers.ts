@@ -111,7 +111,7 @@ export function quickTransferWizardReducer(
     case 'SET_LIQUID_CLASS': {
       return {
         ...state,
-        liquidClass: action.liquidClass,
+        liquidClassName: action.liquidClassName,
       }
     }
   }

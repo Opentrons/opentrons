@@ -1,6 +1,6 @@
 """Tests that validate the built-in liquid class definitions."""
 import pytest
-from typing import List
+from typing import List, Dict, Any
 
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.liquid_classes import load_definition
@@ -10,6 +10,11 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TouchTipProperties,
     BlowoutProperties,
     BlowoutLocation,
+    AspirateProperties,
+    PositionReference,
+    SingleDispenseProperties,
+    MultiDispenseProperties,
+    TransferProperties,
 )
 
 
@@ -124,3 +129,64 @@ def test_validate_blowout_properties_dict() -> None:
                 "params": {"foo": "bar"},
             }
         )
+
+
+def test_validate_aspirate_properties_dict(
+    sample_transfer_properties_dict: Dict[str, Dict[str, Any]],
+) -> None:
+    """Aspirate properties model validator should convert valid dict to AspirateProperties."""
+    obj = AspirateProperties.model_validate(
+        sample_transfer_properties_dict["flex_1channel_50"][
+            "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]["aspirate"]
+    )
+    assert isinstance(obj, AspirateProperties)
+    assert obj.aspiratePosition.positionReference == PositionReference.WELL_BOTTOM
+    assert obj.mix.enable is False
+
+
+def test_validate_single_dispense_properties_dict(
+    sample_transfer_properties_dict: Dict[str, Dict[str, Any]],
+) -> None:
+    """Single dispense properties model validator should convert valid dict to SingleDispenseProperties."""
+    obj = SingleDispenseProperties.model_validate(
+        sample_transfer_properties_dict["flex_1channel_50"][
+            "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]["dispense"]
+    )
+    assert isinstance(obj, SingleDispenseProperties)
+    assert obj.dispensePosition.positionReference == PositionReference.WELL_BOTTOM
+    assert obj.mix.enable is False
+
+
+def test_validate_multi_dispense_properties_dict(
+    sample_transfer_properties_dict: Dict[str, Dict[str, Any]],
+) -> None:
+    """Multi dispense properties model validator should convert valid dict to MultiDispenseProperties."""
+    obj = MultiDispenseProperties.model_validate(
+        sample_transfer_properties_dict["flex_1channel_50"][
+            "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]["multi_dispense"]
+    )
+    assert isinstance(obj, MultiDispenseProperties)
+    assert obj.dispensePosition.positionReference == PositionReference.WELL_BOTTOM
+    assert obj.conditioningByVolume == [(0, 0)]
+    assert obj.disposalByVolume == [(0, 5)]
+
+
+def test_validate_transfer_properties_dict(
+    sample_transfer_properties_dict: Dict[str, Dict[str, Any]],
+) -> None:
+    """Transfer properties model validator should convert valid dict to TransferProperties."""
+    obj = TransferProperties.model_validate(
+        sample_transfer_properties_dict["flex_1channel_50"][
+            "opentrons/opentrons_flex_96_tiprack_50ul/1"
+        ]
+    )
+    assert isinstance(obj, TransferProperties)
+    assert (
+        obj.aspirate.aspiratePosition.positionReference == PositionReference.WELL_BOTTOM
+    )
+    assert obj.singleDispense.pushOutByVolume == [(10.0, 7.0), (20.0, 10.0)]
+    assert obj.multiDispense.conditioningByVolume == [(0, 0)]  # type: ignore[union-attr]
+    assert obj.multiDispense.disposalByVolume == [(0, 5)]  # type: ignore[union-attr]

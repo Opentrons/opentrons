@@ -6,13 +6,13 @@
   --link-btn-blue: {
     display: inline-block;
     width: auto;
-    margin: 1.5rem 0 0.5rem;
     padding: 1rem 2rem;
     border-radius: 3px;
+    margin: 1.5rem 0 0.5rem;
     background-color: var(--c-blue);
-    font-size: var(--fs-body-2);
     color: white;
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    font-size: var(--fs-body-2);
     text-transform: uppercase;
 
     &:visited {
@@ -26,13 +26,13 @@
 }
 
 .labware_creator {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   max-width: 50rem;
-  margin: 1rem auto;
   padding: 1rem;
   padding-bottom: 10rem;
+  margin: 1rem auto;
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
 
   & p {
     margin: 1rem 0;
@@ -40,14 +40,14 @@
   }
 
   & ul {
-    list-style: disc;
     padding-left: 1.25rem;
     line-height: var(--lh-copy);
+    list-style: disc;
   }
 
   & li {
-    line-height: var(--lh-copy);
     margin-left: 2rem;
+    line-height: var(--lh-copy);
     list-style-type: decimal;
   }
 
@@ -65,13 +65,13 @@
   /* from legacy --linkb-tn */
   display: inline-block;
   width: auto;
-  margin: 1.5rem 0 0.5rem;
   padding: 1rem 2rem;
   border-radius: 3px;
+  margin: 1.5rem 0 0.5rem;
   background-color: var(--c-blue);
-  font-size: var(--fs-body-2);
   color: white;
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-size: var(--fs-body-2);
   text-transform: uppercase;
 
   &:visited {
@@ -94,23 +94,23 @@
 
 .error_modal {
   position: fixed;
-  x: 0;
-  y: 0;
+  z-index: 999;
   width: 100%;
   height: 100%;
-  z-index: 999;
+  x: 0;
+  y: 0;
 }
 
 .error_message {
+  padding: 0.5rem 0;
   color: var(--c-red);
   font-style: italic;
-  padding: 0.5rem 0;
 }
 
 .callout {
   padding: 0 0.75rem;
-  border-radius: 0.5rem;
   border: var(--bd-light);
+  border-radius: 0.5rem;
 }
 
 .setup_heading {
@@ -119,9 +119,9 @@
 
 .flex_row_no_columns {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   margin: 1rem 0 2rem;
-  flex-direction: column;
 }
 
 .flex_row {
@@ -187,15 +187,15 @@
     flex-basis: 45%;
     flex-shrink: 1;
     padding-right: 2rem;
-    border-bottom: none;
     border-right: var(--bd-light);
+    border-bottom: none;
   }
 
   .upload_existing_section {
-    padding: 1rem;
-    flex-shrink: 1;
-    padding-right: 0;
     flex-basis: 55%;
+    flex-shrink: 1;
+    padding: 1rem;
+    padding-right: 0;
   }
 
   .diagram_column,
@@ -219,8 +219,8 @@
   }
 
   .form_fields_column {
-    padding-left: var(--spacing-7);
     max-width: 15rem;
+    padding-left: var(--spacing-7);
   }
 
   .preview_labware {
@@ -259,8 +259,8 @@
 }
 
 .export_button {
-  margin-top: 2rem;
   width: 100%;
+  margin-top: 2rem;
 }
 
 .capitalize {

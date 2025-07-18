@@ -1,9 +1,6 @@
 import reduce from 'lodash/reduce'
 
-import type {
-  LoadLiquidRunTimeCommand,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { LoadLiquidRunTimeCommand, RunTimeCommand } from '../../command'
 
 export interface LabwareByLiquidId {
   [liquidId: string]: Array<{

@@ -3,6 +3,6 @@
 }
 
 .rotated {
-  transform-origin: center;
   transform: rotate(180deg);
+  transform-origin: center;
 }

@@ -1,13 +1,13 @@
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI } from './getLabwareDefURI'
 
 import type {
   FlexStackerSetStoredLabwareRunTimeCommand,
-  LabwareDefinition,
   LoadLabwareRunTimeCommand,
   LoadLidRunTimeCommand,
   LoadLidStackRunTimeCommand,
   RunTimeCommand,
-} from '@opentrons/shared-data'
+} from '../../protocol'
+import type { LabwareDefinition } from '../types'
 
 export interface LabwareDefinitionsByURI {
   [labwareDefURI: string]: LabwareDefinition
