@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getInitialSummaryState } from '../../utils'
 
+vi.mock('../../utils/retrieveLiquidClassValues')
+
 describe('getInitialSummaryState', () => {
   const props = {
     state: {
@@ -38,6 +40,7 @@ describe('getInitialSummaryState', () => {
       transferType: 'transfer',
       volume: 25,
       path: 'single',
+      liquidClassValuesInitialized: false,
     } as any,
     deckConfig: [
       {

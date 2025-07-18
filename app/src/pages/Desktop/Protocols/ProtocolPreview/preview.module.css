@@ -52,10 +52,17 @@
 }
 
 .controls_container {
+  position: relative;
   padding: 0 var(--spacing-16);
   background-color: var(--white);
   width: 100%;
   border-radius: var(--border-radius-8);
+}
+
+.controls_overflow_btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
 }
 
 .max_content_size {
@@ -87,6 +94,7 @@
 
 /* Hide thumb initially */
 .range_input::-webkit-slider-thumb {
+  z-index: 5;
   appearance: none;
   width: 0.75rem;
   height: 0.75rem;
@@ -101,6 +109,7 @@
 .range_input:hover::-webkit-slider-thumb,
 .range_input:focus::-webkit-slider-thumb,
 .range_input:active::-webkit-slider-thumb {
+  z-index: 5;
   opacity: 1;
 }
 
@@ -296,6 +305,10 @@
   width: 127.76px; /* STANDARD_X_WIDTH */
   height: 85.48px; /* STANDARD_Y_HEIGHT */
   padding: var(--spacing-8);
+  background-color: transparent;
+}
+
+.dont_show_render_slot_box {
   background-color: var(--grey-50);
 }
 
@@ -349,4 +362,15 @@
 
 .empty_state_box_container {
   padding: 0 var(--spacing-12);
+}
+
+.controls_overflow_menu {
+  z-index: 2;
+  border-radius: var(--border-radius-4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  background-color: var(--white);
+  top: 3.4rem;
+  right: 1.25rem;
+  flex-direction: column;
 }

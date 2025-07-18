@@ -9,6 +9,7 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 
 import { versionForProject } from '../scripts/git-version.mjs'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
@@ -35,6 +36,7 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        cssModuleSideEffect(),
         {
           name: 'markdown-loader',
           transform(code, id) {

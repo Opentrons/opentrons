@@ -197,6 +197,7 @@ export function MoveLabwareInterventionContent({
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
+              labwareDefinitions={Object.values(labwareDefsByUri)}
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}
@@ -210,6 +211,8 @@ export function MoveLabwareInterventionContent({
                       moduleDef,
                       nestedLabwareDef,
                       nestedLabwareId,
+                      targetDeckId,
+                      targetSlotId,
                     }) => (
                       <Module
                         key={moduleId}
@@ -217,10 +220,15 @@ export function MoveLabwareInterventionContent({
                         x={x}
                         y={y}
                         orientation={inferModuleOrientationFromXCoordinate(x)}
+                        targetDeckId={targetDeckId}
+                        targetSlotId={targetSlotId}
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={nestedLabwareDef} />
+                          <LabwareRender
+                            definition={nestedLabwareDef}
+                            positioningMode="offsetInSlot"
+                          />
                         ) : null}
                       </Module>
                     )

@@ -1,10 +1,8 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { Overview } from '../Overview'
 
@@ -54,9 +52,6 @@ describe('Overview', () => {
         },
       } as any,
     }
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('liquidClassesForQuickTransfer')
-      .thenReturn(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -133,9 +128,6 @@ describe('Overview', () => {
   })
 
   it('should render correct items when liquid classes are enabled', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('liquidClassesForQuickTransfer')
-      .thenReturn(true)
     render(props)
     screen.getByText('Pipette')
     screen.getByText('Pipette display name')
@@ -151,5 +143,4 @@ describe('Overview', () => {
     screen.getByText('Liquid class')
     screen.getByText('Dummy liquid class')
   })
-  // ToDo(kk:04/03) add another test  later for the liquid class
 })

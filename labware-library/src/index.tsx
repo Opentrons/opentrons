@@ -5,7 +5,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
 
-import './styles.global.css'
+import './styles.global.module.css'
 
 export * from './labware-creator'
 
