@@ -11,7 +11,7 @@
 }
 
 .setting_button:active {
-  background-color: #4d4d4d;
+  background-color: var(--grey-50);
 }
 
 .content_wrapper {
