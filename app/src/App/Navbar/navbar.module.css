@@ -1,9 +1,9 @@
 .navbar {
   display: flex;
-  flex: none;
-  flex-direction: column;
   width: 5.625rem;
   height: 100vh;
+  flex: none;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   background-color: var(--black-90);
@@ -39,9 +39,9 @@
 }
 
 .navbar_link:focus-visible {
-  outline: none;
   background-color: var(--grey-60);
   box-shadow: inset 0 0 0 3px var(--blue-50);
+  outline: none;
 }
 
 .navbar_link:active {
@@ -54,8 +54,8 @@
 }
 
 .navbar_link:global(.active):focus-visible {
-  outline: none;
   box-shadow: none;
+  outline: none;
 }
 
 .navbar_link.active:has(svg) {
@@ -100,9 +100,9 @@
 }
 
 .navbar_icon:focus-visible {
-  outline: none;
   background-color: var(--grey-60);
   box-shadow: inset 0 0 0 3px var(--blue-50);
+  outline: none;
 }
 
 .navbar_icon:active {
