@@ -5,7 +5,7 @@ import { LegacyStyledText } from '../StyledText'
 
 import '@opentrons/components/styles'
 
-import styles from './Chip.module.css'
+import styles from './chip.module.css'
 
 import type { IconName } from '../../icons'
 
