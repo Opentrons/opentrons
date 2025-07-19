@@ -1,10 +1,10 @@
 /* Chip Container Styles */
 .chip_container {
   display: flex;
-  align-items: center;
-  flex-direction: row;
-  height: max-content;
   width: max-content;
+  height: max-content;
+  flex-direction: row;
+  align-items: center;
 }
 
 .chip_container.medium {
@@ -28,8 +28,8 @@
 }
 
 .chip_container.no_background {
-  padding-left: 0;
   padding-right: 0;
+  padding-left: 0;
 }
 
 /* for TOUCH */
@@ -47,35 +47,35 @@
   }
 
   .chip_container.no_background {
-    padding-left: 0;
     padding-right: 0;
+    padding-left: 0;
   }
 }
 
 /* Chip Type Backgrounds */
 .error {
-  background-color: var(--red-30);
   border-radius: 200px;
+  background-color: var(--red-30);
 }
 
 .info {
-  background-color: var(--blue-30);
   border-radius: 200px;
+  background-color: var(--blue-30);
 }
 
 .neutral {
-  background-color: var(--grey-30);
   border-radius: 200px;
+  background-color: var(--grey-30);
 }
 
 .success {
-  background-color: var(--green-30);
   border-radius: 200px;
+  background-color: var(--green-30);
 }
 
 .warning {
-  background-color: var(--yellow-30);
   border-radius: 200px;
+  background-color: var(--yellow-30);
 }
 
 .transparent {
@@ -115,28 +115,28 @@
 /* Text Styles */
 .text_medium {
   font-size: var(--font-size-h4);
-  line-height: var(--line-height-20);
   font-weight: 600;
+  line-height: var(--line-height-20);
 }
 
 .text_small {
   font-size: 0.8125rem;
-  line-height: 1rem;
   font-weight: 600;
+  line-height: 1rem;
 }
 
 /* for ODD */
 @media (height: 600px) and (width: 1024px) {
   .text_medium {
     font-size: 1.375rem;
-    line-height: 1.75rem;
     font-weight: 600;
+    line-height: 1.75rem;
   }
 
   .text_small {
     font-size: 1.25rem;
-    line-height: 1.5rem;
     font-weight: 600;
+    line-height: 1.5rem;
   }
 }
 
