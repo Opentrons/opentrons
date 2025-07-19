@@ -12,11 +12,11 @@ const TestFormProviderComponent = () => {
     defaultValues: {
       labwares: [
         {
-          labwareURI: 'opentrons/opentrons_flex_96_tiprack_1000ul/2',
+          labwareURI: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
           count: 1,
         },
         {
-          labwareURI: 'opentrons/opentrons_flex_96_tiprack_50ul/2',
+          labwareURI: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
           count: 1,
         },
       ],

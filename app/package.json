@@ -31,7 +31,6 @@
     "@thi.ng/paths": "1.6.5",
     "@types/uuid": "^3.4.7",
     "classnames": "2.2.5",
-    "clsx": "^2.1.1",
     "connected-react-router": "6.9.3",
     "core-js": "3.2.1",
     "date-fns": "2.25.0",
