@@ -1,30 +1,30 @@
 .feature_flag_button {
   display: flex;
   width: 100%;
-  margin-bottom: var(--spacing-8);
-  background-color: var(--grey-35);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-20) var(--spacing-24);
   border-radius: var(--border-radius-16);
-  flex-direction: row;
+  margin-bottom: var(--spacing-8);
+  background-color: var(--grey-35);
   gap: var(--spacing-24);
-  justify-content: space-between;
-  align-items: center;
 }
 
 .feature_flag_content {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-24);
   align-items: center;
+  gap: var(--spacing-24);
 }
 
 .feature_flag_text_content {
   display: flex;
+  width: 46.25rem;
   flex-direction: column;
-  gap: var(--spacing-2);
   align-items: flex-start;
   justify-content: center;
-  width: 46.25rem;
+  gap: var(--spacing-2);
 }
 
 .feature_flag_title {
@@ -49,6 +49,6 @@
 
 .right_element_with_icon {
   display: flex;
-  gap: var(--spacing-40);
   align-items: center;
+  gap: var(--spacing-40);
 }
