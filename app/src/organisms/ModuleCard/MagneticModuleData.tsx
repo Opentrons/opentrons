@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 
 import { Chip, Flex, StyledText } from '@opentrons/components'
 import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
@@ -26,13 +27,12 @@ export const MagneticModuleData = (
   return (
     <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
       <Chip
-        text={moduleStatus}
+        text={capitalize(moduleStatus)}
         chipSize="small"
         type="info"
         hasIcon={true}
         pulseIcon={moduleStatus === 'engaged'}
         iconName="connection-status"
-        textTransform="capitalize"
         data-testid="mag_module_chip"
       />
       <StyledText

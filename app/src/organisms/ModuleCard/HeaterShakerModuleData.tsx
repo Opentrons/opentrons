@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 
 import {
   Chip,
@@ -102,7 +103,7 @@ export const HeaterShakerModuleData = (
           </StyledText>
           <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
             <Chip
-              text={moduleData.temperatureStatus}
+              text={capitalize(moduleData.temperatureStatus)}
               chipSize="small"
               type={getStatusChipType(moduleData.temperatureStatus)}
               hasIcon={true}
@@ -111,7 +112,6 @@ export const HeaterShakerModuleData = (
                 moduleData.temperatureStatus === 'heating'
               }
               iconName="connection-status"
-              textTransform="capitalize"
               data-testid="tempStatus"
             />
             <StyledText
@@ -142,7 +142,7 @@ export const HeaterShakerModuleData = (
         </StyledText>
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
           <Chip
-            text={moduleData.speedStatus}
+            text={capitalize(moduleData.speedStatus)}
             chipSize="small"
             type={getStatusChipType(moduleData.speedStatus)}
             hasIcon={true}
@@ -151,7 +151,6 @@ export const HeaterShakerModuleData = (
               moduleData.speedStatus === 'slowing down'
             }
             iconName="connection-status"
-            textTransform="capitalize"
             data-testid="shakerStatus"
           />
           <StyledText

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 
 import { Chip, Flex, StyledText } from '@opentrons/components'
 
@@ -30,13 +31,12 @@ export const TemperatureModuleData = (
       data-testid="temp_module_data"
     >
       <Chip
-        text={moduleStatus}
+        text={capitalize(moduleStatus)}
         chipSize="small"
         type={chipType}
         hasIcon={true}
         pulseIcon={shouldPulse}
         iconName="connection-status"
-        textTransform="capitalize"
       />
       <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
         {t(targetTemp == null ? 'na_temp' : 'target_temp', {

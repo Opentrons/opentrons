@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 
 import {
   Chip,
@@ -56,15 +57,18 @@ export const ThermocyclerModuleData = (
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
             <Chip
-              text={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
+              text={
+                data.lidStatus === 'in_between'
+                  ? 'Open'
+                  : capitalize(data.lidStatus)
+              }
               chipSize="small"
               type="neutral"
               hasIcon={false}
-              textTransform="capitalize"
               data-testid="lidStatus"
             />
             <Chip
-              text={data.lidTemperatureStatus}
+              text={capitalize(data.lidTemperatureStatus)}
               chipSize="small"
               type={getTemperatureChipType(data.lidTemperatureStatus)}
               hasIcon={true}
@@ -73,7 +77,6 @@ export const ThermocyclerModuleData = (
                 data.lidTemperatureStatus === 'heating'
               }
               iconName="connection-status"
-              textTransform="capitalize"
               data-testid="lidTempStatus"
             />
           </Flex>
@@ -99,13 +102,12 @@ export const ThermocyclerModuleData = (
         </StyledText>
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
           <Chip
-            text={data.status}
+            text={capitalize(data.status)}
             chipSize="small"
             type={getTemperatureChipType(data.status)}
             hasIcon={true}
             pulseIcon={data.status === 'cooling' || data.status === 'heating'}
             iconName="connection-status"
-            textTransform="capitalize"
             data-testid="blockStatus"
           />
           <StyledText

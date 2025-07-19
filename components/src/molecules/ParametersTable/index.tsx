@@ -91,7 +91,6 @@ export function ParametersTable({
                       text={t('protocol_details:requires_upload')}
                       type="warning"
                       hasIcon={false}
-                      width={FLEX_MAX_CONTENT}
                     />
                   ) : (
                     <StyledText desktopStyle="bodyDefaultRegular">

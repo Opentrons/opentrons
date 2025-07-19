@@ -52,7 +52,6 @@ export const AbsorbanceReaderData = (
         type={statusChipType}
         hasIcon={true}
         iconName="connection-status"
-        textTransform="capitalize"
         data-testid="abs_module_status"
       />
       <StyledText
