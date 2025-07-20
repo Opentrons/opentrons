@@ -12,8 +12,6 @@ import {
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import { analyticsEvent } from '/protocol-designer/analytics/actions'
-import { OPEN_STEP_DETAILS_EVENT } from '/protocol-designer/analytics/constants'
 import {
   getBatchEditFormHasUnsavedChanges,
   getCurrentFormHasUnsavedChanges,
@@ -25,6 +23,10 @@ import {
   hoverOnStep,
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
+
+import { analyticsEvent } from '../../../../analytics/actions'
+import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
+import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
@@ -43,8 +45,6 @@ interface StepOverflowMenuProps {
   multiSelectItemIds: string[] | null
   sidebarWidth: number // adjust the position of the overflow menu
 }
-
-const POSITION_ADJUSTMENT = 4
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const {
@@ -102,7 +102,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         ref={menuRootRef}
         zIndex={12}
         top={top}
-        left={sidebarWidth - POSITION_ADJUSTMENT} // the space between kebab menu button and overflow menu is 8px
+        left={sidebarWidth + OVERFLOW_MENU_POSITION_ADJUSTMENT} // the space between kebab menu button and overflow menu is 8px
         position={POSITION_ABSOLUTE}
         whiteSpace={NO_WRAP}
         borderRadius={BORDERS.borderRadius8}

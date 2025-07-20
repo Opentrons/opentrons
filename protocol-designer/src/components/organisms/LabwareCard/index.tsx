@@ -20,6 +20,7 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
@@ -31,7 +32,6 @@ import { getAllLabwareIdsOfCertainURIOnStack } from '/protocol-designer/utils'
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../utils'
 
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'

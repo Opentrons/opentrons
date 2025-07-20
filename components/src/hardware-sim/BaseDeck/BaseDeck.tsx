@@ -4,7 +4,7 @@ import partition from 'lodash/partition'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
-  getModuleDef2,
+  getModuleDef,
   getModuleType,
   getPositionFromSlotId,
   HEATERSHAKER_MODULE_V1,
@@ -89,9 +89,15 @@ export interface HopperLabwareProps {
 // these ugly consts are unfortunately necessary as the hopper location exists
 // outside of our deck definition so the render doesn't follow our normal conventions
 export const STACKER_MODULE_Y_OFFSET = -6
-export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
-export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
+// todo(mm, 2025-07-16): 17.5 mm is a by-eye adjustment that takes us from a little bit
+// left of the hopper to inside the hopper. The fact that we were 17.5 mm left in the
+// first place is weird, and suggests we're doing wrong math somewhere. A more normal
+// thing to expect here would be starting at the extended shuttle position and needing
+// an offset of hundreds of mm to go from there to inside the hopper.
+export const STACKER_HOPPER_LABWARE_X_OFFSET = 17.5
+export const STACKER_HOPPER_LABWARE_Y_OFFSET = 6
 export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
+
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
@@ -292,7 +298,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName,
               deckDef
             )
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
               <Module
                 key={`${moduleModel} ${moduleLocation.slotName}`}
@@ -303,11 +309,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   slotPosition[0]
                 )}
                 innerProps={innerProps}
+                targetDeckId={deckDef.otId}
+                targetSlotId={moduleLocation.slotName}
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
                     <LabwareRender
                       definition={nestedLabwareDef}
+                      positioningMode="offsetInSlot"
                       onLabwareClick={onLabwareClick}
                       wellFill={nestedLabwareWellFill}
                       shouldRotateAdapterOrientation={
@@ -341,7 +350,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName
             )
             const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
               <>
                 <StagingAreaFixture
@@ -361,6 +370,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     slotPosition[0]
                   )}
                   innerProps={innerProps}
+                  targetDeckId={deckDef.otId}
+                  targetSlotId={moduleLocation.slotName}
                 >
                   {nestedLabwareDef != null ? (
                     <g
@@ -369,6 +380,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     >
                       <LabwareRender
                         definition={nestedLabwareDef}
+                        positioningMode="offsetInSlot"
                         onLabwareClick={onLabwareClick}
                         wellFill={nestedLabwareWellFill}
                         shouldRotateAdapterOrientation={
@@ -423,6 +435,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               >
                 <LabwareRender
                   definition={definition}
+                  positioningMode="offsetInSlot"
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}
@@ -437,7 +450,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {/* render stacked badge on module labware */}
         {modulesOnDeck.map(
           ({ moduleModel, moduleLocation, stacked = false }) => {
-            const moduleDef = getModuleDef2(moduleModel)
+            const moduleDef = getModuleDef(moduleModel)
             const slotPosition = getPositionFromSlotId(
               moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStackerLocationFromSlot(moduleLocation.slotName)

@@ -207,30 +207,31 @@ const _getPipetteAccuracyUlPerMm = (args: {
   return lastEntry[1] * targetVolume + lastEntry[2]
 }
 
-export const getMaxUiFlowRate = (args: {
-  targetVolume: number
+interface BaseGetMaxUiFlowRateArgs {
   channels: PipetteChannels
   robotType: RobotType
-  tipLiquidSpecs: SupportedTip
-  flowRateType: FlowRateType
-  correctionVolume: number
   shaftULperMM: number
-}): number => {
-  const {
-    targetVolume,
-    channels,
-    robotType,
-    tipLiquidSpecs,
-    flowRateType,
-    correctionVolume,
-    shaftULperMM,
-  } = args
+}
+interface BlowoutMaxUiFlowRateArgs extends BaseGetMaxUiFlowRateArgs {
+  flowRateType: 'blowout'
+}
+interface AspirateDispenseMaxUiFlowRateArgs extends BaseGetMaxUiFlowRateArgs {
+  flowRateType: 'aspirate' | 'dispense'
+  tipLiquidSpecs: SupportedTip
+  targetVolume: number
+  correctionVolume?: number
+}
+export const getMaxUiFlowRate = (
+  args: BlowoutMaxUiFlowRateArgs | AspirateDispenseMaxUiFlowRateArgs
+): number => {
+  const { channels, robotType, flowRateType, shaftULperMM } = args
 
   const maxPlungerSpeed =
     CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channels].plunger
   if (flowRateType === 'blowout') {
     return round(shaftULperMM * maxPlungerSpeed)
   }
+  const { targetVolume, tipLiquidSpecs, correctionVolume = 0 } = args
   const pipetteAccuracyUlPerMm = _getPipetteAccuracyUlPerMm({
     targetVolume,
     tipLiquidSpecs,

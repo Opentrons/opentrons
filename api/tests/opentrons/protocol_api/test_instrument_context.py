@@ -8,7 +8,7 @@ from typing import ContextManager, Optional, Any
 from unittest.mock import sentinel
 
 from decoy import Decoy, matchers
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.errors.error_occurrence import (

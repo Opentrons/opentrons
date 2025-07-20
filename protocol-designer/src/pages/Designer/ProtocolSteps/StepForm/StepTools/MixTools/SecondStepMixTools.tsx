@@ -10,6 +10,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMaxPushOutVolume } from '@opentrons/shared-data'
 
 import {
   CheckboxExpandStepFormField,
@@ -17,14 +18,13 @@ import {
 } from '/protocol-designer/components/molecules'
 import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '/protocol-designer/step-forms/selectors'
-import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
-import { getMaxPushOutVolume } from '/protocol-designer/utils'
-
+} from '../../../../../../step-forms/selectors'
+import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,

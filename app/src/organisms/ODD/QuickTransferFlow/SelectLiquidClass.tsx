@@ -8,7 +8,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  ETHANOL_LIQUID_CLASS_NAME,
+  getAllLiquidClassDefs,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  NONE_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -52,12 +58,25 @@ export function SelectLiquidClass({
     schemaVersion: 1,
   }
 
+  const mapLiquidClassToInternalName: Record<
+    LiquidClass['liquidClassName'],
+    string
+  > = {
+    ethanol_80: ETHANOL_LIQUID_CLASS_NAME,
+    glycerol_50: GLYCEROL_LIQUID_CLASS_NAME,
+    water: WATER_LIQUID_CLASS_NAME,
+    none: NONE_LIQUID_CLASS_NAME,
+  }
+
   const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
   const handleClickNext = (): void => {
-    dispatch({
-      type: 'SET_LIQUID_CLASS',
-      liquidClass: selectedLiquidClass ?? noLiquidClass,
-    })
+    if (selectedLiquidClass != null) {
+      dispatch({
+        type: 'SET_LIQUID_CLASS',
+        liquidClassName:
+          mapLiquidClassToInternalName[selectedLiquidClass.liquidClassName],
+      })
+    }
     onNext()
   }
 
@@ -105,7 +124,6 @@ export function SelectLiquidClass({
         <StyledText oddStyle="level4HeaderRegular">
           {t('apply_predefined_settings')}
         </StyledText>
-        {/* radio buttons */}
         {liquidClassOptions.map(option => (
           <RadioButton
             key={option.liquidClassName}

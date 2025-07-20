@@ -19,7 +19,10 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import {
   LINE_CLAMP_TEXT_STYLE,
@@ -38,7 +41,6 @@ import {
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -154,6 +156,7 @@ export function AssignLiquidsModal(
                   labwareProps={{
                     wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
                     definition: labwareDef,
+                    positioningMode: 'offsetInSlot',
                     highlightedWells,
                     wellFill: wellFillFromWellContents(
                       wellContents,

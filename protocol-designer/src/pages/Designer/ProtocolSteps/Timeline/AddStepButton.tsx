@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import {
@@ -67,9 +67,13 @@ import type { BaseState } from '/protocol-designer/types'
 
 interface AddStepButtonProps {
   hasText: boolean
+  sidebarWidth: number
 }
 
-export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
+export function AddStepButton({
+  hasText,
+  sidebarWidth,
+}: AddStepButtonProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
   const enableComment = useSelector(getEnableComment)
   const { makeSnackbar } = useKitchen()

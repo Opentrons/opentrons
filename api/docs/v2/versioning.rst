@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (8.4.0) support the following version ranges: 
+Opentrons robots running the latest software (8.5.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.24    |          8.5.0               |
++-------------+------------------------------+
 |     2.23    |          8.4.0               |
 +-------------+------------------------------+
 |     2.22    |          8.3.0               |
@@ -139,6 +141,14 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.24
+-------------
+- Adds the ability to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`.
+
+  - :py:meth:`.ProtocolContext.get_liquid_class` accesses :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>` for aqueous, volatile, and viscous liquids.
+  - New :py:class:`.InstrumentContext` methods — :py:meth:`.transfer_with_liquid_class`, :py:meth:`.distribute_with_liquid_class`, and :py:meth:`.consolidate_with_liquid_class` — move liquids according to their properties.
+- :py:meth:`.air_gap`, :py:meth:`.blow_out`, :py:meth:`.dispense`, :py:meth:`.mix`, and :py:meth:`.touch_tip` have new parameters for advanced settings that are also available in Protocol Designer.
 
 Version 2.23
 -------------

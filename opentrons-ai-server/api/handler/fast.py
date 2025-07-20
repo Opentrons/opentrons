@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
-from api.domain.anthropic_predict import AnthropicPredict
+from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
@@ -63,7 +63,7 @@ app = FastAPI(
 # ALLOWED_ORIGINS is now an environment variable
 ALLOWED_CREDENTIALS: bool = True
 ALLOWED_METHODS: List[str] = ["GET", "POST", "OPTIONS"]
-ALLOWED_HEADERS: List[str] = ["content-type", "authorization", "origin", "accept"]
+ALLOWED_HEADERS: List[str] = ["content-type", "authorization", "origin", "accept", "x-enable-analytics"]
 ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: List[str] = ["content-type"]
 ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 
@@ -183,6 +183,12 @@ def _validate_request(data: Any, field_name: str) -> None:
         )
 
 
+def _get_analytics_preference(request: Request) -> bool:
+    """Get analytics preference from request headers."""
+    analytics_header = request.headers.get("x-enable-analytics", "true").lower()
+    return analytics_header == "true"
+
+
 def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optional[ChatResponse]:
     """Handle fake responses with optional fake_key."""
     if fake_key is not None:
@@ -203,23 +209,26 @@ def _generate_llm_response(
     model_type: str,
     user_id: str,
     prompt: str,
+    enable_analytics: bool,
     history: Optional[List[Any]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM based on context."""
-    if "openai" in model_type.lower():
-        return openai.predict(prompt=prompt, chat_completion_message_params=history)
+    # Wrap all LLM calls with the appropriate tracing context
+    with get_tracing_context(enable_analytics):
+        if "openai" in model_type.lower():
+            return openai.predict(prompt=prompt, chat_completion_message_params=history)
 
-    # Claude models
-    if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
-        return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+        # Claude models
+        if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
-    if protocol_action == "create":
-        return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+        if protocol_action == "create":
+            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
-    # Default to update for chat completion and update_protocol
-    return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+        # Default to update for chat completion and update_protocol
+        return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
 
 def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
@@ -290,7 +299,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
     description="Generate a chat response based on the provided prompt.",
 )
 async def create_chat_completion(
-    body: ChatRequest, user: Annotated[User, Security(auth.verify)]
+    body: ChatRequest, user: Annotated[User, Security(auth.verify)], request: Request
 ) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate a chat completion response using LLM.
@@ -300,6 +309,10 @@ async def create_chat_completion(
     """
     logger.info("POST /api/chat/completion", extra={"body": body.model_dump(), "user": user})
     try:
+        # Setup Weave analytics based on frontend preference
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+
         _validate_request(body, "message")
 
         fake_response = _handle_fake_response(body.fake, getattr(body, "fake_key", None))
@@ -313,6 +326,7 @@ async def create_chat_completion(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
+            enable_analytics=enable_analytics,
             history=body.history,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
@@ -350,7 +364,7 @@ def _determine_protocol_action(body: ChatRequest) -> str:
     description="Generate a chat response based on the provided prompt that will create a new protocol with the required changes.",
 )
 async def create_protocol(
-    body: CreateProtocol, user: Annotated[User, Security(auth.verify)]
+    body: CreateProtocol, user: Annotated[User, Security(auth.verify)], request: Request
 ) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate an updated protocol using LLM.
@@ -360,6 +374,10 @@ async def create_protocol(
     """
     logger.info("POST /api/chat/createProtocol", extra={"body": body.model_dump(), "user": user})
     try:
+        # Setup Weave analytics based on frontend preference
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+
         _validate_request(body, "prompt")
 
         # Special handling for fake_key with delay in createProtocol
@@ -376,7 +394,12 @@ async def create_protocol(
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
         response = _generate_llm_response(
-            model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_format=protocol_format, protocol_action="create"
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.prompt,
+            enable_analytics=enable_analytics,
+            protocol_format=protocol_format,
+            protocol_action="create",
         )
 
         # Special handling for Protocol Designer with null response
@@ -412,7 +435,7 @@ async def create_protocol(
     description="Generate a chat response based on the provided prompt that will update an existing protocol with the required changes.",
 )
 async def update_protocol(
-    body: UpdateProtocol, user: Annotated[User, Security(auth.verify)]
+    body: UpdateProtocol, user: Annotated[User, Security(auth.verify)], request: Request
 ) -> Union[ChatResponse, ErrorResponse]:  # noqa: B008
     """
     Generate an updated protocol using LLM.
@@ -422,13 +445,23 @@ async def update_protocol(
     """
     logger.info("POST /api/chat/updateProtocol", extra={"body": body.model_dump(), "user": user})
     try:
+        # Setup Weave analytics based on frontend preference
+        enable_analytics = _get_analytics_preference(request)
+        setup_weave_analytics(enable_analytics)
+
         _validate_request(body, "protocol_text")
 
         fake_response = _handle_fake_response(bool(body.fake))
         if fake_response:
             return fake_response
 
-        response = _generate_llm_response(model_type=settings.model, user_id=str(user.sub), prompt=body.prompt, protocol_action="update")
+        response = _generate_llm_response(
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=body.prompt,
+            enable_analytics=enable_analytics,
+            protocol_action="update",
+        )
 
         # Handle empty response specifically for update protocol
         if response is None or response == "":

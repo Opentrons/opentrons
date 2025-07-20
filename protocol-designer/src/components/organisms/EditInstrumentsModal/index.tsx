@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -46,6 +47,7 @@ export function EditInstrumentsModal(
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const pipetteEntities = useSelector(getPipetteEntities)
+  const [saveAttemptFailed, setSaveAttemptFailed] = useState<boolean>(false)
   const { pipettes, labware } = initialDeckSetup
   const pipettesOnDeck = Object.values(pipettes)
   const has96Channel = getHas96Channel(pipetteEntities)
@@ -70,7 +72,19 @@ export function EditInstrumentsModal(
       ? `${pipetteVolume}_${pipetteType}`
       : `${pipetteVolume}_${pipetteType}_${pipetteGen.toLowerCase()}`
 
+  const canSave =
+    (page === 'add' &&
+      pipetteVolume != null &&
+      pipetteType != null &&
+      pipetteGen != null &&
+      selectedTips.length > 0) ||
+    (page === 'overview' && pipettesOnDeck.length > 0)
   const handleOnSave = (): void => {
+    if (!canSave) {
+      setSaveAttemptFailed(true)
+      return
+    }
+
     if (page === 'overview') {
       onClose()
     } else {
@@ -119,19 +133,7 @@ export function EditInstrumentsModal(
             >
               {page === 'overview' ? t('cancel') : t('back')}
             </SecondaryButton>
-            <PrimaryButton
-              disabled={
-                (page === 'add' &&
-                  (pipetteVolume == null ||
-                    pipetteType == null ||
-                    pipetteGen == null ||
-                    selectedTips.length === 0)) ||
-                (page === 'overview' && pipettesOnDeck.length === 0)
-              }
-              onClick={handleOnSave}
-            >
-              {t('save')}
-            </PrimaryButton>
+            <PrimaryButton onClick={handleOnSave}>{t('save')}</PrimaryButton>
           </Flex>
         }
       >
@@ -145,6 +147,8 @@ export function EditInstrumentsModal(
             rightPipette={rightPipette}
             gripper={gripper}
             pipetteConfig={pipetteConfig}
+            showNoPipetteError={saveAttemptFailed && !canSave}
+            setSaveAttemptFailed={setSaveAttemptFailed}
           />
         ) : (
           <PipetteConfiguration

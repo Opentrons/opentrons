@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: System Description"
+---
+
 # System Description
 
 This chapter describes the hardware systems of Opentrons Flex, which underlie its core lab automation features. The deck, gantry, and instrument mounts of Opentrons Flex enable the use of precision liquid- and labware-handling components. The on-device touchscreen enables running protocols and checking on the robot's status without needing to bring your computer to the lab bench. Wired and wireless connectivity enables additional control from the Opentrons App (see the [Software and Operation chapter](software-operation.md) for more details) and extending the system's features by attaching peripherals (see the [Modules chapter](modules.md)).
@@ -491,16 +495,95 @@ The E-stop has a press-to-engage, twist-to-release mechanism.
 
 In the stopped state, Flex and connected hardware will behave as follows:
 
-| **Component**            | **Behavior When E-stop Engaged**                                                                                                                                                                                                                   |
-|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Gantry**              | <ul><li>Automated horizontal motion is halted.</li><li>Manual horizontal motion is allowed.</li></ul>                                                                                                                                              |
-| **Pipettes**            | <ul><li>Vertical motion is halted.</li><li>Motor brakes on vertical axes are engaged to prevent pipettes from falling.</li><li>Plunger motion and tip pickup is halted.</li></ul>                                                                  |
-| **Gripper**             | <ul><li>Vertical motion is halted.</li><li>Motor brake on vertical axis is engaged to prevent the gripper from falling.</li><li>Jaw motors that exert gripping force remain enabled, so the gripper will not drop labware it may be carrying.</li></ul> |
-| **Heater-Shaker Module**| <ul><li>The shaker stops and homes.</li><li>The labware latch opens.</li><li>Heating is disabled.</li></ul>                                                                                                                                        |
-| **Temperature Module**  | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                |
-| **Thermocycler Module** | <ul><li>Heating or cooling is disabled.</li></ul>                                                                                                                                                                                                                  |
-| **Status light**        | <ul><li>The light turns red.</li></ul>                                                                                                                                                                                                                     |
-| **Touchscreen**         | <ul><li>A cancellation message takes over the screen.</li><li>An on-screen indicator shows when you have successfully disengaged the stop button.</li></ul>                                                  |
+<table>
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Behavior When E-stop Engaged</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Gantry</strong></td>
+            <td>
+                <ul>
+                    <li>Automated horizontal motion is halted.</li>
+                    <li>Manual horizontal motion is allowed.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Pipettes</strong></td>
+            <td>
+                <ul>
+                    <li>Vertical motion is halted.</li>
+                    <li>Motor brakes on vertical axes are engaged to prevent pipettes from falling.</li>
+                    <li>Plunger motion and tip pickup is halted.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Gripper</strong></td>
+            <td>
+                <ul>
+                    <li>Vertical motion is halted.</li>
+                    <li>Motor brake on vertical axis is engaged to prevent the gripper from falling.</li>
+                    <li>Jaw motors that exert gripping force remain enabled, so the gripper will not drop labware it may be carrying.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Heater-Shaker Module</strong></td>
+            <td>
+                <ul>
+                    <li>The shaker stops and homes.</li>
+                    <li>The labware latch opens.</li>
+                    <li>Heating is disabled.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>HEPA/UV Module</strong></td>
+            <td>
+                <ul>
+                    <li>The UV lights and fan continue to operate.</li>
+                    <li>Opening the door disables the lights.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Plate Reader</strong></td>
+            <td>
+                <ul>
+                    <li>When analyzing a sample, the module will continue to operate.</li>
+                    <li>If the gripper is moving the plate reader's lid, its jaws remain enabled to hold the lid.</li>
+                    <li>The gripper will automatically place the plate reader's lid back in its docking area after you fully reset the E-stop.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Temperature Module</strong></td>
+            <td>Heating or cooling is disabled.</td>
+        </tr>
+        <tr>
+            <td><strong>Thermocycler Module</strong></td>
+            <td>Heating or cooling is disabled.</td>
+        </tr>
+        <tr>
+            <td><strong>Status light</strong></td>
+            <td>The light turns red.</td>
+        </tr>
+        <tr>
+            <td><strong>Touchscreen</strong></td>
+            <td>
+                <ul>
+                    <li>A cancellation message takes over the screen.</li>
+                    <li>An on-screen indicator shows when you have successfully disengaged the stop button.</li>
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 ## Connections
 

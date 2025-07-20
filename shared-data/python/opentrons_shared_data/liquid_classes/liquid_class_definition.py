@@ -81,7 +81,7 @@ class Coordinate(BaseModel):
 class BaseLiquidClassModel(BaseModel):
     """Base class for liquid class definitions."""
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
 
 class TipPosition(BaseLiquidClassModel):
@@ -106,7 +106,7 @@ class DelayParams(BaseLiquidClassModel):
 
 
 class DelayProperties(BaseLiquidClassModel):
-    """Shared properties for delay.."""
+    """Shared properties for delay."""
 
     enable: StrictBool = Field(..., description="Whether delay is enabled.")
     params: DelayParams | SkipJsonSchema[None] = Field(
@@ -508,7 +508,7 @@ class TransferProperties(BaseLiquidClassModel):
     )
     multiDispense: MultiDispenseProperties | SkipJsonSchema[None] = Field(
         None,
-        alias="multi-dispense",
+        alias="multi_dispense",
         description="Optional multi-dispense parameters for this tip type.",
         json_schema_extra=_remove_default,
     )

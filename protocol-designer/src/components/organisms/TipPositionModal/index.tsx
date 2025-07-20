@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Banner,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InputField,
@@ -409,6 +410,7 @@ export function TipPositionModal(
                 {t(`modal:tip_position.view.${view}`)}
               </StyledText>
               <Btn
+                color={COLORS.grey60}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 css={LINK_BUTTON_STYLE}
                 onClick={() => {

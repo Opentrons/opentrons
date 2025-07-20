@@ -58,7 +58,6 @@ const mockMagneticModule = {
   calibrationPoint: { x: 0, y: 0 },
   displayName: 'Magnetic Module',
   dimensions: {},
-  twoDimensionalRendering: { children: [] },
   quirks: [],
 }
 

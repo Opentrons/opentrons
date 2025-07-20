@@ -94,6 +94,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
     '/protocols': t('protocols'),
     [`/protocols/${protocolKey}`]: protocolDisplayName,
+    [`/protocols/${protocolKey}/preview`]: t('preview'),
   }
 
   // create an array of crumbs based on the pathname and defined names by path

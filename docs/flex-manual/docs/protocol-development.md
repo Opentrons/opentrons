@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Protocol Development"
+---
+
 # Protocol Development
 
 The Opentrons Flex system can run a wide variety of automated protocols, for tasks such as PCR, NGS, ELISA, and many more. You can run fully built and verified protocols, edit community protocols to suit your needs, or design protocols from scratch—with or without writing code.
@@ -94,13 +98,11 @@ In general, following the style of the methods section of an academic paper will
 
 #### Custom protocol pricing
 
-Custom Protocol Developmentis a service available to all owners of Opentrons Flex systems. Opentrons provides remote and onsite protocol development services customized to your specific workflow. Price and development time are based on the complexity of your protocol and the related code. See the [Instrument Services section](https://opentrons.com/instrument-services) of the Opentrons website to contact us for more information about our Custom Protocol Development offerings.
+Custom Protocol Development is a service available to all owners of Opentrons Flex systems. Opentrons provides remote and onsite protocol development services customized to your specific workflow. Price and development time are based on the complexity of your protocol and the related code. See the [Instrument Services section](https://opentrons.com/instrument-services) of the Opentrons website to contact us for more information about our Custom Protocol Development offerings.
 
 ## Protocol Designer
 
-is a web-based, no-code tool for developing protocols that run on
-Opentrons robots, including Opentrons Flex. You can use Protocol
-Designer to create protocols that:
+Protocol Designer is a web-based, no-code tool for developing protocols that run on Opentrons robots, including Opentrons Flex. You can use Protocol Designer to create protocols that:
 
 - Aspirate, dispense, transfer, and mix liquids.
 

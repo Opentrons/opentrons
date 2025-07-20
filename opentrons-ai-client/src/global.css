@@ -1,0 +1,43 @@
+@import url('@fontsource/public-sans');
+@import url('@fontsource/public-sans/600.css');
+@import url('@fontsource/public-sans/700.css');
+
+:root {
+  --font-family-main: 'Public Sans', 'DejaVu Sans', sans-serif;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  color: var(--black-90);
+  font-family: var(--font-family-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  border: none;
+}
+
+button:focus,
+button:active {
+  outline: 0;
+}

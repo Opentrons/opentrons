@@ -63,7 +63,7 @@ export function LiquidsOverflowMenu({
     right = undefined
     left =
       targetWidth !== undefined
-        ? `${targetWidth - OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
+        ? `${targetWidth + OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
         : undefined
   }
 

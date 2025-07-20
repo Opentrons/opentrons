@@ -840,10 +840,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :type speed: float
         :param mm_from_edge: How far to move inside the well, as a distance from the
                              well's edge.
-                             When ``mm_from_edge=0``, the pipette tip will move all the
-                             way to the edge of the target well. When ``mm_from_edge=1``,
-                             the pipette tip will move to 1 mm from the well's edge.
-                             Lower values will press the tip harder into the well's
+                             When ``mm_from_edge=0``, the pipette will move to the target well's edge to touch the tip. When ``mm_from_edge=1``,
+                             the pipette will move to 1 mm from the target well's edge to touch the tip.
+                             Values lower than 0 will press the tip harder into the target well's
                              walls; higher values will touch the well more lightly, or
                              not at all.
                              ``mm_from_edge`` and ``radius`` are mutually exclusive: to
@@ -1829,6 +1828,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
@@ -1838,7 +1838,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -1962,13 +1961,14 @@ class InstrumentContext(publisher.CommandPublisher):
             Defaults to ``"once"``.
 
               - ``"once"``: Use one tip for the entire command.
+              - ``"always"``: Use a new tip before each aspirate.
               - ``"never"``: Do not pick up or drop tips at all.
-              - ``"always"``: Pick up a new tip before every aspirate.
 
             See :ref:`param-tip-handling` for details.
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
@@ -1978,7 +1978,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(
@@ -2111,13 +2110,14 @@ class InstrumentContext(publisher.CommandPublisher):
             Defaults to ``"once"``.
 
               - ``"once"``: Use one tip for the entire command.
+              - ``"always"``: Use a new tip after each aspirate and dispense, even when visiting the same source again.
               - ``"never"``: Do not pick up or drop tips at all.
-              - ``"always"``: Pick up a new tip before going back to source for refilling after a dispense.
 
             See :ref:`param-tip-handling` for details.
 
         :param trash_location: A trash container, well, or other location to dispose of
             tips. Depending on the liquid class, the pipette may also blow out liquid here.
+            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
         :param return_tip: Whether to drop used tips in their original locations
             in the tip rack, instead of the trash.
         :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
@@ -2127,7 +2127,6 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
 
-        :meta private:
         """
         if volume == 0.0:
             _log.info(

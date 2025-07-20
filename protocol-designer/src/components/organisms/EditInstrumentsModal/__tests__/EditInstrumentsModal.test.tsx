@@ -123,7 +123,8 @@ describe('EditInstrumentsModal', () => {
       resetFields: vi.fn(),
     })
     render(props)
-    expect(screen.getByText('Save')).toBeDisabled()
+    fireEvent.click(screen.getByText('Save'))
+    expect(mockOnClose).not.toHaveBeenCalled()
   })
 
   it('should render text and buttons - pipette overview', () => {

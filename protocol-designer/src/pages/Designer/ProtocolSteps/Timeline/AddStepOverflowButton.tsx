@@ -25,11 +25,6 @@ export function AddStepOverflowButton(
 ): JSX.Element {
   const { onClick, stepType, isFirstStep = false, isLastStep = false } = props
   const { t, i18n } = useTranslation(['tooltip', 'application'])
-  //   TODO(ja): add or delete tooltips when designs are finalized
-  //   const [targetProps, tooltipProps] = useHoverTooltip({
-  //     placement: TOOLTIP_RIGHT,
-  //   })
-  //   const tooltipMessage = t(`step_description.${stepType}`)
 
   const selectHoverStyle = (): string => {
     if (isFirstStep) {
@@ -52,7 +47,6 @@ export function AddStepOverflowButton(
           )}
         </StyledText>
       </MenuButton>
-      {/* <Tooltip tooltipProps={tooltipProps}>{tooltipMessage}</Tooltip> */}
     </>
   )
 }

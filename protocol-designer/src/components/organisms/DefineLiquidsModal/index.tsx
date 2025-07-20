@@ -26,6 +26,7 @@ import {
   FLEX_ROBOT_TYPE,
   getSortedLiquidClassDefs,
 } from '@opentrons/shared-data'
+import { swatchColors } from '@opentrons/step-generation'
 
 import {
   HandleEnter,
@@ -38,7 +39,6 @@ import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-
 
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
-import { swatchColors } from './swatchColors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Ingredient } from '@opentrons/step-generation'

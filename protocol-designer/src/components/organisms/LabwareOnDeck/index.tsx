@@ -1,13 +1,12 @@
 import { useSelector } from 'react-redux'
 
 import { LabwareRender } from '@opentrons/components'
+import * as wellContentsSelectors from '@opentrons/step-generation'
 
-import { selectors } from '/protocol-designer/labware-ingred/selectors'
-import * as highlightSelectors from '/protocol-designer/top-selectors/substep-highlight'
-import * as tipContentsSelectors from '/protocol-designer/top-selectors/tip-contents'
-import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-
-import { wellFillFromWellContents } from './utils'
+import { selectors } from '../../../labware-ingred/selectors'
+import * as highlightSelectors from '../../../top-selectors/substep-highlight'
+import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
+import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
 import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
@@ -23,7 +22,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     tipContentsSelectors.getMissingTipsByLabwareId
   )
   const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
+    getAllWellContentsForActiveItem
   )
   const allHighlightedWells = useSelector(
     highlightSelectors.wellHighlightsByLabwareId
@@ -41,7 +40,11 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
         definition={labwareOnDeck.def}
-        wellFill={wellFillFromWellContents(wellContents, liquidDisplayColors)}
+        positioningMode="offsetInSlot"
+        wellFill={wellContentsSelectors.wellFillFromWellContents(
+          wellContents,
+          liquidDisplayColors
+        )}
         highlightedWells={highlightedWells}
         missingTips={missingTips}
       />

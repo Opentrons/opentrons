@@ -3,7 +3,7 @@ import pytest
 import mock
 
 from typing import ContextManager, Any, Optional
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from contextlib import nullcontext as does_not_raise
 from opentrons.types import Location, Point
 
@@ -46,7 +46,6 @@ def v1_mag_module_schema_v3_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 
@@ -73,7 +72,6 @@ def minimal_heater_shaker_definition() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["someSimilarModule"],  # type: ignore[list-item]
         "cornerOffsetFromSlot": {"x": 111, "y": 222, "z": 333},
-        "twoDimensionalRendering": {},
         "config": {},
     }
 

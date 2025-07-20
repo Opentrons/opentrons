@@ -108,6 +108,14 @@ adapter_plate = LoadedLabware(
     offsetId=None,
 )
 
+tiprack_lid = LoadedLabware(
+    id="tiprack-lid-id",
+    loadName="tiprack-lid-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    definitionUri="some-tiprack-lid-uri",
+    offsetId=None,
+)
+
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
@@ -720,6 +728,24 @@ def test_is_tiprack(
 
     assert subject.is_tiprack(labware_id="tip-rack-id") is True
     assert subject.is_tiprack(labware_id="reservoir-id") is False
+
+
+def test_is_lid(
+    reservoir_def: LabwareDefinition, tiprack_lid_def: LabwareDefinition
+) -> None:
+    """It should return True if labware is a lid."""
+    subject = get_labware_view(
+        labware_by_id={
+            "reservoir-id": reservoir,
+            "tiprack-lid-id": tiprack_lid,
+        },
+        definitions_by_uri={
+            "some-reservoir-uri": reservoir_def,
+            "some-tiprack-lid-uri": tiprack_lid_def,
+        },
+    )
+    assert subject.is_lid(labware_id="reservoir-id") is False
+    assert subject.is_lid(labware_id="tiprack-lid-id") is True
 
 
 def test_get_load_name(reservoir_def: LabwareDefinition) -> None:

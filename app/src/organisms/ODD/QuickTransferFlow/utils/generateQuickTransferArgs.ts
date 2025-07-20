@@ -190,12 +190,13 @@ function getInvariantContextAndRobotState(
     }
   }
   if (
-    quickTransferState.blowOut != null &&
-    quickTransferState.blowOut !== 'source_well' &&
-    quickTransferState.blowOut !== 'dest_well' &&
-    quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    quickTransferState.blowOutDispense?.location != null &&
+    quickTransferState.blowOutDispense.location !== 'source_well' &&
+    quickTransferState.blowOutDispense.location !== 'dest_well' &&
+    quickTransferState.blowOutDispense.location?.cutoutFixtureId ===
+      TRASH_BIN_ADAPTER_FIXTURE
   ) {
-    const trashLocation = quickTransferState.blowOut.cutoutId
+    const trashLocation = quickTransferState.blowOutDispense.location.cutoutId
     const isSameTrash = Object.values(trashBinEntities).some(
       entity => entity.location === trashLocation
     )
@@ -228,12 +229,15 @@ function getInvariantContextAndRobotState(
     }
   }
   if (
-    quickTransferState.blowOut != null &&
-    quickTransferState.blowOut !== 'source_well' &&
-    quickTransferState.blowOut !== 'dest_well' &&
-    WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut.cutoutFixtureId)
+    quickTransferState.blowOutDispense?.location != null &&
+    quickTransferState.blowOutDispense.location !== 'source_well' &&
+    quickTransferState.blowOutDispense.location !== 'dest_well' &&
+    WASTE_CHUTE_FIXTURES.includes(
+      quickTransferState.blowOutDispense.location.cutoutFixtureId
+    )
   ) {
-    const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
+    const wasteChuteLocation =
+      quickTransferState.blowOutDispense.location.cutoutId
     const isSameChute = Object.values(wasteChuteEntities).some(
       entity => entity.location === wasteChuteLocation
     )
@@ -308,27 +312,29 @@ export function generateQuickTransferArgs(
 
   let blowoutLocation: string | undefined
   if (
-    quickTransferState?.blowOut != null &&
-    quickTransferState.blowOut !== 'source_well' &&
-    quickTransferState.blowOut !== 'dest_well' &&
-    'cutoutId' in quickTransferState.blowOut
+    quickTransferState?.blowOutDispense?.location != null &&
+    quickTransferState.blowOutDispense.location !== 'source_well' &&
+    quickTransferState.blowOutDispense.location !== 'dest_well' &&
+    'cutoutId' in quickTransferState.blowOutDispense.location
   ) {
     const trashBinEntity = Object.values(
       invariantContext.trashBinEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOut as CutoutConfig
+      const blowoutObject = quickTransferState.blowOutDispense
+        ?.location as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const wasteChuteEntity = Object.values(
       invariantContext.wasteChuteEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOut as CutoutConfig
+      const blowoutObject = quickTransferState.blowOutDispense
+        ?.location as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const entity = trashBinEntity != null ? trashBinEntity : wasteChuteEntity
     blowoutLocation = entity?.id
   } else {
-    blowoutLocation = quickTransferState.blowOut
+    blowoutLocation = quickTransferState.blowOutDispense?.location
   }
 
   const dropTipTrashBinLocationEntity = Object.values(
@@ -429,8 +435,7 @@ export function generateQuickTransferArgs(
     description: null,
     nozzles,
     pushOut: null,
-    /** TODO: update all values below once quick transfer state is updated */
-    liquidClass: null,
+    liquidClass: quickTransferState.liquidClassName,
     aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateZOffset: 0,
     aspirateSubmergeSpeed: null,

@@ -17,15 +17,13 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { swatchColors } from '@opentrons/step-generation'
 
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   formatPercentage,
   formatVolume,
 } from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
-
-import { getMainPagePortalEl } from '..'
-import { swatchColors } from '../DefineLiquidsModal/swatchColors'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'

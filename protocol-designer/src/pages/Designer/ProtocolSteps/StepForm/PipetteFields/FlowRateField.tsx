@@ -172,17 +172,18 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const isFlowRateOutOfBounds =
     (maxFlowRate != null && flowRateNum > maxFlowRate) || flowRateNum < 0
 
-  let errorMessage: string | null = null
-  if (
-    (!isPristine && passThruProps.value !== undefined && flowRateNum === 0) ||
+  const errorMessage =
+    (passThruProps.value &&
+      !isPristine &&
+      passThruProps.value !== undefined &&
+      flowRateNum === 0) ||
     isFlowRateOutOfBounds ||
     (isPristine && flowRateNum === 0)
-  ) {
-    errorMessage = i18n.format(
-      t('step_edit_form.field.flow_rate.error_out_of_bounds'),
-      'capitalize'
-    )
-  }
+      ? i18n.format(
+          t('step_edit_form.field.flow_rate.error_out_of_bounds'),
+          'capitalize'
+        )
+      : passThruProps.errorToShow ?? null
 
   useEffect(() => {
     if (isPristine && passThruProps.value == null) {
@@ -196,7 +197,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
       padding={padding}
       type="number"
       setIsPristine={setIsPristine}
-      errorToShow={maxFlowRate != null ? errorMessage : null}
+      errorToShow={errorMessage}
       key={`${flowRateType}_FlowRateInput`}
       title={title}
       showTooltip={false}
@@ -210,7 +211,6 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
             })
           : null
       }
-      placeholder={String(defaultFlowRate)}
     />
   )
 }

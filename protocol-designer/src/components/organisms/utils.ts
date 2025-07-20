@@ -4,7 +4,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { AIR, MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
 import { ALL_MODULE_SLOTS_OT2 } from '/protocol-designer/modules'
 import { DEFAULT_SLOT_MAP_OT2 } from '/protocol-designer/pages/Onboarding/constants'
@@ -19,14 +19,12 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
 } from '/protocol-designer/step-forms'
 import type * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import type { CutoutConfigExtended } from './HardwareConfigurator/AddFixtureModal'
-import type { WellContentsByNumber } from './SlotDetailModal'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -151,18 +149,6 @@ export const getNextAvailableModuleSlot = (
   }
 }
 
-export const getLiquidIdsOnLabware = (
-  wellContents: ContentsByWell
-): string[] => {
-  const allLiquidIdsOnLabware =
-    wellContents != null
-      ? Object.values(wellContents)
-          .flatMap(contents => contents.groupIds)
-          ?.filter(group => group !== AIR)
-      : []
-  return Array.from(new Set(allLiquidIdsOnLabware))
-}
-
 export const getIsWellContentsEmpty = (
   allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null,
   labwareId: string
@@ -176,32 +162,4 @@ export const getIsWellContentsEmpty = (
         well => Object.keys(well.ingreds).length === 0
       )
     : true
-}
-
-export const getVolumesPerLiquid = (
-  wellContents: ContentsByWell,
-  individualIds: string[]
-): Record<string, WellContentsByNumber> => {
-  const volumesPerLiquid: Record<string, WellContentsByNumber> = {}
-  individualIds.forEach(id => {
-    const volumeByWell: WellContentsByNumber =
-      wellContents != null
-        ? Object.values(wellContents).reduce(
-            (acc: WellContentsByNumber, contents) => {
-              const groupIndex = contents.groupIds.indexOf(id)
-              if (groupIndex !== -1) {
-                const ingred = contents.ingreds[id]
-                if (ingred?.volume != null) {
-                  acc[contents.wellName ?? 'A1'] = ingred.volume
-                }
-              }
-              return acc
-            },
-            {}
-          )
-        : {}
-
-    volumesPerLiquid[id] = volumeByWell
-  })
-  return volumesPerLiquid
 }
