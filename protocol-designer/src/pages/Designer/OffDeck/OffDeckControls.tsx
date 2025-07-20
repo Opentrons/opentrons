@@ -89,6 +89,8 @@ export function OffDeckControls(
         innerDivProps={{
           opacity: hoverOpacity,
           ...DECK_CONTROLS_STYLE,
+        }}
+        innerDivEvents={{
           onMouseEnter: () => {
             setHover(labwareId)
           },

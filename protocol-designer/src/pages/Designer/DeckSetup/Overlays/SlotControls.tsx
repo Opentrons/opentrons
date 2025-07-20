@@ -168,6 +168,8 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       innerDivProps={{
         opacity: hoverOpacity,
         ...DECK_CONTROLS_STYLE,
+      }}
+      innerDivEvents={{
         onMouseEnter: () => {
           setHover(itemId)
         },

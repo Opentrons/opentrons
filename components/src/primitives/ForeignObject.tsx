@@ -10,7 +10,6 @@ export interface ForeignObjectProps {
 
 /**
  * Foreign Object styled atomic component
- *
  * @component
  */
 

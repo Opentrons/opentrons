@@ -402,6 +402,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               innerDivProps={{
                 cursor: 'pointer',
                 transform: 'rotate(180deg) scaleX(-1)',
+              }}
+              innerDivEvents={{
                 onClick: () => {
                   setSelectedSlot(slot)
                 },
@@ -519,6 +521,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               innerDivProps={{
                 cursor: 'pointer',
                 transform: 'rotate(180deg) scaleX(-1)',
+              }}
+              innerDivEvents={{
                 onClick: () => {
                   setSelectedSlot(slotForOnTheDeck)
                 },

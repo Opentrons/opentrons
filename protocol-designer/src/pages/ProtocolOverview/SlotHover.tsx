@@ -96,6 +96,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
         foreignObjectProps={{
           opacity: hoverOpacity,
           flex: '1',
+        }}
+        foreignObjectEvents={{
           onMouseEnter: () => {
             setHover(slotId)
           },
@@ -124,6 +126,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
         foreignObjectProps={{
           opacity: hoverOpacity,
           flex: '1',
+        }}
+        foreignObjectEvents={{
           onMouseEnter: () => {
             setHover(slotId)
           },

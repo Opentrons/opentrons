@@ -82,8 +82,7 @@ export const HeaterShakerIsRunningModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         name="alert-circle"
-        marginLeft={SPACING.spacing8}
-        marginRight={SPACING.spacing8}
+        marginX={SPACING.spacing8}
         size={SPACING.spacing20}
         color={COLORS.yellow50}
         data-testid="HeaterShakerIsRunning_warning_icon"

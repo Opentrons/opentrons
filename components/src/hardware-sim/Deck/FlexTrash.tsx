@@ -104,6 +104,8 @@ export const FlexTrash = ({
         y={y + yAdjustment}
         flexProps={{
           flex: '1',
+        }}
+        flexEvents={{
           onClick: onClick,
           onMouseEnter: onMouseEnter,
           onMouseLeave: onMouseLeave,

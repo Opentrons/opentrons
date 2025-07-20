@@ -194,6 +194,8 @@ export const LabwareControls = (
         cursor: CURSOR_GRAB,
         backgroundColor:
           draggedLabware != null ? COLORS.white : `${COLORS.black90}cc`,
+      }}
+      innerDivEvents={{
         onMouseEnter: () => {
           setHover(itemId)
         },

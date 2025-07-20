@@ -114,8 +114,7 @@ export function HistoricalProtocolRun(
                 name="circle"
                 color={COLORS.blue50}
                 size={SPACING.spacing4}
-                marginLeft={SPACING.spacing4}
-                marginRight={SPACING.spacing4}
+                marginX={SPACING.spacing4}
                 marginBottom={SPACING.spacing4}
               />
             ) : null}
