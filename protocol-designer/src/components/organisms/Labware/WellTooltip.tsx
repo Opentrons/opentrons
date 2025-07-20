@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 import { swatchColors } from '@opentrons/step-generation'
 
+import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   formatPercentage,
