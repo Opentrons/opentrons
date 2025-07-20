@@ -521,7 +521,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
-            await self.verify_hopper_labware_presence(Direction.RETRACT, True)
+            await self.verify_hopper_labware_presence(Direction.EXTEND, True)
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
