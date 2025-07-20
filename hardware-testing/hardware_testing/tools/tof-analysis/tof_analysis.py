@@ -577,12 +577,13 @@ def validate_baseline(args: argparse.Namespace) -> None:
                     yaxis_title="Photon Count",
                     template="plotly_white",
                 )
-                figures[axis].show()
+                if not args.disable_validation_plot:
+                    figures[axis].show()
 
     print("\n---------------- RESULT -------------- \n")
-    print(f"SAMPLES DETECTED\n")
-    for stacker, foo in detected_labware.items():
-        for sample in foo:
+    print(f"ZONES DETECTED\n")
+    for stacker, samples in detected_labware.items():
+        for sample in samples:
             axis = sample["axis"]
             platform = sample["platform"]
             zone = sample["zone"]
@@ -594,12 +595,25 @@ def validate_baseline(args: argparse.Namespace) -> None:
             print(
                 f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
             )
-
-    print(f"\nSAMPLES NOT DETECTED\n")
-    for stacker, foo in undetected_labware.items():
-        for sample in foo:
+    
+    print(f"\nZONES NOT DETECTED\n")
+    for stacker, samples in undetected_labware.items():
+        for sample in samples:
             lw, axis, dir, zn = sample
             print(f"{stacker} NOT DETECT {lw} {axis} {dir} zn={zn}")
+
+    # Check if any stackers failed to detect ANY labware
+    print("\n\n")
+    all_detected = True
+    for stacker in undetected_labware:
+        if stacker not in detected_labware:
+            print(f"WARNING NO DETECTION ACROSS ZONES {stacker}")
+            all_detected = False
+
+    if all_detected:
+        print("\nSUCCESS: ALL SAMPLES DETECTED!\n")
+    else:
+        print("\nFAULED: SOME SAMPLES NOT DETECTED!\n")
 
 
 def main(args: argparse.Namespace) -> None:
@@ -741,6 +755,12 @@ if __name__ == "__main__":
         help="Optional graph tag to add to the name",
         type=str,
         default="",
+    )
+    parser.add_argument(
+        "--disable-validation-plot",
+        help="Disables grapping the validation plots.",
+        action="store_true",
+        default=False,
     )
 
     args = parser.parse_args()
