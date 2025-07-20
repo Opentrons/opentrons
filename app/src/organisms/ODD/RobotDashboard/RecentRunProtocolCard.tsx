@@ -203,12 +203,14 @@ export function ProtocolWithLastRun({
       onClick={handleCardClick}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Chip
-          paddingLeft="0"
-          type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
-          background={false}
-          text={i18n.format(chipText, 'capitalize')}
-        />
+        {/* ToDo (kk: 07/20/2025): this should be fixed during CSS Modules migration */}
+        <span style={{ paddingLeft: '0' }}>
+          <Chip
+            type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
+            background={false}
+            text={i18n.format(chipText, 'capitalize')}
+          />
+        </span>
         {showSpinner && (
           <Icon
             name="ot-spinner"
