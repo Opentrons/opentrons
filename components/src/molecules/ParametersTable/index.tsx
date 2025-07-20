@@ -12,7 +12,7 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { TYPOGRAPHY } from '../../helix-design-system/product'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
-import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
+import { DISPLAY_INLINE } from '../../styles'
 import { LegacyTooltip, useHoverTooltip } from '../../tooltips'
 import {
   TYPOGRAPHY as LEGACY_TYPOGERAPHY,
