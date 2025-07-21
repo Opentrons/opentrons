@@ -383,17 +383,9 @@ def generate_baseline(args: argparse.Namespace) -> None:
     measurements, sample_count = read_filtered_data(args.dataframe, config)
     aggregate_zones = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     baselines = defaultdict(dict)  # type: ignore
-    for axis, platform_data in measurements.items():
+    for axis, platform_data in histograms.items():
         zone_count = zone_count_x if axis == "x" else zone_count_z
-        for platform, sample_data in platform_data.items():
-            for _, sample in sample_data.items():
-                for zone, bins in list(sample.values())[0].items():
-                    aggregate_zones[axis][platform][zone].append(bins)
-
-            # Generate baseline
-            zone_data = dict(aggregate_zones[axis][platform])
-            # Remove added keys
-            zone_data.pop("lw")
+        for platform, zone_data in platform_data.items():
             deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
             baselines[axis][platform] = baseline
@@ -755,12 +747,6 @@ if __name__ == "__main__":
         help="Optional graph tag to add to the name",
         type=str,
         default="",
-    )
-    parser.add_argument(
-        "--disable-validation-plot",
-        help="Disables grapping the validation plots.",
-        action="store_true",
-        default=False,
     )
 
     args = parser.parse_args()
