@@ -12,10 +12,7 @@ export function StackerEnsureShuttleEmpty(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const { routeUpdateActions } = props
-  const {
-    proceedNextStep,
-    goBackPrevStep,
-  } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
   return (

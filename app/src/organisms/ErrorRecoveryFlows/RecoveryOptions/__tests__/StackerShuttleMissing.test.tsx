@@ -11,12 +11,12 @@ import {
   ReleaseLabware,
   RetryStepInfo,
   StackerEmptyHopper,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerLoadShuttle,
   StackerReengageLatch,
   StackerShuttleLwInfo,
-  StackerEnsureShuttleEmpty,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerShuttleMissing } from '../StackerShuttleMissing'

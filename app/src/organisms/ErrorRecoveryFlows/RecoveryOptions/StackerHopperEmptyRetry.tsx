@@ -1,8 +1,8 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
-  StackerHopperLwInfo,
   StackerEnsureShuttleEmpty,
+  StackerHopperLwInfo,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 

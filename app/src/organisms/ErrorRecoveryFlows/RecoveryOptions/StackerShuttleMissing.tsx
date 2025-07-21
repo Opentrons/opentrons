@@ -1,10 +1,10 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerLoadShuttle,
-  StackerEnsureShuttleEmpty,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 

@@ -42,7 +42,8 @@ describe('StackerEnsureShuttleEmpty', () => {
       },
       recoveryMap: {
         route: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
-        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
+        step:
+          RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
       },
     } as any
   })
@@ -67,7 +68,8 @@ describe('StackerEnsureShuttleEmpty', () => {
     render(props)
 
     screen.getByText('Ensure stacker labware shuttle is empty')
-    screen.getByText('Empty the labware shuttle so that the stacker is able to retry the retrieve command.')
+    screen.getByText(
+      'Empty the labware shuttle so that the stacker is able to retry the retrieve command.'
+    )
   })
-
 })

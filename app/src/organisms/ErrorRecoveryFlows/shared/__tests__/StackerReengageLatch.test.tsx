@@ -32,7 +32,6 @@ describe('Render StackerReengageLatch', () => {
       } as any,
       recoveryCommands: {
         closeLabwareLatch: mockCloseLabwareLatch,
-
       } as any,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,

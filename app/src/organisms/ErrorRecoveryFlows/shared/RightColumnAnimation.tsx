@@ -1,9 +1,6 @@
 import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  RESPONSIVENESS,
-} from '@opentrons/components'
+import { AnimationVideo, RESPONSIVENESS } from '@opentrons/components'
 
 import type { JSX } from 'react'
 
