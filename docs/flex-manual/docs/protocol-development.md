@@ -163,7 +163,7 @@ Click **Liquids** in the upper right to add liquids in your protocol. Then, clic
 
 The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
 
-[//]: # (formatting suggestions appreciated here! don't want to add another header level, but the numerous bullet lists aren't great (and look a lot better in Google docs than they do here.))
+[//]: # (formatting suggestions appreciated here! ideally I could have >1 paragraph aligned with the bullet point)
 
 **Transfer steps** move liquid from one well or group of wells to another. In the first transfer step menu, specify the basics: source and destination, pipette path, and tip management settings. Next, choose whether to apply liquid class settings in the transfer step. 
 
@@ -184,162 +184,35 @@ You need to manually move labware off-deck. During a manual move step, the proto
 
 **Module steps** let you control Flex modules during a protocol. Protocol Designer includes different customizable options for each module. 
 
-* **Absorbance Plate Reader**: Protocol Designer lets you create multiple steps to initialize the plate reader, read samples in a plate, or move the lid on and off the module. An option to **Read labware** is only available when a plate is inside the plate reader. After reading a plate, you can find a CSV file with absorbance measurement data in the Flex's recent protocol runs in the Opentrons App. 
+  * **Absorbance Plate Reader**: Protocol Designer lets you create multiple steps to initialize the plate reader, read samples in a plate, or move the lid on and off the module. An option to **Read labware** is only available when a plate is inside the plate reader. After reading a plate, you can find a CSV file with absorbance measurement data in the Flex's recent protocol runs in the Opentrons App. 
 
-[//]: # (insert below as a note)
-You'll need a Flex Gripper to add an Absorbance Plate Reader Module to your protocol starting deck. To prevent damage, only a Flex Gripper can move the lid on and off the Plate Reader. 
+  !!! note
+     You'll need a Flex Gripper to add an Absorbance Plate Reader Module to your protocol starting deck. To prevent damage, only a Flex Gripper can move the lid on and off the Plate Reader.  
 
-[//]: # (work on some formatting for this section. ideally I could have >1 paragraph aligned with the bullet point)
+  * **Heater-Shaker**: Protocol Designer supports multiple Heater-Shaker adapters for use with deep well, flat bottom, or PCR plates. In the step menu, control the temperature, shake speed, and labware latch of the Heater-Shaker Module.
 
-* **Heater-Shaker**: Protocol Designer supports multiple Heater-Shaker adapters for use with deep well, flat bottom, or PCR plates. In the step menu, control the temperature, shake speed, and labware latch of the Heater-Shaker Module. You can set a custom time for your step, to begin after the Heater-Shaker reaches the target temperature or shake speed. Because reaching a target temperature takes more time than changing the shaking speed, your protocol can proceed while the Heater-Shaker reaches a target temperature.
+  You can set a custom time for your step, to begin after the Heater-Shaker reaches the target temperature or shake speed. Because reaching a target temperature takes more time than changing the shaking speed, your protocol can proceed while the Heater-Shaker reaches a target temperature.
 
+  * **Temperature**: Set a target temperature or deactivate the Temperature Module. 
 
+  * **Thermocycler**: Use the menu to add one of two mutually exclusive types of steps:
 
+  1. Change Thermocycler state: Set a block or lid temperature, or move the lid.
+  2. Program a Thermocycler profile: Add steps or a cycle to create a *profile*, a timed heating and cooling routine the Thermocycler will automatically repeat. Each step of the profile holds the block and labware inside at a certain temperature for a certain time. Profiles do not change the temperature of the lid. 
 
-#### Part 3: Lay out the deck
+  * **Pause**: Stop your protocol for a certain amount of time. Define your pause with one of three options, and tell the Flex how to resume your protocol: 
 
-Go to the Design tab to do the final setup step, which is placing
-labware and liquids on the deck. The main view on this tab is the deck
-map, which shows everything on the deck down to individual wells ---
-even on 384-well plates.
+  1. Pause until told to resume: Click **Resume** on the Flex touchscreen or in the Opentrons App to resume your protocol. 
+  2. Delay for an amount of time: Use the timer to automatically pause your protocol for a custom duration. 
+  3. Pause until temperature is reached: Automatically pause your protocol while a module reaches your chosen temperature. 
 
-The deck map starts with the tip racks and modules you chose for your
-protocol in their default locations. Hover over any open slot and click
-**Add Labware or Adapter** to add more tip racks, other types of
-labware, or adapters. Drag and drop labware to an open slot to move it
-there, or to an occupied slot to swap the two pieces of labware.
+  You can enter a message in Protocol Designer for your Flex touchscreen or Opentrons App to display for any pause step. 
 
 !!! note
-    You can'tmove modules or adapters around the deck map by drag and drop. This is to make it easier to move *labware* onto or off of a module.
+    You can add multiple Magnetic Blocks to the Flex deck. Because these modules are unpowered, you won't be able to add a specific module step in your Protocol Designer protocol. 
 
-- To change a module's position, return to the **File** tab and click
-  **Edit** next to the module name.
+    To use a Magnetic Block, add a move step to move labware to the Magnetic Block manually or using the Flex Gripper. Then, use a pause step to keep labware on the block for the needed amount of time. 
 
-- To change an adapter's position, add a new adapter. Then move the
-  labware from the old adapter to the new adapter. Finally, delete the
-  old adapter.
-
-Hover over any labware and click **Add Liquids** to specify which wells
-contain which liquid. Clicking on a single well or dragging across a
-range of wells will reveal a form at the top of the screen. Choose one
-of the liquids you defined and the volume *each* well should start with,
-in μL. For example, if you select the first column on a 96-well plate
-and specify 100 μL, that will be 800 μL of liquid total (100 μL × 8
-wells).
-
-#### Part 4: Add steps
-
-At last, it's time to tell your robot how to move liquid around the
-deck. Click **Add Step** and choose the type of step.
-
-- Pipetting steps
-
-  - **Transfer:** Move liquid from one well or group of wells to
-    another. Specify the source, where liquid will be aspirated from, on
-    the left. Specify the destination, where liquid will be dispensed,
-    on the right. Click either gear icon to change behaviors such as
-    flow rate, tip height, knocking droplets off (touch tip), air
-    gapping, blowout, and more. In the Sterility & Motion section,
-    choose the correct tip-use strategy for your application.
-
-  - **Mix:** Repeatedly aspirate and dispense liquid within the same
-    well. Choose how much liquid to mix with, the number of mixing
-    repetitions, and which wells will be mixed. Like with transfer
-    steps, click either gear to change mixing behavior. You can also
-    choose a tip-use strategy for mixing. These options are more limited
-    than for transfers, since all liquid returns to its starting
-    location when mixing.
-
-- Gripper steps
-
-  - **Move Labware:** Control the Flex Gripper or move labware around
-    the deck manually. Choose which labware you want to move and its new
-    location. Check the **Use Gripper** box to have the gripper move the
-    labware automatically, or leave it unchecked to have the protocol
-    pause so you can move the labware manually. You need to use the
-    gripper to dispose labware by moving it into the waste chute. You
-    need to move labware manually to move it off the deck (without
-    disposing it).
-
-- Module steps
-
-  - **Heater-Shaker:** Control the temperature, shake speed, and labware
-    latch of the Heater-Shaker Module. You can set an optional timer
-    that will pause the protocol for a set period of time *after* the
-    other actions are completed (heating to high temperatures or waiting
-    for the module to passively cool to a temperature can take a long
-    time).
-
-  - **Temperature:** Set a target temperature or deactivate the
-    Temperature Module.
-
-  - **Thermocycler:** This action has two mutually exclusive sets of
-    options.
-
-    - Change Thermocycler state: Set a block temperature, set a lid
-      temperature, or move the lid.
-
-    - Program a Thermocycler profile: Define a *profile*, a timed
-      heating and cooling routine that can be automatically repeated.
-      Each step of the profile holds the block at a certain temperature
-      for a certain time. Profiles do not change the temperature of the
-      lid.
-
-- **Pause:** Prevent the protocol from continuing until one of three
-  criteria is met. Pauses can require user intervention (pressing a
-  button on the touchscreen or in the app), wait for a fixed time, or
-  wait until a module reaches a target temperature. Timed pauses are
-  useful for incubation or letting the Magnetic Block work.
-
-#### Part 5: Edit steps
-
-Once you've created a step, preview its effects by hovering over it in
-the Protocol Timeline. Affected tips and wells will be highlighted, as
-will the entire labware containing those wells.
-
-Show or hide the details of a step by clicking the disclosure triangle
-to the right of its name. For liquid handling steps, this will show
-every discrete aspirate and dispense pair comprising the step. For
-module steps, this will show the features of the module that the step
-controls.
-
-Click on the name of a step in the Protocol Timeline to edit it.
-Shift-click to select a range of steps and enter batch editing mode. If
-you select only transfer or mix steps, you can change their behavior as
-a batch. Reorder steps by dragging and dropping them up or down in the
-Protocol Timeline.
-
-When editing any step, click **Notes** to change the step name or add a
-description of what the step does. Custom step names replace their
-default action descriptions (like "Transfer" and "Temperature") in the
-Protocol Timeline, making it easier to navigate around your protocol.
-
-#### Part 6: Export your protocol
-
-When your protocol is complete, click **Final Deck State** to preview
-how the deck should appear at the end of your protocol. In this view (or
-when viewing a particular step), you can click on labware and examine
-the expected quantity of liquid in each well.
-
-To save your work, return to the File tab and click **Export** to
-download your protocol as a JSON file. The file will have the name you
-chose in the Protocol Name field and will have a .json extension. You
-can find exported protocols in the default download location of your web
-browser.
-
-To run your protocol, import it into the Opentrons App. (See the for
-details on installing and using the Opentrons App.) Then either run it
-from the app or send it to your Flex to run from the touchscreen.
-
-### Modifying existing protocols
-
-Click **Import** in the File tab to load an existing protocol. Choose
-any JSON protocol file from the standard system file picker. Once
-loaded, you can edit any aspect of the protocol, including its name,
-description, hardware configuration, and steps.
-
-!!! warning
-    Importing a protocol will replace any other protocol that you've been working on in Protocol Designer. Be sure to export your work before importing another file, or open Protocol Designer in a second browser tab to work on multiple files at once.
 
 ## Python Protocol API
 
