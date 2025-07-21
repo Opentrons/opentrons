@@ -4547,7 +4547,6 @@ def test_find_well_height_and_volume(
             )
             == sentinel.arbitrary_return_val
         )
-    decoy.reset()
 
 
 @pytest.mark.parametrize(
