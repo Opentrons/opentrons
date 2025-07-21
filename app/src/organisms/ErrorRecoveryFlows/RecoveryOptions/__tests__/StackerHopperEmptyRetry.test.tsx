@@ -9,7 +9,7 @@ import { RECOVERY_MAP } from '../../constants'
 import {
   RetryStepInfo,
   StackerHopperLwInfo,
-  TwoColTextAndImage,
+  StackerEnsureShuttleEmpty,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerHopperEmptyRetry } from '../StackerHopperEmptyRetry'
@@ -42,7 +42,7 @@ describe('StackerHopperEmptyRetry', () => {
       <div>MOCK_STACKER_HOPPER_LW_INFO</div>
     )
     vi.mocked(RetryStepInfo).mockReturnValue(<div>MOCK_RETRY_STEP_INFO</div>)
-    vi.mocked(TwoColTextAndImage).mockReturnValue(
+    vi.mocked(StackerEnsureShuttleEmpty).mockReturnValue(
       <div>MOCK_TWO_COLUMN_AND_IMAGE</div>
     )
   })
