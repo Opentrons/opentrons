@@ -703,6 +703,7 @@ export function getAAComboFixtureDisplayName(
   const translationFileName = 'deck_configuration'
   switch (cutoutFixtureId) {
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+    case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
           ? t(`${translationFileName}:module_in_port`, {
