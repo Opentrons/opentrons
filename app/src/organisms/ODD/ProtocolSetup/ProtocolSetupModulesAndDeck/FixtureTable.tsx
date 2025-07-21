@@ -19,7 +19,6 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  SINGLE_SLOT_FIXTURES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -140,9 +139,6 @@ function FixtureTableItem({
     compatibleCutoutFixtureIds,
     fakeCutoutFixtureId
   )
-  const isRequiredSingleSlotMissing = compatibleCutoutFixtureIds.some(
-    fixtureId => SINGLE_SLOT_FIXTURES.includes(fixtureId)
-  )
 
   const isThermocyclerCurrentFixture =
     cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
@@ -224,7 +220,7 @@ function FixtureTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null &&
-            (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
+            (isCurrentFixtureCompatible)
               ? getFixtureDisplayName(fakeCutoutFixtureId ?? cutoutFixtureId)
               : getFixtureDisplayName(
                   fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
@@ -234,7 +230,7 @@ function FixtureTableItem({
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
           <DeckInfoLabel
             deckLabel={
-              isThermocyclerCurrentFixture && isRequiredSingleSlotMissing
+              isThermocyclerCurrentFixture
                 ? TC_MODULE_LOCATION_OT3
                 : getCutoutDisplayName(cutoutId)
             }

@@ -311,6 +311,7 @@ export function ModuleTableItem({
           requiredModule={module.moduleDef.model}
           requiredFixtureId={comboFixtureId}
           deckDef={deckDef}
+          moduleSerialNumber={module.attachedModuleMatch?.serialNumber}
           isOnDevice={true}
           robotName={robotName}
         />

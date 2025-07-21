@@ -22,7 +22,6 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
@@ -92,9 +91,6 @@ export function FixtureListItem({
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
     fakeCutoutFixtureId
-  )
-  const isRequiredSingleSlotMissing = compatibleCutoutFixtureIds.some(
-    fixtureId => SINGLE_SLOT_FIXTURES.includes(fixtureId)
   )
 
   const hasConflict = isConflictingFixtureConfigured(
@@ -186,7 +182,7 @@ export function FixtureListItem({
                 width="60px"
                 height="54px"
                 src={
-                  isCurrentFixtureCompatible || isRequiredSingleSlotMissing
+                  isCurrentFixtureCompatible
                     ? getFixtureImage(fakeCutoutFixtureId ?? cutoutFixtureId)
                     : getFixtureImage(
                         fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
@@ -202,7 +198,7 @@ export function FixtureListItem({
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {isCurrentFixtureCompatible || isRequiredSingleSlotMissing
+                {isCurrentFixtureCompatible
                   ? getFixtureDisplayName(
                       fakeCutoutFixtureId ?? cutoutFixtureId
                     )
