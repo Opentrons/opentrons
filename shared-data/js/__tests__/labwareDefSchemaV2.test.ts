@@ -293,7 +293,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       const innerGeometryObject =
         labwareDef.innerLabwareGeometry?.[wellGeometryId]
       if (innerGeometryObject === undefined) return
-      if (!(isUserDefinedVolumes(innerGeometryObject))) return 
+      if (!isUserDefinedVolumes(innerGeometryObject)) return
       const pairingList = innerGeometryObject.heightToVolumeMap
       const firstEntry = pairingList[0]
       expect(firstEntry.height).toStrictEqual(wellDepth)
@@ -353,7 +353,8 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
 
-      const innerGeometryObject = labwareDef.innerLabwareGeometry?.[wellGeometryId]
+      const innerGeometryObject =
+        labwareDef.innerLabwareGeometry?.[wellGeometryId]
       if (innerGeometryObject === undefined) return
       if (!isInnerWellGeometry(innerGeometryObject)) return
       const topFrustumHeight = innerGeometryObject.sections[0].topHeight
