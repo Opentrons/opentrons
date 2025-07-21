@@ -409,6 +409,7 @@ jobs:
 
       - name: 'print upload folders contents'
         run: |
+          echo "Test Outputs"
           echo "Contents of to_upload_internal-release: $(ls -l ./to_upload_internal-release)"
           echo "Contents of to_upload_release: $(ls -l ./to_upload_release)"
       - name: 'update internal-releases releases.json'
