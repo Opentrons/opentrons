@@ -92,6 +92,9 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
               .airGapByVolume as Array<[number, number]>) ?? []
     }
   }
+
+  const isOT2 = robotType === OT2_ROBOT_TYPE
+
   // if form type is 'mix', we will use single path
   const referenceVolumesForByVolumeInterpolation =
     pipette != null && tiprackDef != null && formData != null
@@ -105,16 +108,14 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDef,
           // multi-dispense is valid on OT-2, even though liquid class values are null
-          conditioningByVolume:
-            robotType === OT2_ROBOT_TYPE
-              ? []
-              : (liquidClassValuesForTip?.multiDispense
-                  ?.conditioningByVolume as Array<[number, number]>) ?? null,
-          disposalByVolume:
-            robotType === OT2_ROBOT_TYPE
-              ? []
-              : (liquidClassValuesForTip?.multiDispense
-                  ?.disposalByVolume as Array<[number, number]>) ?? null,
+          conditioningByVolume: isOT2
+            ? []
+            : (liquidClassValuesForTip?.multiDispense
+                ?.conditioningByVolume as Array<[number, number]>) ?? null,
+          disposalByVolume: isOT2
+            ? []
+            : (liquidClassValuesForTip?.multiDispense
+                ?.disposalByVolume as Array<[number, number]>) ?? null,
           aspirateAirGapByVolume: airGapByVolume,
         }).referenceVolumes
       : null
