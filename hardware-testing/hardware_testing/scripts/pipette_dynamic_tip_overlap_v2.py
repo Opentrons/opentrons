@@ -54,7 +54,7 @@ def file_setup(test_data, details):
     data.append_data_to_file(test_name, test_id, test_file, test_header)
     print("FILE PATH = ", test_path)
     print("FILE NAME = ", test_file)
-    return test_name, test_file
+    return test_name, test_file, test_id
 
 def dial_indicator_setup(port):
     gauge = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=port)
@@ -200,15 +200,21 @@ async def move_to_point(api, mount, point, cp):
     await api.move_to(mount,
                     Point(pos[Axis.X],
                         pos[Axis.Y],
-                        home_pos-home_offset))
+                        home_pos-home_offset),
+                    speed=None,
+                    expect_stalls=False)
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
-                        home_pos-home_offset))
+                        home_pos-home_offset),
+                    speed=None,
+                    expect_stalls=False)
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
-                        point.z))
+                        point.z),
+                    speed=None,
+                    expect_stalls=False)
     
 async def move_direct(api, mount, point, cp):
     offset = 5
@@ -217,17 +223,24 @@ async def move_direct(api, mount, point, cp):
     await api.move_to(mount,
                     Point(pos[Axis.X],
                         pos[Axis.Y],
-                        pos[Axis.by_mount(mount)] + offset))
+                        pos[Axis.by_mount(mount)] + offset),
+                    speed=None,
+                    expect_stalls=False)
     # input("Press Enter to continue 1")
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
-                        pos[Axis.by_mount(mount)] + offset))
+                        pos[Axis.by_mount(mount)] + offset),
+                    speed=None,
+                    expect_stalls=False)
     # input("Press Enter to Continue 2")
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
-                        point.z))
+                        point.z),
+                    speed=None,
+                    expect_stalls=False
+                    )
 
 def load_config_(filename: str) -> Dict:
     """This function loads a given config file"""
@@ -313,19 +326,19 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 'Initial Press Dist(mm)': None,
                 'Final Press Dist(mm)': None,
                 'TipOverlap Enc(mm)': None,
-                'Default EndEffector(mm)': None,
-                'New EndEffector(mm)': None,
-                'Tip Dial Pos(mm)': None,
+                'PressComp(mm)': None,
+                'tip_enc_pos(mm)': None,
+                'CurrentTipLength': None,
+                'NewTipLength': None,
                 'Nozzle Z Position': None,
                 'Nozzle Dial pos': None,
                 'Tip Dial Pos': None,
-                'Delta': None,
-                'Z Comp(mm)': None,
+                'TipDialPos(mm)': None,
                 }
     print(f'Dictionary: {dial_data}')
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
     details = [pipette_model, 'default-current']
-    test_n, test_f = file_setup(dial_data, details)
+    test_n, test_f, test_ID = file_setup(dial_data, details)
     try:
         await hw_api.home()
         await hw_api.set_lights(rails=True)
@@ -337,7 +350,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             initial_dial_loc = Point(
                                 deck_slot['deck_slot'][args.dial_slot]['X'],
                                 deck_slot['deck_slot'][args.dial_slot]['Y'],
-                                home_wo_tip[Axis.by_mount(mount)]
+                                deck_slot['deck_slot'][args.dial_slot]['Z']
             )
             print("Move Nozzle to Dial Indicator")
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
@@ -359,8 +372,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 cp = CriticalPoint.NOZZLE
                 nozzle_count += 1
                 await move_to_point(hw_api, mount, nozzle_loc, cp)
-                await asyncio.sleep(1)
+                time.sleep(0.5)
                 nozzle_measurement = gauge.read()
+                time.sleep(0.5)
                 # measurement_map.update({nozzle_count: nozzle_measurement})
                 print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
                 print("\r", end="")
@@ -390,14 +404,13 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             
             await move_direct(hw_api, mount, prep_target, cp)
             
-            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        hw_api,
-                        Axis.by_mount(mount),
-                        run_current=spec.tip_action_moves[0].currents[Axis.by_mount(mount)],
-                    )
-            # Ignore the stall from the move command 
-            try:
-                
+            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #             hw_api,
+            #             Axis.by_mount(mount),
+            #             run_current=spec.tip_action_moves[0].currents[Axis.by_mount(mount)],
+            #         )
+            # async with hw_api._backend.motor_current(run_currents=spec.tip_action_moves[0].currents):
+            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.15}):
                 target = Point(x=pickup_loc.x-RADIUS, 
                                 y=pickup_loc.y, 
                                 z=pickup_loc.z-PRESS_DISTANCE)
@@ -407,25 +420,29 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                     critical_point=CriticalPoint.NOZZLE,
                                     max_speeds=None,
                                     expect_stalls=True)
-            except Exception as e:
-                pass
             tip_overlap_measurements = []
-            init_tipoverlap = await hw_api.encoder_current_position_ot3(mount, cp, refresh=True)
-            init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
+            await hw_api._update_position_estimation([Axis.by_mount(mount)])
+            init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
+            # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
             print(f'init_tipoverlap: {init_tipoverlap}')
-
-            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        hw_api, 
-                        Axis.by_mount(mount), 
-                        run_current=default_current
-                        )
-            await hw_api.home_z(mount)
             pick_up_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
+            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #             hw_api,
+            #             Axis.by_mount(mount),
+            #             run_current=default_current,
+            #         )
             # Let's pressed onto the tip -> stall and measure the encoder position
-            await move_to_point(hw_api, mount, pick_up_location, cp)
+            await move_direct(hw_api, mount, pick_up_location, cp)
             # This would be my initial press position
+            # the first tip overlap value passed to pickup tip is a placeholder
+            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #             hw_api,
+            #             Axis.by_mount(mount),
+            #             run_current=spec.tip_action_moves[0].currents[Axis.by_mount(mount)],
+            #         )
             tip_overlap_dict = await hw_api.pick_up_tip(
-                mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
+                                        mount, 
+                                        tip_length=(tip_length[args.tip_size]-tip_overlap))
             print(f'Init Position: {init_tipoverlap}')
             print(f'tip_overlap_dict: {tip_overlap_dict}')
             enc_tipoverlap =  (tip_overlap_dict['init'] - tip_overlap_dict['final'])+args.press_comp
@@ -468,7 +485,6 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
         num_of_columns = args.num_cols
         print(f'Trial: {trial}')
         while True:
-            
             encoder_pos = []
             cp = CriticalPoint.TIP
             if args.dial_indicator:
@@ -483,10 +499,11 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                             dial_loc[1] + y_offset,
                                             dial_loc[2])
                     await move_to_point(hw_api, mount, tip_position, cp)
-                    await asyncio.sleep(1)
                     tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                     encoder_pos.append(tip_dist[Axis.by_mount(mount)])
+                    time.sleep(0.5)
                     tip_measurement = gauge.read()
+                    time.sleep(0.5)
                     print("tip-",tip_count, "(mm): " ,tip_measurement,"\r", end="")
                     measurements.append(tip_measurement)
                     print("\r\n")
@@ -502,24 +519,23 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             drop_tip_location =  Point(30 , 60 , 104.5)
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
-            # measurement_map.append(true_tip_count)
-            # measurement_map.append(initial_press_dist[Axis.by_mount(mount)])
-            # measurement_map.append(press_dist[Axis.by_mount(mount)])
-            # measurement_map.append(tip_dist[Axis.by_mount(mount)])
-            # measurement_map.append(args.press_comp)
-            # measurement_map.append(enc_tipoverlap)
-            # measurement_map.append(current_tipL)
-            # measurement_map.append(new_tipL)
-            # measurement_map.append(nozzle_loc[Axis.by_mount(mount)])
-            # measurement_map.append(nozzle_measurement)
-            # measurement_map.append(tip_measurement)
-            # d_str = ''
-            # for m in measurement_map:
-            #     d_str += str(m) + ','
-            # d_str = d_str[:-1] + '\n'
-            # print(f"{d_str}")
-            # data.append_data_to_file(test_n, test_f, d_str)
-            # input("Press Enter to Continue")
+            measurement_map.append(true_tip_count)
+            measurement_map.append(init_tipoverlap)
+            measurement_map.append(tip_overlap_dict['final'])
+            measurement_map.append(enc_tipoverlap)
+            measurement_map.append(args.press_comp)
+            measurement_map.append(tip_dist[Axis.by_mount(mount)])
+            measurement_map.append(current_tipL)
+            measurement_map.append(new_tipL)
+            measurement_map.append(nozzle_loc.z)
+            measurement_map.append(nozzle_measurement)
+            measurement_map.append(tip_measurement)
+            d_str = ''
+            for m in measurement_map:
+                d_str += str(m) + ','
+            d_str = d_str[:-1] + '\n'
+            print(f"{d_str}")
+            data.append_data_to_file(test_n, test_ID, test_f, d_str)
             await hw_api.drop_tip(mount)
             tips_to_use = args.nozzles
             # tips_to_use = num_of_columns * 8
@@ -537,19 +553,19 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             print(f'pick up location: {pickup_location}')
             await move_to_point(hw_api, mount, pickup_location, cp)
             #-----------Get the top of the tip by pressing on it with low current--------------
-            prep_target = Point(x=pickup_location.x+RADIUS,
+            prep_target = Point(x=pickup_location.x-RADIUS,
                                 y=pickup_location.y,
                                 z=pickup_location.z+PREP_PRESS_DISTANCE)
 
             await move_direct(hw_api, mount, prep_target, cp)
 
-            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                                                hw_api,
-                                                Axis.by_mount(mount),
-                                                run_current=0.15,
-                                                    )       
-            try:
-                target = Point(x=pickup_location.x+RADIUS, 
+            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #                                     hw_api,
+            #                                     Axis.by_mount(mount),
+            #                                     run_current=spec.tip_action_moves[0].currents[Axis.by_mount(mount)],
+            #                                         )
+            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.15}):       
+                target = Point(x=pickup_location.x-RADIUS, 
                                 y=pickup_location.y, 
                                 z=pickup_location.z-PRESS_DISTANCE)
                 await hw_api.move_to(mount=mount, 
@@ -558,22 +574,14 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                     critical_point=CriticalPoint.NOZZLE,
                                     max_speeds=None,
                                     expect_stalls=True)
-                # await hw_api._update_position_estimation([Axis.by_mount(mount)])
-            except Exception as e:
-                pass
-            init_tipoverlap = await hw_api.encoder_current_position_ot3(mount, cp, refresh=True)
-            init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
+            await hw_api._update_position_estimation([Axis.by_mount(mount)])
+            init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
+            # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
             print(f'init_tipoverlap: {init_tipoverlap}')
-            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        hw_api, 
-                        Axis.by_mount(mount), 
-                        run_current=default_current
-                        )
-            await hw_api.home_z(mount)
             #------------------------------------------------------------------------------------
             pick_up_location = Point(x=pickup_location.x, y=pickup_location.y,z=init_tipoverlap) 
-            # Let's pressed onto the tip -> stall and measure the encoder position
-            await move_to_point(hw_api, mount, pick_up_location, cp)
+
+            await move_direct(hw_api, mount, pick_up_location, cp)
             trial += 1
             print(f'Trial: {trial}')
             tip_overlap_dict = await hw_api.pick_up_tip(mount,
@@ -590,9 +598,15 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             instr.remove_tip()
             current_position = await hw_api.current_position_ot3(mount)
             instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
-            print(f'new_current_tipL: {instr.current_tip_length}')
+            new_tipL = instr.current_tip_length
+            print(f'new_current_tipL: {new_tipL}')
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
+            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            #             hw_api, 
+            #             Axis.by_mount(mount), 
+            #             run_current=default_current
+            #             )
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
@@ -628,7 +642,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_cols", type=float, default=1)
     parser.add_argument("--rows", action="store_true")
     parser.add_argument("--num_rows", type=float, default=1)
-    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
     parser.add_argument("--nozzles", type=int, default=1)
     parser.add_argument("--press_comp", type=float, default = 0.0)
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], default=1000)
