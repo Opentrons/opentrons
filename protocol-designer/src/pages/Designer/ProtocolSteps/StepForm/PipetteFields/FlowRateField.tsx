@@ -7,6 +7,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
+  OT2_ROBOT_TYPE,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
@@ -103,13 +104,17 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
               : 1,
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDef,
+          // multi-dispense is valid on OT-2, even though liquid class values are null
           conditioningByVolume:
-            (liquidClassValuesForTip?.multiDispense
-              ?.conditioningByVolume as Array<[number, number]>) ?? null,
+            robotType === OT2_ROBOT_TYPE
+              ? []
+              : (liquidClassValuesForTip?.multiDispense
+                  ?.conditioningByVolume as Array<[number, number]>) ?? null,
           disposalByVolume:
-            (liquidClassValuesForTip?.multiDispense?.disposalByVolume as Array<
-              [number, number]
-            >) ?? null,
+            robotType === OT2_ROBOT_TYPE
+              ? []
+              : (liquidClassValuesForTip?.multiDispense
+                  ?.disposalByVolume as Array<[number, number]>) ?? null,
           aspirateAirGapByVolume: airGapByVolume,
         }).referenceVolumes
       : null

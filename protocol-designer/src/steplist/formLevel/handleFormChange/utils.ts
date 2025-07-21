@@ -562,6 +562,46 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
           }
         : {}
     const allOT2Defaults = getDefaultsForStepType('moveLiquid')
+    const matchingTipLiquidSpecs =
+      pipetteEntity != null
+        ? getMatchingTipLiquidSpecs(
+            pipetteEntity,
+            volume,
+            rawForm.tipRack as string
+          )
+        : null
+    const { referenceVolumes } = getTransferPlanAndReferenceVolumes({
+      pipetteSpecs,
+      tiprackDefinition: null,
+      conditioningByVolume: [],
+      disposalByVolume: [],
+      volume,
+      path: rawForm.path as PathOption,
+      numDispenseWells: rawForm.dispense_wells.length,
+      aspirateAirGapByVolume: [],
+    })
+    const aspirateMaxUiFlowRate =
+      matchingTipLiquidSpecs != null
+        ? getMaxUiFlowRate({
+            targetVolume: referenceVolumes.flowRate.aspirate,
+            channels: pipetteSpecs.channels,
+            robotType,
+            flowRateType: 'aspirate',
+            tipLiquidSpecs: matchingTipLiquidSpecs,
+            shaftULperMM: pipetteSpecs.shaftULperMM,
+          })
+        : null
+    const dispenseMaxUiFlowRate =
+      matchingTipLiquidSpecs != null
+        ? getMaxUiFlowRate({
+            targetVolume: referenceVolumes.flowRate.dispense,
+            channels: pipetteSpecs.channels,
+            robotType,
+            flowRateType: 'dispense',
+            tipLiquidSpecs: matchingTipLiquidSpecs,
+            shaftULperMM: pipetteSpecs.shaftULperMM,
+          })
+        : null
     const aspirateOT2Defaults = {
       aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
       aspirate_wellOrder_second: allOT2Defaults.aspirate_wellOrder_second,
@@ -572,7 +612,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       aspirate_mix_times: allOT2Defaults.aspirate_mix_times,
       aspirate_delay_checkbox: allOT2Defaults.aspirate_delay_checkbox,
       aspirate_delay_seconds: allOT2Defaults.aspirate_delay_seconds,
-      aspirate_flowRate: allOT2Defaults.aspirate_flowRate,
+      aspirate_flowRate: aspirateMaxUiFlowRate,
       aspirate_mmFromBottom: allOT2Defaults.aspirate_mmFromBottom,
       aspirate_position_reference: allOT2Defaults.aspirate_position_reference,
       aspirate_touchTip_checkbox: allOT2Defaults.aspirate_touchTip_checkbox,
@@ -602,7 +642,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       dispense_mix_times: allOT2Defaults.dispense_mix_times,
       dispense_delay_checkbox: allOT2Defaults.dispense_delay_checkbox,
       dispense_delay_seconds: allOT2Defaults.dispense_delay_seconds,
-      dispense_flowRate: allOT2Defaults.dispense_flowRate,
+      dispense_flowRate: dispenseMaxUiFlowRate,
       dispense_mmFromBottom: allOT2Defaults.dispense_mmFromBottom,
       dispense_position_reference: allOT2Defaults.dispense_position_reference,
       dispense_touchTip_checkbox: allOT2Defaults.dispense_touchTip_checkbox,
