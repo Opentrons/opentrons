@@ -59,7 +59,6 @@ const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const mockSetSetupScreen = vi.fn()
 const mockSetCutoutId = vi.fn()
-const mockSetAddressableAreaId = vi.fn()
 const mockSetProvidedFixtureOptions = vi.fn()
 
 const calibratedMockApiHeaterShaker = {
@@ -86,7 +85,6 @@ const render = () => {
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
         setCutoutId={mockSetCutoutId}
-        setAddressableAreaId={mockSetAddressableAreaId}
         setProvidedFixtureOptions={mockSetProvidedFixtureOptions}
       />
     </MemoryRouter>,

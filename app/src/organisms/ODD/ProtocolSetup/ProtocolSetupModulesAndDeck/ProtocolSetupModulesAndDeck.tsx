@@ -23,6 +23,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import {
   useMostRecentCompletedAnalysis,
@@ -41,7 +42,6 @@ import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
-  AddressableAreaNamesWithFakes,
   CutoutFixtureId,
   CutoutId,
 } from '@opentrons/shared-data'
@@ -54,9 +54,6 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
-  setAddressableAreaId: (
-    addressableAreaId: AddressableAreaNamesWithFakes
-  ) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -67,7 +64,6 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setCutoutId,
-  setAddressableAreaId,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
@@ -88,7 +84,10 @@ export function ProtocolSetupModulesAndDeck({
     setClearModuleMismatchBanner,
   ] = useState<boolean>(false)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    FLEX_ROBOT_TYPE,
+    mostRecentAnalysis
+  )
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
@@ -193,13 +192,14 @@ export function ProtocolSetupModulesAndDeck({
                     attachedProtocolModuleMatches={
                       attachedProtocolModuleMatches
                     }
+                    deckConfigCompatibility={deckConfigCompatibility}
                     deckDef={deckDef}
                     runId={runId}
                   />
                 ) : null}
                 <FixtureTable
                   robotType={FLEX_ROBOT_TYPE}
-                  mostRecentAnalysis={mostRecentAnalysis}
+                  deckConfigCompatibility={deckConfigCompatibility}
                   setSetupScreen={setSetupScreen}
                   setCutoutId={setCutoutId}
                   setProvidedFixtureOptions={setProvidedFixtureOptions}

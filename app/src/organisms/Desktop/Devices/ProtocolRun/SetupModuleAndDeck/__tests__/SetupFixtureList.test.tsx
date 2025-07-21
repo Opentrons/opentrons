@@ -122,7 +122,7 @@ describe('SetupFixtureList', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
     screen.getByText('mock not configured modal')
   })
-  it('should render a magnetic block with a conflicted fixture', () => {
+  it('should split up magnetic block and staging area combo fixtures', () => {
     props = {
       deckConfigCompatibility: [
         {
@@ -137,9 +137,11 @@ describe('SetupFixtureList', () => {
       robotName: 'otie',
     }
     render(props)
-    screen.getByText('Location conflict')
-    screen.getByText('Magnetic Block GEN1 with staging area slot')
+    screen.getByText('Magnetic Block GEN1')
+    screen.getByText('Configured')
+    screen.getByText('Staging area slot')
+    screen.getByText('Not configured')
     fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
-    screen.getByText('mock location conflict modal')
+    screen.getByText('mock not configured modal')
   })
 })

@@ -21,6 +21,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
+import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
@@ -40,13 +41,13 @@ export const NotConfiguredModal = (
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const handleUpdateDeck = (): void => {
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
-        : fixture
+    const updatedDeckConfig = patchDeckConfigForRequiredFixture(
+      deckConfig,
+      cutoutId,
+      requiredFixtureId
     )
 
-    updateDeckConfiguration(newDeckConfig)
+    updateDeckConfiguration(updatedDeckConfig)
     onCloseClick()
   }
   const cutoutDisplayName = getCutoutDisplayName(cutoutId)

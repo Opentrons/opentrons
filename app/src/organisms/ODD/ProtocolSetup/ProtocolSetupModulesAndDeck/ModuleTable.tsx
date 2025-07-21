@@ -1,9 +1,11 @@
 import { useSelector } from 'react-redux'
 
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   MAGNETIC_BLOCK_TYPE,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { getLocalRobot } from '/app/redux/discovery'
@@ -16,18 +18,25 @@ import {
 import { ModuleTableItem } from './ModuleTableItem'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 interface ModuleTableProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
   deckDef: DeckDefinition
   runId: string
 }
 
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
-  const { attachedProtocolModuleMatches, deckDef, runId } = props
+  const {
+    attachedProtocolModuleMatches,
+    deckDef,
+    runId,
+    deckConfigCompatibility,
+  } = props
 
   const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
@@ -53,6 +62,41 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
             moduleFixtures,
             deckDef
           )
+          // special case for waste chute and stacker combination fixture item
+          if (
+            module.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
+            module.slotName === 'D3'
+          ) {
+            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
+              configItem => configItem.cutoutId === 'cutoutD3'
+            )
+            if (
+              deckConfigCompatabilityD3 != null &&
+              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              )
+            ) {
+              const comboFixtureId =
+                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+                deckConfigCompatabilityD3.cutoutFixtureId
+              )
+              return (
+                <ModuleTableItem
+                  key={module.moduleId}
+                  module={module}
+                  calibrationStatus={calibrationStatus}
+                  chainLiveCommands={chainLiveCommands}
+                  comboFixtureId={comboFixtureId}
+                  conflictedFixture={
+                    comboFixtureConflict ? deckConfigCompatabilityD3 : null
+                  }
+                  deckDef={deckDef}
+                  robotName={robotName}
+                />
+              )
+            }
+          }
           const conflictedFixture =
             deckConfig?.find(
               ({ cutoutId, cutoutFixtureId }) =>

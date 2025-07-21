@@ -21,11 +21,14 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   getCutoutDisplayName,
   getCutoutFixturesForModuleModel,
   getFixtureDisplayName,
   getFixtureIdByCutoutIdFromModuleSlotName,
   getModuleDisplayName,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
@@ -40,6 +43,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
+import { patchDeckConfigForRequiredFixture } from './patchDeckConfigForRequiredFixture'
 
 import type {
   CutoutConfig,
@@ -98,7 +102,7 @@ export const LocationConflictModal = (
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {
-      const slotName = cutoutId.replace('cutout', '')
+      const slotName = getCutoutDisplayName(cutoutId)
       const moduleFixtures = getCutoutFixturesForModuleModel(
         requiredModule,
         deckDef
@@ -125,6 +129,18 @@ export const LocationConflictModal = (
             return {
               ...existingCutoutConfig,
               cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          } else if (
+            existingCutoutConfig.cutoutFixtureId ===
+              MAGNETIC_BLOCK_V1_FIXTURE &&
+            replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
+          ) {
+            // if current fixture is a magnetic block and we are adding a flex stacker, don't remove
+            // the mag block
+            return {
+              ...existingCutoutConfig,
+              cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
               opentronsModuleSerialNumber: moduleSerialNumber,
             }
           } else {
@@ -168,32 +184,11 @@ export const LocationConflictModal = (
     } else if (requiredModule != null) {
       setShowModuleSelect(true)
     } else if (requiredFixtureId != null) {
-      const newRequiredFixtureDeckConfig = deckConfig.map(fixture => {
-        if (fixture.cutoutId === cutoutId) {
-          return {
-            ...fixture,
-            cutoutFixtureId: requiredFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
-        } else if (
-          isThermocyclerCurrentFixture &&
-          ((cutoutId === 'cutoutA1' && fixture.cutoutId === 'cutoutB1') ||
-            (cutoutId === 'cutoutB1' && fixture.cutoutId === 'cutoutA1'))
-        ) {
-          /**
-           * special-case for removing current thermocycler:
-           * set paired cutout (B1 for A1, A1 for B1) to single slot left fixture
-           * TODO(bh, 2024-08-29): generalize to remove all entities from FixtureGroup
-           */
-          return {
-            ...fixture,
-            cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
-            opentronsModuleSerialNumber: undefined,
-          }
-        } else {
-          return fixture
-        }
-      })
+      const newRequiredFixtureDeckConfig = patchDeckConfigForRequiredFixture(
+        deckConfig,
+        cutoutId,
+        requiredFixtureId
+      )
 
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
       onCloseClick()
