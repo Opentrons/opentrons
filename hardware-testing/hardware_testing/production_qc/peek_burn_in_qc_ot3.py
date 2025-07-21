@@ -10,6 +10,12 @@ from opentrons.config.defaults_ot3 import (
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateInitiate,
+    FirmwareUpdateStartApp,
+)
+from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -141,6 +147,16 @@ async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
         acceleration=DEFAULT_ACCELERATION,
     )
     await api.home([pipette_ax])
+
+
+async def _reset_pipette_fw(api: OT3API, mount: types.OT3Mount) -> None:
+    if not api.is_simulator:
+        turn_off = FirmwareUpdateInitiate()
+        turn_on = FirmwareUpdateStartApp()
+        pip_node = sensor_node_for_mount(mount)
+        await api._backend._messenger.ensure_send(pip_node, turn_off)
+        await api._backend._messenger.ensure_send(pip_node, turn_on)
+        await _home_plunger(api, mount)
 
 
 async def _move_plunger(
@@ -464,7 +480,9 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     continue_after_stall=continue_after_stall
                 )
 
-                await _move_plunger_as_cycle_settings(api,mount)
+                # this is the old fix, we can use it if the fw reset doesn't work
+                # await _move_plunger_as_cycle_settings(api, mount)
+                await _reset_pipette_fw(api, mount)
 
                 failed_cycles = await _cycle_plunger(
                     api, mount,
