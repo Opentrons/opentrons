@@ -11,6 +11,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  gap: 4px;
-  padding-inline: 8px;
+  gap: var(--spacing-4);
+  padding-inline: var(--spacing-8);
+}
+
+.waste_chute_fixture_container_highlight {
+  border: 3px solid var(--blue-50);
 }

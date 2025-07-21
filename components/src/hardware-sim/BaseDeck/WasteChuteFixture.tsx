@@ -1,3 +1,5 @@
+import clsx from 'clsx'
+
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -116,11 +118,12 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
           overlay
         ) : (
           <div
-            className={styles.waste_chute_fixture_container}
+            className={clsx(styles.waste_chute_fixture_container, {
+              [styles.waste_chute_fixture_container_highlight]: showHighlight,
+            })}
             style={{
               backgroundColor,
               color: wasteIconColor,
-              border: showHighlight ? `3px solid ${COLORS.blue50}` : 'none',
             }}
           >
             <Icon name="trash" color={wasteIconColor} height="2rem" />

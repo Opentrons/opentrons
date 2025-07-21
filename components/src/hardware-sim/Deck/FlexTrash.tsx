@@ -1,3 +1,6 @@
+import { CSSProperties } from 'react'
+import clsx from 'clsx'
+
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -116,11 +119,10 @@ export const FlexTrash = ({
         }}
       >
         <div
-          className={styles.trash_container}
-          style={{
-            backgroundColor,
-            border: showHighlight ? `3px solid ${COLORS.blue50}` : 'none',
-          }}
+          className={clsx(styles.trash_container, {
+            [styles.trash_container_highlight]: showHighlight,
+          })}
+          style={{ backgroundColor }}
         >
           {rotateDegrees === '180' ? (
             <div

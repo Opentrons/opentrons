@@ -41,8 +41,12 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  gap: 8px;
+  border-radius: var(--border-4);
+  gap: var(--spacing-8);
+}
+
+.trash_container_highlight {
+  border: 3px solid var(--blue-50);
 }
 
 .trash_container_rotate_copy {

@@ -371,8 +371,8 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  gap: 8px;
+  border-radius: var(--border-radius-4);
+  gap: var(--spacing-8);
 }
 
 .controls_overflow_menu {

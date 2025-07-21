@@ -1,18 +1,18 @@
 .heading_small_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 1.125rem/1.5rem 'Public Sans', sans-serif;
+    font: 700 1.125rem/1.5rem;
   }
 }
 
 .caption_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 700 0.8125rem/1rem 'Public Sans', sans-serif;
+    font: 700 0.8125rem/1rem;
   }
 }
 
 .body_default_semi_bold {
   @media not (height: 600px) and (width: 1024px) {
-    font: 600 0.875rem/1.25rem 'Public Sans', sans-serif;
+    font: 600 0.875rem/1.25rem;
   }
 }
 
