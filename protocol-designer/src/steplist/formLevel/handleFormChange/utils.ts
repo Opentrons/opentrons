@@ -317,7 +317,6 @@ const getDelayFields = (
   checkbox: boolean = true
 ): Record<string, any> => {
   const { enable, params } = delay
-  console.log(prefix, { enable, params })
   return {
     ...(checkbox ? { [`${prefix}_delay_checkbox`]: enable } : {}),
     [`${prefix}_delay_seconds`]: params?.duration ?? 0,
