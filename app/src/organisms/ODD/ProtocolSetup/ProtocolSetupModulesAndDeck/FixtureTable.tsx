@@ -219,8 +219,7 @@ function FixtureTableItem({
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {cutoutFixtureId != null &&
-            (isCurrentFixtureCompatible)
+            {cutoutFixtureId != null && isCurrentFixtureCompatible
               ? getFixtureDisplayName(fakeCutoutFixtureId ?? cutoutFixtureId)
               : getFixtureDisplayName(
                   fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
