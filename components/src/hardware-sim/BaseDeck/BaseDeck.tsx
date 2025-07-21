@@ -311,6 +311,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
                 targetDeckId={deckDef.otId}
                 targetSlotId={moduleLocation.slotName}
+                childrenPositioningMode="offsetToSlot"
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
@@ -372,6 +373,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   innerProps={innerProps}
                   targetDeckId={deckDef.otId}
                   targetSlotId={moduleLocation.slotName}
+                  childrenPositioningMode="offsetToSlot"
                 >
                   {nestedLabwareDef != null ? (
                     <g
