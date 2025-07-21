@@ -155,6 +155,9 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 .update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=e.tip_geometry,
+                    well_picked_up_from=update_types.Well(
+                        labware_id=labware_id, well_name=well_name
+                    ),
                 )
                 .set_fluid_empty(pipette_id=pipette_id, clean_tip=True)
                 .mark_tips_as_used(
@@ -190,6 +193,9 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 move_result.state_update.update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=tip_geometry,
+                    well_picked_up_from=update_types.Well(
+                        labware_id=labware_id, well_name=well_name
+                    ),
                 )
                 .mark_tips_as_used(
                     labware_id=labware_id, well_names=tips_to_mark_as_used

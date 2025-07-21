@@ -12,6 +12,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine.types import MotorAxis
 from ..resources import ModelUtils, ensure_ot3_hardware
 from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid
+from ..state.update_types import Well
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -310,6 +311,7 @@ class SealPipetteToTipImplementation(
         state_update = move_result.state_update.update_pipette_tip_state(
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
+            well_picked_up_from=Well(labware_id=labware_id, well_name=well_name),
         ).set_fluid_aspirated(
             pipette_id=pipette_id,
             fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=_SAFE_TOP_VOLUME),

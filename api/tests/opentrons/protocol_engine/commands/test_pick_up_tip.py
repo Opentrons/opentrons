@@ -112,6 +112,9 @@ async def test_success(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="pipette-id",
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
+                well_picked_up_from=update_types.Well(
+                    labware_id="labware-id", well_name="A3"
+                ),
             ),
             tips_used=update_types.TipsUsedUpdate(
                 labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
@@ -208,7 +211,11 @@ async def test_tip_physically_missing_error(
         ),
         state_update_if_false_positive=update_types.StateUpdate(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
-                pipette_id="pipette-id", tip_geometry=sentinel.tip_geometry
+                pipette_id="pipette-id",
+                tip_geometry=sentinel.tip_geometry,
+                well_picked_up_from=update_types.Well(
+                    labware_id="labware-id", well_name="well-name"
+                ),
             ),
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="pipette-id", clean_tip=True
