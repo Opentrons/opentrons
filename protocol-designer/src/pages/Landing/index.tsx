@@ -2,19 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   BasicButton,
   COLORS,
-  CURSOR_POINTER,
-  DIRECTION_COLUMN,
-  Flex,
   INFO_TOAST,
-  JUSTIFY_CENTER,
   LargeButton,
-  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -32,8 +25,9 @@ import {
   localStorageAnnouncementKey,
   setLocalStorageItem,
 } from '../../persist'
+import styles from './landing.module.css'
 
-import type { ChangeEvent, ComponentProps } from 'react'
+import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
@@ -80,7 +74,7 @@ export function Landing(): JSX.Element {
             setShowAnnouncementModal(true)
           },
           disableTimeout: true,
-          justifyContent: JUSTIFY_CENTER,
+          justifyContent: 'center',
         }
       )
     }
@@ -113,28 +107,15 @@ export function Landing(): JSX.Element {
           }}
         />
       ) : null}
-      <Flex
-        data-cy="landing-page"
-        backgroundColor={COLORS.grey10}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 9rem)"
-        width="100%"
-        gridGap={SPACING.spacing32}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <div data-cy="landing-page" className={styles.landing_page}>
+        <div className={styles.content_section}>
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.text_section}>
             <StyledText desktopStyle="headingLargeBold">
               {t('welcome')}
             </StyledText>
@@ -146,53 +127,34 @@ export function Landing(): JSX.Element {
             >
               {t('no-code-required')}
             </StyledText>
-          </Flex>
-        </Flex>
-        <StyledNavLink to="/createNew">
+          </div>
+        </div>
+        <NavLink to="/createNew" className={styles.nav_link}>
           <LargeButton
             onClick={() => {
               dispatch(toggleNewProtocolModal(true))
             }}
-            buttonText={<ButtonText>{t('create_a_protocol')}</ButtonText>}
+            buttonText={
+              <span className={styles.button_text}>
+                {t('create_a_protocol')}
+              </span>
+            }
           />
-        </StyledNavLink>
-        <StyledLabel>
+        </NavLink>
+        <label className={styles.label}>
           <BasicButton onClick={handleImportClick} underLine>
             {t('import_existing_protocol')}
           </BasicButton>
-          <StyledInput
+          <input
             type="file"
             onChange={loadFile}
             ref={fileInputRef}
             aria-label={t('import')}
+            className={styles.hiddenInput}
           />
-        </StyledLabel>
-      </Flex>
+        </label>
+      </div>
       <EndUserAgreementFooter />
     </>
   )
 }
-
-const StyledLabel = styled.label`
-  display: inline-block;
-  cursor: ${CURSOR_POINTER};
-  input[type='file'] {
-    display: none;
-  }
-`
-
-const ButtonText = styled.span`
-  line-height: ${TYPOGRAPHY.lineHeight24};
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-`
-
-const StyledNavLink = styled(NavLink)<ComponentProps<typeof NavLink>>`
-  color: ${COLORS.white};
-  text-decoration: none;
-`
-
-const StyledInput = styled.input`
-  display: none;
-`

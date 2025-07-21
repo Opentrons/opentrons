@@ -3,6 +3,8 @@ from opentrons import types
 from opentrons.protocol_api import COLUMN, ROW, ALL
 import math
 
+from opentrons.protocol_api.core.engine import protocol
+
 metadata = {'protocolName': 'Illumina RNA Prep 96x Dev v1.1-5/2/2025','author': 'Opentrons <protocols@opentrons.com>','source': 'Protocol Library',}
 requirements = {"robotType": "Flex","apiLevel": "2.25",}
 
@@ -2287,3 +2289,4 @@ def run(protocol: protocol_api.ProtocolContext):
     # =================================================================================================
     # ========================================== PROTOCOL END =========================================
     # =================================================================================================
+    protocol.comment("Done!!!")

@@ -83,10 +83,10 @@ def _parse_tuple(arg: str) -> Tuple[int, int]:
 
 def _get_value_from_index(deviations: List[int], axis: str, platform: str) -> int:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return deviations[index_map.get((axis, platform), 0)]
 
@@ -95,17 +95,20 @@ def _get_tuple_from_index(
     bins_list: List[Tuple[int, int]], axis: str, platform: str
 ) -> Tuple[int, int]:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return bins_list[index_map.get((axis, platform), 0)]
 
 
 def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
     """Convert a defaultdict to dict."""
-    return {k: convert_to_dict(v) for k, v in obj.items()}
+    return {
+        k: convert_to_dict(v) if isinstance(v, defaultdict) else v
+        for k, v in obj.items()
+    }
 
 
 def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
@@ -339,7 +342,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                     ],
                 ]
                 fig.update_layout(
-                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis}",
+                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis} {args.graph_name}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
                     template="plotly_white",
@@ -376,7 +379,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
 
     baselines = defaultdict(dict)  # type: ignore
     for axis, platform_data in histograms.items():
-        zone_count = zone_count_x if axis == "X" else zone_count_z
+        zone_count = zone_count_x if axis == "x" else zone_count_z
         for platform, zone_data in platform_data.items():
             deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
@@ -638,6 +641,12 @@ if __name__ == "__main__":
         help="The maximum number of samples (rows) to pricess from the dataframe.",
         type=int,
         default=DEFAULT_MAX_SAMPLES,
+    )
+    parser.add_argument(
+        "--graph-name",
+        help="Optional graph tag to add to the name",
+        type=str,
+        default="",
     )
 
     args = parser.parse_args()

@@ -66,7 +66,7 @@
         "primaryLabware": {
           "loadName": "opentrons_flex_96_tiprack_200ul",
           "namespace": "opentrons",
-          "version": 2
+          "version": 1
         }
       },
       "result": {
@@ -421,7 +421,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -1326,7 +1326,7 @@
           "moduleId": "UUID"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 1
       },
       "result": {
         "definition": {
@@ -1603,7 +1603,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -2533,7 +2533,7 @@
         "primaryLabware": {
           "loadName": "opentrons_flex_96_tiprack_200ul",
           "namespace": "opentrons",
-          "version": 2
+          "version": 1
         }
       },
       "result": {
@@ -2622,42 +2622,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -3150,7 +3150,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -4087,7 +4087,7 @@
         "primaryLabware": {
           "loadName": "opentrons_flex_96_tiprack_50ul",
           "namespace": "opentrons",
-          "version": 2
+          "version": 1
         }
       },
       "result": {
@@ -4176,42 +4176,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -4704,7 +4704,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -5615,7 +5615,7 @@
           "moduleId": "UUID"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 1
       },
       "result": {
         "definition": {
@@ -5892,7 +5892,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -10210,7 +10210,7 @@
           "labwareId": "UUID"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 1
       },
       "result": {
         "definition": {
@@ -10487,7 +10487,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -11392,7 +11392,7 @@
           "slotName": "B2"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 1
       },
       "result": {
         "definition": {
@@ -11669,7 +11669,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -23408,7 +23408,7 @@
           "slotName": "C3"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 1
       },
       "result": {
         "definition": {
@@ -23685,7 +23685,7 @@
             }
           },
           "stackingOffsetWithModule": {},
-          "version": 2,
+          "version": 1,
           "wells": {
             "A1": {
               "depth": 97.5,
@@ -31622,7 +31622,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -32618,7 +32618,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -34568,7 +34568,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -35721,7 +35721,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -35845,7 +35845,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -41477,7 +41477,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -45849,7 +45849,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -48449,7 +48449,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -51603,7 +51603,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -52273,7 +52273,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_50ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1C4",
@@ -52944,7 +52944,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -54512,7 +54512,7 @@
             "moduleId": "UUID"
           }
         ],
-        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+        "primaryLabwareURI": "opentrons/opentrons_flex_96_tiprack_200ul/1",
         "primaryLocationSequence": [
           {
             "addressableAreaName": "flexStackerModuleV1A4",
@@ -57510,6 +57510,20 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0067a8a21005e68bd26126d29bb4732c",
+      "notes": [],
+      "params": {
+        "message": "Done!!!"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -57524,37 +57538,37 @@
   "files": [],
   "labware": [
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": {
@@ -57562,7 +57576,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
@@ -57576,7 +57590,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57594,7 +57608,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57612,7 +57626,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57630,7 +57644,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57648,7 +57662,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57666,7 +57680,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "lid_id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
@@ -57682,7 +57696,7 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57694,7 +57708,7 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57706,7 +57720,7 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57718,7 +57732,7 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57730,7 +57744,7 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57742,13 +57756,13 @@
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57861,13 +57875,13 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_50ul",
       "location": "offDeck"
@@ -57898,7 +57912,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/2",
+      "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
       "location": "offDeck"
