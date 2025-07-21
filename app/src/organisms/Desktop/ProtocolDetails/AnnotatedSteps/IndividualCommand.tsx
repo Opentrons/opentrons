@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 
-import { COLORS, CommandText } from '@opentrons/components'
+import { COLORS, CommandText, StyledText } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
@@ -22,6 +22,7 @@ interface IndividualCommandProps {
   isHighlighted: boolean
   allRunDefs: LabwareDefinition[]
   fromGroup: boolean
+  commandNumber: number
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
 }
 export function IndividualCommand({
@@ -31,7 +32,9 @@ export function IndividualCommand({
   allRunDefs,
   setSelectedCommand,
   fromGroup,
+  commandNumber,
 }: IndividualCommandProps): JSX.Element {
+  const [showNumber, setShowNumber] = useState<boolean>(false)
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
@@ -57,7 +60,16 @@ export function IndividualCommand({
   )
 
   return (
-    <div className={individualCommandContainerStyle} ref={commandRef}>
+    <div
+      className={individualCommandContainerStyle}
+      ref={commandRef}
+      onMouseEnter={() => {
+        setShowNumber(true)
+      }}
+      onMouseLeave={() => {
+        setShowNumber(false)
+      }}
+    >
       <div
         className={commandWrapStyle}
         onClick={() => {
@@ -65,14 +77,21 @@ export function IndividualCommand({
         }}
       >
         <div className={styles.individual_command} key={command.id}>
-          <CommandIcon command={command} color={iconColor} />
-          <CommandText
-            command={command}
-            robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
-            color={COLORS.black90}
-            commandTextData={analysis}
-            allRunDefs={allRunDefs}
-          />
+          <div className={styles.individual_command_header}>
+            <CommandIcon command={command} color={iconColor} />
+            <CommandText
+              command={command}
+              robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
+              color={COLORS.black90}
+              commandTextData={analysis}
+              allRunDefs={allRunDefs}
+            />
+          </div>
+          {showNumber ? (
+            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
+              {commandNumber}
+            </StyledText>
+          ) : null}
         </div>
       </div>
     </div>

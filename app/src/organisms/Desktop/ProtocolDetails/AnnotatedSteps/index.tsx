@@ -63,6 +63,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       }
     }
   })
+
+  let commandNumber = 0
+
   return (
     <div className={styles.annotated_steps_container}>
       <div className={styles.annotated_steps_wrap}>
@@ -74,6 +77,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 nextIndex != null && 'annotationIndex' in nextIndex
 
               if ('annotationIndex' in group) {
+                const subCommandStartNumber = commandNumber + 1 // Starting number for this group
+                commandNumber += group.subCommands.length
                 return (
                   <AnnotatedGroup
                     key={`group_${group.annotationIndex}_${index}`}
@@ -82,12 +87,14 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                       annotations[group.annotationIndex]?.machineReadableName
                     }
                     subCommands={group.subCommands}
+                    commandStartNumber={subCommandStartNumber}
                     allRunDefs={allRunDefs}
                     setSelectedCommand={setSelectedCommand}
                     handlePause={handlePause}
                   />
                 )
               } else {
+                const currentCommandNumber = ++commandNumber
                 return (
                   <IndividualCommand
                     fromGroup={nextIsGrouped}
@@ -97,21 +104,27 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                     analysis={analysis}
                     allRunDefs={allRunDefs}
                     setSelectedCommand={setSelectedCommand}
+                    commandNumber={currentCommandNumber}
                   />
                 )
               }
             })
-          : analysis.commands.map((command, index) => (
-              <IndividualCommand
-                fromGroup={false}
-                key={`individual_${command.id}`}
-                command={command}
-                isHighlighted={index === currentCommandIndex}
-                analysis={analysis}
-                allRunDefs={allRunDefs}
-                setSelectedCommand={setSelectedCommand}
-              />
-            ))}
+          : analysis.commands.map((command, index) => {
+              const currentCommandNumber = ++commandNumber
+
+              return (
+                <IndividualCommand
+                  fromGroup={false}
+                  key={`individual_${command.id}`}
+                  command={command}
+                  commandNumber={currentCommandNumber}
+                  isHighlighted={index === currentCommandIndex}
+                  analysis={analysis}
+                  allRunDefs={allRunDefs}
+                  setSelectedCommand={setSelectedCommand}
+                />
+              )
+            })}
         {analysis?.errors.length > 0 ? (
           <div className={styles.annotated_steps_error_container}>
             {analysis?.errors.map(error => (

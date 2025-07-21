@@ -18,6 +18,7 @@ interface AnnotatedGroupProps {
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
+  commandStartNumber: number
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
 }
@@ -29,6 +30,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     allRunDefs,
     setSelectedCommand,
     handlePause,
+    commandStartNumber
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -64,6 +66,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               fromGroup={false}
               key={`${subCommand.command.id}_${index}`}
               command={subCommand.command}
+              commandNumber={commandStartNumber + index}
               analysis={analysis}
               isHighlighted={subCommand.isHighlighted}
               allRunDefs={allRunDefs}
