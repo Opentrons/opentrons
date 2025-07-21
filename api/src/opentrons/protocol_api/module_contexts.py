@@ -1255,15 +1255,16 @@ class FlexStackerContext(ModuleContext):
         specified here. You can use this to store labware objects that you have already created
         so that, for instance, you can set their liquid state or nicknames. There are several
         restrictions on the values of the ``labware`` argument:
-        - ``labware`` must have at least one element
-        - Elements of ``labware`` will be stored along with their lid, if any, and an adapter they
-          rest on, if any. These must be compatible with the Flex Stacker.
-        - All elements of ``labware`` must be loaded :py:obj:`OFF_DECK`.
-        - All elements of ``labware`` must be the same kind of labware. If any of them have lids, they
-          must all have lids, and the lids must be the same. If any of them are on adapters, they all
-          must be on adapters, and the adapters must be the same.
-        - The number of labware objects must fit in the stacker physically. To make sure the labware
-          will fit, use the return value of :py:method:`.get_max_storable_labware_from_list`.
+
+          - ``labware`` must have at least one element
+          - Elements of ``labware`` will be stored along with their lid, if any, and an adapter they
+            rest on, if any. These must be compatible with the Flex Stacker.
+          - All elements of ``labware`` must be loaded :py:obj:`OFF_DECK`.
+          - All elements of ``labware`` must be the same kind of labware. If any of them have lids, they
+            must all have lids, and the lids must be the same. If any of them are on adapters, they all
+            must be on adapters, and the adapters must be the same.
+          - The number of labware objects must fit in the stacker physically. To make sure the labware
+            will fit, use the return value of :py:meth:`.get_max_storable_labware_from_list`.
 
         :param labware: A list of labware to load into the stacker.
         :param stacking_offset_z: Stacking offset in mm between labware units to override the
@@ -1279,12 +1280,13 @@ class FlexStackerContext(ModuleContext):
 
             There are four possible stacking configurations, each with a different way of calculating
             the stacking offset:
-            - Bare labware: labware (bottomside) overlaps with labware (topside)
-            - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+
+              - Bare labware: labware (bottomside) overlaps with labware (topside)
+              - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
                 of the unit below.
-            - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+              - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
                 of the unit below.
-            - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+              - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
                 lid (topside) of the unit below.
 
         """
@@ -1327,7 +1329,7 @@ class FlexStackerContext(ModuleContext):
             adapter will use the same namespace as the labware, and the API will
             choose the adapter's version automatically.
         :param lid: A lid to load the on top of the main labware. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
+            values as the ``load_name`` parameter of :py:meth:`ProtocolContext.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
         :param count: The number of labware that the Flex Stacker should start the protocol
@@ -1346,12 +1348,13 @@ class FlexStackerContext(ModuleContext):
 
             There are four possible stacking configurations, each with a different way of calculating
             the stacking offset:
-            - Bare labware: labware (bottomside) overlaps with labware (topside)
-            - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
+
+              - Bare labware: labware (bottomside) overlaps with labware (topside)
+              - Labware on adapter: the adapter (bottomside) of the upper unit overlaps with labware (topside)
                 of the unit below.
-            - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
+              - Labware with lid: the labware (bottomside) of the upper unit overlaps the lid (topside)
                 of the unit below.
-            - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
+              - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
                 lid (topside) of the unit below.
 
         """
@@ -1384,10 +1387,10 @@ class FlexStackerContext(ModuleContext):
         """Pause the protocol to add a specific list of labware to the Flex Stacker.
 
         The ``labware`` argument must follow certain rules:
-        - It should have at least one item
-        - Its elements should be the same kind of labware previously passed to
-          :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`
-        - Its elements should all be loaded :py:obj:`OFF_DECK`
+          - It should have at least one item
+          - Its elements should be the same kind of labware previously passed to
+            :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`
+          - Its elements should all be loaded :py:obj:`OFF_DECK`
 
         :param message: A message to display in the Opentrons App.
         :param labware: The list of labware to add, following the rules above.

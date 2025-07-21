@@ -89,6 +89,15 @@ Magnetic Module
    :exclude-members: calibrate, broker, geometry, load_labware_object
    :inherited-members:
 
+Stacker Module
+--------------
+
+.. autoclass:: opentrons.protocol_api.FlexStackerContext
+   :members:
+   :exclude-members: calibrate, broker, geometry, load_labware_object
+   :inherited-members:
+
+
 Temperature Module
 ------------------
 
