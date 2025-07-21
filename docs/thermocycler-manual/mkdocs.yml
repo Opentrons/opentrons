@@ -7,6 +7,7 @@ nav:
   - Product Description: index.md
   - Safety and Compliance: compliance.md
   - Product Specifications: specifications.md
+  - Before You Begin: preinstall.md
 
 theme:
   name: material
