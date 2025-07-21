@@ -48,7 +48,6 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
-  ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -107,11 +106,6 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type {
-  AddressableAreaNamesWithFakes,
-  CutoutFixtureId,
-  CutoutId,
-} from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,
@@ -820,13 +814,6 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
-  const [cutoutId, setCutoutId] = useState<CutoutId | null>(null)
-  const [addressableAreaId] = useState<AddressableAreaNamesWithFakes | null>(
-    null
-  )
-  const [providedFixtureOptions, setProvidedFixtureOptions] = useState<
-    CutoutFixtureId[]
-  >([])
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
   const isRequiredOffsetMissing = useSelector(
@@ -874,8 +861,6 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModulesAndDeck
         runId={runId}
         setSetupScreen={setSetupScreen}
-        setCutoutId={setCutoutId}
-        setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
     offsets: (
@@ -894,15 +879,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
-      />
-    ),
-    'deck configuration': (
-      <ProtocolSetupDeckConfiguration
-        cutoutId={cutoutId}
-        addressableAreaId={addressableAreaId}
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-        providedFixtureOptions={providedFixtureOptions}
       />
     ),
     'view only parameters': (

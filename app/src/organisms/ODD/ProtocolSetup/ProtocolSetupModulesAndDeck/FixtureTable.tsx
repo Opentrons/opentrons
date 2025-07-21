@@ -31,25 +31,20 @@ import {
   isConflictingFixtureConfigured,
   isFixtureCompatible,
 } from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutFixtureId,
-  CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { SetupScreens } from '../types'
 
 interface FixtureTableProps {
   robotType: RobotType
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
-  setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
-  setCutoutId: (cutoutId: CutoutId) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
 /**
@@ -59,9 +54,6 @@ interface FixtureTableProps {
  */
 export function FixtureTable({
   robotType,
-  setSetupScreen,
-  setCutoutId,
-  setProvidedFixtureOptions,
   deckConfigCompatibility,
 }: FixtureTableProps): JSX.Element | null {
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -93,9 +85,6 @@ export function FixtureTable({
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}
             lastItem={index === sortedDeckConfigCompatibility.length - 1}
-            setSetupScreen={setSetupScreen}
-            setCutoutId={setCutoutId}
-            setProvidedFixtureOptions={setProvidedFixtureOptions}
             deckDef={deckDef}
             robotName={robotName}
           />
@@ -107,9 +96,6 @@ export function FixtureTable({
 
 interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   lastItem: boolean
-  setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
-  setCutoutId: (cutoutId: CutoutId) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
   deckDef: DeckDefinition
   robotName: string
   fakeCutoutFixtureId?: CutoutFixtureId
@@ -120,9 +106,6 @@ function FixtureTableItem({
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
   lastItem,
-  setSetupScreen,
-  setCutoutId,
-  setProvidedFixtureOptions,
   deckDef,
   robotName,
   fakeCutoutFixtureId,
@@ -133,7 +116,9 @@ function FixtureTableItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = useState<boolean>(false)
-
+  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
+    false
+  )
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
@@ -172,9 +157,7 @@ function FixtureTableItem({
                   setShowLocationConflictModal(true)
                 }
               : () => {
-                  setCutoutId(cutoutId)
-                  setProvidedFixtureOptions(compatibleCutoutFixtureIds)
-                  setSetupScreen('deck configuration')
+                  setShowNotConfiguredModal(true)
                 }
           }
         />
@@ -192,6 +175,18 @@ function FixtureTableItem({
   }
   return (
     <Fragment key={cutoutId}>
+      {showNotConfiguredModal ? (
+        <NotConfiguredModal
+          onCloseClick={() => {
+            setShowNotConfiguredModal(false)
+          }}
+          cutoutId={cutoutId}
+          requiredFixtureId={
+            fakeCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+          }
+          isOnDevice
+        />
+      ) : null}
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => {

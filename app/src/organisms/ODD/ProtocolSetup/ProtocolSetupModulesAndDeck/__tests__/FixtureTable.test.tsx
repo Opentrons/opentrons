@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -12,6 +12,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 
@@ -21,10 +22,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/organisms/LocationConflictModal')
-
-const mockSetSetupScreen = vi.fn()
-const mockSetCutoutId = vi.fn()
-const mockSetProvidedFixtureOptions = vi.fn()
+vi.mock('/app/organisms/LocationConflictModal/NotConfiguredModal')
 
 const render = (props: ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
@@ -47,13 +45,13 @@ describe('FixtureTable', () => {
         },
       ],
       robotType: FLEX_ROBOT_TYPE,
-      setSetupScreen: mockSetSetupScreen,
-      setCutoutId: mockSetCutoutId,
-      setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
+    )
+    vi.mocked(NotConfiguredModal).mockReturnValue(
+      <div>mock not configured modal</div>
     )
   })
   afterEach(() => {
@@ -80,11 +78,7 @@ describe('FixtureTable', () => {
 
     screen.getByText('Not configured')
     fireEvent.click(screen.getByText('Configure'))
-    expect(mockSetCutoutId).toHaveBeenCalledWith('cutoutD3')
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
-    expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith([
-      TRASH_BIN_ADAPTER_FIXTURE,
-    ])
+    screen.getByText('mock not configured modal')
   })
 
   it('should render the current status - conflicting', () => {

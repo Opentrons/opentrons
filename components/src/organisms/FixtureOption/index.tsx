@@ -1,7 +1,6 @@
 import { TertiaryButton } from '../../atoms/buttons'
 import { ListItem } from '../../atoms/ListItem/index'
 import { StyledText } from '../../atoms/StyledText'
-import { COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -18,7 +17,6 @@ interface FixtureOptionProps {
   optionName: string
   secondaryButtonText?: string
   buttonText: string
-  isOnDevice: boolean
 }
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const {
@@ -35,7 +33,6 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
         padding={SPACING.spacing16 + ' ' + SPACING.spacing24}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        backgroundColor={props.isOnDevice ? COLORS.grey35 : undefined}
       >
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
@@ -72,7 +69,6 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
         padding={SPACING.spacing16 + ' ' + SPACING.spacing24}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        backgroundColor={props.isOnDevice ? COLORS.grey35 : undefined}
       >
         <StyledText
           desktopStyle="bodyDefaultSemiBold"

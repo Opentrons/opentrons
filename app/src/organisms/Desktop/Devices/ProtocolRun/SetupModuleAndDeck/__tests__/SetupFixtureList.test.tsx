@@ -14,8 +14,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 
-import { NotConfiguredModal } from '../NotConfiguredModal'
 import { SetupFixtureList } from '../SetupFixtureList'
 
 import type { ComponentProps } from 'react'
@@ -23,7 +23,7 @@ import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configura
 
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/organisms/LocationConflictModal')
-vi.mock('../NotConfiguredModal')
+vi.mock('/app/organisms/LocationConflictModal/NotConfiguredModal')
 vi.mock(
   '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 )

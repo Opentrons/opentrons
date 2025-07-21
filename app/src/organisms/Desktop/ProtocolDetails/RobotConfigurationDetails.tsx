@@ -109,6 +109,7 @@ export const RobotConfigurationDetails = (
 
   // filter out single slot fixtures as they're implicit
   // also filter out usb module fixtures as they're handled by required modules
+  // add to this - keep waste chutes in for stacker and duplicate mag blocks
   const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
     fixture =>
       ![...SINGLE_SLOT_FIXTURES, ...FLEX_USB_MODULE_FIXTURES].includes(

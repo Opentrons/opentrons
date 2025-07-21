@@ -22,6 +22,7 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
@@ -33,8 +34,8 @@ import {
   isConflictingFixtureConfigured,
   isFixtureCompatible,
 } from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 
-import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
 import type { CutoutFixtureId, DeckDefinition } from '@opentrons/shared-data'
@@ -132,6 +133,13 @@ export function FixtureListItem({
     setShowSetupInstructionsModal,
   ] = useState<boolean>(false)
 
+  const displayLocation =
+    (fakeCutoutFixtureId != null &&
+      STAGING_AREA_FIXTURES.includes(fakeCutoutFixtureId)) ||
+    STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
+      ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
+      : getCutoutDisplayName(cutoutId)
+
   return (
     <>
       {showNotConfiguredModal ? (
@@ -227,7 +235,7 @@ export function FixtureListItem({
             </Flex>
           </Flex>
           <LegacyStyledText as="p" width="15%">
-            {getCutoutDisplayName(cutoutId)}
+            {displayLocation}
           </LegacyStyledText>
           <Flex
             width="15%"

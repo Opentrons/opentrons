@@ -41,7 +41,6 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000
@@ -50,8 +49,6 @@ const DECK_CONFIG_POLL_MS = 5000
 interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
-  setCutoutId: (cutoutId: CutoutId) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
 /**
@@ -60,8 +57,6 @@ interface ProtocolSetupModulesAndDeckProps {
 export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-  setCutoutId,
-  setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
@@ -197,9 +192,6 @@ export function ProtocolSetupModulesAndDeck({
                 <FixtureTable
                   robotType={FLEX_ROBOT_TYPE}
                   deckConfigCompatibility={deckConfigCompatibility}
-                  setSetupScreen={setSetupScreen}
-                  setCutoutId={setCutoutId}
-                  setProvidedFixtureOptions={setProvidedFixtureOptions}
                 />
               </Flex>
             </Flex>
