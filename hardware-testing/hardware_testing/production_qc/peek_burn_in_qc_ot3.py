@@ -155,6 +155,7 @@ async def _reset_pipette_fw(api: OT3API, mount: types.OT3Mount) -> None:
         turn_on = FirmwareUpdateStartApp()
         pip_node = sensor_node_for_mount(mount)
         await api._backend._messenger.ensure_send(pip_node, turn_off)
+        await asyncio.sleep(1)
         await api._backend._messenger.ensure_send(pip_node, turn_on)
         await _home_plunger(api, mount)
 
