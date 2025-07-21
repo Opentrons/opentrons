@@ -756,7 +756,7 @@ export function getFixtureDisplayName(
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       return 'Waste chute'
     case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute only with cover'
+      return 'Waste chute with cover'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       return 'Waste chute with staging area slot'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
