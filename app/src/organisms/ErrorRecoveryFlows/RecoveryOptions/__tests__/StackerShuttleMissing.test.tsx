@@ -16,6 +16,7 @@ import {
   StackerLoadShuttle,
   StackerReengageLatch,
   StackerShuttleLwInfo,
+  TwoColTextAndImage,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerShuttleMissing } from '../StackerShuttleMissing'
@@ -66,6 +67,9 @@ describe('StackerShuttleMissing', () => {
       <div>MOCK_STACKER_HOPPER_LW_INFO</div>
     )
     vi.mocked(RetryStepInfo).mockReturnValue(<div>MOCK_RETRY_STEP_INFO</div>)
+    vi.mocked(TwoColTextAndImage).mockReturnValue(
+      <div>MOCK_TWO_COLUMN_AND_IMAGE</div>
+    )
   })
 
   afterEach(() => {
@@ -91,6 +95,13 @@ describe('StackerShuttleMissing', () => {
       RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER
     render(props)
     screen.getByText('MOCK_STACKER_HOPPER_LW_INFO')
+  })
+
+  it(`renders twoColumnAndImage when step is ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY}`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY
+    render(props)
+    screen.getByText('MOCK_TWO_COLUMN_AND_IMAGE')
   })
 
   it(`renders RetryStepInfo when step is ${RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY}`, () => {

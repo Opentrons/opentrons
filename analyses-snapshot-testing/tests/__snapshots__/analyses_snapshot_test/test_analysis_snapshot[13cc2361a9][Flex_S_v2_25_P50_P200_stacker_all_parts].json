@@ -3908,42 +3908,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -4428,6 +4428,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -5695,6 +5700,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -11510,42 +11520,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -12030,6 +12040,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -13444,42 +13459,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -13964,6 +13979,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -19964,6 +19984,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -22398,42 +22423,42 @@
             "default": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
               "x": 0,
               "y": 0,
-              "z": 14
+              "z": 14.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -22918,6 +22943,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},

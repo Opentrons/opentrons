@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getAllLiquidClassDefs,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -31,7 +32,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   const { state } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
-
+  const allLiquidClasses = getAllLiquidClassDefs()
   let transferCopy = t('volume_per_well')
   if (state.transferType === CONSOLIDATE) {
     transferCopy = t('aspirate_volume')
@@ -90,7 +91,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('liquid_class'),
-      value: state?.liquidClass?.displayName,
+      value: allLiquidClasses[state?.liquidClassName]?.displayName,
     },
   ]
 

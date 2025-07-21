@@ -4345,12 +4345,12 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=2, schema=2
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_96_tiprack_1000ul", version=2
+                        "opentrons_flex_96_tiprack_1000ul", version=1
                     )
                 ),
             ],

@@ -78,7 +78,7 @@ export interface QuickTransferWizardState {
   path?: PathOption // this has been added
   changeTip?: ChangeTipOptions // this has been added
   dropTipLocation?: CutoutConfig // this has been added
-  liquidClass?: LiquidClass // this has been added
+  liquidClassName?: string // this has been added
 }
 ```
 
@@ -157,7 +157,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass // this has been added
+  liquidClassName: string // this has been added
   conditionAspirate?: number // this has been added
   disposalVolumeDispenseSettings?: {
     volume: number

@@ -123,7 +123,7 @@ TOF_DETECTION_CONFIG = {
 # Stallguard defaults
 STALLGUARD_CONFIG = {
     StackerAxis.X: StallGuardParams(StackerAxis.X, True, 0),
-    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 0),
+    StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
 }
 
 # Motion Parameter defaults

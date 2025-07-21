@@ -1,5 +1,9 @@
 import { RECOVERY_MAP } from '../constants'
-import { RetryStepInfo, StackerHopperLwInfo } from '../shared'
+import {
+  RetryStepInfo,
+  StackerHopperLwInfo,
+  TwoColTextAndImage,
+} from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
@@ -14,6 +18,8 @@ export function StackerHopperEmptyRetry(
   switch (step) {
     case STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER:
       return <StackerHopperLwInfo {...props} />
+    case STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
+      return <TwoColTextAndImage {...props} />
     case STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
     default:

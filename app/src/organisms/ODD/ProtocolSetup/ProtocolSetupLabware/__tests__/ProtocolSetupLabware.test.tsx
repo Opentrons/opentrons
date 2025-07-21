@@ -8,6 +8,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import {
+  getStackedItemsOnStartingDeck,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   ot3StandardDeckV5 as ot3StandardDeckDef,
 } from '@opentrons/shared-data'
@@ -18,7 +19,6 @@ import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis/getProtocolModulesInfo'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 
 import { ProtocolSetupLabware } from '..'
 import {
@@ -32,7 +32,7 @@ import {
 } from '../__fixtures__'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type * as AppCommandTransformations from '/app/transformations/commands'
+import type * as OpentronsSharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -42,8 +42,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useModulesQuery: vi.fn(),
   }
 })
-vi.mock('/app/transformations/commands', async importOriginal => {
-  const actual = await importOriginal<typeof AppCommandTransformations>()
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsSharedData>()
   return {
     ...actual,
     getStackedItemsOnStartingDeck: vi.fn(),
