@@ -43,7 +43,7 @@ The supported deck slot positions for the Thermocycler depend on the robot youâ€
 
 To properly align the module relative to the robot, make sure its exhaust port faces to the rear (away from the center of the deck). This keeps the exhaust port clear and aligns the power and USB ports to the left side of the robot for easy access.
 
-## Ventilation Clearance
+## Provide Ventilation Clearance
 
 The Flex and OT-2 need at least 20 cm (8") of side and back clearance. This space helps dissipate exhaust from
 the Thermocycler.
@@ -53,8 +53,11 @@ the Thermocycler.
 For OT-2 ventilation, Opentrons recommends using the side and rear window panels shown below. These panels are included with newer OT-2 models. If you have an older OT-2 and need these panels, contact us at
 <support@opentrons.com>.
 
-![OT-2 replacement window panels](../images/OT-2-panels.png)
+![OT-2 replacement window panels](../images/ot2-panels.png)
 
-## Packing Material
+## Remove Internal Packing Material
 
-The Thermocycler ships with a silicone pad affixed to a PCR plate under the lid. These items help prevent damage during shipping. They should be removed and discarded before using the Thermocycler.
+The Thermocycler ships with a silicone pad affixed to a PCR plate under its lid to help prevent damage during shipping. These items must be removed and discarded before using the module.
+
+IMAGE PLACEHOLDER
+
