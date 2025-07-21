@@ -176,7 +176,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
       'wasteChuteRightAdapterNoCover',
       'D3'
     )
-    expect(result).toEqual('96ChannelWasteChute')
+    expect(result).toEqual('1ChannelWasteChute')
   })
 
   it('Should find an aa for staging area', () => {

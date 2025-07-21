@@ -212,7 +212,7 @@ describe('getFixtureOptions', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
-          addressableAreaId: '96ChannelWasteChute',
+          addressableAreaId: '1ChannelWasteChute',
         },
       ],
     ])
