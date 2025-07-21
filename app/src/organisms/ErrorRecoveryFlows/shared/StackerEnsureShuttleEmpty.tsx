@@ -1,7 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
-import { JUSTIFY_CENTER, RESPONSIVENESS } from '@opentrons/components'
 
 import stackerImage from '/app/assets/images/stacker_shuttle_empty.png'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
@@ -28,7 +25,7 @@ export function StackerEnsureShuttleEmpty(
           headline={t('ensure_stacker_shuttle_empty')}
           message={t('empty_shuttle_to_retry_retrieve')}
         />
-        <img src={stackerImage} alt="Stacker shuttle empty" css={IMAGE_STYLE} />
+        <img src={stackerImage} alt="Stacker shuttle empty" width="100%" />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}
@@ -37,15 +34,3 @@ export function StackerEnsureShuttleEmpty(
     </RecoverySingleColumnContentWrapper>
   )
 }
-
-
-const IMAGE_STYLE = css`
-  justify-content: ${JUSTIFY_CENTER};
-  overflow: hidden;
-  max-height: 13.25rem;
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    width: 27rem;
-    height: 20.25rem;
-  }
-`
