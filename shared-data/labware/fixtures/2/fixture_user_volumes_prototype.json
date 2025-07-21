@@ -30,7 +30,7 @@
   "parameters": {
     "format": "96Standard",
     "isTiprack": false,
-    "loadName": "user_volumes_prototype",
+    "loadName": "fixture_user_volumes_prototype",
     "isMagneticModuleCompatible": false
   },
   "wells": {
@@ -41,7 +41,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G1": {
       "depth": 10.54,
@@ -50,7 +51,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F1": {
       "depth": 10.54,
@@ -59,7 +61,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E1": {
       "depth": 10.54,
@@ -68,7 +71,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D1": {
       "depth": 10.54,
@@ -77,7 +81,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C1": {
       "depth": 10.54,
@@ -86,7 +91,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B1": {
       "depth": 10.54,
@@ -95,7 +101,8 @@
       "totalLiquidVolume": 380,
       "x": 14.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A1": {
       "depth": 10.54,
@@ -114,7 +121,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G2": {
       "depth": 10.54,
@@ -123,7 +131,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F2": {
       "depth": 10.54,
@@ -132,7 +141,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E2": {
       "depth": 10.54,
@@ -141,7 +151,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D2": {
       "depth": 10.54,
@@ -150,7 +161,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C2": {
       "depth": 10.54,
@@ -159,7 +171,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B2": {
       "depth": 10.54,
@@ -168,7 +181,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A2": {
       "depth": 10.54,
@@ -177,7 +191,8 @@
       "totalLiquidVolume": 380,
       "x": 23.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H3": {
       "depth": 10.54,
@@ -186,7 +201,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G3": {
       "depth": 10.54,
@@ -195,7 +211,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F3": {
       "depth": 10.54,
@@ -204,7 +221,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E3": {
       "depth": 10.54,
@@ -213,7 +231,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D3": {
       "depth": 10.54,
@@ -222,7 +241,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C3": {
       "depth": 10.54,
@@ -231,7 +251,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B3": {
       "depth": 10.54,
@@ -240,7 +261,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A3": {
       "depth": 10.54,
@@ -249,7 +271,8 @@
       "totalLiquidVolume": 380,
       "x": 32.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H4": {
       "depth": 10.54,
@@ -258,7 +281,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G4": {
       "depth": 10.54,
@@ -267,7 +291,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F4": {
       "depth": 10.54,
@@ -276,7 +301,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E4": {
       "depth": 10.54,
@@ -285,7 +311,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D4": {
       "depth": 10.54,
@@ -294,7 +321,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C4": {
       "depth": 10.54,
@@ -303,7 +331,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B4": {
       "depth": 10.54,
@@ -312,7 +341,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A4": {
       "depth": 10.54,
@@ -321,7 +351,8 @@
       "totalLiquidVolume": 380,
       "x": 41.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H5": {
       "depth": 10.54,
@@ -330,7 +361,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G5": {
       "depth": 10.54,
@@ -339,7 +371,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F5": {
       "depth": 10.54,
@@ -348,7 +381,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E5": {
       "depth": 10.54,
@@ -357,7 +391,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D5": {
       "depth": 10.54,
@@ -366,7 +401,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C5": {
       "depth": 10.54,
@@ -375,7 +411,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B5": {
       "depth": 10.54,
@@ -384,7 +421,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A5": {
       "depth": 10.54,
@@ -393,7 +431,8 @@
       "totalLiquidVolume": 380,
       "x": 50.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H6": {
       "depth": 10.54,
@@ -402,7 +441,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G6": {
       "depth": 10.54,
@@ -411,7 +451,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F6": {
       "depth": 10.54,
@@ -420,7 +461,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E6": {
       "depth": 10.54,
@@ -429,7 +471,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D6": {
       "depth": 10.54,
@@ -438,7 +481,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C6": {
       "depth": 10.54,
@@ -447,7 +491,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B6": {
       "depth": 10.54,
@@ -456,7 +501,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A6": {
       "depth": 10.54,
@@ -465,7 +511,8 @@
       "totalLiquidVolume": 380,
       "x": 59.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H7": {
       "depth": 10.54,
@@ -474,7 +521,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G7": {
       "depth": 10.54,
@@ -483,7 +531,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F7": {
       "depth": 10.54,
@@ -492,7 +541,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E7": {
       "depth": 10.54,
@@ -501,7 +551,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D7": {
       "depth": 10.54,
@@ -510,7 +561,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C7": {
       "depth": 10.54,
@@ -519,7 +571,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B7": {
       "depth": 10.54,
@@ -528,7 +581,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A7": {
       "depth": 10.54,
@@ -537,7 +591,8 @@
       "totalLiquidVolume": 380,
       "x": 68.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H8": {
       "depth": 10.54,
@@ -546,7 +601,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G8": {
       "depth": 10.54,
@@ -555,7 +611,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F8": {
       "depth": 10.54,
@@ -564,7 +621,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E8": {
       "depth": 10.54,
@@ -573,7 +631,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D8": {
       "depth": 10.54,
@@ -582,7 +641,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C8": {
       "depth": 10.54,
@@ -591,7 +651,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B8": {
       "depth": 10.54,
@@ -600,7 +661,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A8": {
       "depth": 10.54,
@@ -609,7 +671,8 @@
       "totalLiquidVolume": 380,
       "x": 77.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H9": {
       "depth": 10.54,
@@ -618,7 +681,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G9": {
       "depth": 10.54,
@@ -627,7 +691,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F9": {
       "depth": 10.54,
@@ -636,7 +701,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E9": {
       "depth": 10.54,
@@ -645,7 +711,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D9": {
       "depth": 10.54,
@@ -654,7 +721,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C9": {
       "depth": 10.54,
@@ -663,7 +731,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B9": {
       "depth": 10.54,
@@ -672,7 +741,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A9": {
       "depth": 10.54,
@@ -681,7 +751,8 @@
       "totalLiquidVolume": 380,
       "x": 86.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H10": {
       "depth": 10.54,
@@ -690,7 +761,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G10": {
       "depth": 10.54,
@@ -699,7 +771,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F10": {
       "depth": 10.54,
@@ -708,7 +781,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E10": {
       "depth": 10.54,
@@ -717,7 +791,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D10": {
       "depth": 10.54,
@@ -726,7 +801,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C10": {
       "depth": 10.54,
@@ -735,7 +811,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B10": {
       "depth": 10.54,
@@ -744,7 +821,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A10": {
       "depth": 10.54,
@@ -753,7 +831,8 @@
       "totalLiquidVolume": 380,
       "x": 95.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H11": {
       "depth": 10.54,
@@ -762,7 +841,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G11": {
       "depth": 10.54,
@@ -771,7 +851,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F11": {
       "depth": 10.54,
@@ -780,7 +861,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E11": {
       "depth": 10.54,
@@ -789,7 +871,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D11": {
       "depth": 10.54,
@@ -798,7 +881,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C11": {
       "depth": 10.54,
@@ -807,7 +891,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B11": {
       "depth": 10.54,
@@ -816,7 +901,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A11": {
       "depth": 10.54,
@@ -825,7 +911,8 @@
       "totalLiquidVolume": 380,
       "x": 104.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "H12": {
       "depth": 10.54,
@@ -834,7 +921,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 11.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "G12": {
       "depth": 10.54,
@@ -843,7 +931,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 20.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "F12": {
       "depth": 10.54,
@@ -852,7 +941,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 29.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "E12": {
       "depth": 10.54,
@@ -861,7 +951,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 38.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "D12": {
       "depth": 10.54,
@@ -870,7 +961,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 47.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "C12": {
       "depth": 10.54,
@@ -879,7 +971,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 56.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "B12": {
       "depth": 10.54,
@@ -888,7 +981,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 65.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     },
     "A12": {
       "depth": 10.54,
@@ -897,7 +991,8 @@
       "totalLiquidVolume": 380,
       "x": 113.38,
       "y": 74.24,
-      "z": 3.81
+      "z": 3.81,
+      "geometryDefinitionId": "userVolumes"
     }
   },
   "brand": {
@@ -1012,15 +1107,15 @@
     "userVolumes": {
       "heightToVolumeMap": [
         {
-          "height": 59.3,
+          "height": 10.54,
           "volume": 300
         },
         {
-          "height": 30.8,
+          "height": 8.8,
           "volume": 100
         },
         {
-          "height": 10.4,
+          "height": 6.43,
           "volume": 70
         },
         {

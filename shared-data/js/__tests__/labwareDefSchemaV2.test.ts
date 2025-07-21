@@ -291,12 +291,12 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
       const innerGeometryObject =
-        labwareDef.innerLabwareGeometry?.heightToVolumeMap
-      for (const geometry of Object.values(innerGeometryObject ?? {})) {
-        const pairingList = geometry[wellGeometryId].heightToVolumeMap
-        const lastEntry = pairingList[pairingList.length - 1]
-        expect(lastEntry.height).toStrictEqual(wellDepth)
-      }
+        labwareDef.innerLabwareGeometry?.[wellGeometryId]
+      if (innerGeometryObject === undefined) return
+      if (!(isUserDefinedVolumes(innerGeometryObject))) return 
+      const pairingList = innerGeometryObject.heightToVolumeMap
+      const firstEntry = pairingList[0]
+      expect(firstEntry.height).toStrictEqual(wellDepth)
     }
   })
 
@@ -341,53 +341,58 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     return 'sections' in def
   }
 
+  function isUserDefinedVolumes(
+    def: InnerWellGeometry | UserDefinedVolumes
+  ): def is UserDefinedVolumes {
+    return 'heightToVolumeMap' in def
+  }
+
   test("a well's depth should equal the height of its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
       const wellGeometryId = well.geometryDefinitionId
       if (wellGeometryId === undefined) return
       const wellDepth = well.depth
-      const innerGeometryObject = labwareDef.innerLabwareGeometry?.sections
+
+      const innerGeometryObject = labwareDef.innerLabwareGeometry?.[wellGeometryId]
       if (innerGeometryObject === undefined) return
       if (!isInnerWellGeometry(innerGeometryObject)) return
-      for (const geometry of Object.values(innerGeometryObject ?? {})) {
-        const topFrustumHeight = geometry.sections[0].topHeight
+      const topFrustumHeight = innerGeometryObject.sections[0].topHeight
 
-        const labwareWithWellDepthMismatches = [
-          // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
-          'agilent_1_reservoir_290ml/2', // Fixed in v3 of this labware.
-          'corning_24_wellplate_3.4ml_flat/3',
-          'corning_24_wellplate_3.4ml_flat/4',
-          'corning_6_wellplate_16.8ml_flat/3',
-          'corning_6_wellplate_16.8ml_flat/4',
-          'corning_96_wellplate_360ul_flat/3',
-          'corning_96_wellplate_360ul_flat/4',
-          'nest_96_wellplate_2ml_deep/3',
-          'nest_96_wellplate_2ml_deep/4',
-          'opentrons_15_tuberack_falcon_15ml_conical/2',
-          'opentrons_24_aluminumblock_nest_1.5ml_screwcap/2',
-          'opentrons_24_aluminumblock_nest_2ml_screwcap/2',
-          'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2',
-          'opentrons_6_tuberack_falcon_50ml_conical/2',
-          'opentrons_6_tuberack_nest_50ml_conical/2',
-        ]
+      const labwareWithWellDepthMismatches = [
+        // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
+        'agilent_1_reservoir_290ml/2', // Fixed in v3 of this labware.
+        'corning_24_wellplate_3.4ml_flat/3',
+        'corning_24_wellplate_3.4ml_flat/4',
+        'corning_6_wellplate_16.8ml_flat/3',
+        'corning_6_wellplate_16.8ml_flat/4',
+        'corning_96_wellplate_360ul_flat/3',
+        'corning_96_wellplate_360ul_flat/4',
+        'nest_96_wellplate_2ml_deep/3',
+        'nest_96_wellplate_2ml_deep/4',
+        'opentrons_15_tuberack_falcon_15ml_conical/2',
+        'opentrons_24_aluminumblock_nest_1.5ml_screwcap/2',
+        'opentrons_24_aluminumblock_nest_2ml_screwcap/2',
+        'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2',
+        'opentrons_6_tuberack_falcon_50ml_conical/2',
+        'opentrons_6_tuberack_nest_50ml_conical/2',
+      ]
 
-        if (
-          labwareDef.parameters.loadName ===
-            'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical' &&
-          labwareDef.version === 2
-        ) {
-          // todo(mm, 2025-03-17): Some of the well heights in this definition do match
-          // and some of them don't, so we can't assert either way. Investigate and
-          // resolve the mismatches.
-        } else if (
-          labwareWithWellDepthMismatches.includes(
-            labwareDef.parameters.loadName + '/' + labwareDef.version
-          )
-        ) {
-          expect(wellDepth).not.toStrictEqual(topFrustumHeight)
-        } else {
-          expect(wellDepth).toStrictEqual(topFrustumHeight)
-        }
+      if (
+        labwareDef.parameters.loadName ===
+          'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical' &&
+        labwareDef.version === 2
+      ) {
+        // todo(mm, 2025-03-17): Some of the well heights in this definition do match
+        // and some of them don't, so we can't assert either way. Investigate and
+        // resolve the mismatches.
+      } else if (
+        labwareWithWellDepthMismatches.includes(
+          labwareDef.parameters.loadName + '/' + labwareDef.version
+        )
+      ) {
+        expect(wellDepth).not.toStrictEqual(topFrustumHeight)
+      } else {
+        expect(wellDepth).toStrictEqual(topFrustumHeight)
       }
     }
   })
@@ -450,7 +455,6 @@ describe('test schemas of all opentrons definitions', () => {
 
 describe('test that the dimensions in all opentrons definitions make sense', () => {
   const labwarePaths = glob.sync('**/*.json', { cwd: definitionsDir })
-
   beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
@@ -508,6 +512,7 @@ describe('test schemas of all v2 labware fixtures', () => {
     })
 
     expectGroupsFollowConvention(labwareDef, filename)
+    checkGeometryDefinitions(labwareDef)
   })
 })
 
