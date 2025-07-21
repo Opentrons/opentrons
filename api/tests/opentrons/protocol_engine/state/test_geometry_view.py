@@ -387,9 +387,9 @@ def user_volumes_fixture() -> LabwareDefinition:
     """Load a labware def containing a UserDefinedVolumes object."""
     return labware_definition_type_adapter.validate_python(
         json.loads(
-            load_shared_data("labware/fixtures/2/user_volumes_prototype.json").decode(
-                "utf-8"
-            )
+            load_shared_data(
+                "labware/fixtures/2/fixture_user_volumes_prototype.json"
+            ).decode("utf-8")
         )
     )
 
