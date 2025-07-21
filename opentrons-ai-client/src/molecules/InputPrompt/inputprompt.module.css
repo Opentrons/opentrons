@@ -4,26 +4,26 @@
 
 .error_container {
   padding: var(--spacing-12) var(--spacing-16);
-  background-color: var(--red-20);
-  border-radius: var(--border-radius-4);
   border: 1px solid var(--red-30);
+  border-radius: var(--border-radius-4);
   margin-bottom: var(--spacing-8);
+  background-color: var(--red-20);
 }
 
 .textarea {
-  resize: none;
+  width: 100%;
   min-height: 3.75rem;
   max-height: 17.25rem;
-  overflow-y: auto;
-  background-color: var(--white);
-  border: none;
-  outline: none;
   padding: var(--spacing-16) 0;
+  border: none;
+  background-color: var(--white);
   box-shadow: none;
-  width: 100%;
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
+  outline: none;
+  overflow-y: auto;
+  resize: none;
 }
 
 .textarea::placeholder {
@@ -48,17 +48,17 @@
 }
 
 .attached_files_section {
+  border-radius: var(--border-radius-12) var(--border-radius-12) 0 0;
   border-bottom: 1px solid var(--grey-20);
   background-color: var(--white);
-  border-radius: var(--border-radius-12) var(--border-radius-12) 0 0;
 }
 
 .attached_files_list {
-  padding: var(--spacing-12) var(--spacing-16);
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-8);
   flex-wrap: wrap;
+  padding: var(--spacing-12) var(--spacing-16);
+  gap: var(--spacing-8);
 }
 
 .text_input_section {
@@ -70,10 +70,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-8);
   padding: var(--spacing-12) var(--spacing-16);
-  background-color: var(--white);
   border-radius: 0 0 var(--border-radius-12) var(--border-radius-12);
+  background-color: var(--white);
+  gap: var(--spacing-8);
 }
 
 .spacer {

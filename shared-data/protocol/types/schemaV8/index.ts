@@ -47,6 +47,11 @@ export interface CommandV13Mixin {
   commands: CreateCommand[]
 }
 
+export interface CommandV14Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV14'
+  commands: CreateCommand[]
+}
+
 export interface CommandAnnotationsStructure {
   commandAnnotationSchemaId: string
   commandAnnotations: any[]
@@ -143,6 +148,7 @@ export type ProtocolFile<
     | CommandV11Mixin
     | CommandV12Mixin
     | CommandV13Mixin
+    | CommandV14Mixin
   ) &
   CommandAnnotationV1Mixin
 

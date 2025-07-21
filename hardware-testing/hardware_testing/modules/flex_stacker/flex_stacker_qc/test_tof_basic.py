@@ -84,8 +84,7 @@ async def test_get_tof_sensor_histogram(
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     if not stacker.is_simulated:
-        ui.get_user_ready("Make sure both TOF sensors are installed.")
-        ui.get_user_ready("Make sure there is no labware in the stacker.")
+        ui.get_user_ready("Make sure there is no labware in the stacker")
 
     print("Homing stacker X and Z axis.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)

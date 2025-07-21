@@ -121,6 +121,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
                         <>
                           <LabwareRender
                             definition={definition}
+                            positioningMode="offsetInSlot"
                             wellFill={wellFillFromWellContents(
                               wellContents,
                               liquidDisplayColors

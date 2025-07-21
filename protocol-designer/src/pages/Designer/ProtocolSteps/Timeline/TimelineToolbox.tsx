@@ -156,7 +156,10 @@ export function TimelineToolbox({
       childrenPadding="0px"
       confirmButton={
         formData != null ? undefined : (
-          <AddStepButton hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON} />
+          <AddStepButton
+            hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
+            sidebarWidth={sidebarWidth}
+          />
         )
       }
     >

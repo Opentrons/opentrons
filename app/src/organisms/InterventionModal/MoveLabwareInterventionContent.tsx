@@ -225,7 +225,10 @@ export function MoveLabwareInterventionContent({
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={nestedLabwareDef} />
+                          <LabwareRender
+                            definition={nestedLabwareDef}
+                            positioningMode="offsetInSlot"
+                          />
                         ) : null}
                       </Module>
                     )

@@ -13,45 +13,45 @@
   --spacing-mobile-heading: 4.5rem;
 
   --font-menu-title: {
+    color: var(--c-nav-gray);
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
     font-size: var(--fs-body-1);
     font-weight: var(--fw-light);
     letter-spacing: 0.7px;
-    color: var(--c-nav-gray);
   }
 
   --dropdown-base: {
     position: absolute;
     top: 4.25rem;
-    background-color: var(--c-white);
-    border-radius: var(--bd-radius-default);
     border: var(--bd-light);
+    border-radius: var(--bd-radius-default);
+    background-color: var(--c-white);
   }
 
   --dropdown-caret-after: {
-    content: '';
     position: absolute;
+    z-index: 10;
     bottom: 100%;
     border-width: 11px;
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
-    z-index: 10;
+    content: '';
   }
 
   --dropdown-caret-before: {
-    content: '';
     position: absolute;
+    z-index: 20;
     bottom: 100%;
     border-width: 9px;
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
-    z-index: 20;
+    content: '';
   }
 
   --link-text: {
-    font-weight: var(--fw-semibold);
-    font-size: var(--fs-body-2);
     cursor: pointer;
+    font-size: var(--fs-body-2);
+    font-weight: var(--fw-semibold);
   }
 
   --bottom-link: {
@@ -69,24 +69,24 @@
   display: flex;
 
   /* from legacy --flex-end */
-  justify-content: flex-end;
+
+  width: 100%;
+  height: 100%;
 
   /* from legacy --flex-end */
   align-items: center;
 
   /* from legacy --flex-end */
-
-  width: 100%;
-  height: 100%;
+  justify-content: flex-end;
 }
 
 a.subdomain_link {
   margin-left: var(--spacing-subdomain);
+  color: var(--c-nav-gray);
+  cursor: pointer;
   font-size: var(--fs-body-1);
   font-weight: var(--fw-semibold);
-  color: var(--c-nav-gray);
   text-transform: capitalize;
-  cursor: pointer;
 
   &:hover {
     color: var(--c-font-dark);
@@ -100,17 +100,17 @@ a.subdomain_link {
 /* Main Nav (wrapper and container responsive styles in Nav/) */
 .main_nav_contents {
   display: flex;
+  width: 100%;
 
   /* from legacy --flex-between */
-  justify-content: space-between;
+
+  height: 100%;
 
   /* from legacy --flex-between */
   align-items: center;
 
   /* from legacy --flex-between */
-
-  height: 100%;
-  width: 100%;
+  justify-content: space-between;
   padding: var(--spacing-3) 0;
 }
 
@@ -123,12 +123,12 @@ a.subdomain_link {
 }
 
 .nav_link {
-  font-weight: var(--fw-semibold);
-  font-size: var(--fs-body-2);
-  cursor: pointer;
   position: relative;
   padding: 2rem var(--spacing-nav);
   color: var(--c-nav-gray);
+  cursor: pointer;
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
 
   &:last-child {
     padding-right: 0;
@@ -141,108 +141,108 @@ a.subdomain_link {
 
 /* Dropdown Containers */
 .dropdown_small {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   position: absolute;
   top: 4.25rem;
-  background-color: var(--c-white);
-  border-radius: var(--bd-radius-default);
-  border: var(--bd-light);
   left: 0;
   width: 16rem;
+  border: var(--bd-light);
+  border-radius: var(--bd-radius-default);
+  background-color: var(--c-white);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
 
   &::after {
-    content: '';
     position: absolute;
+    z-index: 10;
     bottom: 100%;
+    left: 10%;
     border-width: 11px;
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
-    z-index: 10;
-    left: 10%;
+    content: '';
   }
 
   &::before {
-    content: '';
     position: absolute;
+    z-index: 20;
     bottom: 100%;
+    left: 10.7%;
     border-width: 9px;
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
-    z-index: 20;
-    left: 10.7%;
+    content: '';
   }
 }
 
 .dropdown_medium {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   position: absolute;
   top: 4.25rem;
-  background-color: var(--c-white);
-  border-radius: var(--bd-radius-default);
-  border: var(--bd-light);
   left: -11rem;
   width: 27rem;
+  border: var(--bd-light);
+  border-radius: var(--bd-radius-default);
+  background-color: var(--c-white);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
 
   &::after {
-    content: '';
     position: absolute;
+    z-index: 10;
     bottom: 100%;
+    left: 47%;
     border-width: 11px;
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
-    z-index: 10;
-    left: 47%;
+    content: '';
   }
 
   &::before {
-    content: '';
     position: absolute;
+    z-index: 20;
     bottom: 100%;
+    left: 47.5%;
     border-width: 9px;
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
-    z-index: 20;
-    left: 47.5%;
+    content: '';
   }
 }
 
 .dropdown_large {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   position: absolute;
   top: 4.25rem;
-  background-color: var(--c-white);
-  border-radius: var(--bd-radius-default);
-  border: var(--bd-light);
   right: -0.125rem;
-  width: 46rem;
   display: flex;
+  width: 46rem;
+  border: var(--bd-light);
+  border-radius: var(--bd-radius-default);
+  background-color: var(--c-white);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
 
   &::after {
-    content: '';
     position: absolute;
+    z-index: 10;
     bottom: 100%;
+    left: 86.75%;
     border-width: 11px;
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
-    z-index: 10;
-    left: 86.75%;
+    content: '';
   }
 
   &::before {
-    content: '';
     position: absolute;
+    z-index: 20;
     bottom: 100%;
+    left: 87%;
     border-width: 9px;
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
-    z-index: 20;
-    left: 87%;
+    content: '';
   }
 }
 
@@ -258,29 +258,29 @@ a.subdomain_link {
 }
 
 .submenu_title {
+  width: 7rem;
+  flex: none;
+  padding: 0 var(--spacing-5);
+  color: var(--c-nav-gray);
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-1);
   font-weight: var(--fw-light);
   letter-spacing: 0.7px;
-  color: var(--c-nav-gray);
   line-height: 1.25rem;
-  flex: none;
-  width: 7rem;
-  padding: 0 var(--spacing-5);
   text-transform: uppercase;
 }
 
 /*  Support & Sales Submenu Desktop */
 .support_menu {
+  flex: 1 1 var(--size-two-thirds);
   padding: var(--spacing-submenu);
   padding-bottom: var(--spacing-1);
-  flex: 1 1 var(--size-two-thirds);
 }
 
 .sales_menu {
+  flex: 1 1 var(--size-third);
   padding: var(--spacing-submenu);
   border-left: var(--bd-light);
-  flex: 1 1 var(--size-third);
 }
 
 .support_content {
@@ -289,10 +289,10 @@ a.subdomain_link {
 
 /* NavLink */
 .link_group {
-  line-height: 1.25rem;
-  text-align: left;
   padding-bottom: var(--spacing-link);
   padding-left: 5rem;
+  line-height: 1.25rem;
+  text-align: left;
 
   &.support_nav_link,
   &.product_nav_link {
@@ -310,13 +310,13 @@ a.subdomain_link {
 }
 
 .link_title {
-  font-weight: var(--fw-semibold);
-  font-size: var(--fs-body-2);
-  cursor: pointer;
   display: block;
   width: 100%;
-  text-align: left;
   color: var(--c-black);
+  cursor: pointer;
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  text-align: left;
 
   &:hover {
     color: var(--c-blue);
@@ -329,9 +329,9 @@ a.subdomain_link {
 }
 
 .link_description {
+  color: var(--c-nav-gray);
   font-size: var(--fs-body-1);
   font-weight: var(--fw-regular);
-  color: var(--c-nav-gray);
   text-transform: none;
 }
 
@@ -342,22 +342,22 @@ a.subdomain_link {
 
 .link_button {
   display: flex;
-
-  /* from legacy --center-children */
-  justify-content: center;
+  height: 3rem;
 
   /* from legacy --center-children */
   align-items: center;
 
   /* from legacy --center-children */
+  justify-content: center;
+  border: var(--bd-button);
+  border-radius: var(--bd-radius-default);
+  color: var(--c-blue);
+  cursor: pointer;
+  font-size: var(--fs-body-2);
+
+  /* from legacy --center-children */
 
   font-weight: var(--fw-semibold);
-  font-size: var(--fs-body-2);
-  cursor: pointer;
-  height: 3rem;
-  border-radius: var(--bd-radius-default);
-  border: var(--bd-button);
-  color: var(--c-blue);
 
   &:hover {
     opacity: 0.5;
@@ -368,31 +368,31 @@ a.subdomain_link {
   display: flex;
 
   /* from legacy --flex-start */
-  justify-content: flex-start;
+  height: 3.5rem;
 
   /* from legacy --flex-start */
   align-items: center;
 
   /* from legacy --flex-start */
-  height: 3.5rem;
+  justify-content: flex-start;
+  padding-left: var(--spacing-submenu);
   border-top: var(--bd-light);
   color: var(--c-blue);
   font-weight: var(--fw-semibold);
-  padding-left: var(--spacing-submenu);
 }
 
 .bottom_link_center {
-  height: 3.5rem;
-  border-top: var(--bd-light);
-  color: var(--c-blue);
-  font-weight: var(--fw-semibold);
   display: flex;
-
-  /* from legacy --center-children */
-  justify-content: center;
+  height: 3.5rem;
 
   /* from legacy --center-children */
   align-items: center;
+
+  /* from legacy --center-children */
+  justify-content: center;
+  border-top: var(--bd-light);
+  color: var(--c-blue);
+  font-weight: var(--fw-semibold);
 
   /* from legacy --center-children */
 }
@@ -406,32 +406,32 @@ a.subdomain_link {
 /* Mobile List */
 .mobile_nav {
   position: fixed;
+  z-index: 900;
   top: var(--size-mobile-nav);
-  left: 0;
   right: 0;
+  left: 0;
   width: 100%;
   min-height: calc(100vh - var(--size-mobile-nav));
   padding: 0;
-  background-color: var(--c-white);
-  z-index: 900;
   border-bottom: var(--bd-light);
+  background-color: var(--c-white);
 }
 
 .mobile_nav_item {
   display: flex;
-
-  /* from legacy --flex-start */
-  justify-content: flex-start;
+  height: 4.5rem;
 
   /* from legacy --flex-start */
   align-items: center;
 
   /* from legacy --flex-start */
+  justify-content: flex-start;
+
+  /* from legacy --flex-start */
 
   padding: var(--spacing-7);
-  height: 4.5rem;
-  font-weight: var(--fw-semibold);
   cursor: pointer;
+  font-weight: var(--fw-semibold);
 
   &:first-child {
     padding-top: 2.5rem;
@@ -441,6 +441,7 @@ a.subdomain_link {
 /* Mobile Menu container */
 .mobile_menu {
   position: fixed;
+  z-index: 950;
   top: var(--size-mobile-nav);
   right: 0;
   width: 100%;
@@ -449,7 +450,6 @@ a.subdomain_link {
   margin: 0 -105% 0 0;
   background-color: var(--c-white);
   box-shadow: var(--shadow-1);
-  z-index: 950;
   transition: margin 0.5s linear;
 
   &.active {
@@ -462,14 +462,14 @@ a.subdomain_link {
   display: flex;
 
   /* from legacy --flex-start */
-  justify-content: flex-start;
+
+  height: var(--spacing-mobile-heading);
 
   /* from legacy --flex-start */
   align-items: center;
 
   /* from legacy --flex-start */
-
-  height: var(--spacing-mobile-heading);
+  justify-content: flex-start;
   border-bottom: var(--bd-light);
 }
 
@@ -483,9 +483,9 @@ a.subdomain_link {
 .mobile_menu_title {
   width: 100%;
   padding-left: 6rem;
-  text-align: left;
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
+  text-align: left;
 }
 
 .mobile_content {
@@ -547,10 +547,10 @@ a.subdomain_link {
 
 .sales_number {
   margin-top: var(--spacing-5);
+  color: #808080;
   font-size: var(--fs-body-2);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-copy);
-  color: #808080;
 }
 
 @media (--medium) {
@@ -559,8 +559,8 @@ a.subdomain_link {
   }
 
   .link_group {
-    text-align: center;
     padding-left: 0;
+    text-align: center;
   }
 
   .link_title {
@@ -596,18 +596,18 @@ a.subdomain_link {
   }
 
   .submenu_title {
-    flex: none;
     max-width: 8rem;
+    flex: none;
   }
 
   .support_group {
-    flex-basis: 60%;
     display: flex;
+    flex-basis: 60%;
   }
 
   .sales_group {
-    flex-basis: 40%;
     display: flex;
+    flex-basis: 40%;
     padding-bottom: 0;
     border-bottom: none;
   }
@@ -623,10 +623,10 @@ a.subdomain_link {
     display: flex;
 
     /* from legacy --flex-end */
-    justify-content: flex-end;
+    align-items: center;
 
     /* from legacy --flex-end */
-    align-items: center;
+    justify-content: flex-end;
 
     /* from legacy --flex-end */
   }
@@ -636,8 +636,8 @@ a.subdomain_link {
   }
 
   .link_group {
-    line-height: 1.25rem;
     padding: 0 var(--spacing-link) var(--spacing-link) 0;
+    line-height: 1.25rem;
     text-align: left;
   }
 

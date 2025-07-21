@@ -11,10 +11,7 @@ import {
 import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type {
-  LabwareDefinitionsByURI,
-  StackItem,
-} from '/app/transformations/commands'
+import type { LabwareDefinitionsByURI, StackItem } from '@opentrons/shared-data'
 
 interface OffDeckLabwareListProps {
   labwareItems: StackItem[]
