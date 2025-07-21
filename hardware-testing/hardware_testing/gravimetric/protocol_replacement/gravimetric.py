@@ -674,10 +674,10 @@ def _get_offset_for_channel(
 ) -> Coordinate:
     offset = Coordinate(x=0, y=0, z=submerge_depth)
     if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
-        if channel in [0,1,2,3]:
+        if channel in [0, 1, 2, 3]:
             offset.y = channel * 9.0
         else:
-            offset.y = (channel-7) * 9.0
+            offset.y = (channel - 7) * 9.0
     return offset
 
 
@@ -1043,12 +1043,27 @@ def run_one_test(
     return [pre_aspirate, post_aspirate, post_dispense]
 
 
+def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
+    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
+        primary = "A1"
+        if channel in [4, 5, 6, 7]:
+            primary = "H1"
+        fixture_settings.pipette._core.configure_nozzle_layout(
+            style=NozzleLayout.SINGLE,
+            primary_nozzle=primary,
+            front_right_nozzle=primary,
+            back_left_nozzle=primary,
+        )
+        print_info(f"Configuring for single tip with {primary}")
+
+
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
     first_tip = _get_tips_for_test(
         fixture_settings, fixture_settings.tip_sizes[0], True
     )[0]
     print_info("Picking up first tip.")
+    _configure_tip_count(fixture_settings, 0)
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
     print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
@@ -1128,17 +1143,8 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             actual_disp_list_all = []
             measurements[volume] = []
             for channel in fixture_settings.channels:
-                if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
-                    primary = "A1"
-                    if channel in [4,5,6,7]:
-                        primary = "H1"
-                    fixture_settings.pipette._core.configure_nozzle_layout(
-                        style=NozzleLayout.SINGLE,
-                        primary_nozzle=primary,
-                        front_right_nozzle=primary,
-                        back_left_nozzle=primary,
-                    )
-                    # override pipette movement conflict checking 'cause we specially lay out our tipracks
+                _configure_tip_count(fixture_settings, channel)
+                # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 actual_asp_list_channel: List[float] = []
@@ -1187,6 +1193,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         asp_with_evap,
                         disp_with_evap,
                         cur_height,  # type: ignore[arg-type]
+                    )
+                    print_info(
+                        f"Finished trial {trial} asp {asp_with_evap} disp {disp_with_evap}"
                     )
                     actual_asp_list_channel.append(asp_with_evap)
                     actual_disp_list_channel.append(disp_with_evap)
