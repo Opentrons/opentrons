@@ -19,7 +19,7 @@
 .small_body_text_bold {
   @media (height: 600px) and (width: 1024px) {
     font-size: var(--font-size-20);
-    line-height: var(--font-height-24);
     font-weight: var(--font-weight-bold);
+    line-height: var(--font-height-24);
   }
 }
