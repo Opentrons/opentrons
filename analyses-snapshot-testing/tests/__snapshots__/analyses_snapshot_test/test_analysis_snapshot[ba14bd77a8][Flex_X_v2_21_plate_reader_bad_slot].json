@@ -2419,7 +2419,7 @@
         "errorInfo": {
           "args": "('A absorbanceReaderType cannot be loaded into slot C1',)",
           "class": "ValueError",
-          "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
+          "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    raise ValueError(\n"
         },
         "errorType": "PythonException",
         "id": "UUID",
@@ -2480,7 +2480,7 @@
               "errorInfo": {
                 "args": "('A absorbanceReaderType cannot be loaded into slot C1',)",
                 "class": "ValueError",
-                "traceback": "  File \"<PATH>\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"<PATH>\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"<PATH>\", line N, in _ensure_module_location\n    raise ValueError(\n"
+                "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/execution/command_executor.py\", line N, in execute\n    result = await command_impl.execute(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line N, in execute\n    self._ensure_module_location(params.location.slotName, module_type)\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocol_engine/commands/load_module.py\", line N, in _ensure_module_location\n    raise ValueError(\n"
               },
               "errorType": "PythonException",
               "id": "UUID",

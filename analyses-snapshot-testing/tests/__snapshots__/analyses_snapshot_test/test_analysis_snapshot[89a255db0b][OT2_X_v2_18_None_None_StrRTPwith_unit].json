@@ -26,7 +26,7 @@
           "errorInfo": {
             "args": "(\"ParameterContext.add_str() got an unexpected keyword argument 'unit'\",)",
             "class": "TypeError",
-            "traceback": "  File \"<PATH>\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_18_None_None_StrRTPwith_unit.py\", line N, in add_parameters\n"
+            "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_18_None_None_StrRTPwith_unit.py\", line N, in add_parameters\n"
           },
           "errorType": "PythonException",
           "id": "UUID",
