@@ -397,16 +397,15 @@ jobs:
       - name: 'backup upload folders before checkout'
         run: |
           # Move upload folders to temp location to preserve them during checkout
-          sudo mkdir -p /tmp/upload_backup
-          sudo mv to_upload_* /tmp/upload_backup/ 2>/dev/null || true
+          mkdir -p ${{ runner.temp }}/upload_backup
+          mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
         uses: 'actions/checkout@v4'
       - name: 'restore upload folders after checkout'
         run: |
           # Restore upload folders from temp location
-          sudo mv /tmp/upload_backup/to_upload_* ./ 2>/dev/null || true
+          mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true
       - uses: ./.github/actions/js/setup
-
       - name: 'print upload folders contents'
         run: |
           echo "Test Outputs"
