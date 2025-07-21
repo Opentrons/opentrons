@@ -317,6 +317,7 @@ const getDelayFields = (
   checkbox: boolean = true
 ): Record<string, any> => {
   const { enable, params } = delay
+  console.log(prefix, { enable, params })
   return {
     ...(checkbox ? { [`${prefix}_delay_checkbox`]: enable } : {}),
     [`${prefix}_delay_seconds`]: params?.duration ?? 0,
@@ -570,38 +571,6 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
             rawForm.tipRack as string
           )
         : null
-    const { referenceVolumes } = getTransferPlanAndReferenceVolumes({
-      pipetteSpecs,
-      tiprackDefinition: null,
-      conditioningByVolume: [],
-      disposalByVolume: [],
-      volume,
-      path: rawForm.path as PathOption,
-      numDispenseWells: rawForm.dispense_wells.length,
-      aspirateAirGapByVolume: [],
-    })
-    const aspirateMaxUiFlowRate =
-      matchingTipLiquidSpecs != null
-        ? getMaxUiFlowRate({
-            targetVolume: referenceVolumes.flowRate.aspirate,
-            channels: pipetteSpecs.channels,
-            robotType,
-            flowRateType: 'aspirate',
-            tipLiquidSpecs: matchingTipLiquidSpecs,
-            shaftULperMM: pipetteSpecs.shaftULperMM,
-          })
-        : null
-    const dispenseMaxUiFlowRate =
-      matchingTipLiquidSpecs != null
-        ? getMaxUiFlowRate({
-            targetVolume: referenceVolumes.flowRate.dispense,
-            channels: pipetteSpecs.channels,
-            robotType,
-            flowRateType: 'dispense',
-            tipLiquidSpecs: matchingTipLiquidSpecs,
-            shaftULperMM: pipetteSpecs.shaftULperMM,
-          })
-        : null
     const aspirateOT2Defaults = {
       aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
       aspirate_wellOrder_second: allOT2Defaults.aspirate_wellOrder_second,
@@ -612,7 +581,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       aspirate_mix_times: allOT2Defaults.aspirate_mix_times,
       aspirate_delay_checkbox: allOT2Defaults.aspirate_delay_checkbox,
       aspirate_delay_seconds: allOT2Defaults.aspirate_delay_seconds,
-      aspirate_flowRate: aspirateMaxUiFlowRate,
+      aspirate_flowRate:
+        matchingTipLiquidSpecs?.defaultAspirateFlowRate.default ?? null,
       aspirate_mmFromBottom: allOT2Defaults.aspirate_mmFromBottom,
       aspirate_position_reference: allOT2Defaults.aspirate_position_reference,
       aspirate_touchTip_checkbox: allOT2Defaults.aspirate_touchTip_checkbox,
@@ -642,7 +612,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       dispense_mix_times: allOT2Defaults.dispense_mix_times,
       dispense_delay_checkbox: allOT2Defaults.dispense_delay_checkbox,
       dispense_delay_seconds: allOT2Defaults.dispense_delay_seconds,
-      dispense_flowRate: dispenseMaxUiFlowRate,
+      dispense_flowRate:
+        matchingTipLiquidSpecs?.defaultDispenseFlowRate.default ?? null,
       dispense_mmFromBottom: allOT2Defaults.dispense_mmFromBottom,
       dispense_position_reference: allOT2Defaults.dispense_position_reference,
       dispense_touchTip_checkbox: allOT2Defaults.dispense_touchTip_checkbox,
@@ -799,6 +770,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     aspirate_touchTip_speed: aspirate.retract.touchTip.params?.speed,
     aspirate_touchTip_mmFromEdge: aspirate.retract.touchTip.params?.mmFromEdge,
     aspirate_touchTip_mmFromTop: aspirate.retract.touchTip.params?.zOffset,
+    aspirate_retract_delay_seconds: 0,
+    aspirate_submerge_delay_seconds: 0,
   }
   const dispenseFields = {
     ...dispenseFlowRateFields,
@@ -820,6 +793,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     dispense_touchTip_speed: dispense.retract.touchTip.params?.speed,
     dispense_touchTip_mmFromEdge: dispense.retract.touchTip.params?.mmFromEdge,
     dispense_touchTip_mmFromTop: dispense.retract.touchTip.params?.zOffset,
+    dispense_retract_delay_seconds: 0,
+    dispense_submerge_delay_seconds: 0,
   }
   return {
     ...getDefaultsForStepType(stepType),
@@ -869,10 +844,7 @@ const getNoLiquidClassValuesMix = (args: {
   const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
     tipObject => tipObject.tiprack === tiprack
   )
-  if (liquidClassValuesForTip == null) {
-    return {}
-  }
-  const { aspirate, singleDispense } = liquidClassValuesForTip
+
   const matchingTipLiquidSpecs =
     pipetteEntity != null
       ? getMatchingTipLiquidSpecs(
@@ -881,20 +853,19 @@ const getNoLiquidClassValuesMix = (args: {
           rawForm.tipRack as string
         )
       : null
-
   const aspirateCorrectionVolume =
     linearInterpolate(
       volume,
-      liquidClassValuesForTip.aspirate.correctionByVolume as Array<
+      (liquidClassValuesForTip?.aspirate.correctionByVolume as Array<
         [number, number]
-      >
+      >) ?? []
     ) ?? 0
   const dispenseCorrectionVolume =
     linearInterpolate(
       volume,
-      liquidClassValuesForTip.singleDispense.correctionByVolume as Array<
+      (liquidClassValuesForTip?.singleDispense.correctionByVolume as Array<
         [number, number]
-      >
+      >) ?? []
     ) ?? 0
 
   const aspirateMaxUiFlowRate =
@@ -921,6 +892,15 @@ const getNoLiquidClassValuesMix = (args: {
           correctionVolume: dispenseCorrectionVolume,
         })
       : null
+  if (robotType === OT2_ROBOT_TYPE || liquidClassValuesForTip == null) {
+    return {
+      aspirate_flowRate:
+        matchingTipLiquidSpecs?.defaultAspirateFlowRate.default ?? null,
+      dispense_flowRate:
+        matchingTipLiquidSpecs?.defaultDispenseFlowRate.default ?? null,
+    }
+  }
+  const { aspirate, singleDispense } = liquidClassValuesForTip
 
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
