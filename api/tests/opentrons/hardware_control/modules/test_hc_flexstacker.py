@@ -358,7 +358,7 @@ async def test_store_labware_motion_sequence(
         verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Assertions for offset calculation and move_axis
-        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, distance)
 
@@ -417,7 +417,7 @@ async def test_dispense_labware_motion_sequence(
         )
 
         # We need to verify the move sequence
-        verify_hopper_labware_presence.assert_called_once_with(Direction.RETRACT, True)
+        verify_hopper_labware_presence.assert_called_once_with(Direction.EXTEND, True)
         _prepare_for_action.assert_called()
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD

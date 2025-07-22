@@ -175,7 +175,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     )
 
     # Load Pipettes:
-    mock_python_name_1 = protocol.load_instrument("p10_single", "left", tip_racks=[mock_python_name_2])
+    mock_python_name_1 = protocol.load_instrument(
+        "p10_single", "left", tip_racks=[mock_python_name_2],
+    )
 
     # PROTOCOL STEPS
 

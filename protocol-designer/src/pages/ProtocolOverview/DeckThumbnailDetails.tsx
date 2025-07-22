@@ -91,6 +91,7 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
               {labwareLoadedOnModuleId != null ? (
                 <>
