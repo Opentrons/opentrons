@@ -297,7 +297,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       setShowMenuListForId={setShowMenuListForId}
                       labwareId={labwareOnModule.id}
                       key={moduleOnDeck.slot}
-                      slotPosition={[0, 0, 0]} // Module already handles nested positioning
+                      slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
                       slotBoundingBox={labwareInterfaceBoundingBox}
                       handleDragHover={handleHoverEmptySlot}
                       terminalItemId={terminalItemId}
@@ -310,7 +310,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       setHover={setHover}
                       setShowMenuListForId={setShowMenuListForId}
                       hover={hover}
-                      slotPosition={[0, 0, 0]} // Module already handles nested positioning
+                      slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
                       setHoveredLabware={setHoveredLabware}
                       setDraggedLabware={setDraggedLabware}
                       swapBlocked={
@@ -323,7 +323,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     />
                   )}
                   <ActiveLabwareControls
-                    slotPosition={[0, 0, 0]} // Module already handles nested positioning
+                    slotPosition={[0, 0, 0]}
                     slotBoundingBox={labwareInterfaceBoundingBox}
                     itemId={slotId}
                     terminalItemId={terminalItemId}
