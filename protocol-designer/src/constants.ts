@@ -218,6 +218,9 @@ export const OT2_Y_MAX_SPEED = 400
 export const OT2_Z_MAX_SPEED = 125
 export const OT2_PLUNGER_MAX_SPEED = 40
 
+// pulled from documentation
+export const DEFAULT_TOUCH_TIP_SPEED = 60
+
 export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
   RobotType,
   Record<number, { plunger: number; x: number; y: number; z: number }>
