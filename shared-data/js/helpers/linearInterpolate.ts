@@ -17,11 +17,8 @@ export const linearInterpolate = (
   left: number | null = null,
   right: number | null = null
 ): number | null => {
-  console.assert(
-    interpolationPoints.length > 0,
-    'At least one point required for interpolation'
-  )
   if (interpolationPoints.length === 0) {
+    console.warn('At least one point required for interpolation')
     return null
   }
   const sortedInterpolationPoints = interpolationPoints.sort((a, b) => {

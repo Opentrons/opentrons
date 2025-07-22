@@ -46,7 +46,6 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Svg } from '../../primitives'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { WellFill, WellGroup } from '../Labware'
 import type { StagingAreaLocation } from './StagingAreaFixture'
@@ -89,9 +88,15 @@ export interface HopperLabwareProps {
 // these ugly consts are unfortunately necessary as the hopper location exists
 // outside of our deck definition so the render doesn't follow our normal conventions
 export const STACKER_MODULE_Y_OFFSET = -6
-export const STACKER_HOPPER_LABWARE_X_OFFSET = 178.5
-export const STACKER_HOPPER_LABWARE_Y_OFFSET = 7
+// todo(mm, 2025-07-16): 17.5 mm is a by-eye adjustment that takes us from a little bit
+// left of the hopper to inside the hopper. The fact that we were 17.5 mm left in the
+// first place is weird, and suggests we're doing wrong math somewhere. A more normal
+// thing to expect here would be starting at the extended shuttle position and needing
+// an offset of hundreds of mm to go from there to inside the hopper.
+export const STACKER_HOPPER_LABWARE_X_OFFSET = 17.5
+export const STACKER_HOPPER_LABWARE_Y_OFFSET = 6
 export const STACKER_DECK_VIEW_BOX_EXPANSION = 220
+
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
@@ -107,7 +112,10 @@ interface BaseDeckProps {
   /** whether to make wrapping svg tag animatable via @react-spring/web, defaults to false */
   animatedSVG?: boolean
   /** extra props to pass to svg tag */
-  svgProps?: ComponentProps<typeof Svg>
+  /** NOTE: typing as any because running into some TS issues with React-spring,
+   * CSS Modules & Styled-components not playing together nicely
+   */
+  svgProps?: any
 }
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
@@ -305,11 +313,13 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
                 targetDeckId={deckDef.otId}
                 targetSlotId={moduleLocation.slotName}
+                childrenPositioningMode="offsetToSlot"
               >
                 {nestedLabwareDef != null ? (
                   <g cursor={onLabwareClick != null ? 'pointer' : ''}>
                     <LabwareRender
                       definition={nestedLabwareDef}
+                      positioningMode="offsetInSlot"
                       onLabwareClick={onLabwareClick}
                       wellFill={nestedLabwareWellFill}
                       shouldRotateAdapterOrientation={
@@ -365,6 +375,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   innerProps={innerProps}
                   targetDeckId={deckDef.otId}
                   targetSlotId={moduleLocation.slotName}
+                  childrenPositioningMode="offsetToSlot"
                 >
                   {nestedLabwareDef != null ? (
                     <g
@@ -373,6 +384,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     >
                       <LabwareRender
                         definition={nestedLabwareDef}
+                        positioningMode="offsetInSlot"
                         onLabwareClick={onLabwareClick}
                         wellFill={nestedLabwareWellFill}
                         shouldRotateAdapterOrientation={
@@ -427,6 +439,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               >
                 <LabwareRender
                   definition={definition}
+                  positioningMode="offsetInSlot"
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
                   missingTips={missingTips}

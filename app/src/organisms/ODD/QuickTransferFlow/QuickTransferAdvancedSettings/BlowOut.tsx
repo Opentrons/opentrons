@@ -15,18 +15,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getTipTypeFromTipRackDefinition,
-  GLYCEROL_LIQUID_CLASS_NAME,
   linearInterpolate,
   LOW_VOLUME_PIPETTES,
   NONE_LIQUID_CLASS_NAME,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
-  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
@@ -217,16 +214,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       : liquidSpecs.default.supportedTips[tipType]
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const liquidClassMap = new Map<string, string>([
-    ['none', NONE_LIQUID_CLASS_NAME],
-    ['water', WATER_LIQUID_CLASS_NAME],
-    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
-    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
-  ])
 
-  const selectedLiquidClass = liquidClassMap.get(
-    state.liquidClass?.liquidClassName ?? 'none'
-  )
+  const selectedLiquidClass = state.liquidClassName
   const liquidClassDef =
     allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
   const convertedPipetteName =

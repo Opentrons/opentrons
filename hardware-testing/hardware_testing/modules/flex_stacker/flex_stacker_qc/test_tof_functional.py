@@ -10,6 +10,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
+from .utils import verify_platform_location
+
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -95,12 +97,8 @@ async def test_tof_sensors_labware_detection(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    if not stacker.is_simulated:
-        ui.get_user_ready("Make sure both TOF sensors are installed.")
-
     print("Homing stacker X and Z axis.")
-    await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
-    await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
+    await verify_platform_location(stacker)
 
     print("Test that we have no labware on the X")
     ui.get_user_ready("Make sure there is no labware on the stacker gripper position")

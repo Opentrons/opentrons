@@ -17,7 +17,7 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
-import type { LabwareInStack } from '/app/transformations/commands'
+import type { LabwareInStack } from '@opentrons/shared-data'
 
 const HIDE_SCROLLBAR = css`
   ::-webkit-scrollbar {

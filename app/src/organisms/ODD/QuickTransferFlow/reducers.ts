@@ -111,7 +111,7 @@ export function quickTransferWizardReducer(
     case 'SET_LIQUID_CLASS': {
       return {
         ...state,
-        liquidClass: action.liquidClass,
+        liquidClassName: action.liquidClassName,
       }
     }
   }
@@ -266,7 +266,7 @@ export function quickTransferSummaryReducer(
     case 'SET_PUSH_OUT': {
       return {
         ...state,
-        pushOut: action.pushOut,
+        pushOutDispense: action.pushOutSettings,
       }
     }
     case 'SET_CONDITION_ASPIRATE': {
@@ -279,6 +279,12 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
+      }
+    }
+    case 'SET_LIQUID_CLASS_VALUES': {
+      return {
+        ...state,
+        ...action.liquidClassValues,
       }
     }
   }

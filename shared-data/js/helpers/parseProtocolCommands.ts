@@ -1,8 +1,8 @@
 // set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { getLabwareDefURI } from '..'
 import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { getLabwareDefURI } from './getLabwareDefURI'
 
 import type {
   LabwareLocation,
@@ -392,14 +392,14 @@ interface LabwareLiquidInfo {
 }
 
 /** @deprecated instead use LabwareByLiquidId from components/src/hardware-sim/ProtocolDeck/types */
-export interface LabwareByLiquidId {
+interface DeprecatedLabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
 /** @deprecated instead use getLabwareInfoByLiquidId from components/src/hardware-sim/ProtocolDeck/utils */
 export function parseLabwareInfoByLiquidId(
   commands: RunTimeCommand[]
-): LabwareByLiquidId {
+): DeprecatedLabwareByLiquidId {
   const loadLiquidCommands =
     commands.length !== 0
       ? commands.filter(
@@ -408,7 +408,7 @@ export function parseLabwareInfoByLiquidId(
         )
       : []
 
-  return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
+  return reduce<LoadLiquidRunTimeCommand, DeprecatedLabwareByLiquidId>(
     loadLiquidCommands,
     (acc, command) => {
       if (!(command.params.liquidId in acc)) {

@@ -1,0 +1,8 @@
+.adapter_render {
+  transition: transform 0.3s ease;
+}
+
+.rotated {
+  transform: rotate(180deg); /* fallback in case CSS vars not set */
+  transform-origin: var(--cx) var(--cy);
+}

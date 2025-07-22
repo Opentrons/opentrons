@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf
 
 from ...robot_client import RobotClient
 from ...conftest import _OT3_SESSION_SERVER_PORT
@@ -22,10 +22,10 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
         "standardized_slot_2",
     ),
     [
-        (lazy_fixture("ot2_server_base_url"), "1", "2", "1", "2"),
-        (lazy_fixture("ot2_server_base_url"), "D1", "D2", "1", "2"),
+        (lf("ot2_server_base_url"), "1", "2", "1", "2"),
+        (lf("ot2_server_base_url"), "D1", "D2", "1", "2"),
         pytest.param(
-            lazy_fixture("ot3_server_base_url"),
+            lf("ot3_server_base_url"),
             "1",
             "2",
             "D1",
@@ -33,7 +33,7 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
             marks=pytest.mark.ot3_only,
         ),
         pytest.param(
-            lazy_fixture("ot3_server_base_url"),
+            lf("ot3_server_base_url"),
             "D1",
             "D2",
             "D1",

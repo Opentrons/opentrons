@@ -381,7 +381,6 @@ export const SetupSteps = {
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv')
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
