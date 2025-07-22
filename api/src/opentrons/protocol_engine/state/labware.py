@@ -28,6 +28,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
+    UserDefinedVolumes,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -683,7 +684,7 @@ class LabwareView:
 
     def get_well_geometry(
         self, labware_id: str, well_name: Optional[str] = None
-    ) -> InnerWellGeometry:
+    ) -> InnerWellGeometry | UserDefinedVolumes:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:

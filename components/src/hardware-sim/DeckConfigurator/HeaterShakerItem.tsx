@@ -96,6 +96,7 @@ export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={handleRemoveClick}
+        height="100%"
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

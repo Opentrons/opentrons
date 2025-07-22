@@ -46,7 +46,6 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { Svg } from '../../primitives'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { WellFill, WellGroup } from '../Labware'
 import type { StagingAreaLocation } from './StagingAreaFixture'
@@ -121,7 +120,10 @@ interface BaseDeckProps {
   /** whether to make wrapping svg tag animatable via @react-spring/web, defaults to false */
   animatedSVG?: boolean
   /** extra props to pass to svg tag */
-  svgProps?: ComponentProps<typeof Svg>
+  /** NOTE: typing as any because running into some TS issues with React-spring,
+   * CSS Modules & Styled-components not playing together nicely
+   */
+  svgProps?: any
 }
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
@@ -319,6 +321,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
                 targetDeckId={deckDef.otId}
                 targetSlotId={moduleLocation.slotName}
+                childrenPositioningMode="offsetToSlot"
               >
                 {nestedLabwareDef != null ? (
                   <AlignLabwareToModule
@@ -387,6 +390,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   innerProps={innerProps}
                   targetDeckId={deckDef.otId}
                   targetSlotId={moduleLocation.slotName}
+                  childrenPositioningMode="offsetToSlot"
                 >
                   {nestedLabwareDef != null ? (
                     <AlignLabwareToModule

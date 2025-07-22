@@ -275,6 +275,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               innerProps={innerProps}
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (

@@ -91,6 +91,7 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
               <AlignControlToModule
                 // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a

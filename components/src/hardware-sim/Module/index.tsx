@@ -35,6 +35,7 @@ import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
 export * from './alignToModule'
 export * from './Thermocycler'
@@ -67,6 +68,21 @@ interface Props {
   children?: ReactNode
 
   /**
+   * How child components should be positioned.
+   *
+   * "offsetToSlot" - The SVG origin of a child will be at the labware mating interface of the
+   *   module, which is the front-left (-x, -y) corner of the slot on top of the module.
+   *
+   * todo(mm, 2025-07-21):
+   * 1. Add a "passThrough" mode that disables the "offsetToSlot" behavior,
+   *    to allow child components to replace it with their own SVG transform,
+   *    to support labware schema 3.
+   * 2. Migrate all existing call sites to use "passThrough".
+   * 3. Remove "offsetToSlot".
+   */
+  childrenPositioningMode: 'offsetToSlot'
+
+  /**
    * Used for applying slot-specific positioning adjustments.
    * If you're rendering the module on a deck, supply this for correct positioning.
    */
@@ -83,7 +99,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,

@@ -6,10 +6,9 @@ import { COLORS } from '../../../helix-design-system'
 
 import type { CSSProperties, MemoExoticComponent, MouseEvent } from 'react'
 import type { LabwareWell } from '@opentrons/shared-data'
-import type { StyleProps } from '../../../primitives'
 import type { WellMouseEvent } from './types'
 
-export interface WellProps extends StyleProps {
+export interface WellProps extends CSSProperties {
   /** Well Name (eg 'A1') */
   wellName: string
   /** well object from labware definition */

@@ -117,6 +117,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             orientation={orientation}
             targetDeckId={null}
             targetSlotId={null}
+            childrenPositioningMode="offsetToSlot"
           >
             <AlignControlToModule
               // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
