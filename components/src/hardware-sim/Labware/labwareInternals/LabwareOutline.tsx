@@ -3,8 +3,7 @@ import { getLabwareViewBox } from '@opentrons/shared-data'
 import { COLORS } from '../../../helix-design-system'
 import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
-import type { CSSProperties } from 'styled-components'
-import type { SVGProps } from 'react'
+import type { CSSProperties, SVGProps } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export type LabwareOutlineProps = {

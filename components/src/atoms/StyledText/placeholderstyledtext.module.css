@@ -1,0 +1,25 @@
+.heading_small_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: var(--font-weight-bold) 1.125rem/var(--line-height-24);
+  }
+}
+
+.caption_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: var(--font-weight-bold) var(--font-size-h4)/var(--line-height-16);
+  }
+}
+
+.body_default_semi_bold {
+  @media not (height: 600px) and (width: 1024px) {
+    font: var(--font-weight-semi-bold) var(--font-size-h3)/var(--line-height-20);
+  }
+}
+
+.small_body_text_bold {
+  @media (height: 600px) and (width: 1024px) {
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-height-24);
+  }
+}
