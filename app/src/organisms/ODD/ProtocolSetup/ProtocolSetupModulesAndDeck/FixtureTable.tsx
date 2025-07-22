@@ -19,9 +19,7 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -124,10 +122,14 @@ function FixtureTableItem({
     compatibleCutoutFixtureIds,
     partialRequiredCutoutFixtureId
   )
+  const isFourthColumnFixture =
+    (partialRequiredCutoutFixtureId != null &&
+      STAGING_AREA_RIGHT_SLOT_FIXTURE === partialRequiredCutoutFixtureId) ||
+    STAGING_AREA_RIGHT_SLOT_FIXTURE === compatibleCutoutFixtureIds[0]
 
-  const isThermocyclerCurrentFixture =
-    cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
-    cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE
+  const displayLocation = isFourthColumnFixture
+    ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
+    : getCutoutDisplayName(cutoutId)
 
   let chipLabel: JSX.Element
   if (!isCurrentFixtureCompatible) {
@@ -225,13 +227,7 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel
-            deckLabel={
-              isThermocyclerCurrentFixture
-                ? TC_MODULE_LOCATION_OT3
-                : getCutoutDisplayName(cutoutId)
-            }
-          />
+          <DeckInfoLabel deckLabel={displayLocation} />
         </Flex>
         <Flex
           flex="4 0 0"

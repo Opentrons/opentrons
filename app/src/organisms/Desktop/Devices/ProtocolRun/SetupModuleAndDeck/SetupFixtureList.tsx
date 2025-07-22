@@ -22,7 +22,7 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  STAGING_AREA_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
@@ -133,12 +133,14 @@ export function FixtureListItem({
     setShowSetupInstructionsModal,
   ] = useState<boolean>(false)
 
-  const displayLocation =
+  const isFourthColumnFixture =
     (partialRequiredCutoutFixtureId != null &&
-      STAGING_AREA_FIXTURES.includes(partialRequiredCutoutFixtureId)) ||
-    STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
-      ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
-      : getCutoutDisplayName(cutoutId)
+      STAGING_AREA_RIGHT_SLOT_FIXTURE === partialRequiredCutoutFixtureId) ||
+    STAGING_AREA_RIGHT_SLOT_FIXTURE === compatibleCutoutFixtureIds[0]
+
+  const displayLocation = isFourthColumnFixture
+    ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
+    : getCutoutDisplayName(cutoutId)
 
   return (
     <>
