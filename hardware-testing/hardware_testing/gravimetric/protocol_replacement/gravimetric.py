@@ -227,16 +227,20 @@ class FixtureSettings:
             float(volume) for volume in lookup_key("volumes_to_test_1000ul", csv_params)
         ]
         extra_volumes_to_test_20ul = [
-            float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
+            float(volume)
+            for volume in lookup_key("extra_volumes_to_test_20ul", csv_params)
         ]
         extra_volumes_to_test_50ul = [
-            float(volume) for volume in lookup_key("volumes_to_test_50ul", csv_params)
+            float(volume)
+            for volume in lookup_key("extra_volumes_to_test_50ul", csv_params)
         ]
         extra_volumes_to_test_200ul = [
-            float(volume) for volume in lookup_key("volumes_to_test_200ul", csv_params)
+            float(volume)
+            for volume in lookup_key("extra_volumes_to_test_200ul", csv_params)
         ]
         extra_volumes_to_test_1000ul = [
-            float(volume) for volume in lookup_key("volumes_to_test_1000ul", csv_params)
+            float(volume)
+            for volume in lookup_key("extra_volumes_to_test_1000ul", csv_params)
         ]
         extra = bool(lookup_key("is_extra", csv_params)[0] == "TRUE")
 
@@ -297,6 +301,7 @@ class FixtureSettings:
             pipette_tag = helpers._get_tag_from_pipette(pipette, increment, False)
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
+
         test_report = report.create_csv_test_report(
             volumes=volumes_flat,
             pipette_channels=pipette_channels,
@@ -308,6 +313,13 @@ class FixtureSettings:
         )
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
+
+        print_info(f"volumes flat {volumes_flat}")
+        print_info(f"channels {pipette_channels}")
+        print_info(f"increment {increment}")
+        print_info(f"trials {trials}")
+        print_info(f"name {name}")
+
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
         print_info(f"Fast simulate {fast_simulate}")
