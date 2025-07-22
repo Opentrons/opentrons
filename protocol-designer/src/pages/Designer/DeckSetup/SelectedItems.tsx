@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 
-import { AlignControlToModule, Module } from '@opentrons/components'
+import { Module } from '@opentrons/components'
 import {
   getAllLabwareDefs,
   getModuleDef,

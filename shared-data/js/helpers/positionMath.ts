@@ -20,7 +20,6 @@ import type {
   LabwareDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  SlotTransforms,
   Vector3D,
 } from '../types'
 
