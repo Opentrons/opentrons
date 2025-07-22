@@ -212,7 +212,42 @@ In many cases, the liquid class definition represents fine-tuned changes optimiz
 
 Not all transfer behavior is easily visible. See :ref:`liquid-class-definitions` for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see :ref:`liquid-control`. 
 
-.. _defining-new-liquid-classes:
+.. _customizing-liquid-classes:
+
+Customizing Liquid Classes
+===========================
+
+You can create your own liquid class to customize transfer behavior for any liquid in a Flex protocol. To make changes, you can edit individual properties of an existing liquid class, or add properties to a new liquid class. 
+
+To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use :py:meth:`~.ProtocolContext.get_liquid_class` to specify the liquid class you'll make changes to::
+
+  # get base liquid class and custom properties for the Flex pipette and tips 
+
+    custom_water = protocol.get_liquid_class(name="water")
+    custom_water_properties=custom_water.get_for(pipette, tiprack)
+
+.. versionadded:: 2.24
+
+Next, edit indivual liquid class properties based on your Flex pipette and tip combination. 
+
+.. code-block:: python
+    
+  # edit aspirate submerge speed to 80 μL/sec
+    custom_water_properties.aspirate.submerge.speed = 80
+  # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
+  # edit to delay for 1 sec before retracting after an aspirate
+    custom_water_properties.aspirate.retract.delay.enabled = True
+    custom_water_properties.aspirate.retract.delay.duration = 1.0
+
+.. versionadded:: 2.24
+
+Then, complete your transfers with the modified ``custom_water`` liquid class. 
+
+All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use :ref:`meniscus-relative <well-meniscus>` locations, set the ``positionReference`` to ``"liquid-meniscus"`` for actions like an aspirate or dispense.   
+
+.. _new-liquid-classes:
 
 Defining New Liquid Classes
 ============================
@@ -221,8 +256,8 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 .. code-block:: python
 
-  # add required properties in a dictionary for the chosen pipette and tip racks
-  custom_liquid_class_properties = {
+   # add required properties in a dictionary for the chosen pipette and tip racks
+   custom_liquid_class_properties = {
       "p20_single_gen2": {
           "opentrons/opentrons_96_tiprack_20ul/1": {
               "aspirate": {
@@ -249,8 +284,8 @@ You can also create a new liquid class for your Flex protocols. Instead of using
                       "delay": {"enabled": False},
                       "speed": 100,
                       "start_position": {
-                          "offset": {"x": 1, "y": 2, "z": 3},
-                          "position_reference": "well-bottom",
+                         "offset": {"x": 1, "y": 2, "z": 3},
+                         "position_reference": "well-bottom",
                       },
                   },
               },
@@ -289,70 +324,6 @@ You can also create a new liquid class for your Flex protocols. Instead of using
   }
 
 Then, use the defined properties and :py:meth:`~.ProtocolContext.define_liquid_class` to create your new liquid class::
-
-  # create a new liquid class 
-  custom_viscous = protocol.define_liquid_class(
-    name="custom_viscous",
-    properties=custom_liquid_class_properties,
-    display_name="Custom Viscous"
-  )
-
-.. versionadded:: 2.24
-
-You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified `liquid class properties <https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class-definitions/1>`__ for examples.
-
-You can also define optional properties, like a mix or blowout, in your liquid class. See the `liquid class schema <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ for a complete list of properties.
-
-
-.. _customizing-liquid-classes:
-
-Customizing Liquid Classes
-===========================
-
-You can create your own liquid class to customize transfer behavior for any liquid in a Flex protocol. To make changes, you can edit individual properties of an existing liquid class, or add properties to a new liquid class. 
-
-To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use :py:meth:`~.ProtocolContext.get_liquid_class` to specify the liquid class you'll make changes to::
-
-  # get base liquid class and custom properties for the Flex pipette and tips 
-
-    custom_water = protocol.get_liquid_class(name="water")
-    custom_water_properties=custom_water.get_for(pipette, tiprack)
-
-.. versionadded:: 2.24
-
-Next, edit indivual liquid class properties based on your Flex pipette and tip combination. 
-
-.. code-block:: python
-    
-  # edit aspirate submerge speed to 80 μL/sec
-    custom_water_properties.aspirate.submerge.speed = 80
-  # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
-    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)
-    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
-  # edit to delay for 1 sec before retracting after an aspirate
-    custom_water_properties.aspirate.retract.delay.enabled = True
-    custom_water_properties.aspirate.retract.delay.duration = 1.0
-.. versionadded:: 2.24
-Then, complete your transfers with the modified ``custom_water`` liquid class. 
-All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use :ref:`meniscus-relative <well-meniscus>` locations, set the ``positionReference`` to ``"liquid-meniscus"`` for actions like an aspirate or dispense.   
-.. _new-liquid-classes:
-Defining New Liquid Classes
-============================
-You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified liquid class, you'll start from scratch, providing a value for `every required property <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ in your liquid class. 
-.. code-block:: python
- # examples of required properties in a dictionary for the pipette and tip racks
- custom_liquid_class_properties = {
-    "flex_1channel_50": {
-        "opentrons/opentrons_flex_96_tiprack_50ul/1": {
-            "aspirate": {
-                "aspirate_position": {
-                    "offset": {"x": 1, "y": 2, "z": 3},
-                    "position_reference": "well-bottom",
-                },
-            },
-        },
-    },
-  }
               
  # create a new liquid class
  custom_viscous = protocol.define_liquid_class(
@@ -360,8 +331,13 @@ You can also create a new liquid class for your Flex protocols. Instead of using
     properties=custom_liquid_class_properties,
     display_name="Custom Viscous"
   )
+
 .. versionadded:: 2.24
-The example above is shortened and only includes aspirate position properties. To create your liquid class, you'll need to define values for all `required properties <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>` in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. 
+
+You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified `liquid class properties <https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1>`__ for examples.
+
+You can also define optional properties, like a mix or blowout, in your liquid class. See `the liquid class schema <https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json>`__ for a complete list of properties. 
+
 .. note:: 
     The :py:meth:`.ProtocolContext.get_liquid_class` method only accepts Opentrons-verified liquid classes, like ``glycerol_50``. You'll need to use :py:meth:`.ProtocolContext.define_liquid_class` in each Flex protocol that uses a custom liquid class.
 
