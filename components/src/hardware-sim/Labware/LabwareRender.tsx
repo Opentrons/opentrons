@@ -12,8 +12,7 @@ import {
   WellLabels,
 } from './labwareInternals'
 
-import type { CSSProperties } from 'styled-components'
-import type { RefObject } from 'react'
+import type { CSSProperties, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {

@@ -400,10 +400,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               height={`${STANDARD_Y_HEIGHT}px`}
               dataTestId={id}
               innerDivProps={{
-                style: {
-                  cursor: 'pointer',
-                },
+                cursor: 'pointer',
                 transform: 'rotate(180deg) scaleX(-1)',
+              }}
+              innerDivEvents={{
                 onClick: () => {
                   setSelectedSlot(slot)
                 },
@@ -519,10 +519,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               width={`${STANDARD_X_WIDTH}px`}
               height={`${STANDARD_Y_HEIGHT}px`}
               innerDivProps={{
-                style: {
-                  cursor: 'pointer',
-                },
+                cursor: 'pointer',
                 transform: 'rotate(180deg) scaleX(-1)',
+              }}
+              innerDivEvents={{
                 onClick: () => {
                   setSelectedSlot(slotForOnTheDeck)
                 },

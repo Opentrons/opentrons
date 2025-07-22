@@ -34,6 +34,7 @@ import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
 export * from './Thermocycler'
 
@@ -69,7 +70,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,

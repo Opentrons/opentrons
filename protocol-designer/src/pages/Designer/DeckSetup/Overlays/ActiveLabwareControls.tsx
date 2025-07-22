@@ -80,10 +80,10 @@ export function ActiveLabwareControls(
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
         innerDivProps={{
-          style: {
-            opacity: hoverOpacity,
-            ...DECK_CONTROLS_STYLE,
-          },
+          opacity: hoverOpacity,
+          ...DECK_CONTROLS_STYLE,
+        }}
+        innerDivEvents={{
           onMouseEnter: () => {
             setHover(itemId)
           },
