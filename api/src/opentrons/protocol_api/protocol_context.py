@@ -1402,7 +1402,7 @@ class ProtocolContext(CommandPublisher):
         """Define a custom liquid class, either based on an existing liquid class, or create a completely new one.
 
         :param name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
-        :param properties: A dict of transfer properties for pipette and tip combinations to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be as specified in `TransferPropertiesDict`: <https://github.com/Opentrons/opentrons/blob/edge/shared-data/python/opentrons_shared_data/liquid_classes/types.py>`_.
+        :param properties: A dict of transfer properties for pipette and tip combinations to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be as specified in ``TransferPropertiesDict``. See the  `liquid class type definitions <https://github.com/Opentrons/opentrons/blob/edge/shared-data/python/opentrons_shared_data/liquid_classes/types.py>`_.
 
         :param base_liquid_class: An existing liquid class object to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the specified pipette and tip combinations. All other properties will remain the same as those in the base class.
 
