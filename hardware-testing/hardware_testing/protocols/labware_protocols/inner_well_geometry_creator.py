@@ -34,6 +34,8 @@ PROBING_PIPETTE_SIZE = 50
 
 SLOT_LIQUID_TIPRACK = "C3"
 SLOT_PROBING_TIPRACK = "D3"
+
+
 SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C2"
 SLOT_DIAL = "B2"
@@ -59,8 +61,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "cheight", "hdelta"]
-
+CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "vol_diff", "cheight", "hdelta"]
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -77,6 +78,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
+            {"display_name": "usa96deep", "value": "usascientific_96_wellplate_2.4ml_deep"},
             {
                 "display_name": "applied24",
                 "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
@@ -125,17 +127,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=0.01,
     )
 
-    parameters.add_str(
-        variable_name="well_location",
-        display_name="Well Location",
-        choices=[
-            {"display_name": "A1", "value": "A1"},
-            {"display_name": "A2", "value": "A2"},
-            {"display_name": "A3", "value": "A3"},
-        ],
-        default="A1",
-    )
-
     parameters.add_bool(
         display_name="Quick Mode",
         variable_name="quick_mode",
@@ -180,6 +171,7 @@ def _setup(
     float,
     float,
     str,
+    Labware,
 ]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
@@ -189,7 +181,6 @@ def _setup(
     dynamic_steps = ctx.params.dynamic_steps  # type: ignore[attr-defined]
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
     neutral_target = ctx.params.neutral_target  # type: ignore[attr-defined]
-    well_location = ctx.params.well_location  # type: ignore[attr-defined]
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     # reservoir_used = ctx.params.reservoir_used  # type: ignore[attr-defined]
@@ -270,7 +261,7 @@ def _setup(
         ethanol,
         first_dispense,
         neutral_target,
-        well_location,
+        labware_type,
     )
 
 
@@ -315,7 +306,7 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
         return
     from hardware_testing.data import append_data_to_file
 
-    formatted_line = [str(item).ljust(15) for item in line]
+    formatted_line = [str(item).ljust(25) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
@@ -368,27 +359,27 @@ def run(ctx: ProtocolContext) -> None:
         ethanol,
         first_dispense,
         neutral_target,
-        well_location,
+        labware_type,
     ) = _setup(ctx)
 
     # Constants
-    max_volume = labware[well_location].max_volume
-    min_step = max(max_volume * 0.005, 5)  #
+    max_volume = labware["A1"].max_volume
+    min_step = max(max_volume * 0.005, 5) 
     max_step = min(max_volume * 0.08, 1000)
     tolerance = (
         max_volume / 30
     )  # if the height within tolerance, then protocol can finish.
 
     # Initialize state
-    volume_dispensed = 0.0
-    dispense_volume = 0.0
     corrected_height = 0.0
-    cheight_list = []
+    corrected_heights = []
     tip_z_error = 0.0
     step = 0
     hdelta = 0.0
     height = 0.0
     height_check = 0.0
+    vol_diff = 0.0
+    step_volume = 0.0
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -445,11 +436,12 @@ def run(ctx: ProtocolContext) -> None:
     def write_trial_log() -> None:
         trial_data = [
             step,
-            round(dispense_volume, 5),
-            round(volume_dispensed, 5),
+            round(step_volume, 5),
+            round(total_vol, 5),
             round(tip_z_error, 5),
-            round(corrected_height, 5),
-            round(hdelta, 5),
+            vol_diff,
+            corrected_height,
+            hdelta,
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
@@ -457,9 +449,15 @@ def run(ctx: ProtocolContext) -> None:
 
     drop_tips()
 
-    step_volume = first_dispense if dynamic_steps else max_volume / number_of_steps
+    total_vol = first_dispense if dynamic_steps else max_volume / number_of_steps
+    wells = list(labware.wells_by_name().keys())
 
-    while volume_dispensed < (max_volume - tolerance):
+    while total_vol < (max_volume - tolerance):
+       # if step > len(wells):
+        #   labware = ctx.load_labware(
+         #       labware_type, "A1", version=ctx.params.labware_version
+          # )
+           #step = 1
         # initial step, log 0
         if step == 0:
             pick_up_tips()
@@ -468,40 +466,39 @@ def run(ctx: ProtocolContext) -> None:
         else:
             if not quick_mode:
                 tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-            dispense_volume = step_volume  # dispenses first_dispense initially
+            well = wells[step]
+            total_vol += step_volume
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
-                dispense_volume,
+                total_vol,
                 src["A1"],
-                labware[well_location],
+                labware[well],
                 new_tip="never",
                 return_tip=False,
             )
-            volume_dispensed += dispense_volume
-
+        
             height_check = corrected_height
 
             # probe well
-            height = _get_height_of_liquid_in_well(
-                probe_pipette, labware[well_location], ctx.is_simulating()
-            )
+            height = probe_pipette.measure_liquid_height(labware[well])
             corrected_height = height + tip_z_error
+
+            api_vol = labware[well].height_from_volume(step_volume)
+            vol_diff = api_vol - corrected_height
 
             # check if new height greater than old height
             if height_check > corrected_height:
                 liq_pipette.drop_tip()
                 liq_pipette.pick_up_tip()
-                height = _get_height_of_liquid_in_well(
-                    probe_pipette, labware[well_location], ctx.is_simulating()
-                )
+                height = probe_pipette.measure_liquid_height(labware[well])
                 corrected_height = height + tip_z_error
 
         # log corrected height
-        cheight_list.append(corrected_height)
+        corrected_heights.append(corrected_height)
 
         # find hdelta and correct
-        if dynamic_steps and len(cheight_list) > 1:
-            hdelta = cheight_list[-1] - cheight_list[-2]
+        if dynamic_steps and len(corrected_heights) > 1:
+            hdelta = corrected_heights[-1] - corrected_heights[-2]
             step_volume = adaptive_volume_step(
                 hdelta, corrected_height, step_volume, neutral_target
             )

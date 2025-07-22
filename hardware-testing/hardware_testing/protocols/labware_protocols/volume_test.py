@@ -108,6 +108,12 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=5,
     )
 
+    parameters.add_bool(
+        variable_name="handheld_pipette",
+        display_name = "handheld pipette",
+        default = False
+    )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -120,6 +126,7 @@ def _setup(
     Labware,
     Labware,
     LiquidClass,
+    bool
 ]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
@@ -168,6 +175,10 @@ def _setup(
     props.dispense.dispense_position.offset.z = 2
     props.dispense.dispense_position.offset.x = (labware["A1"].diameter) / 2
 
+    handheld_pipette = ctx.params.handheld_pipette # type: ignore[attr-defined]
+
+
+
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
         from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
@@ -197,6 +208,7 @@ def _setup(
         src,
         dial,
         ethanol,
+        handheld_pipette
     )
 
 
@@ -241,7 +253,7 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
         return
     from hardware_testing.data import append_data_to_file
 
-    formatted_line = [str(item).ljust(20) for item in line]
+    formatted_line = [str(item).ljust(30) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
@@ -270,6 +282,7 @@ def run(ctx: ProtocolContext) -> None:
         src,
         dial,
         ethanol,
+        handheld_pipette
     ) = _setup(ctx)
 
     # Initialize state
@@ -308,16 +321,23 @@ def run(ctx: ProtocolContext) -> None:
     liq_pipette.drop_tip()
 
     for volume, well in zip(volumes, wells):
-        pick_up_tips()
+        if handheld_pipette:
+            probe_pipette.pick_up_tip()
+        else:
+            pick_up_tips()
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-        liq_pipette.transfer_with_liquid_class(
-            ethanol,
-            volume,
-            src["A1"],
-            labware[well],
-            new_tip="never",
-            return_tip=False,
-        )
+
+        if handheld_pipette:
+            ctx.pause(f"Fill with {volume}")
+        else:
+            liq_pipette.transfer_with_liquid_class(
+                ethanol,
+                volume,
+                src["A1"],
+                labware[well],
+                new_tip="never",
+                return_tip=False,
+            )
         # probe well
         height = probe_pipette.measure_liquid_height(labware[well])
         corrected_height = height + tip_z_error
