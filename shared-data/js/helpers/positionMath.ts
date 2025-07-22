@@ -91,14 +91,8 @@ export function getLabwareViewBox(
 
 /** Logically specifies where a labware is located. */
 export interface ComputeLabwareOriginInput {
-  /** The underlying deck. */
-  deckDefinition: DeckDefinition
-
-  /**
-   * The underlying slot. If this is a Flex and the labware is on a module, this should
-   * be the slot that the module replaces.
-   */
-  slotId: string
+  /** The labware and all the labware underneath it. */
+  labwareDefinitionsTopToBottom: LabwareDefinition[]
 
   /**
    * The definition of the module underneath the labware, if there is one.
@@ -107,8 +101,14 @@ export interface ComputeLabwareOriginInput {
    */
   moduleDefinition: ModuleDefinition | null
 
-  /** The labware and all the labware underneath it. */
-  labwareDefinitionsTopToBottom: LabwareDefinition[]
+  /**
+   * The underlying slot. If this is a Flex and the labware is on a module, this should
+   * be the slot that the module replaces.
+   */
+  slotId: string
+
+  /** The underlying deck. */
+  deckDefinition: DeckDefinition
 }
 
 /**
