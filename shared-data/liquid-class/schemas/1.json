@@ -160,7 +160,7 @@
     },
     "correctionByVolume": {
       "type": "array",
-      "description": "Settings for volume correction, keyed by the total volume in tip after the aspirate/ dispense action. The ‘correction value’ represents an additional volume the plunger should move to accurately hit target volume.",
+      "description": "Settings for volume correction, keyed by the total volume in tip after the aspirate/dispense action. The correction value provides additional information about how much the pipette plunger should move to accurately pipette the specified volume when using this liquid class.",
       "items": {
         "type": "array",
         "items": { "type": "number" },
