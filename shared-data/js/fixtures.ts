@@ -315,7 +315,7 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
       providesAddressableAreas: {
         cutoutD1: [],
         cutoutD2: [],
-        cutoutD3: ['96ChannelWasteChute', 'fakeD4'],
+        cutoutD3: ['1ChannelWasteChute', 'fakeD4'],
         cutoutC1: [],
         cutoutC2: [],
         cutoutC3: [],
