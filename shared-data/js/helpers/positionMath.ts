@@ -162,7 +162,7 @@ function getLabwareStackAsArray(
     parentLabwareDefinition,
   ] of pairsFromArray(labwareDefinitionsTopToBottom)) {
     result.push({
-      debugMetadata: {
+      debugInfo: {
         type: 'labwareToLabware',
         parentLabwareDefinition,
         childLabwareDefinition,
@@ -186,7 +186,7 @@ function getLabwareStackAsArray(
     }
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
-      debugMetadata: {
+      debugInfo: {
         type: 'deckSlotToLabware',
         parentSlotId: slotId,
         childLabwareDefinition: bottomLabware,
@@ -197,7 +197,7 @@ function getLabwareStackAsArray(
       ),
     })
     result.push({
-      debugMetadata: {
+      debugInfo: {
         type: 'rootDeckSlot',
         slotId,
       },
@@ -211,7 +211,7 @@ function getLabwareStackAsArray(
     }
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
-      debugMetadata: {
+      debugInfo: {
         type: 'moduleToLabware',
         parentModuleDefinition: moduleDefinition,
         childLabwareDefinition: bottomLabware,
@@ -224,7 +224,7 @@ function getLabwareStackAsArray(
       ),
     })
     result.push({
-      debugMetadata: {
+      debugInfo: {
         type: 'rootModule',
         parentSlotId: slotId,
         moduleDefinition,
@@ -246,7 +246,7 @@ interface LabwareStackElement {
    * Human-readable metadata for the benefit of throwing in a console.log() or whatever.
    * Code should not consume this.
    */
-  debugMetadata:
+  debugInfo:
     | {
         type: 'rootDeckSlot'
         slotId: string
