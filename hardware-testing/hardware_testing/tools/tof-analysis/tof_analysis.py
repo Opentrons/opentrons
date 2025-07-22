@@ -179,10 +179,10 @@ def create_baseline(
         # Iterate through the per-index bin map and calculate the threshold
         # for that specific bin.
         for zone, bins_dict in aggregate.items():
-            for bins in bins_dict.values():
+            for bins in bins_dict.values():  # type: ignore
                 mean = sum(bins) / len(bins)  # type: ignore
                 std = statistics.pstdev(bins)  # type: ignore
-                threshold = float("%.2f" % (mean + (std * deviation)))
+                threshold = float("%.2f" % (mean + (std * deviation)))  # type: ignore
                 baseline[zone].append(threshold)
 
         assert (
@@ -381,7 +381,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
     )
 
     measurements, sample_count = read_filtered_data(args.dataframe, config)
-    aggregate_zones = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    aggregate_zones = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # type: ignore
     baselines = defaultdict(dict)  # type: ignore
     for axis, platform_data in measurements.items():
         zone_count = zone_count_x if axis == "x" else zone_count_z
@@ -595,7 +595,7 @@ def validate_baseline(args: argparse.Namespace) -> None:
             print(
                 f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
             )
-    
+
     print(f"\nZONES NOT DETECTED\n")
     for stacker, samples in undetected_labware.items():
         for sample in samples:
