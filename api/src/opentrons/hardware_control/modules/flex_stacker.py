@@ -2,7 +2,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Mapping, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Mapping,
+    cast,
+)
 
 from opentrons.drivers.flex_stacker.types import (
     AxisParams,
@@ -14,6 +24,7 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     StallGuardParams,
     TOFDetection,
+    TOFMeasurementResult,
     TOFSensor,
     HardwareRevision,
     TOFSensorMode,
@@ -556,8 +567,8 @@ class FlexStacker(mod_abc.AbstractModule):
         if enforce_shuttle_lw_sensing:
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
-        # Move the Z so the labware sits right under any labware already stored
-        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        # Move the Z so the labware sits right under the labware already stored
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
@@ -636,7 +647,13 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.home_axis(StackerAxis.X, Direction.EXTEND)
 
-    async def labware_detected(self, axis: StackerAxis, direction: Direction) -> bool:
+    async def labware_detected(
+        self,
+        axis: StackerAxis,
+        direction: Direction,
+        histogram: Optional[TOFMeasurementResult] = None,
+        baseline: Optional[Dict[int, List[float]]] = None,
+    ) -> bool:
         """Detect labware on the TOF sensor using the `baseline` method
 
         NOTE: This method is still under development and is inconsistent when detecting
@@ -646,11 +663,13 @@ class FlexStacker(mod_abc.AbstractModule):
         """
         dir_str = cast(Literal["extend", "retract"], str(direction))
         sensor = TOFSensor.X if axis == StackerAxis.X else TOFSensor.Z
-        baseline = load_tof_baseline_data(self.model())[sensor.value][dir_str]
+        baseline = (
+            baseline or load_tof_baseline_data(self.model())[sensor.value][dir_str]
+        )
         config = TOF_DETECTION_CONFIG[sensor][direction]
 
         # Take a histogram reading and determine if labware was detected
-        histogram = await self._driver.get_tof_histogram(sensor)
+        histogram = histogram or await self._driver.get_tof_histogram(sensor)
         for zone in config.zones:
             raw_data = histogram.bins[zone]
             baseline_data = baseline[zone]
