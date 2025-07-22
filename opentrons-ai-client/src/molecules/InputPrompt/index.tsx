@@ -188,7 +188,10 @@ export function InputPrompt(): JSX.Element {
         }
       } catch (fileError: unknown) {
         console.error('File processing failed:', fileError)
-        const errorMessage = fileError instanceof Error ? fileError.message : 'Failed to process files'
+        const errorMessage =
+          fileError instanceof Error
+            ? fileError.message
+            : 'Failed to process files'
         setFileError(errorMessage)
         return // Don't proceed with chat if file processing fails
       }
@@ -273,7 +276,10 @@ export function InputPrompt(): JSX.Element {
         chatHistory.forEach(msg => {
           if (msg.attachments != null && msg.attachments.length > 0) {
             msg.attachments.forEach(att => {
-              if (!existingFilenames.has(att.name) && attachmentsToSend != null) {
+              if (
+                !existingFilenames.has(att.name) &&
+                attachmentsToSend != null
+              ) {
                 attachmentsToSend.push({
                   id: att.id || '',
                   filename: att.name,

@@ -266,10 +266,16 @@ export const uploadFile = async (
 
   if (!response.ok) {
     const error: unknown = await response.json()
-    const errorMessage = 
-      (error != null && typeof error === 'object' && 'message' in error && typeof error.message === 'string') 
-        ? error.message 
-        : (error != null && typeof error === 'object' && 'error' in error && typeof error.error === 'string')
+    const errorMessage =
+      error != null &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof error.message === 'string'
+        ? error.message
+        : error != null &&
+          typeof error === 'object' &&
+          'error' in error &&
+          typeof error.error === 'string'
         ? error.error
         : 'File upload failed'
     throw new Error(errorMessage)
