@@ -13,6 +13,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getAllLabwareDefs, getLabwareDefURI } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -22,6 +23,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
+import { getMaxConditioningVolume } from '../utils'
 
 import type { Dispatch } from 'react'
 import type {
@@ -119,6 +121,18 @@ export function Condition(props: DelayProps): JSX.Element {
     buttonIsDisabled = conditionVolume == null
   }
 
+  const maxConditioningVolume = getMaxConditioningVolume(
+    state.volume,
+    state.disposalVolumeDispenseSettings?.volume ?? 0,
+    state.tipRack,
+    state.pipette
+  )
+
+  const volumeError =
+    conditionVolume != null && conditionVolume > maxConditioningVolume
+      ? t('value_out_of_range', { min: 0, max: maxConditioningVolume })
+      : null
+
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
@@ -167,7 +181,7 @@ export function Condition(props: DelayProps): JSX.Element {
           <Flex
             width="30.5rem"
             height="100%"
-            gridGap={SPACING.spacing24}
+            gridGap={SPACING.spacing8}
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
@@ -175,8 +189,12 @@ export function Condition(props: DelayProps): JSX.Element {
               type="number"
               value={conditionVolume}
               title={t('condition_volume')}
+              error={volumeError}
               readOnly
             />
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('condition_max_volume', { max: maxConditioningVolume })}
+            </StyledText>
           </Flex>
           <Flex
             paddingX={SPACING.spacing24}
