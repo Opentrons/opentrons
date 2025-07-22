@@ -109,16 +109,9 @@ export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
       <GenericWizardTile
         header={i18n.format(t('place_shuttle'), 'capitalize')}
         rightHandBody={
-          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
-              <source src={StackerInstallShuttle} />
-            </AnimationVideo>
-          </Flex>
+          <AnimationVideo width="100%">
+            <source src={StackerInstallShuttle} />
+          </AnimationVideo>
         }
         bodyText={
           <>
