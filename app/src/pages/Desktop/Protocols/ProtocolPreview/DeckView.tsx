@@ -32,9 +32,13 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  LabwareEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
 
+export interface LabwareEntityExtended extends LabwareEntity {
+  nickName: string | null
+}
 const POTENTIAL_TRASH_COMMAND_TYPES = [
   'moveToAddressableArea',
   'moveToAddressableAreaForDropTip',
@@ -47,6 +51,7 @@ const POTENTIAL_TRASH_COMMAND_TYPES = [
 ]
 
 interface DeckViewProps {
+  commands: RunTimeCommand[]
   invariantContext: InvariantContext
   robotState: TimelineFrame
   robotType: RobotType
@@ -70,6 +75,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedRunTimeCommand,
     showDeckRenders,
     liquids,
+    commands,
   } = props
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -77,7 +83,25 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     trashBinEntities,
     wasteChuteEntities,
     stagingAreaEntities,
+    labwareEntities,
   } = invariantContext
+  const loadLabwareCommands = commands.filter(
+    command => command.commandType === 'loadLabware'
+  )
+  const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
+    (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
+      const matchingCommand = loadLabwareCommands.find(
+        command => command.result?.labwareId === entity.id
+      )
+      acc[key] = {
+        ...entity,
+        nickName: matchingCommand?.params.displayName ?? null,
+      }
+      return acc
+    },
+    {}
+  )
+
   const trashBinFixtures = Object.values(trashBinEntities).map(trash => ({
     cutoutId: trash.location as CutoutId,
     slot: trash.location.split('cutout')[1],
@@ -193,6 +217,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 />
               ))}
               <DeckViewDetails
+                labwareEntitiesExtended={labwareEntitiesExtended}
                 liquids={liquids}
                 showDeckRenders={showDeckRenders}
                 hoveredSlot={hoveredSlot}

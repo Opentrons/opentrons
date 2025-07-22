@@ -44,11 +44,13 @@ import type {
   ModuleTemporalProperties,
   TimelineFrame,
 } from '@opentrons/step-generation'
+import type { LabwareEntityExtended } from './DeckView'
 
 const STANDARD_X_WIDTH = 127.76
 const STANDARD_Y_HEIGHT = 85.48
 
 interface DeckViewDetailsProps {
+  labwareEntitiesExtended: Record<string, LabwareEntityExtended>
   liquids: Liquid[]
   robotState: TimelineFrame
   robotType: RobotType
@@ -76,6 +78,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     hoveredSlot,
     showDeckRenders,
     liquids,
+    labwareEntitiesExtended,
   } = props
   const { labware, modules, pipettes } = robotState
   const { labwareEntities, moduleEntities, trashBinEntities } = invariantContext
@@ -183,8 +186,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   >
                     {isActiveLayerVisible
                       ? copy
-                      : labwareEntities[labwareLoadedOnModuleId].def.metadata
-                          .displayName}
+                      : labwareEntitiesExtended[labwareLoadedOnModuleId]
+                          .nickName ??
+                        labwareEntitiesExtended[labwareLoadedOnModuleId].def
+                          .metadata.displayName}
                   </StyledText>
                 </div>
               </RobotCoordsForeignDiv>
@@ -430,7 +435,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     desktopStyle="captionRegular"
                     color={COLORS.white}
                   >
-                    {labwareEntities[id].def.metadata.displayName}
+                    {labwareEntitiesExtended[id].nickName ??
+                      labwareEntitiesExtended[id].def.metadata.displayName}
                   </StyledText>
                 )}
               </div>
@@ -549,7 +555,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     desktopStyle="captionRegular"
                     color={COLORS.white}
                   >
-                    {labwareEntities[id].def.metadata.displayName}
+                    {labwareEntitiesExtended[id].nickName ??
+                      labwareEntitiesExtended[id].def.metadata.displayName}
                   </StyledText>
                 )}
               </div>
