@@ -18,6 +18,7 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
@@ -174,6 +175,12 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(fixture.cutoutFixtureId) &&
       fixture.cutoutId === WASTE_CHUTE_CUTOUT
   )
+  const wasteChuteStackerFixtures = deckConfig.filter(
+    fixture =>
+      fixture.cutoutFixtureId != null &&
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId) &&
+      fixture.cutoutId === WASTE_CHUTE_CUTOUT
+  )
 
   const [singleLocationModules, stackerModules] = partition(
     modulesOnDeck,
@@ -283,6 +290,85 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       <>
+        {stackerModules.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDef,
+            nestedLabwareWellFill,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+            highlightLabware,
+            highlightShadowLabware,
+          }) => {
+            const stackerSlotName = getStackerLocationFromSlot(
+              moduleLocation.slotName
+            )
+            const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
+            const moduleDef = getModuleDef(moduleModel)
+            return slotPosition != null ? (
+              <>
+                <StagingAreaFixture
+                  cutoutId={
+                    `cutout${moduleLocation.slotName}` as StagingAreaLocation
+                  }
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                />
+                {wasteChuteStackerFixtures.map(fixture => {
+                  if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+                    return (
+                      <WasteChuteFixture
+                        key={fixture.cutoutId}
+                        cutoutId={fixture.cutoutId}
+                        deckDefinition={deckDef}
+                        fixtureBaseColor={lightFill}
+                        wasteChuteColor={mediumFill}
+                      />
+                    )
+                  }
+                })}
+                <Module
+                  key={`${moduleModel} ${moduleLocation.slotName}`}
+                  def={moduleDef}
+                  x={slotPosition[0]}
+                  y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slotPosition[0]
+                  )}
+                  innerProps={innerProps}
+                  targetDeckId={deckDef.otId}
+                  targetSlotId={moduleLocation.slotName}
+                  childrenPositioningMode="offsetToSlot"
+                >
+                  {nestedLabwareDef != null ? (
+                    <g
+                      cursor={onLabwareClick != null ? 'pointer' : ''}
+                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
+                    >
+                      <LabwareRender
+                        definition={nestedLabwareDef}
+                        positioningMode="offsetInSlot"
+                        onLabwareClick={onLabwareClick}
+                        wellFill={nestedLabwareWellFill}
+                        shouldRotateAdapterOrientation={
+                          inferModuleOrientationFromXCoordinate(
+                            slotPosition[0]
+                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                        }
+                        highlight={highlightLabware}
+                        highlightShadow={highlightShadowLabware}
+                      />
+                    </g>
+                  ) : null}
+                  {moduleChildren}
+                </Module>
+              </>
+            ) : null
+          }
+        )}
         {/* render modules, nested labware, and overlays */}
         {singleLocationModules.map(
           ({
@@ -334,72 +420,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 ) : null}
                 {moduleChildren}
               </Module>
-            ) : null
-          }
-        )}
-        {stackerModules.map(
-          ({
-            moduleModel,
-            moduleLocation,
-            nestedLabwareDef,
-            nestedLabwareWellFill,
-            innerProps,
-            moduleChildren,
-            onLabwareClick,
-            highlightLabware,
-            highlightShadowLabware,
-          }) => {
-            const stackerSlotName = getStackerLocationFromSlot(
-              moduleLocation.slotName
-            )
-            const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
-            const moduleDef = getModuleDef(moduleModel)
-            return slotPosition != null ? (
-              <>
-                <StagingAreaFixture
-                  cutoutId={
-                    `cutout${moduleLocation.slotName}` as StagingAreaLocation
-                  }
-                  deckDefinition={deckDef}
-                  slotClipColor={darkFill}
-                  fixtureBaseColor={lightFill}
-                />
-                <Module
-                  key={`${moduleModel} ${moduleLocation.slotName}`}
-                  def={moduleDef}
-                  x={slotPosition[0]}
-                  y={slotPosition[1] + STACKER_MODULE_Y_OFFSET}
-                  orientation={inferModuleOrientationFromXCoordinate(
-                    slotPosition[0]
-                  )}
-                  innerProps={innerProps}
-                  targetDeckId={deckDef.otId}
-                  targetSlotId={moduleLocation.slotName}
-                  childrenPositioningMode="offsetToSlot"
-                >
-                  {nestedLabwareDef != null ? (
-                    <g
-                      cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, ${STACKER_HOPPER_LABWARE_Y_OFFSET})`}
-                    >
-                      <LabwareRender
-                        definition={nestedLabwareDef}
-                        positioningMode="offsetInSlot"
-                        onLabwareClick={onLabwareClick}
-                        wellFill={nestedLabwareWellFill}
-                        shouldRotateAdapterOrientation={
-                          inferModuleOrientationFromXCoordinate(
-                            slotPosition[0]
-                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                        }
-                        highlight={highlightLabware}
-                        highlightShadow={highlightShadowLabware}
-                      />
-                    </g>
-                  ) : null}
-                  {moduleChildren}
-                </Module>
-              </>
             ) : null
           }
         )}
