@@ -98,7 +98,7 @@ interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   lastItem: boolean
   deckDef: DeckDefinition
   robotName: string
-  fakeCutoutFixtureId?: CutoutFixtureId
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
 }
 
 function FixtureTableItem({
@@ -108,7 +108,7 @@ function FixtureTableItem({
   lastItem,
   deckDef,
   robotName,
-  fakeCutoutFixtureId,
+  partialRequiredCutoutFixtureId,
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
 
@@ -122,7 +122,7 @@ function FixtureTableItem({
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
-    fakeCutoutFixtureId
+    partialRequiredCutoutFixtureId
   )
 
   const isThermocyclerCurrentFixture =
@@ -133,7 +133,7 @@ function FixtureTableItem({
   if (!isCurrentFixtureCompatible) {
     const hasConflict = isConflictingFixtureConfigured(
       cutoutFixtureId,
-      fakeCutoutFixtureId
+      partialRequiredCutoutFixtureId
     )
 
     chipLabel = (
@@ -182,7 +182,7 @@ function FixtureTableItem({
           }}
           cutoutId={cutoutId}
           requiredFixtureId={
-            fakeCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
           }
           isOnDevice
         />
@@ -194,7 +194,7 @@ function FixtureTableItem({
           }}
           cutoutId={cutoutId}
           requiredFixtureId={
-            fakeCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
           }
           isOnDevice={true}
           deckDef={deckDef}
@@ -215,9 +215,12 @@ function FixtureTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null && isCurrentFixtureCompatible
-              ? getFixtureDisplayName(fakeCutoutFixtureId ?? cutoutFixtureId)
+              ? getFixtureDisplayName(
+                  partialRequiredCutoutFixtureId ?? cutoutFixtureId
+                )
               : getFixtureDisplayName(
-                  fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
+                  partialRequiredCutoutFixtureId ??
+                    compatibleCutoutFixtureIds?.[0]
                 )}
           </LegacyStyledText>
         </Flex>

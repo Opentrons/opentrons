@@ -69,7 +69,7 @@ export const getFilteredDeckConfigFixtureCompatibility = (
       ) {
         const magBlockRequirement = {
           ...compatabilityItem,
-          fakeCutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+          partialRequiredCutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
         }
         acc.push(magBlockRequirement)
         if (
@@ -79,7 +79,7 @@ export const getFilteredDeckConfigFixtureCompatibility = (
         ) {
           const stagingAreaRequirement = {
             ...compatabilityItem,
-            fakeCutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+            partialRequiredCutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
           }
           acc.push(stagingAreaRequirement)
         }
@@ -91,14 +91,25 @@ export const getFilteredDeckConfigFixtureCompatibility = (
     }, [])
 }
 
+/**
+ * This function determines if the currently configured fixture is compatible
+ * with the required fixture for a protocol
+ * @param cutoutFixtureId: currently configured fixtureId
+ * @param compatibleCutoutFixtureIds: array of fixtureIds that are compatible for this cutout in the protocol
+ * @param partialRequiredCutoutFixtureId: required fixtureId that may fulfill a subset of the requirement for
+ * one of the compatible cutout fixtureIds
+ * @returns boolean indicating if the current fixture conflicts with the required fixture
+ */
 export const isFixtureCompatible = (
   cutoutFixtureId: CutoutFixtureId,
   compatibleCutoutFixtureIds: CutoutFixtureId[],
-  fakeCutoutFixtureId?: CutoutFixtureId
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
 ): boolean => {
-  if (fakeCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
+  if (partialRequiredCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
     return MAGNETIC_BLOCK_FIXTURES.includes(cutoutFixtureId)
-  } else if (fakeCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+  } else if (
+    partialRequiredCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+  ) {
     return STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
   } else {
     return (
@@ -107,17 +118,28 @@ export const isFixtureCompatible = (
     )
   }
 }
+
+/**
+ * Assuming the current fixture is not compatible, this function checks if there
+ * is a conflicting fixture configured, or if the fixture is just missing.
+ * @param cutoutFixtureId: currently configured fixtureId
+ * @param partialRequiredCutoutFixtureId: required fixtureId that may be able to coexist with
+ * a non-single slot fixture in the same cutout
+ * @returns boolean indicating if the current fixture conflicts with the required fixture
+ */
 export const isConflictingFixtureConfigured = (
   cutoutFixtureId: CutoutFixtureId,
-  fakeCutoutFixtureId?: CutoutFixtureId
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
 ): boolean => {
-  if (fakeCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
+  if (partialRequiredCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
     return (
       !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) &&
       cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE &&
       cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE
     )
-  } else if (fakeCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+  } else if (
+    partialRequiredCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+  ) {
     return (
       !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) &&
       cutoutFixtureId !== MAGNETIC_BLOCK_V1_FIXTURE

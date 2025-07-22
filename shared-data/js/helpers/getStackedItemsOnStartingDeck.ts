@@ -49,7 +49,7 @@ export interface ModuleInStack {
 export type StackItem = LabwareInStack | ModuleInStack
 
 export interface StackedItemsOnDeck {
-  [slotName: string]: StackItem[]
+  [location: string]: StackItem[]
 }
 
 interface LoadLidOnLabwareParams extends Omit<LoadLidParams, 'location'> {
@@ -72,13 +72,13 @@ export function getStackerLocationFromSlotName(slotName: string): string {
 
 /**
  * This function parses all commands that load labware in reverse order and makes a map of
- * shape [slotName]: ordered list of stacked items in slot at the start of a protocol, returning
+ * shape [location]: ordered list of stacked items in slot at the start of a protocol, returning
  * exactly one array per utilized slot in the starting deck state
  * with an additional list for all off deck items
  * @param commands
  * @param loadedLabware
  * @param loadedModules
- * @returns [slotName]: StackItem[]
+ * @returns [location]: StackItem[] where location is a slot name, 'offDeck', or a hopper location 'STACKER A(column)'
  */
 
 export function getStackedItemsOnStartingDeck(
@@ -463,7 +463,7 @@ export function getLabwareLiquidRenderInfoFromStack(
 export function getLabwareOnDeck(
   itemsOnDeck: StackedItemsOnDeck
 ): {
-  [slotName: string]: LabwareInStack[]
+  [location: string]: LabwareInStack[]
 } {
   // @ts-expect-error this filter should act as a type narrower
   const labwareOnDeckEntries: Array<
@@ -481,7 +481,7 @@ export function getLabwareOnDeck(
 // filter function to get stacks that include labware
 export function getStacksWithLabware(
   itemsOnDeck: StackedItemsOnDeck
-): { [slotName: string]: StackItem[] } {
+): { [location: string]: StackItem[] } {
   const stacksWithLabwareEntries = Object.entries(
     itemsOnDeck
   ).filter(([key, value]) =>
@@ -496,7 +496,7 @@ export function getStacksWithLabware(
 export function getStacksOnModules(
   itemsOnDeck: StackedItemsOnDeck
 ): {
-  [slotName: string]: {
+  [location: string]: {
     // This could be typed more cleverly as:
     // [ModuleInStack, ...StackItem[]]
     // if we're sure that the module is always the first element in the array,
@@ -506,14 +506,14 @@ export function getStacksOnModules(
   }
 } {
   return Object.entries(itemsOnDeck).reduce((acc, entry) => {
-    const [slotName, stack] = entry
+    const [location, stack] = entry
     const moduleInStack = stack.find(
       (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
     )
     return moduleInStack != null
       ? {
           ...acc,
-          [slotName]: {
+          [location]: {
             allItemsInStack: stack,
             moduleInStack,
           },

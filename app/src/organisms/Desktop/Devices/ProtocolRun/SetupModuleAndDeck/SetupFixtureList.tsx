@@ -75,7 +75,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 interface FixtureListItemProps extends CutoutConfigAndCompatibility {
   deckDef: DeckDefinition
   robotName: string
-  fakeCutoutFixtureId?: CutoutFixtureId
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
 }
 
 export function FixtureListItem({
@@ -84,19 +84,19 @@ export function FixtureListItem({
   compatibleCutoutFixtureIds,
   deckDef,
   robotName,
-  fakeCutoutFixtureId,
+  partialRequiredCutoutFixtureId,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
-    fakeCutoutFixtureId
+    partialRequiredCutoutFixtureId
   )
 
   const hasConflict = isConflictingFixtureConfigured(
     cutoutFixtureId,
-    fakeCutoutFixtureId
+    partialRequiredCutoutFixtureId
   )
 
   let statusLabel
@@ -134,8 +134,8 @@ export function FixtureListItem({
   ] = useState<boolean>(false)
 
   const displayLocation =
-    (fakeCutoutFixtureId != null &&
-      STAGING_AREA_FIXTURES.includes(fakeCutoutFixtureId)) ||
+    (partialRequiredCutoutFixtureId != null &&
+      STAGING_AREA_FIXTURES.includes(partialRequiredCutoutFixtureId)) ||
     STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
       ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
       : getCutoutDisplayName(cutoutId)
@@ -149,7 +149,7 @@ export function FixtureListItem({
           }}
           cutoutId={cutoutId}
           requiredFixtureId={
-            fakeCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
           }
         />
       ) : null}
@@ -161,7 +161,7 @@ export function FixtureListItem({
           cutoutId={cutoutId}
           deckDef={deckDef}
           requiredFixtureId={
-            fakeCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
           }
           robotName={robotName}
         />
@@ -191,9 +191,12 @@ export function FixtureListItem({
                 height="54px"
                 src={
                   isCurrentFixtureCompatible
-                    ? getFixtureImage(fakeCutoutFixtureId ?? cutoutFixtureId)
+                    ? getFixtureImage(
+                        partialRequiredCutoutFixtureId ?? cutoutFixtureId
+                      )
                     : getFixtureImage(
-                        fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
+                        partialRequiredCutoutFixtureId ??
+                          compatibleCutoutFixtureIds?.[0]
                       )
                 }
               />
@@ -208,10 +211,11 @@ export function FixtureListItem({
               >
                 {isCurrentFixtureCompatible
                   ? getFixtureDisplayName(
-                      fakeCutoutFixtureId ?? cutoutFixtureId
+                      partialRequiredCutoutFixtureId ?? cutoutFixtureId
                     )
                   : getFixtureDisplayName(
-                      fakeCutoutFixtureId ?? compatibleCutoutFixtureIds?.[0]
+                      partialRequiredCutoutFixtureId ??
+                        compatibleCutoutFixtureIds?.[0]
                     )}
               </LegacyStyledText>
               <Btn
