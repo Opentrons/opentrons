@@ -171,7 +171,7 @@ export function InputPrompt(): JSX.Element {
     )
 
     // Process files locally if there are any
-    let fileAttachments: any[] = []
+    const fileAttachments: any[] = []
     if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
       try {
         for (const file of attachedFiles) {
@@ -186,9 +186,10 @@ export function InputPrompt(): JSX.Element {
             size: file.size,
           })
         }
-      } catch (fileError: any) {
+      } catch (fileError: unknown) {
         console.error('File processing failed:', fileError)
-        setFileError(fileError.message || 'Failed to process files')
+        const errorMessage = fileError instanceof Error ? fileError.message : 'Failed to process files'
+        setFileError(errorMessage)
         return // Don't proceed with chat if file processing fails
       }
     }
@@ -270,10 +271,10 @@ export function InputPrompt(): JSX.Element {
 
         // Collect all unique attachments from chat history
         chatHistory.forEach(msg => {
-          if (msg.attachments && msg.attachments.length > 0) {
+          if (msg.attachments != null && msg.attachments.length > 0) {
             msg.attachments.forEach(att => {
-              if (!existingFilenames.has(att.name)) {
-                attachmentsToSend!.push({
+              if (!existingFilenames.has(att.name) && attachmentsToSend != null) {
+                attachmentsToSend.push({
                   id: att.id || '',
                   filename: att.name,
                   file_type: att.type,

@@ -265,8 +265,14 @@ export const uploadFile = async (
   })
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || error.error || 'File upload failed')
+    const error: unknown = await response.json()
+    const errorMessage = 
+      (error != null && typeof error === 'object' && 'message' in error && typeof error.message === 'string') 
+        ? error.message 
+        : (error != null && typeof error === 'object' && 'error' in error && typeof error.error === 'string')
+        ? error.error
+        : 'File upload failed'
+    throw new Error(errorMessage)
   }
 
   const data = await response.json()
@@ -287,5 +293,5 @@ export const uploadFiles = async (
   token: string
 ): Promise<FileAttachment[]> => {
   const uploadPromises = files.map(file => uploadFile(file, token))
-  return Promise.all(uploadPromises)
+  return await Promise.all(uploadPromises)
 }
