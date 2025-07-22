@@ -147,6 +147,7 @@ Version 2.24
 - Adds the ability to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`.
 
   - :py:meth:`.ProtocolContext.get_liquid_class` accesses :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>` for aqueous, volatile, and viscous liquids.
+  - :py:meth: `.ProtocolContext.define_liquid_class` lets you create your own liquid classes from verified classes or from scratch.
   - New :py:class:`.InstrumentContext` methods — :py:meth:`.transfer_with_liquid_class`, :py:meth:`.distribute_with_liquid_class`, and :py:meth:`.consolidate_with_liquid_class` — move liquids according to their properties.
 - :py:meth:`.air_gap`, :py:meth:`.blow_out`, :py:meth:`.dispense`, :py:meth:`.mix`, and :py:meth:`.touch_tip` have new parameters for advanced settings that are also available in Protocol Designer.
 
