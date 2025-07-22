@@ -3,7 +3,7 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Iterable, List, Literal, cast
+from typing import Any, ContextManager, Dict, Iterable, List, Literal, Optional, cast
 
 import requests
 import structlog
@@ -264,6 +264,8 @@ class AnthropicPredict:
         For now, system prompt is the same.
         """
 
+        # With the Files API, uploaded files should be automatically accessible
+        # when file IDs are mentioned in the message content (which we do in _create_file_attachment_blocks)
         response: Message = self.client.messages.create(  # type: ignore[call-overload]
             max_tokens=self.max_tokens,
             messages=messages,
@@ -285,9 +287,80 @@ class AnthropicPredict:
         )
         return response
 
+    def _create_file_attachment_blocks(
+        self, file_references: Optional[List[Dict[str, str]]], user_id: str  # noqa: ARG002
+    ) -> List[Dict[str, Any]]:
+        """
+        Create content blocks with file attachments using appropriate format for each file type
+
+        Args:
+            file_references: List of file references with content included
+            user_id: User ID (kept for interface compatibility, not used in simplified approach)
+
+        Returns:
+            List of content blocks for Anthropic API (text blocks for CSV/Python, document blocks for PDF)
+        """
+        if not file_references:
+            return []
+
+        content_blocks: List[Dict[str, Any]] = []
+
+        for file_ref in file_references:
+            filename = file_ref.get("filename", "Attached File")
+            file_type = file_ref.get("file_type", "unknown").lower()
+            file_content = file_ref.get("content", "")
+            media_type = file_ref.get("media_type", "text/plain")
+
+            if not file_content:
+                # Fallback if content is missing
+                file_block = {
+                    "type": "text",
+                    "text": f"=== FILE: {filename} ({file_type.upper()}) ===\n\n"
+                    f"[File content is empty or missing]\n\n"
+                    f"=== END OF FILE: {filename} ===\n\n",
+                }
+                content_blocks.append(file_block)
+                continue
+
+            if file_type == "pdf" and media_type == "application/pdf":
+                # PDF files are sent as base64-encoded documents
+                # Use cast() to handle mixed value types: "type": str and "source": dict
+                file_block = cast(
+                    Dict[str, Any],
+                    {
+                        "type": "document",
+                        "source": {"type": "base64", "media_type": "application/pdf", "data": file_content},
+                    },
+                )
+            else:
+                # CSV and Python files are sent as text blocks
+                file_block = {
+                    "type": "text",
+                    "text": f"=== FILE: {filename} ({file_type.upper()}) ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
+                }
+
+            content_blocks.append(file_block)
+
+        # Add an introductory message only for text-based files (not PDFs)
+        has_pdf = any(
+            file_ref.get("file_type", "").lower() == "pdf" and file_ref.get("media_type") == "application/pdf"
+            for file_ref in file_references or []
+        )
+
+        if content_blocks and not has_pdf:
+            intro_block = {"type": "text", "text": f"The user has uploaded {len(file_references)} file(s). Here are the contents:\n\n"}
+            content_blocks.insert(0, intro_block)
+
+        return content_blocks
+
     @tracer.wrap()
     def process_message(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
+        self,
+        user_id: str,
+        prompt: str,
+        history: List[MessageParam] | None = None,
+        message_type: MessageType = "create",
+        file_references: Optional[List[Dict[str, str]]] = None,
     ) -> str | None:
         """Unified method for creating and updating messages"""
         try:
@@ -296,9 +369,36 @@ class AnthropicPredict:
                 messages += history
 
             relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
-            prompt = f"{prompt}\n\n{relevant_api_docs}"
+            prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
-            messages.append({"role": "user", "content": PROMPT.format(USER_PROMPT=prompt)})
+            # Create user message with file attachments if present
+            user_content: List[Dict[str, Any]] = [{"type": "text", "text": PROMPT.format(USER_PROMPT=prompt_with_docs)}]
+
+            # Add file attachments with actual content
+            if file_references:
+                file_blocks = self._create_file_attachment_blocks(file_references, user_id)
+                user_content.extend(file_blocks)
+                logger.info(
+                    "Added file attachments to message",
+                    extra={"user_id": user_id, "num_files": len(file_references), "file_ids": [ref["id"] for ref in file_references]},
+                )
+
+            user_message: MessageParam = cast(MessageParam, {"role": "user", "content": user_content})
+
+            # Debug log the message structure for PDF debugging
+            if file_references:
+                logger.info(
+                    "Message structure debug",
+                    extra={
+                        "user_id": user_id,
+                        "content_types": [block.get("type") for block in user_content],
+                        "has_document_blocks": any(block.get("type") == "document" for block in user_content),
+                        "message_structure": user_message,
+                    },
+                )
+
+            messages.append(user_message)
+
             response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
 
             if response.content[-1].type == "tool_use":

@@ -10,6 +10,7 @@ type Role = 'assistant' | 'user'
 export type ValidFileType = 'pdf' | 'csv' | 'python'
 
 export interface FileAttachment {
+  id?: string // Optional because it's not present when initially selecting files
   name: string
   type: ValidFileType
   content: string
@@ -82,6 +83,8 @@ export interface Chat {
   protocol_content?: string
   /** The format of the protocol */
   protocol_format?: ProtocolFormat
+  /** attached files */
+  attachments?: FileAttachment[]
 }
 
 export interface RouteProps {

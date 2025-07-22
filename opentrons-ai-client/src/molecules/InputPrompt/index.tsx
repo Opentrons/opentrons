@@ -32,6 +32,7 @@ import { calcTextAreaHeight } from '/ai-client/resources/utils'
 import {
   getFileType,
   MAX_FILES_PER_MESSAGE,
+  readFileContent,
   validateFile,
 } from '/ai-client/resources/utils/fileUtils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
@@ -168,17 +169,42 @@ export function InputPrompt(): JSX.Element {
       watchUserPrompt,
       chatHistory
     )
+
+    // Process files locally if there are any
+    let fileAttachments: any[] = []
+    if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
+      try {
+        for (const file of attachedFiles) {
+          const fileType = getFileType(file)
+          const fileContent = await readFileContent(file, fileType)
+          fileAttachments.push({
+            id: uuidv4(), // Generate local ID
+            filename: file.name,
+            file_type: fileType,
+            content: fileContent.content,
+            media_type: fileContent.mediaType,
+            size: file.size,
+          })
+        }
+      } catch (fileError: any) {
+        console.error('File processing failed:', fileError)
+        setFileError(fileError.message || 'Failed to process files')
+        return // Don't proceed with chat if file processing fails
+      }
+    }
+
     const userInput: ChatData = {
       requestId: newRequestId,
       role: 'user',
       reply: watchUserPrompt,
       protocol_format: currentProtocolFormat,
       attachments:
-        attachedFiles.length > 0
-          ? attachedFiles.map(file => ({
-              name: file.name,
-              type: getFileType(file),
-              content: '', // Content will be read separately if needed
+        fileAttachments.length > 0
+          ? fileAttachments.map(file => ({
+              id: file.id,
+              name: file.filename,
+              type: file.file_type,
+              content: file.content,
               size: file.size,
             }))
           : undefined,
@@ -228,6 +254,52 @@ export function InputPrompt(): JSX.Element {
               return { role: msg.role, content: msg.content }
             })
 
+      // Combine all attachments - new files plus files from chat history
+      let attachmentsToSend: any[] | undefined = []
+
+      // Add new files being attached
+      if (fileAttachments.length > 0) {
+        attachmentsToSend = [...fileAttachments]
+      }
+
+      // Add existing files from chat history (avoid duplicates by filename)
+      if (chatHistory.length > 0) {
+        const existingFilenames = new Set(
+          attachmentsToSend.map(att => att.filename)
+        )
+
+        // Collect all unique attachments from chat history
+        chatHistory.forEach(msg => {
+          if (msg.attachments && msg.attachments.length > 0) {
+            msg.attachments.forEach(att => {
+              if (!existingFilenames.has(att.name)) {
+                attachmentsToSend!.push({
+                  id: att.id || '',
+                  filename: att.name,
+                  file_type: att.type,
+                  content: att.content,
+                  media_type:
+                    att.type === 'csv'
+                      ? 'application/json'
+                      : att.type === 'python'
+                      ? 'text/x-python'
+                      : att.type === 'pdf'
+                      ? 'application/pdf'
+                      : 'text/plain',
+                  size: att.size,
+                })
+                existingFilenames.add(att.name)
+              }
+            })
+          }
+        })
+      }
+
+      // Set to undefined if no attachments to send
+      if (attachmentsToSend.length === 0) {
+        attachmentsToSend = undefined
+      }
+
       const config = {
         url,
         method: 'POST',
@@ -241,12 +313,26 @@ export function InputPrompt(): JSX.Element {
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
               pd_protocol_content: pdProtocolContent,
               protocol_format: currentProtocolFormat,
+              attachments: attachmentsToSend,
             },
       }
 
       setChatHistory(chatHistory => [
         ...chatHistory,
-        { role: 'user', content: watchUserPrompt },
+        {
+          role: 'user',
+          content: watchUserPrompt,
+          attachments:
+            fileAttachments.length > 0
+              ? fileAttachments.map(file => ({
+                  id: file.id,
+                  name: file.filename,
+                  type: file.file_type,
+                  content: file.content,
+                  size: file.size,
+                }))
+              : undefined,
+        },
       ])
       await callApi(config as AxiosRequestConfig)
       trackEvent({

@@ -7,6 +7,8 @@ export const STAGING_CREATE_PROTOCOL_END_POINT =
   'https://staging.opentrons.ai/api/chat/createProtocol'
 export const STAGING_UPDATE_PROTOCOL_END_POINT =
   'https://staging.opentrons.ai/api/chat/updateProtocol'
+export const STAGING_FILE_UPLOAD_END_POINT =
+  'https://staging.opentrons.ai/api/files/upload'
 
 export const PROD_END_POINT = 'https://ai.opentrons.com/api/chat/completion'
 export const PROD_FEEDBACK_END_POINT =
@@ -15,6 +17,8 @@ export const PROD_CREATE_PROTOCOL_END_POINT =
   'https://ai.opentrons.com/api/chat/createProtocol'
 export const PROD_UPDATE_PROTOCOL_END_POINT =
   'https://ai.opentrons.com/api/chat/updateProtocol'
+export const PROD_FILE_UPLOAD_END_POINT =
+  'https://ai.opentrons.com/api/files/upload'
 
 // auth0 domain
 export const AUTH0_DOMAIN = 'identity.auth.opentrons.com'
@@ -38,6 +42,8 @@ export const LOCAL_UPDATE_PROTOCOL_END_POINT =
   'http://localhost:8000/api/chat/updateProtocol'
 export const LOCAL_FEEDBACK_END_POINT =
   'http://localhost:8000/api/chat/feedback'
+export const LOCAL_FILE_UPLOAD_END_POINT =
+  'http://localhost:8000/api/files/upload'
 
 export const CLIENT_MAX_WIDTH = '1440px'
 

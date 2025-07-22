@@ -3,6 +3,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel, Field
 
+from api.models.file_attachment import FileReference
 from api.models.protocol_format import ProtocolFormat
 
 
@@ -38,3 +39,4 @@ class ChatRequest(BaseModel):
     chat_options: ChatOptionType
     pd_protocol_content: Optional[Dict[str, Any]] = Field(None, description="PD protocol that was previously generated")
     protocol_format: ProtocolFormat = ProtocolFormat.PYTHON
+    attachments: Optional[List[FileReference]] = Field(None, description="File attachments to include in the message")

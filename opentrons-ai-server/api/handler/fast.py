@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
+from typing import Annotated, Any, Awaitable, Callable, Dict, List, Literal, Optional, Union, cast
 
 import structlog
 from anthropic.types import MessageParam
@@ -34,11 +34,15 @@ from api.models.empty_request_error import EmptyRequestError
 from api.models.error_response import ErrorResponse
 from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
+
+# FileUploadResponse removed - using simplified JSON-based approach
 from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.settings import Settings
+
+# FileProcessor removed - using simplified JSON-based approach
 
 settings: Settings = Settings()
 setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
@@ -50,6 +54,7 @@ auth: VerifyToken = VerifyToken()
 openai: OpenAIPredict = OpenAIPredict(settings)
 google_sheets_client = GoogleSheetsClient(settings)
 claude: AnthropicPredict = AnthropicPredict(settings)
+# file_processor removed - using simplified JSON-based approach
 
 # Initialize FastAPI app with metadata
 app = FastAPI(
@@ -213,6 +218,7 @@ def _generate_llm_response(
     history: Optional[List[Any]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
+    file_references: Optional[List[Dict[str, str]]] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM based on context."""
     # Wrap all LLM calls with the appropriate tracing context
@@ -223,6 +229,16 @@ def _generate_llm_response(
         # Claude models
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
             return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+
+        # For regular chat, we use the process_message method directly with file references
+        if file_references and protocol_action != "create":
+            return claude.process_message(
+                user_id=user_id,
+                prompt=prompt,
+                history=cast(Optional[List[MessageParam]], history),
+                message_type="update",
+                file_references=file_references,
+            )
 
         if protocol_action == "create":
             return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
@@ -291,6 +307,10 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
     return ChatResponse(reply=response, fake=bool(is_fake))
 
 
+# File upload endpoints removed - using simplified JSON-based approach
+# Files are now processed locally on the frontend and content is sent directly in chat messages
+
+
 @tracer.wrap()
 @app.post(
     "/api/chat/completion",
@@ -322,6 +342,29 @@ async def create_chat_completion(
         protocol_format = getattr(body, "protocol_format", ProtocolFormat.PYTHON)
         protocol_action = _determine_protocol_action(body)
 
+        # Process attached files with content
+        file_references = None
+        if body.attachments:
+            file_references = []
+            for attachment in body.attachments:
+                file_references.append(
+                    {
+                        "id": attachment.id,
+                        "filename": attachment.filename,
+                        "file_type": attachment.file_type,
+                        "content": attachment.content or "",
+                    }
+                )
+
+            logger.info(
+                "Processing chat with file attachments",
+                extra={
+                    "user_id": str(user.sub),
+                    "num_files": len(file_references),
+                    "file_types": [ref["file_type"] for ref in file_references],
+                },
+            )
+
         response = _generate_llm_response(
             model_type=settings.model,
             user_id=str(user.sub),
@@ -330,6 +373,7 @@ async def create_chat_completion(
             history=body.history,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
+            file_references=file_references,
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
