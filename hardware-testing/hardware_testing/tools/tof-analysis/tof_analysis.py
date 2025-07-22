@@ -18,7 +18,7 @@ from ast import literal_eval
 from collections import defaultdict
 from enum import Enum
 from typing import Any, DefaultDict, Dict, List, Tuple
-from itertools import chain, product
+from itertools import product
 from math import trunc
 
 
@@ -452,7 +452,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             print(baseline, "\n")
 
 
-def validate_baseline(args: argparse.Namespace) -> None:
+def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
     """Validates the baseline and dataframe and determines if the labware is detected."""
     config = parse_common_args(args)
     thresholds = config["threshold"]
@@ -581,7 +581,7 @@ def validate_baseline(args: argparse.Namespace) -> None:
                     figures[axis].show()
 
     print("\n---------------- RESULT -------------- \n")
-    print(f"ZONES DETECTED\n")
+    print("ZONES DETECTED\n")
     for stacker, samples in detected_labware.items():
         for sample in samples:
             axis = sample["axis"]
@@ -596,7 +596,7 @@ def validate_baseline(args: argparse.Namespace) -> None:
                 f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
             )
 
-    print(f"\nZONES NOT DETECTED\n")
+    print("\nZONES NOT DETECTED\n")
     for stacker, samples in undetected_labware.items():
         for sample in samples:
             lw, axis, dir, zn = sample
