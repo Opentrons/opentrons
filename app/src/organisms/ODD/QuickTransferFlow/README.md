@@ -62,6 +62,8 @@ touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
 
+Now using command schema 14
+
 ```ts
 export interface QuickTransferWizardState {
   pipette?: PipetteV2Specs
@@ -76,7 +78,7 @@ export interface QuickTransferWizardState {
   path?: PathOption // this has been added
   changeTip?: ChangeTipOptions // this has been added
   dropTipLocation?: CutoutConfig // this has been added
-  liquidClass?: LiquidClass // this has been added
+  liquidClassName?: string // this has been added
 }
 ```
 
@@ -155,7 +157,7 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass // this has been added
+  liquidClassName: string // this has been added
   conditionAspirate?: number // this has been added
   disposalVolumeDispenseSettings?: {
     volume: number

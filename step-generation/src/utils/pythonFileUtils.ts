@@ -258,9 +258,7 @@ export function getLoadPipettes(
     .map(pipette => {
       const { name, id, spec, pythonName, tiprackDefURI } = pipette
       const mount =
-        spec.channels === 96
-          ? ''
-          : `, ${formatPyStr(pipetteRobotState[id].mount)}`
+        spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
@@ -288,13 +286,20 @@ export function getLoadPipettes(
       const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
         .map(tiprack => tiprack.pythonName)
         .join(', ')
-
       const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `, tip_racks=[${tiprackPythonNames}]`
+        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
-      return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(${formatPyStr(
-        pipetteName
-      )}${mount}${pythonTipRacks})`
+      return (
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
+        `${indentPyLines(
+          [
+            formatPyStr(pipetteName),
+            ...(mount ? [mount] : []),
+            ...(pythonTipRacks ? [pythonTipRacks] : []),
+          ].join(', ')
+        )},\n` +
+        ')'
+      )
     })
     .join('\n')
 

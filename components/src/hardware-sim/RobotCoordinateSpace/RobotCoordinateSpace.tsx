@@ -1,30 +1,31 @@
 import { animated } from '@react-spring/web'
-import styled from 'styled-components'
 
-import { Svg } from '../../primitives'
+import styles from './robotcoordinatespace.module.css'
 
-import type { ComponentProps } from 'react'
+import type { ComponentType, ReactNode, SVGProps } from 'react'
 
-interface RobotCoordinateSpaceProps extends ComponentProps<typeof Svg> {
+interface RobotCoordinateSpaceProps {
   animated?: boolean
+  children?: ReactNode
+  height?: string
+  viewBox?: string
 }
+
+const AnimatedSvg = animated.svg as ComponentType<SVGProps<SVGSVGElement>>
+
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps
 ): JSX.Element {
-  const { animated = false, children, ...restProps } = props
+  const { animated: isAnimated = false, children, ...restProps } = props
+
   const allPassThroughProps = {
-    transform: 'scale(1, -1)',
+    className: styles.svg,
     ...restProps,
   }
-  return animated ? (
+
+  return isAnimated ? (
     <AnimatedSvg {...allPassThroughProps}>{children}</AnimatedSvg>
   ) : (
-    <Svg {...allPassThroughProps}>{children}</Svg>
+    <svg {...allPassThroughProps}>{children}</svg>
   )
 }
-
-/**
- * These animated components needs to be split out because react-spring and styled-components don't play nice
- * @see https://github.com/pmndrs/react-spring/issues/1515 */
-// @ts-expect-error Type instantiation is excessively deep and possibly infinite
-const AnimatedSvg = styled(animated.svg)<typeof animated.svg>``

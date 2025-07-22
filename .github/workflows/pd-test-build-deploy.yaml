@@ -79,7 +79,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
       - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:
@@ -123,6 +123,8 @@ jobs:
           aws-region: us-east-2
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
 
       - uses: ./.github/actions/git/resolve-tag
 
