@@ -170,7 +170,7 @@ export function TwoColLwInfoAndDeck(
                       orientation={inferModuleOrientationFromXCoordinate(x)}
                       targetDeckId={targetDeckId}
                       targetSlotId={targetSlotId}
-                      childrenPositioningMode="offsetToSlot"
+                      childrenPositioningMode="passThrough"
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (

@@ -321,7 +321,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
                 targetDeckId={deckDef.otId}
                 targetSlotId={moduleLocation.slotName}
-                childrenPositioningMode="offsetToSlot"
+                childrenPositioningMode="passThrough"
               >
                 {nestedLabwareDef != null ? (
                   <AlignLabwareToModule
@@ -390,7 +390,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   innerProps={innerProps}
                   targetDeckId={deckDef.otId}
                   targetSlotId={moduleLocation.slotName}
-                  childrenPositioningMode="offsetToSlot"
+                  childrenPositioningMode="passThrough"
                 >
                   {nestedLabwareDef != null ? (
                     <AlignLabwareToModule

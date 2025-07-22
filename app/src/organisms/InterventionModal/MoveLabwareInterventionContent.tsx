@@ -223,7 +223,7 @@ export function MoveLabwareInterventionContent({
                         orientation={inferModuleOrientationFromXCoordinate(x)}
                         targetDeckId={targetDeckId}
                         targetSlotId={targetSlotId}
-                        childrenPositioningMode="offsetToSlot"
+                        childrenPositioningMode="passThrough"
                       >
                         {nestedLabwareDef != null &&
                         nestedLabwareId !== command.params.labwareId ? (

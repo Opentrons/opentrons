@@ -209,7 +209,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 }
                 targetSlotId={slot}
                 targetDeckId={deckDef.otId}
-                childrenPositioningMode="offsetToSlot"
+                childrenPositioningMode="passThrough"
               >
                 {labwareLoadedOnModuleId != null ? (
                   <>
