@@ -121,7 +121,6 @@ describe('checkLiquidClassCompatibility', () => {
 
   it('liquid volume should be less than 10 incompatible', () => {
     const invalidState = { ...mockState, volume: 0 }
-    console.log('invalidState', invalidState)
     const result = checkLiquidClassCompatibility(mockLiquid, invalidState)
     expect(result.incompatible).toBe(true)
     expect(result.volumeIncompatible).toBe(true)
