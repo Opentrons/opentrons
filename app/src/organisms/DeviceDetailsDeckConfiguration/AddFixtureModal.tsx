@@ -319,32 +319,8 @@ export function AddFixtureModal({
               {nextStageOptions}
             </ListTable>
           </Flex>
-          {optionStage === 'wasteChuteOptions' ? (
-            <Btn
-              onClick={() => {
-                setOptionStage('fixtureOptions')
-              }}
-              aria-label="back"
-              paddingX={SPACING.spacing16}
-              marginTop="1.44rem"
-              marginBottom="0.56rem"
-            >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
-                {t('shared:go_back')}
-              </StyledText>
-            </Btn>
-          ) : null}
         </Modal>
       )}
     </>
   )
 }
-
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-`
