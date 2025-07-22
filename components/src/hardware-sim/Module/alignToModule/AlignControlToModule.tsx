@@ -5,7 +5,7 @@ import type { ModuleDefinition } from '@opentrons/shared-data'
 
 export type AlignControlToModuleProps = PropsWithChildren<{
   /** Should match the `deckId` passed to the parent `<Module>`. */
-  deckId: string
+  deckId: string | null
   /** Should match the `slotId` passed to the parent `<Module>`. */
   slotId: string | null
   /** Should match the module definition passed to the parent `<Module>`. */

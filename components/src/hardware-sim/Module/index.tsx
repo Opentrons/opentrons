@@ -11,6 +11,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { AlignControlToModule } from '../..'
 import {
   ALIGN_CENTER,
   C_DARK_GRAY,
@@ -63,24 +64,31 @@ interface Props {
 
   /**
    * Contents to be rendered above and as part of the module, typically labware.
-   * Use a helper component like `<AlignLabwareToModule>` to position them properly.
+   * See `childrenPositioningMode`.
    */
   children?: ReactNode
 
   /**
-   * How child components should be positioned.
+   * How child components should be positioned. Use `passThrough` for new code.
    *
-   * "offsetToSlot" - The SVG origin of a child will be at the labware mating interface of the
-   *   module, which is the front-left (-x, -y) corner of the slot on top of the module.
+   * `passThrough` - The SVG origin of each child will be at the origin of the module,
+   *   which is the front-left (-x, -y) corner of the slot that the module is in.
+   *   From there, use a helper component like `AlignLabwareToModule` or
+   *   `AlignControlToModule` to move the child where you want it.
+   *
+   * `offsetToSlot - The SVG origin of each child will be at the "labware mating interface"
+   *   of the module, which is the front-left (-x, -y) corner of the slot on top of the
+   *   module.
+   *
+   *   This is deprecated because it can't scale to support labware schema 3's many
+   *   ideas of how labware can fit on things. This will not position a child labware
+   *   properly if it has labware schema 3.
    *
    * todo(mm, 2025-07-21):
-   * 1. Add a "passThrough" mode that disables the "offsetToSlot" behavior,
-   *    to allow child components to replace it with their own SVG transform,
-   *    to support labware schema 3.
-   * 2. Migrate all existing call sites to use "passThrough".
-   * 3. Remove "offsetToSlot".
+   * 1. Migrate all existing call sites to use "passThrough".
+   * 2. Remove "offsetToSlot".
    */
-  childrenPositioningMode: 'offsetToSlot'
+  childrenPositioningMode: 'passThrough' | 'offsetToSlot'
 
   /**
    * Used for applying slot-specific positioning adjustments.
@@ -117,6 +125,7 @@ export const Module = (props: Props): JSX.Element => {
     innerProps = {},
     statusInfo,
     children,
+    childrenPositioningMode,
     targetSlotId,
     targetDeckId,
   } = props
@@ -225,7 +234,17 @@ export const Module = (props: Props): JSX.Element => {
         </g>
       </g>
       {renderStatusInfo()}
-      {children}
+      {childrenPositioningMode === 'offsetToSlot' ? (
+        <AlignControlToModule
+          moduleDefinition={def}
+          slotId={targetSlotId}
+          deckId={targetDeckId}
+        >
+          {children}
+        </AlignControlToModule>
+      ) : (
+        children
+      )}
     </g>
   )
 }
