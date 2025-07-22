@@ -735,7 +735,7 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 ]
 
-export const DEFAULT_AA_FOR_WASTE_CHUTE = '1ChannelWasteChute'
+export const DEFAULT_AA_FOR_WASTE_CHUTE = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
 
