@@ -30,6 +30,7 @@ export function HoldingLabware({
   currentRecoveryOptionUtils,
   recoveryCommands,
   recoveryMap,
+  isOnDevice,
 }: RecoveryContentProps): JSX.Element {
   const {
     proceedNextStep,
@@ -126,6 +127,7 @@ export function HoldingLabware({
             selectedOption={selectedOption}
             setSelectedOption={setSelectionOption}
             t={t}
+            isOnDevice={isOnDevice}
           />
         </Flex>
       </Flex>
@@ -141,12 +143,14 @@ interface GripperHoldingOptionsProps {
   t: TFunction
   selectedOption: HoldingLabwareOption
   setSelectedOption: (option: HoldingLabwareOption) => void
+  isOnDevice: boolean
 }
 
 function GripperHoldingLwOptions({
   t,
   selectedOption,
   setSelectedOption,
+  isOnDevice,
 }: GripperHoldingOptionsProps): JSX.Element {
   return (
     <Flex css={OPTIONS_STLYE}>
@@ -162,6 +166,7 @@ function GripperHoldingLwOptions({
             }}
             isSelected={option === selectedOption}
             radioButtonType="large"
+            largeDesktopBorderRadius={!isOnDevice}
           />
         )
       })}
