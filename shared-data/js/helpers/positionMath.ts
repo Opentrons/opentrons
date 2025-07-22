@@ -163,7 +163,7 @@ function getLabwareStackAsArray(
   ] of pairsFromArray(labwareDefinitionsTopToBottom)) {
     result.push({
       debugInfo: {
-        type: 'labwareToLabware',
+        type: 'labwareOnLabware',
         parentLabwareDefinition,
         childLabwareDefinition,
       },
@@ -187,7 +187,7 @@ function getLabwareStackAsArray(
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
       debugInfo: {
-        type: 'deckSlotToLabware',
+        type: 'labwareOnDeckSlot',
         parentSlotId: slotId,
         childLabwareDefinition: bottomLabware,
       },
@@ -212,7 +212,7 @@ function getLabwareStackAsArray(
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
       debugInfo: {
-        type: 'moduleToLabware',
+        type: 'labwareOnModule',
         parentModuleDefinition: moduleDefinition,
         childLabwareDefinition: bottomLabware,
       },
@@ -257,17 +257,17 @@ interface LabwareStackElement {
         moduleDefinition: ModuleDefinition
       }
     | {
-        type: 'deckSlotToLabware'
+        type: 'labwareOnDeckSlot'
         parentSlotId: string
         childLabwareDefinition: LabwareDefinition
       }
     | {
-        type: 'moduleToLabware'
+        type: 'labwareOnModule'
         parentModuleDefinition: ModuleDefinition
         childLabwareDefinition: LabwareDefinition
       }
     | {
-        type: 'labwareToLabware'
+        type: 'labwareOnLabware'
         parentLabwareDefinition: LabwareDefinition
         childLabwareDefinition: LabwareDefinition
       }
