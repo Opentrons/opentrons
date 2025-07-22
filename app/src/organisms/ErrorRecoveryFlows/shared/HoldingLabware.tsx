@@ -11,9 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { RecoveryRadioGroup } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryRadioGroup'
-
-import { DESKTOP_ONLY, ODD_ONLY, RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
@@ -123,15 +121,8 @@ export function HoldingLabware({
         >
           {buildTitle()}
         </StyledText>
-        <Flex css={ODD_ONLY}>
-          <ODDGripperHoldingLwOptions
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectionOption}
-            t={t}
-          />
-        </Flex>
-        <Flex css={DESKTOP_ONLY}>
-          <DesktopGripperHoldingLwOptions
+        <Flex>
+          <GripperHoldingLwOptions
             selectedOption={selectedOption}
             setSelectedOption={setSelectionOption}
             t={t}
@@ -152,13 +143,13 @@ interface GripperHoldingOptionsProps {
   setSelectedOption: (option: HoldingLabwareOption) => void
 }
 
-function ODDGripperHoldingLwOptions({
+function GripperHoldingLwOptions({
   t,
   selectedOption,
   setSelectedOption,
 }: GripperHoldingOptionsProps): JSX.Element {
   return (
-    <Flex css={ODD_OPTIONS_STLYE}>
+    <Flex css={OPTIONS_STLYE}>
       {HOLDING_LABWARE_OPTIONS.map(option => {
         const optionCopy = getCopyFromOption(option, t)
         return (
@@ -175,37 +166,6 @@ function ODDGripperHoldingLwOptions({
         )
       })}
     </Flex>
-  )
-}
-
-function DesktopGripperHoldingLwOptions({
-  t,
-  selectedOption,
-  setSelectedOption,
-}: GripperHoldingOptionsProps): JSX.Element {
-  return (
-    <RecoveryRadioGroup
-      css={RADIO_GAP}
-      onChange={e => {
-        setSelectedOption(e.currentTarget.value as HoldingLabwareOption)
-      }}
-      value={selectedOption}
-      options={HOLDING_LABWARE_OPTIONS.map(
-        option =>
-          ({
-            value: option,
-            children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getCopyFromOption(option, t)}
-              </StyledText>
-            ),
-          } as const)
-      )}
-    />
   )
 }
 
@@ -229,12 +189,8 @@ const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
 `
 
-const ODD_OPTIONS_STLYE = css`
+const OPTIONS_STLYE = css`
   flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
   gap: ${SPACING.spacing8};
-`
-
-const RADIO_GAP = `
-  gap: ${SPACING.spacing4};
 `
