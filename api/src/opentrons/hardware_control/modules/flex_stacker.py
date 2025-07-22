@@ -521,7 +521,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
         if enforce_hopper_lw_sensing:
-            await self.verify_hopper_labware_presence(Direction.RETRACT, True)
+            await self.verify_hopper_labware_presence(Direction.EXTEND, True)
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
@@ -557,7 +557,7 @@ class FlexStacker(mod_abc.AbstractModule):
             await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
 
         # Move the Z so the labware sits right under any labware already stored
-        latch_clear_distance = labware_height + PLATFORM_OFFSET + LATCH_CLEARANCE
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
         distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 

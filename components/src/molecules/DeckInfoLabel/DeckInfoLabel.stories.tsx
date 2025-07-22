@@ -1,7 +1,5 @@
-import { DeckInfoLabel } from '.'
 import { customViewports } from '../../../../.storybook/preview'
-import { Flex } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
+import { DeckInfoLabel } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -45,9 +43,9 @@ const meta: Meta<typeof DeckInfoLabel> = {
   },
   decorators: [
     Story => (
-      <Flex padding={SPACING.spacing16} width="15rem" height="5rem">
+      <div style={{ padding: '16px', width: '15rem', height: '5rem' }}>
         <Story />
-      </Flex>
+      </div>
     ),
   ],
 }

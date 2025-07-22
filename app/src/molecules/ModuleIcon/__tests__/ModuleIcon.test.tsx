@@ -65,8 +65,8 @@ describe('ModuleIcon', () => {
     expect(module).toHaveStyle(`color: ${COLORS.grey60}`)
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
-    expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)
-    expect(module).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
+    expect(module).toHaveStyle(`margin-left: ${SPACING.spacing4}`)
+    expect(module).toHaveStyle(`margin-right: ${SPACING.spacing4}`)
   })
 
   it('renders magnetic module icon', () => {

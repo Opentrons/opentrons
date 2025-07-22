@@ -77,6 +77,8 @@ describe('getLabwareViewBox()', () => {
     const expectedResult: typeof result = {
       minX: 0,
       minY: 0,
+      maxX: 200,
+      maxY: 100,
       xDimension: 200,
       yDimension: 100,
     }
@@ -104,6 +106,8 @@ describe('getLabwareViewBox()', () => {
     const expectedResult: typeof result = {
       minX: -20,
       minY: -10,
+      maxX: 180,
+      maxY: 90,
       xDimension: 200,
       yDimension: 100,
     }
