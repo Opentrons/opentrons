@@ -13,7 +13,6 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getAllLabwareDefs, getLabwareDefURI } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
