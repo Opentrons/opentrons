@@ -119,23 +119,11 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             targetSlotId={null}
             childrenPositioningMode="offsetToSlot"
           >
-            <AlignControlToModule
-              // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
-              // <AlignLabwareToModule> to support labware schema 3. To do that,
-              // <SelectedModuleLabwareRender> needs to be changed simultaneously to
-              // support labware schema 3, probably by passing `positioningMode="passThrough"`
-              // to its underlying <LabwareRender>s and using the math in
-              // shared-data/js/helpers/positionMath.ts.
-              deckId={deckDef.otId}
-              slotId={null}
-              moduleDefinition={getModuleDef(selectedModuleModel)}
-            >
-              <SelectedModuleLabwareRender
-                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-                adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
-              />
-            </AlignControlToModule>
+            <SelectedModuleLabwareRender
+              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+              adapterDef={selectedAdapterDef}
+              moduleModel={selectedModuleModel}
+            />
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel

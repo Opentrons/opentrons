@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import values from 'lodash/values'
 
-import { AlignControlToModule, Module } from '@opentrons/components'
+import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getModuleDef,
@@ -93,16 +93,7 @@ export const DeckThumbnailDetails = (
               targetDeckId={deckDef.otId}
               childrenPositioningMode="offsetToSlot"
             >
-              <AlignControlToModule
-                // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
-                // <AlignLabwareToModule> to support labware schema 3. To do that,
-                // <LabwareOnDeck> needs to be changed simultaneously to support
-                // labware schema 3, probably just by passing
-                // `positioningMode="passThrough"` to its underlying <LabwareRender>.
-                deckId={deckDef.otId}
-                slotId={slotId}
-                moduleDefinition={moduleDef}
-              >
+              <>
                 {labwareLoadedOnModuleId != null ? (
                   <LabwareOnDeck
                     x={0}
@@ -119,7 +110,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              </AlignControlToModule>
+              </>
             </Module>
           </Fragment>
         )

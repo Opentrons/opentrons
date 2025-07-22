@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
-import { AlignControlToModule, Module } from '@opentrons/components'
+import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getModuleDef,
@@ -279,18 +279,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
             >
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
-                <AlignControlToModule
-                  // todo(mm, 2025-07-11): To support labware schema 3, this ought to
-                  // be <AlignLabwareToModule> instead of <AlignControlToModule>,
-                  // at least for the children that are actually labware instead of
-                  // controls. Those children will need to be modified simultaneously
-                  // to support labware schema 3, probably by passing `positioningMode="passThrough"`
-                  // to their underlying <LabwareRender>s and by using the math in
-                  // shared-data/js/helpers/positionMath.ts.
-                  deckId={deckDef.otId}
-                  moduleDefinition={moduleDef}
-                  slotId={slotId}
-                >
+                <>
                   <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
@@ -308,7 +297,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       setShowMenuListForId={setShowMenuListForId}
                       labwareId={labwareOnModule.id}
                       key={moduleOnDeck.slot}
-                      slotPosition={[0, 0, 0]} // AlignControlToModule already handles nested positioning
+                      slotPosition={[0, 0, 0]} // Module already handles nested positioning
                       slotBoundingBox={labwareInterfaceBoundingBox}
                       handleDragHover={handleHoverEmptySlot}
                       terminalItemId={terminalItemId}
@@ -321,7 +310,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       setHover={setHover}
                       setShowMenuListForId={setShowMenuListForId}
                       hover={hover}
-                      slotPosition={[0, 0, 0]} // AlignControlToModule already handles nested positioning
+                      slotPosition={[0, 0, 0]} // Module already handles nested positioning
                       setHoveredLabware={setHoveredLabware}
                       setDraggedLabware={setDraggedLabware}
                       swapBlocked={
@@ -334,14 +323,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     />
                   )}
                   <ActiveLabwareControls
-                    slotPosition={[0, 0, 0]} // AlignControlToModule already handles nested positioning
+                    slotPosition={[0, 0, 0]} // Module already handles nested positioning
                     slotBoundingBox={labwareInterfaceBoundingBox}
                     itemId={slotId}
                     terminalItemId={terminalItemId}
                     hover={hover}
                     setHover={setHover}
                   />
-                </AlignControlToModule>
+                </>
               ) : null}
 
               {labwareOnModule == null ? (
