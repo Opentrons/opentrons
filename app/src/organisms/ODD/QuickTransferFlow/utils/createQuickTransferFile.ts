@@ -108,7 +108,7 @@ export function createQuickTransferFile(
     ...loadLabwareCommands,
     ...nonLoadCommands,
   ]
-  console.log('nonLoadCommands', nonLoadCommands)
+
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
   if (quickTransferState.destination !== 'source') {
