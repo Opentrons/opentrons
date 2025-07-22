@@ -51,7 +51,23 @@ interface Props {
     | ComponentProps<typeof Temperature>
     | {}
   statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
-  children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
+
+  children?: ReactNode
+
+  /**
+   * How child components should be positioned.
+   *
+   * "offsetToSlot" - The SVG origin of a child will be at the labware mating interface of the
+   *   module, which is the front-left (-x, -y) corner of the slot on top of the module.
+   *
+   * todo(mm, 2025-07-21):
+   * 1. Add a "passThrough" mode that disables the "offsetToSlot" behavior,
+   *    to allow child components to replace it with their own SVG transform,
+   *    to support labware schema 3.
+   * 2. Migrate all existing call sites to use "passThrough".
+   * 3. Remove "offsetToSlot".
+   */
+  childrenPositioningMode: 'offsetToSlot'
 
   /**
    * Used for applying slot-specific positioning adjustments.
