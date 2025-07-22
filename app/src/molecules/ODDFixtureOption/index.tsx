@@ -28,17 +28,17 @@ export function ODDFixtureOption(props: ODDFixtureOptionProps): JSX.Element {
     secondaryOnClickHandler,
     secondaryButtonText,
   } = props
-  if (secondaryOnClickHandler != null && secondaryButtonText != null) {
-    return (
-      <ListItem
-        type="default"
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        backgroundColor={COLORS.grey35}
-      >
-        <Flex gridGap={SPACING.spacing24}>
-          <StyledText oddStyle="bodyTextSemiBold">{optionName}</StyledText>
-          <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_END}>
+  return (
+    <ListItem
+      type="default"
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      backgroundColor={COLORS.grey35}
+    >
+      <Flex gridGap={SPACING.spacing24}>
+        <StyledText oddStyle="bodyTextSemiBold">{optionName}</StyledText>
+        <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_END}>
+          {secondaryOnClickHandler != null && secondaryButtonText != null ? (
             <SmallButton
               buttonType="secondary"
               onClick={secondaryOnClickHandler}
@@ -46,34 +46,15 @@ export function ODDFixtureOption(props: ODDFixtureOptionProps): JSX.Element {
               buttonText={secondaryButtonText}
               buttonCategory="rounded"
             />
-            <SmallButton
-              buttonType="primary"
-              onClick={onClickHandler}
-              data-testid={optionName}
-              buttonText={buttonText}
-              buttonCategory="rounded"
-            />
-          </Flex>
+          ) : null}
+          <SmallButton
+            onClick={onClickHandler}
+            data-testid={optionName}
+            buttonText={buttonText}
+            buttonCategory="rounded"
+          />
         </Flex>
-      </ListItem>
-    )
-  } else {
-    return (
-      <ListItem
-        type="default"
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        backgroundColor={COLORS.grey35}
-      >
-        <StyledText oddStyle="bodyTextSemiBold">{optionName}</StyledText>
-        <SmallButton
-          buttonType="primary"
-          onClick={onClickHandler}
-          data-testid={optionName}
-          buttonText={buttonText}
-          buttonCategory="rounded"
-        />
-      </ListItem>
-    )
-  }
+      </Flex>
+    </ListItem>
+  )
 }

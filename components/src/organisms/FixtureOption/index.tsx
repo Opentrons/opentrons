@@ -26,25 +26,22 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
     secondaryOnClickHandler,
     secondaryButtonText,
   } = props
-  if (secondaryOnClickHandler !== null && secondaryButtonText !== undefined) {
-    return (
-      <ListItem
-        type="default"
-        padding={SPACING.spacing16 + ' ' + SPACING.spacing24}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+  return (
+    <ListItem
+      type="default"
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        oddStyle="bodyTextSemiBold"
       >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          oddStyle="bodyTextSemiBold"
-        >
-          {optionName}
-        </StyledText>
-        <Flex
-          gridGap={SPACING.spacing4}
-          width={'10rem'}
-          justifyContent={JUSTIFY_FLEX_END}
-        >
+        {optionName}
+      </StyledText>
+      <Flex gridGap={SPACING.spacing4} justifyContent={JUSTIFY_FLEX_END}>
+        {secondaryOnClickHandler !== null &&
+        secondaryButtonText !== undefined ? (
           <TertiaryButton
             buttonType="secondary"
             onClick={secondaryOnClickHandler}
@@ -52,30 +49,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
           >
             {secondaryButtonText}
           </TertiaryButton>
-          <TertiaryButton
-            buttonType="primary"
-            onClick={onClickHandler}
-            data-testid={optionName}
-          >
-            {buttonText}
-          </TertiaryButton>
-        </Flex>
-      </ListItem>
-    )
-  } else {
-    return (
-      <ListItem
-        type="default"
-        padding={SPACING.spacing16 + ' ' + SPACING.spacing24}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          oddStyle="bodyTextSemiBold"
-        >
-          {optionName}
-        </StyledText>
+        ) : null}
         <TertiaryButton
           buttonType="primary"
           onClick={onClickHandler}
@@ -83,7 +57,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
         >
           {buttonText}
         </TertiaryButton>
-      </ListItem>
-    )
-  }
+      </Flex>
+    </ListItem>
+  )
 }

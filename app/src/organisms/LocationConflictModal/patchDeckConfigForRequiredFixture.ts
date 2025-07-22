@@ -16,6 +16,17 @@ import type {
   DeckConfiguration,
 } from '@opentrons/shared-data'
 
+/**
+ * Given the current deck config, current cutoutId, and required fixtureId
+ * for that cutout in a given protocol this function will return an updated deck config
+ * with that patches the fixture at the provided cutoutId
+ * @param deckConfig: current deck configuration
+ * @param requiredFixtureId: the required fixtureId for a protocol for a given item in the
+ * protocol setup deck hardware section
+ * @param cutoutId: the cutoutId for the required fixture
+ * @returns updated deck configuration
+ */
+
 export const patchDeckConfigForRequiredFixture = (
   deckConfig: DeckConfiguration,
   cutoutId: CutoutId,

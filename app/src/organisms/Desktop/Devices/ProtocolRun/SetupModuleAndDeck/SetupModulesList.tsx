@@ -153,12 +153,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                   displayName={moduleDef.displayName}
                   slotName={slotName}
                   attachedModuleMatch={attachedModuleMatch}
-                  heaterShakerModuleFromProtocol={
-                    moduleRenderInfoForProtocolById[moduleId].moduleDef
-                      .moduleType === HEATERSHAKER_MODULE_TYPE
-                      ? moduleRenderInfoForProtocolById[moduleId]
-                      : null
-                  }
+                  heaterShakerModuleFromProtocol={null}
                   isFlex={isFlex}
                   calibrationStatus={calibrationStatus}
                   chainLiveCommands={chainLiveCommands}
