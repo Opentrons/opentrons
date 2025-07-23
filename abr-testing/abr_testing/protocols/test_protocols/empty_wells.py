@@ -76,6 +76,20 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="opentrons_tough_1_reservoir_300ml",
     )
+    parameters.add_float(
+        variable_name="start_z_height",
+        display_name="Start Dist from Well Bottom",
+        default=0.5,
+        minimum=0,
+        maximum=10,
+    )
+    parameters.add_float(
+        variable_name="increment",
+        display_name="Increment Distance",
+        default=0.2,
+        minimum=0.1,
+        maximum=1,
+    )
 
 
 def home_axes_only(ctx: ProtocolContext) -> None:
@@ -89,8 +103,10 @@ def run(ctx: ProtocolContext) -> None:
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     labware = ctx.load_labware(labware_type, "D2")
     pipette_type = ctx.params.left_mount  # type: ignore[attr-defined]
-
-    tip_rack_type = ctx.params.tip_type
+    start_z_height = ctx.params.start_z_height  # type: ignore[attr-defined]
+    increment = ctx.params.increment  # type: ignore[attr-defined]
+    waste = ctx.load_waste_chute()
+    tip_rack_type = ctx.params.tip_type  # type: ignore[attr-defined]
     if int(pipette_type.split("_")[2]) > 8:
         tiprack_adapter = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", "C2")
         tip_rack = tiprack_adapter.load_labware(tip_rack_type)
@@ -99,43 +115,42 @@ def run(ctx: ProtocolContext) -> None:
     tip_volume = float(tip_rack_type.split("_")[-1].split("ul")[0])
     pipette = ctx.load_instrument(pipette_type, "left", tip_racks=[tip_rack])
 
-    well_location = {
-        "opentrons_tough_12_reservoir_22ml": "A1",
-        "opentrons_96_wellplate_200ul_pcr_full_skirt": "A1",
-        "corning_6_wellplate_16.8ml_flat": "B1",
-        "opentrons_tough_1_reservoir_300ml": "A1",
-    }
-    well = labware[well_location[labware_type]]
     pipette.pick_up_tip()
-    z_height = 0.5
-    pipette.aspirate(100, well.bottom(z=z_height))
+    well = labware["A1"]
+    pipette.aspirate(100, well.bottom(z=start_z_height))
     NO_OVERPRESSURE = True
-
+    total_vol = 100
+    z_height = start_z_height
     while NO_OVERPRESSURE:
-        z_height -= 0.2
+        z_height -= increment
         ctx.comment(f"Z height {z_height}")
         try:
             print(z_height)
             if (tip_volume - pipette.current_volume) >= 5:
                 pipette.aspirate(100, well.bottom(z=z_height))
+                total_vol += 100
             else:
                 break
         except Exception as e:
             msg = str(e)
             if "pressure" in msg:
                 ctx.comment(f"error caught: {e}")
-                adjusted_height = z_height + 0.1
+                adjusted_height = z_height + increment
                 pipette._retract()
                 try:
                     pipette._retract()
-                    pipette.move_to(well.bottom(adjusted_height))
-                    aspirate_vol = min(tip_volume, pipette.remaining_volume)
-                    pipette.aspirate(aspirate_vol)
-                except:
+                    pipette.blow_out(waste)
+                    pipette.blow_out(waste)
+                    pipette.blow_out(waste)
+                    pipette.blow_out(waste)
+                    aspirate_vol = 100
+                    pipette.aspirate(aspirate_vol, well.bottom(z=adjusted_height))
+                except Exception as e:
+                    ctx.comment(f"error caught: {e}")
                     home_axes_only(ctx)
-                    pipette.move_to(well.bottom(adjusted_height))
-                    aspirate_vol = min(tip_volume, pipette.remaining_volume)
-                    pipette.aspirate(aspirate_vol)
+                    pipette.dispense(pipette.current_volume, waste)
+                    aspirate_vol = 100
+                    pipette.aspirate(aspirate_vol, well.bottom(z=adjusted_height))
                 ctx.comment(
                     f"Height at overpressure: {z_height} adjusted to {adjusted_height}"
                 )
