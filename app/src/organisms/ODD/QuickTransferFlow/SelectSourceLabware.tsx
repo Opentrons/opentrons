@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  FLEX_MAX_CONTENT,
   POSITION_FIXED,
   RadioButton,
   SPACING,
