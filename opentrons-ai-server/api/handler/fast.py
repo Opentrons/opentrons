@@ -34,15 +34,11 @@ from api.models.empty_request_error import EmptyRequestError
 from api.models.error_response import ErrorResponse
 from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
-
-# FileUploadResponse removed - using simplified JSON-based approach
 from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.settings import Settings
-
-# FileProcessor removed - using simplified JSON-based approach
 
 settings: Settings = Settings()
 setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
@@ -54,7 +50,6 @@ auth: VerifyToken = VerifyToken()
 openai: OpenAIPredict = OpenAIPredict(settings)
 google_sheets_client = GoogleSheetsClient(settings)
 claude: AnthropicPredict = AnthropicPredict(settings)
-# file_processor removed - using simplified JSON-based approach
 
 # Initialize FastAPI app with metadata
 app = FastAPI(
@@ -305,10 +300,6 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
             return ChatResponse(reply=error_message, fake=bool(is_fake))
 
     return ChatResponse(reply=response, fake=bool(is_fake))
-
-
-# File upload endpoints removed - using simplified JSON-based approach
-# Files are now processed locally on the frontend and content is sent directly in chat messages
 
 
 @tracer.wrap()

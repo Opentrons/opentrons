@@ -1,10 +1,4 @@
-import {
-  LOCAL_FILE_UPLOAD_END_POINT,
-  PROD_FILE_UPLOAD_END_POINT,
-  STAGING_FILE_UPLOAD_END_POINT,
-} from '../constants'
-
-import type { FileAttachment, ValidFileType } from '../types'
+import type { ValidFileType } from '../types'
 
 export const ALLOWED_FILE_TYPES = {
   pdf: ['.pdf'],
@@ -234,70 +228,4 @@ export const formatFileSize = (bytes: number): string => {
   const rounded = size.toFixed(1)
 
   return `${rounded} ${sizes[i]}`
-}
-
-// Get the correct file upload endpoint based on environment
-const getFileUploadEndpoint = (): string => {
-  switch (process.env.NODE_ENV) {
-    case 'production':
-      return PROD_FILE_UPLOAD_END_POINT
-    case 'development':
-      return LOCAL_FILE_UPLOAD_END_POINT
-    default:
-      return STAGING_FILE_UPLOAD_END_POINT
-  }
-}
-
-// Upload file to backend API
-export const uploadFile = async (
-  file: File,
-  token: string
-): Promise<FileAttachment> => {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  const response = await fetch(getFileUploadEndpoint(), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  })
-
-  if (!response.ok) {
-    const error: unknown = await response.json()
-    const errorMessage =
-      error != null &&
-      typeof error === 'object' &&
-      'message' in error &&
-      typeof error.message === 'string'
-        ? error.message
-        : error != null &&
-          typeof error === 'object' &&
-          'error' in error &&
-          typeof error.error === 'string'
-        ? error.error
-        : 'File upload failed'
-    throw new Error(errorMessage)
-  }
-
-  const data = await response.json()
-
-  // Map backend response to FileAttachment type
-  return {
-    id: data.id,
-    name: data.filename,
-    type: data.file_type as ValidFileType,
-    content: '', // Content is stored on server, not needed in frontend
-    size: data.size_bytes,
-  }
-}
-
-// Upload multiple files
-export const uploadFiles = async (
-  files: File[],
-  token: string
-): Promise<FileAttachment[]> => {
-  const uploadPromises = files.map(file => uploadFile(file, token))
-  return await Promise.all(uploadPromises)
 }
