@@ -140,8 +140,5 @@ jobs:
       - name: 'publish to npm registry'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd ./components
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc
-          ls -R # Debug: View contents of ./components
-          npm publish --access public
+        run: npm publish --access public
+        working-directory: ./components
