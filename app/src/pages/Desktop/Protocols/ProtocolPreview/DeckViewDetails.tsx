@@ -199,7 +199,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         let fixtureBaseColor = COLORS.grey35
         if (showDeckRenders) {
           if (isStepAssosciatedWithModule || isActiveLayerVisible) {
-            fixtureBaseColor = '#E6D5EC'
+            fixtureBaseColor = COLORS.purple30
           } else if (
             !isStepAssosciatedWithModule &&
             !isActiveLayerVisible &&
@@ -224,7 +224,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     stroke={
                       hoveredSlot === 'B1' || selectedSlot === 'B1'
                         ? COLORS.purple50
-                        : undefined
+                        : 'none'
                     }
                   />
                 ) : null}
@@ -238,7 +238,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   stroke={
                     hoveredSlot === slot || selectedSlot === slot
                       ? COLORS.purple50
-                      : undefined
+                      : 'none'
                   }
                 />
                 <Module
@@ -381,13 +381,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 fixtureBaseColor={
                   selectedSlot === addressableArea.id ||
                   (hoveredSlot === addressableArea.id && !showDeckRenders)
-                    ? '#E6D5EC'
+                    ? COLORS.purple30
                     : COLORS.transparent
                 }
                 stroke={
                   hoveredSlot === addressableArea.id && showDeckRenders
                     ? COLORS.purple50
-                    : undefined
+                    : 'none'
                 }
               />
             </Fragment>

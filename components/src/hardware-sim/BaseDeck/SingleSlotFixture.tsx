@@ -27,7 +27,7 @@ export function SingleSlotFixture(
     fixtureBaseColor,
     slotClipColor,
     showExpansion = false,
-    stroke,
+    stroke = 'none',
     ...restProps
   } = props
 

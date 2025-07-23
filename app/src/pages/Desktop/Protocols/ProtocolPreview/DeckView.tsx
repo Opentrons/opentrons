@@ -157,7 +157,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 let fixtureBaseColor = lightFill
                 if (showDeckRenders) {
                   if (isActiveLayerVisible) {
-                    fixtureBaseColor = '#E6D5EC'
+                    fixtureBaseColor = COLORS.purple30
                   } else if (
                     !isActiveLayerVisible &&
                     selectedSlot === addressableArea.id
@@ -178,7 +178,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                       (hoveredSlot === addressableArea.id ||
                         selectedSlot === addressableArea.id)
                         ? COLORS.purple50
-                        : undefined
+                        : 'none'
                     }
                   />
                 ) : null

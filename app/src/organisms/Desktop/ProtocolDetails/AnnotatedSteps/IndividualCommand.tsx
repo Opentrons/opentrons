@@ -6,7 +6,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
 
-import styles from './annotatedSteps.module.css'
+import styles from './annotatedsteps.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -50,7 +50,7 @@ export function IndividualCommand({
         })
       })
     }
-  }, [isHighlighted, scrollTargetId])
+  }, [isHighlighted, scrollTargetId, command])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
     [styles.individual_command_wrap_highlighted]: isHighlighted,
@@ -86,7 +86,6 @@ export function IndividualCommand({
             <CommandText
               command={command}
               robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
-              color={COLORS.black90}
               commandTextData={analysis}
               allRunDefs={allRunDefs}
             />

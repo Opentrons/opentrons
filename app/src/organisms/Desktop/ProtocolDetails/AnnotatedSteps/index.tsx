@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { AnnotatedGroup } from './AnnotatedGroup'
-import styles from './annotatedSteps.module.css'
+import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 
 import type { Dispatch, SetStateAction } from 'react'
