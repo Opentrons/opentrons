@@ -15,9 +15,9 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             ],
             "traceback": [
                 (r"line \d+,", "line N,"),
-                # Replace absolute paths (macOS, Linux, CI, etc.) with <PATH>
+                # A single, smarter pattern for project paths on all platforms
                 (
-                    r"([a-zA-Z]:\\[Uu]sers\\[^\\\"']+\\github\\opentrons\\opentrons|/(?:Users/[^/\"']+/github|home/runner/work)/opentrons/opentrons)[^\s\"]*",
+                    r"((?:[a-zA-Z]:\\[Uu]sers\\[^\\\"']+|/Users/[^/\"']+)[/\\]github[/\\]opentrons[/\\]opentrons|/home/runner/work/opentrons/opentrons)[^\s\"]*",
                     "<PATH>",
                 ),
             ],
