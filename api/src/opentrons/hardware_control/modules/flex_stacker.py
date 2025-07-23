@@ -627,6 +627,8 @@ class FlexStacker(mod_abc.AbstractModule):
         if not ignore_latch:
             if self.limit_switch_status[StackerAxis.Z] == StackerAxisState.UNKNOWN:
                 if self.latch_state == LatchState.OPENED:
+                    # let's make sure the latch is opened all the way before homging the Z
+                    await self.open_latch()
                     # self.latch_state is OPENED, so we need to home Z in the EXTEND direction
                     await self.home_axis(StackerAxis.Z, Direction.EXTEND)
             await self.close_latch()
