@@ -144,7 +144,10 @@ def test_analasis(csv: str) -> None:
 
 def test_photometric() -> None:
     """Make sure each CSV can analyze successfully."""
-    photometric_protocol = Path(__file__).parent / "../../../hardware_testing/protocols/universal_photometric.py"
+    photometric_protocol = (
+        Path(__file__).parent
+        / "../../../hardware_testing/protocols/universal_photometric.py"
+    )
     result = _get_analysis_result(
         [photometric_protocol],
         "--json-output",
