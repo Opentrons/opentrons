@@ -6,6 +6,18 @@ export const ALLOWED_FILE_TYPES = {
   python: ['.py'],
 } as const
 
+// MIME types provide better security than file extensions
+// as they check the actual file content headers
+export const ALLOWED_MIME_TYPES = {
+  pdf: ['application/pdf'] as string[],
+  csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel'] as string[],
+  python: [
+    'text/x-python',
+    'text/plain',
+    'application/x-python-code',
+  ] as string[],
+}
+
 export type FileType = ValidFileType
 
 export interface FileValidationResult {
@@ -29,15 +41,20 @@ export const FILE_SIZE_LIMITS = {
 export const MAX_FILES_PER_MESSAGE = 5
 
 export const validateFile = (file: File): FileValidationResult => {
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+  // First check MIME type for security
+  const isSupportedMimeType =
+    ALLOWED_MIME_TYPES.pdf.includes(file.type) ||
+    ALLOWED_MIME_TYPES.csv.includes(file.type) ||
+    ALLOWED_MIME_TYPES.python.includes(file.type)
 
-  // Check if file type is supported
-  const isSupportedType =
+  // Fall back to extension check if MIME type is empty or not recognized
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+  const isSupportedExtension =
     ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf') ||
     ALLOWED_FILE_TYPES.csv.includes(extension as '.csv') ||
     ALLOWED_FILE_TYPES.python.includes(extension as '.py')
 
-  if (!isSupportedType) {
+  if (!isSupportedMimeType && !isSupportedExtension) {
     return {
       isValid: false,
       error:
@@ -59,6 +76,18 @@ export const validateFile = (file: File): FileValidationResult => {
 }
 
 export const getFileType = (file: File): FileType => {
+  // Check MIME type first for security
+  if (ALLOWED_MIME_TYPES.pdf.includes(file.type)) {
+    return 'pdf'
+  }
+  if (ALLOWED_MIME_TYPES.csv.includes(file.type)) {
+    return 'csv'
+  }
+  if (ALLOWED_MIME_TYPES.python.includes(file.type)) {
+    return 'python'
+  }
+
+  // Fall back to extension if MIME type is not recognized
   const extension = '.' + file.name.split('.').pop()?.toLowerCase()
 
   if (ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf')) {
@@ -72,7 +101,7 @@ export const getFileType = (file: File): FileType => {
   }
 
   // This should never happen if validateFile is called first
-  throw new Error(`Unsupported file type: ${extension}`)
+  throw new Error(`Unsupported file type: ${file.type || extension}`)
 }
 
 const fileTypeLabels: Record<FileType, string> = {
@@ -84,9 +113,9 @@ const fileTypeLabels: Record<FileType, string> = {
 export const getFileTypeLabel = (type: FileType): string => fileTypeLabels[type]
 
 export const readFileContent = async (
-  file: File,
-  type: FileType
+  file: File
 ): Promise<ProcessedFileContent> => {
+  const type = getFileType(file)
   switch (type) {
     case 'pdf':
       // PDF files are encoded as base64 for proper document handling
@@ -95,14 +124,14 @@ export const readFileContent = async (
 
       // Check if PDF is too large (base64 encoding increases size by ~33%)
       // Claude has a ~200k token limit, so we need to be conservative
-      const MAX_PDF_SIZE = 5 * 1024 * 1024 // 5MB limit for PDFs
+      const MAX_PDF_SIZE_MB = 5 * 1024 * 1024 // 5MB limit for PDFs
 
-      if (pdfBuffer.byteLength > MAX_PDF_SIZE) {
+      if (pdfBuffer.byteLength > MAX_PDF_SIZE_MB) {
         throw new Error(
           `PDF file is too large (${Math.round(
             pdfBuffer.byteLength / (1024 * 1024)
           )}MB). Please use a PDF smaller than ${Math.round(
-            MAX_PDF_SIZE / (1024 * 1024)
+            MAX_PDF_SIZE_MB / (1024 * 1024)
           )}MB or extract the relevant text content and paste it directly.`
         )
       }
@@ -127,13 +156,6 @@ export const readFileContent = async (
         throw new Error('Failed to encode PDF as base64')
       }
 
-      // Log base64 info for debugging
-      console.log(
-        `PDF encoded to base64: ${Math.round(
-          pdfBase64.length / 1000
-        )}k characters, starts with: ${pdfBase64.substring(0, 50)}...`
-      )
-
       // Additional check for base64 size (approximate token count)
       if (pdfBase64.length > 150000) {
         // Very conservative estimate
@@ -154,7 +176,7 @@ export const readFileContent = async (
       const csvText = await file.text()
 
       // If CSV is large, send as raw text to avoid timeout
-      const MAX_CSV_JSON_SIZE = 500 * 1024 // 500KB limit for JSON conversion
+      const MAX_CSV_JSON_SIZE_KB = 500 * 1024 // 500KB limit for JSON conversion
 
       try {
         // Simple CSV to JSON conversion
@@ -163,10 +185,7 @@ export const readFileContent = async (
           return { content: '[]', mediaType: 'application/json' }
 
         // Check if CSV is too large to convert to JSON
-        if (csvText.length > MAX_CSV_JSON_SIZE) {
-          console.log(
-            `CSV file is large (${csvText.length} bytes), sending as raw text`
-          )
+        if (csvText.length > MAX_CSV_JSON_SIZE_KB) {
           return {
             content: csvText,
             mediaType: 'text/csv',
@@ -187,10 +206,7 @@ export const readFileContent = async (
         const jsonContent = JSON.stringify(data)
 
         // If resulting JSON is too large, fall back to CSV
-        if (jsonContent.length > MAX_CSV_JSON_SIZE * 2) {
-          console.log(
-            `Converted JSON is too large (${jsonContent.length} bytes), sending as CSV`
-          )
+        if (jsonContent.length > MAX_CSV_JSON_SIZE_KB * 2) {
           return {
             content: csvText,
             mediaType: 'text/csv',

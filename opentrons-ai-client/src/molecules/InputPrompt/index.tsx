@@ -47,6 +47,7 @@ import type {
   ChatData,
   CreatePrompt,
   UpdatePrompt,
+  ValidFileType,
 } from '../../resources/types'
 
 // Helper to safely parse the `protocol_content` field that may be a JSON string or an object.
@@ -171,12 +172,20 @@ export function InputPrompt(): JSX.Element {
     )
 
     // Process files locally if there are any
-    const fileAttachments: any[] = []
+    interface FileAttachmentForBackend {
+      id: string
+      filename: string
+      file_type: string
+      content: string
+      media_type: string
+      size: number
+    }
+    const fileAttachments: FileAttachmentForBackend[] = []
     if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
       try {
         for (const file of attachedFiles) {
           const fileType = getFileType(file)
-          const fileContent = await readFileContent(file, fileType)
+          const fileContent = await readFileContent(file)
           fileAttachments.push({
             id: uuidv4(), // Generate local ID
             filename: file.name,
@@ -207,7 +216,7 @@ export function InputPrompt(): JSX.Element {
           ? fileAttachments.map(file => ({
               id: file.id,
               name: file.filename,
-              type: file.file_type,
+              type: file.file_type as ValidFileType,
               content: file.content,
               size: file.size,
             }))
@@ -259,7 +268,7 @@ export function InputPrompt(): JSX.Element {
             })
 
       // Combine all attachments - new files plus files from chat history
-      let attachmentsToSend: any[] | undefined = []
+      let attachmentsToSend: FileAttachmentForBackend[] = []
 
       // Add new files being attached
       if (fileAttachments.length > 0) {
@@ -302,11 +311,6 @@ export function InputPrompt(): JSX.Element {
         })
       }
 
-      // Set to undefined if no attachments to send
-      if (attachmentsToSend.length === 0) {
-        attachmentsToSend = undefined
-      }
-
       const config = {
         url,
         method: 'POST',
@@ -334,7 +338,7 @@ export function InputPrompt(): JSX.Element {
               ? fileAttachments.map(file => ({
                   id: file.id,
                   name: file.filename,
-                  type: file.file_type,
+                  type: file.file_type as ValidFileType,
                   content: file.content,
                   size: file.size,
                 }))
