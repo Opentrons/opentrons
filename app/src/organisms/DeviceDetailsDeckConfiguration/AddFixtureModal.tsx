@@ -25,7 +25,7 @@ import {
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  WASTE_CHUTE_CUTOUT,
+  STAGING_AREA_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
@@ -115,7 +115,7 @@ export function AddFixtureModal({
     cutoutConfig => cutoutConfig.cutoutId === cutoutId
   )
   const hasStackerInSlot = existingCutoutConfig?.cutoutFixtureId
-    ? cutoutId === WASTE_CHUTE_CUTOUT &&
+    ? STAGING_AREA_CUTOUTS.includes(cutoutId) &&
       FLEX_STACKER_FIXTURES.includes(existingCutoutConfig.cutoutFixtureId)
     : false
 
