@@ -51,6 +51,7 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { getModuleTooHot } from '/app/transformations/modules'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
@@ -433,18 +434,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                  slotName != null
+                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {module?.usbPort !== null
-                    ? t('usb_port', {
-                        port: module?.usbPort?.port,
-                        hubPort:
-                          module?.usbPort?.hubPort != null
-                            ? `.${module.usbPort.hubPort}`
-                            : '',
-                      })
-                    : t('usb_port_not_connected')}
+                  {getModuleUSBPort(module) ?? t('usb_port_not_connected')}
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
