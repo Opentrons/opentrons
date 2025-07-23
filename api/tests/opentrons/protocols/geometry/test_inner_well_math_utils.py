@@ -1,6 +1,6 @@
 import pytest
 from math import pi, isclose
-from typing import Any, List, cast
+from typing import Any, List, cast, Dict
 from hypothesis import given, strategies as st
 
 from opentrons_shared_data.labware.labware_definition import (
@@ -8,8 +8,10 @@ from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     SphericalSegment,
     InnerWellGeometry,
+    UserDefinedVolumes,
+    HeightVolumePair,
 )
-from opentrons.protocol_engine.state.frustum_helpers import (
+from opentrons.protocol_engine.state.inner_well_math_utils import (
     _cross_section_area_rectangular,
     _cross_section_area_circular,
     _reject_unacceptable_heights,
@@ -20,11 +22,43 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
-    find_height_at_well_volume,
-    find_volume_at_well_height,
+    find_height_inner_well_geometry,
+    find_volume_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_user_defined_volumes,
     _get_segment_capacity,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
+
+
+@pytest.fixture
+def user_defined_volumes_params() -> Dict[str, Any]:
+    """Return a UserDefinedVolumes BaseModel."""
+    params = {}
+    params["obj"] = UserDefinedVolumes(
+        heightToVolumeMap=[
+            HeightVolumePair(height=0.4, volume=2.0),
+            HeightVolumePair(height=2.3, volume=9.8),
+            HeightVolumePair(height=4.5, volume=12.2),
+            HeightVolumePair(height=7.8, volume=50.1),
+        ]
+    )
+    params["volume_inputs_expected_outputs"] = [  # type: ignore[assignment]
+        (0.2, 1.0),
+        (2.1, 8.9789),
+        (2.5, 10.01818),
+        (4.5, 12.2),
+        (6.0, 29.42727),
+    ]
+    params["height_inputs_expected_outputs"] = [  # type: ignore[assignment]
+        (0.4, 0.08),
+        (5.5, 1.2525),
+        (9.8, 2.3),
+        (0.0, 0.0),
+        (50.1, 7.8),
+        (40.0, 6.92),
+    ]
+    return params
 
 
 def fake_frusta() -> List[List[Any]]:
@@ -337,14 +371,14 @@ def test_height_at_volume_at_section_boundaries(well: List[Any]) -> None:
         inner_well_geometry.sections, key=lambda section: section.topHeight
     )
     running_volume = 0.0
-    height = find_height_at_well_volume(
+    height = find_height_inner_well_geometry(
         target_volume=0.0, well_geometry=inner_well_geometry
     )
     assert isinstance(height, float)
     assert isclose(height, 0.0)
     for segment in sorted_well:
         running_volume += _get_segment_capacity(segment)
-        height = find_height_at_well_volume(
+        height = find_height_inner_well_geometry(
             target_volume=running_volume,
             well_geometry=inner_well_geometry,
         )
@@ -359,12 +393,43 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
     tot_ul = 0.0
     # reverse b/c list of top->bottom
     for segment in reversed(well):
-        bottom_ul = find_volume_at_well_height(
+        bottom_ul = find_volume_inner_well_geometry(
             target_height=segment.bottomHeight, well_geometry=inner_well_geometry
         )
         assert isclose(cast(float, bottom_ul), tot_ul)
-        top_ul = find_volume_at_well_height(
+        top_ul = find_volume_inner_well_geometry(
             target_height=segment.topHeight, well_geometry=inner_well_geometry
         )
         tot_ul += _get_segment_capacity(segment)
         assert isclose(cast(float, top_ul), tot_ul)
+
+
+def test_get_user_volumes(user_defined_volumes_params: Dict[str, Any]) -> None:
+    """Test linear interpolation math for user-defined volumes."""
+    user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    inputs_expected_outputs = user_defined_volumes_params[
+        "volume_inputs_expected_outputs"
+    ]
+    for height, expected_vol in inputs_expected_outputs:
+        volume_estimate = find_volume_user_defined_volumes(
+            target_height=height, well_geometry=user_defined_volumes_obj
+        )
+        assert isinstance(volume_estimate, float)
+        assert isclose(volume_estimate, expected_vol, abs_tol=0.001)
+
+
+def test_get_user_heights(
+    user_defined_volumes_params: Dict[str, Any],
+) -> None:
+    """Test linear interpolation math for user-defined volumes."""
+    user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    inputs_expected_outputs = user_defined_volumes_params[
+        "height_inputs_expected_outputs"
+    ]
+
+    for vol, expected_height in inputs_expected_outputs:
+        height_estimate = find_height_user_defined_volumes(
+            target_volume=vol, well_geometry=user_defined_volumes_obj
+        )
+        assert isinstance(height_estimate, float)
+        assert isclose(height_estimate, expected_height, abs_tol=0.001)

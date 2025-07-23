@@ -52,7 +52,6 @@ describe('Touchscreen AddFixtureModal', () => {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
-      isOnDevice: true,
       deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -82,23 +81,6 @@ describe('Touchscreen AddFixtureModal', () => {
     render(props)
     fireEvent.click(screen.getAllByText('Add')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
-  })
-
-  it('when fixture options are provided, should only render those options', () => {
-    props = {
-      ...props,
-      providedFixtureOptions: ['trashBinAdapter'],
-    }
-    render(props)
-    screen.getByText('Add to Slot D3')
-    screen.getByText(
-      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
-    )
-    expect(screen.queryByText('Staging area slot')).toBeNull()
-    screen.getByText('Trash bin')
-    expect(screen.queryByText('Waste chute')).toBeNull()
-    expect(screen.getAllByText('Add').length).toBe(1)
-    expect(screen.queryByText('Select options')).toBeNull()
   })
 })
 

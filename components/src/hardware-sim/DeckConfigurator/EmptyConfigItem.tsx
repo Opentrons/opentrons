@@ -102,6 +102,7 @@ export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
         onClick={() => {
           handleClickAdd(fixtureLocation, addressableAreaId)
         }}
+        height="100%"
         data-testid={addressableAreaId}
         disabled={disableButton}
       >

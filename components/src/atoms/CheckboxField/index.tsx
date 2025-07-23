@@ -65,7 +65,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         <Icon
           css={value ?? false ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
           name={value ?? false ? 'ot-checkbox' : 'checkbox-blank-outline'}
-          width="100%"
+          width="1.25rem"
           data-testid="CheckboxField_icon"
         />
       )}

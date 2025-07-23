@@ -34,13 +34,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 10.08,
@@ -49,13 +43,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.26,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.08,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.26,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.08,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.26,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.08,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.26
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.26
               }
             }
           }
@@ -73,13 +61,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.52,
@@ -88,13 +70,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.2,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.71,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.52,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.2,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.71,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.52,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.2,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.71,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.52,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.2
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.2
               }
             }
           }
@@ -112,13 +88,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.24,
@@ -127,13 +97,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.73,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.52,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.24,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.73,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.52,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.24,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.73,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.52,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.24,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.73
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.73
               }
             }
           }
@@ -151,13 +115,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.2,
@@ -166,13 +124,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.8,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.8
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -190,13 +142,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.2,
@@ -205,13 +151,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.8,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.8
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -229,13 +169,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.2,
@@ -244,13 +178,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.8,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.8
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -268,13 +196,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.2,
@@ -283,13 +205,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.8,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.3,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.8,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.3,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.2,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.8
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.8
               }
             }
           }
@@ -307,13 +223,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 9.13,
@@ -322,13 +232,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.9,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.23,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.13,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.9,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.23,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.13,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.9,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.23,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.13,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.9
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.9
               }
             }
           }
@@ -346,13 +250,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.17,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 10.1,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 10.17,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 10.1,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 10.05,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 10.17
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 10.17
               },
               "v1": {
                 "default": 10.5,
@@ -361,13 +259,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.42,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.42,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.27,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.42,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.27,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.67
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
               },
               "v3": {
                 "default": 9.28,
@@ -376,13 +268,7 @@
                 "opentrons/opentrons_flex_96_tiprack_1000ul/1": 9.67,
                 "opentrons/opentrons_flex_96_filtertiprack_200ul/1": 9.37,
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.28,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67,
-                "opentrons/opentrons_flex_96_tiprack_200ul/2": 9.37,
-                "opentrons/opentrons_flex_96_tiprack_50ul/2": 9.28,
-                "opentrons/opentrons_flex_96_tiprack_1000ul/2": 9.67,
-                "opentrons/opentrons_flex_96_filtertiprack_200ul/2": 9.37,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/2": 9.28,
-                "opentrons/opentrons_flex_96_filtertiprack_1000ul/2": 9.67
+                "opentrons/opentrons_flex_96_filtertiprack_1000ul/1": 9.67
               }
             }
           }

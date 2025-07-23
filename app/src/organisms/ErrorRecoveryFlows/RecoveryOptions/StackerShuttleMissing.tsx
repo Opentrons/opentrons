@@ -1,6 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerLoadShuttle,
@@ -23,6 +24,8 @@ export function StackerShuttleMissing(
       return <StackerLoadShuttle {...props} />
     case STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER:
       return <StackerHopperLwInfo {...props} />
+    case STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
+      return <StackerEnsureShuttleEmpty {...props} />
     case STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
     default:
