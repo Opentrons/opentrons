@@ -62,7 +62,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "vol_diff", "cheight", "hdelta"]
+CSV_HEADER = ["step", "step volume", "dispense volume", "tip-z-error", "error from nominal", "height", "hdelta"]
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -91,7 +91,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
             {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="nest_96_wellplate_2ml_deep",
     )
 
     parameters.add_float(
@@ -128,13 +128,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=0.01,
     )
 
-    parameters.add_bool(
-        display_name="Quick Mode",
-        variable_name="quick_mode",
-        description="If true, dial indicator is not used and tips are reused.",
-        default=False,
-    )
-
     parameters.add_float(
         variable_name="number_of_steps",
         display_name="Number of Steps",
@@ -165,7 +158,6 @@ def _setup(
     Labware,
     Labware,
     Labware,
-    Labware, 
     bool,
     float,
     bool,
@@ -178,7 +170,6 @@ def _setup(
 
     global DIAL_PORT, RUN_ID, FILE_NAME
 
-    quick_mode = ctx.params.quick_mode  # type: ignore[attr-defined]
     number_of_steps = int(ctx.params.number_of_steps)  # type: ignore[attr-defined]
     dynamic_steps = ctx.params.dynamic_steps  # type: ignore[attr-defined]
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
@@ -192,20 +183,16 @@ def _setup(
     probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
 
     # tipracks
-    liquid_rack1 = ctx.load_labware(
+    liquid_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{liq_tip_size}uL", SLOT_LIQUID_TIPRACK
     )
-    liquid_rack2 = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{liq_tip_size}uL", "B1"
-    )
     probing_rack = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", "C1"
+        f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
-    liquid_racks = [liquid_rack1, liquid_rack2]
 
     # load pipettes w tipracks
     liq_pipette = ctx.load_instrument(
-        liquid_pip_name, LIQUID_MOUNT, tip_racks=[liquid_rack1, liquid_rack2]
+        liquid_pip_name, LIQUID_MOUNT, tip_racks=[liquid_rack]
     )
     probe_pipette = ctx.load_instrument(
         probing_pip_name, PROBING_MOUNT, tip_racks=[probing_rack]
@@ -226,14 +213,12 @@ def _setup(
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class("ethanol_80")
     lm = "liquid-meniscus"
-
-    for rack in liquid_racks:
-        props = ethanol.get_for(liq_pipette, rack)
-        meniscus_z = -0.5
-        props.aspirate.aspirate_position.position_reference = lm
-        props.aspirate.aspirate_position.offset.z = meniscus_z
-        props.dispense.dispense_position.position_reference = lm
-        props.dispense.dispense_position.offset.z = meniscus_z
+    props = ethanol.get_for(liq_pipette, liquid_rack)
+    meniscus_z = -0.5
+    props.aspirate.aspirate_position.position_reference = lm
+    props.aspirate.aspirate_position.offset.z = meniscus_z
+    props.dispense.dispense_position.position_reference = lm
+    props.dispense.dispense_position.offset.z = meniscus_z
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -245,7 +230,7 @@ def _setup(
         DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(
-            metadata["protocolName"], RUN_ID, f"{LIQUID_MOUNT}-{liquid_rack1.load_name}"
+            metadata["protocolName"], RUN_ID, f"{LIQUID_MOUNT}-{liquid_rack.load_name}"
         )
         _write_line_to_csv(ctx, [RUN_ID])
         _write_line_to_csv(ctx, [liquid_pip_name])
@@ -260,14 +245,12 @@ def _setup(
         liq_pipette,
         probe_pipette,
         probing_rack,
-        liquid_rack1,
-        liquid_rack2,
+        liquid_rack,
         labware,
         src,
         dial,
         dynamic_steps,
         number_of_steps,
-        quick_mode,
         ethanol,
         first_dispense,
         neutral_target,
@@ -316,7 +299,7 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
         return
     from hardware_testing.data import append_data_to_file
 
-    formatted_line = [str(item).ljust(25) for item in line]
+    formatted_line = [str(item).ljust(23) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
@@ -359,14 +342,12 @@ def run(ctx: ProtocolContext) -> None:
         liq_pipette,
         probe_pipette,
         probing_rack,
-        liquid_rack1,
-        liquid_rack2,
+        liquid_rack,
         labware,
         src,
         dial,
         dynamic_steps,
         number_of_steps,
-        quick_mode,
         ethanol,
         first_dispense,
         neutral_target,
@@ -388,11 +369,12 @@ def run(ctx: ProtocolContext) -> None:
     step = 0
     hdelta = 0.0
     height = 0.0
-    height_check = 0.0
     vol_diff = 0.0
     step_volume = 0.0
     total_vol = 0.0
     tipcount = 0
+    dispense_volume = 0
+
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -463,7 +445,7 @@ def run(ctx: ProtocolContext) -> None:
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
     
-    def reload_labware() -> None:
+    def reload_labware(ctx) -> None:
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
         labware = ctx.load_labware(
@@ -474,71 +456,70 @@ def run(ctx: ProtocolContext) -> None:
 
     ################ Begin Protocol
 
-    drop_tips()
 
-    total_vol = first_dispense if dynamic_steps else max_volume / number_of_steps
+    drop_tips()
+    
     wells = list(labware.wells_by_name().keys())
 
-
     while total_vol < (max_volume - tolerance):
-        # initial step, log 0
+        well = wells[step-1]
+
+        pick_up_tips()
+        tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
+
+        #first, check if the step exceeds the number of wells
+        if step >= len(wells):
+            print("Reloading labware")
+            labware = reload_labware(ctx, labware_type, "B3", ctx.params.labware_version)
+            step = 0
+
         if step == 0:
-            pick_up_tips()
-            tipcount += 1
-            tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-            _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-        else:
-            if not quick_mode:
-                tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-            #todo: make this a function
-            if step > len(wells):
-                reload_labware()
-                step = 1 #reset the step 
-            well = wells[step-1]
-            print(well)
-            total_vol += step_volume
+            src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
+        #initial dispense
+        elif step == 1:
+            step_volume = first_dispense if dynamic_steps else max_volume / number_of_steps
+        #adaptive step volume
+        elif dynamic_steps and len(corrected_heights) > 1:
+            step_volume = adaptive_volume_step(
+                hdelta, corrected_height, step_volume, neutral_target
+            ) #to do: modify this to take step_volume as param, or dispense_volume? 
+
+        # track volumes 
+        dispense_volume += step_volume
+        total_vol += step_volume # the amount dispensed was updated to be the same as the total vol
+
+        if dispense_volume > 0:
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
-                total_vol,
+                dispense_volume,
                 src["A1"],
                 labware[well],
                 new_tip="never",
                 return_tip=False,
             )
+            # Measure height
+            height = probe_pipette.measure_liquid_height(labware[well])
         
-            height_check = corrected_height
+        corrected_height = height + tip_z_error
 
-            # probe well
+        api_vol = labware[well].height_from_volume(step_volume)
+        vol_diff = api_vol - corrected_height
+
+        corrected_heights.append(corrected_height)
+        hdelta = corrected_heights[-1] - corrected_heights[-2] if len(corrected_heights) > 1 else 0.0
+
+        # pick up tip and remeasure if hdelta is negative 
+        if hdelta < 0:
+            ctx.comment("hdelta is negative, remeasuring height")
+            liq_pipette.drop_tip()
+            liq_pipette.pick_up_tip()
             height = probe_pipette.measure_liquid_height(labware[well])
             corrected_height = height + tip_z_error
 
-            api_vol = labware[well].height_from_volume(step_volume)
-            vol_diff = api_vol - corrected_height
-
-            # check if new height greater than old height
-            if height_check > corrected_height:
-                liq_pipette.drop_tip()
-                liq_pipette.pick_up_tip()
-                height = probe_pipette.measure_liquid_height(labware[well])
-                corrected_height = height + tip_z_error
-
-        # log corrected height
-        corrected_heights.append(corrected_height)
-
-        # find hdelta and correct
-        if dynamic_steps and len(corrected_heights) > 1:
-            hdelta = corrected_heights[-1] - corrected_heights[-2]
-            step_volume = adaptive_volume_step(
-                hdelta, corrected_height, step_volume, neutral_target
-            )
-
         write_trial_log()
+
         step += 1
 
-        if not quick_mode:
-            drop_tips()
-            pick_up_tips()
-
-        print(tipcount)
+        drop_tips()
 
     drop_tips()
