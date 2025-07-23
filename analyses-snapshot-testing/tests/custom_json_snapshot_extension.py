@@ -16,7 +16,10 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             "traceback": [
                 (r"line \d+,", "line N,"),
                 # Replace absolute paths (macOS, Linux, CI, etc.) with <PATH>
-                (r"(/Users/[^/]+/github/opentrons/opentrons|/home/runner/work/opentrons/opentrons)[^\s\"]*", "<PATH>"),
+                (
+                    r"([a-zA-Z]:\\[Uu]sers\\[^\\\"']+\\github\\opentrons\\opentrons|/(?:Users/[^/\"']+/github|home/runner/work)/opentrons/opentrons)[^\s\"]*",
+                    "<PATH>",
+                ),
             ],
             "obj": [
                 (r"(<[\w\.]+ object at 0x)[0-9a-fA-F]+(>)", r"\1UUID\2"),
