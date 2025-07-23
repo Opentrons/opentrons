@@ -10,6 +10,7 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -208,13 +209,6 @@ describe('getFixtureOptions', () => {
           addressableAreaId: 'movableTrashD3',
         },
       ],
-      [
-        {
-          cutoutId: 'cutoutD3',
-          cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
-          addressableAreaId: '96ChannelWasteChute',
-        },
-      ],
     ])
   })
   it('Should not get a trash bin for cutoutD3 and aa D3 with a stacker in the slot', () => {
@@ -259,6 +253,13 @@ describe('getWasteChuteOptions', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
+        },
+      ],
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
           addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
         },
       ],
