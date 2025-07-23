@@ -1,4 +1,3 @@
-export * from './ProtocolSetupDeckConfiguration'
 export * from './ProtocolSetupInstruments'
 export * from './ProtocolSetupLabware'
 export * from './ProtocolSetupModulesAndDeck'

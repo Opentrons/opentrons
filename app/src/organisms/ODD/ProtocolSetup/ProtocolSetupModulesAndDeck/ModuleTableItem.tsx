@@ -17,6 +17,7 @@ import {
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   TC_MODULE_LOCATION_OT3,
@@ -34,7 +35,12 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  CutoutFixtureId,
+  DeckDefinition,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
@@ -102,6 +108,7 @@ interface ModuleTableItemProps {
   module: AttachedProtocolModuleMatch
   deckDef: DeckDefinition
   robotName: string
+  comboFixtureId?: CutoutFixtureId
 }
 
 export function ModuleTableItem({
@@ -111,6 +118,7 @@ export function ModuleTableItem({
   conflictedFixture,
   deckDef,
   robotName,
+  comboFixtureId,
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
@@ -272,6 +280,17 @@ export function ModuleTableItem({
     }
   }
 
+  const getModuleLocation = (moduleModel: ModuleModel): string => {
+    const moduleType = getModuleType(moduleModel)
+    if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+      return TC_MODULE_LOCATION_OT3
+    } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
+      return `${module.slotName.charAt(0)}4`
+    } else {
+      return module.slotName
+    }
+  }
+
   return (
     <>
       {showModuleWizard && module.attachedModuleMatch != null ? (
@@ -290,7 +309,9 @@ export function ModuleTableItem({
           }}
           cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
+          requiredFixtureId={comboFixtureId}
           deckDef={deckDef}
+          moduleSerialNumber={module.attachedModuleMatch?.serialNumber}
           isOnDevice={true}
           robotName={robotName}
         />
@@ -307,16 +328,14 @@ export function ModuleTableItem({
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {getModuleDisplayName(module.moduleDef.model)}
+            {comboFixtureId != null
+              ? getFixtureDisplayName(comboFixtureId)
+              : getModuleDisplayName(module.moduleDef.model)}
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
           <DeckInfoLabel
-            deckLabel={
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName
-            }
+            deckLabel={getModuleLocation(module.moduleDef.model)}
           />
         </Flex>
         <Flex

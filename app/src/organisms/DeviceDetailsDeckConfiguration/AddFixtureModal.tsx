@@ -26,11 +26,12 @@ import {
   SINGLE_CENTER_CUTOUTS,
 } from '@opentrons/shared-data'
 
+import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { getOptions } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
-import { getOptions } from './utils'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
@@ -38,7 +39,6 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
-  CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -52,7 +52,6 @@ interface AddFixtureModalProps {
   addressableAreaId: AddressableAreaNamesWithFakes
   closeModal: () => void
   deckDef: DeckDefinition
-  providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
 type OptionStage =
@@ -66,7 +65,6 @@ export function AddFixtureModal({
   cutoutId,
   addressableAreaId,
   closeModal,
-  providedFixtureOptions,
   isOnDevice = false,
   deckDef,
 }: AddFixtureModalProps): JSX.Element {
@@ -87,20 +85,16 @@ export function AddFixtureModal({
         )
     ) ?? []
 
-  let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
+  const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'
-  if (providedFixtureOptions != null) {
-    // only show provided options if given as props
-    initialStage = 'providedOptions'
-  }
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to', {
       slotName: getAADisplayName(addressableAreaId),
     }),
-    hasExitIcon: providedFixtureOptions == null,
+    hasExitIcon: true,
     onClick: closeModal,
   }
 
@@ -116,7 +110,6 @@ export function AddFixtureModal({
 
   const availableOptions = getOptions(
     cutoutId,
-    providedFixtureOptions,
     unconfiguredMods,
     optionStage,
     addressableAreaId,
@@ -125,7 +118,28 @@ export function AddFixtureModal({
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
-    nextStageOptions = (
+    nextStageOptions = isOnDevice ? (
+      <>
+        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
+          <ODDFixtureOption
+            key="fixturesOption"
+            optionName="Fixtures"
+            buttonText={t('add')}
+            onClickHandler={() => {
+              setOptionStage('fixtureOptions')
+            }}
+          />
+        )}
+        <ODDFixtureOption
+          key="modulesOption"
+          optionName="Modules"
+          buttonText={t('add')}
+          onClickHandler={() => {
+            setOptionStage('moduleOptions')
+          }}
+        />
+      </>
+    ) : (
       <>
         {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
           <FixtureOption
@@ -135,7 +149,6 @@ export function AddFixtureModal({
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
-            isOnDevice={isOnDevice}
           />
         )}
         <FixtureOption
@@ -145,7 +158,6 @@ export function AddFixtureModal({
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}
-          isOnDevice={isOnDevice}
         />
       </>
     )
@@ -234,7 +246,23 @@ export function AddFixtureModal({
       fixtureSerialNumber !== undefined &&
       cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)
     ) {
-      return (
+      return isOnDevice ? (
+        <ODDFixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs, fixtureSerialNumber)
+          }}
+          secondaryButtonText={t('identify')}
+          secondaryOnClickHandler={() => {
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
+        />
+      ) : (
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
@@ -249,11 +277,22 @@ export function AddFixtureModal({
           secondaryOnClickHandler={() => {
             handleIdentifyFixture(fixtureSerialNumber)
           }}
-          isOnDevice={isOnDevice}
         />
       )
     } else {
-      return (
+      return isOnDevice ? (
+        <ODDFixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs)
+          }}
+        />
+      ) : (
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
@@ -264,7 +303,6 @@ export function AddFixtureModal({
           onClickHandler={() => {
             handleAddFixture(cutoutConfigs)
           }}
-          isOnDevice={isOnDevice}
         />
       )
     }
@@ -273,12 +311,7 @@ export function AddFixtureModal({
   return (
     <>
       {isOnDevice ? (
-        <OddModal
-          header={modalHeader}
-          onOutsideClick={() => {
-            if (providedFixtureOptions == null) closeModal()
-          }}
-        >
+        <OddModal header={modalHeader} onOutsideClick={closeModal}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText oddStyle="bodyTextRegular">
               {t('add_fixture_description')}
