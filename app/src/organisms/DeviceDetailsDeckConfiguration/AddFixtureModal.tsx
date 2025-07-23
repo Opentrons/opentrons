@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
@@ -12,7 +9,6 @@ import {
   Modal,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useModulesQuery,
