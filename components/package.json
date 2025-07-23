@@ -5,10 +5,16 @@
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
   "style": "src/index.module.css",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "main": "lib/index.mjs",
+  "module": "lib/index.mjs",
   "exports": {
-    "./styles": "./src/styles/global.css"
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.mjs",
+      "default": "./lib/index.mjs"
+    },
+    "./styles": "./lib/style.css"
   },
   "repository": {
     "type": "git",
@@ -21,12 +27,12 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
+    "@opentrons/shared-data": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
     "@popperjs/core": "2.1.1",
     "@react-spring/types": "9.6.1",
     "@react-spring/web": "9.6.1",
@@ -48,6 +54,18 @@
     "styled-components": "5.3.6"
   },
   "devDependencies": {
+    "@opentrons/step-generation": "link:../step-generation",
     "react-redux": "8.1.2"
-  }
+  },
+  "scripts": {
+    "build": "npm run build-ts && npm run build-lib",
+    "build-lib": "NODE_ENV=production vite build",
+    "build-ts": "tsc --build --emitDeclarationOnly",
+    "prepublishOnly": "npm run build",
+    "postpack": "echo 'Package ready for publishing with bundled step-generation'"
+  },
+  "files": [
+    "lib/",
+    "README.md"
+  ]
 }

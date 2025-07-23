@@ -1,5 +1,8 @@
 // opentrons components library
 
+// Import global CSS first (not as CSS modules)
+import './styles/global.css'
+
 export * from './hooks'
 export * from './utils'
 

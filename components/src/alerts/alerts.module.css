@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import '../modules.css';
 
 .alert {
   font-size: var(--fs-body-2);

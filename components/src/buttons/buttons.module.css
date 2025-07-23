@@ -1,5 +1,5 @@
 /* button styling */
-@import '../index.module.css';
+@import '../modules.css';
 
 :root {
   --button-pad: 0.5rem;

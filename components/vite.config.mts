@@ -11,8 +11,13 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   build: {
-    // Relative to the root
-    ssr: 'src/index.ts',
+    // Build a library bundle
+    lib: {
+      entry: 'src/index.ts',
+      name: 'OpentronsComponents',
+      fileName: 'index',
+      formats: ['es'],
+    },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them
     emptyOutDir: false,
@@ -21,8 +26,27 @@ export default defineConfig({
       esmExternals: true,
     },
     rollupOptions: {
-      // Only @opentrons/shared-data is external; step-generation will be bundled!
-      external: ['@opentrons/shared-data'],
+      // Only @opentrons/shared-data and React/React-DOM are external; step-generation will be bundled!
+      external: [
+        '@opentrons/shared-data',
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+      ],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          '@opentrons/shared-data': 'OpentronsSharedData',
+        },
+        // Ensure CSS is extracted properly
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.names?.some(name => name.endsWith('.css'))) {
+            return 'style.css'
+          }
+          return assetInfo.names?.[0] || 'asset'
+        },
+      },
     },
   },
   plugins: [
@@ -41,6 +65,10 @@ export default defineConfig({
     },
   },
   css: {
+    modules: {
+      generateScopedName: '[name]__[local]___[hash:base64:5]',
+      localsConvention: 'camelCase',
+    },
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),

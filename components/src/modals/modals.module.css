@@ -1,5 +1,5 @@
 /* common styling for modals */
-@import '../index.module.css';
+@import '../modules.css';
 
 .modal {
   position: fixed;

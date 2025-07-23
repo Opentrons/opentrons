@@ -1,0 +1,24 @@
+# Development files - these should NOT be in the published package
+src/
+*.stories.*
+*.test.*
+*.spec.*
+__tests__/
+__mocks__/
+.storybook/
+coverage/
+
+# Build tools
+tsconfig*.json
+vite.config.*
+babel.config.*
+cssModuleSideEffect.*
+Makefile
+
+# Local dependencies - these get bundled instead
+node_modules/@opentrons/step-generation/
+
+# Other development files
+.env*
+.DS_Store
+*.log
