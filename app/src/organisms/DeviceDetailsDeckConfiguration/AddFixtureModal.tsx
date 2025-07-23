@@ -172,7 +172,6 @@ export function AddFixtureModal({
           onClickHandler={() => {
             setOptionStage('wasteChuteOptions')
           }}
-          isOnDevice={isOnDevice}
         />
       </>
     )
