@@ -2,11 +2,11 @@
   "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
-    "brand": "greiner",
-    "brandId": ["655090", "655094", "655096", "655097", "655098"]
+    "brand": "MILLIPLEX",
+    "brandId": []
   },
   "metadata": {
-    "displayName": "Greiner 96 Well Plate 392 µL Chimney Lid",
+    "displayName": "MILLIPLEX Microtiter Plate Lid",
     "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -33,18 +33,18 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "greiner_96_wellplate_392ul_chimney_lid"
+    "loadName": "milliplex_microtiter_plate_lid"
   },
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
-    "greiner_96_wellplate_392ul_chimney": {
+    "milliplex_microtiter_plate": {
       "x": 0,
       "y": 0,
       "z": 7.4
     },
-    "greiner_96_wellplate_392ul_chimney_lid": {
+    "milliplex_microtiter_plate_lid": {
       "x": 0,
       "y": 0,
       "z": 1
@@ -64,8 +64,8 @@
   "compatibleParentLabware": [
     "protocol_engine_lid_stack_object",
     "opentrons_flex_deck_riser",
-    "greiner_96_wellplate_392ul_chimney",
-    "greiner_96_wellplate_392ul_chimney_lid"
+    "milliplex_microtiter_plate",
+    "milliplex_microtiter_plate_lid"
   ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 7,
@@ -88,7 +88,7 @@
         "y": 0,
         "z": -5
       },
-      "dropOffset":{
+      "dropOffset": {
         "x": 0,
         "y": 0,
         "z": -5
