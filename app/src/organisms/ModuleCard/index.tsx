@@ -434,7 +434,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                   slotName != null
+                    slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
                   {getModuleUSBPort(module) ?? t('usb_port_not_connected')}
