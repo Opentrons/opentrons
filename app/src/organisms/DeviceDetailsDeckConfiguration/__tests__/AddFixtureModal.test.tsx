@@ -144,7 +144,9 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Waste chute')
     // Verify trash bin is not rendered
     expect(screen.queryByText('Trash bin')).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
@@ -197,7 +199,9 @@ describe('Desktop AddFixtureModal', () => {
 
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getAllByRole('button', { name: 'Select options' })[0]) // click fixtures
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Select options' })[0]
+    ) // click fixtures
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
     expect(
       screen.getAllByRole('button', { name: 'Select options' }).length
