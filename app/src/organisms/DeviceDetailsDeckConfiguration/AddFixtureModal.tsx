@@ -151,7 +151,7 @@ export function AddFixtureModal({
           <FixtureOption
             key="fixturesOption"
             optionName="Fixtures"
-            buttonText={t('add')}
+            buttonText={t('select_options')}
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
@@ -160,7 +160,7 @@ export function AddFixtureModal({
         <FixtureOption
           key="modulesOption"
           optionName="Modules"
-          buttonText={t('add')}
+          buttonText={t('select_options')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}
