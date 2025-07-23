@@ -17,6 +17,7 @@ import type {
 } from '@opentrons/shared-data'
 
 interface IndividualCommandProps {
+  scrollTargetId: string | null
   command: RunTimeCommand
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   isHighlighted: boolean
@@ -33,20 +34,23 @@ export function IndividualCommand({
   setSelectedCommand,
   fromGroup,
   commandNumber,
+  scrollTargetId,
 }: IndividualCommandProps): JSX.Element {
   const [showNumber, setShowNumber] = useState<boolean>(false)
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
   useEffect(() => {
-    if (isHighlighted && commandRef.current) {
-      commandRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'nearest',
+    if (isHighlighted && commandRef.current && command.id === scrollTargetId) {
+      requestAnimationFrame(() => {
+        commandRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        })
       })
     }
-  }, [isHighlighted])
+  }, [isHighlighted, scrollTargetId])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
     [styles.individual_command_wrap_highlighted]: isHighlighted,

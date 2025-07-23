@@ -17,16 +17,18 @@ import {
   isAddressableAreaStandardSlot,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DeckViewDetails } from './DeckViewDetails'
 import styles from './preview.module.css'
-import { getBackgroundColor } from './utils'
+import { getActiveLayer, getBackgroundColor } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   CutoutId,
   Liquid,
+  LoadLabwareRunTimeCommand,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -85,17 +87,20 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
+  const { labware, pipettes } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
-      const matchingCommand = loadLabwareCommands.find(
-        command => command.result?.labwareId === entity.id
-      )
+      const matchingCommand =
+        loadLabwareCommands.find(
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.result?.labwareId === entity.id
+        ) ?? null
       acc[key] = {
         ...entity,
-        nickName: matchingCommand?.params.displayName ?? null,
+        nickName: matchingCommand?.params?.displayName ?? null,
       }
       return acc
     },
@@ -114,6 +119,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
+
   return (
     <div className={styles.deck_view_padding}>
       <div className={styles.deck_view_container}>
@@ -131,14 +137,49 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   addressableArea.id,
                   deckDef.cutoutFixtures
                 )
+                const labwareOnSlot = Object.entries(labware).find(
+                  ([_, lw]) =>
+                    getSlotInLocationStack(lw.stack) === addressableArea.id
+                )
+                const isTiprack =
+                  labwareOnSlot != null
+                    ? labwareEntities[labwareOnSlot[0]].def.parameters.isTiprack
+                    : false
+                const { isActiveLayerVisible } =
+                  labwareOnSlot != null
+                    ? getActiveLayer(
+                        isTiprack,
+                        Object.values(pipettes),
+                        labwareOnSlot[0],
+                        selectedRunTimeCommand
+                      )
+                    : { isActiveLayerVisible: false }
+                let fixtureBaseColor = lightFill
+                if (showDeckRenders) {
+                  if (isActiveLayerVisible) {
+                    fixtureBaseColor = '#E6D5EC'
+                  } else if (
+                    !isActiveLayerVisible &&
+                    selectedSlot === addressableArea.id
+                  ) {
+                    fixtureBaseColor = COLORS.grey40
+                  }
+                }
                 return cutoutId != null ? (
                   <SingleSlotFixture
                     key={addressableArea.id}
                     cutoutId={cutoutId}
                     deckDefinition={deckDef}
                     showExpansion={cutoutId === 'cutoutA1'}
-                    fixtureBaseColor={lightFill}
+                    fixtureBaseColor={fixtureBaseColor}
                     slotClipColor={darkFill}
+                    stroke={
+                      showDeckRenders &&
+                      (hoveredSlot === addressableArea.id ||
+                        selectedSlot === addressableArea.id)
+                        ? COLORS.purple50
+                        : undefined
+                    }
                   />
                 ) : null
               })}

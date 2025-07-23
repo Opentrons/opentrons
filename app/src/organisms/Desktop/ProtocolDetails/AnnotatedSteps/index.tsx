@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   COLORS,
@@ -34,6 +34,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
   } = props
+  const [scrollTargetId, setScrollTargetId] = useState<string | null>(null)
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
     () =>
@@ -64,6 +65,22 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     }
   })
 
+  useEffect(() => {
+    if (groupedCommands != null) {
+      const flatCommands = groupedCommands.flatMap(node =>
+        'subCommands' in node ? node.subCommands : [node]
+      )
+
+      const targetNode = flatCommands.find(
+        node => analysis.commands.indexOf(node.command) === currentCommandIndex
+      )
+
+      if (targetNode?.command.id && scrollTargetId !== targetNode.command.id) {
+        setScrollTargetId(targetNode.command.id)
+      }
+    }
+  }, [analysis, groupedCommands, currentCommandIndex, scrollTargetId])
+
   let commandNumber = 0
 
   return (
@@ -79,9 +96,11 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
               if ('annotationIndex' in group) {
                 const subCommandStartNumber = commandNumber + 1 // Starting number for this group
                 commandNumber += group.subCommands.length
+
                 return (
                   <AnnotatedGroup
                     key={`group_${group.annotationIndex}_${index}`}
+                    scrollTargetId={scrollTargetId}
                     analysis={analysis}
                     annotationType={
                       annotations[group.annotationIndex]?.machineReadableName
@@ -95,8 +114,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 )
               } else {
                 const currentCommandNumber = ++commandNumber
+
                 return (
                   <IndividualCommand
+                    scrollTargetId={scrollTargetId}
                     fromGroup={nextIsGrouped}
                     key={group.command.id}
                     command={group.command}
@@ -114,6 +135,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
               return (
                 <IndividualCommand
+                  scrollTargetId={scrollTargetId}
                   fromGroup={false}
                   key={`individual_${command.id}`}
                   command={command}

@@ -128,6 +128,7 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
       />
       <div className={styles.preview_container}>
         <DeckView
+          commands={analysis.commands}
           liquids={liquids}
           invariantContext={invariantContext}
           robotState={robotState}
