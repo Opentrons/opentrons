@@ -7,6 +7,7 @@ module.exports = {
     '**/coverage/**',
     '**/venv/**',
     'docs/**',
+    'components/lib/**',
   ],
 
   rules: {
