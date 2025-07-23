@@ -221,5 +221,7 @@ jobs:
         run: |
           cd ./components
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc
+          echo "//registry.npmjs.org/:username=opentrons-engineering" >> ./.npmrc
+          echo "//registry.npmjs.org/:email=engineering@opentrons.com" >> ./.npmrc
           ls -R # Debug: View contents of ./components
           npm publish --access public
