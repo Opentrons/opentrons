@@ -330,6 +330,7 @@ class AnthropicPredict:
                     {
                         "type": "document",
                         "source": {"type": "base64", "media_type": "application/pdf", "data": file_content},
+                        "title": filename,  # Preserve filename for PDF documents
                     },
                 )
             else:

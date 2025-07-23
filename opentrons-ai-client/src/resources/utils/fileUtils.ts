@@ -90,6 +90,7 @@ export const readFileContent = async (
   switch (type) {
     case 'pdf':
       // PDF files are encoded as base64 for proper document handling
+      // Using simplified approach similar to Anthropic SDK example
       const pdfBuffer = await file.arrayBuffer()
 
       // Check if PDF is too large (base64 encoding increases size by ~33%)
@@ -106,13 +107,18 @@ export const readFileContent = async (
         )
       }
 
-      // Convert to base64 using a more reliable method for binary data
-      const uint8Array = new Uint8Array(pdfBuffer)
-      let binaryString = ''
-      for (let i = 0; i < uint8Array.length; i++) {
-        binaryString += String.fromCharCode(uint8Array[i])
-      }
-      const pdfBase64 = btoa(binaryString)
+      // Convert to base64 using browser equivalent of fs.readFileSync().toString('base64')
+      const pdfBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const result = reader.result as string
+          // Extract base64 data (remove data:application/pdf;base64, prefix)
+          const base64Data = result.split(',')[1]
+          resolve(base64Data)
+        }
+        reader.onerror = () => { reject(new Error('Failed to read PDF file')); }
+        reader.readAsDataURL(file)
+      })
 
       // Validate base64 encoding
       if (!pdfBase64 || pdfBase64.length === 0) {

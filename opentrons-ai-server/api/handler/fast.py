@@ -344,6 +344,7 @@ async def create_chat_completion(
                         "filename": attachment.filename,
                         "file_type": attachment.file_type,
                         "content": attachment.content or "",
+                        "media_type": attachment.media_type or "text/plain",
                     }
                 )
 
