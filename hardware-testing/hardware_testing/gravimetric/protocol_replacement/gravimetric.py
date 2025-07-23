@@ -8,6 +8,7 @@ from time import time
 import importlib
 import copy
 import json
+import subprocess
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -706,6 +707,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Date portion of tip batch.",
     )
 
+    parameters.add_bool(
+        display_name="Sync output to USB",
+        variable_name="export_results",
+        default=True,
+        description="This will attempt to sync the output files to an inserted flash drive.",
+    )
+
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
     """Either return or drop tip(s)."""
@@ -1366,6 +1374,27 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
     tx_ctl_lib.check_valid_liquid_class_volume_parameters = _override_check
 
 
+def _find_usb_path() -> str:
+    with os.scandir(f"{str(infer_config_base_dir())}/testing_data/") as itr:
+        for path in itr:
+            if path.is_dir() and "mmcb" not in path.name:
+                return path.name
+    raise FileNotFoundError("No usb attached")
+
+
+def _find_test_results() -> List[os.DirEntry]:
+    tests = []
+    with os.scandir(f"{str(infer_config_base_dir())}/testing_data/") as itr:
+        for path in itr:
+            if (
+                path.is_dir()
+                and "gravimetric" in path.name
+                and "simulate" not in path.name
+            ):
+                tests.append(path)
+    return tests
+
+
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
@@ -1382,3 +1411,16 @@ def run(ctx: ProtocolContext) -> None:
             fixture_settings.recorder.stop()
             fixture_settings.recorder.deactivate()
             set_output_file(None)
+    try:
+        if ctx.params.export_results and not ctx.is_simulating():  # type: ignore [attr-defined]
+            usb_dir = f"{_find_usb_path()}/testing_data"
+            results = _find_test_results()
+            for test_type in results:
+                os.makedirs(f"{usb_dir}/{test_type.name}", exist_ok=True)
+                subprocess.run(
+                    ["rsync", "-a", f"{test_type.path}/", f"{usb_dir}/{test_type.name}"]
+                )
+
+    except Exception as e:
+        ctx.comment(f"couldn't sync files {str(e)}")
+        pass
