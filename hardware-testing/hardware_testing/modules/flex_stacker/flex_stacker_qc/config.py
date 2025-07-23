@@ -98,12 +98,12 @@ TESTS = [
         test_tof_basic.run,
     ),
     (
-        TestSection.L_AXIS_CURRENT_SPEED,
-        test_l_axis_current_speed.run,
-    ),
-    (
         TestSection.TOF_FUNCTIONAL,
         test_tof_functional.run,
+    ),
+    (
+        TestSection.L_AXIS_CURRENT_SPEED,
+        test_l_axis_current_speed.run,
     ),
     (
         TestSection.Z_AXIS_CURRENT_SPEED,

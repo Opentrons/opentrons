@@ -213,4 +213,4 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         Direction.EXTEND,
         runtime_baseline_z,
     )
-    ui.get_user_ready("Please remove all labware from the stacker.")
+    ui.get_user_ready("Please remove all labware from the stacker")
