@@ -1,10 +1,12 @@
 import {
+  COMBO_FIXTURES,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
@@ -18,6 +20,7 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfigMap,
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   CutoutIdToCutoutFixtureId,
   DeckDefinition,
@@ -213,7 +216,7 @@ export const getWasteChuteOptions = (
 export const getFixtureOptions = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
-  hasStackerInSlot: boolean
+  existingCutoutFixtureId?: CutoutFixtureId
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
   const TrashBinAA = getMainAAForAFixture(
@@ -221,6 +224,11 @@ export const getFixtureOptions = (
     TRASH_BIN_ADAPTER_FIXTURE,
     addressableAreaId
   )
+  const hasStackerInSlot = existingCutoutFixtureId
+    ? STAGING_AREA_CUTOUTS.includes(cutoutId) &&
+      COMBO_FIXTURES.includes(existingCutoutFixtureId)
+    : false
+
   if (TrashBinAA != null && !hasStackerInSlot) {
     availableOptions = [
       ...availableOptions,
@@ -266,10 +274,14 @@ export const getOptions = (
   optionStage: string,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDefinition: DeckDefinition,
-  hasStackerInSlot: boolean
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): CutoutConfigMap[][] => {
   if (optionStage === 'fixtureOptions') {
-    return getFixtureOptions(cutoutId, addressableAreaId, hasStackerInSlot)
+    return getFixtureOptions(
+      cutoutId,
+      addressableAreaId,
+      existingCutoutFixtureId
+    )
   }
   if (optionStage === 'moduleOptions') {
     return getModuleOptions(

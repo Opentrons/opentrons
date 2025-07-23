@@ -19,13 +19,11 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  FLEX_STACKER_FIXTURES,
   getAADisplayName,
   getFixtureDisplayName,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  STAGING_AREA_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
@@ -114,10 +112,6 @@ export function AddFixtureModal({
   const existingCutoutConfig = deckConfigWithAA.find(
     cutoutConfig => cutoutConfig.cutoutId === cutoutId
   )
-  const hasStackerInSlot = existingCutoutConfig?.cutoutFixtureId
-    ? STAGING_AREA_CUTOUTS.includes(cutoutId) &&
-      FLEX_STACKER_FIXTURES.includes(existingCutoutConfig.cutoutFixtureId)
-    : false
 
   const availableOptions = getOptions(
     cutoutId,
@@ -125,7 +119,7 @@ export function AddFixtureModal({
     optionStage,
     addressableAreaId,
     deckDef,
-    hasStackerInSlot
+    existingCutoutConfig?.cutoutFixtureId
   )
 
   let nextStageOptions = null
