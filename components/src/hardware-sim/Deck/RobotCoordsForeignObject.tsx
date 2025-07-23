@@ -1,8 +1,13 @@
-import { css } from 'styled-components'
+import { withStyleProps } from '../../hocs/withStyleProps'
+import { ForeignObject } from '../../primitives'
+import styles from './deck.module.css'
 
-import { Flex, ForeignObject } from '../../primitives'
+import type { HTMLAttributes, ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
-import type { ComponentProps, ReactNode } from 'react'
+export type FlexDirection = 'column' | 'row'
+
+const StyledDiv = withStyleProps('div' as any)
 
 export interface RobotCoordsForeignObjectProps {
   width: string | number
@@ -10,35 +15,33 @@ export interface RobotCoordsForeignObjectProps {
   x: string | number
   y: string | number
   children?: ReactNode
-  foreignObjectProps?: ComponentProps<typeof ForeignObject>
-  flexProps?: ComponentProps<typeof Flex>
+  foreignObjectProps?: StyleProps
+  foreignObjectEvents?: HTMLAttributes<HTMLDivElement>
+  flexProps?: StyleProps
+  flexEvents?: HTMLAttributes<HTMLDivElement>
 }
-
-export const RobotCoordsForeignObject = (
-  props: RobotCoordsForeignObjectProps
-): JSX.Element => {
-  const {
-    children,
-    x,
-    y,
-    height,
-    width,
-    foreignObjectProps = {},
-    flexProps = {},
-  } = props
-
+export const RobotCoordsForeignObject = ({
+  children,
+  x,
+  y,
+  height,
+  width,
+  foreignObjectEvents,
+  foreignObjectProps = {},
+  flexProps,
+  flexEvents = {},
+}: RobotCoordsForeignObjectProps): JSX.Element => {
   return (
-    <ForeignObject {...{ x, y, height, width }}>
-      <Flex
-        height="100%"
-        width="100%"
-        css={css`
-          transform: scale(1, -1);
-        `}
-        {...foreignObjectProps}
+    <ForeignObject x={x} y={y} height={height} width={width}>
+      <StyledDiv
+        className={styles.robot_coords_foreign_object_container}
+        {...foreignObjectEvents}
+        style={foreignObjectProps}
       >
-        <Flex {...flexProps}>{children}</Flex>
-      </Flex>
+        <StyledDiv {...flexEvents} style={flexProps}>
+          {children}
+        </StyledDiv>
+      </StyledDiv>
     </ForeignObject>
   )
 }

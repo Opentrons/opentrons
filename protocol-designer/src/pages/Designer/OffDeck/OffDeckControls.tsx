@@ -65,9 +65,7 @@ export function OffDeckControls(
     return null
   }
   const hoverOpacity =
-    (hover != null && hover === labwareId) || menuListId === labwareId
-      ? '1'
-      : '0'
+    (hover != null && hover === labwareId) || menuListId === labwareId ? 1 : 0
 
   return (
     <>
@@ -85,10 +83,10 @@ export function OffDeckControls(
         width={slotBoundingBox.x}
         height={slotBoundingBox.y}
         innerDivProps={{
-          style: {
-            opacity: hoverOpacity,
-            ...DECK_CONTROLS_STYLE,
-          },
+          opacity: hoverOpacity,
+          ...DECK_CONTROLS_STYLE,
+        }}
+        innerDivEvents={{
           onMouseEnter: () => {
             setHover(labwareId)
           },

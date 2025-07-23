@@ -118,7 +118,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     LOW_VOLUME_PIPETTES.includes(pipetteName)
       ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
       : liquidSpecs.default.supportedTips[tipType]
-  const minFlowRate = 1
+  const minFlowRate = 0.1
   const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
 
   const flowRateError =
@@ -167,8 +167,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
 
   const setSaveOrContinueButtonText =
     currentStep < 3 ? t('shared:continue') : t('shared:save')
-
-  // ToDo Add flowRate range
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
@@ -295,6 +293,12 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               error={flowRateError}
               readOnly
             />
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('disposal_volume_flow_rate', {
+                min: minFlowRate,
+                max: maxFlowRate,
+              })}
+            </StyledText>
           </Flex>
           <Flex
             paddingX={SPACING.spacing24}

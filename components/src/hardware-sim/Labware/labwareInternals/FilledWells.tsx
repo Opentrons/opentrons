@@ -4,8 +4,7 @@ import map from 'lodash/map'
 import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 
-import type { CSSProperties } from 'styled-components'
-import type { MemoExoticComponent, ReactNode } from 'react'
+import type { CSSProperties, MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface FilledWellsProps {

@@ -11,12 +11,12 @@ import {
   ReleaseLabware,
   RetryStepInfo,
   StackerEmptyHopper,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerLoadShuttle,
   StackerReengageLatch,
   StackerShuttleLwInfo,
-  TwoColTextAndImage,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerShuttleMissing } from '../StackerShuttleMissing'
@@ -67,7 +67,7 @@ describe('StackerShuttleMissing', () => {
       <div>MOCK_STACKER_HOPPER_LW_INFO</div>
     )
     vi.mocked(RetryStepInfo).mockReturnValue(<div>MOCK_RETRY_STEP_INFO</div>)
-    vi.mocked(TwoColTextAndImage).mockReturnValue(
+    vi.mocked(StackerEnsureShuttleEmpty).mockReturnValue(
       <div>MOCK_TWO_COLUMN_AND_IMAGE</div>
     )
   })
