@@ -79,7 +79,10 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
-            {"display_name": "usa96deep", "value": "usascientific_96_wellplate_2.4ml_deep"},
+            {
+                "display_name": "usa96deep",
+                "value": "usascientific_96_wellplate_2.4ml_deep",
+            },
             {
                 "display_name": "applied24",
                 "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
@@ -356,7 +359,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # Constants
     max_volume = labware["A1"].max_volume
-    min_step = max(max_volume * 0.005, 5) 
+    min_step = max(max_volume * 0.005, 5)
     max_step = min(max_volume * 0.08, 1000)
     tolerance = (
         max_volume / 30
@@ -388,7 +391,6 @@ def run(ctx: ProtocolContext) -> None:
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip()
         tipcount += 1
-        
 
     def drop_tips() -> None:
         if probe_pipette.has_tip:
@@ -452,7 +454,6 @@ def run(ctx: ProtocolContext) -> None:
             labware_type, SLOT_LABWARE, version=ctx.params.labware_version
         )
         labware.load_empty(labware.wells())
-            
 
     ################ Begin Protocol
 
