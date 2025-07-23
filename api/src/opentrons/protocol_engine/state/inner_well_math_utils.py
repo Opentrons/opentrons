@@ -16,6 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     CuboidalFrustum,
     SquaredConeSegment,
+    UserDefinedVolumes,
 )
 
 
@@ -359,7 +360,92 @@ def _find_volume_in_partial_frustum(
     )
 
 
-def find_volume_at_well_height(
+def _linear_interpolation(
+    interpolating_from: List[float], to_interpolate: List[float], target_val: float
+) -> float:
+    assert len(interpolating_from) == len(to_interpolate), "Invalid height/volume data"
+    assert (
+        interpolating_from[0] == to_interpolate[0] == 0.0
+    ), "height and volume data must start with 0.0"
+
+    if target_val == 0.0:
+        return 0.0
+    for i in range(1, len(interpolating_from)):
+        if target_val == interpolating_from[i]:
+            return to_interpolate[i]
+        if interpolating_from[i - 1] < target_val < interpolating_from[i]:
+            proportional_diff = (target_val - interpolating_from[i - 1]) / (
+                interpolating_from[i] - interpolating_from[i - 1]
+            )
+            addend = proportional_diff * (to_interpolate[i] - to_interpolate[i - 1])
+            result = to_interpolate[i - 1] + addend
+            return result
+    raise ValueError("linear interpolation failed")
+
+
+def find_volume_user_defined_volumes(
+    target_height: LiquidTrackingType, well_geometry: UserDefinedVolumes
+) -> LiquidTrackingType:
+    """Return a linear interpolation of volume based on target height."""
+    if isinstance(target_height, SimulatedProbeResult):
+        return target_height
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    max_height = sorted_volume_map[-1].height
+    if target_height < 0 or target_height > max_height:
+        raise InvalidLiquidHeightFound(
+            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
+        )
+    volumes = [0.0]
+    heights = [0.0]
+    for pair in sorted_volume_map:
+        volumes.append(pair.volume)
+        heights.append(pair.height)
+
+    try:
+        return _linear_interpolation(
+            interpolating_from=heights, to_interpolate=volumes, target_val=target_height
+        )
+    except ValueError:
+        raise InvalidLiquidHeightFound(
+            f"Unable to find volume at target volume {target_height}."
+        )
+
+
+def find_height_user_defined_volumes(
+    target_volume: LiquidTrackingType,
+    well_geometry: UserDefinedVolumes,
+) -> LiquidTrackingType:
+    """Return a linear interpolation of height based on target volume."""
+    if isinstance(target_volume, SimulatedProbeResult):
+        return target_volume
+    sorted_volume_map = sorted(
+        well_geometry.heightToVolumeMap, key=lambda section: section.height
+    )
+    max_volume = sorted_volume_map[-1].volume
+    if target_volume < 0 or target_volume > max_volume:
+        raise InvalidLiquidHeightFound(
+            f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
+        )
+
+    volumes = [0.0]
+    heights = [0.0]
+    for pair in sorted_volume_map:
+        volumes.append(pair.volume)
+        heights.append(pair.height)
+
+    try:
+        return _linear_interpolation(
+            interpolating_from=volumes, to_interpolate=heights, target_val=target_volume
+        )
+    except ValueError:
+        raise InvalidLiquidHeightFound(
+            f"Unable to find volume at target volume {target_volume}."
+        )
+
+
+def find_volume_inner_well_geometry(
     target_height: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
 ) -> LiquidTrackingType:
@@ -434,7 +520,7 @@ def _find_height_in_partial_frustum(
     )
 
 
-def find_height_at_well_volume(
+def find_height_inner_well_geometry(
     target_volume: LiquidTrackingType,
     well_geometry: InnerWellGeometry,
 ) -> LiquidTrackingType:

@@ -8,9 +8,9 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
 import {
   RetryStepInfo,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
-  TwoColTextAndImage,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerStalledRetry } from '../StackerStalledRetry'
@@ -46,7 +46,7 @@ describe('StackerStalledRetry', () => {
       <div>MOCK_STACKER_HOPPER_LW_INFO</div>
     )
     vi.mocked(RetryStepInfo).mockReturnValue(<div>MOCK_RETRY_STEP_INFO</div>)
-    vi.mocked(TwoColTextAndImage).mockReturnValue(
+    vi.mocked(StackerEnsureShuttleEmpty).mockReturnValue(
       <div>MOCK_TWO_COLUMN_AND_IMAGE</div>
     )
   })

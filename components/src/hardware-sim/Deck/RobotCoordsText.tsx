@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import type { ComponentProps, ReactNode } from 'react'
 
 export interface RobotCoordsTextProps extends ComponentProps<'text'> {
@@ -28,13 +26,7 @@ export function RobotCoordsText(props: RobotCoordsTextProps): JSX.Element {
       x={x}
       y={-1 * y}
       transform="scale(1, -1)"
-      css={
-        !canHighlight
-          ? css`
-              user-select: none;
-            `
-          : undefined
-      }
+      style={{ userSelect: !canHighlight ? 'none' : undefined }}
     >
       {children}
     </text>

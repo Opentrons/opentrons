@@ -265,38 +265,11 @@ export const getFixtureOptions = (
 
 export const getOptions = (
   cutoutId: CutoutId,
-  providedFixtureOptions: CutoutFixtureId[] | undefined,
   unconfiguredMods: AttachedModule[],
   optionStage: string,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDefinition: DeckDefinition
 ): CutoutConfigMap[][] => {
-  if (providedFixtureOptions != null) {
-    return providedFixtureOptions?.map((o: CutoutFixtureId) => {
-      const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
-        cutoutId,
-        deckDefinition
-      )
-      const aaProvidedFixtureOptions = addressableAreasById[o]
-      if (aaProvidedFixtureOptions != null) {
-        const aaForFixture = getMainAAForAFixture(
-          cutoutId,
-          o,
-          addressableAreaId
-        )
-        if (aaForFixture != null) {
-          return [
-            {
-              cutoutId,
-              cutoutFixtureId: o,
-              addressableAreaId: aaForFixture,
-            },
-          ]
-        }
-      }
-      return []
-    })
-  }
   if (optionStage === 'fixtureOptions') {
     return getFixtureOptions(cutoutId, addressableAreaId)
   }

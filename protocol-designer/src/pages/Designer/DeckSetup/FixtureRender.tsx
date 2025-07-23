@@ -99,6 +99,7 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
         def={getModuleDef(adjacentModule.model)}
         targetSlotId={adjacentModule.slot}
         targetDeckId={deckDef.otId}
+        childrenPositioningMode="offsetToSlot"
       />
     )
   }

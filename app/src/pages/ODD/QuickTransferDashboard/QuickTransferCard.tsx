@@ -190,7 +190,8 @@ export function QuickTransferCard(props: {
           aria-label="Transfer is loading"
           spin
           size="2rem"
-          marginY="-1.5rem"
+          marginTop="-1.5rem"
+          marginBottom="-1.5rem"
           opacity={0.7}
         />
       ) : null}

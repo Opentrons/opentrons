@@ -1,0 +1,42 @@
+.label {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--border-radius-8);
+  background-color: inherit;
+}
+
+.deck_info_label_highlight {
+  border-color: transparent;
+  background-color: var(--color-blue50);
+}
+
+.deck_info_label_no_highlight {
+  border-color: var(--color-black90);
+}
+
+.large {
+  height: 1.75rem;
+  border-width: 2px;
+}
+
+.default {
+  height: 1.25rem;
+}
+
+@media (height: 600px) and (width: 1024px) {
+  .label {
+    height: var(--spacing-32);
+    padding: var(--spacing-4) var(--spacing-6);
+    border-width: 2px;
+    border-radius: var(--border-radius-12);
+  }
+
+  .has_deck_label {
+    padding-right: var(--spacing-8);
+  }
+}

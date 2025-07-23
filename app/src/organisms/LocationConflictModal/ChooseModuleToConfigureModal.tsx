@@ -29,6 +29,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
@@ -154,7 +155,23 @@ export const ChooseModuleToConfigureModal = (
         unconfiguredModuleMatches.find(m => m.serialNumber === serialNumber) ??
         null
       if (moduleModel === 'flexStackerModuleV1' && selectedModule !== null) {
-        return (
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleStackerClearAndConfigureModule(selectedModule)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            secondaryButtonText={i18n.format(
+              t('shared:identify'),
+              'capitalize'
+            )}
+            secondaryOnClickHandler={() => {
+              handleIdentifyFixture(selectedModule)
+            }}
+          />
+        ) : (
           <FixtureOption
             key={serialNumber}
             onClickHandler={() => {
@@ -169,11 +186,19 @@ export const ChooseModuleToConfigureModal = (
             secondaryOnClickHandler={() => {
               handleIdentifyFixture(selectedModule)
             }}
-            isOnDevice={isOnDevice}
           />
         )
       } else {
-        return (
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleConfigureModule(serialNumber)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+          />
+        ) : (
           <FixtureOption
             key={serialNumber}
             onClickHandler={() => {
@@ -181,7 +206,6 @@ export const ChooseModuleToConfigureModal = (
             }}
             optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
-            isOnDevice={isOnDevice}
           />
         )
       }
