@@ -1,17 +1,18 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../testing/utils'
-import { FixtureOption } from '../index'
+import { renderWithProviders } from '/app/__testing-utils__'
+
+import { ODDFixtureOption } from '..'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof FixtureOption>) => {
-  return renderWithProviders(<FixtureOption {...props} />)
+const render = (props: ComponentProps<typeof ODDFixtureOption>) => {
+  return renderWithProviders(<ODDFixtureOption {...props} />)
 }
 
-describe('FixtureOption', () => {
-  let props: ComponentProps<typeof FixtureOption>
+describe('ODDFixtureOption', () => {
+  let props: ComponentProps<typeof ODDFixtureOption>
 
   it('should render text and buttons for desktop app', () => {
     props = {

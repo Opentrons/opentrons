@@ -118,7 +118,7 @@ describe('SelectBasics', () => {
     expect(props.setValue).toHaveBeenCalled()
 
     // wasteChute
-    screen.getByText('Are you using a Waste chute in your protocol?')
+    screen.getByText('Are you using a waste chute in your protocol?')
     fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[2])
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getAllByRole('label', { name: 'No' })[2])

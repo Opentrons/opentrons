@@ -4,10 +4,10 @@ import {
   ReleaseLabware,
   RetryStepInfo,
   StackerEmptyHopper,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerReengageLatch,
-  TwoColTextAndImage,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
@@ -34,7 +34,7 @@ export function StackerShuttleEmptyRetry(
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER:
       return <StackerHopperLwInfo {...props} />
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
-      return <TwoColTextAndImage {...props} />
+      return <StackerEnsureShuttleEmpty {...props} />
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
     default:
