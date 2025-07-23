@@ -503,7 +503,7 @@ def run(ctx: ProtocolContext) -> None:
         
         corrected_height = height + tip_z_error
 
-        api_vol = labware[well].height_from_volume(step_volume)
+        api_vol = labware[well].height_from_volume(dispense_volume)
         vol_diff = api_vol - corrected_height
 
         corrected_heights.append(corrected_height)
