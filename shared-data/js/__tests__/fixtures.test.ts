@@ -320,7 +320,7 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
       ],
       fakeStagingAreaRightSlot: ['D3', 'fakeD4'],
       fakeStagingSlotWithMagBlockV1: ['magneticBlockV1D3', 'fakeD4'],
-      fakeWasteChuteWithEmptySlot: ['96ChannelWasteChute', 'fakeD4'],
+      fakeWasteChuteWithEmptySlot: ['1ChannelWasteChute', 'fakeD4'],
       flexStackerModuleV1: ['D3', 'flexStackerModuleV1D4'],
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1D4',
