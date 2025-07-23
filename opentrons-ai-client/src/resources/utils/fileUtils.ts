@@ -116,7 +116,9 @@ export const readFileContent = async (
           const base64Data = result.split(',')[1]
           resolve(base64Data)
         }
-        reader.onerror = () => { reject(new Error('Failed to read PDF file')); }
+        reader.onerror = () => {
+          reject(new Error('Failed to read PDF file'))
+        }
         reader.readAsDataURL(file)
       })
 
