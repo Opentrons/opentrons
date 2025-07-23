@@ -34,11 +34,12 @@ export function Gallery(props: GalleryProps): JSX.Element {
   const { parameters: params } = definition
 
   const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
-  const xDimensionOverride =
-    ['opentrons_universal_flat_adapter', 'opentrons_universal_flat_adapter_type_b'].includes(params.loadName)
-      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
-      : xDimension
-
+  const xDimensionOverride = [
+    'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
+  ].includes(params.loadName)
+    ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
+    : xDimension
 
   const [currentImage, setCurrentImage] = useState<number>(0)
   const render = (
