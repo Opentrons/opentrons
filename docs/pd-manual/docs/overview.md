@@ -1,6 +1,6 @@
 ## Protocol metadata
 
-Before you finish creating your protocol, give us a few more details! A unique title, description, and author details will be displayed in the Opentrons App for your completed protocol and help it stand out from the others. 
+Before you finish creating your protocol, add a few more details. A unique title, description, and author details will be displayed in the Opentrons App for your completed protocol and help it stand out from the others. 
 
 ## Protocol overview
 
@@ -9,7 +9,7 @@ The protocol overview summarizes details you've added for your protocol. The pro
 <figure class="screenshot" markdown>
   ![Protocol overview](images/protocol-overview-left.png)
   <figcaption>The left section of the protocol overview screen.</figcaption>
-  </figure>
+</figure>
 
 
 The protocol overview shows instruments, including pipettes and the gripper, added to your protocol. In this example, a 1- and 8-channel Flex pipette are in the left and right mounts, respectively. By default, Protocol Designer adds your first 1- or 8-channel pipette to the left mount. Click **Edit** at the top right of the section to swap mounts or add, edit, or remove pipettes or the gripper. 
@@ -25,7 +25,7 @@ The protocol overivew also includes a preview of your protocol starting deck. Th
   </figure>
 
 
-In the example above, the protocol starting deck includes a trash bin (slot A3), Temperature and Heater-Shaker modules (slos C1 and D1, respectively), two staging areas (creating slots B4 and D4), and two tip racks (one for each pipette).
+In the example above, the protocol starting deck includes a trash bin (slot A3), Temperature and Heater-Shaker Modules (slots C1 and D1, respectively), two staging areas (creating slots B4 and D4), and two tip racks (one for each pipette).
 
 
 Hover over each deck slot to view individual details. In the example starting deck, hovering over slot B2 shows an Opentrons Flex filter tip rack in that slot. The materials list shows the same information, including liquid definitions, at a glance. Use the toggle switch at the upper right to view any off-deck labware added to your protocol. 
