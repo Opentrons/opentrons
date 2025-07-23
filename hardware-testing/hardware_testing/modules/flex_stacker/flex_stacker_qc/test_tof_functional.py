@@ -24,7 +24,7 @@ from opentrons.drivers.flex_stacker.types import (
 
 # Number of histogram samples for creating runtime baseline
 DEFAULT_SAMPLES = 5
-DEFAULT_DEVIATION = 6
+DEFAULT_DEVIATION = 8
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -50,21 +50,17 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def get_runtime_baseline(
+async def create_runtime_baseline(
     stacker: FlexStacker,
     sensor: TOFSensor,
     samples: int = DEFAULT_SAMPLES,
     deviation: int = DEFAULT_DEVIATION,
 ) -> Dict[int, List[float]]:
-    """Gets the runtime baseline"""
-    # home x/z
-    # get number of samples
-    # create baseline
-    # use new baseline to determine labware/no labware
-    # use default baseline to determine labware/no labware
-    # test fails if both fail to detect labware
-    # test fails if both disagree between lw/no lw
+    """Creates the runtime baseline.
 
+    This takes N histogram samples of the sensor and computes the baseline.
+
+    """
     baseline = defaultdict(list)
     aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
     for _ in range(samples):
@@ -149,13 +145,16 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     print("Homing stacker X and Z axis.")
     await verify_platform_location(stacker)
+    assert (
+        await stacker._driver.get_hopper_door_closed()
+    ), "Failed: Make sure to close the stacker door."
 
+    ui.get_user_ready("Make sure there is NO labware in the stacker tower or gripper position")
     print(f"Getting runtime baseline.")
-    runtime_baseline_x = await get_runtime_baseline(stacker, TOFSensor.X)
-    runtime_baseline_z = await get_runtime_baseline(stacker, TOFSensor.Z)
+    runtime_baseline_x = await create_runtime_baseline(stacker, TOFSensor.X)
+    runtime_baseline_z = await create_runtime_baseline(stacker, TOFSensor.Z)
 
     print("Test that we have no labware on the X")
-    ui.get_user_ready("Make sure there is no labware on the stacker gripper position")
     await stacker.home_axis(StackerAxis.X, Direction.RETRACT)
     await test_tof_sensors_labware_detection(
         stacker,
