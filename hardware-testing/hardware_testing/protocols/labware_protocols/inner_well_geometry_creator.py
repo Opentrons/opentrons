@@ -62,7 +62,16 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step_volume", "total_vol", "tip-z-error", "vol_diff", "cheight", "hdelta"]
+CSV_HEADER = [
+    "step",
+    "step_volume",
+    "total_vol",
+    "tip-z-error",
+    "vol_diff",
+    "cheight",
+    "hdelta",
+]
+
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -79,7 +88,10 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "smc 384", "value": "smc_384_read_plate"},
             {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
-            {"display_name": "usa96deep", "value": "usascientific_96_wellplate_2.4ml_deep"},
+            {
+                "display_name": "usa96deep",
+                "value": "usascientific_96_wellplate_2.4ml_deep",
+            },
             {
                 "display_name": "applied24",
                 "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
@@ -165,7 +177,7 @@ def _setup(
     Labware,
     Labware,
     Labware,
-    Labware, 
+    Labware,
     bool,
     float,
     bool,
@@ -195,9 +207,7 @@ def _setup(
     liquid_rack1 = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{liq_tip_size}uL", SLOT_LIQUID_TIPRACK
     )
-    liquid_rack2 = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{liq_tip_size}uL", "B1"
-    )
+    liquid_rack2 = ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}uL", "B1")
     probing_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", "C1"
     )
@@ -375,7 +385,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # Constants
     max_volume = labware["A1"].max_volume
-    min_step = max(max_volume * 0.005, 5) 
+    min_step = max(max_volume * 0.005, 5)
     max_step = min(max_volume * 0.08, 1000)
     tolerance = (
         max_volume / 30
@@ -406,7 +416,6 @@ def run(ctx: ProtocolContext) -> None:
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip()
         tipcount += 1
-        
 
     def drop_tips() -> None:
         if probe_pipette.has_tip:
@@ -462,7 +471,7 @@ def run(ctx: ProtocolContext) -> None:
             hdelta,
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-    
+
     def reload_labware() -> None:
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
@@ -470,7 +479,6 @@ def run(ctx: ProtocolContext) -> None:
             labware_type, SLOT_LABWARE, version=ctx.params.labware_version
         )
         labware.load_empty(labware.wells())
-            
 
     ################ Begin Protocol
 
@@ -478,7 +486,6 @@ def run(ctx: ProtocolContext) -> None:
 
     total_vol = first_dispense if dynamic_steps else max_volume / number_of_steps
     wells = list(labware.wells_by_name().keys())
-
 
     while total_vol < (max_volume - tolerance):
         # initial step, log 0
@@ -490,11 +497,11 @@ def run(ctx: ProtocolContext) -> None:
         else:
             if not quick_mode:
                 tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-            #todo: make this a function
+            # todo: make this a function
             if step > len(wells):
                 reload_labware()
-                step = 1 #reset the step 
-            well = wells[step-1]
+                step = 1  # reset the step
+            well = wells[step - 1]
             print(well)
             total_vol += step_volume
             liq_pipette.transfer_with_liquid_class(
@@ -505,7 +512,7 @@ def run(ctx: ProtocolContext) -> None:
                 new_tip="never",
                 return_tip=False,
             )
-        
+
             height_check = corrected_height
 
             # probe well

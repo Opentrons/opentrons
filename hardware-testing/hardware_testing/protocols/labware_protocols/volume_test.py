@@ -32,7 +32,7 @@ PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
 
-SLOT_LIQUID_TIPRACK = "C3"
+SLOT_LIQUID_TIPRACK = ["C3", "C1", "B1"]
 SLOT_PROBING_TIPRACK = "D3"
 SLOT_LABWARE = "D2"
 SLOT_RESERVOIR = "C2"
@@ -109,24 +109,14 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_bool(
-        variable_name="handheld_pipette",
-        display_name = "handheld pipette",
-        default = False
+        variable_name="handheld_pipette", display_name="handheld pipette", default=False
     )
 
 
 def _setup(
     ctx: ProtocolContext,
 ) -> Tuple[
-    InstrumentContext,
-    InstrumentContext,
-    Labware,
-    Labware,
-    Labware,
-    Labware,
-    Labware,
-    LiquidClass,
-    bool
+    InstrumentContext, InstrumentContext, Labware, Labware, Labware, LiquidClass, bool
 ]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
@@ -138,16 +128,20 @@ def _setup(
     probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
 
     # tipracks
-    liquid_rack = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK
-    )
+    liquid_tip_racks = [
+        ctx.load_labware(
+            f"opentrons_flex_96_tiprack_{LIQUID_TIP_SIZE}uL", SLOT_LIQUID_TIPRACK[i]
+        )
+        for i in range(3)
+    ]
+
     probing_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
 
     # load pipettes w tipracks
     liq_pipette = ctx.load_instrument(
-        liquid_pip_name, LIQUID_MOUNT, tip_racks=[liquid_rack]
+        liquid_pip_name, LIQUID_MOUNT, tip_racks=liquid_tip_racks
     )
     probe_pipette = ctx.load_instrument(
         probing_pip_name, PROBING_MOUNT, tip_racks=[probing_rack]
@@ -167,17 +161,19 @@ def _setup(
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class("ethanol_80")
     lm = "liquid-meniscus"
-    props = ethanol.get_for(liq_pipette, liquid_rack)
-    meniscus_z = ctx.params.meniscus_submerge_depth  # type: ignore[attr-defined]
-    props.aspirate.aspirate_position.position_reference = lm
-    props.aspirate.aspirate_position.offset.z = meniscus_z
-    props.dispense.dispense_position.position_reference = lm
-    props.dispense.dispense_position.offset.z = 2
-    props.dispense.dispense_position.offset.x = (labware["A1"].diameter) / 2
+    for liq_rack in liquid_tip_racks:
+        props = ethanol.get_for(liq_pipette, liq_rack)
+        meniscus_z = ctx.params.meniscus_submerge_depth  # type: ignore[attr-defined]
+        props.aspirate.aspirate_position.position_reference = lm
+        props.aspirate.aspirate_position.offset.z = meniscus_z
+        props.dispense.dispense_position.position_reference = lm
+        props.dispense.dispense_position.offset.z = 2
+        try:
+            props.dispense.dispense_position.offset.x = (labware["A1"].diameter) / 2
+        except TypeError:
+            props.dispense.dispense_position.offset.x = 0
 
-    handheld_pipette = ctx.params.handheld_pipette # type: ignore[attr-defined]
-
-
+    handheld_pipette = ctx.params.handheld_pipette  # type: ignore[attr-defined]
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -189,7 +185,9 @@ def _setup(
         DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(
-            metadata["protocolName"], RUN_ID, f"{LIQUID_MOUNT}-{liquid_rack.load_name}"
+            metadata["protocolName"],
+            RUN_ID,
+            f"{LIQUID_MOUNT}-{liquid_racks[0].load_name}",
         )
         _write_line_to_csv(ctx, [RUN_ID])
         _write_line_to_csv(ctx, [liquid_pip_name])
@@ -199,17 +197,7 @@ def _setup(
         lpc = str(labware._core.get_calibrated_offset())
         _write_line_to_csv(ctx, ["LPC Offset", labware.load_name, lpc])
 
-    return (
-        liq_pipette,
-        probe_pipette,
-        probing_rack,
-        liquid_rack,
-        labware,
-        src,
-        dial,
-        ethanol,
-        handheld_pipette
-    )
+    return (liq_pipette, probe_pipette, labware, src, dial, ethanol, handheld_pipette)
 
 
 def _read_dial_indicator(
@@ -276,13 +264,11 @@ def run(ctx: ProtocolContext) -> None:
     (
         liq_pipette,
         probe_pipette,
-        probing_rack,
-        liquid_rack,
         labware,
         src,
         dial,
         ethanol,
-        handheld_pipette
+        handheld_pipette,
     ) = _setup(ctx)
 
     # Initialize state
@@ -296,9 +282,9 @@ def run(ctx: ProtocolContext) -> None:
 
     def pick_up_tips() -> None:
         if not probe_pipette.has_tip:
-            probe_pipette.pick_up_tip(probing_rack)
+            probe_pipette.pick_up_tip()
         if not liq_pipette.has_tip:
-            liq_pipette.pick_up_tip(liquid_rack)
+            liq_pipette.pick_up_tip()
 
     def drop_tips() -> None:
         if probe_pipette.has_tip:
