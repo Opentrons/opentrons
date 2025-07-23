@@ -149,7 +149,9 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         await stacker._driver.get_hopper_door_closed()
     ), "Failed: Make sure to close the stacker door."
 
-    ui.get_user_ready("Make sure there is NO labware in the stacker tower or gripper position")
+    ui.get_user_ready(
+        "Make sure there is NO labware in the stacker tower or gripper position"
+    )
     print(f"Getting runtime baseline.")
     runtime_baseline_x = await create_runtime_baseline(stacker, TOFSensor.X)
     runtime_baseline_z = await create_runtime_baseline(stacker, TOFSensor.Z)

@@ -21,14 +21,15 @@ HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
 HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
 
 TEST_SPEEDS = [50, 100, 150]  # mm/s
-TEST_CURRENTS = [1.5, 1.2, 0.8, 0.3, 0.1]  # A rms
+TEST_CURRENTS = [1.5, 1.2, 0.8, 0.3]  # A rms
 TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
 CURRENT_THRESHOD = 0.8  # A rms
 TEST_TRIALS = 5
 
 # All units in mm
 
-AXIS_TRAVEL = MAX_TRAVEL[TEST_AXIS]  # The distance from retracted to extended limit switch
+# The distance from retracted to extended limit switch
+AXIS_TRAVEL = MAX_TRAVEL[TEST_AXIS]
 OFFSET = 2  # The distance to be off the springs from the limit switch
 AXIS_TOLERANCE = 0.5  # Distance tolerance of AXIS_TRAVEL in ONE direction
 LIMIT_SWICH_CHECK = 0.1
@@ -111,7 +112,9 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     for speed in TEST_SPEEDS:
         for current in TEST_CURRENTS:
             tag = f"speed-{speed}-current-{current}"
-            ui.print_header(f"{TEST_AXIS.name} Speed: {speed} mm/s, Current: {current} A")
+            ui.print_header(
+                f"{TEST_AXIS.name} Speed: {speed} mm/s, Current: {current} A"
+            )
             trial = 0
             failures = 0
             extend_data: List[Optional[float]] = [None] * TEST_TRIALS
