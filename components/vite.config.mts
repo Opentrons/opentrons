@@ -11,8 +11,12 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   build: {
-    // Relative to the root
-    ssr: 'src/index.ts',
+    // Configure for library mode instead of SSR
+    lib: {
+      entry: 'src/index.ts',
+      formats: ['es'],
+      fileName: 'index',
+    },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them
     emptyOutDir: false,
