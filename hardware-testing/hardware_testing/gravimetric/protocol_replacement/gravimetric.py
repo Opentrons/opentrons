@@ -7,6 +7,7 @@ import sys
 from time import time
 import importlib
 import copy
+import json
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -348,10 +349,18 @@ class FixtureSettings:
         robot_serial = str(ot3api.get_serial_number())
         fw_version = ot3api.fw_version
         git_description = get_git_description()
-        operator_name = "unused"
+        operator_name = ctx.params.operator  # type: ignore [attr-defined]
+        robot_name = "Simulating"
+        if IS_ROBOT:
+            try:
+                with open("/data/ODD/discovery.json", "r") as disc:
+                    robot_name = json.load(disc)["robots"][0]["name"]
+            except Exception:
+                robot_name = "Error Reading Robot Name"
 
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
+        test_report.set_robot_id(robot_name)
         test_report.set_version(git_description)
         test_report.set_firmware(fw_version)
         t50_str = f"{ctx.params.cavity_50}"  # type: ignore [attr-defined]
@@ -557,6 +566,31 @@ def _get_tips_for_test(
 def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
     parameters.add_csv_file("QC test profile", "qc_test_profile")
+
+    parameters.add_str(
+        display_name="Operator",
+        variable_name="operator",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "Haiyan",
+                "Jiqing",
+                "Yanglin",
+                "Yangyin",
+                "Hejie",
+                "Zhihua",
+                "Huanjun",
+                "Chengkun",
+                "Xiongjian",
+                "Zhougui",
+                "Zhiwei",
+                "TE",
+            ]
+        ],
+        description="Operator for this QC run",
+    )
 
     parameters.add_str(
         display_name="Tip Cavity for 50ul tips",
