@@ -9066,7 +9066,7 @@
             "class": "AttributeError",
             "name": "None",
             "obj": "None",
-            "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_24_P50_P1000_HappyPath_alter_lc.py\", line N, in run\n\n  File \"Flex_S_v2_24_P50_P1000_HappyPath_alter_lc.py\", line N, in alter_config\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_S_v2_24_P50_P1000_HappyPath_alter_lc.py\", line N, in run\n\n  File \"Flex_S_v2_24_P50_P1000_HappyPath_alter_lc.py\", line N, in alter_config\n"
           },
           "errorType": "PythonException",
           "id": "UUID",

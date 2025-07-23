@@ -5060,7 +5060,7 @@
             "class": "AttributeError",
             "name": "items",
             "obj": "pick_up_current",
-            "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_S_v2_12_PL_6d901d.py\", line N, in run\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/instruments/ot2/pipette.py\", line N, in update_config_item\n    self._config = load_pipette_data.update_pipette_configuration(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/shared-data/python/opentrons_shared_data/pipette/load_data.py\", line N, in update_pipette_configuration\n    for c, v in v1_configuration_changes.items():\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_S_v2_12_PL_6d901d.py\", line N, in run\n\n  File \"<PATH>\", line N, in update_config_item\n    self._config = load_pipette_data.update_pipette_configuration(\n\n  File \"<PATH>\", line N, in update_pipette_configuration\n    for c, v in v1_configuration_changes.items():\n"
           },
           "errorType": "PythonException",
           "id": "UUID",

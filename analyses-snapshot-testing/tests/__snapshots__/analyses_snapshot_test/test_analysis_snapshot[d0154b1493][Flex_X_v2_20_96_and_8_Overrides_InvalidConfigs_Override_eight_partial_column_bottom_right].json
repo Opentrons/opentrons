@@ -1228,7 +1228,7 @@
             "errorInfo": {
               "args": "('G12',)",
               "class": "KeyError",
-              "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
+              "traceback": "  File \"<PATH>\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
             },
             "errorType": "PythonException",
             "id": "UUID",
@@ -1303,7 +1303,7 @@
                   "errorInfo": {
                     "args": "('G12',)",
                     "class": "KeyError",
-                    "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
+                    "traceback": "  File \"<PATH>\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
                   },
                   "errorType": "PythonException",
                   "id": "UUID",

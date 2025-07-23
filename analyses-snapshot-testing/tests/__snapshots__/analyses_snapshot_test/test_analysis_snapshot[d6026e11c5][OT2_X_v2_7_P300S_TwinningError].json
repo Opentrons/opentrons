@@ -2806,7 +2806,7 @@
             "class": "AttributeError",
             "name": "pair_with",
             "obj": "P300 Single-Channel GEN2 on left mount",
-            "traceback": "  File \"/Users/alex.copperman/Documents/SnapshotTester/opentrons/api/src/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line N, in run\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line N, in run\n"
           },
           "errorType": "PythonException",
           "id": "UUID",
