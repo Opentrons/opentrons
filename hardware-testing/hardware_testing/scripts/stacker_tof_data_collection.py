@@ -138,8 +138,6 @@ class Stacker_TOF_Data_Collection:
             self.labware_name = "tiprack"
             self.labware_amount = 1
             self.labware_amount_z = 3
-        print("FILE PATH = ", self.test_path)
-        print("FILE NAMES = ")
         for stacker in self.stackers:
             self.test_tag = (
                 f"labx{self.labware_amount}_labz{self.labware_amount_z}_{stacker}"
@@ -154,7 +152,7 @@ class Stacker_TOF_Data_Collection:
                 data=self.test_header,
             )
             self.test_files.append(test_file)
-            print(test_file)
+            print("FILE = ", f"{self.test_path}/{test_file}")
 
     def dict_keys_to_line(self, dict: Dict[str, Any]) -> str:
         """Convert dict keys to CSV line."""

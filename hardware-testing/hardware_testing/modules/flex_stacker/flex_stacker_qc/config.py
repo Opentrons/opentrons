@@ -10,6 +10,7 @@ from . import (
     test_z_axis_basic,
     test_x_axis_basic,
     test_l_axis_basic,
+    test_l_axis_current_speed,
     test_z_axis_current_speed,
     test_x_axis_current_speed,
     test_stallguard,
@@ -38,6 +39,7 @@ class TestSection(enum.Enum):
     INSTALL_DETECTION = "INSTALL_DETECTION"
     TOF_BASIC = "TOF_BASIC"
     TOF_FUNCTIONAL = "TOF_FUNCTIONAL"
+    L_AXIS_CURRENT_SPEED = "L_AXIS_CURRENT_SPEED"
     Z_AXIS_CURRENT_SPEED = "Z_AXIS_CURRENT_SPEED"
     X_AXIS_CURRENT_SPEED = "X_AXIS_CURRENT_SPEED"
 
@@ -94,6 +96,10 @@ TESTS = [
     (
         TestSection.TOF_BASIC,
         test_tof_basic.run,
+    ),
+    (
+        TestSection.L_AXIS_CURRENT_SPEED,
+        test_l_axis_current_speed.run,
     ),
     (
         TestSection.TOF_FUNCTIONAL,
@@ -162,6 +168,10 @@ def build_report(test_name: str) -> CSVReport:
             CSVSection(
                 title=TestSection.TOF_FUNCTIONAL.value,
                 lines=test_tof_functional.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.L_AXIS_CURRENT_SPEED.value,
+                lines=test_l_axis_current_speed.build_csv_lines(),
             ),
             CSVSection(
                 title=TestSection.Z_AXIS_CURRENT_SPEED.value,
