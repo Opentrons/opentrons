@@ -10,7 +10,7 @@ Transfer steps move liquid from one well or group of wells to another. Adding a 
 * Pipette path, or motion the pipette uses to perform the transfer. 
 * Tip management settings, including how often the pipette picks up a new tip and where tips are dropped. 
 
-Click **Choose wells** then click and drag to select source and destination wells. Pipette path and tip handling options, shown below, are only available if they are compatible with your well selections and other transfer settings. 
+Click **Choose wells**, and then click and drag to select source and destination wells. Pipette path and tip handling options, shown below, are only available if they are compatible with your well selections and other transfer settings. 
 
 | **Pipette Path** | **Well Ratio** | **Description** {style="width: 25%;"}| **Tip Handling** |
 | ---------------- | -------------- | --------------- | ---------------- |
@@ -46,7 +46,8 @@ In the second form, choose whether to use liquid class settings in the transfer.
 
 ## Additional Settings
 
-Click **Continue** to move to the third form. Here, click the aspirate and dispense tabs to access additional settings. 
+In the third form, click the aspirate and dispense tabs to access additional settings.
+
 * **Custom flow rate**: the speed the robot aspirates or dispenses liquid at. 
 * **Well order**: the order the robot addresses source or destination wells in. 
 * **Tip position**: where the robot aspirates or dispenses in your labware. 
@@ -59,7 +60,7 @@ Click the default well order or tip position to open the menu and edit. Here, gr
 <figure class="screenshot" markdown>
   ![Tip position](images/tip_position.png)
   <figcaption>Edit the aspirate tip position.</figcaption>
-  </figure>
+</figure>
 
 The default tip position value of 0 represents the middle of the well for both X and Y positions. In the example above, a positive X value moves the tip to the right within the well, a negative Y value moves the tip to the left, and a positive Z value moves the tip up towards the top of the well. as you enter custom values, the graphic changes to demonstrate the new tip position. Toggle between top and side views of the well by clicking **Swap view**.
 
