@@ -419,9 +419,13 @@ async def test_dispense_labware_motion_sequence(
         # We need to verify the move sequence
         verify_hopper_labware_presence.assert_called_once_with(Direction.EXTEND, True)
         _prepare_for_action.assert_called()
+
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD
         )
+        # Verify labware presence
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, False)
+
         _move_and_home_axis.assert_any_call(
             StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM
         )
@@ -440,12 +444,15 @@ async def test_dispense_labware_motion_sequence(
         home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT)
 
         # Verify labware presence
-        verify_shuttle_labware_presence.assert_called_once_with(Direction.RETRACT, True)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Then finally the x is moved to the gripper position
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD
         )
+
+        # Make sure labware presense check on the X retract was called twice
+        assert verify_shuttle_labware_presence.call_count == 2
 
 
 @pytest.mark.parametrize(
