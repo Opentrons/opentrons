@@ -114,8 +114,10 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Add')[0])
     screen.getByText('Trash bin')
-    screen.getByText('Waste chute')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
@@ -169,7 +171,10 @@ describe('Desktop AddFixtureModal', () => {
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button', { name: 'Add' })[0]) // click fixtures
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
 
     const displayText = getFixtureDisplayName(
       WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE

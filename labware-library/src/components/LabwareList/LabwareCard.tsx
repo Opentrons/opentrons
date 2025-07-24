@@ -4,7 +4,6 @@ import uniq from 'lodash/uniq'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { isNewLabware } from '../../definitions'
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
@@ -14,7 +13,6 @@ import {
   Gallery,
   getWellLabel,
   LoadName,
-  NewLabwareAlert,
   Tags,
   WellCount,
 } from '../labware-ui'
@@ -50,7 +48,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </div>
       </div>
       <Tags definition={definition} />
-      {isNewLabware(definition) && <NewLabwareAlert />}
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )

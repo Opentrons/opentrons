@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
@@ -12,7 +9,6 @@ import {
   Modal,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -24,6 +20,7 @@ import {
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
@@ -157,6 +154,23 @@ export function AddFixtureModal({
           buttonText={t('add')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
+          }}
+        />
+      </>
+    )
+  } else if (
+    optionStage === 'fixtureOptions' &&
+    cutoutId === WASTE_CHUTE_CUTOUT &&
+    addressableAreaId === 'D3'
+  ) {
+    nextStageOptions = (
+      <>
+        <FixtureOption
+          key="wasteChuteStageOption"
+          optionName="Waste chute"
+          buttonText={t('select_options')}
+          onClickHandler={() => {
+            setOptionStage('wasteChuteOptions')
           }}
         />
       </>
@@ -333,32 +347,8 @@ export function AddFixtureModal({
               {nextStageOptions}
             </ListTable>
           </Flex>
-          {optionStage === 'wasteChuteOptions' ? (
-            <Btn
-              onClick={() => {
-                setOptionStage('fixtureOptions')
-              }}
-              aria-label="back"
-              paddingX={SPACING.spacing16}
-              marginTop="1.44rem"
-              marginBottom="0.56rem"
-            >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
-                {t('shared:go_back')}
-              </StyledText>
-            </Btn>
-          ) : null}
         </Modal>
       )}
     </>
   )
 }
-
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-`

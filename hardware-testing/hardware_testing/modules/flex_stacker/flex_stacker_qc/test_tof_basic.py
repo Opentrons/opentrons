@@ -16,6 +16,10 @@ from opentrons.drivers.flex_stacker.types import (
     TOFSensor,
 )
 
+from hardware_testing.modules.flex_stacker.flex_stacker_qc.utils import (
+    convert_histogram_bins_to_csv_string,
+)
+
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
@@ -71,12 +75,13 @@ async def test_get_tof_sensor_histogram(
     """Test that we can request and store histogram measurements from this TOF sensor."""
     print(f"Getting histogram for {sensor}.")
     histogram = await stacker._driver.get_tof_histogram(sensor)
+    histogram_string = convert_histogram_bins_to_csv_string(histogram.bins)
     report(
         section,
         f"tof-{sensor.name}-histogram",
         [
             CSVResult.PASS,
-            histogram.bins,
+            histogram_string,
         ],
     )
 

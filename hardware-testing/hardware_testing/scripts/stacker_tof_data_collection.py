@@ -6,8 +6,11 @@ import subprocess
 import re
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 import uuid
+
+from opentrons.hardware_control.modules import FlexStacker, PlatformState
+from opentrons.hardware_control.modules.types import HopperDoorState
 
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
@@ -117,7 +120,16 @@ class Stacker_TOF_Data_Collection:
         self.port_list = re.findall(r"ot_module_flexstacker[0-9]", res.decode())
         for i in range(len(self.port_list)):
             if self.api is not None:
-                serial_number = self.api.attached_modules[i].device_info["serial"]
+                stacker: FlexStacker = cast(FlexStacker, self.api.attached_modules[i])
+                await stacker.home_all()
+                serial_number = stacker.device_info["serial"]
+                assert (
+                    stacker.hopper_door_state == HopperDoorState.CLOSED
+                ), f"ERROR: The stacker door must be closed {serial_number}."
+                assert stacker.platform_state not in [
+                    PlatformState.UNKNOWN,
+                    PlatformState.MISSING,
+                ], f"ERROR: The stacker platform must be installed {serial_number}."
                 self.stackers.append(serial_number)
 
     def file_setup(self) -> None:
@@ -138,8 +150,6 @@ class Stacker_TOF_Data_Collection:
             self.labware_name = "tiprack"
             self.labware_amount = 1
             self.labware_amount_z = 3
-        print("FILE PATH = ", self.test_path)
-        print("FILE NAMES = ")
         for stacker in self.stackers:
             self.test_tag = (
                 f"labx{self.labware_amount}_labz{self.labware_amount_z}_{stacker}"
@@ -154,7 +164,7 @@ class Stacker_TOF_Data_Collection:
                 data=self.test_header,
             )
             self.test_files.append(test_file)
-            print(test_file)
+            print("FILE = ", f"{self.test_path}/{self.test_date}/{test_file}")
 
     def dict_keys_to_line(self, dict: Dict[str, Any]) -> str:
         """Convert dict keys to CSV line."""
@@ -167,10 +177,9 @@ class Stacker_TOF_Data_Collection:
     async def read_stacker_tof(self) -> None:
         """Read the stacker TOF Sensor data."""
         for i in range(len(self.stackers)):
-            await self.api.attached_modules[i].home_all()  # type: ignore
             print(f"\n>> Stacker = {self.stackers[i]}")
-            for axis, tof_axis in self.tof_axes.items():
-                for pos, direction in self.directions.items():
+            for pos, direction in self.directions.items():
+                for axis, tof_axis in self.tof_axes.items():
                     for k in range(self.samples):
                         sample = k + 1
                         print(f">>> Reading {axis} {pos} Sample = {sample}")
@@ -230,12 +239,12 @@ class Stacker_TOF_Data_Collection:
             if self.api and self.mount:
                 await self._home(self.api, self.mount)
             await self.read_stacker_tof()
-        except Exception as e:
-            await self.exit()
-            raise e
         except KeyboardInterrupt:
             await self.exit()
             print("\nTest Cancelled!")
+        except Exception as e:
+            await self.exit()
+            raise e
         finally:
             await self.exit()
             print("\nTest Completed!")
