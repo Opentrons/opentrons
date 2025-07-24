@@ -296,9 +296,9 @@ Flex provides a protocol recovery path for the following error conditions.
       <td>Occurs when a pipette encounters an empty well and expects a liquid to be present.</td>
       <td>
         <ul>
-          <li>Manually fill the empty well retry with the same tips.</li>
+          <li>Manually fill the empty well and retry with the same tips.</li>
           <li>Manually fill the empty well and retry with new tips.</li>
-          <li>Manually refill well and skip to the next step.</li>
+          <li>Manually fill the empty well and skip to the next step.</li>
           <li>Ignore the error and skip to the next step.</li>
           <li>Cancel protocol run.</li>
         </ul>
