@@ -1092,10 +1092,15 @@ export const getMainAAForAFixture = (
   }
 }
 
-export const getMainModuleFixtureId = (compatibleCutoutFixtureIds: CutoutFixtureId[]): CutoutFixtureId => {
-  return compatibleCutoutFixtureIds.find(cf => FLEX_USB_MODULE_FIXTURES.includes(cf)) ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+export const getMainUsbModuleFixtureIdForComboFixture = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): CutoutFixtureId => {
+  return (
+    compatibleCutoutFixtureIds.find(cf =>
+      FLEX_USB_MODULE_FIXTURES.includes(cf)
+    ) ?? compatibleCutoutFixtureIds[0]
+  )
 }
-
 
 export const isModuleAllowedOnAA = (
   cutoutId: CutoutId,
