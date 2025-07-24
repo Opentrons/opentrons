@@ -1,7 +1,7 @@
 
 Your protocol timeline includes steps the robot will peform in your protocol. To start, the timeline includes the starting and ending deck states. Click **Add Step** in the lower left to add transfer, move, mix, pause, or module-specific steps to your protocol. 
 
-## The Basics
+## The basics
 
 Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a three-part form. In the first, select basic settings for your liquid transfer: 
 
@@ -18,7 +18,7 @@ Click **Choose wells**, and then click and drag to select source and destination
 | Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
 | Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
 
-## Tip Management
+## Tip management
 
 Customizing tip management in your transfer steps can prevent contamination or reduce tip use in a protocol. Choose how often the robot selects a new tip: 
 
@@ -38,13 +38,13 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
 <figure class="screenshot" markdown>
   ![Transfer warning](images/transfer_warning.png)
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
-  </figure>
+</figure>
 
 Choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol. 
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
-## Additional Settings
+## Additional settings
 
 In the third form, click the aspirate and dispense tabs to access additional settings.
 

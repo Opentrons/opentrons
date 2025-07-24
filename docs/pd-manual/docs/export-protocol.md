@@ -5,4 +5,4 @@ If your protocol contains unused hardware or labware, Protocol Designer will ask
 <figure class="screenshot" markdown>
   ![Protocol overview](images/protocol_overview.png)
   <figcaption>Click in the upper right to export your protocol.</figcaption>
-  </figure>
+</figure>

@@ -1,68 +1,17 @@
-When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules: 
+When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-c3ow{border-color:inherit;text-align:center;vertical-align:top}
-.tg .tg-kvpo{background-color:#d0e6fe;border-color:inherit;color:#000000;font-weight:bold;text-align:center;vertical-align:top}
-</style>
-<table class="tg"><thead>
-  <tr>
-    <th class="tg-kvpo">Module and generation</th>
-    <th class="tg-kvpo">Opentrons Flex</th>
-    <th class="tg-kvpo">Opentrons OT-2</th>
-  </tr></thead>
-<tbody>
-  <tr>
-    <td class="tg-c3ow">Absorbance Plate Reader Module GEN1</td>
-    <td class="tg-c3ow"><img src="/images/check.png" height=35 width=35></td>
-    <td class="tg-c3ow"><img src="/images/X.png" height=30 width=30></td>
-  </tr>
-  <tr>
-    <td class="tg-c3ow">Heater-Shaker Module GEN1</td>
-    <td class="tg-c3ow"><img src="/images/check.png" height=35 width=35></td>
-    <td class="tg-c3ow"><img src="/images/X.png" height=30 width=30></td>
-  </tr>
-  <tr>
-    <td class="tg-c3ow">Magnetic Module GEN1</td>
-    <td class="tg-c3ow"><img src="/images/X.png" height=30 width=30></td>
-    <td class="tg-c3ow"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Magnetic Module GEN2</td>
-    <td class="tg-baqh"><img src="/images/X.png" height=30 width=30></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Magnetic Block GEN1</td>
-    <td class="tg-baqh"><img src="/images/X.png" height=30 width=30></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Temperature Module GEN1</td>
-    <td class="tg-baqh"><img src="/images/X.png" height=30 width=30></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Temperature Module GEN2</td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Thermocycler Module GEN1</td>
-    <td class="tg-baqh"><img src="/images/X.png" height=30 width=30></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-  <tr>
-    <td class="tg-baqh">Thermocycler Module GEN2</td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-    <td class="tg-baqh"><img src="/images/check.png" height=35 width=35></td>
-  </tr>
-</tbody></table>
+| Module and generation | Opentrons Flex | Opentrons OT-2 |
+| --------------------- | :--------------: | :--------: |
+| Absorbance Plate Reader Module GEN1 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/X.png" height=30 width=30></td> |
+| Heater-Shaker Module GEN1 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/X.png" height=30 width=30></td> |
+| Magnetic Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Magnetic Module GEN2 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Magnetic Block GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Temperature Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Temperature Module GEN2 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Thermocycler Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Thermocycler Module GEN2 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+
 
 You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex and the OT-2. 
 
@@ -114,7 +63,7 @@ Adding a Heater-Shaker Module step to your protocol displays any labware and ada
 <figure class="screenshot" markdown>
   ![Heater-Shaker step](images/heater_shaker.png)
   <figcaption>Add a temperature, shake speed, and timer for a Heater-Shaker step.</figcaption>
-  </figure>
+</figure>
 
 In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](warnings-errors.md#errors) could occur. 
 
@@ -125,7 +74,7 @@ Set a custom time for your Heater-Shaker step by enabling the timer. The timer w
 <figure class="screenshot" markdown>
   ![Heater-Shaker pause](images/heater_shaker_pause.png)
   <figcaption>Build a pause step now or later in your protocol.</figcaption>
-  </figure>
+</figure>
 
 You can choose to pause your protocol until the Heater-Shaker
 reaches the set temperature, or build a pause step later in your
@@ -172,7 +121,7 @@ the profile steps menu.
 <figure class="screenshot" markdown>
   ![Thermocycler profile](images/thermocycler.png)
   <figcaption>Add a cycle of temperature holds within a Thermocycler step.</figcaption>
-  </figure>
+</figure>
 
 Click **Add step** to create a step, like an initial denaturation, that only needs to happen once. Choose a block temperature, time, and name for your step. 
 

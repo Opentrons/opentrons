@@ -1,13 +1,13 @@
 To prevent errors, Protocol Designer displays hints, warnings, and error descriptions as you create a protocol. This section covers types and causes of warnings and errors in Protocol Designer. 
 
-Warnings
----------
+## Warnings
+
 Warnings in Protocol Designer alert you to a potential problem with a protocol step. In the example below, 4 source wells have been selected for a liquid transfer to 16 destination wells. Protocol Designer includes a warning in the transfer step form because this well selection, or ratio of source to destination wells, isn't allowed. 
 
 <figure class="screenshot" markdown>
   ![Transfer warning](images/transfer_warning.png)
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
-  </figure>
+</figure>
 
 The step warning appears in a red text box at the top of the step form. In most cases, the warning includes a description of the issue or action needed to resolve the warning. To quickly resolve this step warning, change the well selection to just one source or destination well. 
 
@@ -24,7 +24,7 @@ A protocol error appears in a red text box above the deck map and, like a warnin
 <figure class="screenshot" markdown>
   ![Not enough tips](images/not_enough_tips.png)
   <figcaption>The Flex deck doesn't have enough tips to complete the transfer step.</figcaption>
-  </figure>
+</figure>
 
 In this example, not enough tips are available on the deck to complete the number of transfers. Because the robot cannot complete the protocol as is, Protocol Designer displays a protocol error. To resolve the error, add more tips to the protocol starting deck or change tip management settings in the transfer step form. 
 
@@ -33,6 +33,6 @@ When designing your protocol, consider the order the labware and modules should 
 <figure class="screenshot" markdown>
   ![Latch open](images/latch_error.png)
   <figcaption>Labware can't be moved to the Heater-Shaker module when the labware latch is closed.</figcaption>
-  </figure>
+</figure>
 
 For example, the labware latch of the Heater-Shaker needs to be open to move labware to and from the module. Before heating or shaking, the latch needs to be closed. To resolve this errors, add a Heater-Shaker step to open the labware latch or drag and drop to change the order of steps. 

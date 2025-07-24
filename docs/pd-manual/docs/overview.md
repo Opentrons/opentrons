@@ -7,7 +7,7 @@ Before you finish creating your protocol, add a few more details. A unique title
 The protocol overview summarizes details you've added for your protocol. The protocol metadata section at the top left includes your protocol description, author, and organization details. You can also see the dates the protocol was created and exported. Modifying a protocol updates the last export date. Click **Edit** at the top right of the section to make changes. 
 
 <figure class="screenshot" markdown>
-  ![Protocol overview](images/protocol-overview-left.png)
+  ![Protocol overview](images/protocol-overview-left-2.png)
   <figcaption>The left section of the protocol overview screen.</figcaption>
 </figure>
 
@@ -17,15 +17,14 @@ The protocol overview shows instruments, including pipettes and the gripper, add
 
 The protocol overivew also includes a preview of your protocol starting deck. The initial deck state for a protocol includes all the labware, modules, and fixtures you've added. Protocol Designer automatically adds modules, fixtures, and tip racks to deck slots. You can edit their locations on the starting deck and add labware and liquids by clicking  **Edit protocol** in the upper right. 
 
-In the example below, hovering over a deck slot shows individual details, like an Opentrons Flex filter tip rack in slot B2. 
+Hovering over a deck slot shows individual details below the deck map, like labware and liquids. In the example below, slot B2 contains an Opentrons Flex filter tip rack. 
 
 <figure class="screenshot" markdown>
   ![Protocol overview](images/protocol-overview-right.png)
   <figcaption>The right section of the protocol overview screen.</figcaption>
-  </figure>
+</figure>
 
 
 This protocol starting deck also includes a trash bin (slot A3), Temperature and Heater-Shaker Modules (slots C1 and D1, respectively), two staging areas (creating slots B4 and D4), and a second tip rack (one tip rack for each pipette).
 
-
-Hovering over each deck slot shows individual details, like labware and liquids. The materials list shows the same information, including liquid definitions, at a glance. Use the toggle switch at the upper right to view any off-deck labware added to your protocol. 
+ Use the toggle switch at the upper right to view any off-deck labware added to your protocol. 
