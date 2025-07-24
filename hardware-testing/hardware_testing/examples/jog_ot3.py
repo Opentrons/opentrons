@@ -7,8 +7,7 @@ from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
-from opentrons_hardware.hardware_control.motion_planning import move_utils 
-
+from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 
 async def _exercise_pipette(api: OT3API, mount: types.OT3Mount) -> None:
@@ -62,6 +61,7 @@ async def _exercise_gripper(api: OT3API) -> None:
         else:
             print(f"unexpected input: {inp}")
 
+
 async def _main(
     is_simulating: bool, mount: types.OT3Mount, speed: Optional[float]
 ) -> None:
@@ -91,4 +91,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     _mount = mount_options[args.mount]
     asyncio.run(_main(args.simulate, _mount, args.speed))
- 

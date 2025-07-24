@@ -122,11 +122,13 @@ def _build_csv_report() -> CSVReport:
         sections=[
             CSVSection(
                 title="TEST_LEFT_PARAMETERS",
-                lines=[CSVLine(parameter, [int]) for parameter in TEST_LEFT_PARAMETERS],
+                lines=[CSVLine(parameter, [float]) for parameter in TEST_LEFT_PARAMETERS],
             ),
-             CSVSection(
+            CSVSection(
                 title="TEST_RIGHT_PARAMETERS",
-                lines=[CSVLine(parameter, [int]) for parameter in TEST_RIGHT_PARAMETERS],
+                lines=[
+                    CSVLine(parameter, [float]) for parameter in TEST_RIGHT_PARAMETERS
+                ],
             ),
             CSVSection(
                 title=OT3Mount.LEFT.name,
@@ -233,7 +235,11 @@ def check_force(
 
 
 async def _force_gauge(
-    api: OT3API, mount: OT3Mount, report: CSVReport, simulate: bool, arguments: argparse.Namespace
+    api: OT3API,
+    mount: OT3Mount,
+    report: CSVReport,
+    simulate: bool,
+    arguments: argparse.Namespace,
 ) -> bool:
     """Apply force to the gague and log."""
     global thread_sensor
@@ -293,8 +299,7 @@ async def _force_gauge(
                     await api.refresh_positions()
 
                     await api.move_to(mount=mount, abs_position=pre_test_pos)
-                    
-                    
+
         for i in range(CYCLES_CURRENT):
             # Move to just above force gauge
             await api.move_to(mount=mount, abs_position=pre_test_pos)
@@ -368,11 +373,15 @@ async def _run(api: OT3API, arguments: argparse.Namespace, report: CSVReport) ->
     qc_pass = True
 
     if not arguments.skip_left:
-        res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate, arguments)
+        res = await _force_gauge(
+            api, OT3Mount.LEFT, report, arguments.simulate, arguments
+        )
         qc_pass = res and qc_pass
 
     if not arguments.skip_right:
-        res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate, arguments)
+        res = await _force_gauge(
+            api, OT3Mount.RIGHT, report, arguments.simulate, arguments
+        )
         qc_pass = res and qc_pass
 
     return qc_pass
@@ -390,8 +399,10 @@ async def _main(arguments: argparse.Namespace) -> None:
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
     for k, v in TEST_LEFT_PARAMETERS.items():
+        print(f"output check for TEST_LEFT_PARAMETERS: {k, [v]}")
         report("TEST_LEFT_PARAMETERS", k, [v])
     for k, v in TEST_RIGHT_PARAMETERS.items():
+        print(f"output check for TEST_RIGHT_PARAMETERS: {k, [v]}")
         report("TEST_RIGHT_PARAMETERS", k, [v])
 
     # Attempt to home if first homing fails because of OT-3 in box Y axis issue
