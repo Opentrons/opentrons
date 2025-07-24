@@ -367,7 +367,7 @@ Python protocols generally follow the same basic structure:
 
     - Locations of [modules](https://docs.opentrons.com/v2/new_modules.html), [labware](https://docs.opentrons.com/v2/new_labware.html), and [deck fixtures](https://docs.opentrons.com/v2/deck_slots.html#deck-configuration).
 
-    - [Liquid](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells) types and locations (optional).
+    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells) (optional).
 
     - Commands the system will physically execute (e.g., [simple](https://docs.opentrons.com/v2/new_atomic_commands.html) or [complex](https://docs.opentrons.com/v2/new_complex_commands.html) liquid
       handling commands, [module](https://docs.opentrons.com/v2/new_modules.html) commands, or [movement](https://docs.opentrons.com/v2/robot_position.html) commands).
@@ -432,6 +432,10 @@ Some module commands that take a long time to complete (such as heating from amb
 #### Multiple modules of the same type
 
 The Python API only restricts module placement based on physical limitations. Protocol Designer can only place one of each type of module on the deck, except the Temperature Module. [`ProtocolContext.load_module()`](https://docs.opentrons.com/v2/new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module) allows placing any powered module in any column 1 or 3 slot (except the Thermocycler Module, which only fits in slots A1 and B1). And it allows placing Magnetic Blocks in any working area slot.
+
+#### Liquid level detection
+
+Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) during a pipetting action.
 
 #### Python packages
 
