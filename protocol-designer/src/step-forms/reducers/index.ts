@@ -375,8 +375,7 @@ export const savedStepForms = (
     case 'LOAD_FILE': {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const stepFormsFromFile = metadata.savedStepForms
-      const labware = metadata.labware
+      const { savedStepForms: stepFormsFromFile, labware } = metadata
       const prevInitialDeckSetupStep =
         stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID]
       const formLabwareLocationUpdate: Record<string, string> =
