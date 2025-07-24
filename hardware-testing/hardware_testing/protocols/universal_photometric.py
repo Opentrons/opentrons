@@ -80,6 +80,14 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "5", "value": 5},
         ],
     )
+    parameters.add_float(
+        display_name="First aspirate submerge depth",
+        variable_name="first_asp_sub_depth",
+        description="Override the submerge depth for the first test.",
+        default=1.5,
+        minimum=0.0,
+        maximum=20.0,
+    )
 
     parameters.add_bool(
         variable_name="use_pip_motion_defaults",
@@ -393,10 +401,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
 
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
-    def _get_transfer_settings(tiprack: Labware) -> LiquidClass:
+    def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
         liquid_class = ctx.get_liquid_class("water")
         transfer_properties = liquid_class.get_for(pip, tiprack)
+
         asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]
+        if first_trial:
+            asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.first_asp_sub_depth)  # type: ignore [attr-defined]
         disp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.disp_sub_depth)  # type: ignore [attr-defined]
 
         transfer_properties.aspirate.submerge.start_position.offset = asp_offset
@@ -436,7 +447,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
 
     for i in range(ctx.params.cycles):  # type: ignore [attr-defined]
         tips = _get_tiprack(i)
-        liquid_class = _get_transfer_settings(tips)
+        liquid_class = _get_transfer_settings(tips, i == 0)
         pip.pick_up_tip(tips["A1"])
 
         if i == 0:
