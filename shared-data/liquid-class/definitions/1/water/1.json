@@ -4072,7 +4072,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -4310,7 +4310,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -4548,7 +4548,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 15.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -4786,7 +4786,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 15.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
