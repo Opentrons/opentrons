@@ -55,6 +55,9 @@ pip-delete-this-directory.txt
 node_modules
 package-lock.json
 
+# npm pack tarballs
+opentrons-*.tgz
+
 # Unit test / coverage reports
 htmlcov/
 .tox/

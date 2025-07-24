@@ -59,10 +59,6 @@
     "react-redux": "8.1.2"
   },
   "scripts": {
-    "build": "npm run build-ts && npm run build-lib",
-    "build-lib": "NODE_ENV=production vite build",
-    "build-ts": "tsc --build --emitDeclarationOnly",
-    "prepublishOnly": "npm run build",
     "postpack": "echo 'Package ready for publishing with bundled step-generation'"
   },
   "files": [

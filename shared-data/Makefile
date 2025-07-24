@@ -45,6 +45,10 @@ lib-js:
 build-ts:
 	yarn tsc --build --emitDeclarationOnly
 
+.PHONY: pack-js
+pack-js: build-ts lib-js
+	yarn pack
+
 .PHONY: format-js
 format-js:
 	yarn prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)

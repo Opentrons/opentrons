@@ -1,2 +1,6 @@
 lib
 python/opentrons_shared_data/_version.py
+
+# npm pack tarballs
+*.tgz
+opentrons-shared-data-*.tgz

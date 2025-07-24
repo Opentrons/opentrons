@@ -35,6 +35,10 @@ lib:
 build-ts:
 	yarn tsc --build --emitDeclarationOnly
 
+.PHONY: pack
+pack: build-ts lib
+	yarn pack
+
 # development
 #####################################################################
 
