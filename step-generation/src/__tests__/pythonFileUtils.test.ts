@@ -19,6 +19,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  formatChangeTipArg,
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
@@ -568,5 +569,17 @@ water_base_class = protocol.get_liquid_class("water")
 ethanol_80_base_class = protocol.get_liquid_class("ethanol_80")
 glycerol_50_base_class = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
+  })
+})
+
+describe('formatChangeTipArg', () => {
+  it('should transform perSource into per source', () => {
+    expect(formatChangeTipArg('perSource')).toBe('per source')
+  })
+  it('should transform perDest into per destination', () => {
+    expect(formatChangeTipArg('perDest')).toBe('per destination')
+  })
+  it('should not alter never', () => {
+    expect(formatChangeTipArg('never')).toBe('never')
   })
 })
