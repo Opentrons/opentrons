@@ -419,7 +419,11 @@ export const savedStepForms = (
             ),
             tipRack:
               stepForm.stepType === 'mix'
-                ? getMigratedURI(stepForm.tipRack, allLabware, latestDefs)
+                ? getMigratedURI(
+                    stepForm.tipRack as string,
+                    allLabware,
+                    latestDefs
+                  )
                 : undefined,
           }
         } else if (stepForm.stepType === 'moveLiquid') {
@@ -438,7 +442,11 @@ export const savedStepForms = (
               allLabware,
               latestDefs
             ),
-            tipRack: getMigratedURI(stepForm.tipRack, allLabware, latestDefs),
+            tipRack: getMigratedURI(
+              stepForm.tipRack as string,
+              allLabware,
+              latestDefs
+            ),
           }
         }
         return {
