@@ -53,9 +53,13 @@ from .types import (
     CriticalPoint,
 )
 
+
 # Supress logging.exception messages as they can be confusing when running scripts.
 class StripExceptionMessageHandler(logging.StreamHandler):
-    def emit(self, record):
+    """Custom StreamHandler to strip logging.exception messages."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, but supress logging.exception logs."""
         if record.exc_info:
             # Remove the msg, traceback if it's an exception
             record.msg = ""

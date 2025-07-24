@@ -18,7 +18,7 @@ from ast import literal_eval
 from collections import defaultdict
 from enum import Enum
 from typing import Any, DefaultDict, Dict, List, Tuple
-from itertools import chain, product
+from itertools import product
 from math import trunc
 
 
@@ -83,10 +83,10 @@ def _parse_tuple(arg: str) -> Tuple[int, int]:
 
 def _get_value_from_index(deviations: List[int], axis: str, platform: str) -> int:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return deviations[index_map.get((axis, platform), 0)]
 
@@ -95,17 +95,20 @@ def _get_tuple_from_index(
     bins_list: List[Tuple[int, int]], axis: str, platform: str
 ) -> Tuple[int, int]:
     index_map = {
-        ("X", "extend"): 0,
-        ("X", "retract"): 1,
-        ("Z", "extend"): 2,
-        ("Z", "retract"): 3,
+        ("x", "extend"): 0,
+        ("x", "retract"): 1,
+        ("z", "extend"): 2,
+        ("z", "retract"): 3,
     }
     return bins_list[index_map.get((axis, platform), 0)]
 
 
 def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
     """Convert a defaultdict to dict."""
-    return {k: convert_to_dict(v) for k, v in obj.items()}
+    return {
+        k: convert_to_dict(v) if isinstance(v, defaultdict) else v
+        for k, v in obj.items()
+    }
 
 
 def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
@@ -165,9 +168,8 @@ def create_baseline(
         aggregate = defaultdict(lambda: defaultdict(list))  # type: ignore
         # Iterate through the histograms and create a map of zones to bin value
         # per index of each histogram.
-        for zone, zone_info in histograms.items():
-            for bins_data in zone_info:
-                bins = list(bins_data.values())[0]
+        for zone, zone_bins in histograms.items():
+            for bins in zone_bins:
                 assert (
                     len(bins) == bin_count
                 ), f"Invalid number of bins in zone {zone}, got {len(bins)} expected: {bin_count}."
@@ -177,10 +179,10 @@ def create_baseline(
         # Iterate through the per-index bin map and calculate the threshold
         # for that specific bin.
         for zone, bins_dict in aggregate.items():
-            for bins in bins_dict.values():
+            for bins in bins_dict.values():  # type: ignore
                 mean = sum(bins) / len(bins)  # type: ignore
                 std = statistics.pstdev(bins)  # type: ignore
-                threshold = float("%.2f" % (mean + (std * deviation)))
+                threshold = float("%.2f" % (mean + (std * deviation)))  # type: ignore
                 baseline[zone].append(threshold)
 
         assert (
@@ -195,7 +197,7 @@ def read_filtered_data(
     """Parses the dataframe CSV files into a defaultdict of measurements."""
     samples = 0
     bin_count = len(config["bins_list"])
-    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # type: ignore
+    measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(dict))))  # type: ignore
     for filepath in dataframes:
         if not os.path.exists(filepath):
             sys.exit(f"ERROR: Invalid dataframe file provided - {filepath}")
@@ -212,12 +214,16 @@ def read_filtered_data(
                 zone = row.Zone
                 platform = row.Platform_Position
                 stacker = row.Stacker_SN
+                labware = row.Labware_Name
+                sample = row.Sample
 
                 if not is_valid_row(axis, platform, zone, config):
                     continue
 
                 bins = list(row[start_index : start_index + bin_count])
-                measurements[axis][platform][zone].append({stacker: bins})
+                measurements[axis][platform][stacker][sample].update(
+                    {zone: bins, "lw": labware}
+                )
 
                 samples += 1
                 if samples > config["max_samples"]:
@@ -281,13 +287,14 @@ def plot_baseline(args: argparse.Namespace) -> None:
                         zone_visibility[zone].append(idx)
 
                     if measurements:
-                        for zone, entries in (
+                        for stacker, entries in (
                             measurements.get(axis, {}).get(platform, {}).items()
                         ):
-                            if not is_valid_row(axis, platform, zone, config):
-                                continue
-                            for entry in entries:
-                                for stacker, bin in entry.items():
+                            for _, zone_data in entries.items():
+                                zone_data.pop("lw")
+                                for zone, bin in zone_data.items():
+                                    if not is_valid_row(axis, platform, zone, config):
+                                        continue
                                     bins, photons = zip(*enumerate(bin))
                                     fig.add_trace(
                                         go.Scatter(
@@ -339,7 +346,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                     ],
                 ]
                 fig.update_layout(
-                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis}",
+                    title=f"TOF Sensor Baseline: {config['labware_list']} {axis} {args.graph_name}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
                     template="plotly_white",
@@ -358,7 +365,6 @@ def plot_baseline(args: argparse.Namespace) -> None:
 def generate_baseline(args: argparse.Namespace) -> None:
     """Generates a new baseline given the dataframe."""
     config = parse_common_args(args)
-    histograms, samples = read_filtered_data(args.dataframe, config)
 
     deviations = config["std"]
     if len(deviations) > 4:
@@ -374,10 +380,20 @@ def generate_baseline(args: argparse.Namespace) -> None:
         f" ZonesX={config['zone_list_x']}, ZonesZ={config['zone_list_z']}, Bins={config['bins_list']}\n"
     )
 
+    measurements, sample_count = read_filtered_data(args.dataframe, config)
+    aggregate_zones = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # type: ignore
     baselines = defaultdict(dict)  # type: ignore
-    for axis, platform_data in histograms.items():
-        zone_count = zone_count_x if axis == "X" else zone_count_z
-        for platform, zone_data in platform_data.items():
+    for axis, platform_data in measurements.items():
+        zone_count = zone_count_x if axis == "x" else zone_count_z
+        for platform, sample_data in platform_data.items():
+            for _, sample in sample_data.items():
+                for zone, bins in list(sample.values())[0].items():
+                    aggregate_zones[axis][platform][zone].append(bins)
+
+            # Generate baseline
+            zone_data = dict(aggregate_zones[axis][platform])
+            # Remove added keys
+            zone_data.pop("lw")
             deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
             baselines[axis][platform] = baseline
@@ -423,7 +439,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             file.truncate()
 
     print(
-        f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {samples} Samples ---------------\n"
+        f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {sample_count} Samples ---------------\n"
     )
     print(
         "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
@@ -436,7 +452,7 @@ def generate_baseline(args: argparse.Namespace) -> None:
             print(baseline, "\n")
 
 
-def validate_baseline(args: argparse.Namespace) -> None:
+def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
     """Validates the baseline and dataframe and determines if the labware is detected."""
     config = parse_common_args(args)
     thresholds = config["threshold"]
@@ -447,8 +463,9 @@ def validate_baseline(args: argparse.Namespace) -> None:
             " cant be more than 4."
         )
 
-    detected_labware = defaultdict(list)
-    measurements, samples = read_filtered_data(args.dataframe, config)
+    detected_labware = defaultdict(list)  # type: ignore
+    undetected_labware = defaultdict(set)  # type: ignore
+    measurements, samples_count = read_filtered_data(args.dataframe, config)
     for baseline_path in args.baseline:
         if not os.path.exists(baseline_path):
             sys.exit(f"ERROR: Invalid baseline file provided - {baseline_path}")
@@ -459,50 +476,144 @@ def validate_baseline(args: argparse.Namespace) -> None:
             version = baseline.pop("version", config["baseline_version"])
             baseline["version"] = baseline.get("version", 1)
             baseline = {k.lower(): v for k, v in baseline.items()}
+            figures = {}
+
             # The baseline is stored as string, so convert to dict
             for axis, platform in product(["x", "z"], ["extend", "retract"]):
-                baseline[axis][platform] = literal_eval(baseline[axis][platform])
+                figures.update({axis: go.Figure()})
+                data = literal_eval(baseline[axis][platform])
+                baseline[axis][platform] = data
+                for zone, bins in data.items():
+                    figures[axis].add_trace(
+                        go.Scatter(
+                            x=list(range(NUMBER_OF_BINS)),
+                            y=bins,
+                            mode="lines",
+                            name=f"Baseline zone {zone}",
+                            visible=True,
+                            line=dict(dash="dash", color="blue", width=2),
+                        )
+                    )
 
             # Go through measurements
-            for axis, platform, zone in product(
-                config["axis_list"],
-                config["platform_list_x"] + config["platform_list_z"],
-                config["zone_list_x"] + config["zone_list_z"],
-            ):
-                if not is_valid_row(axis, platform, zone, config):
-                    continue
+            for axis in config["axis_list"]:
+                for platform in set(
+                    config["platform_list_x"] + config["platform_list_z"]
+                ):
+                    print(
+                        f"Validate baseline V{version} for {axis} axis {platform} from {samples_count} samples"
+                    )
 
-                print(
-                    f"Validate baseline V{version} for {axis} axis {platform} from {samples} samples"
-                )
-
-                baseline_data = baseline[axis][platform][zone]
-                data = measurements[axis][platform][zone]
-                for stacker, raw_data in chain.from_iterable(d.items() for d in data):
-                    bin_range = _get_tuple_from_index(bin_ranges, axis, platform)
-                    threshold = _get_tuple_from_index(thresholds, axis, platform)
-                    for bin in range(*bin_range):
-                        raw_data_value = raw_data[bin]
-                        baseline_value = baseline_data[bin]
-                        delta = _truncate(raw_data_value - baseline_value)
-                        if raw_data_value > threshold and delta > 0:
-                            detected_labware[stacker].append(
-                                dict(
-                                    detected=True,
-                                    stacker=stacker,
-                                    axis=axis,
-                                    platform=platform,
-                                    zone=zone,
-                                    bin=bin,
-                                    raw_data=raw_data,
-                                    raw_data_value=raw_data_value,
-                                    baseline_value=baseline_value,
-                                    delta=delta,
+                    for stacker, samples in (
+                        measurements.get(axis, {}).get(platform, {}).items()
+                    ):
+                        for sample, data in samples.items():
+                            detected = False
+                            for zone in set(
+                                config["zone_list_x"] + config["zone_list_z"]
+                            ):
+                                if not is_valid_row(axis, platform, zone, config):
+                                    continue
+                                baseline_data = baseline[axis][platform][zone]
+                                raw_data = data[zone]
+                                labware = data["lw"]
+                                bin_range = _get_tuple_from_index(
+                                    bin_ranges, axis, platform
                                 )
-                            )
-                            break
-                    else:
-                        print("NOT DETECTED", stacker, axis, platform, zone, bin_range)
+                                threshold = _get_tuple_from_index(
+                                    thresholds, axis, platform
+                                )
+                                for bin in range(*bin_range):
+                                    raw_data_value = raw_data[bin]
+                                    baseline_value = baseline_data[bin]
+                                    delta = _truncate(raw_data_value - baseline_value)
+                                    if raw_data_value > threshold and delta > 0:
+                                        detected = True
+                                        mark = "+++" if labware == "baseline" else ""
+                                        figures[axis].add_trace(
+                                            go.Scatter(
+                                                x=list(range(NUMBER_OF_BINS)),
+                                                y=raw_data,
+                                                mode="lines",
+                                                name=f"zone {zone} {mark}",
+                                                visible=True,
+                                                line=dict(color="green", width=1),
+                                            )
+                                        )
+                                        detected_labware[stacker].append(
+                                            dict(
+                                                labware=labware,
+                                                stacker=stacker,
+                                                axis=axis,
+                                                platform=platform,
+                                                zone=zone,
+                                                bin=bin,
+                                                raw_data=raw_data,
+                                                raw_data_value=raw_data_value,
+                                                baseline_value=baseline_value,
+                                                delta=delta,
+                                                threshold=threshold,
+                                            )
+                                        )
+                                        break
+                                if not detected:
+                                    detected = False
+                                    figures[axis].add_trace(
+                                        go.Scatter(
+                                            x=list(range(NUMBER_OF_BINS)),
+                                            y=raw_data,
+                                            mode="lines",
+                                            name=f"zone {zone}",
+                                            visible=True,
+                                            line=dict(color="red", width=2),
+                                        )
+                                    )
+                                    undetected_labware[stacker].add(
+                                        (labware, axis, platform, zone)
+                                    )
+                figures[axis].update_layout(
+                    title=f"Validate Baseline {axis}",
+                    xaxis_title="Bins",
+                    yaxis_title="Photon Count",
+                    template="plotly_white",
+                )
+                if not args.disable_validation_plot:
+                    figures[axis].show()
+
+    print("\n---------------- RESULT -------------- \n")
+    print("ZONES DETECTED\n")
+    for stacker, samples in detected_labware.items():
+        for sample in samples:
+            axis = sample["axis"]
+            platform = sample["platform"]
+            zone = sample["zone"]
+            bin = sample["bin"]
+            value = sample["raw_data_value"]
+            base = sample["baseline_value"]
+            delta = sample["delta"]
+            lw = sample["labware"]
+            print(
+                f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
+            )
+
+    print("\nZONES NOT DETECTED\n")
+    for stacker, samples in undetected_labware.items():
+        for sample in samples:
+            lw, axis, dir, zn = sample
+            print(f"{stacker} NOT DETECT {lw} {axis} {dir} zn={zn}")
+
+    # Check if any stackers failed to detect ANY labware
+    print("\n\n")
+    all_detected = True
+    for stacker in undetected_labware:
+        if stacker not in detected_labware:
+            print(f"WARNING NO DETECTION ACROSS ZONES {stacker}")
+            all_detected = False
+
+    if all_detected:
+        print("\nSUCCESS: ALL SAMPLES DETECTED!\n")
+    else:
+        print("\nFAULED: SOME SAMPLES NOT DETECTED!\n")
 
 
 def main(args: argparse.Namespace) -> None:
@@ -638,6 +749,18 @@ if __name__ == "__main__":
         help="The maximum number of samples (rows) to pricess from the dataframe.",
         type=int,
         default=DEFAULT_MAX_SAMPLES,
+    )
+    parser.add_argument(
+        "--graph-name",
+        help="Optional graph tag to add to the name",
+        type=str,
+        default="",
+    )
+    parser.add_argument(
+        "--disable-validation-plot",
+        help="Disables grapping the validation plots.",
+        action="store_true",
+        default=False,
     )
 
     args = parser.parse_args()

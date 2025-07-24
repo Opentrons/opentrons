@@ -30,6 +30,7 @@ import { LINK_BUTTON_STYLE } from '../../atoms'
 import { PipetteInfoItem } from '../PipetteInfoItem'
 import { getSectionsFromPipetteName } from './utils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
@@ -51,6 +52,8 @@ interface PipetteOverviewProps {
   labware: AllTemporalPropertiesForTimelineFrame['labware']
   robotType: RobotType
   pipetteConfig: PipetteConfig
+  showNoPipetteError: boolean
+  setSaveAttemptFailed: Dispatch<SetStateAction<boolean>>
   leftPipette?: PipetteOnDeck
   rightPipette?: PipetteOnDeck
   gripper?: Gripper
@@ -62,6 +65,8 @@ export function PipetteOverview({
   labware,
   robotType,
   pipetteConfig,
+  showNoPipetteError,
+  setSaveAttemptFailed,
   leftPipette,
   rightPipette,
   gripper,
@@ -106,6 +111,12 @@ export function PipetteOverview({
     setPipetteVolume,
     setSelectedTips,
   } = pipetteConfig
+
+  const handleAddPipette = (): void => {
+    setPage('add')
+    setMount(targetPipetteMount)
+    setSaveAttemptFailed(false)
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
@@ -187,16 +198,23 @@ export function PipetteOverview({
           ) : null}
           {has96Channel ||
           (leftPipette != null && rightPipette != null) ? null : (
-            <Flex width={FLEX_MAX_CONTENT}>
-              <EmptySelectorButton
-                onClick={() => {
-                  setPage('add')
-                  setMount(targetPipetteMount)
-                }}
-                text={t('add_pipette')}
-                textAlignment="left"
-                iconName="plus"
-              />
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex width={FLEX_MAX_CONTENT}>
+                <EmptySelectorButton
+                  onClick={handleAddPipette}
+                  text={t('add_pipette')}
+                  textAlignment="left"
+                  iconName="plus"
+                />
+              </Flex>
+              {showNoPipetteError ? (
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.red50}
+                >
+                  {t('pipette_required')}
+                </StyledText>
+              ) : null}
             </Flex>
           )}
         </Flex>

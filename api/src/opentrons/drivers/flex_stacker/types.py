@@ -136,6 +136,10 @@ class Direction(Enum):
         """Convert to tag for clear logging."""
         return self.name.lower()
 
+    def polarity(self) -> str:
+        """Convert to polarity tag for testing."""
+        return "positive" if self == Direction.EXTEND else "negative"
+
     def opposite(self) -> "Direction":
         """Get opposite direction."""
         return Direction.EXTEND if self == Direction.RETRACT else Direction.RETRACT

@@ -63,11 +63,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       y={y}
       outerProps={{ style: { overflow: 'visible' } }}
       innerDivProps={{
-        style: {
-          width: '100%',
-          height: '100%',
-          overflow: 'visible',
-        },
+        width: '100%',
+        height: '100%',
+        overflow: 'visible',
       }}
     >
       <svg overflow="visible">
