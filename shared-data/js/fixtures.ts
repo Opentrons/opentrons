@@ -9,6 +9,7 @@ import {
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
+  FLEX_USB_MODULE_FIXTURES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1090,6 +1091,11 @@ export const getMainAAForAFixture = (
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
 }
+
+export const getMainModuleFixtureId = (compatibleCutoutFixtureIds: CutoutFixtureId[]): CutoutFixtureId => {
+  return compatibleCutoutFixtureIds.find(cf => FLEX_USB_MODULE_FIXTURES.includes(cf)) ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+}
+
 
 export const isModuleAllowedOnAA = (
   cutoutId: CutoutId,
