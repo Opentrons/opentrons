@@ -1,6 +1,7 @@
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_ROBOT_TYPE,
+  getIsLid,
   HEATERSHAKER_MODULE_TYPE,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   OT2_ROBOT_TYPE,
@@ -13,8 +14,10 @@ import * as errorCreators from '../../errorCreators'
 import {
   formatPyStr,
   getCutoutIdByAddressableArea,
-  getFullStackFromLabwares,
+  getIsLabwareCompatibleWithStack,
   getLabwareHasLiquid,
+  getLargestStackInSlot,
+  getNearestParentInStack,
   getSlotInLocationStack,
   getTiprackHasTips,
   OFF_DECK,
@@ -73,46 +76,6 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     'addressableAreaName' in newLocation &&
     newLocation.addressableAreaName === 'gripperWasteChute'
 
-  const newLocationSlot =
-    newLocation !== 'offDeck' && newLocation !== 'systemLocation'
-      ? Object.values(newLocation)[0]
-      : null
-
-  const largestStack =
-    newLocationSlot != null
-      ? getFullStackFromLabwares(prevRobotState.labware, newLocationSlot)
-      : []
-  const largestStackLoadnames = largestStack?.reduce<string[]>(
-    (acc: string[], itemId: string) => {
-      const labware = labwareEntities[itemId]
-      const loadName = labware?.def.parameters.loadName
-      const isAdapter = labware?.def.allowedRoles?.includes('adapter')
-
-      if (loadName !== undefined && !isAdapter) {
-        acc.push(loadName)
-      }
-
-      return acc
-    },
-    []
-  )
-  const labwareIdLoadname = Object.values(labwareEntities).find(
-    lw => lw.id === labwareId
-  )?.def.parameters.loadName
-  const isStackingAllowed = largestStackLoadnames?.some(loadName =>
-    Object.values(labwareEntities).some(lw => {
-      return (
-        lw.def.parameters.loadName === loadName &&
-        labwareIdLoadname != null &&
-        lw.def.compatibleParentLabware?.includes(labwareIdLoadname)
-      )
-    })
-  )
-  const hasMultipleObjectsInSameSlot =
-    largestStackLoadnames?.length > 0 &&
-    !isStackingAllowed &&
-    !newLocationInWasteChute
-
   if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -126,8 +89,6 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     useGripper
   ) {
     errors.push(errorCreators.labwareOffDeck())
-  } else if (hasMultipleObjectsInSameSlot) {
-    errors.push(errorCreators.multipleEntitiesOnSameSlotName())
   }
 
   const isAluminumBlock =
@@ -246,10 +207,6 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     }
   }
 
-  if (errors.length > 0) {
-    return { errors }
-  }
-
   const params = {
     labwareId,
     strategy,
@@ -266,16 +223,33 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 
   const labwarePythonName = labwareEntities[labwareId].pythonName
   let location: string = ''
+  let parentSlotForSlotCompatibility: string | null = null
   if (newLocation === 'offDeck') {
     location = OFF_DECK
   } else if (newLocation === 'systemLocation') {
     location = 'system_location' // NOTE: i think this is for LPC but shouldn't be used in PD
   } else if ('labwareId' in newLocation) {
     location = labwareEntities[newLocation.labwareId].pythonName
+    const newLocationStack = prevRobotState.labware[newLocation.labwareId].stack
+    parentSlotForSlotCompatibility =
+      newLocationStack[newLocationStack.length - 1]
   } else if ('moduleId' in newLocation) {
     location = moduleEntities[newLocation.moduleId].pythonName
   } else if ('slotName' in newLocation) {
-    location = formatPyStr(newLocation.slotName)
+    const { slotName } = newLocation
+    if (slotName in labwareEntities) {
+      const slot = getSlotInLocationStack(
+        prevRobotState.labware[slotName].stack
+      )
+      const isParentLid = getIsLid(labwareEntities[slotName].def)
+      location = isParentLid ? slot : labwareEntities[slotName].pythonName
+      const newLocationStack = prevRobotState.labware[slotName].stack
+      parentSlotForSlotCompatibility =
+        newLocationStack[newLocationStack.length - 1]
+    } else {
+      location = formatPyStr(slotName)
+      parentSlotForSlotCompatibility = slotName
+    }
   } else if ('addressableAreaName' in newLocation) {
     const is4thColumnSlot = COLUMN_4_SLOTS.includes(
       newLocation.addressableAreaName
@@ -325,16 +299,74 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     }
   }
 
+  // check compatibility of stack to move to
+  if (parentSlotForSlotCompatibility != null) {
+    const largestStackInSlot = getLargestStackInSlot(
+      prevRobotState.labware,
+      parentSlotForSlotCompatibility
+    )
+    const isCompatibleStack = getIsLabwareCompatibleWithStack(
+      labwareId,
+      largestStackInSlot,
+      labwareEntities
+    )
+    if (!isCompatibleStack) {
+      errors.push(errorCreators.multipleEntitiesOnSameSlotName())
+    }
+  }
+
+  if (errors.length > 0) {
+    return { errors }
+  }
+
   if (location === '') {
     console.error('expected to find a python new location but could not')
   }
 
   const pythonUseGripper = useGripper ? ', use_gripper=True' : ''
-  const python = `${PROTOCOL_CONTEXT_NAME}.move_labware(${labwarePythonName}, ${location}${pythonUseGripper})`
+  const isMovingLid = getIsLid(labwareEntities[labwareId].def)
+
+  const labwareToMoveStack = prevRobotState.labware[labwareId].stack
+
+  // transform target for move_lid source location
+  // if moving a lid from a stack, we use the slot of the stack
+  // if moving a lid from a labware, we use the labware's pythonName
+  let lidToMoveLocation = ''
+  if (isMovingLid) {
+    const parentId = getNearestParentInStack(labwareToMoveStack)
+    if (parentId == null) {
+      console.error(
+        'expected to find a parent for labware to move but could not'
+      )
+    } else {
+      const isParentLabware = labwareEntities[parentId] != null
+      const isParentLid =
+        isParentLabware && getIsLid(labwareEntities[parentId].def)
+      const isDirectlyOnSlot = labwareToMoveStack.length === 2 // lid and slot only
+      const isParentLidStack =
+        isDirectlyOnSlot || (isParentLabware && isParentLid)
+      if (isParentLidStack) {
+        lidToMoveLocation = formatPyStr(
+          getSlotInLocationStack(labwareToMoveStack)
+        )
+      } else if (isParentLabware || !getIsLid(labwareEntities[parentId].def)) {
+        // lid to move is on non-lid labware
+        lidToMoveLocation = labwareEntities[parentId].pythonName
+      }
+    }
+  }
+
+  if (isMovingLid && lidToMoveLocation === '') {
+    console.error('expected to find a valid lid move location but could not')
+  }
+
+  const python = isMovingLid
+    ? `${PROTOCOL_CONTEXT_NAME}.move_lid(${lidToMoveLocation}, ${location}${pythonUseGripper})`
+    : `${PROTOCOL_CONTEXT_NAME}.move_labware(${labwarePythonName}, ${location}${pythonUseGripper})`
 
   return {
     commands,
-    warnings: warnings.length > 0 ? warnings : undefined,
+    ...(warnings.length > 0 ? { warnings } : {}),
     python,
   }
 }

@@ -892,6 +892,37 @@ export const getTopLocationInStack = (stack?: string[]): string => {
   }
 }
 
+export const getNearestParentInStack = (stack: string[]): string | null =>
+  stack.length >= 2 ? stack[1] : null
+
+export const getLargestStackInSlot = (
+  labwareState: RobotState['labware'],
+  slot: string
+): string[] =>
+  Object.values(labwareState).reduce<string[]>((acc, { stack }) => {
+    if (stack[stack.length - 1] === slot && stack.length > acc.length) {
+      acc = stack
+    }
+    return acc
+  }, [])
+
+export const getIsLabwareCompatibleWithStack = (
+  labwareId: string,
+  stack: string[],
+  labwareEntities: LabwareEntities
+): boolean => {
+  const topLabwareEntity = labwareEntities[getTopLocationInStack(stack)]
+  if (topLabwareEntity != null) {
+    const loadNameToCheck = topLabwareEntity.def.parameters.loadName
+    return (
+      labwareEntities[labwareId].def.compatibleParentLabware?.some(
+        loadName => loadName === loadNameToCheck
+      ) ?? true // be permissive if `compatibleParentLabware` is undefined
+    )
+  }
+  return true
+}
+
 export const getModuleIdFromRobotStateStack = (
   modules: RobotState['modules'],
   stack?: string[]
