@@ -315,7 +315,7 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
       providesAddressableAreas: {
         cutoutD1: [],
         cutoutD2: [],
-        cutoutD3: ['96ChannelWasteChute', 'fakeD4'],
+        cutoutD3: ['1ChannelWasteChute', 'fakeD4'],
         cutoutC1: [],
         cutoutC2: [],
         cutoutC3: [],
@@ -703,6 +703,7 @@ export function getAAComboFixtureDisplayName(
   const translationFileName = 'deck_configuration'
   switch (cutoutFixtureId) {
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+    case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
           ? t(`${translationFileName}:module_in_port`, {
@@ -755,7 +756,7 @@ export function getFixtureDisplayName(
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       return 'Waste chute'
     case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute only with cover'
+      return 'Waste chute with cover'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
       return 'Waste chute with staging area slot'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
