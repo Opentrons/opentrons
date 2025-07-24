@@ -1167,12 +1167,13 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
         if tip != last_probed_tip_size:
+            _configure_tip_count(fixture_settings, 0)
             probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
             pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
             fixture_settings.pipette.require_liquid_presence(
                 fixture_settings.liquid_source
             )
-            last_probed_tip_size = fixture_settings.tip_sizes[0]
+            last_probed_tip_size = tip
             remove_tip(fixture_settings)
         volumes_to_tests = (
             fixture_settings.volumes[tip]
