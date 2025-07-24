@@ -117,7 +117,7 @@ This section covers using Protocol Designer to create and edit a Flex protocol. 
 [//]: # (temporary link, until we have an online/mkdocs PD manual)
 
 All work in Protocol Designer takes place within your web browser. When
-you're done creating or editing your protocol, you need to export it to
+you're done creating or editing your protocol, you'll need to export it to
 a Python file. Then upload that file to a robot and run it, as you would
 with any protocol.
 
@@ -130,10 +130,10 @@ and requires an internet connection. Newer versions of Protocol Designer require
 ### Designing a protocol
 
 Protocols are all about informing the robot what hardware it will use to
-take specific actions. This process is broken down into five steps in
+take specific actions. This process is broken down into four steps in
 Protocol Designer:
 
-| **Step** | **Description** |
+| Step | Description |
 | -------- | --------------- |
 | Protocol setup | Specify your robot, pipettes, modules, and other hardware (like the Flex Gripper). |
 | Protocol overview | View protocol details like instruments, liquids, and the protocol starting deck at a glance. |
@@ -142,15 +142,11 @@ Protocol Designer:
 
 ### Part 1: Create a protocol
 
-[//]: # (leaving these as H3; don't want to go further down)
-
 When you launch Protocol Designer, click to **Create a protocol**. Start by selecting pipettes and, if needed, a Flex Gripper to use with the Flex. You can also customize modules and fixtures, like the waste chute, trash bin, and staging areas, to optimize deck space. Only modules and fixtures compatible with Flex are available. 
 
 Protocol Designer protocols can control multiple Flex modules of the same type, except for the Thermocycler. At any time, you can edit the protocol to change your hardware configuration. 
 
 After naming your protocol, review the details in the protocol overview. Protocol Designer shows metadata, like the title and authors, instruments, liquids, and protocol steps. Click **Edit** in the upper right of each section to make changes. You can hover over the protocol starting deck on the right to view current deck slot details. 
-
-This overview is the first screen you'll see when you import an existing protocol into Protocol Designer. 
 
 <figure class="screenshot" markdown>
   ![Protocol overview](images/protocol_overview.png)
@@ -168,6 +164,8 @@ You can fully customize the Flex deck in Protocol Designer by adding compatible 
 Click **Liquids** in the upper right to add liquids in your protocol. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
 
 The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
+
+[//]: # (screenshot here? would make a nice break before the steps section)
 
 * **Transfer steps** move liquid from one well or group of wells to another. In the first transfer step menu, specify the basics: source and destination, pipette path, and tip management settings. Next, choose whether to apply liquid class settings in the transfer step. 
 
