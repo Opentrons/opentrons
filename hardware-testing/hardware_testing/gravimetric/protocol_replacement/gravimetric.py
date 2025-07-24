@@ -489,7 +489,10 @@ def _get_tips_for_test_single_multi(
     ]
     if fixture_settings.pipette_channels == 8:
         if fixture_settings.increment:
-            return tips.get_tips_for_all_channels_on_multi(fixture_settings.ctx, tip)
+            a_row_tips = tips.get_tips_for_all_channels_on_multi(
+                fixture_settings.ctx, tip
+            )
+            return [t for t in a_row_tips if t.has_tip]
         else:
             return tips.get_tips_for_individual_channel_on_multi(
                 fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
