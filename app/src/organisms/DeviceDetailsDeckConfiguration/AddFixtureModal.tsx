@@ -17,6 +17,7 @@ import {
 import {
   getAADisplayName,
   getFixtureDisplayName,
+  getMainAAForAFixture,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
@@ -40,6 +41,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000
@@ -247,14 +249,10 @@ export function AddFixtureModal({
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
-    const usbPort = (modulesData?.data ?? []).find(
+    const matchedModule = (modulesData?.data ?? []).find(
       m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
-    )?.usbPort
-    const portDisplay =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : usbPort?.port
-
+    )
+    const portDisplay = matchedModule ? getModuleUSBPort(matchedModule) : null
     const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
     if (
       fixtureSerialNumber !== undefined &&

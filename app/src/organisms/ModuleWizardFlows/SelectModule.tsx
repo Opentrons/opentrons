@@ -22,6 +22,7 @@ import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 
 import { useSendIdentifyStacker } from './hooks'
 
@@ -62,12 +63,8 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
-    const usbPort = module.usbPort
     const name = getModuleDisplayName(module.moduleModel)
-    const port =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : `${usbPort?.port}`
+    const port = getModuleUSBPort(module)
     return { name, port }
   }
 

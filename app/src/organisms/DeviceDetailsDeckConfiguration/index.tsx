@@ -70,7 +70,6 @@ export function DeviceDetailsDeckConfiguration({
     setShowSetupInstructionsModal,
   ] = useState<boolean>(false)
 
-  const { data: modulesData } = useModulesQuery()
   const deckConfig =
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
@@ -104,7 +103,6 @@ export function DeviceDetailsDeckConfiguration({
       {
         cutoutId,
         cutoutFixtureId,
-        opentronsModuleSerialNumber,
         addressableAreaId,
       }
     ) => {
@@ -120,21 +118,12 @@ export function DeviceDetailsDeckConfiguration({
       ) {
         return acc
       }
-      const usbPort = modulesData?.data.find(
-        m => m.serialNumber === opentronsModuleSerialNumber
-      )?.usbPort
-      const portDisplay =
-        usbPort?.hubPort != null
-          ? `${usbPort.port}.${usbPort.hubPort}`
-          : usbPort?.port
       const displayName =
         getAAComboFixtureDisplayName(
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
-          t as TFunction,
-          portDisplay
-        ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
+          t as TFunction) ?? getFixtureDisplayName(cutoutFixtureId)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
@@ -171,8 +160,8 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
-                )
+                getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+              )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
@@ -254,8 +243,8 @@ export function DeviceDetailsDeckConfiguration({
                 <DeckConfigurator
                   editableCutoutIds={
                     isRunRunning ||
-                    isMaintenanceRunExisting ||
-                    isEstopNotDisengaged
+                      isMaintenanceRunExisting ||
+                      isEstopNotDisengaged
                       ? []
                       : deckConfig.map(({ cutoutId }) => cutoutId)
                   }

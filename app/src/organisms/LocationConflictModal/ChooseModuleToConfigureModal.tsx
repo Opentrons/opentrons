@@ -31,6 +31,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
@@ -44,7 +45,7 @@ const MODULE_IDENTIFY_TIME_MS = 10000
 
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
-  usbPort?: number | string
+  usbPort?: string
   serialNumber?: string
 }
 interface ChooseModuleToConfigureModalProps {
@@ -105,13 +106,9 @@ export const ChooseModuleToConfigureModal = (
 
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
     attachedMod => {
-      const portDisplay =
-        attachedMod.usbPort.hubPort != null
-          ? `${attachedMod.usbPort.port}.${attachedMod.usbPort.hubPort}`
-          : attachedMod.usbPort.port
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: portDisplay,
+        usbPort: getModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
