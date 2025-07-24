@@ -302,7 +302,7 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
     <tr>
       <td>Yearly</td>
       <td>Evaluate pipette performance</td>
-      <td markdown>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the [published accuracy and precision standards][Pipette specifications].</td>
+      <td>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the <a href="../system-description/#pipette-specifications">published accuracy and precision standards</a>.</td>
     </tr>
   </tbody>
 </table>
