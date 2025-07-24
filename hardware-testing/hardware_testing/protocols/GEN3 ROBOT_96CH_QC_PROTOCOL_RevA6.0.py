@@ -1,4 +1,5 @@
 # flake8: noqa
+# mypy: ignore-errors
 
 from opentrons import protocol_api
 from opentrons import types

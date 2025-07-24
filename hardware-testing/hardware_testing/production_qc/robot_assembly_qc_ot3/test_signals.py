@@ -113,7 +113,7 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
                 await runner.run(can_messenger=messenger)
             except MotionFailedError:
                 print("caught MotionFailedError from estop")
-            except Exception as e:
+            except Exception:
                 # Ensure we have cleared the estop
                 await backend.release_estop()
                 backend.estop_acknowledge_and_clear()
@@ -136,10 +136,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             print(e)
             ui.get_user_ready("release the E-STOP")
             await _home()
-        except Exception as e:
+        except Exception:
             # Ensure we have cleared the estop
-            await api._backend.release_estop()
-            api._backend.estop_acknowledge_and_clear()
+            backend: OT3Controller = api._backend  # type: ignore[assignment]
+            await backend.release_estop()
+            backend.estop_acknowledge_and_clear()
             await _home()
 
     for sig_name in SIGNAL_TEST_NAMES:
