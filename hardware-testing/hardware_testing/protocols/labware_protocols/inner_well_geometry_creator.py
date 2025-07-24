@@ -62,7 +62,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["step", "step volume", "dispense volume", "tip-z-error", "error from nominal", "height", "hdelta"]
+CSV_HEADER = ["well", "step volume", "dispense volume", "tip-z-error", "error from nominal", "height", "hdelta"]
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -244,8 +244,6 @@ def _setup(
     return (
         liq_pipette,
         probe_pipette,
-        probing_rack,
-        liquid_rack,
         labware,
         src,
         dial,
@@ -393,7 +391,7 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    # defines alphas for different regions (under/over a threshold)
+    # defines alphas for different regions (under/over a threshold). this is kinda useless tbh 
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
@@ -510,6 +508,9 @@ def run(ctx: ProtocolContext) -> None:
         # pick up tip and remeasure if hdelta is negative 
         if hdelta < 0:
             ctx.comment("hdelta is negative, remeasuring height")
+            corrected_heights.remove(-1)
+            hdelta = corrected_heights[-1] - corrected_heights[-2] if len(corrected_heights) > 1 else 0.0 #recalculate hdelta 
+            step += 1 #dispense in new well 
             continue 
 
         write_trial_log()
