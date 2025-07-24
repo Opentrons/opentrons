@@ -44,6 +44,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
+  getModuleUSBPort,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -109,7 +110,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     <>
       {showOT2MoamHelp ? <OT2MultipleModulesHelp /> : null}
       {remainingAttachedModules.length !== 0 &&
-      missingModuleIds.length !== 0 ? (
+        missingModuleIds.length !== 0 ? (
         <UnMatchedModuleWarning />
       ) : null}
 
@@ -319,8 +320,8 @@ export function ModulesListItem({
   const stackerNeedsHome =
     attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
       ? attachedModuleMatch?.data.platformState === 'unknown' ||
-        attachedModuleMatch?.data.platformState === 'retracted' ||
-        attachedModuleMatch?.data.latchState !== 'closed'
+      attachedModuleMatch?.data.platformState === 'retracted' ||
+      attachedModuleMatch?.data.latchState !== 'closed'
       : false
   const stackerShuttleMissing =
     attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE
@@ -345,7 +346,7 @@ export function ModulesListItem({
           {t('setup_now')}
         </TertiaryButton>
         {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
-        isModuleTooHot ? (
+          isModuleTooHot ? (
           <Tooltip tooltipProps={tooltipProps}>
             {calibrateDisabledReason}
           </Tooltip>
@@ -386,11 +387,7 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
-
-  const portDisplay =
-    attachedModuleMatch?.usbPort?.hubPort != null
-      ? `${attachedModuleMatch.usbPort.port}.${attachedModuleMatch.usbPort.hubPort}`
-      : attachedModuleMatch?.usbPort?.port
+  const portDisplay = attachedModuleMatch ? getModuleUSBPort(attachedModuleMatch) : null
 
   return (
     <>
@@ -474,9 +471,7 @@ export function ModulesListItem({
             </LegacyStyledText>
             {portDisplay != null ? (
               <LegacyStyledText as="p">
-                {t('usb_port_number', {
-                  port: portDisplay,
-                })}
+                {portDisplay}
               </LegacyStyledText>
             ) : null}
           </Flex>
