@@ -9,11 +9,13 @@ import {
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMmFromBottom,
   getWellNamePerMultiTip,
   linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
+  SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
 
 import {
@@ -44,6 +46,7 @@ import type {
   LabwareDefinition2,
   PipetteChannels,
   PipetteV2Specs,
+  PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -356,7 +359,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutLocationHelper = (args: {
+export const mixBlowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -378,41 +381,25 @@ export const blowoutLocationHelper = (args: {
     offsetFromTopMm,
     invariantContext,
   } = args
-  if (!blowoutLocation) return []
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
-  const trashOrLabware = getTrashOrLabware(
-    labwareEntities,
-    wasteChuteEntities,
-    trashBinEntities,
-    destLabwareId
-  )
+  if (!blowoutLocation) {
+    return []
+  }
+  const { trashBinEntities, wasteChuteEntities } = invariantContext
 
-  let labware: LabwareEntity | null = null
+  let labwareId: string | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-    labware = invariantContext.labwareEntities[sourceLabwareId]
+    labwareId = sourceLabwareId
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware =
-      trashOrLabware === 'labware'
-        ? invariantContext.labwareEntities[destLabwareId]
-        : null
-    well = trashOrLabware === 'labware' ? destWell : null
-  } else {
-    // if it's not one of the magic strings, it's a labware or waste chute or trash bin id
-    labware = invariantContext.labwareEntities?.[blowoutLocation]
-    well = trashOrLabware === 'labware' ? 'A1' : null
+    labwareId = destLabwareId
+    well = destWell
   }
-
-  if (well != null && trashOrLabware === 'labware' && labware != null) {
+  if (well != null && labwareId != null) {
     return [
       curryCommandCreator(blowOutInWell, {
         pipetteId: pipette,
-        labwareId: labware.id,
+        labwareId: labwareId,
         wellName: well,
         flowRate,
         wellLocation: {
@@ -423,7 +410,7 @@ export const blowoutLocationHelper = (args: {
         },
       }),
     ]
-  } else if (trashOrLabware === 'wasteChute') {
+  } else if (wasteChuteEntities[blowoutLocation] != null) {
     return [
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
@@ -1150,4 +1137,37 @@ export const getTransferPlanAndReferenceVolumes = (args: {
       numWellsToFitInTip: maxSourcesPerAspiration,
     },
   }
+}
+
+export const getIsRetractSafeForAirGap = (args: {
+  retractZOffset: number
+  retractPositionReference: PositionReference
+  labwareEntities: LabwareEntities
+  labwareId: string
+  well: string | null
+}): boolean => {
+  const {
+    retractZOffset,
+    retractPositionReference,
+    labwareId,
+    labwareEntities,
+    well,
+  } = args
+  if (well == null) {
+    return false
+  }
+  const wellDepth = labwareEntities[labwareId]?.def.wells[well]?.depth
+  if (wellDepth == null) {
+    return false
+  }
+  const retractMmFromBottom = getMmFromBottom(
+    retractZOffset,
+    retractPositionReference,
+    wellDepth
+  )
+  if (retractMmFromBottom == null) {
+    return false
+  }
+  const retractZOffsetFromTop = retractMmFromBottom - wellDepth
+  return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
 }

@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  ALL,
+  COLUMN,
   getAllLiquidClassDefs,
   getFlexNameConversion,
 } from '@opentrons/shared-data'
 
 import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../../../../../constants'
+import { selectors as labwareIngredSelectors } from '../../../../../../labware-ingred/selectors'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormUnsavedChangedFields,
@@ -40,6 +43,42 @@ export function useAssignLiquidClass(
   const { t } = useTranslation('liquids')
   const liquids = useSelector(getLiquidEntities)
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const liquidEntities = useSelector(getLiquidEntities)
+  const allIngredientGroupFields = useSelector(
+    labwareIngredSelectors.allIngredientGroupFields
+  )
+  const liquidsInLabware = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )[formData[labwareField]]
+  const nozzlesConfigured = formData.nozzles
+  let channels = 1
+  if (nozzlesConfigured === COLUMN) {
+    channels = 8
+  } else if (nozzlesConfigured === ALL) {
+    channels = 96
+  }
+  const allWellsAdjustedForPipette =
+    channels !== 1
+      ? getAllWellsFromPrimaryWells(
+          formData[wellsField] as string[],
+          labwareEntities[formData[labwareField]]?.def,
+          channels as 8 | 96
+        )
+      : (formData[wellsField] as string[])
+
+  const liquidClassesInSourceWellsSet = allWellsAdjustedForPipette.reduce<
+    Set<string>
+  >((acc, wellName) => {
+    const liquidGroupsInWell = liquidsInLabware?.[wellName] ?? {}
+    for (const liquidGroup of Object.keys(liquidGroupsInWell)) {
+      const liquidClass = allIngredientGroupFields[liquidGroup]?.liquidClass
+      if (liquidClass != null) {
+        acc.add(liquidClass)
+      }
+    }
+    return acc
+  }, new Set<string>())
   const liquidClasses = getAllLiquidClassDefs()
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
@@ -59,7 +98,8 @@ export function useAssignLiquidClass(
     ...Object.entries(liquidClasses).map(([liquidClassName, def]) => ({
       name: def.displayName,
       value: liquidClassName,
-      subButtonLabel: (liquidClassToLiquidsMap[liquidClassName] != null
+      subButtonLabel: (liquidClassToLiquidsMap[liquidClassName] != null &&
+      liquidClassesInSourceWellsSet.has(liquidClassName)
         ? t('assigned_liquid', {
             liquidName: liquidClassToLiquidsMap[liquidClassName].join(', '),
           })
@@ -74,19 +114,6 @@ export function useAssignLiquidClass(
   )
   const aspirateLabwareLiquids =
     allWellContentsForActiveItem?.[formData[labwareField]]
-  const labwareEntities = useSelector(getLabwareEntities)
-  const pipetteEntities = useSelector(getPipetteEntities)
-  const liquidEntities = useSelector(getLiquidEntities)
-  const channels = pipetteEntities[formData.pipette]?.spec.channels ?? 1
-  const allWellsAdjustedForPipette =
-    channels !== 1
-      ? getAllWellsFromPrimaryWells(
-          formData[wellsField] as string[],
-          labwareEntities[formData[labwareField]]?.def,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          channels
-        )
-      : formData[wellsField]
 
   const [orderedLiquidClassOptions, setOrderedLiquidClassOptions] = useState<
     LiquidClassOption[]

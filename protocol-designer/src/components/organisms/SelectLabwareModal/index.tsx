@@ -84,11 +84,6 @@ import type { ThunkDispatch } from '../../../types'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
-const STACKING_LOADNAMES = [
-  'opentrons_flex_deck_riser',
-  'opentrons_flex_tiprack_lid',
-  'opentrons_tough_pcr_auto_sealing_lid',
-]
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 interface SelectLabwareModalProps {
@@ -219,7 +214,7 @@ export function SelectLabwareModal(
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
-        (!enableStacking && STACKING_LOADNAMES.includes(parameters.loadName))
+        (!enableStacking && parameters.loadName === 'opentrons_flex_deck_riser')
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
@@ -235,8 +230,9 @@ export function SelectLabwareModal(
         const category: string = def.metadata.displayCategory
         //  filter out non-permitted tipracks
         if (
-          category === 'tipRack' &&
-          !permittedTipracks.includes(getLabwareDefURI(def))
+          (category === 'tipRack' &&
+            !permittedTipracks.includes(getLabwareDefURI(def))) ||
+          (category === 'lid' && !enableStacking)
         ) {
           return acc
         }
@@ -574,7 +570,17 @@ export function SelectLabwareModal(
                                                 : uri,
                                           })
                                         )
+                                        dispatch(
+                                          selectAdapter({
+                                            adapterDefURI: null,
+                                          })
+                                        )
                                       }
+                                      dispatch(
+                                        selectLid({
+                                          labwareDefURI: null,
+                                        })
+                                      )
                                     }}
                                     isSelected={
                                       (isAdapter &&

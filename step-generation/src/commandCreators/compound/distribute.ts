@@ -24,6 +24,7 @@ import {
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatPyStr,
+  getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   getTransferPlanAndReferenceVolumes,
@@ -34,7 +35,7 @@ import {
 } from '../../utils'
 import {
   getCustomLiquidClassProperties,
-  getPythonLiquidClassName,
+  getLiquidClassName,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -384,7 +385,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
     ...(liquidClass != null
-      ? [`base_liquid_class=${getPythonLiquidClassName(liquidClass)}`]
+      ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
       args,
@@ -507,6 +508,26 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }) ?? dispenseFlowRateUlSec
 
   const destWellChunks = chunk(destWells, numWellsToFitInTip)
+
+  const isAspirateRetractSafeForAirGap = getIsRetractSafeForAirGap({
+    retractZOffset: aspirateRetractZOffset,
+    retractPositionReference: aspirateRetractPositionReference,
+    labwareId: sourceLabware,
+    labwareEntities,
+    well: sourceWell,
+  })
+  const preAspirateAirGapMoveToCommand =
+    !isAspirateRetractSafeForAirGap && sourceWell != null
+      ? [
+          curryWithoutPython(moveToWell, {
+            pipetteId: pipette,
+            labwareId: sourceLabware,
+            wellName: sourceWell,
+            wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+          }),
+        ]
+      : []
+
   const jsonCommandCreators = flatMap(
     destWellChunks,
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
@@ -567,6 +588,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
         }) ?? 0
+      const delayAfterDispenseCommands =
+        dispenseDelay != null
+          ? [
+              curryWithoutPython(delay, {
+                seconds: dispenseDelay.seconds,
+              }),
+            ]
+          : []
       const voidDispenseAirGapCommand =
         dispenseAirGapVolume > 0 &&
         !changeTipNow &&
@@ -586,6 +615,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   : {}),
                 pushOut: 0,
               }),
+              ...delayAfterDispenseCommands,
             ]
           : []
 
@@ -672,14 +702,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
               }),
             ]
           : []
-      const delayAfterDispenseCommands =
-        dispenseDelay != null
-          ? [
-              curryWithoutPython(delay, {
-                seconds: dispenseDelay.seconds,
-              }),
-            ]
-          : []
 
       const touchTipAfterAspirateRetractCommands = touchTipAfterAspirate
         ? [
@@ -696,7 +718,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 : {}),
             }),
             // move back to retract position after touch tip if air gap needed
-            ...(aspirateAirGapVolume > 0
+            // if retract isn't safe for air gap, air gap commands will include a move to well safe position
+            ...(aspirateAirGapVolume > 0 && isAspirateRetractSafeForAirGap
               ? [
                   curryWithoutPython(moveToWell, {
                     pipetteId: pipette,
@@ -721,6 +744,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const airGapAfterAspirateRetractCommands =
         aspirateAirGapVolume > 0
           ? [
+              ...preAspirateAirGapMoveToCommand,
               curryWithoutPython(airGapInPlace, {
                 pipetteId: pipette,
                 volume: aspirateAirGapVolume,
@@ -765,6 +789,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 volume: conditioningVolume,
                 flowRate: dispenseFlowRateUlSec,
                 correctionVolume: dispenseCorrectionVolumeForConditioningVolume,
+                pushOut: 0,
               }),
               ...delayAfterDispenseCommands,
             ]
@@ -833,6 +858,25 @@ export const distribute: CommandCreator<DistributeArgs> = (
               byVolumeProperty: 'correctionByVolume',
               defaultValue: 0,
             }) ?? 0
+
+          const isDispenseRetractSafeForAirGap = getIsRetractSafeForAirGap({
+            retractZOffset: dispenseRetractZOffset,
+            retractPositionReference: dispenseRetractPositionReference,
+            labwareId: destLabware,
+            labwareEntities,
+            well: destinationWell,
+          })
+          const preDispenseAirGapMoveToCommand = !isDispenseRetractSafeForAirGap
+            ? [
+                curryWithoutPython(moveToWell, {
+                  pipetteId: pipette,
+                  labwareId: destLabware,
+                  wellName: destinationWell,
+                  wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
+                }),
+              ]
+            : []
+
           const dispenseSubmergeCommands =
             destinationWell != null
               ? [
@@ -951,7 +995,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               defaultValue: 0,
             }) ?? 0
           const getAirGapAfterDispenseCommands = (
-            considerUltimateSubtransfer: boolean
+            considerUltimateSubtransfer: boolean,
+            considerRetractSafety: boolean = true
           ): CurriedCommandCreator[] =>
             dispenseAirGapVolume > 0 &&
             // don't air gap if not last well in chunk and conditioning volume is present
@@ -967,6 +1012,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               considerUltimateSubtransfer
             )
               ? [
+                  ...(considerRetractSafety
+                    ? preDispenseAirGapMoveToCommand
+                    : []),
                   curryWithoutPython(prepareToAspirate, {
                     pipetteId: pipette,
                   }),
@@ -1001,9 +1049,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
                       : {}),
                   }),
                   // move back to retract position after touch tip if air gap needed
+                  // if retract isn't safe for air gap, air gap commands will include a move to well safe position
                   ...(getAirGapAfterDispenseCommands(
                     considerUltimateSubtransfer
-                  ).length > 0
+                  ).length > 0 && isDispenseRetractSafeForAirGap
                     ? [
                         curryWithoutPython(moveToWell, {
                           pipetteId: pipette,
@@ -1082,7 +1131,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     }),
                   ]
                 : []),
-              ...finalAirGapAfterDispenseCommands,
+              ...getAirGapAfterDispenseCommands(true, false),
             ]
           } else {
             // trash or waste chute
@@ -1102,7 +1151,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 },
               }),
               ...blowoutInPlaceCommand,
-              ...getAirGapAfterDispenseCommands(true),
+              ...getAirGapAfterDispenseCommands(true, false),
             ]
           }
 

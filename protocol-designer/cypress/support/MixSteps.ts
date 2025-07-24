@@ -341,7 +341,7 @@ export const MixSteps = {
         .should('exist')
         .should('be.visible')
         .should('have.prop', 'value')
-      cy.get(MixLocators.BlowoutPos).click()
+      cy.get(MixLocators.BlowoutPos).click({ force: true })
       cy.get(MixLocators.BlowoutZPosition).type('{selectAll}{backspace}4')
       cy.get(MixLocators.ResetToDefault).click()
       cy.get(MixLocators.BlowoutZPosition).type('{selectAll}{backspace}-3')

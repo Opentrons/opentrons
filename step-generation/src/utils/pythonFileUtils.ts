@@ -9,11 +9,14 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { getPythonLiquidClassName } from './liquidClassUtils'
+import { getLiquidClassName } from './liquidClassUtils'
+import { getSlotInLocationStack } from './misc'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
+  getChunkForIndentingLists,
+  INDENT,
   indentPyLines,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
@@ -23,6 +26,7 @@ import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
+  LabwareEntity,
   LabwareLiquidState,
   LiquidEntities,
   ModuleEntities,
@@ -110,7 +114,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace } = def
+      const { parameters, namespace, version } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -132,10 +136,7 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -172,7 +173,7 @@ export function getLoadLabware(
   const pythonLabware = Object.values(labwareEntities)
     .map(labware => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace } = def
+      const { metadata, parameters, namespace, version } = def
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -204,10 +205,7 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_labware(\n` +
@@ -236,32 +234,55 @@ export function getLoadLabware(
 export function getLoadPipettes(
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware'],
   pipetteRobotState: TimelineFrame['pipettes']
 ): string {
   const pythonPipette = Object.values(pipetteEntities)
     .map(pipette => {
       const { name, id, spec, pythonName, tiprackDefURI } = pipette
       const mount =
-        spec.channels === 96
-          ? ''
-          : `, ${formatPyStr(pipetteRobotState[id].mount)}`
+        spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const tiprackPythonNames = tiprackDefURI
-        .flatMap(defURI =>
-          Object.values(labwareEntities).filter(
-            lw => lw.labwareDefURI === defURI
-          )
-        )
+      const allTipracks = tiprackDefURI.reduce(
+        (acc: LabwareEntity[], defURI) => {
+          for (const lw of Object.values(labwareEntities)) {
+            if (lw.labwareDefURI === defURI) {
+              acc.push(lw)
+            }
+          }
+          return acc
+        },
+        []
+      )
+      const onDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
+          'offDeck'
+      )
+      const offDeckTipracks = allTipracks.filter(
+        tiprack =>
+          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
+          'offDeck'
+      )
+      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
         .map(tiprack => tiprack.pythonName)
         .join(', ')
       const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `, tip_racks=[${tiprackPythonNames}]`
+        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
-      return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(${formatPyStr(
-        pipetteName
-      )}${mount}${pythonTipRacks})`
+      return (
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
+        `${indentPyLines(
+          [
+            formatPyStr(pipetteName),
+            ...(mount ? [mount] : []),
+            ...(pythonTipRacks ? [pythonTipRacks] : []),
+          ].join(', ')
+        )},\n` +
+        ')'
+      )
     })
     .join('\n')
 
@@ -293,19 +314,67 @@ export function getLoadLiquids(
   liquidEntities: LiquidEntities,
   labwareEntities: LabwareEntities
 ): string {
-  const pythonLoadLiquids = Object.entries(liquidsByLabwareId)
-    .flatMap(([labwareId, liquidState]) => {
+  const groupedLiquids = Object.entries(liquidsByLabwareId).reduce(
+    (
+      acc: Record<
+        string,
+        {
+          labwarePythonName: string
+          liquidPythonName: string
+          volume: number
+          wells: string[]
+        }
+      >,
+      [labwareId, liquidState]
+    ) => {
       const labwarePythonName = labwareEntities[labwareId].pythonName
 
-      return Object.entries(liquidState).flatMap(([well, locationState]) =>
-        Object.entries(locationState)
-          .map(([liquidGroupId, volume]) => {
-            const liquidPythonName = liquidEntities[liquidGroupId].pythonName
-            return `${labwarePythonName}[${formatPyStr(
-              well
-            )}].load_liquid(${liquidPythonName}, ${volume.volume})`
-          })
-          .join('\n')
+      Object.entries(liquidState).forEach(([well, locationState]) => {
+        Object.entries(locationState).forEach(([liquidGroupId, volumeInfo]) => {
+          const liquidPythonName = liquidEntities[liquidGroupId].pythonName
+
+          const key = `${labwarePythonName}__${liquidPythonName}__${volumeInfo.volume}`
+          if (!acc[key]) {
+            acc[key] = {
+              labwarePythonName,
+              liquidPythonName,
+              volume: volumeInfo.volume,
+              wells: [],
+            }
+          }
+          acc[key].wells.push(well)
+        })
+      })
+
+      return acc
+    },
+    {}
+  )
+
+  const pythonLoadLiquids = Object.values(groupedLiquids)
+    .map(({ labwarePythonName, liquidPythonName, volume, wells }) => {
+      const formattedWells = wells.map(w => formatPyStr(w))
+      const wellChunks = getChunkForIndentingLists(formattedWells, 8)
+
+      const indentedWells = wellChunks
+        .map(chunk => INDENT + chunk.join(', '))
+        .join(',\n')
+
+      const pythonWells =
+        formattedWells.length < 8
+          ? formattedWells.join(', ')
+          : `\n${indentedWells}\n`
+
+      const loadLiquidArgs = [
+        `wells=[${pythonWells}],\n` +
+          `liquid=${liquidPythonName},\n` +
+          `volume=${volume},\n`,
+      ].join()
+
+      return (
+        `${labwarePythonName}.load_liquid(\n` +
+        `${indentPyLines(loadLiquidArgs)}` +
+        `)`
       )
     })
     .join('\n')
@@ -321,8 +390,9 @@ export function getLoadLiquidClasses(
       if (liquidClass == null) {
         return ''
       }
-      return `${getPythonLiquidClassName(
-        liquidClass
+      return `${getLiquidClassName(
+        liquidClass,
+        true
       )} = ${PROTOCOL_CONTEXT_NAME}.get_liquid_class(${formatPyStr(
         allLiquidClassDefs[liquidClass].liquidClassName
       )})`
@@ -399,7 +469,7 @@ export function pythonDefRun(
       labware,
       labwareNicknamesById
     ),
-    getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
+    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
           getLoadTrashBins(trashBinEntities),
