@@ -35,6 +35,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -51,7 +52,6 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { getModuleTooHot } from '/app/transformations/modules'
-import { getModuleUSBPort } from '/app/local-resources/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
@@ -434,7 +434,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                    slotName != null
+                  slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
                   {getModuleUSBPort(module) ?? t('usb_port_not_connected')}

@@ -29,9 +29,9 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
-import { getModuleUSBPort } from '/app/local-resources/modules'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 

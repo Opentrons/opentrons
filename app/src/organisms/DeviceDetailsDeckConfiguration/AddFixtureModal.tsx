@@ -17,13 +17,13 @@ import {
 import {
   getAADisplayName,
   getFixtureDisplayName,
-  getMainAAForAFixture,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
@@ -41,7 +41,6 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import { getModuleUSBPort } from '/app/local-resources/modules'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000

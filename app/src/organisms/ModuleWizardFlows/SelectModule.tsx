@@ -17,12 +17,12 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
-import { getModuleUSBPort } from '/app/local-resources/modules'
 
 import { useSendIdentifyStacker } from './hooks'
 

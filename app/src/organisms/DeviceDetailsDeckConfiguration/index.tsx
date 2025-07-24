@@ -20,7 +20,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
@@ -98,14 +97,7 @@ export function DeviceDetailsDeckConfiguration({
     displayList: Array<{ displayLocation: string; displayName: string }>
     groupedCutoutIds: CutoutId[]
   }>(
-    (
-      acc,
-      {
-        cutoutId,
-        cutoutFixtureId,
-        addressableAreaId,
-      }
-    ) => {
+    (acc, { cutoutId, cutoutFixtureId, addressableAreaId }) => {
       const areaInCheck = getAAByAAId(addressableAreaId, deckDef)
       const shouldShowAA =
         areaInCheck.areaType !== 'slot' &&
@@ -123,7 +115,8 @@ export function DeviceDetailsDeckConfiguration({
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
-          t as TFunction) ?? getFixtureDisplayName(cutoutFixtureId)
+          t as TFunction
+        ) ?? getFixtureDisplayName(cutoutFixtureId)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
@@ -160,8 +153,8 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                getAAWithFakesFromVSId(vsId) ?? addressableAreaId
-              )
+                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+                )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
@@ -243,8 +236,8 @@ export function DeviceDetailsDeckConfiguration({
                 <DeckConfigurator
                   editableCutoutIds={
                     isRunRunning ||
-                      isMaintenanceRunExisting ||
-                      isEstopNotDisengaged
+                    isMaintenanceRunExisting ||
+                    isEstopNotDisengaged
                       ? []
                       : deckConfig.map(({ cutoutId }) => cutoutId)
                   }

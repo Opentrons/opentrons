@@ -12,8 +12,8 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { getModuleUSBPort } from '/app/local-resources/modules'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
+import { getModuleUSBPort } from '/app/local-resources/modules'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '/app/redux/modules/types'

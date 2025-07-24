@@ -33,7 +33,11 @@ export function ModulesAndDeckMapView({
       <ModuleInfo
         moduleModel={module.moduleDef.model}
         isAttached={module.attachedModuleMatch != null}
-        physicalPort={module.attachedModuleMatch ? getModuleUSBPort(module.attachedModuleMatch) : null}
+        physicalPort={
+          module.attachedModuleMatch
+            ? getModuleUSBPort(module.attachedModuleMatch)
+            : null
+        }
         runId={runId}
       />
     ),
