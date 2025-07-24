@@ -221,7 +221,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     },
   ]
 
-  const labwarePythonName = labwareEntities[labwareId].pythonName
+  const labwarePythonName = labwareEntities[labwareId]?.pythonName ?? ''
   let location: string = ''
   let parentSlotForSlotCompatibility: string | null = null
   if (newLocation === 'offDeck') {
@@ -234,6 +234,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     parentSlotForSlotCompatibility =
       newLocationStack[newLocationStack.length - 1]
   } else if ('moduleId' in newLocation) {
+    parentSlotForSlotCompatibility =
+      prevRobotState.modules[newLocation.moduleId].slot
     location = moduleEntities[newLocation.moduleId].pythonName
   } else if ('slotName' in newLocation) {
     const { slotName } = newLocation
@@ -293,7 +295,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     } else if (matchingTrashId != null && !isWasteChuteLocation) {
       location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {
-      location = Object.values(wasteChuteEntities)[0].pythonName ?? ''
+      location = Object.values(wasteChuteEntities)[0]?.pythonName ?? ''
     } else {
       location = ''
     }
