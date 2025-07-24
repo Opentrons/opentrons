@@ -203,6 +203,14 @@ describe('moveLabware', () => {
       ...invariantContext,
       labwareEntities: {
         ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          pythonName: 'mock_source_plate',
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            compatibleParentLabware: ['fixture_flex_96_tiprack_adapter'],
+          } as LabwareDefinition2,
+        },
         [DEST_LABWARE]: {
           def: fixtureTiprackAdapter as LabwareDefinition2,
           pythonName: 'mock_dest_adapter',
@@ -342,6 +350,7 @@ describe('moveLabware', () => {
       strategy: 'usingGripper',
       newLocation: { slotName: '1' },
     } as MoveLabwareParams
+
     robotState = {
       ...robotState,
       ...robotState.labware,
@@ -358,10 +367,17 @@ describe('moveLabware', () => {
       ...invariantContext,
       labwareEntities: {
         ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            compatibleParentLabware: ['fixture_12_trough'],
+          } as LabwareDefinition2,
+          pythonName: 'mock_source_plate',
+        },
         stackingLabware: {
           def: {
             ...fixture12Trough,
-            compatibleParentLabware: ['fixture_96_plate'],
           } as LabwareDefinition2,
         } as any,
       },
@@ -389,11 +405,23 @@ describe('moveLabware', () => {
 
     robotState = {
       ...state,
-
       labware: {
         ...state.labware,
         mockLabwareId: {
           stack: ['mockLabwareId', HEATER_SHAKER_ID, HEATER_SHAKER_SLOT],
+        },
+      },
+      modules: {
+        ...state.modules,
+        [HEATER_SHAKER_ID]: {
+          ...state.modules[HEATER_SHAKER_ID],
+          slot: HEATER_SHAKER_SLOT,
+          moduleState: {
+            type: HEATERSHAKER_MODULE_TYPE,
+            latchOpen: true,
+            targetSpeed: null,
+            targetTemp: null,
+          },
         },
       },
     }
@@ -529,6 +557,16 @@ describe('moveLabware', () => {
     const HEATER_SHAKER_ID = 'heaterShakerId'
     const HEATER_SHAKER_SLOT = 'A1'
 
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [HEATER_SHAKER_ID]: {
+          ...invariantContext.moduleEntities[HEATER_SHAKER_ID],
+          pythonName: 'mock_heater_shaker',
+        },
+      },
+    }
+
     robotState = {
       ...state,
       modules: {
@@ -560,6 +598,22 @@ describe('moveLabware', () => {
     const HEATER_SHAKER_ID = 'heaterShakerId'
     const HEATER_SHAKER_SLOT = 'A1'
     const ADAPTER_ID = 'adapterId'
+
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [ADAPTER_ID]: {
+          ...invariantContext.labwareEntities[ADAPTER_ID],
+          def: {
+            parameters: {
+              loadName: 'opentrons_96_wellplate_200ul_pcr_full_skirt',
+            },
+          } as LabwareDefinition2,
+          pythonName: 'mock_adapter',
+        },
+      },
+    }
 
     robotState = {
       ...state,
@@ -597,6 +651,16 @@ describe('moveLabware', () => {
     const state = getInitialRobotStateStandard(invariantContext)
     const HEATER_SHAKER_ID = 'heaterShakerId'
     const HEATER_SHAKER_SLOT = 'A1'
+
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [HEATER_SHAKER_ID]: {
+          ...invariantContext.moduleEntities[HEATER_SHAKER_ID],
+          pythonName: 'mock_heater_shaker',
+        },
+      },
+    }
 
     robotState = {
       ...state,
