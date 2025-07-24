@@ -352,8 +352,8 @@ def run(ctx: ProtocolContext) -> None:
 
     # Constants
     max_volume = labware["A1"].max_volume
-    min_step = max(max_volume * 0.005, 5)
-    max_step = min(max_volume * 0.08, 1000)
+    min_step = max(max_volume * 0.005, 2)
+    max_step = min(max_volume * 0.08, 8000)
     tolerance = (
         max_volume / 30
     )  # if the height within tolerance, then protocol can finish.
@@ -461,7 +461,7 @@ def run(ctx: ProtocolContext) -> None:
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
         #first, check if the step exceeds the number of wells
-        if step >= len(wells):
+        if step > len(wells):
             reload_labware()
             step = 1
 
@@ -506,7 +506,7 @@ def run(ctx: ProtocolContext) -> None:
         # pick up tip and remeasure if hdelta is negative 
         if hdelta < 0:
             ctx.comment("hdelta is negative, remeasuring height")
-            corrected_heights.remove(-1)
+            corrected_heights.pop()
             hdelta = corrected_heights[-1] - corrected_heights[-2] if len(corrected_heights) > 1 else 0.0 #recalculate hdelta 
             step += 1 #dispense in new well 
             continue 
