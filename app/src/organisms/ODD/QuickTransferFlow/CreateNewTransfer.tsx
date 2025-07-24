@@ -4,9 +4,8 @@ import {
   DeckConfigurator,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -49,8 +48,8 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
               i18nKey="use_deck_slots"
               components={{
                 block: (
-                  <LegacyStyledText
-                    css={TYPOGRAPHY.level4HeaderRegular}
+                  <StyledText
+                    oddStyle="level4HeaderRegular"
                     marginBottom={SPACING.spacing16}
                   />
                 ),

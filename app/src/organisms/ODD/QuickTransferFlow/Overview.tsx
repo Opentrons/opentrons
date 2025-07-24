@@ -5,11 +5,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   NO_WRAP,
   SPACING,
-  TEXT_ALIGN_RIGHT,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -104,20 +103,20 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       {displayItems.map(displayItem => (
         <ListItem type="default" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <LegacyStyledText
-              css={TYPOGRAPHY.level4HeaderSemiBold}
+            <StyledText
+              oddStyle="level4HeaderRegular"
               width="20rem"
               whiteSpace={NO_WRAP}
             >
               {displayItem.option}
-            </LegacyStyledText>
-            <LegacyStyledText
-              css={TYPOGRAPHY.level4HeaderRegular}
+            </StyledText>
+            <StyledText
+              oddStyle="level4HeaderRegular"
               color={COLORS.grey60}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {displayItem.value}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </ListItem>
       ))}
