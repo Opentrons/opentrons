@@ -1,11 +1,6 @@
 import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Flex,
-  JUSTIFY_CENTER,
-  RESPONSIVENESS,
-} from '@opentrons/components'
+import { AnimationVideo, RESPONSIVENESS } from '@opentrons/components'
 
 import type { JSX } from 'react'
 
@@ -19,21 +14,15 @@ export function RightColumnAnimation(
   const { animationSrc } = props
 
   return (
-    <Flex css={ANIMATION_CONTAINER_STYLE}>
-      <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
-        <source src={animationSrc} data-testid="animation" />
-      </AnimationVideo>
-    </Flex>
+    <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
+      <source src={animationSrc} data-testid="animation" />
+    </AnimationVideo>
   )
 }
 
-const ANIMATION_CONTAINER_STYLE = css`
-  justify-content: ${JUSTIFY_CENTER};
-  overflow: hidden;
-  max-height: 13.25rem;
-`
-
 const ANIMATION_STYLE = css`
+  width: 100%;
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 27rem;
     height: 20.25rem;

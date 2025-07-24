@@ -69,6 +69,7 @@ const Template: Story<{
         orientation={args.orientation}
         targetSlotId={null}
         targetDeckId={null}
+        childrenPositioningMode="offsetToSlot"
       >
         {args.hasLabware ? (
           <LabwareRender

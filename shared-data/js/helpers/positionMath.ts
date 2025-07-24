@@ -50,15 +50,25 @@ export function getLabwareViewBox(
   minX: number
   /** The minimum y-coord, i.e. the front of the labware. */
   minY: number
+  /** The maximum x-coord, i.e. the right of the labware. */
+  maxX: number
+  /** The maximum y-coord, i.e. the back of the labware. */
+  maxY: number
+  /** The distance between left and right. */
   xDimension: number
+  /** The distance between front and back. */
   yDimension: number
 } {
   if (definition.schemaVersion === 2) {
     const { xDimension, yDimension } = definition.dimensions
+    // In labware schema 2, the front-left is always at (0, 0) by definition.
+    const minX = 0
+    const minY = 0
     return {
-      // In labware schema 2, the front-left is always at (0, 0) by definition.
-      minX: 0,
-      minY: 0,
+      minX,
+      minY,
+      maxX: minX + xDimension,
+      maxY: minY + yDimension,
       xDimension,
       yDimension,
     }
@@ -71,6 +81,8 @@ export function getLabwareViewBox(
     return {
       minX,
       minY,
+      maxX,
+      maxY,
       xDimension: maxX - minX,
       yDimension: maxY - minY,
     }

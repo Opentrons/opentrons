@@ -14,7 +14,8 @@
       "require": "./lib/index.mjs",
       "default": "./lib/index.mjs"
     },
-    "./styles": "./lib/style.css"
+    "./styles": "./src/index.module.css",
+    "./styles/global": "./lib/style.css"
   },
   "repository": {
     "type": "git",
