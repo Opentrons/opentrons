@@ -36,6 +36,8 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
+  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -50,6 +52,7 @@ interface AddFixtureModalProps {
   closeModal: () => void
   deckDef: DeckDefinition
   isOnDevice?: boolean
+  existingCutoutFixtureId?: CutoutFixtureId
 }
 type OptionStage =
   | 'modulesOrFixtures'
@@ -64,6 +67,7 @@ export function AddFixtureModal({
   closeModal,
   isOnDevice = false,
   deckDef,
+  existingCutoutFixtureId,
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -104,11 +108,7 @@ export function AddFixtureModal({
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
   }
-
-  // Check if there's already a stacker in this slot
-  const existingCutoutConfig = deckConfigWithAA.find(
-    cutoutConfig => cutoutConfig.cutoutId === cutoutId
-  )
+  console.log("existingCutoutFixtureId: ", existingCutoutFixtureId)
 
   const availableOptions = getOptions(
     cutoutId,
@@ -116,7 +116,7 @@ export function AddFixtureModal({
     optionStage,
     addressableAreaId,
     deckDef,
-    existingCutoutConfig?.cutoutFixtureId
+    existingCutoutFixtureId
   )
 
   let nextStageOptions = null

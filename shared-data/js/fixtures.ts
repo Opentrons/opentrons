@@ -1070,7 +1070,8 @@ export const getAAForModuleFixture = (
 export const getMainAAForAFixture = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): AddressableAreaNamesWithFakes | null => {
   const addressableAreasByFIxtureId = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,

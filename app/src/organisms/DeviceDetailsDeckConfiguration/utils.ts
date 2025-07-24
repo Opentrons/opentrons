@@ -230,7 +230,8 @@ export const getFixtureOptions = (
   const TrashBinAA = getMainAAForAFixture(
     cutoutId,
     TRASH_BIN_ADAPTER_FIXTURE,
-    addressableAreaId
+    addressableAreaId,
+    existingCutoutFixtureId
   )
   const hasStackerInSlot = existingCutoutFixtureId
     ? STAGING_AREA_CUTOUTS.includes(cutoutId) &&
