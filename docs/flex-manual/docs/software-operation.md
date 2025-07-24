@@ -243,10 +243,12 @@ move the pipette quickly, but beware of crashing the pipette into
 labware.</figcaption>
 </figure>
 
+<!-- commenting this, no image, TK placeholder text below
 <figure class="screenshot" markdown>
 TK image of 8.4 LPC
 <figcaption>Summary of new labware offsets ready to be applied to a protocol.</figcaption>
 </figure>
+-->
 
 When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
 
@@ -320,6 +322,7 @@ Flex provides a protocol recovery path for the following error conditions.
         </ul>
       </td>
     </tr>
+    <tr>
       <td>General errors</td>
       <td>A catch-all category for other errors.</td>
       <td>
@@ -329,8 +332,7 @@ Flex provides a protocol recovery path for the following error conditions.
           <li>Cancel protocol run.</li>
         </ul>
       </td>
-    </tr>
-  </tbody>
+    </tr> </tbody>
 </table>
 
 !!! note
@@ -749,7 +751,7 @@ Flex *will not* retain information about more than 20 runs on the robot. Proceed
 
 You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
-!!!Note
+!!!note
     - SSH keys are required before you can connect to Flex and issue commands from a terminal.
     - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
 
