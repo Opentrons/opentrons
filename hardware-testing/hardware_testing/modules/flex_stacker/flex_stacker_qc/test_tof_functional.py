@@ -13,7 +13,7 @@ from hardware_testing.data.csv_report import (
     CSVResult,
 )
 
-from .utils import verify_platform_location
+from .utils import convert_histogram_bins_to_csv_string, verify_platform_location
 
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.drivers.flex_stacker.types import (
@@ -115,6 +115,7 @@ async def test_tof_sensors_labware_detection(
 
     print(f"Getting histogram for {sensor}.")
     histogram = await stacker._driver.get_tof_histogram(sensor)
+    histogram_string = convert_histogram_bins_to_csv_string(histogram.bins)
 
     print(f"Verifying Labware Presence for {sensor}.")
     labware_expected = labware != "empty"
@@ -136,7 +137,7 @@ async def test_tof_sensors_labware_detection(
             baseline_result,
             "HISTOGRAM",
             CSVResult.from_bool(runtime_result),
-            str(histogram.bins),
+            histogram_string,
         ],
     )
 

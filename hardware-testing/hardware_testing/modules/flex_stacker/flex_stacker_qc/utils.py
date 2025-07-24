@@ -1,5 +1,6 @@
 """Utility functions for the Flex Stacker EVT QC module."""
 import re
+from typing import Dict, List
 from serial.tools.list_ports import comports  # type: ignore[import]
 
 from opentrons.drivers.flex_stacker.driver import FlexStackerDriver
@@ -89,3 +90,12 @@ async def verify_platform_location(stacker: FlexStacker) -> None:
         assert (
             stacker.platform_state == PlatformState.EXTENDED
         ), "FAILURE - Cannot start test without the platform on the carrier."
+
+
+def convert_histogram_bins_to_csv_string(histogram: Dict[int, List[float]]) -> str:
+    """Convert histogram Dict[int, List[float]] to csv friendly string."""
+    lines = []
+    for bin_id in sorted(histogram):  # Sort for consistent order
+        values = ",".join(f"{v:.6g}" for v in histogram[bin_id])
+        lines.append(f"{bin_id},{values}")
+    return ",".join(lines)
