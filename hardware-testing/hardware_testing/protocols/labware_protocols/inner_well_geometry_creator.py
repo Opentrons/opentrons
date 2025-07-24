@@ -163,11 +163,9 @@ def _setup(
     Labware,
     bool,
     float,
-    bool,
     LiquidClass,
     float,
     float,
-    str,
     Labware,
 ]:
 
@@ -211,7 +209,6 @@ def _setup(
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     # liquid classing
-
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class("ethanol_80")
@@ -344,8 +341,6 @@ def run(ctx: ProtocolContext) -> None:
     (
         liq_pipette,
         probe_pipette,
-        probing_rack,
-        liquid_rack,
         labware,
         src,
         dial,
@@ -437,7 +432,7 @@ def run(ctx: ProtocolContext) -> None:
 
     def write_trial_log() -> None:
         trial_data = [
-            step,
+            well,
             round(step_volume, 5),
             round(total_vol, 5),
             round(tip_z_error, 5),
@@ -474,16 +469,17 @@ def run(ctx: ProtocolContext) -> None:
             labware = reload_labware(ctx, labware_type, "B3", ctx.params.labware_version)
             step = 0
 
+        #log step 0 in the csv 
         if step == 0:
             src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
-        #initial dispense
+        #step 1: initial dispense
         elif step == 1:
             step_volume = first_dispense if dynamic_steps else max_volume / number_of_steps
-        #adaptive step volume
+        #step > 1: adaptive step volume
         elif dynamic_steps and len(corrected_heights) > 1:
             step_volume = adaptive_volume_step(
                 hdelta, corrected_height, step_volume, neutral_target
-            ) #to do: modify this to take step_volume as param, or dispense_volume? 
+            ) 
 
         # track volumes 
         dispense_volume += step_volume
@@ -498,24 +494,23 @@ def run(ctx: ProtocolContext) -> None:
                 new_tip="never",
                 return_tip=False,
             )
-            # Measure height
+            
             height = probe_pipette.measure_liquid_height(labware[well])
         
         corrected_height = height + tip_z_error
 
+        # Error from nominal (api)
         api_vol = labware[well].height_from_volume(dispense_volume)
         vol_diff = api_vol - corrected_height
 
+        # Calculating change in height from previous step
         corrected_heights.append(corrected_height)
         hdelta = corrected_heights[-1] - corrected_heights[-2] if len(corrected_heights) > 1 else 0.0
 
         # pick up tip and remeasure if hdelta is negative 
         if hdelta < 0:
             ctx.comment("hdelta is negative, remeasuring height")
-            liq_pipette.drop_tip()
-            liq_pipette.pick_up_tip()
-            height = probe_pipette.measure_liquid_height(labware[well])
-            corrected_height = height + tip_z_error
+            continue 
 
         write_trial_log()
 
