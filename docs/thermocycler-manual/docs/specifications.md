@@ -4,7 +4,7 @@ title: "Thermocycler GEN2 Instruction Manual: Product Specifications"
 
 # Product Specifications
 
-![Thermocycler with labeled main features](../images/Specifications-PLACEHOLDER.png)
+![Thermocycler with labeled main features](../images/specifications.png)
 
 ## Model Number
 
@@ -12,7 +12,7 @@ TCG2
 
 ## Included Parts
 
-![Thermocycler box contents and quantities](../images/box-contents-PLACEHOLDER.png)
+![Thermocycler box contents and quantities](../images/box-contents.png)
 
 ## Physical Specifications
 
