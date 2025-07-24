@@ -24,6 +24,7 @@ import {
 
 import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
+  ChangeTipOptions,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -509,5 +510,19 @@ export function pythonCustomLabwareDict(
     )}""")`
   } else {
     return ''
+  }
+}
+
+export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
+  switch (changeTip) {
+    case 'perDest': {
+      return 'per destination'
+    }
+    case 'perSource': {
+      return 'per source'
+    }
+    default: {
+      return changeTip
+    }
   }
 }
