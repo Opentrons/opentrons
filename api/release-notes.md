@@ -10,7 +10,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 8.5.1
 
-The 8.5.1 hotfix release fixes two bugs:
+The 8.5.1 hotfix release fixes these bugs:
 
 - Corrected behavior when performing multi-dispense actions using a custom or modified liquid class.
 - Fixed a problem where certain quick transfers (specifically ones that attempt to blow out over the waste chute) could not be run.
