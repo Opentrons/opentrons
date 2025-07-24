@@ -35,8 +35,8 @@ import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
-  ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsHeaderChipSkeleton,
+  ProtocolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
@@ -150,7 +150,7 @@ const QuickTransferHeader = ({
               {displayedTitle}
             </LegacyStyledText>
           ) : (
-            <ProcotolDetailsHeaderTitleSkeleton />
+            <ProtocolDetailsHeaderTitleSkeleton />
           )}
         </Flex>
       </Flex>

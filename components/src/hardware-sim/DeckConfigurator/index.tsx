@@ -336,11 +336,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       <SlotLabels
         robotType={FLEX_ROBOT_TYPE}
         color={darkFill}
-        show4thColumn={
-          stagingAreaItems.length > 0 ||
-          absorbanceReaderItems.length > 0 ||
-          flexStackerItems.length > 0
-        }
+        show4thColumn={true}
       />
       {children}
     </RobotCoordinateSpace>

@@ -10,6 +10,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -204,6 +205,13 @@ export const getWasteChuteOptions = (
           addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
         },
       ],
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
+        },
+      ],
     ]
   } else {
     return []
@@ -252,10 +260,6 @@ export const getFixtureOptions = (
     ]
   }
 
-  if (cutoutId === 'cutoutD3' && addressableAreaId === 'D3') {
-    const wasteChuteOptions = getWasteChuteOptions(cutoutId)
-    availableOptions = [...availableOptions, ...wasteChuteOptions]
-  }
   return availableOptions
 }
 

@@ -1,4 +1,4 @@
-@import '@opentrons/components/styles';
+@import '../index.module.css';
 
 .module {
   display: flex;
