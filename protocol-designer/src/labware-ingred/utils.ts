@@ -152,3 +152,15 @@ export const getMigratedLabwareId = (
 
   return latestLabwareId
 }
+
+export const getMigratedURI = (
+  oldURI: string,
+  allLabwareDefs: Record<string, LabwareDefinition2>,
+  latestDefs: LabwareDefByDefURI
+): string => {
+  const loadName = allLabwareDefs[oldURI]?.parameters.loadName
+  const latestURI = Object.entries(latestDefs).find(
+    ([_, def]) => def.parameters.loadName === loadName
+  )?.[0]
+  return latestURI ?? oldURI // fallback to oldURI for custom labware
+}

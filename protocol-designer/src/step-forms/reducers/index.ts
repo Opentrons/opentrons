@@ -8,6 +8,7 @@ import { handleActions } from 'redux-actions'
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,
+  getAllLabwareDefs,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -23,7 +24,10 @@ import {
   getOnlyLatestDefs,
   rootReducer as labwareDefsRootReducer,
 } from '../../labware-defs'
-import { getMigratedLabwareId } from '../../labware-ingred/utils'
+import {
+  getMigratedLabwareId,
+  getMigratedURI,
+} from '../../labware-ingred/utils'
 import {
   getDefaultsForStepType,
   handleFormChange,
@@ -413,6 +417,10 @@ export const savedStepForms = (
               allLabware,
               latestDefs
             ),
+            tipRack:
+              stepForm.stepType === 'mix'
+                ? getMigratedURI(stepForm.tipRack, allLabware, latestDefs)
+                : undefined,
           }
         } else if (stepForm.stepType === 'moveLiquid') {
           return {
@@ -430,6 +438,7 @@ export const savedStepForms = (
               allLabware,
               latestDefs
             ),
+            tipRack: getMigratedURI(stepForm.tipRack, allLabware, latestDefs),
           }
         }
         return {
@@ -1306,19 +1315,24 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
       const pipettes = Object.entries(metadata.pipettes).reduce(
         (
           acc: NormalizedPipetteById,
           [id, pipetteLoadInfo]: [string, PipetteLoadInfo]
         ) => {
           const tiprackDefURI = metadata.pipetteTiprackAssignments[id]
+          const latestTiprackDefURIs = tiprackDefURI.map(uri =>
+            getMigratedURI(uri, allLabwareDefs, latestDefs)
+          )
 
           return {
             ...acc,
             [id]: {
               id,
               name: pipetteLoadInfo.pipetteName as PipetteName,
-              tiprackDefURI,
+              tiprackDefURI: latestTiprackDefURIs,
             },
           }
         },
