@@ -360,7 +360,6 @@ class FixtureSettings:
 
         test_report.set_tag(pipette_tag)
         test_report.set_operator(operator_name)
-        test_report.set_robot_id(robot_name)
         test_report.set_version(git_description)
         test_report.set_firmware(fw_version)
         t50_str = f"{ctx.params.cavity_50}"  # type: ignore [attr-defined]
@@ -374,7 +373,7 @@ class FixtureSettings:
             t50_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
         report.store_serial_numbers(
             test_report,
-            robot=robot_serial,
+            robot=robot_name,
             pipette=pipette_tag,
             tips={
                 "tips_50ul": t50_str,
@@ -385,7 +384,9 @@ class FixtureSettings:
             environment=env_serial,
             liquid=liquid_name,
         )
-
+        # todo fix set serial to take robot name and serial separate
+        # do this after the set serial to overwrite where the name.
+        test_report.set_robot_id(robot_serial)
         ctx.load_trash_bin("A3")
         return cls(
             ctx=ctx,
