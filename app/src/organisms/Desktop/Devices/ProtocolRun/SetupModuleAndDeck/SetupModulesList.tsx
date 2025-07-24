@@ -28,6 +28,7 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getMainUsbModuleFixtureIdForComboFixture,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -133,6 +134,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
               configItem => configItem.cutoutId === 'cutoutD3'
             )
+            const mainUsbModuleFixtureId = getMainUsbModuleFixtureIdForComboFixture(deckConfigCompatabilityD3?.compatibleCutoutFixtureIds)
             if (
               deckConfigCompatabilityD3 != null &&
               WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
