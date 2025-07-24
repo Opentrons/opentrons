@@ -94,7 +94,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
             {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
         ],
-        default="nest_96_wellplate_2ml_deep",
+        default="usascientific_12_reservoir_22ml",
     )
 
     parameters.add_float(
@@ -368,22 +368,20 @@ def run(ctx: ProtocolContext) -> None:
     vol_diff = 0.0
     step_volume = 0.0
     total_vol = 0.0
-    tipcount = 0
     dispense_volume = 0
 
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    tipcount = 0
+
 
     def pick_up_tips() -> None:
-        nonlocal tipcount
         if not probe_pipette.has_tip:
             probe_pipette.pick_up_tip()
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip()
-        tipcount += 1
+        
 
     def drop_tips() -> None:
         if probe_pipette.has_tip:
@@ -440,7 +438,8 @@ def run(ctx: ProtocolContext) -> None:
         ]
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
     
-    def reload_labware(ctx) -> None:
+    def reload_labware() -> None:
+        nonlocal labware, labware_type
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
         labware = ctx.load_labware(
@@ -463,9 +462,8 @@ def run(ctx: ProtocolContext) -> None:
 
         #first, check if the step exceeds the number of wells
         if step >= len(wells):
-            print("Reloading labware")
-            labware = reload_labware(ctx, labware_type, "B3", ctx.params.labware_version)
-            step = 0
+            reload_labware()
+            step = 1
 
         #log step 0 in the csv 
         if step == 0:
