@@ -234,11 +234,11 @@ This illustration shows how the different types of offsets appear as you're conf
 
 ![](images/labware-offsets.svg)
 
-You create offsets by running Labware Position Check on attached instruments and deck-mounted labware.
+You create offsets by running Labware Position Check using an attached pipette.
 
 #### Labware Position Check
 
-Labware Position Check lets you align a gantry mounted instrument relative to a well plate (or other labware), which helps ensure accurate and reproducible pipetting results.
+Labware Position Check lets you align a gantry mounted instrument relative to a piece of labware (e.g. a well plate), which helps ensure accurate and reproducible pipetting results.
 
 You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
@@ -719,7 +719,7 @@ Flex *will not* retain information about more than 20 runs on the robot. Proceed
 
 You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
-!!!Note
+!!!note
     - SSH keys are required before you can connect to Flex and issue commands from a terminal.
     - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
 
