@@ -531,11 +531,16 @@ class FlexStacker(mod_abc.AbstractModule):
         """Dispenses the next labware in the stacker."""
         self.verify_labware_height(labware_height)
         await self._prepare_for_action()
+
         if enforce_hopper_lw_sensing:
             await self.verify_hopper_labware_presence(Direction.EXTEND, True)
 
-        # Move platform along the X then Z axis
+        # Move platform along the X and make sure we DONT detect labware
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
+        if enforce_shuttle_lw_sensing:
+            await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
+
+        # Move platform along the Z axis
         await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM)
 
         # Transfer
