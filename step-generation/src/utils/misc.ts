@@ -911,16 +911,25 @@ export const getIsLabwareCompatibleWithStack = (
   stack: string[],
   labwareEntities: LabwareEntities
 ): boolean => {
+  // if stack is empty, moving directly to empty slot
+  if (stack.length === 0) {
+    return true
+  }
   const topLabwareEntity = labwareEntities[getTopLocationInStack(stack)]
   if (topLabwareEntity != null) {
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
     return (
+      // check compatible labware key
       labwareEntities[labwareId].def.compatibleParentLabware?.some(
         loadName => loadName === loadNameToCheck
-      ) ?? true // be permissive if `compatibleParentLabware` is undefined
+      ) ||
+      // check stacking offset map for legacy compatibility
+      Object.keys(topLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
+        lw => lw === loadNameToCheck
+      )
     )
   }
-  return true
+  return false
 }
 
 export const getModuleIdFromRobotStateStack = (
