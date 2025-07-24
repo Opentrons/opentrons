@@ -57,6 +57,7 @@ import type {
   LabwareEntity,
   LabwareTemporalProperties,
   LocationLiquidState,
+  ModuleEntities,
   PathOption,
   PipetteEntity,
   RobotState,
@@ -909,14 +910,18 @@ export const getLargestStackInSlot = (
 export const getIsLabwareCompatibleWithStack = (
   labwareId: string,
   stack: string[],
-  labwareEntities: LabwareEntities
+  labwareEntities: LabwareEntities,
+  moduleEntities: ModuleEntities
 ): boolean => {
   // if stack is empty, moving directly to empty slot
   if (stack.length === 0) {
     return true
   }
-  const topLabwareEntity = labwareEntities[getTopLocationInStack(stack)]
-  if (topLabwareEntity != null) {
+  const topIdInStack = getTopLocationInStack(stack)
+
+  // check compatibility with labware
+  if (topIdInStack in labwareEntities) {
+    const topLabwareEntity = labwareEntities[topIdInStack]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
     return (
       // check compatible labware key
@@ -927,6 +932,16 @@ export const getIsLabwareCompatibleWithStack = (
       Object.keys(topLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
       )
+    )
+    // check compatibility with module
+  } else if (topIdInStack in moduleEntities) {
+    const topModuleEntity = moduleEntities[topIdInStack]
+    const { model: stackingModel } = topModuleEntity
+    return (
+      // check compatible labware key
+      Object.keys(
+        labwareEntities[labwareId].def.stackingOffsetWithModule ?? {}
+      ).some(model => stackingModel === model)
     )
   }
   return false
