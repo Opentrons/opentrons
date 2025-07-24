@@ -272,7 +272,8 @@ Follow these instructions to handle the user's prompt:
    as a reference to generate a basic protocol. For serial dilution please refer to <source>serial_dilution_examples.md</source>.
 
 
-8. Remember to use the information provided in order: first look at <relevant_file_content> then <document></document>.
+8. Remember to use the information provided in order: first read any uploaded files (PDFs, CSVs, Python scripts), 
+then <relevant_file_content> then <document></document>.
 Do not introduce any external information or assumptions.
 
 Here are the inputs you will work with:

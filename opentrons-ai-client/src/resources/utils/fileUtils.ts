@@ -33,7 +33,7 @@ export interface ProcessedFileContent {
 const UNIT_MB = 1024 * 1024
 
 export const FILE_SIZE_LIMITS = {
-  pdf: 10 * UNIT_MB, // 10MB
+  pdf: 5 * UNIT_MB, // 5MB
   csv: 2 * UNIT_MB, // 2MB
   python: 1 * UNIT_MB, // 1MB
 } as const
