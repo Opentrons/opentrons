@@ -408,7 +408,7 @@ export const savedStepForms = (
             ...getDefaultsForStepType(stepForm.stepType),
             ...stepForm,
             labware: getMigratedLabwareId(
-              stepForm.labware,
+              stepForm.labware as string,
               labware,
               allLabware,
               latestDefs
@@ -419,13 +419,13 @@ export const savedStepForms = (
             ...getDefaultsForStepType(stepForm.stepType),
             ...stepForm,
             aspirate_labware: getMigratedLabwareId(
-              stepForm.aspirate_labware,
+              stepForm.aspirate_labware as string,
               labware,
               allLabware,
               latestDefs
             ),
             dispense_labware: getMigratedLabwareId(
-              stepForm.dispense_labware,
+              stepForm.dispense_labware as string,
               labware,
               allLabware,
               latestDefs

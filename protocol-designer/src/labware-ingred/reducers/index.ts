@@ -319,7 +319,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
       const latestDefs = getOnlyLatestDefs()
 
       return Object.entries(ingredLocations).reduce(
-        (acc, [labwareId, liquidIngredient]) => {
+        (acc: LocationsState, [labwareId, liquidIngredient]) => {
           const latestLabwareId = getMigratedLabwareId(
             labwareId,
             labware,
@@ -329,7 +329,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
           acc[latestLabwareId] = liquidIngredient
           return acc
         },
-        {} as LocationsState
+        {}
       )
     },
   },

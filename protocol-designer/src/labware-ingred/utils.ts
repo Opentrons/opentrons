@@ -2,7 +2,6 @@ import {
   FIXED_TRASH_ID,
   FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_STACKER_ADDRESSABLE_AREAS,
-  getAllLabwareDefs,
   getAreSlotsAdjacent,
   getDeckDefFromRobotType,
   getIsLabwareAboveHeight,
@@ -15,8 +14,6 @@ import {
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 
-import { Labware } from '../file-types'
-import { getOnlyLatestDefs, LabwareDefByDefURI } from '../labware-defs'
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { getStagingAreaAddressableAreas } from '../utils'
 
@@ -25,6 +22,8 @@ import type {
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
+import type { Labware } from '../file-types'
+import type { LabwareDefByDefURI } from '../labware-defs'
 import type { InitialDeckSetup } from '../step-forms/types'
 import type { DeckSlot } from '../types'
 
