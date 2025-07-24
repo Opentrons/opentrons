@@ -310,7 +310,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     const isCompatibleStack = getIsLabwareCompatibleWithStack(
       labwareId,
       largestStackInSlot,
-      labwareEntities
+      labwareEntities,
+      moduleEntities
     )
     if (!isCompatibleStack) {
       errors.push(errorCreators.multipleEntitiesOnSameSlotName())
