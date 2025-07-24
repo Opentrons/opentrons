@@ -10,11 +10,10 @@ import {
   getInitialRobotStateStandard,
   makeContext,
   SOURCE_LABWARE,
-  TROUGH_LABWARE,
 } from '../fixtures'
 import {
-  blowoutLocationHelper,
   DEST_WELL_BLOWOUT_DESTINATION,
+  mixBlowoutLocationHelper,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
@@ -56,8 +55,8 @@ describe('blowoutLocationHelper', () => {
     }
     vi.mocked(curryCommandCreator).mockClear()
   })
-  it('blowoutLocationHelper curries blowout with source well params', () => {
-    blowoutLocationHelper({
+  it('mixBlowoutLocationHelper curries blowout with source well params', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
@@ -74,7 +73,7 @@ describe('blowoutLocationHelper', () => {
       },
     })
   })
-  it('blowoutLocationHelper curries waste chute commands when there is no well', () => {
+  it('mixBlowoutLocationHelper curries waste chute commands when there is no well', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
@@ -86,7 +85,7 @@ describe('blowoutLocationHelper', () => {
         },
       },
     }
-    blowoutLocationHelper({
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       destLabwareId: wasteChuteId,
       invariantContext: invariantContext,
@@ -99,8 +98,8 @@ describe('blowoutLocationHelper', () => {
       wasteChuteId,
     })
   })
-  it('blowoutLocationHelper curries blowout with dest plate params', () => {
-    blowoutLocationHelper({
+  it('mixBlowoutLocationHelper curries blowout with dest plate params', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
@@ -117,15 +116,15 @@ describe('blowoutLocationHelper', () => {
       },
     })
   })
-  it('blowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
-    blowoutLocationHelper({
+  it('mixBlowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
-      blowoutLocation: TROUGH_LABWARE,
+      blowoutLocation: 'dest_well',
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
-      labwareId: TROUGH_LABWARE,
-      wellName: 'A1',
+      labwareId: 'destPlateId',
+      wellName: 'A2',
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
         origin: 'top',
@@ -135,8 +134,8 @@ describe('blowoutLocationHelper', () => {
       },
     })
   })
-  it('blowoutLocationHelper returns an empty array if not given a blowoutLocation', () => {
-    const result = blowoutLocationHelper({
+  it('mixBlowoutLocationHelper returns an empty array if not given a blowoutLocation', () => {
+    const result = mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: null,
     })

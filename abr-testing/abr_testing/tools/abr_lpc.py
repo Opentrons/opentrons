@@ -31,7 +31,7 @@ def remove_duplicate_data() -> None:
         else:
             row_indices.append(i)
     if len(row_indices) > 0:
-        google_sheet_lpc.batch_delete_rows(row_indices)
+        google_sheet_lpc.batch_delete_rows(row_indices, "0")
 
 
 if __name__ == "__main__":

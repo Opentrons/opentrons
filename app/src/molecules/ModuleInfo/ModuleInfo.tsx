@@ -12,12 +12,11 @@ import {
   RobotCoordsForeignObject,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
-  STACKER_HOPPER_LABWARE_Y_OFFSET,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
-  getModuleDef2,
+  getModuleDef,
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
@@ -36,7 +35,7 @@ export interface ModuleInfoProps {
 
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { moduleModel, physicalPort, isAttached, runId = null } = props
-  const moduleDef = getModuleDef2(moduleModel)
+  const moduleDef = getModuleDef(moduleModel)
   const {
     xDimension,
     yDimension,
@@ -67,11 +66,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           ? STACKER_HOPPER_LABWARE_X_OFFSET
           : 0
       }
-      y={
-        moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-          ? STACKER_HOPPER_LABWARE_Y_OFFSET
-          : 0
-      }
+      y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{

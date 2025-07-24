@@ -20,7 +20,10 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
+  getLiquidIdsOnLabware,
   getSlotInLocationStack,
+  getVolumesPerLiquid,
+  wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
@@ -28,9 +31,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { WellTooltip } from '../Labware/WellTooltip'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { getMainPagePortalEl } from '../Portal'
-import { getLiquidIdsOnLabware, getVolumesPerLiquid } from '../utils'
 import { LiquidCardList } from './LiquidCardList'
 
 import type { WellGroup } from '@opentrons/components'
@@ -159,6 +160,7 @@ export const SlotDetailModal = (
                           }
                         }}
                         definition={labwareOnDeck.def}
+                        positioningMode="offsetInSlot"
                         wellFill={allWellFill}
                         highlightedWells={wellContentsWithLiquidId}
                       />

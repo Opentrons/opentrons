@@ -6,7 +6,6 @@ import { createSelector } from 'reselect'
 
 import * as StepGeneration from '@opentrons/step-generation'
 
-import { getAllWellsForLabware } from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
@@ -34,7 +33,9 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
         labwareId
       ): StepGeneration.LabwareLiquidState => {
         const labwareDef = labwareEntities[labwareId].def
-        const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
+        const allWells = labwareDef
+          ? StepGeneration.getAllWellsForLabware(labwareDef)
+          : []
         const liquidStateForLabwareAllWells = allWells.reduce(
           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
             ...innerAcc,

@@ -124,10 +124,12 @@ def get_addressable_area_from_name(
                 z=addressable_area["boundingBox"]["zDimension"],
             )
             features = addressable_area["features"]
+            mating_surface_unit_vector = addressable_area.get("matingSurfaceUnitVector")
 
             return AddressableArea(
                 area_name=addressable_area["id"],
                 area_type=AreaType(addressable_area["areaType"]),
+                mating_surface_unit_vector=mating_surface_unit_vector,
                 base_slot=base_slot,
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,

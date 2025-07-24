@@ -30,6 +30,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -138,6 +139,7 @@ export function TwoColLwInfoAndDeck(
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
             backgroundItems={
               <>
@@ -149,6 +151,8 @@ export function TwoColLwInfoAndDeck(
                     moduleDef,
                     nestedLabwareDef,
                     nestedLabwareId,
+                    targetDeckId,
+                    targetSlotId,
                   }) => (
                     <Module
                       key={moduleId}
@@ -156,21 +160,31 @@ export function TwoColLwInfoAndDeck(
                       x={x}
                       y={y}
                       orientation={inferModuleOrientationFromXCoordinate(x)}
+                      targetDeckId={targetDeckId}
+                      targetSlotId={targetSlotId}
+                      childrenPositioningMode="offsetToSlot"
                     >
                       {nestedLabwareDef != null &&
                       nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
+                        <LabwareRender
+                          definition={nestedLabwareDef}
+                          positioningMode="offsetInSlot"
+                        />
                       ) : null}
                     </Module>
                   )
                 )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>

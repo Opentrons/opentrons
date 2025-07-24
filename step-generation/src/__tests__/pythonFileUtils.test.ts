@@ -352,8 +352,12 @@ describe('getLoadPipettes', () => {
     ).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument("p300_multi_gen2", "left", tip_racks=[tip_rack_2, tip_rack_1])
-pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks=[tip_rack_2, tip_rack_1])`.trimStart()
+pipette_left = protocol.load_instrument(
+    "p300_multi_gen2", "left", tip_racks=[tip_rack_2, tip_rack_1],
+)
+pipette_left = protocol.load_instrument(
+    "flex_1channel_1000", "right", tip_racks=[tip_rack_2, tip_rack_1],
+)`.trimStart()
     )
   })
 
@@ -384,7 +388,9 @@ pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks
     ).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
+pipette_left = protocol.load_instrument(
+    "p300_multi_gen2", "left",
+)`.trimStart()
     )
   })
 
@@ -416,7 +422,9 @@ pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
     ).toBe(
       `
 # Load Pipettes:
-pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
+pipette = protocol.load_instrument(
+    "flex_96channel_1000",
+)`.trimStart()
     )
   })
 })
@@ -503,7 +511,7 @@ well_plate_2.load_liquid(
     wells=[
         "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8",
         "E3"
-        ],
+    ],
     liquid=liquid_2,
     volume=180,
 )`.trimStart()

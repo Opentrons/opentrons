@@ -10,6 +10,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMaxPushOutVolume } from '@opentrons/shared-data'
 
 import {
   CheckboxExpandStepFormField,
@@ -23,7 +24,6 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
-import { getMaxPushOutVolume } from '../../../../../../utils'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,

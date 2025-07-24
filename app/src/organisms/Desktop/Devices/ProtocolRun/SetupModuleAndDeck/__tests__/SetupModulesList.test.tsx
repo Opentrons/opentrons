@@ -58,7 +58,6 @@ const mockMagneticModule = {
   calibrationPoint: { x: 0, y: 0 },
   displayName: 'Magnetic Module',
   dimensions: {},
-  twoDimensionalRendering: { children: [] },
   quirks: [],
 }
 
@@ -93,6 +92,7 @@ describe('SetupModulesList', () => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      deckConfigCompatibility: [],
     }
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)

@@ -206,6 +206,7 @@ export const RECOVERY_MAP = {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
       CHECK_HOPPER: 'check-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -223,6 +224,7 @@ export const RECOVERY_MAP = {
     ROUTE: 'stacker-hopper-empty-retry',
     STEPS: {
       FILL_HOPPER: 'fill-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -243,6 +245,7 @@ export const RECOVERY_MAP = {
       RELEASE_FROM_LATCH: 'release-labware-from-latch',
       REENGAGE_LATCH: 're-engage-latch',
       FILL_HOPPER: 'fill-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -265,6 +268,7 @@ export const RECOVERY_MAP = {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       LOAD_SHUTTLE: 'manual-load-shuttle',
       CHECK_HOPPER: 'check-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
       RETRY: 'retry',
     },
   },
@@ -412,6 +416,7 @@ export const STEP_ORDER: StepOrder = {
     STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
     STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER,
+    STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_STALLED_RETRY.STEPS.RETRY,
   ],
   [STACKER_STALLED_SKIP.ROUTE]: [
@@ -425,10 +430,12 @@ export const STEP_ORDER: StepOrder = {
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.LOAD_SHUTTLE,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER,
+    STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY,
   ],
   [STACKER_HOPPER_EMPTY_RETRY.ROUTE]: [
     STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER,
+    STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY,
   ],
   [STACKER_HOPPER_EMPTY_SKIP.ROUTE]: [
@@ -443,6 +450,7 @@ export const STEP_ORDER: StepOrder = {
     STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RELEASE_FROM_LATCH,
     STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
     STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER,
+    STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
     STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RETRY,
   ],
   [STACKER_SHUTTLE_EMPTY_SKIP.ROUTE]: [
@@ -619,6 +627,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER]: {
       allowDoorOpen: true,
     },
+    [STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
+      allowDoorOpen: true,
+    },
     [STACKER_STALLED_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
   [STACKER_STALLED_SKIP.ROUTE]: {
@@ -638,6 +649,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
   },
   [STACKER_HOPPER_EMPTY_RETRY.ROUTE]: {
     [STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
       allowDoorOpen: true,
     },
     [STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
@@ -663,6 +677,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [STACKER_SHUTTLE_MISSING_RETRY.STEPS.CHECK_HOPPER]: {
       allowDoorOpen: true,
     },
+    [STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
+      allowDoorOpen: true,
+    },
     [STACKER_SHUTTLE_MISSING_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
   [STACKER_SHUTTLE_EMPTY_RETRY.ROUTE]: {
@@ -682,6 +699,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [STACKER_SHUTTLE_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
       allowDoorOpen: true,
     },
     [STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RETRY]: {

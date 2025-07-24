@@ -4,7 +4,7 @@ import inspect
 import json
 from datetime import datetime
 from math import isclose
-from typing import cast, List, Tuple, Optional, NamedTuple, Dict
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict, Any
 from unittest.mock import sentinel
 from os import listdir, path
 
@@ -120,14 +120,18 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
 )
+
+from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
-from opentrons.protocol_engine.state.frustum_helpers import (
+from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _volume_from_height_circular,
     _volume_from_height_rectangular,
-    find_height_at_well_volume,
-    find_volume_at_well_height,
+    find_height_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_inner_well_geometry,
+    find_volume_user_defined_volumes,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
@@ -197,6 +201,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
     features=LocatingFeatures(),
+    mating_surface_unit_vector=[-1, 1, -1],
 )
 
 
@@ -366,6 +371,30 @@ def nice_labware_definition() -> LabwareDefinition:
 
 
 @pytest.fixture
+def inner_labware_geometry_fixture() -> LabwareDefinition:
+    """Load a labware def containing an InnerWellGeometry object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data("labware/fixtures/3/fixture_corning_24_plate.json").decode(
+                "utf-8"
+            )
+        )
+    )
+
+
+@pytest.fixture
+def user_volumes_fixture() -> LabwareDefinition:
+    """Load a labware def containing a UserDefinedVolumes object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data(
+                "labware/fixtures/2/fixture_user_volumes_prototype.json"
+            ).decode("utf-8")
+        )
+    )
+
+
+@pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
     return labware_definition_type_adapter.validate_python(
@@ -375,6 +404,35 @@ def nice_adapter_definition() -> LabwareDefinition:
             ).decode("utf-8")
         )
     )
+
+
+@pytest.fixture
+def mock_well_math_utils(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> Dict[str, Any]:
+    """Patch inner_well_math_utils functions."""
+    mocks = {}
+    mocks["volume_user_volumes"] = decoy.mock(func=find_volume_user_defined_volumes)
+    mocks["height_user_volumes"] = decoy.mock(func=find_height_user_defined_volumes)  # type: ignore[assignment]
+    mocks["volume_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
+        func=find_volume_inner_well_geometry
+    )
+    mocks["height_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
+        func=find_height_inner_well_geometry
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_user_defined_volumes", mocks["volume_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_user_defined_volumes", mocks["height_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_inner_well_geometry", mocks["volume_inner_well_geometry"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_inner_well_geometry", mocks["height_inner_well_geometry"]
+    )
+    return mocks
 
 
 _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
@@ -964,7 +1022,7 @@ def test_get_all_obstacle_highest_z_with_modules(
     # Note: since no labware are loaded on the modules, the thermocycler
     # lid is considered open, so the thermocycler lid height is not included
     # in the thermocycler height
-    assert isclose(subject.get_all_obstacle_highest_z(), 44.725)
+    assert isclose(subject.get_all_obstacle_highest_z(), 35.0)
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -2995,6 +3053,7 @@ def test_get_slot_item(
         position=AddressableOffsetVector(x=0, y=0, z=0),
         compatible_module_types=[],
         features=LocatingFeatures(),
+        mating_surface_unit_vector=[-1, 1, -1],
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(
@@ -3801,7 +3860,7 @@ def test_validate_dispense_volume_into_well_meniscus(
 ) -> None:
     """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
     well_def = well_plate_def.wells["A1"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
         well_def
@@ -4343,12 +4402,12 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=2, schema=2
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_96_tiprack_1000ul", version=2
+                        "opentrons_flex_96_tiprack_1000ul", version=1
                     )
                 ),
             ],
@@ -4388,7 +4447,7 @@ def test_virtual_get_well_height_after_liquid_handling(
         well_plate_def
     )
     well_def = well_plate_def.wells["B2"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
@@ -4417,12 +4476,12 @@ def test_virtual_find_height_and_volume(
     target_height_volume: LiquidTrackingType,
 ) -> None:
     """Make sure geometry math helpers return the expected liquid tracking type."""
-    height_estimate = find_height_at_well_volume(
+    height_estimate = find_height_inner_well_geometry(
         target_volume=target_height_volume,
         well_geometry=_TEST_INNER_WELL_GEOMETRY,
     )
 
-    volume_estimate = find_volume_at_well_height(
+    volume_estimate = find_volume_inner_well_geometry(
         target_height=target_height_volume, well_geometry=_TEST_INNER_WELL_GEOMETRY
     )
 
@@ -4430,6 +4489,64 @@ def test_virtual_find_height_and_volume(
     #  SimulatedProbeResult
     if isinstance(target_height_volume, SimulatedProbeResult):
         assert height_estimate == volume_estimate == target_height_volume
+
+
+@pytest.mark.parametrize("target_measurement", ["height", "volume"])
+@pytest.mark.parametrize("well_def_type", ["user_volumes", "inner_well_geometry"])
+def test_find_well_height_and_volume(
+    mock_labware_view: LabwareView,
+    mock_well_math_utils: Dict[str, Any],
+    user_volumes_fixture: LabwareDefinition,
+    inner_labware_geometry_fixture: LabwareDefinition,
+    decoy: Decoy,
+    subject: GeometryView,
+    target_measurement: str,
+    well_def_type: str,
+) -> None:
+    """Test that find_volume_at_well_height and find_height_at_well_volume call the correct functions."""
+    assert inner_labware_geometry_fixture.innerLabwareGeometry is not None
+    assert user_volumes_fixture.innerLabwareGeometry is not None
+    inner_well_geometry = [
+        well for well in inner_labware_geometry_fixture.innerLabwareGeometry.values()
+    ][0]
+    user_defined_volumes = [
+        well for well in user_volumes_fixture.innerLabwareGeometry.values()
+    ][0]
+    if well_def_type == "inner_well_geometry":
+        labware_id = "iwg"
+        geometry_def = inner_well_geometry
+    else:
+        labware_id = "udv"
+        geometry_def = user_defined_volumes
+
+    decoy.when(mock_labware_view.get_well_geometry(labware_id, "A1")).then_return(
+        geometry_def
+    )
+    # mock the correct inner_well_math_utils functions
+    decoy.when(
+        mock_well_math_utils[target_measurement + "_" + well_def_type](
+            sentinel.arbitrary_height_volume, geometry_def
+        )
+    ).then_return(sentinel.arbitrary_return_val)
+
+    if target_measurement == "height":
+        assert (
+            subject.find_height_at_well_volume(
+                labware_id=labware_id,
+                well_name="A1",
+                target_volume=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
+    elif target_measurement == "volume":
+        assert (
+            subject.find_volume_at_well_height(
+                labware_id=labware_id,
+                well_name="A1",
+                target_height=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
 
 
 @pytest.mark.parametrize(
@@ -4456,7 +4573,7 @@ def test_get_liquid_handling_z_change(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
     ).then_return(fake_min_height)
     well_def = well_plate_def.wells["A1"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
         well_def

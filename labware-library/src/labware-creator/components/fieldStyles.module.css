@@ -10,7 +10,7 @@
 
 .field_label {
   margin-bottom: 0.375rem;
-  font-weight: var(--fw-semibold);
   font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
   line-height: var(--lh-copy);
 }

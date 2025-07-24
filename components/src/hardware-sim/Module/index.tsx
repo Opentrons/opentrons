@@ -5,7 +5,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
-  OT2_STANDARD_DECKID,
+  multiplyMatrices,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -21,7 +21,6 @@ import {
   SPACING_1,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-import { multiplyMatrices } from '../utils'
 import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
 import { MagneticBlock } from './MagneticBlock'
@@ -35,6 +34,7 @@ import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
 export * from './Thermocycler'
 
@@ -51,9 +51,34 @@ interface Props {
     | ComponentProps<typeof Temperature>
     | {}
   statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
-  children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
-  targetSlotId?: string
-  targetDeckId?: string
+
+  children?: ReactNode
+
+  /**
+   * How child components should be positioned.
+   *
+   * "offsetToSlot" - The SVG origin of a child will be at the labware mating interface of the
+   *   module, which is the front-left (-x, -y) corner of the slot on top of the module.
+   *
+   * todo(mm, 2025-07-21):
+   * 1. Add a "passThrough" mode that disables the "offsetToSlot" behavior,
+   *    to allow child components to replace it with their own SVG transform,
+   *    to support labware schema 3.
+   * 2. Migrate all existing call sites to use "passThrough".
+   * 3. Remove "offsetToSlot".
+   */
+  childrenPositioningMode: 'offsetToSlot'
+
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetSlotId: string | null
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetDeckId: string | null
 }
 
 const statusInfoWrapperProps = {
@@ -61,7 +86,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,
@@ -80,8 +105,9 @@ export const Module = (props: Props): JSX.Element => {
     statusInfo,
     children,
     targetSlotId,
-    targetDeckId = OT2_STANDARD_DECKID,
+    targetDeckId,
   } = props
+
   const moduleType = getModuleType(def.model)
 
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
@@ -110,19 +136,16 @@ export const Module = (props: Props): JSX.Element => {
   let nestedLabwareOffsetY = labwareOffsetY
 
   // additional transforms to apply to vectors in certain deck/slot combinations
-  const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
+  const transformsForDeckBySlot =
+    (targetDeckId != null ? def?.slotTransforms?.[targetDeckId] : null) ?? {}
   const slotTransformsForDeckSlot =
-    targetSlotId != null &&
-    transformsForDeckBySlot != null &&
-    targetSlotId in transformsForDeckBySlot
-      ? transformsForDeckBySlot[targetSlotId]
-      : null
-  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
-  if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
+    (targetSlotId != null ? transformsForDeckBySlot[targetSlotId] : null) ?? {}
+
+  if (slotTransformsForDeckSlot.cornerOffsetFromSlot != null) {
     const [
       [slotTranslateX],
       [slotTranslateY],
-    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.cornerOffsetFromSlot, [
       [translateX],
       [translateY],
       [translateZ],
@@ -130,11 +153,11 @@ export const Module = (props: Props): JSX.Element => {
     ])
     offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
-  if (deckSpecificTransforms?.labwareOffset != null) {
+  if (slotTransformsForDeckSlot.labwareOffset != null) {
     const [
       [slotLabwareOffsetX],
       [slotLabwareOffsetY],
-    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
+    ] = multiplyMatrices(slotTransformsForDeckSlot.labwareOffset, [
       [labwareOffsetX],
       [labwareOffsetY],
       [1],

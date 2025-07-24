@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import isEmpty from 'lodash/isEmpty'
 import map from 'lodash/map'
@@ -16,6 +17,7 @@ import {
   Box,
   Btn,
   COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -23,6 +25,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
@@ -30,6 +33,8 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
+  ProtocolDeck,
+  SecondaryButton,
   SIZE_1,
   SIZE_5,
   SPACING,
@@ -37,6 +42,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getSimplestDeckConfigForProtocol,
@@ -48,7 +54,6 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
-import { ProtocolDeck } from '/app/organisms/ProtocolDeck'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
@@ -79,12 +84,6 @@ import type {
   StoredProtocolData,
 } from '/app/redux/protocol-storage'
 import type { Dispatch, State } from '/app/redux/types'
-
-const GRID_STYLE = css`
-  display: ${DISPLAY_GRID};
-  width: 100%;
-  grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
-`
 
 const TWO_COL_GRID_STYLE = css`
   display: ${DISPLAY_GRID};
@@ -220,6 +219,7 @@ export function ProtocolDetails(
     groupedCommands,
   } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
+  const navigate = useNavigate()
   const enableProtocolStats = useFeatureFlag('protocolStats')
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
@@ -382,6 +382,10 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
+  const handleClickTimeline = (): void => {
+    navigate(`/protocols/${protocolKey}/preview`)
+  }
+
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
@@ -461,7 +465,15 @@ export function ProtocolDetails(
               >
                 {protocolDisplayName}
               </LegacyStyledText>
-              <Flex css={GRID_STYLE}>
+              <Flex
+                display={DISPLAY_GRID}
+                width="100%"
+                gridTemplateColumns={
+                  enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE
+                    ? '25.5% 25.5% 25.5% 22.9%'
+                    : '26.6% 26.6% 26.6% 20.2%'
+                }
+              >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
@@ -501,12 +513,16 @@ export function ProtocolDetails(
                       : lastAnalyzed}
                   </LegacyStyledText>
                 </Flex>
-                <Flex
-                  css={css`
-                    display: ${DISPLAY_GRID};
-                    justify-self: end;
-                  `}
-                >
+                <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
+                  {/* TODO: add OT-2 support */}
+                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
+                    <SecondaryButton
+                      onClick={handleClickTimeline}
+                      cursor={CURSOR_POINTER}
+                    >
+                      Preview
+                    </SecondaryButton>
+                  ) : null}
                   <PrimaryButton
                     onClick={() => {
                       handleRunProtocolButtonClick()

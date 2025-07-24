@@ -112,7 +112,6 @@
     "quirks",
     "slotTransforms",
     "compatibleWith",
-    "twoDimensionalRendering",
     "incompatibleWithDecks"
   ],
   "additionalProperties": false,
@@ -137,7 +136,10 @@
       "type": "string",
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
-    "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "labwareOffset": {
+      "$ref": "#/definitions/coordinates",
+      "description": "The offset from the left-front-bottom corner of the slot holding this module, to the left-front-bottom corner of the labware interface atop this module."
+    },
     "extents": {
       "description": "The outer dimensions of the addressable area. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
@@ -152,14 +154,13 @@
     },
     "features": {
       "type": "object",
-      "description": "Locating features when this labware is a part of a stackup.",
-      "required": ["slotFootprintAsChild"],
+      "description": "Locating features when this module is a part of a stackup.",
+      "required": [],
       "properties": {
         "slotFootprintAsChild": {
-          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "description": "The 3D plane of the module that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
           "type": "object",
           "required": ["backLeft", "frontRight", "z"],
-          "additionalProperties": false,
           "properties": {
             "backLeft": {
               "description": "(-x, +y) relative to the labware origin.",
@@ -170,8 +171,13 @@
               "$ref": "#/definitions/vector2D"
             },
             "z": {
-              "description": "Always zero. Z-coordinate of the footprint plane.",
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
               "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the module contains a spring that influences its position when placed on a parent deck item.",
+              "type": "string",
+              "enum": ["backLeftBottom"]
             }
           }
         }
@@ -308,11 +314,6 @@
     "uniqueModuleData": {
       "type": "object",
       "description": "Unique data used by the module, (e.g. TOF sensor baseline data)"
-    },
-    "twoDimensionalRendering": {
-      "type": "object",
-      "description": "SVG rendering of the module represented as svgson",
-      "items": { "$ref": "#/definitions/svgsonNode" }
     }
   }
 }

@@ -22,10 +22,10 @@
 }
 
 .title {
+  color: var(--c-black);
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
-  color: var(--c-black);
 }
 
 .lighter {
@@ -33,8 +33,8 @@
 }
 
 .well_group_title {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-semibold);
 }
 

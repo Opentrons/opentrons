@@ -20,7 +20,7 @@ import {
 import {
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
-  getModuleDef2,
+  getModuleDef,
   getModuleDisplayName,
   getModuleType,
   getPositionFromSlotId,
@@ -443,7 +443,7 @@ export function Ot2Modules(): JSX.Element {
                       console.warn(`no slot ${slotId} for module ${id}`)
                       return null
                     }
-                    const moduleDef = getModuleDef2(model)
+                    const moduleDef = getModuleDef(model)
                     return (
                       <Fragment key={id}>
                         <Module
@@ -461,6 +461,7 @@ export function Ot2Modules(): JSX.Element {
                           }
                           targetSlotId={slotId}
                           targetDeckId={deckDef.otId}
+                          childrenPositioningMode="offsetToSlot"
                         />
                       </Fragment>
                     )

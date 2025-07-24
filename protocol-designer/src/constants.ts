@@ -12,10 +12,6 @@ import type { WellVolumes } from './types'
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
-/** All wells for labware, in arbitrary order. */
-export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
-  return Object.keys(def.wells)
-}
 export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
 // Standard slot dims FOR VISUALIZATION ONLY
 export const STD_SLOT_X_DIM = 128
@@ -99,7 +95,7 @@ export const OFFDECK: 'offDeck' = 'offDeck'
 export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app
 
 export const DECK_SETUP_TOOLS_WIDTH_REM = 21.875
-export const OVERFLOW_MENU_POSITION_ADJUSTMENT = 4
+export const OVERFLOW_MENU_POSITION_ADJUSTMENT = 8
 
 // Below values copied from opentrons/api/src/opentrons/config/defaults_ot[2/3].py
 export const FLEX_X_Y_MAX_SPEED = 300
@@ -111,6 +107,9 @@ export const OT2_X_MAX_SPEED = 600
 export const OT2_Y_MAX_SPEED = 400
 export const OT2_Z_MAX_SPEED = 125
 export const OT2_PLUNGER_MAX_SPEED = 40
+
+// pulled from documentation
+export const DEFAULT_TOUCH_TIP_SPEED = 60
 
 export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
   RobotType,

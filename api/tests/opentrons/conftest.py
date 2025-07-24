@@ -85,7 +85,6 @@ from opentrons_shared_data.deck import (
 )
 
 from opentrons import config
-from opentrons import hardware_control as hc
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
@@ -424,19 +423,6 @@ def hardware_controller_lockfile(
     monkeypatch.setitem(config.CONFIG, "hardware_controller_lockfile", lockfile)
 
     return lockfile_dir
-
-
-@pytest.mark.skipif(
-    not hc.Controller,
-    reason="hardware controller not available (probably windows)",
-)
-@pytest.fixture()
-def cntrlr_mock_connect(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def mock_connect(obj: object, port: Any = None) -> None:
-        return
-
-    monkeypatch.setattr(hc.Controller, "connect", mock_connect)
-    monkeypatch.setattr(hc.Controller, "fw_version", "virtual")
 
 
 @pytest.fixture()
@@ -809,7 +795,6 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "slotTransforms": {},
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
-        "twoDimensionalRendering": {},
     }
 
 
@@ -1237,5 +1222,109 @@ def custom_pip_n_tip_transfer_properties_dict() -> (
                     delay=DelayPropertiesDict(enabled=False),
                 ),
             )
+        }
+    }
+
+
+@pytest.fixture
+def custom_pip_n_tip_transfer_properties_dict_v2() -> Dict[str, Dict[str, Any]]:
+    """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
+    return {
+        "a_custom_pipette_type": {
+            "a_custom_tiprack_uri": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                    "correction_by_volume": [(0.0, 0.0)],
+                    "delay": {"enable": False},
+                    "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                    "mix": {"enable": False},
+                    "pre_wet": True,
+                    "retract": {
+                        "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                        "delay": {"enable": False},
+                        "end_position": {
+                            "offset": {"x": 1, "y": 2, "z": 3},
+                            "position_reference": "well-bottom",
+                        },
+                        "speed": 40,
+                        "touch_tip": {"enable": False},
+                    },
+                    "submerge": {
+                        "delay": {"enable": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 1, "y": 2, "z": 3},
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                    "correction_by_volume": [(0.0, 0.0)],
+                    "delay": {"enable": False},
+                    "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                    "mix": {"enable": False},
+                    "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
+                    "retract": {
+                        "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                        "blowout": {"enable": False},
+                        "delay": {"enable": False},
+                        "end_position": {
+                            "offset": {"x": 1, "y": 2, "z": 3},
+                            "position_reference": "well-bottom",
+                        },
+                        "speed": 40,
+                        "touch_tip": {"enable": False},
+                    },
+                    "submerge": {
+                        "delay": {"enable": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 1, "y": 2, "z": 3},
+                            "position_reference": "well-bottom",
+                        },
+                    },
+                },
+                "multi_dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 318)],
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 50,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {
+                            "enabled": True,
+                            "location": "trash",
+                            "flow_rate": 478,
+                        },
+                    },
+                    "conditioning_by_volume": [(0, 0)],
+                    "disposal_by_volume": [(0, 5)],
+                },
+            }
         }
     }
