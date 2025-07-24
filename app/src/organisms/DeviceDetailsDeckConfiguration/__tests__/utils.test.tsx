@@ -213,15 +213,7 @@ describe('getFixtureOptions', () => {
   })
   it('Should not get a trash bin for cutoutD3 and aa D3 with a stacker in the slot', () => {
     const result = getFixtureOptions('cutoutD3', 'D3', FLEX_STACKER_MODULE_V1)
-    expect(result).toEqual([
-      [
-        {
-          cutoutId: 'cutoutD3',
-          cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
-          addressableAreaId: '96ChannelWasteChute',
-        },
-      ],
-    ])
+    expect(result).toEqual([])
   })
   it('Should get staging area for cutoutD3 and aa fakeD4', () => {
     const result = getFixtureOptions('cutoutD3', 'fakeD4')

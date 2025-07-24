@@ -224,7 +224,7 @@ export const getWasteChuteOptions = (
 export const getFixtureOptions = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
-  existingCutoutFixtureId?: CutoutFixtureId
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
   const TrashBinAA = getMainAAForAFixture(
