@@ -1,6 +1,7 @@
 import { ProtocolDeck } from '.'
 // Import the real protocol analysis data
 import realProtocolAnalysis from './1751479157228.json'
+import magBindExtractionAnalysis from './sci-omegabiotek-extraction-fa-analysis.json'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -45,21 +46,25 @@ export default meta
 type Story = StoryObj<typeof ProtocolDeck>
 
 // Story with real protocol analysis data - P50 & P1000 transfer protocol
-export const Default: Story = {
+export const Flex: Story = {
   args: {
-    protocolAnalysis: realProtocolAnalysis as CompletedProtocolAnalysis,
+    protocolAnalysis: realProtocolAnalysis as unknown as CompletedProtocolAnalysis,
     baseDeckProps: {
       showSlotLabels: true,
       showExpansion: true,
-      animatedSVG: false,
-      svgProps: {
-        style: {
-          transform: 'none',
-          transformOrigin: 'initial',
-          width: '100%',
-          height: 'auto',
-        },
-      },
+      animatedSVG: true,
+    },
+  },
+}
+
+// Story with Mag-Bind® Blood & Tissue DNA HDQ 96 Kit extraction protocol (OT-2)
+export const OT2: Story = {
+  args: {
+    protocolAnalysis: magBindExtractionAnalysis as unknown as CompletedProtocolAnalysis,
+    baseDeckProps: {
+      showSlotLabels: true,
+      showExpansion: true,
+      animatedSVG: true,
     },
   },
 }
