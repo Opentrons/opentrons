@@ -1,9 +1,0 @@
-/* opentrons style library - CSS modules only (no global styles) */
-
-@import './styles/colors.module.css';
-@import './styles/typography.module.css';
-@import './styles/borders.module.css';
-
-:global(*) {
-  box-sizing: border-box;
-}

@@ -1,4 +1,4 @@
-@import '../modules.css';
+@import '../index.module.css';
 
 .pill {
   padding: 0.5em;

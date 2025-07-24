@@ -1,4 +1,4 @@
-@import '../modules.css';
+@import '../index.module.css';
 
 :root {
   --sidebar-width: 18.25rem;

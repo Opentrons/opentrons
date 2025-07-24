@@ -1,5 +1,5 @@
 /* common styling for tooltips */
-@import '../modules.css';
+@import '../index.module.css';
 
 .tooltip_box {
   z-index: 9001;

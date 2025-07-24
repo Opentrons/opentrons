@@ -1,10 +1,8 @@
-/* opentrons style library - CSS modules only */
+/* opentrons style library */
 
 @import './styles/colors.module.css';
 @import './styles/typography.module.css';
 @import './styles/borders.module.css';
-
-/* Note: global.css is imported separately in index.ts to avoid CSS modules processing */
 
 :global(*) {
   box-sizing: border-box;

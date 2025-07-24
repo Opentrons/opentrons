@@ -1,4 +1,4 @@
-@import '../modules.css';
+@import '../index.module.css';
 
 :root {
   --list-padding-large: 1rem;
