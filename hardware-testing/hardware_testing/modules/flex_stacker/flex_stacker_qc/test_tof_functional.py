@@ -152,7 +152,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     ui.get_user_ready(
         "Make sure there is NO labware in the stacker tower or gripper position"
     )
-    print(f"Getting runtime baseline.")
+    print("Getting runtime baseline.")
     runtime_baseline_x = await create_runtime_baseline(stacker, TOFSensor.X)
     runtime_baseline_z = await create_runtime_baseline(stacker, TOFSensor.Z)
 
