@@ -4,7 +4,11 @@ import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
+import { getAllLabwareDefs } from '@opentrons/shared-data'
+
 import { getPDMetadata } from '../../file-types'
+import { getOnlyLatestDefs } from '../../labware-defs'
+import { getMigratedLabwareId } from '../utils'
 
 import type { Reducer } from 'redux'
 import type {
@@ -180,10 +184,19 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
       const containers: ContainersState = Object.entries(
         metadata.labware
       ).reduce((acc: ContainersState, [id, labwareLoadInfo], key) => {
-        acc[id] = {
+        const latestLabwareId = getMigratedLabwareId(
+          id,
+          metadata.labware,
+          allLabwareDefs,
+          latestDefs
+        )
+
+        acc[latestLabwareId] = {
           nickname: labwareLoadInfo.displayName,
           disambiguationNumber: key,
         }
@@ -299,7 +312,26 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     LOAD_FILE: (
       state: LocationsState,
       action: LoadFileAction
-    ): LocationsState => getPDMetadata(action.payload.file).ingredLocations,
+    ): LocationsState => {
+      const ingredLocations = getPDMetadata(action.payload.file).ingredLocations
+      const labware = getPDMetadata(action.payload.file).labware
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
+
+      return Object.entries(ingredLocations).reduce(
+        (acc, [labwareId, liquidIngredient]) => {
+          const latestLabwareId = getMigratedLabwareId(
+            labwareId,
+            labware,
+            allLabwareDefs,
+            latestDefs
+          )
+          acc[latestLabwareId] = liquidIngredient
+          return acc
+        },
+        {} as LocationsState
+      )
+    },
   },
   {}
 )

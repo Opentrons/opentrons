@@ -2,6 +2,7 @@ import {
   FIXED_TRASH_ID,
   FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_STACKER_ADDRESSABLE_AREAS,
+  getAllLabwareDefs,
   getAreSlotsAdjacent,
   getDeckDefFromRobotType,
   getIsLabwareAboveHeight,
@@ -14,6 +15,8 @@ import {
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 
+import { Labware } from '../file-types'
+import { getOnlyLatestDefs, LabwareDefByDefURI } from '../labware-defs'
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { getStagingAreaAddressableAreas } from '../utils'
 
@@ -131,4 +134,22 @@ export function getNextNickname(
   return Number.isFinite(topMatchNum)
     ? `${proposedNickname.trim()} (${topMatchNum + 1})`
     : proposedNickname
+}
+
+export const getMigratedLabwareId = (
+  oldLabwareId: string,
+  labware: Labware,
+  allLabwareDefs: Record<string, LabwareDefinition2>,
+  latestDefs: LabwareDefByDefURI
+): string => {
+  const defURI = labware[oldLabwareId].labwareDefURI
+  const loadName = allLabwareDefs[defURI]?.parameters.loadName
+  const latestURI = Object.entries(latestDefs).find(
+    ([_, def]) => def.parameters.loadName === loadName
+  )?.[0]
+  const labwareIdString = oldLabwareId.split(':')[0]
+  const latestLabwareId =
+    latestURI != null ? `${labwareIdString}:${latestURI}` : oldLabwareId // fallback to original labwareId for custom labware
+
+  return latestLabwareId
 }
