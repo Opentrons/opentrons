@@ -20,8 +20,8 @@ To attach the Thermocycler to your OT-2:
 
 6. Press the illuminated button on the Thermocycler to open the lid.
 
-7. Remove and discard the shipping insert after opening the module's lid. The insert consists of a pad attached to a PRC plate.
+7. Remove and discard the shipping insert after opening the module's lid. The insert consists of a pad attached to a PCR plate.
 
 ![](images/shipping-insert.svg)
 
-When successfully connected, the module appears in the Pipettes and Modules section on your robot’s device detail page in the Opentrons App. The module is ready to use and does not require calibration on an OT-2.
+When successfully connected, the module appears in the Pipettes and Modules section on your robot's device detail page in the Opentrons App. The module is ready to use and does not require calibration on an OT-2.

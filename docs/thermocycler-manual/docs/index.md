@@ -1,5 +1,5 @@
 ---
-Title: "Thermocycler GEN2 Instruction Manual"
+title: "Thermocycler GEN2 Instruction Manual"
 hide: toc
 ---
 

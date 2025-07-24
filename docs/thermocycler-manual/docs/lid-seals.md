@@ -4,16 +4,11 @@ title: "Thermocycler GEN2 Instruction Manual: Thermocycler Lid Seals"
 
 # Thermocycler Lid Seals
 
-The Thermocycler GEN2 accepts two different plate seals to help
-protect PCR samples. These are the disposable [Opentrons Tough PCR
- Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and the reusable [GEN2 automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+The Thermocycler GEN2 accepts two different plate seals to help protect PCR samples. These are the disposable [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and the reusable [GEN2 automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
 
 ## Disposable PCR Lids
 
-Opentrons Tough Auto-sealing Lids are disposable, stackable
-well plate lids. They’re ideal for protocols that require sterility,
-automated lid handling, single-use consumables, or that include two
-or more PCR steps in a single automated protocol.
+Opentrons Tough Auto-sealing Lids are disposable, stackable well plate lids. They're ideal for protocols that require sterility, automated lid handling, single-use consumables, or that include two or more PCR steps in a single automated protocol.
 
 ![Auto-sealing lids example](images/autoseal-lids.png)
 
@@ -35,11 +30,11 @@ The Opentrons auto-sealing lids work with the following Flex hardware and softwa
 
 ### Cleanliness Standards
 
-Auto-sealing lids are manufactured and packaged in cleanroom facilities that meet ISO 14644-1 Class 8 standards. Lids also have a “Sterile-R” designation, which means they’re irradiated to a sterility assurance level (SAL) of 10-6. Each box contains documentation that certifies the lids are free of ATP, pyrogens, DNA, DNase, RNase, and PCR inhibitors.
+Auto-sealing lids are manufactured and packaged in cleanroom facilities that meet ISO 14644-1 Class 8 standards. Lids also have a "Sterile-R" designation, which means they're irradiated to a sterility assurance level (SAL) of 10-6. Each box contains documentation that certifies the lids are free of ATP, pyrogens, DNA, DNase, RNase, and PCR inhibitors.
 
 ### Packaging
 
-Opentrons auto-sealing lids ship in blister packs of five lids each. There are four packs in a box, totaling 20 disposable lids per box. Each blister has its own lot, production, and serial number for tracking or other record-keeping purposes. You can store the lids until they’re needed, but we recommend using them within two years of their manufacture date.
+Opentrons auto-sealing lids ship in blister packs of five lids each. There are four packs in a box, totaling 20 disposable lids per box. Each blister has its own lot, production, and serial number for tracking or other record-keeping purposes. You can store the lids until they're needed, but we recommend using them within two years of their manufacture date.
 
 ### Deck Riser
 
@@ -54,14 +49,14 @@ You can stack up to 5 auto-sealing lids on a special [deck riser](https://opentr
 
 While disposable PCR lids offer sterile, single-use convenience, the Thermocycler GEN2 also ships with a package of reusable automation seals. Unlike the disposable lids, these seals need to be sanitized before use and can be reused up to 20 times. Note, too, that only one type of seal (disposable or reusable) should be used at a time; you must not use both on the same thermocycler simultaneously.
 
-![Reuseable automation seals](images/reuseable-seals.png)
+![Reusable automation seals](images/reuseable-seals.png)
 
 !!!note "Note: Thermocycler GEN1 Incompatibility"
     If you have a Thermocycler Module GEN1, you must use the [Thermocycler GEN1 Seals](https://opentrons.com/products/thermocycler-seals-1). You cannot use GEN2 seals on a GEN1 Thermocycler.
 
-## Attachment Instructions 
+### Attachment Instructions 
 
-To properly attach a reuseable automation seal:
+To properly attach a reusable automation seal:
 
 - Attach a seal _after_ installing the module. 
 - Apply the seal to the module lid, not the plate.
@@ -72,6 +67,6 @@ To properly attach a reuseable automation seal:
 After applying the seal, wipe it with a 1:10 diluted bleach solution. Rinse the seal by wiping it with molecular biology grade water. Air dry when finished.
 
 !!!warning
-    Reuseable seals are not autoclave-safe.
+    Reusable seals are not autoclave-safe.
 
 Each seal may be used for several runs. You should check the state of the seal after each run and replace it if needed. Worn or damaged seals may result in increased sample evaporation.

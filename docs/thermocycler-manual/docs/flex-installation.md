@@ -16,12 +16,9 @@ your Flex.
 slot plate and the A1 and B1 deck slot plates.
 
 2. Using both hands, lift the module carefully and insert it into
-its caddy. Make sure the module’s exhaust port faces the
-exhaust duct on the caddy.3
+its caddy. Make sure the module's exhaust port faces the exhaust duct on the caddy.
 
-3. Use a 2.5 mm hex screwdriver to turn the anchor screws
-clockwise to tighten the anchors. The module is secure when
-it doesn’t move while gently pulling on it and rocking it from
+3. Use a 2.5 mm hex screwdriver to turn the anchor screws clockwise to tighten the anchors. The module is secure when it doesn't move while gently pulling on it and rocking it from
 side to side.
 
 4. Connect the USB cable to the module and route the remaining cable through the cable management bracket.
@@ -42,7 +39,7 @@ side to side.
 
 ![Thermocycler shipping insert](images/shipping-insert.svg)
 
-When successfully connected, the module appears in the Pipettes and Modules section on your robot’s device detail page in the Opentrons App.
+When successfully connected, the module appears in the Pipettes and Modules section on your robot's device detail page in the Opentrons App.
 
 Next, you'll calibrate the module.
 
@@ -54,9 +51,9 @@ You need to calibrate the Thermocycler after attaching it for the first time. To
     The gantry and pipette move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
 
 1. Tap **Start setup** on the touchscreen. The robot checks the
-module’s firmware and updates it automatically, if required.
+module's firmware and updates it automatically, if required.
 
-2. Attach the module’s calibration adapter and tap **Confirm placement**.
+2. Attach the module's calibration adapter and tap **Confirm placement**.
 
 3. Attach the calibration probe to the indicated pipette.
 
@@ -66,5 +63,4 @@ module’s firmware and updates it automatically, if required.
 
 6. Click **Exit**.
 
-Your module is now calibrated. You will not have to recalibrate the
-same module if you remove and reattach it to the same Flex.
+Your module is now calibrated. You will not have to recalibrate the same module if you remove and reattach it to the same Flex.

@@ -78,19 +78,19 @@ TCG2
     </tr>
     <tr>
       <td>Pulsing red</td>
-      <td>Changing to hot temperature (>23 °C)</td>
+      <td>Changing to hot temperature (&gt;23 °C)</td>
     </tr>
     <tr>
       <td>Solid red</td>
-      <td>Holding at hot temperature (>23 °C)</td>
+      <td>Holding at hot temperature (&gt;23 °C)</td>
     </tr>
     <tr>
       <td>Pulsing blue</td>
-      <td>Changing to cool temperature (<23 °C)</td>
+      <td>Changing to cool temperature (&lt; °C)</td>
     </tr>
     <tr>
       <td>Solid blue</td>
-      <td>Holding at cool temperature (<23 °C)</td>
+      <td>Holding at cool temperature (&lt;23 °C)</td>
     </tr>
   </tbody>
 </table>
@@ -103,8 +103,7 @@ TCG2
 In case of a power outage, connectivity issue, or other electrical failure, the Thermocycler lid may not open. Follow these steps to manually open the lid:
 
 1. If possible, turn the unit off and unplug it.
-2. Insert the included hex wrench into the circular slot on the left
-side of the module.
+2. Insert the included hex wrench into the circular slot on the left side of the module.
 3. Push the wrench inward 25 mm / 1 inch.
 4. Lift the lid manually.
 
