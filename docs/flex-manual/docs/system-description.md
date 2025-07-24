@@ -212,7 +212,7 @@ Locations of components of the 1-, 8-, and 96-channel pipettes.
 
 The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
 
-### Pipette specifications { #pipette-specifications }
+### Pipette specifications
 
 Opentrons Flex pipettes are designed to handle a wide range of volumes.
 Because of their wide overall range, they can use multiple sizes of
