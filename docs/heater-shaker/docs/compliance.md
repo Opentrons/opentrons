@@ -59,3 +59,27 @@ The following table lists and defines use and storage standards for the Heater-S
 
 ## Safety Warning Labels
 
+Warning symbols posted on the Heater-Shaker and in this manual warn you about sources of potential injury or harm. The following table lists and defines each safety warning symbol.
+
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="../images/hot-surface-warning.svg" alt="Hot surface warning symbol"></td>
+      <td><strong>CAUTION: Hot Surface!<br>
+        This symbol identifies in instrument components that pose a risk of burning or heat damage if handled improperly.
+      </td>
+    </tr>
+    <tr>
+      <td><img src="../images/pinch-point-warning.svg" alt="Pinch point warning symbol"></td>
+      <td><strong>CAUTION: Pinch point!</strong><br>
+        This symbol identifies instrument components which can pose a risk of personal injury due to moving parts.
+      </td>
+    </tr>
+  </tbody>
+</table>
