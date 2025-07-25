@@ -51,9 +51,15 @@ The following table lists the chemicals you can use to clean your Heater-Shaker.
   </tbody>
 </table>
 
-Turn off the Heater-Shaker before cleaning it. You can clean the top
-surfaces of the module while it’s installed in a deck slot. However, for
-better access, you may want to:
-� Disconnect any USB or power cables before you begin.
-� Remove the caddy (Flex only) and module from the deck slot.
-� Remove the module from the caddy (Flex only).
+Turn off the Heater-Shaker before cleaning it. You can clean the top surfaces of the module while it’s installed in a deck slot. However, for better access, you may want to:
+
+- Disconnect any USB or power cables before you begin.
+- Remove the caddy (Flex only) and module from the deck slot.
+- Remove the module from the caddy (Flex only).
+
+Once you’ve prepared the module for cleaning:
+
+1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
+2. Gently wipe off the module’s surfaces.
+3. Rinse off any remaining residue using a cloth dampened with distilled water.
+4. Let the module air dry.
