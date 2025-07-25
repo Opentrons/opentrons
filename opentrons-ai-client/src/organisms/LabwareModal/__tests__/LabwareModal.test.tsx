@@ -194,7 +194,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
       ).toBeInTheDocument()
     })
   })
@@ -222,7 +222,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
       ).toBeInTheDocument()
     })
 
@@ -233,7 +233,7 @@ describe('LabwareModal', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/2')
+        screen.getByText('opentrons/opentrons_flex_96_tiprack_1000ul/1')
       ).toBeInTheDocument()
     })
   })

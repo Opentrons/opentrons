@@ -2,7 +2,6 @@ import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   LabwareDefinition2,
-  LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
@@ -28,7 +27,7 @@ export interface QuickTransferWizardState {
   path?: PathOption
   changeTip?: ChangeTipOptions
   dropTipLocation?: CutoutConfig
-  liquidClass?: LiquidClass
+  liquidClassName?: string
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -64,17 +63,21 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
-  pushOut: boolean
+  pushOutDispense?: {
+    volume: number
+  }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
   submergeAspirate?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractAspirate?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayAspirate?: {
@@ -90,10 +93,12 @@ export interface QuickTransferSummaryState {
   }
   submergeDispense?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   retractDispense?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
   delayDispense?: {
@@ -109,13 +114,15 @@ export interface QuickTransferSummaryState {
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass
+  liquidClassName: string
   conditionAspirate?: number
   disposalVolumeDispenseSettings?: {
     volume: number
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+  // Note this is used to apply liquid class values to the state only once
+  liquidClassValuesInitialized: boolean
 }
 
 export type TransferType =
@@ -161,6 +168,7 @@ export type QuickTransferSummaryAction =
   | SetPushOut
   | SetConditionAspirate
   | SetDisposalVolumeDispense
+  | SetLiquidClassValues
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -207,6 +215,7 @@ interface SetSubmergeAspirate {
   type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
   submergeSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -214,6 +223,7 @@ interface SetRetractAspirate {
   type: typeof ACTIONS.SET_RETRACT_ASPIRATE
   retractSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -251,6 +261,7 @@ interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
   submergeSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -258,6 +269,7 @@ interface SetRetractDispense {
   type: typeof ACTIONS.SET_RETRACT_DISPENSE
   retractSettings?: {
     speed: number
+    delayDuration: number
     positionFromBottom: number
   }
 }
@@ -272,7 +284,7 @@ interface SetDropTipLocation {
 
 interface SetLiquidClassAction {
   type: typeof ACTIONS.SET_LIQUID_CLASS
-  liquidClass: LiquidClass
+  liquidClassName: string
 }
 
 interface SelectPipetteAction {
@@ -307,7 +319,9 @@ interface SetVolumeAction {
 
 interface SetPushOut {
   type: typeof ACTIONS.SET_PUSH_OUT
-  pushOut: boolean
+  pushOutSettings?: {
+    volume: number
+  }
 }
 
 interface SetConditionAspirate {
@@ -322,4 +336,8 @@ interface SetDisposalVolumeDispense {
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
+}
+interface SetLiquidClassValues {
+  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUES
+  liquidClassValues: QuickTransferSummaryState
 }

@@ -99,6 +99,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
                 setStepName(e.target.value)
               }}
               type="text"
+              name="stepName_input"
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>

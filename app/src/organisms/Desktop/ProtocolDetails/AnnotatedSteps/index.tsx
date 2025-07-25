@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   COLORS,
@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import { AnnotatedGroup } from './AnnotatedGroup'
-import styles from './annotatedSteps.module.css'
+import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -34,6 +34,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
   } = props
+  const [scrollTargetId, setScrollTargetId] = useState<string | null>(null)
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
     () =>
@@ -63,47 +64,89 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       }
     }
   })
+
+  useEffect(() => {
+    if (groupedCommands != null) {
+      const flatCommands = groupedCommands.flatMap(node =>
+        'subCommands' in node ? node.subCommands : [node]
+      )
+
+      const targetNode = flatCommands.find(
+        node => analysis.commands.indexOf(node.command) === currentCommandIndex
+      )
+
+      if (targetNode?.command.id && scrollTargetId !== targetNode.command.id) {
+        setScrollTargetId(targetNode.command.id)
+      }
+    }
+  }, [analysis, groupedCommands, currentCommandIndex, scrollTargetId])
+
+  let commandNumber = 0
+
   return (
     <div className={styles.annotated_steps_container}>
       <div className={styles.annotated_steps_wrap}>
         {groupedCommandsHighlightedInfo != null &&
         groupedCommandsHighlightedInfo.length > 0
-          ? groupedCommandsHighlightedInfo.map((group, index) =>
-              'annotationIndex' in group ? (
-                <AnnotatedGroup
-                  key={`group_${group.annotationIndex}_${index}`}
-                  analysis={analysis}
-                  annotationType={
-                    annotations[group.annotationIndex]?.machineReadableName
-                  }
-                  subCommands={group.subCommands}
-                  allRunDefs={allRunDefs}
-                  setSelectedCommand={setSelectedCommand}
-                  handlePause={handlePause}
-                />
-              ) : (
+          ? groupedCommandsHighlightedInfo.map((group, index) => {
+              const nextIndex = groupedCommandsHighlightedInfo[index + 1]
+              const nextIsGrouped =
+                nextIndex != null && 'annotationIndex' in nextIndex
+
+              if ('annotationIndex' in group) {
+                const subCommandStartNumber = commandNumber + 1 // Starting number for this group
+                commandNumber += group.subCommands.length
+
+                return (
+                  <AnnotatedGroup
+                    key={`group_${group.annotationIndex}_${index}`}
+                    scrollTargetId={scrollTargetId}
+                    analysis={analysis}
+                    annotationType={
+                      annotations[group.annotationIndex]?.machineReadableName
+                    }
+                    subCommands={group.subCommands}
+                    commandStartNumber={subCommandStartNumber}
+                    allRunDefs={allRunDefs}
+                    setSelectedCommand={setSelectedCommand}
+                    handlePause={handlePause}
+                  />
+                )
+              } else {
+                const currentCommandNumber = ++commandNumber
+
+                return (
+                  <IndividualCommand
+                    scrollTargetId={scrollTargetId}
+                    fromGroup={nextIsGrouped}
+                    key={group.command.id}
+                    command={group.command}
+                    isHighlighted={group.isHighlighted}
+                    analysis={analysis}
+                    allRunDefs={allRunDefs}
+                    setSelectedCommand={setSelectedCommand}
+                    commandNumber={currentCommandNumber}
+                  />
+                )
+              }
+            })
+          : analysis.commands.map((command, index) => {
+              const currentCommandNumber = ++commandNumber
+
+              return (
                 <IndividualCommand
-                  fromGroup={true}
-                  key={group.command.id}
-                  command={group.command}
-                  isHighlighted={group.isHighlighted}
+                  scrollTargetId={scrollTargetId}
+                  fromGroup={false}
+                  key={`individual_${command.id}`}
+                  command={command}
+                  commandNumber={currentCommandNumber}
+                  isHighlighted={index === currentCommandIndex}
                   analysis={analysis}
                   allRunDefs={allRunDefs}
                   setSelectedCommand={setSelectedCommand}
                 />
               )
-            )
-          : analysis.commands.map((command, index) => (
-              <IndividualCommand
-                fromGroup={false}
-                key={`individual_${command.id}`}
-                command={command}
-                isHighlighted={index === currentCommandIndex}
-                analysis={analysis}
-                allRunDefs={allRunDefs}
-                setSelectedCommand={setSelectedCommand}
-              />
-            ))}
+            })}
         {analysis?.errors.length > 0 ? (
           <div className={styles.annotated_steps_error_container}>
             {analysis?.errors.map(error => (

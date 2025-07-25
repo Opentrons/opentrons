@@ -3,6 +3,7 @@ import paramiko as pmk
 import time
 import json
 import multiprocessing
+import os
 from typing import Optional, List, Any
 
 
@@ -56,12 +57,12 @@ def run_command_on_ip(
         ssh = connect_ssh(curr_ip)
         status = execute(ssh, cd + cmd, [robot_names[index], "540", "5"])
         if status == 0:
-            print(f"Envrironmental sensors for {curr_ip}, are now running")
+            print(f"Environmental sensors for {curr_ip}, are now running")
     except Exception as e:
         print(f"Error running command on {curr_ip}: {e}")
 
 
-def run() -> List[Any]:
+def run(storage_directory: str) -> List[Any]:
     """Run asair script module."""
     # Load Robot IPs
     cmd = "nohup python3 -m hardware_testing.scripts.abr_asair_sensor {name} {duration} {frequency}"
@@ -69,19 +70,13 @@ def run() -> List[Any]:
     robot_ips = []
     robot_names = []
 
-    robot = input("Enter IP of robot (type 'all' to run on all robots): ")
-    if robot.lower() == "all":
-        ip_file = input("Path of IPs.json: ")
-        with open(ip_file) as file:
-            file_dict = json.load(file)
-            robot_dict = file_dict.get("ip_address_list")
-            robot_ips = list(robot_dict.keys())
-            robot_names = list(robot_dict.values())
-    else:
-        robot_name = input("What is the name of the robot? ")
-        robot_ips.append(robot)
-        robot_names.append(robot_name)
-    print("Executing Script on Robot(s):")
+    ip_file = os.path.join(storage_directory, "IPs.json")
+    with open(ip_file) as file:
+        file_dict = json.load(file)
+        robot_dict = file_dict.get("ip_address_list")
+        robot_ips = list(robot_dict.keys())
+        robot_names = list(map(list, (zip(*robot_dict.values()))))[0]
+    print("Executing Script on Robots:")
     # Launch the processes for each robot.
     processes = []
     for index in range(len(robot_ips)):
@@ -94,7 +89,8 @@ def run() -> List[Any]:
 
 if __name__ == "__main__":
     # Wait for all processes to finish.
-    processes = run()
+    storage_directory = ""
+    processes = run(storage_directory)
     for process in processes:
         process.start()
         time.sleep(20)

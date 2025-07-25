@@ -1,6 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
+  StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
 } from '../shared'
@@ -21,6 +22,8 @@ export function StackerStalledRetry(props: RecoveryContentProps): JSX.Element {
       return <StackerHopperLwInfo {...props} />
     case STACKER_STALLED_RETRY.STEPS.RETRY:
       return <RetryStepInfo {...props} />
+    case STACKER_STALLED_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY:
+      return <StackerEnsureShuttleEmpty {...props} />
     default:
       console.warn(
         `StackerStalledRetry: ${step} in ${route} not explicitly handled. Rerouting.`

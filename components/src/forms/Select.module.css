@@ -12,18 +12,18 @@
   position: relative;
 
   & :global(.ot_select__control) {
+    position: relative;
+    display: flex;
+    height: 1.75rem;
+    padding: 0.25rem 0;
+    border: none;
+    border-radius: var(--bd-radius-form-field);
+    background-color: var(--c-light-gray);
+    box-shadow: none;
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
     font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
     font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-    display: flex;
-    position: relative;
-    background-color: var(--c-light-gray);
-    border: none;
-    padding: 0.25rem 0;
     outline: none;
-    border-radius: var(--bd-radius-form-field);
-    height: 1.75rem;
-    box-shadow: none;
   }
 
   & :global(.ot_select__control--menu-is-open) {
@@ -52,11 +52,11 @@
   }
 
   & :global(.ot_select__group-heading) {
+    margin-left: 0.5rem;
+    color: var(--c-med-gray); /* from legacy --font-form-caption */
     font-size: var(--fs-caption); /* from legacy --font-form-caption */
     font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
-    color: var(--c-med-gray); /* from legacy --font-form-caption */
     text-transform: uppercase;
-    margin-left: 0.5rem;
   }
 
   & :global(.ot_select__single-value) {
@@ -64,9 +64,9 @@
   }
 
   & :global(.ot_select__group):not(:first-child) {
-    margin-top: 0.25rem;
-    border-top: 1px solid color-mod(var(--c-med-gray) alpha(0.4));
     padding-top: 0.25rem;
+    border-top: 1px solid color-mod(var(--c-med-gray) alpha(0.4));
+    margin-top: 0.25rem;
   }
 }
 
@@ -91,28 +91,28 @@
 }
 
 .menu {
-  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
   z-index: 99;
-  background-color: var(--c-white);
-  box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
-  border-bottom-left-radius: var(--bd-radius-form-field);
-  border-bottom-right-radius: var(--bd-radius-form-field);
+  top: 100%;
+  right: 0;
+  left: 0;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+  background-color: var(--c-white);
+  border-bottom-left-radius: var(--bd-radius-form-field);
+  border-bottom-right-radius: var(--bd-radius-form-field);
+  box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
 }
 
 .menu_control_bridge {
   position: absolute;
-  background-color: var(--c-white);
-  top: calc(100% - 2px);
-  left: 0;
-  right: 0;
   z-index: 99;
+  top: calc(100% - 2px);
+  right: 0;
+  left: 0;
   height: 4px;
+  background-color: var(--c-white);
 }

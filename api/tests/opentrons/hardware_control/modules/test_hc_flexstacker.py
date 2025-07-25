@@ -2,9 +2,6 @@ import asyncio
 import pytest
 import mock
 from typing import AsyncGenerator
-from opentrons.drivers.flex_stacker.driver import (
-    STACKER_MOTION_CONFIG,
-)
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -17,11 +14,13 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import (
+    LATCH_CLEARANCE,
     MAX_TRAVEL,
     HOME_OFFSET_MD,
     HOME_OFFSET_SM,
     PLATFORM_OFFSET,
     SIMULATING_POLL_PERIOD,
+    STACKER_MOTION_CONFIG,
     FlexStackerReader,
 )
 from opentrons.hardware_control.modules.types import PlatformState
@@ -359,12 +358,13 @@ async def test_store_labware_motion_sequence(
         verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Assertions for offset calculation and move_axis
-        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - distance - HOME_OFFSET_SM
+        z_distance = latch_clear_distance - HOME_OFFSET_SM
         z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_distance, z_speed)
         home_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_speed)
@@ -417,32 +417,42 @@ async def test_dispense_labware_motion_sequence(
         )
 
         # We need to verify the move sequence
-        verify_hopper_labware_presence.assert_called_once_with(True)
+        verify_hopper_labware_presence.assert_called_once_with(Direction.EXTEND, True)
         _prepare_for_action.assert_called()
+
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD
         )
+        # Verify labware presence
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, False)
+
         _move_and_home_axis.assert_any_call(
             StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM
         )
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, labware_height)
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        move_axis.assert_any_call(
+            StackerAxis.Z, Direction.RETRACT, latch_clear_distance
+        )
         close_latch.assert_called_once()
 
         # Assertions for offset calculation and move_axis/home_axis
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
         move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, z_distance)
         home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT)
 
         # Verify labware presence
-        verify_shuttle_labware_presence.assert_called_once_with(Direction.RETRACT, True)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Then finally the x is moved to the gripper position
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD
         )
+
+        # Make sure labware presense check on the X retract was called twice
+        assert verify_shuttle_labware_presence.call_count == 2
 
 
 @pytest.mark.parametrize(

@@ -8,12 +8,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import {
   getLabwareInfoByLiquidId,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
@@ -21,9 +20,9 @@ import { SlotDetailModal } from './SlotDetailModal'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
+  StackItem,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { StackItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {

@@ -19,8 +19,10 @@ import {
 } from '..'
 import {
   getAAComboFixtureDisplayName,
+  getAAForModuleFixture,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
+  getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
   getMainAAForAFixture,
   getReplacementFixtureForFakeFixture,
@@ -28,12 +30,14 @@ import {
   getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
   isFixtureInUsbModules,
+  isModuleAllowedOnAA,
   replaceCutoutFixtureRemove,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
+import type { CutoutConfig, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -172,7 +176,7 @@ describe('getAddressableAreaWithFakesMatchForAreaId', () => {
       'wasteChuteRightAdapterNoCover',
       'D3'
     )
-    expect(result).toEqual('96ChannelWasteChute')
+    expect(result).toEqual('1ChannelWasteChute')
   })
 
   it('Should find an aa for staging area', () => {
@@ -316,7 +320,7 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
       ],
       fakeStagingAreaRightSlot: ['D3', 'fakeD4'],
       fakeStagingSlotWithMagBlockV1: ['magneticBlockV1D3', 'fakeD4'],
-      fakeWasteChuteWithEmptySlot: ['96ChannelWasteChute', 'fakeD4'],
+      fakeWasteChuteWithEmptySlot: ['1ChannelWasteChute', 'fakeD4'],
       flexStackerModuleV1: ['D3', 'flexStackerModuleV1D4'],
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1D4',
@@ -555,5 +559,78 @@ describe('getVisualSlotIdFromAAId', () => {
   it('should get VSD3 for D3', () => {
     const vs = getVisualSlotIdFromAAId('D3')
     expect(vs).toEqual('VSD3')
+  })
+})
+
+describe('isModuleAllowedOnAA', () => {
+  it('should return false for flexStackerModuleV1D4 and D3', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'flexStackerModuleV1')
+    expect(vs).toEqual(false)
+  })
+
+  it('should return true for flexStackerModuleV1D4 and fakeD4', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4', 'flexStackerModuleV1')
+    expect(vs).toEqual(true)
+  })
+
+  it('should return true for no module input and fakeD4', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'fakeD4', 'temperatureModuleV2')
+    expect(vs).toEqual(false)
+  })
+
+  it('should return true for tempModule on D3', () => {
+    const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
+    expect(vs).toEqual(true)
+  })
+})
+
+describe('getAAForModuleFixture', () => {
+  it('should return temp module aa', () => {
+    const result = getAAForModuleFixture(
+      'cutoutB3',
+      'temperatureModuleV2',
+      'temperatureModuleV2'
+    )
+    expect(result).toEqual('temperatureModuleV2B3')
+  })
+
+  it('should return stacker module aa', () => {
+    const result = getAAForModuleFixture(
+      'cutoutB3',
+      'flexStackerModuleV1',
+      'flexStackerModuleV1'
+    )
+    expect(result).toEqual('flexStackerModuleV1B4')
+  })
+})
+
+describe('getCutoutConfigReplacmentForModule', () => {
+  const mockStacker: CutoutConfig = {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+    opentronsModuleSerialNumber: 'fsm123',
+  }
+
+  const mockDeckConfig: DeckConfiguration = [mockStacker]
+  it('should get temp module replacment fixture', () => {
+    expect(
+      getCutoutConfigReplacmentForModule(
+        'cutoutD3',
+        'temperatureModuleV2',
+        'temperatureModuleV2',
+        mockDeckConfig
+      )
+    ).toStrictEqual('temperatureModuleV2')
+  })
+
+  it('should get flex module replacment fixture', () => {
+    expect(
+      getCutoutConfigReplacmentForModule(
+        'cutoutC3',
+        'flexStackerModuleV1',
+        'flexStackerModuleV1',
+        mockDeckConfig
+      )
+    ).toStrictEqual('flexStackerModuleV1')
   })
 })

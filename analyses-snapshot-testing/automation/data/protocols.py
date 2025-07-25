@@ -279,6 +279,9 @@ class Protocols:
         robot="Flex",
         folder=PROTOCOLS_FOLDER,
     )
+    Flex_S_2_24_P1000S_keep_last_tip_check: Protocol = Protocol(
+        file_stem="Flex_S_2_24_P1000S_keep_last_tip_check", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
     Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x: Protocol = Protocol(
         file_stem="Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x", file_extension="json", robot="Flex", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
     )
@@ -694,6 +697,12 @@ class Protocols:
     Flex_S_v2_21_tc_lids_happy_path: Protocol = Protocol(
         file_stem="Flex_S_v2_21_tc_lids_happy_path", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_v2_24_8_channel_1000_flex_do_it_all_custom_liquid_class_PD_8_5: Protocol = Protocol(
+        file_stem="Flex_S_v2_24_8_channel_1000_flex_do_it_all_custom_liquid_class_PD_8_5",
+        file_extension="py",
+        robot="Flex",
+        folder=PROTOCOLS_FOLDER,
+    )
     Flex_S_v2_24_96_Live_Column_NIR: Protocol = Protocol(
         file_stem="Flex_S_v2_24_96_Live_Column_NIR", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
@@ -750,6 +759,12 @@ class Protocols:
     )
     Flex_S_v2_24_P50_PAPI_Changes: Protocol = Protocol(
         file_stem="Flex_S_v2_24_P50_PAPI_Changes", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_v2_25_P200_stacker_2: Protocol = Protocol(
+        file_stem="Flex_S_v2_25_P200_stacker_2", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_v2_25_P50_P200_stacker_all_parts: Protocol = Protocol(
+        file_stem="Flex_S_v2_25_P50_P200_stacker_all_parts", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots: Protocol = Protocol(
         file_stem="Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
