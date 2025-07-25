@@ -23,6 +23,7 @@ import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
+  formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
@@ -405,9 +406,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
-    //  TODO: fix bug where new_tip api arg does not allow
-    //  changeTip: always but PD does
-    `new_tip=${formatPyStr(changeTip)}`,
+    `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
