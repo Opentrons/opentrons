@@ -2,6 +2,7 @@ site_name: heater-shaker
 
 nav:
   - Home: index.md
+  - Safety Information and Regulatory Compliance: compliance.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: warranty.md
 
