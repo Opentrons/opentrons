@@ -16,6 +16,7 @@ import {
   FAKE_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_FIXTURES,
+  FLEX_STACKER_MODULE_TYPE,
   getAAForModuleFixture,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
@@ -79,6 +80,15 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
+  // FIXME: use getModuleUSBPort instead of this logic once it is merged
+  const usbPort = attachedModule.usbPort
+  const modulePort =
+    usbPort?.hubPort != null
+      ? `${usbPort.port}.${usbPort.hubPort}`
+      : `${usbPort?.port}`
+
+  const isFlexStacker = attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE
+
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
       createMaintenanceRun({}).catch(error => {
@@ -230,11 +240,18 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       bodyText={
         <>
           <LegacyStyledText css={BODY_STYLE}>
-            {t('select_the_slot', { module: moduleName })}
+            {t('select_the_slot', { module: moduleName, port: modulePort })}
+            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
           </LegacyStyledText>
-          <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-            {t('module_secured')}
-          </Banner>
+          {isFlexStacker ? (
+            <Banner type="informing" size={SIZE_1} marginY={SPACING.spacing4}>
+              {t('look_for_pulsing_lights')}
+            </Banner>
+          ) : (
+            <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+              {t('module_secured')}
+            </Banner>
+          )}
         </>
       }
       proceedButtonText={t('confirm_location')}
