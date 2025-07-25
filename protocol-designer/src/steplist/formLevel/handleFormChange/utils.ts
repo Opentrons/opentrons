@@ -659,6 +659,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     >,
     volume,
     path: rawForm.path as PathOption,
+    numAspirateWells: rawForm.aspirate_wells.length,
     numDispenseWells: rawForm.dispense_wells.length,
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
@@ -1032,6 +1033,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
     disposalByVolume,
     volume,
     path: rawForm.path as PathOption,
+    numAspirateWells: rawForm.aspirate_wells.length,
     numDispenseWells: rawForm.dispense_wells.length,
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
@@ -1107,6 +1109,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
     'dispense'
   )
   const dispenseOffsetFields = getOffsetFields(dispenseOffset, 'dispense')
+  console.log(byVolumeLookup, dispenseFlowRateByVolume)
   const dispenseFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.dispense,
     dispenseFlowRateByVolume,

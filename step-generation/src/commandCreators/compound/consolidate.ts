@@ -234,7 +234,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     tiprackDefinition,
     volume,
     path: 'multiAspirate',
-    numDispenseWells: sourceWells.length,
+    numAspirateWells: sourceWells.length,
+    numDispenseWells: 1,
     aspirateAirGapByVolume:
       (aspirate?.retract.airGapByVolume as Array<[number, number]>) ?? [],
     conditioningByVolume: null,
