@@ -3,19 +3,18 @@
 @import '../../styles/spacing.module.css';
 
 .analytics_modal {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
   /* NOTE: this z-index must beat the Nav z-index! */
   z-index: 9999;
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
 
   & h2 {
-    font-size: var(--fs-default); /* from legacy --font-default-dark */
-    color: var(--c-font-dark); /* from legacy --font-default-dark */
-    line-height: var(--lh-title);
-    font-weight: var(--fw-semibold);
     padding-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-default-dark */
+    font-size: var(--fs-default); /* from legacy --font-default-dark */
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-title);
   }
 
   & p {
@@ -30,9 +29,9 @@
   padding-top: calc(var(--size-mobile-nav) + var(--size-breadcrumb-nav));
 
   & h2 {
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
     font-size: var(--fs-header); /* from legacy --font-header-dark */
     font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
   }
 }
 

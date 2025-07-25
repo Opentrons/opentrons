@@ -229,8 +229,16 @@ export type WellSegment =
   | SphericalSegment
   | RoundedCuboidSegment
 
+export interface HeightVolumePair {
+  height: number
+  volume: number
+}
+
 export interface InnerWellGeometry {
   sections: WellSegment[]
+}
+export interface UserDefinedVolumes {
+  heightToVolumeMap: HeightVolumePair[]
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -306,7 +314,10 @@ export interface LabwareDefinition2 {
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
-  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
+  innerLabwareGeometry?: Record<
+    string,
+    InnerWellGeometry | UserDefinedVolumes
+  > | null
 }
 
 export interface LabwareDefinition3 {

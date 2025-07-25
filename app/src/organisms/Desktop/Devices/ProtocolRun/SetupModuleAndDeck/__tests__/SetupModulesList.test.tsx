@@ -92,6 +92,7 @@ describe('SetupModulesList', () => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      deckConfigCompatibility: [],
     }
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)

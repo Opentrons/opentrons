@@ -150,6 +150,7 @@ export const SelectWellsModal = (
           labwareProps={{
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
             definition: labwareDef,
+            positioningMode: 'offsetInSlot',
             highlightedWells,
             wellFill: wellFillFromWellContents(
               wellContents,

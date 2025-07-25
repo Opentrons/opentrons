@@ -33,8 +33,8 @@
 }
 
 .content_container {
-  min-height: 87vh;
   width: 100%;
+  min-height: 87vh;
   padding: var(--spacing-5);
   margin: 0;
 }
@@ -50,8 +50,8 @@
   }
 
   .page {
-    height: 100%;
     overflow: hidden;
+    height: 100%;
   }
 
   .sidebar_container {
@@ -59,9 +59,9 @@
     top: 0;
     bottom: 0;
     width: var(--size-4);
-    padding-left: var(--spacing-7);
     padding-right: var(--spacing-5);
     padding-bottom: var(--spacing-3);
+    padding-left: var(--spacing-7);
     overflow-y: auto;
   }
 

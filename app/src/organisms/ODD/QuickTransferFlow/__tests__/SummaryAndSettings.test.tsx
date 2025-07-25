@@ -15,7 +15,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
 import { SummaryAndSettings } from '../SummaryAndSettings'
-import { createQuickTransferFile } from '../utils'
+import { createQuickTransferFile, getInitialSummaryState } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -93,6 +93,9 @@ describe('SummaryAndSettings', () => {
       createRun,
     } as any)
     vi.mocked(createQuickTransferFile).mockReturnValue('' as any)
+    vi.mocked(getInitialSummaryState).mockReturnValue({
+      liquidClassValuesInitialized: true,
+    } as any)
     createProtocol.mockResolvedValue({
       data: {
         data: {
@@ -118,8 +121,8 @@ describe('SummaryAndSettings', () => {
   it('renders the three tabs and shows overview screen by default', () => {
     render(props)
     screen.getByText('Overview')
-    screen.getByText('Advanced settings')
-    screen.getByText('Tip management')
+    screen.getByText('Aspirate')
+    screen.getByText('Dispense')
     expect(vi.mocked(Overview)).toHaveBeenCalled()
   })
   it('renders the save or run modal when continue is pressed', () => {

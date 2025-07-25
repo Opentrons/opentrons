@@ -37,7 +37,7 @@
   "current_temp": "Current: {{temp}} °C",
   "current_version": "Current Version",
   "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first.",
-  "deck_configuration": "deck configuration",
+  "deck_configuration": "Deck configuration",
   "deck_configuration_is_not_available_when_robot_is_busy": "Deck configuration is not available when the robot is busy",
   "deck_configuration_is_not_available_when_run_is_in_progress": "Deck configuration is not available when run is in progress",
   "deck_fixture_setup_instructions": "Deck fixture setup instructions",

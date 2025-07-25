@@ -18,19 +18,15 @@ import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type {
-  CoordinateTuple,
-  DeckSlotId,
-  Dimensions,
-} from '@opentrons/shared-data'
+import type { DeckSlotId, Vector2D } from '@opentrons/shared-data'
 import type { DeckSetupTerminalIdType } from '../types'
 
 interface OffDeckControlsProps extends DeckSetupTerminalIdType {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
-  slotBoundingBox: Dimensions
+  slotBoundingBox: Vector2D
   labwareId: string
-  slotPosition: CoordinateTuple | null
+  slotPosition: Vector2D | null
   setShowMenuListForId: Dispatch<SetStateAction<string | null>>
   menuListId: DeckSlotId | null
   isSelected?: boolean
@@ -69,9 +65,7 @@ export function OffDeckControls(
     return null
   }
   const hoverOpacity =
-    (hover != null && hover === labwareId) || menuListId === labwareId
-      ? '1'
-      : '0'
+    (hover != null && hover === labwareId) || menuListId === labwareId ? 1 : 0
 
   return (
     <>
@@ -84,15 +78,15 @@ export function OffDeckControls(
         />
       ) : null}
       <RobotCoordsForeignDiv
-        x={slotPosition[0]}
-        y={slotPosition[1]}
-        width={slotBoundingBox.xDimension}
-        height={slotBoundingBox.yDimension}
+        x={slotPosition.x}
+        y={slotPosition.y}
+        width={slotBoundingBox.x}
+        height={slotBoundingBox.y}
         innerDivProps={{
-          style: {
-            opacity: hoverOpacity,
-            ...DECK_CONTROLS_STYLE,
-          },
+          opacity: hoverOpacity,
+          ...DECK_CONTROLS_STYLE,
+        }}
+        innerDivEvents={{
           onMouseEnter: () => {
             setHover(labwareId)
           },

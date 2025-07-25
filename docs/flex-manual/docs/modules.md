@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Modules"
+---
+
 # Modules
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
@@ -69,6 +73,16 @@ In general, to install a module caddy:
 4.  Seat the module caddy into the slot and screw it into place.
 
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
+
+!!!warning
+    The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
+
+    * Align the connector's flat side with the flat side of the module's power port.
+    * Connect the cable to the module first, before plugging it in to a wall outlet.
+
+    ![DIN power connector](images/module-power-connector.png){width="40%"}
+
+    _Do not_ force cable connections, or you may damage the module.
 
 ## Module calibration
 
@@ -293,20 +307,72 @@ Outside of protocols, the Opentrons App can display the current status of the He
 
 ### Heater-Shaker specifications
 
-| **Specification**               | **Details**  |
-|---------------------------------|--------------|
-| **Dimensions**                  | 152 × 90 × 82 mm (L/W/H)                                                   |
-| **Weight**                      | 1.34 kg                                                                    |
-| **Module power input**          | 36 VDC, 6.1 A                                                              |
-| **Power adapter input**         | 100–240 VAC, 50/60 Hz                                                      |
-| **Mains supply voltage fluctuation** | ±10%                                                                  |
-| **Overvoltage**                 | Category II                                                                |
-| **Power consumption**           | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | 20–25 °C                                                                   |
-| **Relative humidity**           | Up to 80%, non-condensing                                                  |
-| **Altitude**                    | Up to 2,000 m above sea level                                              |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>152 × 90 × 82 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.34 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power input</strong></td>
+      <td>36 VDC, 6.1 A</td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter input</strong></td>
+      <td>100–240 VAC, 50/60 Hz</td>
+    </tr>
+    <tr>
+      <td><strong>Mains supply voltage fluctuation</strong></td>
+      <td>±10%</td>
+    </tr>
+    <tr>
+      <td><strong>Overvoltage</strong></td>
+      <td>Category II</td>
+    </tr>
+    <tr>
+      <td><strong>Power consumption</strong></td>
+      <td>
+        Idle: 3 W<br />Typical:
+        <ul>
+          <li>Shaking: 4–11 W</li>
+          <li>Heating: 10–30 W</li>
+          <li>Heating and shaking: 10–40 W</li>
+        </ul>
+        Maximum: 125–130 W
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>20–25 °C</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 80%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2,000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## HEPA/UV Module
 
@@ -483,16 +549,53 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Temperature Module specifications
 
-| **Specification**               | **Details**                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| **Dimensions**                  | 194 × 90 × 84 mm (L/W/H)                                                   |
-| **Weight**                      | 1.5 kg                                                                    |
-| **Module power**                | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | <22 °C (recommended for optimal cooling)                                  |
-| **Relative humidity**           | Up to 60%, non-condensing                                                  |
-| **Altitude**                    | Up to 2000 m above sea level                                               |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th><strong>Specification</strong></th>
+      <th><strong>Details</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>194 × 90 × 84 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.5 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power</strong></td>
+      <td>
+        <ul>
+          <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
+          <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>&lt;22 °C (recommended for optimal cooling)</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 60%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Thermocycler Module GEN2
 

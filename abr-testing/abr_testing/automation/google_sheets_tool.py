@@ -95,21 +95,21 @@ class google_sheet:
         """Delete Row from google sheet."""
         self.worksheet.delete_rows(row_index)
 
-    def batch_delete_rows(self, row_indices: List[int]) -> None:
+    def batch_delete_rows(self, row_indices: List[int], sheet_id: str) -> None:
         """Batch delete rows in list of indices."""
         delete_body = {
             "requests": [
                 {
                     "deleteDimension": {
                         "range": {
-                            "sheetId": 0,
+                            "sheetId": sheet_id,
                             "dimension": "ROWS",
                             "startIndex": index,
                             "endIndex": index + 1,
                         }
                     }
                 }
-                for index in row_indices
+                for index in sorted(row_indices, reverse=True)
             ]
         }
         self.spread_sheet.batch_update(body=delete_body)
