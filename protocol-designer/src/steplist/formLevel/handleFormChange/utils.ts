@@ -148,7 +148,7 @@ export function getChannels(
   return pipette.spec.channels
 }
 export const DISPOSAL_VOL_DIGITS = 1
-export function getMaxDisposalVolumeForMultidispense(
+export function getMaxDisposalVolumeForMultiDispense(
   values: {
     aspirate_airGap_checkbox?: boolean | null
     aspirate_airGap_volume?: string | null
