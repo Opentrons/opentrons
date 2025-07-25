@@ -221,7 +221,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     },
   ]
 
-  const labwarePythonName = labwareEntities[labwareId]?.pythonName ?? ''
+  // null protect if labware to move has been deleted
+  const labwarePythonName = labwareEntities[labwareId]?.pythonName
   let location: string = ''
   let parentSlotForSlotCompatibility: string | null = null
   if (newLocation === 'offDeck') {
