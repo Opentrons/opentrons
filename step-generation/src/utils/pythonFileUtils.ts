@@ -245,13 +245,6 @@ export function getLoadLabware(
     lw.def.allowedRoles?.includes('lid')
   )
 
-  // store quantity here
-  const lidStacks = _getLidStacks(
-    lidEntities,
-    allLabwareEntities,
-    labwareRobotState
-  )
-
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
@@ -259,13 +252,7 @@ export function getLoadLabware(
       const lidEntity = Object.values(lidEntities).find(
         lid => labwareRobotState[lid.id].stack[1] === id
       )
-      const lidSlot = getSlotInLocationStack(labwareRobotState[id].stack)
-      const isLidInStack = lidSlot in lidStacks
 
-      // this lid will be loaded in a stack, so don't load it individually
-      if (isLidInStack) {
-        return acc
-      }
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
