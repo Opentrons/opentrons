@@ -84,7 +84,6 @@ import {
   composeWarnings,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
 } from './warnings'
@@ -245,7 +244,6 @@ const stepFormHelperMap: {
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
       maxDispenseWellVolume,
-      minDisposalVolume,
       tipPositionInTube,
       incompatibleLiquidClass
     ),
