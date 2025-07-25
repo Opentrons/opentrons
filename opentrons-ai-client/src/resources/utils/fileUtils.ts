@@ -1,5 +1,3 @@
-import type { ValidFileType } from '../types'
-
 export const ALLOWED_FILE_TYPES = {
   pdf: ['.pdf'],
   csv: ['.csv'],
@@ -18,7 +16,7 @@ export const ALLOWED_MIME_TYPES = {
   ] as string[],
 }
 
-export type FileType = ValidFileType
+export type FileType = 'pdf' | 'csv' | 'python'
 
 export interface FileValidationResult {
   isValid: boolean
@@ -30,7 +28,8 @@ export interface ProcessedFileContent {
   mediaType: string
 }
 
-const UNIT_MB = 1024 * 1024
+const UNIT_KB = 1024
+const UNIT_MB = UNIT_KB * UNIT_KB
 
 export const FILE_SIZE_LIMITS = {
   pdf: 5 * UNIT_MB, // 5MB
@@ -41,28 +40,15 @@ export const FILE_SIZE_LIMITS = {
 export const MAX_FILES_PER_MESSAGE = 5
 
 export const validateFile = (file: File): FileValidationResult => {
-  // First check MIME type for security
-  const isSupportedMimeType =
-    ALLOWED_MIME_TYPES.pdf.includes(file.type) ||
-    ALLOWED_MIME_TYPES.csv.includes(file.type) ||
-    ALLOWED_MIME_TYPES.python.includes(file.type)
+  const fileType = getFileType(file)
 
-  // Fall back to extension check if MIME type is empty or not recognized
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
-  const isSupportedExtension =
-    ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf') ||
-    ALLOWED_FILE_TYPES.csv.includes(extension as '.csv') ||
-    ALLOWED_FILE_TYPES.python.includes(extension as '.py')
-
-  if (!isSupportedMimeType && !isSupportedExtension) {
+  if (!fileType) {
     return {
       isValid: false,
       error:
         'Unsupported file type. Please upload PDF, CSV, or Python (.py) files.',
     }
   }
-
-  const fileType = getFileType(file)
   const sizeLimit = FILE_SIZE_LIMITS[fileType]
   if (file.size > sizeLimit) {
     const sizeMB = Math.round(sizeLimit / UNIT_MB)
@@ -75,33 +61,20 @@ export const validateFile = (file: File): FileValidationResult => {
   return { isValid: true }
 }
 
-export const getFileType = (file: File): FileType => {
-  // Check MIME type first for security
-  if (ALLOWED_MIME_TYPES.pdf.includes(file.type)) {
+export const getFileType = (file: File): FileType | null => {
+  const mimeType = file.type.toLowerCase()
+
+  if (ALLOWED_MIME_TYPES.pdf.includes(mimeType)) {
     return 'pdf'
   }
-  if (ALLOWED_MIME_TYPES.csv.includes(file.type)) {
+  if (ALLOWED_MIME_TYPES.csv.includes(mimeType)) {
     return 'csv'
   }
-  if (ALLOWED_MIME_TYPES.python.includes(file.type)) {
+  if (ALLOWED_MIME_TYPES.python.includes(mimeType)) {
     return 'python'
   }
 
-  // Fall back to extension if MIME type is not recognized
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
-
-  if (ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf')) {
-    return 'pdf'
-  }
-  if (ALLOWED_FILE_TYPES.csv.includes(extension as '.csv')) {
-    return 'csv'
-  }
-  if (ALLOWED_FILE_TYPES.python.includes(extension as '.py')) {
-    return 'python'
-  }
-
-  // This should never happen if validateFile is called first
-  throw new Error(`Unsupported file type: ${file.type || extension}`)
+  return null
 }
 
 const fileTypeLabels: Record<FileType, string> = {
@@ -116,6 +89,9 @@ export const readFileContent = async (
   file: File
 ): Promise<ProcessedFileContent> => {
   const type = getFileType(file)
+  if (!type) {
+    throw new Error(`Unsupported file type: ${file.type || file.name}`)
+  }
   switch (type) {
     case 'pdf':
       // PDF files are encoded as base64 for proper document handling
@@ -124,14 +100,12 @@ export const readFileContent = async (
 
       // Check if PDF is too large (base64 encoding increases size by ~33%)
       // Claude has a ~200k token limit, so we need to be conservative
-      const MAX_PDF_SIZE_MB = 5 * 1024 * 1024 // 5MB limit for PDFs
-
-      if (pdfBuffer.byteLength > MAX_PDF_SIZE_MB) {
+      if (pdfBuffer.byteLength > FILE_SIZE_LIMITS.pdf) {
         throw new Error(
           `PDF file is too large (${Math.round(
-            pdfBuffer.byteLength / (1024 * 1024)
+            pdfBuffer.byteLength / UNIT_MB
           )}MB). Please use a PDF smaller than ${Math.round(
-            MAX_PDF_SIZE_MB / (1024 * 1024)
+            FILE_SIZE_LIMITS.pdf / UNIT_MB
           )}MB or extract the relevant text content and paste it directly.`
         )
       }
@@ -176,7 +150,7 @@ export const readFileContent = async (
       const csvText = await file.text()
 
       // If CSV is large, send as raw text to avoid timeout
-      const MAX_CSV_JSON_SIZE_KB = 500 * 1024 // 500KB limit for JSON conversion
+      const MAX_CSV_JSON_SIZE_KB = 500 * UNIT_KB // 500KB limit for JSON conversion
 
       try {
         // Simple CSV to JSON conversion

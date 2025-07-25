@@ -1,18 +1,17 @@
 import type { FC } from 'react'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { Flags } from '../feature-flags/types'
+import type { FileType } from './utils/fileUtils'
 
 export type ProtocolFormat = 'Protocol Designer' | 'Python'
 
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
 
-export type ValidFileType = 'pdf' | 'csv' | 'python'
-
 export interface FileAttachment {
   id?: string // Optional because it's not present when initially selecting files
   name: string
-  type: ValidFileType
+  type: FileType
   content: string
   size: number
 }

@@ -46,7 +46,7 @@ export function AttachedFileItem({
   onRemove,
   showRemoveButton = true,
 }: AttachedFileItemProps): JSX.Element {
-  const fileType = getFileType(file as File)
+  const fileType = getFileType(file as File) || 'unsupported'
 
   const containerClass = `${styles.container} ${
     showRemoveButton && onRemove != null

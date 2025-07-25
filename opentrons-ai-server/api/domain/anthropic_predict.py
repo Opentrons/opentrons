@@ -3,13 +3,13 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Iterable, List, Literal, Optional, cast
+from typing import Any, ContextManager, Dict, List, Literal, Optional
 
 import requests
 import structlog
 import weave
 from anthropic import Anthropic
-from anthropic.types import Message, MessageParam, TextBlockParam
+from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam
 from ddtrace import tracer
 from weave.trace.context.call_context import set_tracing_enabled
 
@@ -69,26 +69,20 @@ class AnthropicPredict:
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct.md"
         self.system_prompt_pd = self.get_system_prompt_pd()
 
-        self.cached_docs: List[MessageParam] = cast(
-            List[MessageParam],
-            [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}
-                    ],
-                }
-            ],
-        )
-        self.cached_api_docs: List[MessageParam] = cast(
-            List[MessageParam],
-            [
-                {
-                    "role": "user",
-                    "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],
-                }
-            ],
-        )
+        self.cached_docs: List[MessageParam] = [
+            {
+                "role": "user",
+                "content": [
+                    TextBlockParam(type="text", text=DOCUMENTS.format(doc_content=self.get_docs()), cache_control={"type": "ephemeral"})
+                ],
+            }
+        ]
+        self.cached_api_docs: List[MessageParam] = [
+            {
+                "role": "user",
+                "content": [TextBlockParam(type="text", text=self.get_api_docs(), cache_control={"type": "ephemeral"})],
+            }
+        ]
         self.tools: List[Dict[str, Any]] = [
             {
                 "name": "simulate_protocol",
@@ -104,7 +98,7 @@ class AnthropicPredict:
         ]
 
     @tracer.wrap()
-    def get_system_prompt_pd(self) -> List[Dict[str, Any]]:
+    def get_system_prompt_pd(self) -> List[TextBlockParam]:
         """
         Get the system prompt for the PD model
         """
@@ -133,15 +127,11 @@ class AnthropicPredict:
         # complete prompt
         self.PROMPT_PD = self.PROMPT_PD.format(EXPECTED_JSON=expected_json, USER_PROMPT="{USER_PROMPT}")
 
-        system_content = [
-            {
-                "type": "text",
-                "text": SYSTEM_PROMPT_PD,
-            },
-            {"type": "text", "text": formatted_documents_pd, "cache_control": {"type": "ephemeral"}},
+        system_content: List[TextBlockParam] = [
+            TextBlockParam(type="text", text=SYSTEM_PROMPT_PD),
+            TextBlockParam(type="text", text=formatted_documents_pd, cache_control={"type": "ephemeral"}),
         ]
-        # Cast to satisfy mypy return type
-        return cast(List[Dict[str, Any]], system_content)
+        return system_content
 
     @tracer.wrap()
     def get_docs(self) -> str:
@@ -289,7 +279,7 @@ class AnthropicPredict:
 
     def _create_file_attachment_blocks(
         self, file_references: Optional[List[Dict[str, str]]], user_id: str  # noqa: ARG002
-    ) -> List[Dict[str, Any]]:
+    ) -> List[ContentBlockParam]:
         """
         Create content blocks with file attachments using appropriate format for each file type
 
@@ -303,53 +293,48 @@ class AnthropicPredict:
         if not file_references:
             return []
 
-        content_blocks: List[Dict[str, Any]] = []
+        content_blocks: List[ContentBlockParam] = []
 
         for file_ref in file_references:
             filename = file_ref.get("filename", "Attached File")
             file_type = file_ref.get("file_type", "unknown").lower()
             file_content = file_ref.get("content", "")
-            media_type = file_ref.get("media_type", "text/plain")
 
             if not file_content:
                 # Fallback if content is missing
-                file_block = {
-                    "type": "text",
-                    "text": f"=== FILE: {filename} ({file_type.upper()}) ===\n\n"
+                text_block = TextBlockParam(
+                    type="text",
+                    text=f"=== FILE: {filename} ({file_type.upper()}) ===\n\n"
                     f"[File content is empty or missing]\n\n"
                     f"=== END OF FILE: {filename} ===\n\n",
-                }
-                content_blocks.append(file_block)
+                )
+                content_blocks.append(text_block)
                 continue
 
-            if file_type == "pdf" and media_type == "application/pdf":
+            if file_type == "pdf":
                 # PDF files are sent as base64-encoded documents
-                # Use cast() to handle mixed value types: "type": str and "source": dict
-                file_block = cast(
-                    Dict[str, Any],
-                    {
-                        "type": "document",
-                        "source": {"type": "base64", "media_type": "application/pdf", "data": file_content},
-                        "title": filename,  # Preserve filename for PDF documents
-                    },
+                # Trust file_type over media_type for consistency
+                doc_block = DocumentBlockParam(
+                    type="document",
+                    source={"type": "base64", "media_type": "application/pdf", "data": file_content},
+                    title=filename,  # Preserve filename for PDF documents
                 )
+                content_blocks.append(doc_block)
             else:
                 # CSV and Python files are sent as text blocks
-                file_block = {
-                    "type": "text",
-                    "text": f"=== FILE: {filename} ({file_type.upper()}) ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
-                }
-
-            content_blocks.append(file_block)
+                text_block = TextBlockParam(
+                    type="text",
+                    text=f"=== FILE: {filename} ({file_type.upper()}) ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
+                )
+                content_blocks.append(text_block)
 
         # Add an introductory message only for text-based files (not PDFs)
-        has_pdf = any(
-            file_ref.get("file_type", "").lower() == "pdf" and file_ref.get("media_type") == "application/pdf"
-            for file_ref in file_references or []
-        )
+        has_pdf = any(file_ref.get("file_type", "").lower() == "pdf" for file_ref in file_references or [])
 
         if content_blocks and not has_pdf:
-            intro_block = {"type": "text", "text": f"The user has uploaded {len(file_references)} file(s). Here are the contents:\n\n"}
+            intro_block = TextBlockParam(
+                type="text", text=f"The user has uploaded {len(file_references)} file(s). Here are the contents:\n\n"
+            )
             content_blocks.insert(0, intro_block)
 
         return content_blocks
@@ -369,11 +354,11 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
+            relevant_api_docs = ""  # self.get_relevant_api_docs(prompt, user_id)
             prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
             # Create user message with file attachments if present
-            user_content: List[Dict[str, Any]] = [{"type": "text", "text": PROMPT.format(USER_PROMPT=prompt_with_docs)}]
+            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
 
             # Add file attachments with actual content
             if file_references:
@@ -384,7 +369,7 @@ class AnthropicPredict:
                     extra={"user_id": user_id, "num_files": len(file_references), "file_ids": [ref["id"] for ref in file_references]},
                 )
 
-            user_message: MessageParam = cast(MessageParam, {"role": "user", "content": user_content})
+            user_message: MessageParam = {"role": "user", "content": user_content}
 
             # Debug log the message structure for PDF debugging
             if file_references:
@@ -452,7 +437,7 @@ class AnthropicPredict:
                 max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
-                system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
+                system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
                 temperature=0.0,
             )

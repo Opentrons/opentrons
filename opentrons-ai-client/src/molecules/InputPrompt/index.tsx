@@ -43,11 +43,11 @@ import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { FileType } from '/ai-client/resources/utils/fileUtils'
 import type {
   ChatData,
   CreatePrompt,
   UpdatePrompt,
-  ValidFileType,
 } from '../../resources/types'
 
 // Helper to safely parse the `protocol_content` field that may be a JSON string or an object.
@@ -185,6 +185,9 @@ export function InputPrompt(): JSX.Element {
       try {
         for (const file of attachedFiles) {
           const fileType = getFileType(file)
+          if (!fileType) {
+            throw new Error(`Unsupported file type: ${file.name}`)
+          }
           const fileContent = await readFileContent(file)
           fileAttachments.push({
             id: uuidv4(), // Generate local ID
@@ -216,7 +219,7 @@ export function InputPrompt(): JSX.Element {
           ? fileAttachments.map(file => ({
               id: file.id,
               name: file.filename,
-              type: file.file_type as ValidFileType,
+              type: file.file_type as FileType,
               content: file.content,
               size: file.size,
             }))
@@ -338,7 +341,7 @@ export function InputPrompt(): JSX.Element {
               ? fileAttachments.map(file => ({
                   id: file.id,
                   name: file.filename,
-                  type: file.file_type as ValidFileType,
+                  type: file.file_type as FileType,
                   content: file.content,
                   size: file.size,
                 }))
