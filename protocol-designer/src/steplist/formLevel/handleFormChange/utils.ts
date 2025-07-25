@@ -1109,7 +1109,6 @@ const getLiquidClassValuesMoveLiquid = (args: {
     'dispense'
   )
   const dispenseOffsetFields = getOffsetFields(dispenseOffset, 'dispense')
-  console.log(byVolumeLookup, dispenseFlowRateByVolume)
   const dispenseFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.dispense,
     dispenseFlowRateByVolume,
