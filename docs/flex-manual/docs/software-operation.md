@@ -223,8 +223,8 @@ Labware offsets are fine-tuned positional coordinates that help your robot align
 
 | Feature | Description |
 |----|----|
-| Protocol independence | Offsets are labware-based and no longer bound to a 20-run limit. Each piece of labware requires one default offset and can also be associated with a significantly larger number of applied offsets. |
-| Default offsets | Default offsets are automatically applied to particular piece of labware and to all other identical labware, regardless of deck slot or protocol. This "measure once, set everywhere" feature means you don’t have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
+| Protocol independence | Offsets are positional adjustments associated with a piece of labware, rather than with a specific protocol, and saved on the robot. This allows for greater flexibility and reusability of offset data in any protocol. |
+| Default offsets | Default offsets are manually created via Labware Position Check and then automatically applied to each instance of that labware, regardless of deck slot or protocol. This "measure once, set everywhere" feature means you don't have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
 | Applied offsets | Applied offsets override defaults for a specific piece of labware in a specific deck slot. You can use an applied offset with different protocols, but the labware and deck slot must be the same as the original applied offset. |
 | Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the Python protocol file to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
 
@@ -233,8 +233,6 @@ Labware offsets are fine-tuned positional coordinates that help your robot align
 This illustration shows how the different types of offsets appear as you're configuring a protocol on the Flex touchscreen.
 
 ![](images/labware-offsets.svg)
-
-You create offsets by running Labware Position Check using an attached pipette.
 
 #### Labware Position Check
 
