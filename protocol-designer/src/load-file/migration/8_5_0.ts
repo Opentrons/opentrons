@@ -1,3 +1,4 @@
+import { round } from 'lodash'
 import first from 'lodash/first'
 import floor from 'lodash/floor'
 import min from 'lodash/min'
@@ -72,9 +73,9 @@ const getClippedFlowRateForMoveLiquid = (args: {
   pipetteSpecs: PipetteV2Specs | null
 }): number | null => {
   const { formData, rawFlowRate, flowRateType, robotType, pipetteSpecs } = args
-  if (pipetteSpecs == null || rawFlowRate == null) {
+  if (pipetteSpecs == null) {
     console.warn('No pipette specs found. Using old flow rate.')
-    return rawFlowRate
+    return null
   }
   const rawFlowRateNumber = Number(rawFlowRate)
   const volume = Number(formData.volume)
@@ -140,7 +141,24 @@ const getClippedFlowRateForMoveLiquid = (args: {
     shaftULperMM,
     correctionVolume,
   })
-  return Math.min(rawFlowRateNumber, maxFlowRate)
+  let defaultFlowRate: number | null
+  switch (flowRateType) {
+    case 'aspirate':
+      defaultFlowRate = matchingTipLiquidSpecs.defaultAspirateFlowRate.default
+      break
+    case 'dispense':
+      defaultFlowRate = matchingTipLiquidSpecs.defaultDispenseFlowRate.default
+      break
+    default:
+      // flowRateTypeis blowout
+      defaultFlowRate = matchingTipLiquidSpecs.defaultBlowOutFlowRate.default
+      break
+  }
+
+  return Math.min(
+    rawFlowRate == null ? round(defaultFlowRate, 2) : rawFlowRateNumber,
+    maxFlowRate
+  )
 }
 
 export const migrateFile = (
