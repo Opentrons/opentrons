@@ -11,7 +11,7 @@ from typing import List, Dict, Optional
 from opentrons.types import Point
 
 # SLOTS
-SLOT_LIQUID_TIPRACK = "C3"
+SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
 SLOT_PROBING_TIPRACK = "D3"
 SLOT_FRUSTUM_LABWARE = "D2"
 SLOT_UDV_LABWARE = "D1"
@@ -98,11 +98,14 @@ def _get_tip_z_error(
     dial: Labware,
     front_channel: bool = False,
 ) -> float:
-    idx = 0 if not front_channel else 1
-    baseline = DIAL_POS_WITHOUT_TIP[idx]
-    assert baseline is not None
-    new_val = _read_dial_indicator(ctx, pipette, dial, front_channel)
-    return (new_val - baseline) * -1.0
+    if not ctx.is_simulating():
+        idx = 0 if not front_channel else 1
+        baseline = DIAL_POS_WITHOUT_TIP[idx]
+        assert baseline is not None
+        new_val = _read_dial_indicator(ctx, pipette, dial, front_channel)
+        return (new_val - baseline) * -1.0
+    else:
+        return 0.0
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -131,10 +134,6 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "value": "usascientific_96_wellplate_2.4ml_deep",
             },
             {
-                "display_name": "applied24",
-                "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
-            },
-            {
                 "display_name": "opentrons96",
                 "value": "opentrons_96_wellplate_200ul_pcr_full_skirt",
             },
@@ -146,7 +145,12 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="nest_96_wellplate_2ml_deep",
+    )
+    parameters.add_bool(
+        variable_name = "fill_with_manual_pipette",
+        display_name = "Fill with Manual Pipette",
+        default=False
     )
 
 
@@ -161,23 +165,31 @@ def aspirate_dispense_measure(
     ethanol: LiquidClass,
 ) -> None:
     """Aspirate from source, dispense into labware, measure height, record."""
-    for vol in volumes_dict:
+    i = 0
+    for well, vol in volumes_dict.items():
+        if len(labware.wells()) == 12 and i == 11:
+            ctx.pause("Empty Labware")
+            print(f"empty labware at well {well}")
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-        liq_pipette.transfer_with_liquid_class(
-            ethanol,
-            vol if liq_pipette.channels == 1 else vol / 8,
-            src["A1"],
-            labware[vol],
-            new_tip="never",
-            return_tip=False,
-        )
-        height = probe_pipette.measure_liquid_height(labware[vol])
+        fill_with_manual_pipette = ctx.params.fill_with_manual_pipette # type: ignore[attr-defined]
+        if not fill_with_manual_pipette:
+            liq_pipette.transfer_with_liquid_class(
+                ethanol,
+                vol if liq_pipette.channels == 1 else vol / 8,
+                src["A1"],
+                labware[well],
+                new_tip="never",
+                return_tip=False,
+            )
+        else:
+            ctx.pause(f"Fill {well} with {vol}")
+        height = probe_pipette.measure_liquid_height(labware[well])
         corrected_height = height + tip_z_error
-        expected_height = labware[vol].height_from_volume(vol)
+        expected_height = labware[well].height_from_volume(vol)
         acc = (corrected_height - expected_height) / expected_height * 100
         line_for_csv = [
-            labware[vol],
+            well,
             vol,
             corrected_height,
             expected_height,
@@ -185,39 +197,17 @@ def aspirate_dispense_measure(
         ]
         _write_line_to_csv(ctx, line_for_csv)
         drop_tips(probe_pipette, liq_pipette)
+        i+=1
+        
+
+        
 
 
 def run(ctx: ProtocolContext) -> None:
     """Protocol."""
     global DIAL_PORT, RUN_ID, FILE_NAME
-
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
-    liq_tip_rack = ctx.load_labware(
-        "opentrons_flex_96_tiprack_200ul", SLOT_LIQUID_TIPRACK
-    )
-    probe_tip_rack = ctx.load_labware(
-        "opentrons_flex_96_tiprack_50ul", SLOT_PROBING_TIPRACK
-    )
-    liquid_racks = [liq_tip_rack]
-    liq_pipette = ctx.load_instrument(
-        "flex_1channel_1000", "left", tip_racks=liquid_racks
-    )
-    probe_pipette = ctx.load_instrument(
-        "flex_1channel_50", "right", tip_racks=[probe_tip_rack]
-    )
-
-    # Assign ethanol liquid class behavior
-    ethanol = ctx.get_liquid_class("ethanol_80")
-    lm = "liquid-meniscus"
-    for liquid_rack in liquid_racks:
-        props = ethanol.get_for(liq_pipette, liquid_rack)
-        meniscus_z = -0.5
-        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-        props.aspirate.aspirate_position.offset.z = meniscus_z
-        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
-        props.dispense.dispense_position.offset.z = meniscus_z
-
-    # load labware, reservoir, and dial
+    # LOAD LABWARE AND DIAL
     frustum_version = ctx.params.labware_version_of_frustum  # type: ignore[attr-defined]
     frustum_labware = ctx.load_labware(
         labware_type, SLOT_FRUSTUM_LABWARE, version=frustum_version
@@ -226,11 +216,49 @@ def run(ctx: ProtocolContext) -> None:
     udv_version = ctx.params.labware_version_of_table  # type: ignore[attr-defined]
     udv_labware = ctx.load_labware(labware_type, SLOT_UDV_LABWARE, version=udv_version)
     udv_labware.load_empty(udv_labware.wells())
-    src = ctx.load_labware("nest_1_reservoir_195ml", SLOT_RESERVOIR)
+    src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    # LOAD TIP RACKS AND PIPETTES
+    if frustum_labware["A1"].max_volume < 100:
+        liq_rack_vol = 50
+    else:
+        liq_rack_vol = 1000
+
+    liq_tip_racks = [
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_rack_vol}ul", slot)
+        for slot in SLOT_LIQUID_TIPRACKS
+    ]
+    probe_tip_rack = ctx.load_labware(
+        "opentrons_flex_96_tiprack_50ul", SLOT_PROBING_TIPRACK
+    )
+    if frustum_labware["A1"].max_volume > 500:
+        liq_racks = liq_tip_racks
+    else:
+        liqracks = liq_tip_racks[:1]
+    if len(frustum_labware.wells()) <= 12:
+        channel_num = 8
+    else:
+        channel_num = 1
+    liq_pipette = ctx.load_instrument(
+       f"flex_{channel_num}channel_1000", "left", tip_racks=liq_racks
+    )
+    probe_pipette = ctx.load_instrument(
+        "flex_1channel_50", "right", tip_racks=[probe_tip_rack]
+    )
+
+    # Assign ethanol liquid class behavior
+    ethanol = ctx.get_liquid_class("ethanol_80")
+    lm = "liquid-meniscus"
+    for liquid_rack in liq_racks:
+        props = ethanol.get_for(liq_pipette, liquid_rack)
+        meniscus_z = -0.5
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        props.aspirate.aspirate_position.offset.z = meniscus_z
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+        props.dispense.dispense_position.offset.z = meniscus_z
 
     # Connect dial indicator and create data sheet
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -259,16 +287,19 @@ def run(ctx: ProtocolContext) -> None:
     num_of_rows = 3
     low_height = 3
     mid_height = frustum_labware["A1"].depth / 2
-    high_height = frustum_labware["A1"].depth - 5
+    high_height = frustum_labware["A1"].depth - 9
     heights = [low_height, mid_height, high_height]
     frustum_volumes = {}
     udv_volumes = {}
-
     for i in range(num_of_rows):
-        wells_in_row = frustum_labware.rows()[i]
+        try:
+            wells_in_row = frustum_labware.rows()[i]
+        except IndexError:
+            wells_in_row = frustum_labware.rows()[0]
+        well_names = [str(well).split(" ")[0] for well in wells_in_row][:6]
         frustum_vol = frustum_labware["A1"].volume_from_height(heights[i])
         ud_vol = udv_labware["A1"].volume_from_height(heights[i])
-        for well in wells_in_row:
+        for well in well_names:
             frustum_volumes[well] = frustum_vol
             udv_volumes[well] = ud_vol
     # Pick up Tips
