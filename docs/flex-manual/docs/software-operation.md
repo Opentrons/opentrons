@@ -236,7 +236,7 @@ This illustration shows how the different types of offsets appear as you're conf
 
 #### Labware Position Check
 
-Labware Position Check lets you align a gantry mounted instrument relative to a piece of labware (e.g. a well plate), which helps ensure accurate and reproducible pipetting results.
+Labware Position Check lets you align a pipette relative to a piece of labware (e.g. a well plate), which helps ensure accurate and reproducible pipetting results.
 
 You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
