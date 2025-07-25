@@ -35,7 +35,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getModuleUSBPort } from '/app/local-resources/modules'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -437,7 +437,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {getModuleUSBPort(module) ?? t('usb_port_not_connected')}
+                  {useModuleUSBPort(module) ?? t('usb_port_not_connected')}
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}

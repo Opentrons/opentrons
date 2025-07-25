@@ -13,7 +13,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
-import { getModuleUSBPort } from '/app/local-resources/modules'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '/app/redux/modules/types'
@@ -49,7 +49,7 @@ export const HeaterShakerModuleCard = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
           >
-            {getModuleUSBPort(module)}
+            {useModuleUSBPort(module)}
           </LegacyStyledText>
           <Flex paddingBottom={SPACING.spacing4}>
             <Icon

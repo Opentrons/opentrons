@@ -44,7 +44,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
-  getModuleUSBPort,
+  useModuleUSBPort,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -388,7 +388,7 @@ export function ModulesListItem({
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
   const portDisplay = attachedModuleMatch
-    ? getModuleUSBPort(attachedModuleMatch)
+    ? useModuleUSBPort(attachedModuleMatch)
     : null
 
   return (

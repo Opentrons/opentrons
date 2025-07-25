@@ -12,7 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getModuleUSBPort } from '/app/local-resources/modules'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -69,7 +69,7 @@ export const SetupModulesMap = ({
         isAttached={module.attachedModuleMatch != null}
         physicalPort={
           module.attachedModuleMatch
-            ? getModuleUSBPort(module.attachedModuleMatch)
+            ? useModuleUSBPort(module.attachedModuleMatch)
             : null
         }
         runId={runId}

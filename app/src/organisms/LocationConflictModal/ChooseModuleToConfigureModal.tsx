@@ -29,7 +29,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
-import { getModuleUSBPort } from '/app/local-resources/modules'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -108,7 +108,7 @@ export const ChooseModuleToConfigureModal = (
     attachedMod => {
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: getModuleUSBPort(attachedMod),
+        usbPort: useModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
