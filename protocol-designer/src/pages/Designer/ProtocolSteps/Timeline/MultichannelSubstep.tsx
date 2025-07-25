@@ -88,14 +88,19 @@ export function MultichannelSubstep(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          padding="12px"
+          padding={SPACING.spacing12}
           width="100%"
+          height={collapsed ? '3rem' : 'auto'}
         >
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
-            <Flex gridGap={SPACING.spacing4}>
+            <Flex
+              gridGap={SPACING.spacing4}
+              paddingRight={SPACING.spacing12}
+              alignItems={ALIGN_CENTER}
+            >
               <StyledText desktopStyle="bodyDefaultRegular">
                 {titleCopy}
               </StyledText>
@@ -133,7 +138,11 @@ export function MultichannelSubstep(
                 >
                   {t('protocol_steps:individual_wells')}
                 </StyledText>
-                <Flex flexDirection="column" gridGap={SPACING.spacing4}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  alignItems={ALIGN_CENTER}
+                >
                   {rowGroup.map((row, rowKey) => {
                     return (
                       <Substep
