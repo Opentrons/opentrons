@@ -3,12 +3,10 @@ import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 
 import {
-  Banner,
   DeckConfigurator,
-  LegacyStyledText,
+  InlineNotification,
   RESPONSIVENESS,
-  SIZE_1,
-  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
@@ -239,18 +237,17 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       }
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
+          <StyledText css={BODY_STYLE}>
             {t('select_the_slot', { module: moduleName, port: modulePort })}
             {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
-          </LegacyStyledText>
+          </StyledText>
           {isFlexStacker ? (
-            <Banner type="informing" size={SIZE_1} marginY={SPACING.spacing4}>
-              {t('look_for_pulsing_lights')}
-            </Banner>
+            <InlineNotification
+              type="neutral"
+              message={t('look_for_pulsing_lights')}
+            />
           ) : (
-            <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-              {t('module_secured')}
-            </Banner>
+            <InlineNotification type="alert" message={t('module_secured')} />
           )}
         </>
       }
