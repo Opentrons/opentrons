@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -27,7 +27,11 @@ import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
-import { getOptions } from '../DeviceDetailsDeckConfiguration/utils'
+import {
+  getFixtureOptions,
+  getOptions,
+  getWasteChuteOptions,
+} from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -90,6 +94,23 @@ export function AddFixtureModal({
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
 
+  // Bind allFixtureOptions with useEffect
+  const [allFixtureOptions, setAllFixtureOptions] = useState<
+    CutoutConfigMap[][]
+  >([])
+
+  useEffect(() => {
+    const options = [
+      ...getFixtureOptions(
+        cutoutId,
+        addressableAreaId,
+        existingCutoutFixtureId
+      ),
+      ...getWasteChuteOptions(cutoutId),
+    ]
+    setAllFixtureOptions(options)
+  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
+
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to', {
       slotName: getAADisplayName(addressableAreaId),
@@ -142,7 +163,8 @@ export function AddFixtureModal({
       </>
     ) : (
       <>
-        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
+        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ||
+        allFixtureOptions.length === 0 ? null : (
           <FixtureOption
             key="fixturesOption"
             optionName="Fixtures"

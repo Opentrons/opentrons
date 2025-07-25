@@ -132,6 +132,7 @@ describe('Desktop AddFixtureModal', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [mockFixture],
     } as unknown) as UseQueryResult<DeckConfiguration>)
+    props = { ...props, existingCutoutFixtureId: FLEX_STACKER_V1_FIXTURE }
     render(props)
     screen.getByText('Add to Slot D3')
     screen.getByText(
