@@ -117,33 +117,35 @@ export function SelectLiquidClass({
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        gridGap={SPACING.spacing24}
         width="100%"
       >
         <StyledText oddStyle="level4HeaderRegular">
           {t('apply_predefined_settings')}
         </StyledText>
-        {liquidClassOptions.map(option => (
-          <RadioButton
-            key={option.liquidClassName}
-            isSelected={
-              selectedLiquidClass?.liquidClassName === option.liquidClassName
-            }
-            buttonLabel={option.displayName}
-            buttonValue={option.liquidClassName}
-            buttonSubLabel={{ label: option.description, align: 'vertical' }}
-            onChange={() => {
-              setSelectedLiquidClass(option)
-            }}
-            onClick={() => {
-              handleClick(option)
-            }}
-            ariaDisabled={
-              checkLiquidClassCompatibility(option, state).incompatible
-            }
-          />
-        ))}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {liquidClassOptions.map(option => (
+            <RadioButton
+              key={option.liquidClassName}
+              isSelected={
+                selectedLiquidClass?.liquidClassName === option.liquidClassName
+              }
+              buttonLabel={option.displayName}
+              buttonValue={option.liquidClassName}
+              buttonSubLabel={{ label: option.description, align: 'vertical' }}
+              onChange={() => {
+                setSelectedLiquidClass(option)
+              }}
+              onClick={() => {
+                handleClick(option)
+              }}
+              ariaDisabled={
+                checkLiquidClassCompatibility(option, state).incompatible
+              }
+            />
+          ))}
+        </Flex>
       </Flex>
     </Flex>
   )

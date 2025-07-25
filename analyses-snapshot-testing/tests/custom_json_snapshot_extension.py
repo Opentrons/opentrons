@@ -14,9 +14,11 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
                 (r"moduleId='[^']+'", "moduleId='UUID'"),
             ],
             "traceback": [
+                # Pattern to match file paths in tracebacks
                 (r"line \d+,", "line N,"),
-                # Replace absolute paths (macOS, Linux, CI, etc.) with <PATH>
-                (r"(/Users/[^/]+/github/opentrons/opentrons|/home/runner/work/opentrons/opentrons)[^\s\"]*", "<PATH>"),
+                # This pattern finds absolute paths and uses backreferences (\1, \2)
+                # to keep the surrounding "File " and quotes.
+                (r"(File \")(?:/|[a-zA-Z]:\\).*?(\")", r"\1<PATH>\2"),
             ],
             "obj": [
                 (r"(<[\w\.]+ object at 0x)[0-9a-fA-F]+(>)", r"\1UUID\2"),

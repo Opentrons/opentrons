@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
 import { Auth0Provider } from '@auth0/auth0-react'
 
-import '@opentrons/components/styles'
+import '@opentrons/components/styles/global'
 
 import { App } from './App'
 import { i18n } from './i18n'

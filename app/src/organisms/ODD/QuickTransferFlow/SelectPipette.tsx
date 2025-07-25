@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
@@ -80,14 +79,14 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing8}
       >
-        <LegacyStyledText
-          css={TYPOGRAPHY.level4HeaderRegular}
-          paddingBottom={SPACING.spacing8}
+        <StyledText
+          oddStyle="level4HeaderRegular"
+          paddingBottom={SPACING.spacing16}
         >
           {t('pipette_currently_attached')}
-        </LegacyStyledText>
+        </StyledText>
         {leftPipetteSpecs != null ? (
           <RadioButton
             isSelected={selectedPipette === LEFT}
