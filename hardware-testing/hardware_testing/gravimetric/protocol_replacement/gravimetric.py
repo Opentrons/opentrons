@@ -1178,11 +1178,10 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             )
             last_probed_tip_size = tip
             remove_tip(fixture_settings)
-        volumes_to_tests = (
-            fixture_settings.volumes[tip]
-            if tip not in tip_sizes_done
-            else fixture_settings.extra_volumes[tip]
-        )
+
+        volumes_to_tests = fixture_settings.volumes[tip]
+        if tip in tip_sizes_done or len(fixture_settings.volumes[tip]) == 0:
+            volumes_to_tests = fixture_settings.extra_volumes[tip]
         for volume in volumes_to_tests:
             trial_asp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
