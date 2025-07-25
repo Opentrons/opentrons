@@ -842,4 +842,234 @@ describe('moveLabware', () => {
       type: 'PIPETTE_HAS_TIP',
     })
   })
+
+  it('should return a move_lid command when moving a lid from a stack to a stack', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+            compatibleParentLabware: ['fixture_96_plate'],
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+        stackingLabware: {
+          stack: ['stackingLabware', 'A1'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_lid("A2", "A1", use_gripper=True)`
+    )
+  })
+
+  it('should return a move_lid command when moving a lid from a stack to a slot', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_lid("A2", "A1", use_gripper=True)`
+    )
+  })
+
+  it('should return a move_lid command when moving a lid from a labware to a slot', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...fixture12Trough,
+          } as LabwareDefinition2,
+          pythonName: 'stacking_labware',
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        stackingLabware: {
+          stack: ['stackingLabware', '1'],
+        },
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'stackingLabware', 'A2'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_lid(stacking_labware, "A1", use_gripper=True)`
+    )
+  })
+
+  it('should return a move_lid command when moving a lid from a stack to a compatible labware', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+            compatibleParentLabware: ['fixture_12_trough'],
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...fixture12Trough,
+          } as LabwareDefinition2,
+          pythonName: 'stacking_labware',
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        stackingLabware: {
+          stack: ['stackingLabware', 'A1'],
+        },
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { labwareId: 'stackingLabware' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_lid("A2", stacking_labware, use_gripper=True)`
+    )
+  })
+
+  it('should return an error when moving a lid from a stack to an incompatible labware', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...fixture12Trough,
+          } as LabwareDefinition2,
+          pythonName: 'stacking_labware',
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        stackingLabware: {
+          stack: ['stackingLabware', 'A1'],
+        },
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { labwareId: 'stackingLabware' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
 })
