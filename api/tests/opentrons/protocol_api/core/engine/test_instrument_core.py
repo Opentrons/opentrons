@@ -2666,9 +2666,6 @@ def test_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         mock_transfer_components_executor.tip_state.last_liquid_and_air_gap_in_tip
     ).then_return(LiquidAndAirGapPair(liquid=333, air_gap=444))
-    decoy.when(
-        mock_engine_client.state.pipettes.get_aspirated_volume("abc123")
-    ).then_return(12345)
     result = subject.dispense_liquid_class_during_multi_dispense(
         volume=123,
         dest=(dest_location, dest_well),
@@ -2680,6 +2677,7 @@ def test_dispense_liquid_class_during_multi_dispense(
         trash_location=Location(Point(1, 2, 3), labware=None),
         conditioning_volume=conditioning_volume,
         disposal_volume=disposal_volume,
+        is_last_dispense_in_tip=False,  # testing the case when this is not last dispense
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
@@ -2750,9 +2748,6 @@ def test_last_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         mock_transfer_components_executor.tip_state.last_liquid_and_air_gap_in_tip
     ).then_return(LiquidAndAirGapPair(liquid=333, air_gap=444))
-    decoy.when(
-        mock_engine_client.state.pipettes.get_aspirated_volume("abc123")
-    ).then_return(123)
     result = subject.dispense_liquid_class_during_multi_dispense(
         volume=123,
         dest=(dest_location, dest_well),
@@ -2764,6 +2759,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
         trash_location=Location(Point(1, 2, 3), labware=None),
         conditioning_volume=conditioning_volume,
         disposal_volume=disposal_volume,
+        is_last_dispense_in_tip=True,
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(

@@ -1504,6 +1504,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
             ),
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
@@ -1524,6 +1525,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=True,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
@@ -1554,6 +1556,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
             ),
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
@@ -1574,6 +1577,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=True,
             ),
             mock.call.drop_tip_in_disposal_location(
                 mock.ANY,
@@ -1882,6 +1886,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
             ),
             mock.call.dispense_liquid_class_during_multi_dispense(
                 mock.ANY,
@@ -1899,6 +1904,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
                 trash_location=mock.ANY,
                 conditioning_volume=expected_conditioning_volume,
                 disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=True,
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
