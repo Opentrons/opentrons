@@ -223,7 +223,6 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     ) -> None:
         """Initialize the response object and render the response body."""
         super().__init__(content, status_code)
-        self.content = content
 
     @classmethod
     async def create(
