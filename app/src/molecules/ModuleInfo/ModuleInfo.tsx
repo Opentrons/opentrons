@@ -28,7 +28,7 @@ import type { ModuleModel } from '@opentrons/shared-data'
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
   isAttached: boolean
-  physicalPort: string | null | undefined
+  physicalPort?: string | null
   runId?: string
 }
 
