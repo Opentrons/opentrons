@@ -1257,6 +1257,10 @@ def test_retract_after_dispense_with_blowout_in_destination(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
+    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0,
+        1234,  # Explicitly check that this value is not used during post-dispense air gap
+    )
     sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )

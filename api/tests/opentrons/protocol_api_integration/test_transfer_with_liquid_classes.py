@@ -1602,7 +1602,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
 ) -> None:
     """It should distribute the liquid using multi-dispense steps in the expected order.
 
-    It should add air gaps between dispenses due to no conditioning volume..
+    It should add air gaps between dispenses due to no conditioning volume.
     """
     trash = simulated_protocol_context.load_trash_bin("A3")
     tiprack = simulated_protocol_context.load_labware(

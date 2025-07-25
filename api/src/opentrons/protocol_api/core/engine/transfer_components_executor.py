@@ -604,13 +604,18 @@ class TransferComponentsExecutor:
             last_air_gap = self._tip_state.last_liquid_and_air_gap_in_tip.air_gap
             self._tip_state.delete_air_gap(last_air_gap)
             self._tip_state.ready_to_aspirate = False
+
+            air_gap_volume = (
+                retract_props.air_gap_by_volume.get_for_volume(0)
+                if add_final_air_gap
+                else 0.0
+            )
             # Do touch tip and air gap again after blowing out into source well or trash
             self._do_touch_tip_and_air_gap_after_dispense(
                 touch_tip_properties=retract_props.touch_tip,
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
-                air_gap_volume=add_final_air_gap
-                and retract_props.air_gap_by_volume.get_for_volume(0),
+                air_gap_volume=air_gap_volume,
             )
 
     def retract_during_multi_dispensing(  # noqa: C901
@@ -726,6 +731,14 @@ class TransferComponentsExecutor:
             else:
                 add_air_gap = True
 
+        air_gap_volume = (
+            retract_props.air_gap_by_volume.get_for_volume(
+                self.tip_state.last_liquid_and_air_gap_in_tip.liquid
+            )
+            if add_air_gap
+            else 0.0
+        )
+
         # Regardless of the blowout location, do touch tip
         # when leaving the dispense well.
         # Add an air gap depending on conditioning volume + whether this is
@@ -735,10 +748,7 @@ class TransferComponentsExecutor:
             touch_tip_properties=retract_props.touch_tip,
             location=retract_location,
             well=self._target_well,
-            air_gap_volume=add_air_gap
-            and retract_props.air_gap_by_volume.get_for_volume(
-                self.tip_state.last_liquid_and_air_gap_in_tip.liquid
-            ),
+            air_gap_volume=air_gap_volume,
         )
 
         if (
