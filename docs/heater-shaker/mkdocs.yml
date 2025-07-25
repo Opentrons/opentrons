@@ -2,6 +2,8 @@ site_name: heater-shaker
 
 nav:
   - Home: index.md
+  - Maintenance and Cleaning: maintenance.md
+  - Additional Product Information: warranty.md
 
 theme:
   name: material

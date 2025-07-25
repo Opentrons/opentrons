@@ -1,17 +1,10 @@
-# Welcome to MkDocs
+---
+title: "Heater-Shaker Module GEN1 Instruction Manual"
+hide: toc
+---
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+IMAGE PLACEHOLDER
 
-## Commands
+## Product Description
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+The Opentrons Heater-Shaker Module GEN1 provides on-deck heating and orbital shaking. The Heater-Shaker can heat samples to 95 °C and shake them at speeds ranging from 200 to 3000 rpm. It is compatible with the Opentrons Flex and OT-2 liquid handling robots and selected flat, deep-well, and 96-well plates. The Heater-Shaker can also be used alongside other Opentrons modules and with the Opentrons Flex Gripper.
