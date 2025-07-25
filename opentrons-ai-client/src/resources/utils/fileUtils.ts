@@ -11,6 +11,7 @@ export const ALLOWED_MIME_TYPES = {
   csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel'] as string[],
   python: [
     'text/x-python',
+    'text/x-python-script',
     'text/plain',
     'application/x-python-code',
   ] as string[],
@@ -64,6 +65,7 @@ export const validateFile = (file: File): FileValidationResult => {
 export const getFileType = (file: File): FileType | null => {
   const mimeType = file.type.toLowerCase()
 
+  // Check MIME type first for security (reliable for PDF/CSV)
   if (ALLOWED_MIME_TYPES.pdf.includes(mimeType)) {
     return 'pdf'
   }
@@ -71,6 +73,13 @@ export const getFileType = (file: File): FileType | null => {
     return 'csv'
   }
   if (ALLOWED_MIME_TYPES.python.includes(mimeType)) {
+    return 'python'
+  }
+
+  // Special case: Python files often have unreliable MIME types
+  // Check if it's a .py file regardless of MIME type
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+  if (extension === '.py') {
     return 'python'
   }
 
