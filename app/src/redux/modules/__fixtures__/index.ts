@@ -398,7 +398,8 @@ export const mockFlexStacker: Types.FlexStackerModule = {
   usbPort: {
     path: '/dev/ot_module_flexstacker0',
     port: 1,
-    hub: false,
+    hub: true,
+    hubPort: 1,
     portGroup: 'unknown',
   },
 }
@@ -421,7 +422,8 @@ export const mockFlexStackerMissingShuttle: Types.FlexStackerModule = {
   usbPort: {
     path: '/dev/ot_module_flexstacker0',
     port: 1,
-    hub: false,
+    hub: true,
+    hubPort: 2,
     portGroup: 'unknown',
   },
 }
