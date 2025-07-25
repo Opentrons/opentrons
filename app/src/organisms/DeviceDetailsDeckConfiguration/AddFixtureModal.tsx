@@ -37,7 +37,6 @@ import type {
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixtureId,
-  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
