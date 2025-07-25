@@ -1,3 +1,4 @@
+import max from 'lodash/max'
 import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
@@ -172,7 +173,10 @@ export function getMaxDisposalVolumeForMultiDispense(
   const airGapChecked = values.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
-  return round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS)
+  return max([
+    round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS),
+    0,
+  ])
 }
 // Ensures that 2x volume can fit in pipette
 // NOTE: ensuring that disposalVolume_volume will not exceed pipette capacity
