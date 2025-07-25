@@ -354,7 +354,7 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            relevant_api_docs = ""  # self.get_relevant_api_docs(prompt, user_id)
+            relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
             prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
             # Create user message with file attachments if present

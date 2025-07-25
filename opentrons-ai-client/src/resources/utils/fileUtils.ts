@@ -175,9 +175,42 @@ export const readFileContent = async (
           }
         }
 
-        const headers = lines[0].split(',').map(h => h.trim())
+        // Parse CSV properly handling quoted values with commas
+        const parseCSVLine = (line: string): string[] => {
+          const result: string[] = []
+          let current = ''
+          let inQuotes = false
+
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i]
+            const nextChar = line[i + 1]
+
+            if (char === '"') {
+              if (inQuotes && nextChar === '"') {
+                // Handle escaped quotes ("")
+                current += '"'
+                i++ // Skip next quote
+              } else {
+                // Toggle quote state
+                inQuotes = !inQuotes
+              }
+            } else if (char === ',' && !inQuotes) {
+              // Found delimiter outside quotes
+              result.push(current.trim())
+              current = ''
+            } else {
+              current += char
+            }
+          }
+
+          // Add the last field
+          result.push(current.trim())
+          return result
+        }
+
+        const headers = parseCSVLine(lines[0])
         const data = lines.slice(1).map(line => {
-          const values = line.split(',').map(v => v.trim())
+          const values = parseCSVLine(line)
           const obj: Record<string, string> = {}
           headers.forEach((header, index) => {
             obj[header] = values[index] || ''
