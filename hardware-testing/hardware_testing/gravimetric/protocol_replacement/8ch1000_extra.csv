@@ -8,8 +8,8 @@ return_tip,FALSE,,,
 touch_tip,FALSE,,,
 liquid,water,Deionized water,#0000ff,100000
 tipracks_20ul,,,,
-tipracks_50ul,D2,B2,C3,B1
-tipracks_200ul,C2,A1,,
+tipracks_50ul,D2,B2,B1,
+tipracks_200ul,A1,,,
 tipracks_1000ul,D3,B3,,
 labware_on_scale,radwag_pipette_calibration_vial,A1,,
 slot_scale,C1,,,
