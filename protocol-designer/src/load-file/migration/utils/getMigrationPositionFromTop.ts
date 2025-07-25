@@ -8,13 +8,7 @@ export const getMigratedPositionFromTop = (
   labware: Labware,
   type: MoveLiquidPrefixType
 ): number => {
-  const labwareDefUri = labware[formLabwareId].labwareDefURI
-
-  if (labwareDefUri == null) {
-    console.error(
-      `unable to find matching labware def uri from form labware id ${formLabwareId}`
-    )
-  }
+  const labwareDefUri = labware[formLabwareId]?.labwareDefURI
 
   //    early exit for dispense_labware equaling trashBin or wasteChute
   if (labwareDefsByURI[labwareDefUri] == null) {

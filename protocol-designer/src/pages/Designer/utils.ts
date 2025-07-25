@@ -250,6 +250,7 @@ const getLabwareInfo = (
   nicknamesById: Record<string, string>,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
+<<<<<<< HEAD
   robotType: RobotType
 ): { nickName: string; latestSlot: string } => {
   const { modules, labware } = activeDeckSetup
@@ -257,6 +258,25 @@ const getLabwareInfo = (
   const latestSlot = resolveSlotLocation(modules, stack, robotType)
 
   return { nickName: nicknamesById[labwareId], latestSlot }
+=======
+  robotType: RobotType,
+  t: any
+): string => {
+  const { modules } = activeDeckSetup
+  const stack = activeDeckSetup.labware[labwareId]?.stack
+  const latestSlot =
+    stack != null
+      ? resolveSlotLocation(modules, stack, robotType)
+      : 'unknown slot'
+  const name = nicknamesById[labwareId]
+  let nickName: string = name
+  if (latestSlot != null && latestSlot !== 'offDeck') {
+    nickName = t('labware_in_slot', { name, slot: latestSlot })
+  } else if (latestSlot != null && latestSlot === 'offDeck') {
+    nickName = t('labware_offdeck', { name })
+  }
+  return nickName
+>>>>>>> origin/chore_release-pd-8.5.0
 }
 
 export const useLabwareDropdownOptions = (
@@ -276,11 +296,16 @@ export const useLabwareDropdownOptions = (
       labwareEntity: LabwareEntity,
       labwareId: string
     ): DropdownOption[] => {
+<<<<<<< HEAD
       const { def } = labwareEntity
       const deckSlot = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
         deckSlot
+=======
+      const deckSlot = getSlotInLocationStack(
+        activeDeckSetup.labware[labwareId]?.stack
+>>>>>>> origin/chore_release-pd-8.5.0
       )
       const labwareStack = fullStackFromLabwares.filter(
         id =>
