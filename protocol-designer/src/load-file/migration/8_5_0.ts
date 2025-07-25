@@ -1,7 +1,7 @@
-import { round } from 'lodash'
 import first from 'lodash/first'
 import floor from 'lodash/floor'
 import min from 'lodash/min'
+import round from 'lodash/round'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -43,14 +43,13 @@ const getMigratedBlowoutFlowRate = (
   form: FormData,
   pipetteSpecs: PipetteV2Specs | null,
   tipRackDef: LabwareDefinition2 | null
-): number | null => {
-  return (form.blowout_checkbox || form.disposalVolume_checkbox) &&
-    !form.blowout_flowRate &&
-    pipetteSpecs != null &&
-    tipRackDef != null
+): number | null =>
+  (form.blowout_checkbox || form.disposalVolume_checkbox) &&
+  !form.blowout_flowRate &&
+  pipetteSpecs != null &&
+  tipRackDef != null
     ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
     : null
-}
 
 const getMigratedBlowoutLocation = (
   form: FormData,
@@ -150,7 +149,7 @@ const getClippedFlowRateForMoveLiquid = (args: {
       defaultFlowRate = matchingTipLiquidSpecs.defaultDispenseFlowRate.default
       break
     default:
-      // flowRateTypeis blowout
+      // flowRateType is blowout
       defaultFlowRate = matchingTipLiquidSpecs.defaultBlowOutFlowRate.default
       break
   }
