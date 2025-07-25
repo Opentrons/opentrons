@@ -62,11 +62,9 @@ export function useDeckConfigurationEditingTools(
   ): void => {
     setTargetCutoutId(cutoutId)
     setAddressableAreaId(addressableAreaId)
-    console.log('cutoutId', cutoutId)
     const foundFixtureId =
       deckConfig.find(config => config.cutoutId === cutoutId)
         ?.cutoutFixtureId ?? null
-    console.log('foundFixtureId', foundFixtureId)
     setExistingCutoutFixtureId(foundFixtureId ?? null)
   }
 

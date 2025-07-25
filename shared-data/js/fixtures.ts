@@ -1074,12 +1074,10 @@ export const getMainAAForAFixture = (
   addressableAreaId: AddressableAreaNamesWithFakes,
   existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): AddressableAreaNamesWithFakes | null => {
-  console.log('here: ', existingCutoutFixtureId)
   const addressableAreasByFixtureId = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
   )
-  console.log('addressableAreasByFixtureId: ', addressableAreasByFixtureId)
   const aaListForFixtureId = addressableAreasByFixtureId[fixtureId] ?? []
   if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
     return aaListForFixtureId[0]

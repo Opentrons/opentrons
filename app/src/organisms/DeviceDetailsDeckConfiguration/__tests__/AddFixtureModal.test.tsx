@@ -174,7 +174,6 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Select options')[0])
     screen.getByText('Trash bin')
-    console.log('screen: ', screen)
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
   })
 

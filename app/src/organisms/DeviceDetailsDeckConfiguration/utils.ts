@@ -233,13 +233,8 @@ export const getFixtureOptions = (
     addressableAreaId,
     existingCutoutFixtureId
   )
-  console.log('TrashBinAA: ', TrashBinAA)
-  const hasStackerInSlot = existingCutoutFixtureId
-    ? STAGING_AREA_CUTOUTS.includes(cutoutId) &&
-      COMBO_FIXTURES.includes(existingCutoutFixtureId)
-    : false
 
-  if (TrashBinAA != null && !hasStackerInSlot) {
+  if (TrashBinAA != null) {
     availableOptions = [
       ...availableOptions,
       [
