@@ -627,6 +627,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       dispense_retract_delay_seconds:
         allOT2Defaults.dispense_retract_delay_seconds,
       ...dipsosalFields,
+      blowout_flowRate:
+        matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? null,
     }
     return {
       ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'aspirate'
@@ -728,6 +730,11 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     'dispense',
     dispenseMaxUiFlowRate
   )
+
+  const blowoutFlowRateFields = {
+    blowout_flowRate: dispense.retract.blowout.params?.flowRate ?? null,
+  }
+
   const pushOutVolume =
     linearInterpolate(
       volume,
@@ -776,6 +783,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     ...dispenseFlowRateFields,
     ...dispenseOffsetFields,
     ...dispensePositionReferenceFields,
+    ...blowoutFlowRateFields,
     dispense_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispense_submerge_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
     dispense_submerge_position_reference: POSITION_REFERENCE_TOP,
