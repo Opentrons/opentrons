@@ -15,7 +15,7 @@ The 8.5.1 hotfix release fixes these bugs:
 - Corrected behavior when performing multi-dispense actions using a custom or modified liquid class.
 - Fixed a problem where certain quick transfers (specifically ones that attempt to blow out over the waste chute) could not be run.
 - Air-gapping after a dispense when using a liquid class now uses the correct volume.
-- Fixed a problem where distributing with a liquid class would fail to blow out for certain volumes.
+- Fixed a problem where distributing with a liquid class would sometimes fail to blow out the disposal volume.
 
 ---
 
