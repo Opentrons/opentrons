@@ -27,7 +27,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
 DEFAULT_TRIALS = 10 # The number of trials each current speed check does
-DEFAULT_CYCLES = 4 # The number of burn-in cycles
+DEFAULT_CYCLES = 140000 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 140000 # number of plunger cycles in one burn in cycle
 
 STALL_THRESHOLD_MM = 0.1
@@ -115,7 +115,7 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
                 for pos in ["start", "end"]
             ],
         )
-        for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
+        for cycle in range(0, DEFAULT_CYCLES)
         for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     ]
     section_list.append(
@@ -123,7 +123,7 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
             title=_get_cycling_section_tag(),
             lines=[
                 CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
-                for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
+                for cycle in range(0, DEFAULT_CYCLES)
             ],
         )
     )
@@ -474,7 +474,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
             helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
             try:
-                for cycle in range(0, TRIALS_PER_CYCLE):
+                for cycle in range(0, DEFAULT_CYCLES):
                     # await _test_plunger(
                     #     api, mount, report,
                     #     cycle=cycle, trials=trials,
@@ -487,7 +487,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
 
                     failed_cycles = await _cycle_plunger(
                         api, mount,
-                        cycle=cycle, trials=TRIALS_PER_CYCLE,
+                        cycle=cycle, trials=DEFAULT_CYCLES,
                         continue_after_stall=continue_after_stall
                     )
                     data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
