@@ -921,15 +921,16 @@ export const getIsLabwareCompatibleWithStack = (
 
   // check compatibility with labware
   if (topIdInStack in labwareEntities) {
+    const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
     return (
       // check compatible labware key
-      labwareEntities[labwareId].def.compatibleParentLabware?.some(
+      movingLabwareEntity.def.compatibleParentLabware?.some(
         loadName => loadName === loadNameToCheck
       ) ||
       // check stacking offset map for legacy compatibility
-      Object.keys(topLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
+      Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
       )
     )
