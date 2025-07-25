@@ -27,7 +27,7 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 interface DeckConfigurationEditingTools {
   addFixtureToCutout: (
     cutoutId: CutoutId,
-    addressableAreaId: AddressableAreaNamesWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
@@ -58,11 +58,15 @@ export function useDeckConfigurationEditingTools(
 
   const addFixtureToCutout = (
     cutoutId: CutoutId,
-    addressableAreaId: AddressableAreaNamesWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     setTargetCutoutId(cutoutId)
     setAddressableAreaId(addressableAreaId)
-    const foundFixtureId = deckConfig.find(config => config.cutoutId === cutoutId)?.cutoutFixtureId ?? null
+    console.log('cutoutId', cutoutId)
+    const foundFixtureId =
+      deckConfig.find(config => config.cutoutId === cutoutId)
+        ?.cutoutFixtureId ?? null
+    console.log('foundFixtureId', foundFixtureId)
     setExistingCutoutFixtureId(foundFixtureId ?? null)
   }
 
@@ -132,7 +136,7 @@ export function useDeckConfigurationEditingTools(
           }}
           isOnDevice={isOnDevice}
           deckDef={deckDef}
-          currentCutoutFixtureId={existingCutoutFixtureId ?? undefined}
+          existingCutoutFixtureId={existingCutoutFixtureId ?? undefined}
         />
       ) : null,
   }

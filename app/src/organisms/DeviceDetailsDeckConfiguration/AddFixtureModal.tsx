@@ -108,7 +108,7 @@ export function AddFixtureModal({
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
   }
-  console.log("existingCutoutFixtureId: ", existingCutoutFixtureId)
+  console.log('existingCutoutFixtureId: ', existingCutoutFixtureId)
 
   const availableOptions = getOptions(
     cutoutId,
