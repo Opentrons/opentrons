@@ -27,15 +27,19 @@ import {
   STAGING_UPDATE_PROTOCOL_END_POINT,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
+import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import { calcTextAreaHeight } from '/ai-client/resources/utils'
 import {
   getFileType,
   MAX_FILES_PER_MESSAGE,
-  readFileContent,
-  validateFile,
 } from '/ai-client/resources/utils/fileUtils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
+import {
+  getPreFixText,
+  getUpdateOrCreatePrompt,
+  parseProtocolContent,
+} from '/ai-client/resources/utils/protocolUtils'
 
 import { AttachedFileItem } from '../../atoms/AttachedFileItem'
 import { AttachFileButton } from '../../atoms/AttachFileButton'
@@ -44,30 +48,7 @@ import styles from './inputprompt.module.css'
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { FileType } from '/ai-client/resources/utils/fileUtils'
-import type {
-  ChatData,
-  CreatePrompt,
-  UpdatePrompt,
-} from '../../resources/types'
-
-// Helper to safely parse the `protocol_content` field that may be a JSON string or an object.
-const parseProtocolContent = (content: unknown): Record<string, unknown> => {
-  let parsed: unknown
-  if (typeof content === 'string') {
-    try {
-      parsed = JSON.parse(content)
-    } catch {
-      parsed = {}
-    }
-  } else {
-    parsed = content
-  }
-
-  // Ensure result is a non-null object; otherwise fall back to {}
-  return parsed != null && typeof parsed === 'object'
-    ? (parsed as Record<string, unknown>)
-    : {}
-}
+import type { ChatData } from '../../resources/types'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -98,39 +79,17 @@ export function InputPrompt(): JSX.Element {
   }
 
   const [requestId, setRequestId] = useState<string>(uuidv4())
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
-  const [fileError, setFileError] = useState<string | null>(null)
 
-  const handleFileSelect = (files: FileList): void => {
-    setFileError(null)
-    const fileArray = Array.from(files)
-
-    // Check total file count
-    if (attachedFiles.length + fileArray.length > MAX_FILES_PER_MESSAGE) {
-      setFileError(
-        `You can attach a maximum of ${MAX_FILES_PER_MESSAGE} files per message.`
-      )
-      return
-    }
-
-    // Validate each file
-    const validFiles: File[] = []
-    for (const file of fileArray) {
-      const validation = validateFile(file)
-      if (!validation.isValid) {
-        setFileError(validation.error || 'Invalid file')
-        return
-      }
-      validFiles.push(file)
-    }
-
-    setAttachedFiles(prev => [...prev, ...validFiles])
-  }
-
-  const handleRemoveFile = (index: number): void => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
-    setFileError(null)
-  }
+  // Use custom hook for file attachments
+  const {
+    attachedFiles,
+    fileError,
+    handleFileSelect,
+    handleRemoveFile,
+    prepareFilesForUpload,
+    processFilesForHistory,
+    clearFiles,
+  } = useAttachFiles()
 
   // This is to autofill the input field for when we navigate to the chat page from the existing/new protocol generator pages
   useEffect(() => {
@@ -164,48 +123,22 @@ export function InputPrompt(): JSX.Element {
     isUpdateOrCreateRequest: boolean = false,
     isRegenerateRequest: boolean = false
   ): Promise<void> => {
-    const newRequestId = uuidv4() + getPreFixText(isUpdateOrCreateRequest)
+    const newRequestId =
+      uuidv4() + getPreFixText(isUpdateOrCreateRequest, isNewProtocol)
     setRequestId(newRequestId)
     const currentProtocolFormat = detectProtocolFormat(
       watchUserPrompt,
       chatHistory
     )
 
-    // Process files locally if there are any
-    interface FileAttachmentForBackend {
-      id: string
-      filename: string
-      file_type: string
-      content: string
-      media_type: string
-      size: number
-    }
-    const fileAttachments: FileAttachmentForBackend[] = []
+    // Prepare files for upload - use multipart for efficiency
+    let validatedFiles: File[] = []
     if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
       try {
-        for (const file of attachedFiles) {
-          const fileType = getFileType(file)
-          if (!fileType) {
-            throw new Error(`Unsupported file type: ${file.name}`)
-          }
-          const fileContent = await readFileContent(file)
-          fileAttachments.push({
-            id: uuidv4(), // Generate local ID
-            filename: file.name,
-            file_type: fileType,
-            content: fileContent.content,
-            media_type: fileContent.mediaType,
-            size: file.size,
-          })
-        }
+        validatedFiles = prepareFilesForUpload()
       } catch (fileError: unknown) {
-        console.error('File processing failed:', fileError)
-        const errorMessage =
-          fileError instanceof Error
-            ? fileError.message
-            : 'Failed to process files'
-        setFileError(errorMessage)
-        return // Don't proceed with chat if file processing fails
+        // Error is already set in the hook
+        return // Don't proceed with chat if file validation fails
       }
     }
 
@@ -215,18 +148,25 @@ export function InputPrompt(): JSX.Element {
       reply: watchUserPrompt,
       protocol_format: currentProtocolFormat,
       attachments:
-        fileAttachments.length > 0
-          ? fileAttachments.map(file => ({
-              id: file.id,
-              name: file.filename,
-              type: file.file_type as FileType,
-              content: file.content,
-              size: file.size,
-            }))
+        validatedFiles.length > 0
+          ? validatedFiles.map(file => {
+              const fileType = getFileType(file)
+              if (!fileType) {
+                throw new Error(
+                  `Unexpected: validated file has no type: ${file.name}`
+                )
+              }
+              return {
+                id: uuidv4(),
+                name: file.name,
+                type: fileType,
+                content: '', // Content will be uploaded via multipart
+              }
+            })
           : undefined,
     }
     reset()
-    setAttachedFiles([]) // Clear attached files after sending
+    clearFiles() // Clear attached files and errors after sending
     setChatData(chatData => [...chatData, userInput])
 
     try {
@@ -239,116 +179,125 @@ export function InputPrompt(): JSX.Element {
         ? getCreateOrUpdateEndpoint()
         : getChatEndpoint()
 
-      const promptData = getUpdateOrCreatePrompt(isRegenerateRequest)
+      const promptData = getUpdateOrCreatePrompt(
+        isNewProtocol,
+        createProtocol,
+        updateProtocol,
+        isRegenerateRequest,
+        detectProtocolFormat(
+          isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
+        )
+      )
 
-      // Build a history array that conforms to the server schema (role + content).
-      // If this chat is dealing with a Protocol Designer conversation and a history
-      // item contains a `protocol_content`, strip out `labwareDefinitions` and
-      // append the remaining JSON to its content.
-      const sanitizedHistory =
-        currentProtocolFormat !== 'Protocol Designer'
-          ? chatHistory
-          : chatHistory.map(msg => {
-              if (msg.protocol_content != null) {
-                // Use helper to parse the protocol content into a plain object
-                const rawPdJson = parseProtocolContent(msg.protocol_content)
+      // Build a complete history array that preserves file attachments in their original messages.
+      // This allows the backend to construct proper conversation history with files in the right context.
+      const completeHistory = chatHistory.map(msg => {
+        const baseMessage = {
+          role: msg.role,
+          content: msg.content,
+          attachments: msg.attachments || [], // Keep attachments with their original messages
+        }
 
-                // Remove labwareDefinitions without using the `delete` operator
-                const {
-                  labwareDefinitions: _omit,
-                  ...pdWithoutLabwareDefs
-                } = rawPdJson
+        // Handle Protocol Designer content if needed
+        if (
+          currentProtocolFormat === 'Protocol Designer' &&
+          msg.protocol_content != null
+        ) {
+          // Use helper to parse the protocol content into a plain object
+          const rawPdJson = parseProtocolContent(msg.protocol_content)
 
-                return {
-                  role: msg.role,
-                  content: `${msg.content}\n\n${JSON.stringify(
-                    pdWithoutLabwareDefs
-                  )}`,
-                }
-              }
+          // Remove labwareDefinitions without using the `delete` operator
+          const {
+            labwareDefinitions: _omit,
+            ...pdWithoutLabwareDefs
+          } = rawPdJson
 
-              return { role: msg.role, content: msg.content }
-            })
+          baseMessage.content = `${msg.content}\n\n${JSON.stringify(
+            pdWithoutLabwareDefs
+          )}`
+        }
 
-      // Combine all attachments - new files plus files from chat history
-      let attachmentsToSend: FileAttachmentForBackend[] = []
+        return baseMessage
+      })
 
-      // Add new files being attached
-      if (fileAttachments.length > 0) {
-        attachmentsToSend = [...fileAttachments]
-      }
+      // Use multipart upload when files are attached (much more efficient)
+      let config: AxiosRequestConfig
 
-      // Add existing files from chat history (avoid duplicates by filename)
-      if (chatHistory.length > 0) {
-        const existingFilenames = new Set(
-          attachmentsToSend.map(att => att.filename)
+      if (validatedFiles.length > 0 && !isUpdateOrCreateRequest) {
+        // Process files locally for chat history storage
+        const fileAttachmentsWithContent = processFilesForHistory(
+          validatedFiles
         )
 
-        // Collect all unique attachments from chat history
-        chatHistory.forEach(msg => {
-          if (msg.attachments != null && msg.attachments.length > 0) {
-            msg.attachments.forEach(att => {
-              if (
-                !existingFilenames.has(att.name) &&
-                attachmentsToSend != null
-              ) {
-                attachmentsToSend.push({
-                  id: att.id || '',
-                  filename: att.name,
-                  file_type: att.type,
-                  content: att.content,
-                  media_type:
-                    att.type === 'csv'
-                      ? 'application/json'
-                      : att.type === 'python'
-                      ? 'text/x-python'
-                      : att.type === 'pdf'
-                      ? 'application/pdf'
-                      : 'text/plain',
-                  size: att.size,
-                })
-                existingFilenames.add(att.name)
-              }
-            })
-          }
+        // Multipart upload for file attachments
+        const formData = new FormData()
+        formData.append('message', watchUserPrompt)
+        formData.append('history', JSON.stringify(completeHistory)) // Send complete history with attachments
+        formData.append('fake', 'false')
+        formData.append('protocol_format', currentProtocolFormat)
+
+        // Add files to FormData
+        validatedFiles.forEach(file => {
+          formData.append('files', file)
         })
+
+        config = {
+          url: getChatEndpoint().replace(
+            '/completion',
+            '/completion-multipart'
+          ),
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Don't set Content-Type for multipart - browser sets it with boundary
+          },
+          data: formData,
+        }
+
+        // Ensure all files were processed successfully
+        if (fileAttachmentsWithContent.length !== validatedFiles.length) {
+          console.error('Failed to process some files for chat history')
+          return
+        }
+
+        // Store processed files for chat history
+        userInput.attachments = fileAttachmentsWithContent.map(file => ({
+          id: file.id,
+          name: file.filename,
+          type: file.file_type as FileType,
+          content: file.content,
+        }))
+      } else {
+        // Traditional JSON request (no files or update/create requests)
+        config = {
+          url,
+          method: 'POST',
+          headers,
+          data: isUpdateOrCreateRequest
+            ? promptData
+            : {
+                message: watchUserPrompt,
+                history: completeHistory, // Send complete history with attachments
+                fake: false,
+                chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
+                pd_protocol_content: pdProtocolContent,
+                protocol_format: currentProtocolFormat,
+                // No separate attachments parameter needed - they're in history now
+              },
+        }
       }
 
-      const config = {
-        url,
-        method: 'POST',
-        headers,
-        data: isUpdateOrCreateRequest
-          ? promptData
-          : {
-              message: watchUserPrompt,
-              history: sanitizedHistory,
-              fake: false,
-              chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
-              pd_protocol_content: pdProtocolContent,
-              protocol_format: currentProtocolFormat,
-              attachments: attachmentsToSend,
-            },
-      }
+      await callApi(config)
 
+      // Update chat history AFTER successful API call
       setChatHistory(chatHistory => [
         ...chatHistory,
         {
           role: 'user',
           content: watchUserPrompt,
-          attachments:
-            fileAttachments.length > 0
-              ? fileAttachments.map(file => ({
-                  id: file.id,
-                  name: file.filename,
-                  type: file.file_type as FileType,
-                  content: file.content,
-                  size: file.size,
-                }))
-              : undefined,
+          attachments: userInput.attachments, // Use the processed attachments with content
         },
       ])
-      await callApi(config as AxiosRequestConfig)
       trackEvent({
         name: 'chat-submitted',
         properties: {
@@ -361,34 +310,6 @@ export function InputPrompt(): JSX.Element {
       console.error(`error: ${err.message}`)
       throw err
     }
-  }
-
-  const getUpdateOrCreatePrompt = (
-    isRegenerateRequest: boolean
-  ): CreatePrompt | UpdatePrompt => {
-    createProtocol.regenerate = isRegenerateRequest
-    updateProtocol.regenerate = isRegenerateRequest
-
-    // If it's a new protocol, set the protocol_format property
-    if (isNewProtocol) {
-      createProtocol.protocol_format = detectProtocolFormat(
-        createProtocol.prompt
-      )
-    }
-
-    return isNewProtocol ? createProtocol : updateProtocol
-  }
-
-  const getPreFixText = (isUpdateOrCreate: boolean): string => {
-    let appendCreateOrUpdate = ''
-    if (isUpdateOrCreate) {
-      if (isNewProtocol) {
-        appendCreateOrUpdate = 'NewProtocol'
-      } else {
-        appendCreateOrUpdate = 'UpdateProtocol'
-      }
-    }
-    return appendCreateOrUpdate
   }
 
   const getCreateOrUpdateEndpoint = (): string => {

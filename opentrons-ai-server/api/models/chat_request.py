@@ -10,6 +10,7 @@ from api.models.protocol_format import ProtocolFormat
 class Chat(BaseModel):
     role: str
     content: str
+    attachments: Optional[List[FileReference]] = Field(None, description="File attachments in this message")
 
 
 # from api.domain.fake_responses import fake_keys

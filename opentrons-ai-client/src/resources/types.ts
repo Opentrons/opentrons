@@ -13,7 +13,6 @@ export interface FileAttachment {
   name: string
   type: FileType
   content: string
-  size: number
 }
 
 export interface ChatData {
