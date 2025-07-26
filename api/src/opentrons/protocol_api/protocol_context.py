@@ -1386,6 +1386,8 @@ class ProtocolContext(CommandPublisher):
             - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
+
+        :returns: A new LiquidClass object.
         """
         return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
@@ -1397,15 +1399,16 @@ class ProtocolContext(CommandPublisher):
         base_liquid_class: Optional[LiquidClass] = None,
         display_name: Optional[str] = None,
     ) -> LiquidClass:
-        """Define a custom liquid class, either based on an existing, Opentrons-verified liquid class, or to create a completely new one.
+        """Define a custom liquid class, either based on an existing liquid class, or create a completely new one.
 
         :param name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
-        :param properties: A dict of transfer properties for the Flex pipette and tips to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be in the format returned by :py:meth:`.LiquidClass.get_for`. See also the `liquid class JSON schema <https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/schemas>`_.
+        :param properties: A dict of transfer properties for pipette and tip combinations to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be as specified in ``TransferPropertiesDict``. See the  `liquid class type definitions <https://github.com/Opentrons/opentrons/blob/edge/shared-data/python/opentrons_shared_data/liquid_classes/types.py>`_.
 
-        :param base_liquid_class: An Opentrons-verified liquid class to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the Flex pipette and tips. All other properties will remain the same as those in the base class.
+        :param base_liquid_class: An existing liquid class object to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the specified pipette and tip combinations. All other properties will remain the same as those in the base class.
 
         :param display_name: An optional name for the liquid class. Defaults to the title-case ``name`` if a display name isn't provided.
 
+        :returns: A new LiquidClass object.
         """
         if definition_exists(name, DEFAULT_LC_VERSION):
             raise ValueError(
