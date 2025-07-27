@@ -7,7 +7,22 @@ import base64
 import csv
 import io
 import json
-from typing import Any, Dict, Optional
+import logging
+from typing import Literal, Optional, TypedDict
+
+logger = logging.getLogger(__name__)
+
+# Type definitions for better type safety
+FileType = Literal["pdf", "csv", "python", "unknown"]
+MediaType = Literal["application/pdf", "application/json", "text/csv", "text/x-python", "text/plain"]
+
+
+class ProcessedFileResult(TypedDict):
+    """Type definition for processed file results"""
+
+    content: str
+    media_type: MediaType
+    file_type: FileType
 
 
 class FileProcessor:
@@ -19,10 +34,12 @@ class FileProcessor:
 
     # Maximum sizes for different processing operations
     MAX_CSV_JSON_SIZE_KB = 500 * UNIT_KB  # 500KB limit for JSON conversion
-    MAX_PDF_BASE64_LENGTH = 150000  # Conservative limit for base64 PDF content
+    # Conservative base64 limit: ~100KB binary PDF → ~133KB base64 → ~150KB with overhead
+    # Anthropic has ~200K token limit, so this leaves room for conversation context
+    MAX_PDF_BASE64_LENGTH = 150000
 
     @staticmethod
-    def process_file(filename: str, mime_type: str, content: str) -> Dict[str, Any]:
+    def process_file(filename: str, mime_type: str, content: str) -> ProcessedFileResult:
         """
         Process a file based on its MIME type
 
@@ -48,7 +65,7 @@ class FileProcessor:
         return {"content": content, "media_type": "text/plain", "file_type": "unknown"}
 
     @staticmethod
-    def _process_pdf(filename: str, content: str) -> Dict[str, Any]:
+    def _process_pdf(filename: str, content: str) -> ProcessedFileResult:
         """Process PDF file (already base64 encoded from frontend)"""
         # Validate base64 content
         if not content:
@@ -70,13 +87,15 @@ class FileProcessor:
         return {"content": content, "media_type": "application/pdf", "file_type": "pdf"}
 
     @staticmethod
-    def _process_csv(filename: str, content: str) -> Dict[str, Any]:
+    def _process_csv(filename: str, content: str) -> ProcessedFileResult:
         """Process CSV file with robust parsing"""
         if not content:
+            logger.info(f"CSV file {filename} is empty, returning empty JSON array")
             return {"content": "[]", "media_type": "application/json", "file_type": "csv"}
 
         # Check if CSV is too large to convert to JSON
         if len(content) > FileProcessor.MAX_CSV_JSON_SIZE_KB:
+            logger.info(f"CSV file {filename} is large ({len(content)} bytes), sending as raw text")
             return {"content": content, "media_type": "text/csv", "file_type": "csv"}
 
         try:
@@ -89,17 +108,19 @@ class FileProcessor:
 
             # If resulting JSON is too large, fall back to CSV
             if len(json_content) > FileProcessor.MAX_CSV_JSON_SIZE_KB * 2:
+                logger.info(f"Converted JSON for {filename} is too large ({len(json_content)} bytes), sending as CSV")
                 return {"content": content, "media_type": "text/csv", "file_type": "csv"}
 
+            logger.info(f"Successfully converted CSV file {filename} to JSON ({len(json_content)} characters)")
             return {"content": json_content, "media_type": "application/json", "file_type": "csv"}
 
         except Exception as e:
             # If CSV parsing fails, return as raw text
-            print(f"CSV parsing failed for {filename}: {str(e)}")
+            logger.warning(f"CSV parsing failed for {filename}: {str(e)}")
             return {"content": content, "media_type": "text/csv", "file_type": "csv"}
 
     @staticmethod
-    def _process_python(filename: str, content: str) -> Dict[str, Any]:
+    def _process_python(filename: str, content: str) -> ProcessedFileResult:
         """Process Python file"""
         # Could add Python syntax validation here if needed
         return {"content": content, "media_type": "text/x-python", "file_type": "python"}
