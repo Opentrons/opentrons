@@ -28,6 +28,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
+    UserDefinedVolumes,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -683,7 +684,7 @@ class LabwareView:
 
     def get_well_geometry(
         self, labware_id: str, well_name: Optional[str] = None
-    ) -> InnerWellGeometry:
+    ) -> InnerWellGeometry | UserDefinedVolumes:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
@@ -1028,6 +1029,10 @@ class LabwareView:
         return labware_validation.is_absorbance_reader_lid(
             self.get(labware_id).loadName
         )
+
+    def is_lid(self, labware_id: str) -> bool:
+        """Check if labware is a lid."""
+        return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
 
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""

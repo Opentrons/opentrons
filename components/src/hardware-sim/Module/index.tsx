@@ -29,11 +29,12 @@ import { PlateReader } from './PlateReader'
 import { Temperature } from './Temperature'
 import { Thermocycler } from './Thermocycler'
 
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
 export * from './Thermocycler'
 
@@ -43,14 +44,20 @@ interface Props {
   x: number
   y: number
   def: ModuleDefinition
-  orientation?: 'left' | 'right'
-  innerProps?:
-    | ComponentProps<typeof Thermocycler>
-    | ComponentProps<typeof HeaterShaker>
-    | ComponentProps<typeof Temperature>
-    | {}
-  statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
-  children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
+  /**
+   * How child components should be positioned.
+   *
+   * "offsetToSlot" - The SVG origin of a child will be at the labware mating interface of the
+   *   module, which is the front-left (-x, -y) corner of the slot on top of the module.
+   *
+   * todo(mm, 2025-07-21):
+   * 1. Add a "passThrough" mode that disables the "offsetToSlot" behavior,
+   *    to allow child components to replace it with their own SVG transform,
+   *    to support labware schema 3.
+   * 2. Migrate all existing call sites to use "passThrough".
+   * 3. Remove "offsetToSlot".
+   */
+  childrenPositioningMode: 'offsetToSlot'
 
   /**
    * Used for applying slot-specific positioning adjustments.
@@ -62,6 +69,17 @@ interface Props {
    * If you're rendering the module on a deck, supply this for correct positioning.
    */
   targetDeckId: string | null
+  orientation?: 'left' | 'right'
+  innerProps?:
+    | ComponentProps<typeof Thermocycler>
+    | ComponentProps<typeof HeaterShaker>
+    | ComponentProps<typeof Temperature>
+    | {}
+  statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
+
+  children?: ReactNode
+  setSelectedSlot?: Dispatch<SetStateAction<string | null>>
+  setHoveredSlot?: Dispatch<SetStateAction<string | null>>
 }
 
 const statusInfoWrapperProps = {
@@ -69,7 +87,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,
@@ -89,6 +107,8 @@ export const Module = (props: Props): JSX.Element => {
     children,
     targetSlotId,
     targetDeckId,
+    setSelectedSlot,
+    setHoveredSlot,
   } = props
 
   const moduleType = getModuleType(def.model)
@@ -221,7 +241,22 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <FlexStacker />
   }
   return (
-    <g transform={positionTransform} data-test={`Module_${moduleType}`}>
+    <g
+      transform={positionTransform}
+      data-test={`Module_${moduleType}`}
+      onMouseEnter={() => {
+        setHoveredSlot?.(targetSlotId)
+      }}
+      onMouseLeave={() => {
+        setHoveredSlot?.(null)
+      }}
+      onClick={() => {
+        setSelectedSlot?.(targetSlotId)
+      }}
+      cursor={
+        setHoveredSlot != null || setSelectedSlot != null ? 'pointer' : 'auto'
+      }
+    >
       <g transform={orientationTransform}>
         <g transform={offsetTransform} style={{ fill: C_DARK_GRAY }}>
           {moduleViz}

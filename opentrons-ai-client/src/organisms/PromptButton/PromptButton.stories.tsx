@@ -1,3 +1,5 @@
+import { FormProvider, useForm } from 'react-hook-form'
+
 import { PromptButton as PromptButtonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -9,7 +11,15 @@ const buttonTextOptions = [
   'PCR (Flex)',
 ]
 
-// ToDo (kk:04/22/2024) fix this stories
+const FormProviderWrapper = ({
+  children,
+}: {
+  children: React.ReactNode
+}): JSX.Element => {
+  const methods = useForm()
+  return <FormProvider {...methods}>{children}</FormProvider>
+}
+
 const meta: Meta<typeof PromptButtonComponent> = {
   title: 'AI/organisms/PromptButton',
   component: PromptButtonComponent,
@@ -24,9 +34,9 @@ const meta: Meta<typeof PromptButtonComponent> = {
   decorators: [
     Story => {
       return (
-        <>
+        <FormProviderWrapper>
           <Story />
-        </>
+        </FormProviderWrapper>
       )
     },
   ],

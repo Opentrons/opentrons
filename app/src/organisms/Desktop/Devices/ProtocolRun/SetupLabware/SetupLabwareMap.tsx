@@ -7,27 +7,23 @@ import {
   Flex,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
-  STACKER_HOPPER_LABWARE_Y_OFFSET,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  getLabwareDefinitionsByURIForProtocol,
+  getLabwareInfoByLiquidId,
+  getLabwareOnDeck,
   getModuleType,
   getSimplestDeckConfigForProtocol,
+  getStackedItemsOnStartingDeck,
+  getStacksOnModules,
+  getTopLabwareFromStack,
+  getWellFillFromLabwareId,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
-import {
-  getLabwareDefinitionsByURIForProtocol,
-  getLabwareInfoByLiquidId,
-  getLabwareOnDeck,
-  getModuleFromStack,
-  getStackedItemsOnStartingDeck,
-  getStacksOnModules,
-  getTopLabwareFromStack,
-} from '/app/transformations/commands'
 
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
@@ -36,10 +32,9 @@ import { SlotDetailModal } from './SlotDetailModal'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
-  ModuleModel,
   ProtocolAnalysisOutput,
+  StackItem,
 } from '@opentrons/shared-data'
-import type { StackItem } from '/app/transformations/commands'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -80,8 +75,7 @@ export function SetupLabwareMap({
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
-    ([slotName, stackedItems]) => {
-      const module = getModuleFromStack(stackedItems)
+    ([slotName, { allItemsInStack: stackedItems, moduleInStack: module }]) => {
       const topLabwareInfo = getTopLabwareFromStack(stackedItems)
       const topLabwareDefinition =
         topLabwareInfo != null
@@ -97,14 +91,13 @@ export function SetupLabwareMap({
               labwareByLiquidId
             )
           : undefined
-      const moduleType =
-        module?.moduleModel == null ? null : getModuleType(module.moduleModel)
+      const moduleType = getModuleType(module.moduleModel)
 
       return {
-        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
-        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        moduleModel: module.moduleModel,
+        moduleLocation: { slotName: module.moduleSlotName },
         innerProps:
-          module?.moduleModel === THERMOCYCLER_MODULE_V1
+          module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
 
@@ -118,7 +111,7 @@ export function SetupLabwareMap({
             onClick={() => {
               if (topLabwareInfo != null) {
                 setSelectedStack({
-                  slotName: slotName,
+                  slotName,
                   stack: stackedItems,
                 })
               }
@@ -131,7 +124,7 @@ export function SetupLabwareMap({
             onMouseLeave={() => {
               setHoverLabwareId(null)
             }}
-            cursor={'pointer'}
+            cursor="pointer"
           >
             {topLabwareDefinition != null && topLabwareInfo != null ? (
               <LabwareInfoOverlay
@@ -145,11 +138,6 @@ export function SetupLabwareMap({
                 xOffset={
                   moduleType === FLEX_STACKER_MODULE_TYPE
                     ? STACKER_HOPPER_LABWARE_X_OFFSET
-                    : 0
-                }
-                yOffset={
-                  moduleType === FLEX_STACKER_MODULE_TYPE
-                    ? STACKER_HOPPER_LABWARE_Y_OFFSET
                     : 0
                 }
               />
@@ -183,12 +171,12 @@ export function SetupLabwareMap({
       definition: topLabwareDefinition,
       highlight: hoverLabwareId === topLabwareInfo.labwareId,
       stacked: isLabwareInStack,
-      wellFill: wellFill,
+      wellFill,
       labwareChildren: (
         <g
-          cursor={'pointer'}
+          cursor="pointer"
           onClick={() => {
-            setSelectedStack({ slotName: slotName, stack: stackedItems })
+            setSelectedStack({ slotName, stack: stackedItems })
           }}
           onMouseEnter={() => {
             setHoverLabwareId(() => topLabwareInfo.labwareId)

@@ -1,21 +1,20 @@
-import cx from 'classnames'
-import { css, keyframes } from 'styled-components'
+import clsx from 'clsx'
 
-import { Svg } from '../primitives'
+import { withStyleProps } from '../hocs/withStyleProps'
 import { ICON_DATA_BY_NAME } from './icon-data'
+import styles from './icon.module.css'
 
-import type { ReactNode } from 'react'
-import type { SvgProps } from '../primitives'
+import type { ReactNode, SVGProps } from 'react'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 
-export interface IconProps extends SvgProps {
+export interface IconProps extends SVGProps<SVGSVGElement> {
   /** name constant of the icon to display */
   name: IconName
-  /** classes to apply */
-  className?: string
   /** spin the icon with a CSS animation */
   spin?: boolean
+  /** override default size */
+  size?: string | number
   /** x attribute as a number or string (for nesting inside another SVG) */
   x?: number | string
   /** y attribute as a number or string (for nesting inside another SVG) */
@@ -28,21 +27,7 @@ export interface IconProps extends SvgProps {
   style?: Record<string, string | number>
   /** optional children */
   children?: ReactNode
-  id?: string
 }
-
-const spinAnimation = keyframes`
-  100% {
-    transform: rotate(360deg);
-  }
-`
-
-const spinStyle = css`
-  &.spin {
-    animation: ${spinAnimation} 0.8s steps(8) infinite;
-    transform-origin: center;
-  }
-`
 
 /**
  * Inline SVG icon component
@@ -52,9 +37,22 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps): JSX.Element | null {
-  const { name, children, className, spin, id, ...svgProps } = props
+function IconComponent(props: IconProps): JSX.Element | null {
+  const {
+    name,
+    className,
+    spin,
+    size,
+    height: rawHeight,
+    width: rawWidth,
+    color,
+    transform,
+    opacity,
+    ...svgProps
+  } = props
 
+  const height = size ?? rawHeight
+  const width = size ?? rawWidth
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
     return null
@@ -62,18 +60,29 @@ export function Icon(props: IconProps): JSX.Element | null {
 
   const { viewBox, path } = ICON_DATA_BY_NAME[name]
 
+  const style = Object.fromEntries(
+    Object.entries({
+      color,
+      height,
+      width,
+      transform,
+      //  filter undefined props
+    }).filter(([_, value]) => value != null)
+  )
+
   return (
-    <Svg
+    <svg
       aria-hidden="true"
       fill="currentColor"
       viewBox={viewBox}
-      className={cx(className, { spin })}
-      css={spinStyle}
+      className={clsx(className, { [styles.spin]: spin })}
+      style={{ ...style }}
       {...svgProps}
-      id={id}
     >
       <path aria-roledescription={name} fillRule="evenodd" d={path} />
       {props.children}
-    </Svg>
+    </svg>
   )
 }
+
+export const Icon = withStyleProps(IconComponent)

@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Software and Operation"
+---
+
 # Software and Operation
 
 There are multiple ways to control Opentrons Flex, depending on the needs of your lab. You can perform most functions either from the touchscreen or from a computer running the Opentrons App. This chapter will focus primarily on touchscreen operation, and will only cover features of the Opentrons App that are not possible on the touchscreen. It will also outline advanced control features, such as running Python code using the Jupyter Notebook server or from the command line of Flex.
@@ -295,11 +299,56 @@ Tap **Launch recovery mode** to see options for the particular type of error tha
 
 Flex provides a protocol recovery path for the following error conditions.
 
-| Error type | Description {style="width: 30%;"} | Recovery options |
-| :--------- | :---------- | :--------------- |
-| No liquid detected | Occurs when a pipette encounters an empty well and expects a liquid to be present. | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul> |
-| Pipette overpressure | Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips. | <ul><li>For aspiration:</li><ul><li>Retry with new tips.</li><li>Cancel protocol run.</li></ul><li>For dispense:</li><ul><li>Skip to the next step with the same tips.</li><li>Skip to the next step with new tips.</li><li>Cancel protocol run.</li></ul></ul> |
-| General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Error type</th>
+      <th style="width: 30%;">Description</th>
+      <th>Recovery options</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No liquid detected</td>
+      <td>Occurs when a pipette encounters an empty well and expects a liquid to be present.</td>
+      <td>
+        <ul>
+          <li>Manually fill the empty well and retry with the same tips.</li>
+          <li>Manually fill the empty well and retry with new tips.</li>
+          <li>Manually fill the empty well and skip to the next step.</li>
+          <li>Ignore the error and skip to the next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Pipette overpressure</td>
+      <td>Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips.</td>
+      <td>For aspiration:<br>
+        <ul>
+            <li>Retry with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+        For dispense:
+        <ul>
+            <li>Skip to the next step with the same tips.</li>
+            <li>Skip to the next step with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>General errors</td>
+      <td>A catch-all category for other errors.</td>
+      <td>
+        <ul>
+          <li>Retry step.</li>
+          <li>Skip to next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr> </tbody>
+</table>
 
 !!! note
     The tip presence sensor is disabled for [partial tip pickup](system-description.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.

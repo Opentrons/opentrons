@@ -170,3 +170,6 @@ export function getWellPropsForSVGLabwareV1(
     y: _getSvgYValueForWell(def, wellDef) + yCorrection,
   }))
 }
+
+export const getIsLid = (labwareDef: LabwareDefinition): boolean =>
+  labwareDef.allowedRoles?.includes('lid') ?? false

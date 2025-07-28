@@ -40,6 +40,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
         definition={labwareOnDeck.def}
+        positioningMode="offsetInSlot"
         wellFill={wellContentsSelectors.wellFillFromWellContents(
           wellContents,
           liquidDisplayColors

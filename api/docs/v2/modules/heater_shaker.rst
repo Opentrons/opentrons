@@ -92,6 +92,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
      - API Load Name
    * - Opentrons Universal Flat Heater-Shaker Adapter
      - ``opentrons_universal_flat_adapter``
+   * - Opentrons Universal Flat Heater-Shaker Adapter Type B
+     - ``opentrons_universal_flat_adapter_type_b``
    * - Opentrons 96 PCR Heater-Shaker Adapter
      - ``opentrons_96_pcr_adapter``
    * - Opentrons 96 Deep Well Heater-Shaker Adapter

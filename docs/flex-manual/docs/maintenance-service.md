@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Maintenance and Service"
+---
+
 # Maintenance and Service
 
 This chapter covers how to perform routine maintenance on your Opentrons Flex, and what to do if you require service for a problem. You should be able to perform cleaning tasks yourself, whereas service and repairs should be handled by Opentrons Support.
@@ -25,11 +29,11 @@ The following table lists the chemicals you can use to clean your Flex. Diluted 
 !!! warning
     *Do not use acetone.* The robot, pipettes, and modules are made from materials that acetone can damage or dissolve.
 
-| Solution   | Recommendations |
-|------------|-----------------|
-| **Alcohol**    | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
-| **Bleach**     | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.   |
-| **Distilled water** | You can use distilled water to clean or rinse your robot.                  |
+| Solution | Recommendations |
+|----|----|
+| **Alcohol** | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
+| **Bleach** | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
+| **Distilled water** | You can use distilled water to clean or rinse your robot. |
 
 ### Frame and window panel cleaning
 
@@ -37,7 +41,7 @@ To clean the exterior and interior frame and window panels of your Flex:
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the exposed and easily accessible surface areas.
-3. Use a cloth dampened with distilled water for a rinse wipedown.
+3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the robot air dry.
 
 ### Deck cleaning
@@ -46,8 +50,8 @@ To clean the deck, deck slots, and trash bin:
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the deck, deck slots, and trash bin. You can remove the deck slots and trash bin for easier access.
-3. Use a cloth dampened with distilled water for a rinse wipedown.
-4. Let the deck pieces air dry. Replace any pieces that you removed for cleaning.
+3. Rinse off any remaining residue using a cloth dampened with distilled water.
+4. Let the deck pieces air dry. Replace any items that you removed for cleaning.
 
 ### Gantry cleaning
 
@@ -55,7 +59,7 @@ To clean the gantry:
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the horizontal and vertical gantry surfaces, and side rails.
-3. Use a cloth dampened with distilled water for a rinse wipedown.
+3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the gantry air dry.
 
 ### Waste chute cleaning
@@ -65,8 +69,9 @@ To clean the waste chute:
 1. Remove the waste chute from its deck plate adapter.
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 3. Gently wipe down the exterior of the chute. The interior is powder-coated steel, so you can clean it with mild detergents or surfactants.
-4. Use a cloth dampened with distilled water for a rinse wipedown.
-5. Let the waste chute air dry and reattach it to the deck.
+4. Rinse off any remaining residue using a cloth dampened with distilled water.
+5. Let the waste chute air dry.
+6. Reattach the waste chute to its deck plate adapter.
 
 ## Cleaning pipettes and tips
 
@@ -78,8 +83,10 @@ To clean a 1-, 8-, or 96-channel pipette:
     - Body
     - Ejector
     - Nozzles
-4. Use a cloth dampened with distilled water for a rinse wipedown.
-5. Let the pipette air dry and reattach.
+4. Rinse off any remaining residue using a cloth dampened with distilled water.
+5. Let the pipette air dry.
+6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
+
 
 ![Cleanable pipette components, including the body, ejector, and nozzles.](images/pipette-components-cleaning.png "Pipette components")
 
@@ -107,10 +114,13 @@ Refer to the following table for recommended cleaning methods, by contamination 
 
 Filtered pipette tips help prevent contaminating the barrel or inside of the pipette. But, you cannot disassemble the barrel if it becomes contaminated. If the inside of your pipette gets contaminated, the following steps may help remove the contamination:
 
-1. Inject a small amount of cleaning solution into the barrel using a manual pipette or syringe.
-2. Gently shake the pipette to swirl the cleaning solution.
-3. Rinse with distilled water.
-4. Let the pipette air dry and reattach.
+1. Remove the pipette from the gantry.
+2. Inject a small amount of cleaning solution into the barrel using a manual pipette or syringe.
+3. Gently shake the pipette to swirl the cleaning solution.
+4. Rinse with distilled water.
+5. Let the pipette air dry.
+6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
+
 
 ### Cleaning pipette tips
 
@@ -126,8 +136,9 @@ To clean the gripper:
     - Gripper body
     - Jaws
     - Paddles
-4. Use a cloth dampened with distilled water for a rinse wipedown.
-5. Let the gripper air dry and reattach.
+4. Rinse off any remaining residue using a cloth dampened with distilled water.
+5. Let the gripper air dry.
+6. Reattach the gripper to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 ![Cleanable gripper components, including the body, jaws, and paddles.](images/gripper-components-cleaning.png "Gripper components"){width="50%"}
 
@@ -163,7 +174,7 @@ Once you've prepared the module for cleaning:
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the module's surfaces.
-3. Use a cloth dampened with distilled water as a rinse wipedown.
+3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the module air dry.
 
 ### Thermocycler seals
@@ -181,12 +192,38 @@ To set up the Thermocycler with a clean seal:
 
 The following table lists labware sold by Opentrons that we have verified as autoclave-safe. When you can't determine whether a piece of labware is autoclave-safe, just replace it with new, clean labware. You can [purchase replacement labware](https://opentrons.com/products/categories/tips-&-labware) from the Opentrons shop.
 
-| Labware type | Autoclave-safe items |
-|--------------|----------------------|
-| **Reservoirs**        | All NEST reservoirs                                                                                   |
-| **Sample vials**      | Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)                       |
-| **Tip racks and tips**| All Flex tip racks and tips                                                                          |
-| **Well plates**       | <ul><li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li><li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li><li>USA Scientific 96 Deep Well Plate, 2.4 mL</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Labware type</th>
+      <th>Autoclave-safe items</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Reservoirs</strong></td>
+      <td>All NEST reservoirs</td>
+    </tr>
+    <tr>
+      <td><strong>Sample vials</strong></td>
+      <td>Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)</td>
+    </tr>
+    <tr>
+      <td><strong>Tip racks and tips</strong></td>
+      <td>All Flex tip racks and tips</td>
+    </tr>
+    <tr>
+      <td><strong>Well plates</strong></td>
+      <td>
+        <ul>
+          <li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li>
+          <li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li>
+          <li>USA Scientific 96 Deep Well Plate, 2.4 mL</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
 
@@ -208,7 +245,7 @@ In addition, Opentrons Care Plus includes on-site visits for:
 - Preventive maintenance, yearly.
 - Repairs, as needed.
 
-You can also [purchase services](https://opentrons.com/instrument-services) a la carte, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
+You can also [purchase services](https://opentrons.com/instrument-services) individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
 
 ### Installation qualification and operation qualification
 
@@ -223,55 +260,55 @@ Consult the [Flex IQ/OQ form](https://opentrons-flex-iq-oq-checklist.paperform.c
 
 ### Preventative maintenance
 
-Opentrons recommends performing basic maintenance tasks — above and beyond cleaning, but not repairs or service — on a regular schedule. These recommendations assume that Flex is in operation 20 hours per week, 50 weeks per year. Adjust the schedule to meet your needs if you use your Flex more or less.
+Along with routine cleaning, Opentrons also recommends the following optional procedures to help keep your Flex running smoothly. These suggestions are based on a Flex that operates for about 20 hours per week, 50 weeks per year. Feel free to adapt this schedule to your robot's workload. Alternatively, let Opentrons do the work for you—see the [Instrument Services section](https://opentrons.com/instrument-services) of our website for information about our service contract offerings.
 
-<table markdown>
-<thead>
-<tr>
-<th>Frequency</th>
-<th>Task</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody markdown>
-<tr>
-<td rowspan="2">Daily</td>
-<td>Empty trash</td>
-<td>Take the movable trash out of its deck slot, safely discard its contents, and replace it into the deck.</td>
-</tr>
-<tr>
-<td>Inspect working area</td>
-<td>Clear the deck of any debris, liquid, or no-longer-needed labware. Check that the plastic labware clips are not damaged.</td>
-</tr>
-<tr>
-<td>Weekly</td>
-<td>Clean surfaces</td>
-<td>Clean the exterior surfaces of the deck, gantry, windows, instruments, and other hardware, as described above.</td>
-</tr>
-<tr>
-<td>Monthly</td>
-<td>Power cycle</td>
-<td>Turn off Flex and all connected modules. Then turn them back on.</td>
-</tr>
-<tr>
-<td rowspan="3">Every six months</td>
-<td>Inspect pipettes</td>
-<td>Inspect the O-rings on the pipette nozzles for signs of wear (notches, deformation). Replace the O-rings with the provided spares, if needed.</td>
-</tr>
-<tr>
-<td>Inspect gripper</td>
-<td>Inspect the rubber pads on the gripper paddles. Replace the gripper paddles with the provided spares, if needed.</td>
-</tr>
-<tr>
-<td>Recalibrate instruments</td>
-<td>Run recalibration for the pipettes and gripper.</td>
-</tr>
-<tr markdown>
-<td>Yearly</td>
-<td>Evaluate pipette performance</td>
-<td markdown>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the [published accuracy and precision standards][pipette-specifications].</td>
-</tr>
-</tbody>
+<table>
+  <thead>
+    <tr>
+      <th>Frequency</th>
+      <th>Task</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">Daily</td>
+      <td>Empty trash</td>
+      <td>Take the movable trash out of its deck slot, safely discard its contents, and replace it into the deck.</td>
+    </tr>
+    <tr>
+      <td>Inspect working area</td>
+      <td>Clear the deck of any debris, liquid, or no-longer-needed labware. Check that the plastic labware clips are not damaged.</td>
+    </tr>
+    <tr>
+      <td>Weekly</td>
+      <td>Clean surfaces</td>
+      <td>Clean the exterior surfaces of the deck, gantry, windows, instruments, and other hardware, as described above.</td>
+    </tr>
+    <tr>
+      <td>Monthly</td>
+      <td>Power cycle</td>
+      <td>Turn off Flex and all connected modules. Then turn them back on.</td>
+    </tr>
+    <tr>
+      <td rowspan="3">Every six months</td>
+      <td>Inspect pipettes</td>
+      <td>Inspect the O-rings on the pipette nozzles for signs of wear (notches, deformation). Replace the O-rings with the provided spares, if needed.</td>
+    </tr>
+    <tr>
+      <td>Inspect gripper</td>
+      <td>Inspect the rubber pads on the gripper paddles. Replace the gripper paddles with the provided spares, if needed.</td>
+    </tr>
+    <tr>
+      <td>Recalibrate instruments</td>
+      <td>Run recalibration for the pipettes and gripper.</td>
+    </tr>
+    <tr>
+      <td>Yearly</td>
+      <td>Evaluate pipette performance</td>
+      <td>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the <a href="../system-description/#pipette-specifications">published accuracy and precision standards</a>.</td>
+    </tr>
+  </tbody>
 </table>
 
 The annual on-site preventative maintenance visit that is part of Opentrons Care Plus includes performance of all of the tasks listed above, as well as replacement parts.

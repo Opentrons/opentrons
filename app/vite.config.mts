@@ -1,12 +1,15 @@
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
+
 import { versionForProject } from '../scripts/git-version.mjs'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
+
 import type { UserConfig } from 'vite'
 
 export default defineConfig(
@@ -19,7 +22,7 @@ export default defineConfig(
       build: {
         // Relative to the root
         outDir: 'dist',
-        sourcemap: true
+        sourcemap: true,
       },
       plugins: [
         react({
@@ -29,6 +32,7 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        cssModuleSideEffect(),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -58,6 +62,9 @@ export default defineConfig(
       },
       resolve: {
         alias: {
+          '@opentrons/components/styles/global': path.resolve(
+            '../components/src/styles/global.css'
+          ),
           '@opentrons/components/styles': path.resolve(
             '../components/src/index.module.css'
           ),

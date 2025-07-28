@@ -28,7 +28,7 @@ SERVER_CMD = "{0} -m http.server {1} --directory {2}"
 CAM_PIC_FILE_NAME = "camera_{0}.jpg"
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "v4l2-ctl --device /dev/video2 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
@@ -244,7 +244,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA
     ui.print_header("CAMERA")
-    cam_pic_path = await _take_picture(api, report, section)
+    try:
+        cam_pic_path = await _take_picture(api, report, section)
+    except Exception as e:
+        print(f"Take a picture failed with the following error: {e}")
     if cam_pic_path:
         await _run_image_check_server(api, report, section, cam_pic_path)
         cam_pic_path.unlink()

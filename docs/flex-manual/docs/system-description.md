@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: System Description"
+---
+
 # System Description
 
 This chapter describes the hardware systems of Opentrons Flex, which underlie its core lab automation features. The deck, gantry, and instrument mounts of Opentrons Flex enable the use of precision liquid- and labware-handling components. The on-device touchscreen enables running protocols and checking on the robot's status without needing to bring your computer to the lab bench. Wired and wireless connectivity enables additional control from the Opentrons App (see the [Software and Operation chapter](software-operation.md) for more details) and extending the system's features by attaching peripherals (see the [Modules chapter](modules.md)).
@@ -136,7 +140,7 @@ The primary user interface is the 7-inch LCD *touchscreen*, located on the front
 
 - Operation logs and error notifications
 
-For more information on using Flex via the touchscreen, see the of the Software and Operation chapter.
+For more information on using Flex via the touchscreen, see the [Touchscreen Operation section](software-operation.md#touchscreen-operation) of the Software and Operation chapter.
 
 The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 
@@ -215,10 +219,7 @@ The pipettes pick up disposable plastic *tips* by pressing them onto the pipette
 ### Pipette specifications
 
 Opentrons Flex pipettes are designed to handle a wide range of volumes.
-Because of their wide overall range, they can use multiple sizes of
-tips, which affect their liquid-handling characteristics. Opentrons has
-tested Flex pipettes for accuracy and precision in a number of tip and
-liquid volume combinations:
+Because of their wide overall range, they can use multiple sizes of tips, which affect their liquid-handling characteristics. Opentrons has tested Flex pipettes for accuracy and precision in a number of tip and liquid volume combinations:
 
 <table>
   <thead>
@@ -352,7 +353,7 @@ pipette. In general, for best results you should use the smallest tips
 that meet the needs of your protocol.
 
 !!! note
-    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the of the [Pipette Installation section][pipette-installation] Installation and Relocation chapter, for details.
+    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
 
     The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section][servicing-flex] of the Maintenance and Service chapter for details.
 

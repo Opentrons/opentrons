@@ -1,4 +1,4 @@
-site_name: Flex Stacker Module GEN1 Instruction Manual
+site_name: stacker-manual
 
 theme:
   name: material
@@ -33,6 +33,6 @@ nav:
   - Pre-installation Information: preinstall.md
   - Installing the Stacker: installation.md
   - Post-installation Procedures: postinstall.md
-  - Loading and Unloading Labware: loading-labware.md
+  - Loading Labware: loading-labware.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: warranty.md
