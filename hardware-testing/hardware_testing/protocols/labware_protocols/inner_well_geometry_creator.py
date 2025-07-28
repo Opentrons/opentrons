@@ -376,7 +376,7 @@ def run(ctx: ProtocolContext) -> None:
     # Constants
     max_volume = labware["A1"].max_volume
     min_step = max(max_volume * 0.005, 2)
-    max_step = min(max_volume * 0.3, 50000)
+    max_step = min(max_volume * 0.3, 1500)
     tolerance = (
         max_volume / 30
     )  # if the height within tolerance, then protocol can finish.
@@ -493,7 +493,11 @@ def run(ctx: ProtocolContext) -> None:
         elif dynamic_steps:
             step_volume = adaptive_volume_step(
                 hdelta, corrected_height, step_volume, neutral_target
-            )                                                                                                     
+            )
+
+        # prevent potential well overflow 
+        if (dispense_volume + step_volume) > max_volume:
+                step_volume = max_volume - dispense_volume                                             
 
         # track volumes 
         dispense_volume += step_volume
