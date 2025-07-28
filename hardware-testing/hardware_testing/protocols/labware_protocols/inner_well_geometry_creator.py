@@ -23,7 +23,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProb
 ASPIRATE_MM_FROM_BOTTOM = 5
 DISPENSE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_290ml"
-DEFAULT_STEPS = 18  # change later
+DEFAULT_STEPS = 20  # change later
 
 LIQUID_MOUNT = "right"
 LIQUID_PIPETTE_SIZE = 1000
@@ -376,14 +376,14 @@ def run(ctx: ProtocolContext) -> None:
     # Constants
     max_volume = labware["A1"].max_volume
     min_step = max(max_volume * 0.005, 2)
-    max_step = min(max_volume * 0.3, 20000)
+    max_step = min(max_volume * 0.3, 50000)
     tolerance = (
         max_volume / 30
     )  # if the height within tolerance, then protocol can finish.
 
     # Initialize state
     corrected_height = 0.0
-    corrected_heights = []
+    corrected_heights = [0]
     tip_z_error = 0.0
     step = 0
     hdelta = 0.0
@@ -392,6 +392,7 @@ def run(ctx: ProtocolContext) -> None:
     step_volume = 0.0
     total_vol = 0.0
     dispense_volume = 0
+    current_well = "none"
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -470,7 +471,7 @@ def run(ctx: ProtocolContext) -> None:
     ################ Begin Protocol
     
     num_wells = len(wells)
-    _write_line_to_csv(ctx, current_well = "none", step_volume = 0, dispense_volume = 0, tip_z_error = 0, error_from_nominal = 0, height = 0, hdelta = 0)
+    write_trial_log()
 
     # probe source well
     liq_pipette.pick_up_tip()
