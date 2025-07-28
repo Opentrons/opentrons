@@ -633,8 +633,6 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       blowout_flowRate:
         matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? null,
       ...dipsosalFields,
-      blowout_flowRate:
-        matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? null,
     }
     return {
       ...(liquidHandlingAction === 'all' || liquidHandlingAction === 'aspirate'
