@@ -22,6 +22,7 @@ paramiko = "*"
 prettier = "*"
 pydantic = "==2.9.0"
 build = "*"
+gopro = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"
