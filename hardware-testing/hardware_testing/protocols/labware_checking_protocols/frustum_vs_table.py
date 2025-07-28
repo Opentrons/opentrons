@@ -115,14 +115,14 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Labware Version of Frustum",
         maximum=10,
         minimum=1,
-        default=4,
+        default=3,
     )
     parameters.add_int(
         variable_name="labware_version_of_table",
         display_name="Labware Version of Table",
         maximum=10,
         minimum=1,
-        default=5,
+        default=4,
     )
     parameters.add_str(
         variable_name="labware_type",
@@ -145,7 +145,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="usascientific_96_wellplate_2.4ml_deep",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
