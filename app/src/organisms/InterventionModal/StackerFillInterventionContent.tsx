@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import FillHopper from '/app/assets/videos/error-recovery/FlexStacker_FillHopper.webm'
 import {
   AnimationVideo,
   BORDERS,
-  Box,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -17,6 +14,7 @@ import {
   getStackerLocationFromSlotName,
 } from '@opentrons/shared-data'
 
+import FillHopper from '/app/assets/videos/error-recovery/FlexStacker_FillHopper.webm'
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
@@ -29,11 +27,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const STACKER_IMAGE_STYLE = css`
-  flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey35};
-  border-radius: ${BORDERS.lineBorder};
+  border-radius: ${BORDERS.borderRadius16};
 `
 
 export interface StackerFillInterventionProps {
@@ -104,11 +98,9 @@ export function StackerFillInterventionContent({
           />
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
-          <Box margin="0 auto" width="100%">
-            <AnimationVideo role="presentation">
-              <source src={FillHopper} data-testid="fill-animation" />
-            </AnimationVideo>
-          </Box>
+          <AnimationVideo role="presentation" width="100%">
+            <source src={FillHopper} data-testid="fill-animation" />
+          </AnimationVideo>
         </Flex>
       </Flex>
     </Flex>
