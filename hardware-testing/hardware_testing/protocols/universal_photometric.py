@@ -361,7 +361,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         display_color="#FE0000",
     )
 
-    def _validate_dye_liquid_height() -> None:
+    def _validate_dye_liquid_height(trial: int) -> None:
 
         liquid_height_valid = False
         retrying = False
@@ -378,7 +378,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
 
             needed_starting_dye_volume = (
                 96
-                * ctx.params.cycles  # type: ignore [attr-defined]
+                * (ctx.params.cycles - trial)  # type: ignore [attr-defined]
                 * ctx.params.target_volume  # type: ignore [attr-defined]
             ) + DYE_RESERVOIR_DEAD_VOLUME
             # note: want to acct for needed dead volume here
@@ -393,11 +393,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 )
                 retrying = True
         pip._retract()
-        if ctx.params.lld:  # type: ignore [attr-defined]
-            pip.return_tip()
-            pip._retract()
-            ctx.pause("Replace tip rack.")
-            pip.pick_up_tip(tips["A1"])
+        #if ctx.params.lld:  # type: ignore [attr-defined]
+        #    pip.return_tip()
+        #    pip._retract()
+        #    ctx.pause("Replace tip rack.")
+        #    pip.pick_up_tip(tips["A1"])
 
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
@@ -450,8 +450,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         liquid_class = _get_transfer_settings(tips, i == 0)
         pip.pick_up_tip(tips["A1"])
 
-        if i == 0:
-            _validate_dye_liquid_height()
+        #if i == 0:
+        #    _validate_dye_liquid_height()
+        _validate_dye_liquid_height(i)
 
         # we'll always end up with 200 uL after dispensing
         prep_vol = 200 - target_volume
@@ -469,7 +470,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             aspirate_volume,
             liquid_class.get_for(pip, tips),
             transfer_type,
-            dye_source.wells()[0],
+            dye_source["A1"],
         )
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]
@@ -478,7 +479,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 ctx.params.conditioning_volume,  # type: ignore [attr-defined]
                 liquid_class.get_for(pip, tips),
                 transfer_type,
-                dye_source.wells()[0],
+                dye_source["A1"],
                 contents,
             )
         # Pause after aspiration
