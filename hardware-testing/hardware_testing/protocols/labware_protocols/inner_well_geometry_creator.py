@@ -22,7 +22,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProb
 
 ASPIRATE_MM_FROM_BOTTOM = 5
 DISPENSE_MM_FROM_BOTTOM = 5
-RESERVOIR = "nest_1_reservoir_195ml"
+RESERVOIR = "nest_1_reservoir_290ml"
 DEFAULT_STEPS = 18  # change later
 
 LIQUID_MOUNT = "right"
@@ -94,8 +94,9 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
             {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
+            {"display_name": "nest 195 reservoir", "value": "nest_1_reservoir_195ml"},
         ],
-        default="usascientific_12_reservoir_22ml",
+        default= "nest_96_wellplate_2ml_deep",
     )
 
     parameters.add_float(
@@ -177,6 +178,7 @@ def _setup(
     float,
     str,
     str,
+    list[str],
 ]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
@@ -218,6 +220,7 @@ def _setup(
         labware_type, SLOT_LABWARE, version=ctx.params.labware_version
     )
     labware.load_empty(labware.wells())
+    wells = list(labware.wells_by_name().keys())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
@@ -269,7 +272,8 @@ def _setup(
         first_dispense,
         neutral_target,
         labware_type,
-        liq_mount
+        liq_mount,
+        wells
     )
 
 
@@ -365,13 +369,14 @@ def run(ctx: ProtocolContext) -> None:
         first_dispense,
         neutral_target,
         labware_type,
-        liq_mount
+        liq_mount,
+        wells
     ) = _setup(ctx)
 
     # Constants
     max_volume = labware["A1"].max_volume
     min_step = max(max_volume * 0.005, 2)
-    max_step = min(max_volume * 0.1, 3000)
+    max_step = min(max_volume * 0.3, 20000)
     tolerance = (
         max_volume / 30
     )  # if the height within tolerance, then protocol can finish.
@@ -388,12 +393,8 @@ def run(ctx: ProtocolContext) -> None:
     total_vol = 0.0
     dispense_volume = 0
 
-
-
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
-
-
 
     def pick_up_tips() -> None:
         if not probe_pipette.has_tip:
@@ -447,7 +448,7 @@ def run(ctx: ProtocolContext) -> None:
 
     def write_trial_log() -> None:
         trial_data = [
-            well,
+            current_well,
             round(step_volume, 5),
             round(total_vol, 5),
             round(tip_z_error, 5),
@@ -467,55 +468,51 @@ def run(ctx: ProtocolContext) -> None:
         labware.load_empty(labware.wells())
 
     ################ Begin Protocol
-
-
-    drop_tips()
     
-    wells = list(labware.wells_by_name().keys())
+    num_wells = len(wells)
+    _write_line_to_csv(ctx, current_well = "none", step_volume = 0, dispense_volume = 0, tip_z_error = 0, error_from_nominal = 0, height = 0, hdelta = 0)
+
+    # probe source well
+    liq_pipette.pick_up_tip()
+    _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
+    liq_pipette.drop_tip()
 
     while total_vol < (max_volume - tolerance):
-        #check if the step exceeds the number of wells
-        if step > len(wells):
+
+        current_well = wells[step % num_wells]
+
+        if step > 0 and step % num_wells == 0:
             reload_labware()
-            step = 2
-
-        well = wells[step-1]
-
+        
         pick_up_tips()
-        tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
-        #log step 0 in the csv 
+        # determine step volume 
         if step == 0:
-            src_height = _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
-        #step 1: initial dispense
-        elif step == 1:
             step_volume = first_dispense if dynamic_steps else max_volume / number_of_steps
-        #step > 1: adaptive step volume
-        elif dynamic_steps and len(corrected_heights) > 1:
+        elif dynamic_steps:
             step_volume = adaptive_volume_step(
                 hdelta, corrected_height, step_volume, neutral_target
-            ) 
+            )                                                                                                     
 
         # track volumes 
         dispense_volume += step_volume
         total_vol += step_volume # the amount dispensed was updated to be the same as the total vol
 
-        if dispense_volume > 0:
-            liq_pipette.transfer_with_liquid_class(
-                ethanol,
-                dispense_volume if liq_mount == "1" else dispense_volume / 8,
-                src["A1"],
-                labware[well],
-                new_tip="never",
-                return_tip=False,
-            )
-            
-            height = probe_pipette.measure_liquid_height(labware[well])
+        liq_pipette.transfer_with_liquid_class(
+            ethanol,
+            dispense_volume if liq_mount == "1" else dispense_volume / 8,
+            src["A1"],
+            labware[current_well],
+            new_tip="never",
+            return_tip=False,
+        )
+        
+        height = probe_pipette.measure_liquid_height(labware[current_well])
         
         corrected_height = height + tip_z_error
 
         # Error from nominal (api)
-        api_vol = labware[well].height_from_volume(dispense_volume)
+        api_vol = labware[current_well].height_from_volume(dispense_volume)
         vol_diff = api_vol - corrected_height
 
         # Calculating change in height from previous step
