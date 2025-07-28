@@ -464,57 +464,57 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
     await _reset_gantry(api)
 
     # test each attached pipette
-    while True:
-        mount_list = await _get_next_pipette_mount(api)
-        for mount in mount_list:
-            # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-            #     continue
+    # while True:
+    mount_list = await _get_next_pipette_mount(api)
+    for mount in mount_list:
+        # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+        #     continue
 
-            # report = _build_csv_report(cycles=cycles, trials=trials)
-            # dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-            # helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
-            try:
-                for cycle in range(0, DEFAULT_CYCLES):
-                    # await _test_plunger(
-                    #     api, mount, report,
-                    #     cycle=cycle, trials=trials,
-                    #     continue_after_stall=continue_after_stall
-                    # )
-
-                    # this is the old fix, we can use it if the fw reset doesn't work
-                    # await _move_plunger_as_cycle_settings(api, mount)
-                    #await _reset_pipette_fw(api, mount)
-
-                    failed_cycles = await _cycle_plunger(
-                        api, mount,
-                        cycle=cycle, trials=DEFAULT_CYCLES,
-                        continue_after_stall=continue_after_stall
-                    )
-                    data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
-                    # report(
-                    #     _get_cycling_section_tag(),
-                    #     _get_cycling_test_tag(cycle),
-                    #     data,
-                    # )
-                    ui.print_title(data)
-            except Exception as errrrr:
-                print("errrrr",errrrr)
+        # report = _build_csv_report(cycles=cycles, trials=trials)
+        # dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+        # helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+        # try:
+        # for cycle in range(0, cycles):
             # await _test_plunger(
-            #         api, mount, report,
-            #         cycle=cycles*TRIALS_PER_CYCLE, trials=trials,
-            #         continue_after_stall=continue_after_stall
-            #     )
-            # data = [0, CSVResult.from_Numbool(0)]
+            #     api, mount, report,
+            #     cycle=cycle, trials=trials,
+            #     continue_after_stall=continue_after_stall
+            # )
+
+            # this is the old fix, we can use it if the fw reset doesn't work
+            # await _move_plunger_as_cycle_settings(api, mount)
+            #await _reset_pipette_fw(api, mount)
+
+        failed_cycles = await _cycle_plunger(
+            api, mount,
+            cycle=1, trials=cycles,
+            continue_after_stall=continue_after_stall
+        )
+        data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
             # report(
             #     _get_cycling_section_tag(),
-            #     _get_cycling_test_tag(cycles),
+            #     _get_cycling_test_tag(cycle),
             #     data,
             # )
-            
-            ui.print_title("DONE")
+        # ui.print_title(data)
+        # except Exception as errrrr:
+        #     print("errrrr",errrrr)
+        # await _test_plunger(
+        #         api, mount, report,
+        #         cycle=cycles*TRIALS_PER_CYCLE, trials=trials,
+        #         continue_after_stall=continue_after_stall
+        #     )
+        # data = [0, CSVResult.from_Numbool(0)]
+        # report(
+        #     _get_cycling_section_tag(),
+        #     _get_cycling_test_tag(cycles),
+        #     data,
+        # )
+        
+        ui.print_title("DONE")
 
-            if api.is_simulator:
-                break
+        if api.is_simulator:
+            break
 
 
 if __name__ == "__main__":
