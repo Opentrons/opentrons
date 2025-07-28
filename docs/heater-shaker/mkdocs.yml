@@ -7,6 +7,7 @@ nav:
   - Additional Product Information: warranty.md
   - Product Specifications: specifications.md
   - Thermal Adapters: adapters.md
+  - Before You Begin: preinstall.md
 
 theme:
   name: material
