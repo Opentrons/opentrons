@@ -31,6 +31,7 @@ class _EngineStateSlice:
     current_command: Optional[CommandPointer] = None
     recovery_target_command: Optional[CommandPointer] = None
     state_summary_status: Optional[EngineStatus] = None
+    state_summary_labware_offset_count: Optional[int] = None
 
 
 class RunsPublisher:
@@ -152,13 +153,23 @@ class RunsPublisher:
                 self._run_hooks.run_id
             )
 
-            if (
-                new_state_summary is not None
-                and self._engine_state_slice.state_summary_status
-                != new_state_summary.status
-            ):
-                self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
-                self._engine_state_slice.state_summary_status = new_state_summary.status
+            if new_state_summary is not None:
+                if (
+                    self._engine_state_slice.state_summary_status
+                    != new_state_summary.status
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_status = (
+                        new_state_summary.status
+                    )
+
+                elif self._engine_state_slice.state_summary_labware_offset_count != len(
+                    new_state_summary.labwareOffsets
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_labware_offset_count = len(
+                        new_state_summary.labwareOffsets
+                    )
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
