@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { parse } from 'date-fns'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 
@@ -31,6 +32,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
@@ -78,12 +80,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
-  // FIXME: use getModuleUSBPort instead of this logic once it is merged
-  const usbPort = attachedModule.usbPort
-  const modulePort =
-    usbPort?.hubPort != null
-      ? `${usbPort.port}.${usbPort.hubPort}`
-      : `${usbPort?.port}`
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isFlexStacker = attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE
 
@@ -238,7 +235,10 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       bodyText={
         <>
           <StyledText css={BODY_STYLE}>
-            {t('select_the_slot', { module: moduleName, port: modulePort })}
+            {t('select_the_slot', {
+              module: moduleName,
+              port: parseModuleUSBPort(attachedModule),
+            })}
             {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
           </StyledText>
           {isFlexStacker ? (
