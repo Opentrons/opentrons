@@ -630,6 +630,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       dispense_retract_delay_seconds:
         allOT2Defaults.dispense_retract_delay_seconds,
+      blowout_flowRate:
+        matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? null,
       ...dipsosalFields,
     }
     return {
@@ -799,6 +801,10 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     dispense_touchTip_mmFromTop: dispense.retract.touchTip.params?.zOffset,
     dispense_retract_delay_seconds: 0,
     dispense_submerge_delay_seconds: 0,
+    blowout_flowRate:
+      dispense.retract.blowout.params?.flowRate ??
+      matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ??
+      null,
   }
   return {
     ...getDefaultsForStepType(stepType),
