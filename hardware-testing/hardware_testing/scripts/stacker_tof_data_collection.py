@@ -146,7 +146,7 @@ class Stacker_TOF_Data_Collection:
         await self.stacker_setup()
         self.file_setup()
         print("\n-> Starting Stacker TOF Validation Test!\n")
-        self.start_time = time.time()
+        self.start_time = time.monotonic()
 
     async def stacker_setup(self) -> None:
         """Find stacker symlinks from the file system."""
@@ -206,7 +206,7 @@ class Stacker_TOF_Data_Collection:
                     for k in range(self.samples):
                         sample = k + 1
                         print(f">>> Reading {axis} {pos} Sample = {sample}")
-                        elapsed_time = (time.time() - self.start_time) / 60
+                        elapsed_time = (time.monotonic() - self.start_time) / 60
                         if self.api is not None:
                             await self.api.attached_modules[i].home_axis(  # type: ignore
                                 StackerAxis.X, direction
