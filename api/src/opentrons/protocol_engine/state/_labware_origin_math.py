@@ -369,7 +369,7 @@ def _parent_deck_item_to_child_labware_feature_offset(
         parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
         and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
     ):
-        return _parent_origin_flex_tip_rack_lid_feature(
+        return _parent_origin_to_flex_tip_rack_lid_feature(
             parent_deck_item
         ) + _flex_tip_rack_lid_feature_to_child_origin(child_labware)
     elif (
@@ -420,7 +420,7 @@ def _get_spring_force(
     return parent_spring_force or child_spring_force
 
 
-def _parent_origin_flex_tip_rack_lid_feature(
+def _parent_origin_to_flex_tip_rack_lid_feature(
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
     """Returns the offset from a deck item's origin to the Flex tip rack lid locating feature."""
@@ -469,7 +469,7 @@ def _parent_origin_to_slot_back_left_bottom(
 def _flex_tip_rack_lid_feature_to_child_origin(
     child_labware: LabwareDefinition3,
 ) -> Point:
-    """Returns the offset from a parent lid's Flex tip rack lid locating feature to the child origin."""
+    """Returns the offset from a Flex tip rack lid locating feature to the child origin."""
     flex_tip_rack_lid_as_child = child_labware.features.get(
         "opentronsFlexTipRackLidAsChild"
     )
