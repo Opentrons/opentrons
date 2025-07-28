@@ -243,13 +243,6 @@ move the pipette quickly, but beware of crashing the pipette into
 labware.</figcaption>
 </figure>
 
-<!-- commenting this, no image, TK placeholder text below
-<figure class="screenshot" markdown>
-TK image of 8.4 LPC
-<figcaption>Summary of new labware offsets ready to be applied to a protocol.</figcaption>
-</figure>
--->
-
 When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
 
 !!! note
