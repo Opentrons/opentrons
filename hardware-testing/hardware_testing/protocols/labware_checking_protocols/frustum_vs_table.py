@@ -145,7 +145,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="nest_96_wellplate_2ml_deep",
+        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
