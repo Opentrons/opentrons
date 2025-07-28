@@ -5,6 +5,7 @@ nav:
   - Safety Information and Regulatory Compliance: compliance.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: warranty.md
+  - Product Specifications: specifications.md
 
 theme:
   name: material
