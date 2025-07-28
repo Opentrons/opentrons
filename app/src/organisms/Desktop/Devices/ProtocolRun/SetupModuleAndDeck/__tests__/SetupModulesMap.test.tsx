@@ -155,7 +155,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
-          physicalPort: null,
+          physicalPort: 'usb not connected',
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
