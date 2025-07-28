@@ -17,6 +17,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
@@ -52,6 +53,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const availableModules = useGetNewModules()
   const newModules =
     attachedModuleOnLaunch !== null
@@ -62,12 +64,8 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
-    const usbPort = module.usbPort
     const name = getModuleDisplayName(module.moduleModel)
-    const port =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : `${usbPort?.port}`
+    const port = parseModuleUSBPort(module)
     return { name, port }
   }
 
