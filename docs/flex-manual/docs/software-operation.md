@@ -220,37 +220,55 @@ When working with CSV files, keep in mind that:
 
 Parameter and CSV file selections are still editable until you tap **Confirm values**. Modifications become read-only after that. To make further adjustments, you'll have to cancel the protocol run and start over.
 
-### Labware Position Check
+### Labware offsets and position checking
 
-Opentrons recommends performing Labware Position Check before your protocol run. This process fine- tunes the positioning of instruments, relative to specific types of labware in specific slots on the deck. The results of Labware Position Check are saved as labware offsets, which are measured to the nearest 0.1 mm. You can apply saved labware offsets to future runs of the same protocol (or other protocols that use the same labware in the same positions) to save time.
+#### Labware offsets
+Labware offsets are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
 
-Labware Position Check guides you through these steps:
+| Feature | Description |
+|----|----|
+| Protocol independence | Offsets are positional adjustments associated with a piece of labware, rather than with a specific protocol, and saved on the robot. This allows for greater flexibility and reusability of offset data in any protocol. |
+| Default offsets | Default offsets are manually created via Labware Position Check and then automatically applied to each instance of that labware, regardless of deck slot or protocol. This "measure once, set everywhere" feature means you don't have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
+| Applied offsets | Applied offsets override defaults for a specific piece of labware in a specific deck slot. You can use an applied offset with different protocols, but the labware and deck slot must be the same as the original applied offset. |
+| Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the Python protocol file to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
 
-1.  Attach the calibration probe to the pipette.
+#### Offsets at-a-glance
 
-2.  Clear the deck of labware, but leave modules in place.
+This illustration shows how the different types of offsets appear as you're configuring a protocol on the Flex touchscreen.
 
-3.  Place a specific type of labware in a specific deck slot.
+![](images/labware-offsets.svg)
 
-4.  Align the probe to the labware using the on-screen jog controls. Then confirm the position.
+#### Labware Position Check
 
-5.  Repeat steps 3 and 4 for each labware--slot combination used in your protocol.
+Labware Position Check lets you align a pipette relative to a piece of labware (e.g. a well plate), which helps ensure accurate and reproducible pipetting results.
 
-6.  Review and save your new labware offset data.
+You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
-7.  Remove the calibration probe from the pipette.
+<figure class="screenshot" markdown>
+![Touchscreen showing missing labware offset](images/missing-offsets.png)
+</figure>
+
+Tap **Labware Offsets** to see which labware is missing an offset and to start Labware Position Check. Refer to the touchscreen or the Opentrons App when running Labware Position Check. It will provide instructions and animations to guide you through this process.
+
+#### Jog controls
+
+During Labware Position Check, you’ll use the jog controls to align the pipette with the selected labware.
 
 <figure class="screenshot" markdown>
 ![Jog controls, with three options for jump size on the left, toggle between axes in the middle, and arrow buttons on the right.](images/touchscreen-lpc-jog-controls.png "Labware Position Check jog controls")
-<figcaption>Jog controls used in Labware Position Check. Use larger jump sizes to
-move the pipette quickly, but beware of crashing the pipette into
-labware.</figcaption>
+<figcaption>Jog controls used in Labware Position Check.</figcaption>
 </figure>
 
-When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
+To use the jog controls:
+
+1. Select a jog control option to set the pipette's axis of movement.
+2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm.  Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette into labware.
+3. Tap an arrow to move the pipette for your selected direction and distance.
+4. Tap **Close** when, in your best judgement, the pipette is optimally aligned with the selected labware.
+5. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
 
 !!! note
-    The pipette will always start at the default position if you turn off Apply Labware Offsets in the robot settings.
+    Labware Position Check corrects for minor, millimeter-scale pipette and labware alignment variations. If you find yourself using it to compensate for large, multi-centimeter offsets, this may suggest an alignment problem related to labware manufacturing defects or incorrect labware definitions. Contact Opentrons Support if you encounter persistent, significant instrument or labware misalignments.
 
 ### Run progress
 
