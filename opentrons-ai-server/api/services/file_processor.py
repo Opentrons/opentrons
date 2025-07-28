@@ -5,7 +5,9 @@ Server handles all file processing
 
 import base64
 import logging
-from typing import Literal, Optional, TypedDict
+from typing import Any, Dict, List, Literal, Optional, TypedDict
+
+import anthropic
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +31,34 @@ class FileProcessor:
     UNIT_KB = 1024
     UNIT_MB = UNIT_KB * UNIT_KB
 
-    # Maximum sizes for different processing operations
-    # Conservative base64 limit: ~100KB binary PDF → ~133KB base64 → ~150KB with overhead
+    # Maximum total token count for all files combined
     # Anthropic has ~200K token limit, so this leaves room for conversation context
-    MAX_PDF_BASE64_LENGTH = 150000
+    MAX_TOTAL_TOKENS = 150000
+    # Warning threshold at 80% of limit
+    WARNING_TOTAL_TOKENS = int(MAX_TOTAL_TOKENS * 0.8)  # 120,000 tokens
+
+    @staticmethod
+    def count_file_tokens(filename: str, content: str, media_type: str, anthropic_client: anthropic.Anthropic) -> int:
+        """Count tokens for a file using Anthropic API"""
+        try:
+            if media_type == "application/pdf":
+                # PDF content is base64 - use document block
+                message_content = [{"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": content}}]
+            else:
+                # Text content (CSV, Python, etc.) - use text block
+                message_content = [{"type": "text", "text": content}]
+
+            token_count_response = anthropic_client.messages.count_tokens(
+                model="claude-3-5-sonnet-20241022", messages=[{"role": "user", "content": message_content}]  # type: ignore
+            )
+
+            logger.info(f"File {filename} token count: {token_count_response.input_tokens}")
+            return token_count_response.input_tokens
+
+        except anthropic.APIError as e:
+            logger.warning(f"Could not count tokens for file {filename} ({media_type}): {e}")
+            # Rough fallback estimate: ~4 chars per token for text, ~6 for base64
+            return len(content) // 4 if media_type != "application/pdf" else len(content) // 6
 
     @staticmethod
     def process_file(filename: str, mime_type: str, content: str) -> ProcessedFileResult:
@@ -67,13 +93,6 @@ class FileProcessor:
         if not content:
             raise ValueError(f"PDF file {filename} has empty content")
 
-        # Check size limit
-        if len(content) > FileProcessor.MAX_PDF_BASE64_LENGTH:
-            raise ValueError(
-                f"PDF file {filename} is too large ({len(content)} characters). "
-                f"Maximum allowed is {FileProcessor.MAX_PDF_BASE64_LENGTH} characters."
-            )
-
         # Validate it's valid base64
         try:
             base64.b64decode(content, validate=True)
@@ -97,6 +116,33 @@ class FileProcessor:
         """Process Python file"""
         # Could add Python syntax validation here if needed
         return {"content": content, "media_type": "text/x-python", "file_type": "python"}
+
+    @staticmethod
+    def check_files_token_warning(file_references: List[Dict[str, Any]], anthropic_client: anthropic.Anthropic) -> Optional[str]:
+        """Check if total tokens across all files exceeds limits and return warning message"""
+        total_tokens = 0
+
+        for file_ref in file_references:
+            filename = file_ref.get("filename", "unknown")
+            content = file_ref.get("content", "")
+            media_type = file_ref.get("media_type", "text/plain")
+
+            # Count tokens for this file
+            tokens = FileProcessor.count_file_tokens(filename, content, media_type, anthropic_client)
+            total_tokens += tokens
+
+        if total_tokens > FileProcessor.MAX_TOTAL_TOKENS:
+            return (
+                f"Total file tokens ({total_tokens:,}) exceeds the maximum limit "
+                f"({FileProcessor.MAX_TOTAL_TOKENS:,} tokens). Please reduce file sizes."
+            )
+        elif total_tokens > FileProcessor.WARNING_TOTAL_TOKENS:
+            return (
+                f"Warning: Total file tokens ({total_tokens:,}) is approaching the limit "
+                f"({FileProcessor.MAX_TOTAL_TOKENS:,} tokens). Consider reducing file sizes to avoid issues."
+            )
+
+        return None
 
     @staticmethod
     def validate_file_content(filename: str, mime_type: str, content: str) -> Optional[str]:

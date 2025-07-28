@@ -316,10 +316,12 @@ def _generate_llm_response(
         return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
 
-def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
+def _format_response(
+    response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool, file_token_warning: Optional[str] = None
+) -> ChatResponse:
     """Format the LLM response according to the protocol format."""
     if response is None or response == "":
-        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake))
+        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake), file_token_warning=file_token_warning)
 
     if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
         logger.debug("Formatting response for Protocol Designer")
@@ -327,7 +329,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
         try:
             # Case 1: No PD JSON content, but comments are present.
             if pd_json_content is None and comments is not None:
-                return ChatResponse(reply=comments, fake=bool(is_fake))
+                return ChatResponse(reply=comments, fake=bool(is_fake), file_token_warning=file_token_warning)
 
             # Case 2: PD JSON content is present (comments may or may not be).
             elif pd_json_content is not None:
@@ -335,7 +337,9 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                 parsed_protocol_json = json.loads(pd_content_str)  # Can raise JSONDecodeError
 
                 reply_text = comments if comments is not None else ""  # Avoid literal "None"
-                return ChatResponse(reply=reply_text, fake=bool(is_fake), protocol_content=parsed_protocol_json)
+                return ChatResponse(
+                    reply=reply_text, fake=bool(is_fake), protocol_content=parsed_protocol_json, file_token_warning=file_token_warning
+                )
 
             # Case 3: No PD JSON content AND no comments.
             else:
@@ -347,6 +351,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                     reply="""The AI's response did not contain a parsable protocol or any specific
                     comments. Please try rephrasing your request.""",
                     fake=bool(is_fake),
+                    file_token_warning=file_token_warning,
                 )
 
         except json.JSONDecodeError as e:
@@ -359,7 +364,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
             else:
                 error_message = "Failed to generate a protocol. Please try again."
 
-            return ChatResponse(reply=error_message, fake=bool(is_fake))
+            return ChatResponse(reply=error_message, fake=bool(is_fake), file_token_warning=file_token_warning)
 
         except Exception as e:
             logger.error(
@@ -371,9 +376,9 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                 error_message = f"\nComments: {comments}"
             else:
                 error_message = "An unexpected error occurred while preparing the protocol. Please try again."
-            return ChatResponse(reply=error_message, fake=bool(is_fake))
+            return ChatResponse(reply=error_message, fake=bool(is_fake), file_token_warning=file_token_warning)
 
-    return ChatResponse(reply=response, fake=bool(is_fake))
+    return ChatResponse(reply=response, fake=bool(is_fake), file_token_warning=file_token_warning)
 
 
 @tracer.wrap()
@@ -517,7 +522,7 @@ async def create_chat_completion_multipart(
             parsed_history_with_attachments = []
 
         # Process NEW uploaded files for current message
-        new_file_references = await _process_multipart_files(files)
+        new_file_references, token_warning = await _process_multipart_files(files)
 
         # Determine protocol format
         protocol_format_enum = ProtocolFormat.PYTHON
@@ -535,7 +540,7 @@ async def create_chat_completion_multipart(
             protocol_action="update",  # Default action
             new_file_references=new_file_references,
         )
-        return _format_response(response, protocol_format_enum, fake)
+        return _format_response(response, protocol_format_enum, fake, token_warning)
 
     except Exception as e:
         logger.exception("Error processing multipart chat completion")
@@ -544,10 +549,10 @@ async def create_chat_completion_multipart(
         ) from e
 
 
-async def _process_multipart_files(files: List[UploadFile]) -> Optional[List[Dict[str, str]]]:
+async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[List[Dict[str, str]]], Optional[str]]:
     """Process uploaded files for multipart requests."""
     if not files or not any(f.filename for f in files):
-        return None
+        return None, None
 
     UNIT_KB = 1024
     UNIT_MB = UNIT_KB * UNIT_KB
@@ -591,19 +596,26 @@ async def _process_multipart_files(files: List[UploadFile]) -> Optional[List[Dic
             )
 
         # Use FileProcessor for consistent processing
-        processed = FileProcessor.process_file(file.filename, media_type, processed_content)
+        try:
+            processed = FileProcessor.process_file(file.filename, media_type, processed_content)
 
-        file_references.append(
-            {
-                "id": f"upload_{len(file_references)}",
-                "filename": file.filename,
-                "file_type": processed["file_type"],
-                "content": processed["content"],
-                "media_type": processed["media_type"],
-            }
-        )
+            file_references.append(
+                {
+                    "id": f"upload_{len(file_references)}",
+                    "filename": file.filename,
+                    "file_type": processed["file_type"],
+                    "content": processed["content"],
+                    "media_type": processed["media_type"],
+                }
+            )
+        except ValueError as e:
+            # Handle file processing errors (like PDF too large)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
-    return file_references
+    # Check total token count and generate warning if needed
+    token_warning = FileProcessor.check_files_token_warning(file_references, claude.client) if file_references else None
+
+    return file_references, token_warning
 
 
 def _determine_protocol_action(body: ChatRequest) -> str:
