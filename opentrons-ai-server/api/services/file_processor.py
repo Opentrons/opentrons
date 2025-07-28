@@ -8,6 +8,8 @@ import logging
 from typing import Any, Dict, List, Literal, Optional, TypedDict
 
 import anthropic
+from api.constants.file_constants import CONTENT_TYPE_MAPPING, FILE_SIZE_LIMITS, format_file_size_error, get_file_size_limit
+from ddtrace import tracer
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +29,6 @@ class ProcessedFileResult(TypedDict):
 class FileProcessor:
     """Process raw file content from frontend into appropriate formats for Anthropic"""
 
-    # File size constants
-    UNIT_KB = 1024
-    UNIT_MB = UNIT_KB * UNIT_KB
-
     # Maximum total token count for all files combined
     # Anthropic has ~200K token limit, so this leaves room for conversation context
     MAX_TOTAL_TOKENS = 150000
@@ -49,6 +47,7 @@ class FileProcessor:
         return len(content) // 4
 
     @staticmethod
+    @tracer.wrap()
     def count_file_tokens(
         filename: str, content: str, media_type: str, anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> int:
@@ -73,6 +72,45 @@ class FileProcessor:
         except anthropic.APIError as e:
             logger.warning(f"Could not count tokens for file {filename} ({media_type}): {e}")
             return FileProcessor._estimate_tokens(content, media_type)
+
+    @staticmethod
+    def process_multipart_file(filename: str, content_type: str, raw_content: bytes) -> ProcessedFileResult:
+        """Process a raw file from multipart upload directly without double processing."""
+        # Validate file size first
+        file_size = len(raw_content)
+
+        # Determine file type from content type
+        file_type = CONTENT_TYPE_MAPPING.get(content_type)
+        if not file_type and filename.lower().endswith(".py"):
+            file_type = "python"
+
+        if not file_type:
+            raise ValueError(f"Unsupported file type: {content_type} for file {filename}")
+
+        # Validate file size using shared logic
+        max_size = get_file_size_limit(file_type)
+        if file_size > max_size:
+            raise ValueError(format_file_size_error(filename, file_size, file_type))
+
+        # Process content based on type without double processing
+        if content_type == "application/pdf":
+            # Convert raw PDF to base64
+            processed_content = base64.b64encode(raw_content).decode("utf-8")
+            return {"content": processed_content, "media_type": "application/pdf", "file_type": "pdf"}
+        else:
+            # Text files (CSV, Python) - decode to string
+            try:
+                processed_content = raw_content.decode("utf-8")
+            except UnicodeDecodeError as e:
+                raise ValueError(f"Cannot decode {filename} as UTF-8: {str(e)}") from e
+
+            # Return appropriate media type based on content type
+            if content_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
+                return {"content": processed_content, "media_type": "text/csv", "file_type": "csv"}
+            elif filename.lower().endswith(".py"):
+                return {"content": processed_content, "media_type": "text/x-python", "file_type": "python"}
+            else:
+                return {"content": processed_content, "media_type": "text/plain", "file_type": "unknown"}
 
     @staticmethod
     def process_file(filename: str, mime_type: str, content: str) -> ProcessedFileResult:
@@ -132,6 +170,7 @@ class FileProcessor:
         return {"content": content, "media_type": "text/x-python", "file_type": "python"}
 
     @staticmethod
+    @tracer.wrap()
     def check_files_token_warning(
         file_references: Optional[List[Dict[str, Any]]], anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> Optional[str]:
@@ -195,11 +234,16 @@ class FileProcessor:
 
         # Size validation (approximate, before processing)
         content_size = len(content)
-        if mime_type == "application/pdf" and content_size > 7 * FileProcessor.UNIT_MB:  # ~5MB file becomes ~7MB base64
-            return f"PDF file {filename} is too large"
-        elif mime_type in ["text/csv", "application/csv"] and content_size > 2 * FileProcessor.UNIT_MB:
-            return f"CSV file {filename} is too large (max 2MB)"
-        elif content_size > 1 * FileProcessor.UNIT_MB and filename.endswith(".py"):
-            return f"Python file {filename} is too large (max 1MB)"
+
+        if mime_type == "application/pdf":
+            # Base64 encoded PDFs are ~33% larger than original
+            estimated_original_size = int(content_size * 0.75)
+            if estimated_original_size > FILE_SIZE_LIMITS["pdf"]:
+                return format_file_size_error(filename, estimated_original_size, "pdf")
+        elif mime_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
+            if content_size > FILE_SIZE_LIMITS["csv"]:
+                return format_file_size_error(filename, content_size, "csv")
+        elif filename.lower().endswith(".py") and content_size > FILE_SIZE_LIMITS["python"]:
+            return format_file_size_error(filename, content_size, "python")
 
         return None

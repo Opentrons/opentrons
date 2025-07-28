@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
+from api.constants.file_constants import MEDIA_TYPE_MAPPING
 from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
@@ -241,7 +242,7 @@ def _generate_llm_response_with_history(
                                 "filename": attachment.get("name", attachment.get("filename", "")),
                                 "file_type": attachment.get("type", attachment.get("file_type", "")),
                                 "content": attachment.get("content", ""),
-                                "media_type": _determine_media_type(attachment.get("type", attachment.get("file_type", ""))),
+                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", attachment.get("file_type", "")), "text/plain"),
                             }
                         )
 
@@ -267,16 +268,6 @@ def _generate_llm_response_with_history(
                 message_type="update",
                 new_file_references=new_file_references,
             )
-
-
-def _determine_media_type(file_type: str) -> str:
-    """Determine media type from file type."""
-    type_mapping = {
-        "csv": "application/json",
-        "python": "text/x-python",
-        "pdf": "application/pdf",
-    }
-    return type_mapping.get(file_type, "text/plain")
 
 
 def _generate_llm_response(
@@ -554,9 +545,6 @@ async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[Li
     if not files or not any(f.filename for f in files):
         return None, None
 
-    UNIT_KB = 1024
-    UNIT_MB = UNIT_KB * UNIT_KB
-
     file_references: List[Dict[str, str]] = []
     for file in files:
         if not file.filename:  # Skip empty file entries
@@ -564,40 +552,14 @@ async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[Li
 
         # Read file content
         file_content = await file.read()
-        file_size = len(file_content)
 
-        # Validate file size first
-        max_size = 5 * UNIT_MB  # 5MB default limit
-        if file_size > max_size:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"File {file.filename} is too large ({file_size/UNIT_MB:.1f}MB). Maximum size is {max_size/UNIT_MB}MB.",
-            )
+        # Validate content type before processing
+        if not file.content_type:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File {file.filename} has no content type")
 
-        # Process file content based on type
-        if file.content_type == "application/pdf":
-            # Convert raw PDF to base64 (server-side encoding)
-            import base64
-
-            base64_content = base64.b64encode(file_content).decode("utf-8")
-            processed_content = base64_content
-            media_type = "application/pdf"
-        elif file.content_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
-            # CSV files as text
-            processed_content = file_content.decode("utf-8")
-            media_type = file.content_type
-        elif file.filename.lower().endswith(".py"):
-            # Python files as text
-            processed_content = file_content.decode("utf-8")
-            media_type = "text/x-python"
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=f"Unsupported file type: {file.content_type} for file {file.filename}"
-            )
-
-        # Use FileProcessor for consistent processing
+        # Let FileProcessor handle all validation and processing
         try:
-            processed = FileProcessor.process_file(file.filename, media_type, processed_content)
+            processed = FileProcessor.process_multipart_file(file.filename, file.content_type, file_content)
 
             file_references.append(
                 {
