@@ -247,11 +247,6 @@ move the pipette quickly, but beware of crashing the pipette into
 labware.</figcaption>
 </figure>
 
-<figure class="screenshot" markdown>
-TK image of 8.4 LPC
-<figcaption>Summary of new labware offsets ready to be applied to a protocol.</figcaption>
-</figure>
-
 When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
 
 !!! note
@@ -286,11 +281,56 @@ Tap **Launch recovery mode** to see options for the particular type of error tha
 
 Flex provides a protocol recovery path for the following error conditions.
 
-| Error type | Description {style="width: 30%;"} | Recovery options |
-| :--------- | :---------- | :--------------- |
-| No liquid detected | Occurs when a pipette encounters an empty well and expects a liquid to be present. | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul> |
-| Pipette overpressure | Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips. | <ul><li>For aspiration:</li><ul><li>Retry with new tips.</li><li>Cancel protocol run.</li></ul><li>For dispense:</li><ul><li>Skip to the next step with the same tips.</li><li>Skip to the next step with new tips.</li><li>Cancel protocol run.</li></ul></ul> |
-| General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Error type</th>
+      <th style="width: 30%;">Description</th>
+      <th>Recovery options</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No liquid detected</td>
+      <td>Occurs when a pipette encounters an empty well and expects a liquid to be present.</td>
+      <td>
+        <ul>
+          <li>Manually fill the empty well and retry with the same tips.</li>
+          <li>Manually fill the empty well and retry with new tips.</li>
+          <li>Manually fill the empty well and skip to the next step.</li>
+          <li>Ignore the error and skip to the next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Pipette overpressure</td>
+      <td>Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips.</td>
+      <td>For aspiration:<br>
+        <ul>
+            <li>Retry with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+        For dispense:
+        <ul>
+            <li>Skip to the next step with the same tips.</li>
+            <li>Skip to the next step with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>General errors</td>
+      <td>A catch-all category for other errors.</td>
+      <td>
+        <ul>
+          <li>Retry step.</li>
+          <li>Skip to next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr> </tbody>
+</table>
 
 !!! note
     The tip presence sensor is disabled for [partial tip pickup](system-description.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
@@ -708,7 +748,7 @@ Flex *will not* retain information about more than 20 runs on the robot. Proceed
 
 You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
 
-!!!Note
+!!!note
     - SSH keys are required before you can connect to Flex and issue commands from a terminal.
     - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
 
