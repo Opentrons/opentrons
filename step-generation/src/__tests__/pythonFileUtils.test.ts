@@ -271,7 +271,7 @@ describe('getLoadLidStacks', () => {
     },
   }
 
-  it('should generate loadLidStacks for 2 lid stacks', () => {
+  it('should generate load_lid_stack for 2 lids in a stack', () => {
     expect(
       getLoadLidStacks(labwareEntitiesWithLid, labwareRobotStateWithLids)
     ).toBe(
@@ -285,7 +285,7 @@ lid_stack_D1 = protocol.load_lid_stack(
   })
 })
 describe('getLoadLabware', () => {
-  it('should generate loadLabware for 3 labware with a lid on the first one', () => {
+  it('should generate load_labware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
         mockModuleEntities,
