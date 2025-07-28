@@ -613,7 +613,9 @@ async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[Li
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     # Check total token count and generate warning if needed
-    token_warning = FileProcessor.check_files_token_warning(file_references, claude.client) if file_references else None
+    token_warning = (
+        FileProcessor.check_files_token_warning(file_references, claude.client, settings.anthropic_model_name) if file_references else None
+    )
 
     return file_references, token_warning
 
