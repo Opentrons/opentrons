@@ -50,7 +50,7 @@ class RunsPublisher:
             [
                 self._handle_current_command_change,
                 self._handle_recovery_target_command_change,
-                self._handle_engine_status_change,
+                self._handle_relevant_engine_change,
             ]
         )
 
@@ -146,8 +146,8 @@ class RunsPublisher:
                     new_recovery_target_command
                 )
 
-    async def _handle_engine_status_change(self) -> None:
-        """Publish a refetch flag if the engine status has changed."""
+    async def _handle_relevant_engine_change(self) -> None:
+        """Publish a refetch flag if relevant engine changes occur."""
         if self._run_hooks is not None and self._engine_state_slice is not None:
             new_state_summary = self._run_hooks.get_state_summary(
                 self._run_hooks.run_id
