@@ -69,6 +69,7 @@ async def test_initialize(
     assert runs_publisher._engine_state_slice.current_command is None
     assert runs_publisher._engine_state_slice.recovery_target_command is None
     assert runs_publisher._engine_state_slice.state_summary_status is None
+    assert runs_publisher._engine_state_slice.state_summary_labware_offset_count is None
 
     notification_client.publish_advise_refetch.assert_any_call(topic=topics.RUNS)
     notification_client.publish_advise_refetch.assert_any_call(
@@ -171,10 +172,10 @@ async def test_handle_recovery_target_command_change(
     )
 
 
-async def test_handle_engine_status_change(
+async def test_handle_relevant_engine_change(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
-    """It should handle engine status changes appropriately."""
+    """It should handle relevant engine changes appropriately."""
     runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=lambda _: make_command_pointer("command1"),
@@ -189,24 +190,66 @@ async def test_handle_engine_status_change(
 
     runs_publisher._run_hooks.run_id = "1234"
     runs_publisher._run_hooks.get_state_summary = MagicMock(
-        return_value=MagicMock(status=EngineStatus.IDLE)
+        return_value=MagicMock(status=EngineStatus.IDLE, labwareOffsets=[])
     )
     runs_publisher._engine_state_slice.state_summary_status = EngineStatus.IDLE
+    runs_publisher._engine_state_slice.state_summary_labware_offset_count = 0
 
-    await runs_publisher._handle_engine_status_change()
+    await runs_publisher._handle_relevant_engine_change()
 
     assert notification_client.publish_advise_refetch.call_count == 2
 
     runs_publisher._run_hooks.get_state_summary.return_value = MagicMock(
-        status=EngineStatus.RUNNING
+        status=EngineStatus.RUNNING, labwareOffsets=[]
     )
 
-    await runs_publisher._handle_engine_status_change()
+    await runs_publisher._handle_relevant_engine_change()
 
     notification_client.publish_advise_refetch.assert_any_call(topic=topics.RUNS)
     notification_client.publish_advise_refetch.assert_any_call(
         topic=f"{topics.RUNS}/1234"
     )
+
+
+async def test_handle_labware_offset_count_change(
+    runs_publisher: RunsPublisher, notification_client: Mock
+) -> None:
+    """It should handle labware offset count changes appropriately."""
+    runs_publisher.start_publishing_for_run(
+        run_id="1234",
+        get_current_command=lambda _: make_command_pointer("command1"),
+        get_recovery_target_command=AsyncMock(),
+        get_state_summary=AsyncMock(),
+    )
+
+    # todo(mm, 2024-05-21): We should test through the public interface of the subject,
+    # not through its private attributes.
+    assert runs_publisher._run_hooks
+    assert runs_publisher._engine_state_slice
+
+    initial_offsets = ["offset1", "offset2"]
+    runs_publisher._run_hooks.run_id = "1234"
+    runs_publisher._run_hooks.get_state_summary = MagicMock(
+        return_value=MagicMock(status=EngineStatus.IDLE, labwareOffsets=initial_offsets)
+    )
+    runs_publisher._engine_state_slice.state_summary_status = EngineStatus.IDLE
+    runs_publisher._engine_state_slice.state_summary_labware_offset_count = 2
+
+    await runs_publisher._handle_relevant_engine_change()
+    assert notification_client.publish_advise_refetch.call_count == 2
+
+    new_offsets = ["offset1", "offset2", "offset3"]
+    runs_publisher._run_hooks.get_state_summary.return_value = MagicMock(
+        status=EngineStatus.IDLE, labwareOffsets=new_offsets
+    )
+
+    await runs_publisher._handle_relevant_engine_change()
+
+    notification_client.publish_advise_refetch.assert_any_call(topic=topics.RUNS)
+    notification_client.publish_advise_refetch.assert_any_call(
+        topic=f"{topics.RUNS}/1234"
+    )
+    assert runs_publisher._engine_state_slice.state_summary_labware_offset_count == 3
 
 
 async def test_publish_pre_serialized_commannds_notif(
