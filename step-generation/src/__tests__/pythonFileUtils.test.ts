@@ -368,10 +368,12 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
+    version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
+    version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
