@@ -241,6 +241,7 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
@@ -387,9 +388,7 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
-  const portDisplay = attachedModuleMatch
-    ? useModuleUSBPort(attachedModuleMatch)
-    : null
+  const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
   return (
     <>

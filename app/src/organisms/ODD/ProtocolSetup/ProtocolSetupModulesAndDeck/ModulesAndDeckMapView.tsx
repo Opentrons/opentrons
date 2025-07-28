@@ -22,8 +22,8 @@ export function ModulesAndDeckMapView({
   runId,
   protocolAnalysis,
 }: ModulesAndDeckMapViewProps): JSX.Element | null {
+  const { parseModuleUSBPort } = useModuleUSBPort()
   if (protocolAnalysis == null) return null
-
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
@@ -33,11 +33,7 @@ export function ModulesAndDeckMapView({
       <ModuleInfo
         moduleModel={module.moduleDef.model}
         isAttached={module.attachedModuleMatch != null}
-        physicalPort={
-          module.attachedModuleMatch
-            ? useModuleUSBPort(module.attachedModuleMatch)
-            : null
-        }
+        physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
         runId={runId}
       />
     ),

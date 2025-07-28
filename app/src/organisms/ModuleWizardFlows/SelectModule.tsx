@@ -53,6 +53,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const availableModules = useGetNewModules()
   const newModules =
     attachedModuleOnLaunch !== null
@@ -64,7 +65,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const name = getModuleDisplayName(module.moduleModel)
-    const port = useModuleUSBPort(module)
+    const port = parseModuleUSBPort(module)
     return { name, port }
   }
 

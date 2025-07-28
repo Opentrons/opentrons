@@ -143,6 +143,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runStatus = useCurrentRunStatus()
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
@@ -437,7 +438,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {useModuleUSBPort(module) ?? t('usb_port_not_connected')}
+                  {parseModuleUSBPort(module)}
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}

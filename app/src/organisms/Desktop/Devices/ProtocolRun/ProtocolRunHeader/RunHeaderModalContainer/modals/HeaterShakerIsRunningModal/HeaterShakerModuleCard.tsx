@@ -26,6 +26,7 @@ export const HeaterShakerModuleCard = (
   props: HeaterShakerModuleCardProps
 ): JSX.Element | null => {
   const { module } = props
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   return (
     <Flex
@@ -49,7 +50,7 @@ export const HeaterShakerModuleCard = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
           >
-            {useModuleUSBPort(module)}
+            {parseModuleUSBPort(module)}
           </LegacyStyledText>
           <Flex paddingBottom={SPACING.spacing4}>
             <Icon

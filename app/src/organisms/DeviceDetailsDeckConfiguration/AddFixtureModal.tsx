@@ -179,6 +179,7 @@ export function AddFixtureModal({
   }
 
   const sendIdentifyStacker = useSendIdentifyStacker()
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
   const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
 
@@ -248,10 +249,11 @@ export function AddFixtureModal({
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
-    const matchedModule = (modulesData?.data ?? []).find(
-      m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
-    )
-    const portDisplay = matchedModule ? useModuleUSBPort(matchedModule) : null
+    const matchedModule =
+      (modulesData?.data ?? []).find(
+        m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
+      ) ?? null
+    const portDisplay = parseModuleUSBPort(matchedModule)
     const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
     if (
       fixtureSerialNumber !== undefined &&

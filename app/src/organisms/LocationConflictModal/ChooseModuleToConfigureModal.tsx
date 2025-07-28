@@ -71,6 +71,7 @@ export const ChooseModuleToConfigureModal = (
     displaySlotName,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -108,7 +109,7 @@ export const ChooseModuleToConfigureModal = (
     attachedMod => {
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: useModuleUSBPort(attachedMod),
+        usbPort: parseModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
