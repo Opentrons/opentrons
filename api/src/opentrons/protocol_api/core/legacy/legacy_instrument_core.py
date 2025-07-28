@@ -306,6 +306,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         hw = self._protocol_interface.get_hardware()
         self.move_to(location=location)
         hw.drop_tip(self._mount, home_after=True if home_after is None else home_after)
+        self._last_tiprack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker

@@ -184,6 +184,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.ready_to_aspirate_by_id[pipette_id] = False
+            self._state.last_tiprack_well_by_id[pipette_id] = None
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:

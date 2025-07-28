@@ -272,6 +272,7 @@ class LegacyInstrumentCoreSimulator(
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0
         self._update_volume(0)
+        self._last_tiprack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
