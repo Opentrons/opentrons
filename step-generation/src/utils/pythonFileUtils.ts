@@ -1,3 +1,5 @@
+import max from 'lodash/max'
+
 import {
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
@@ -162,6 +164,70 @@ export function getLoadAdapters(
   return pythonAdapters ? `# Load Adapters:\n${pythonAdapters}` : ''
 }
 
+const _getLidStacks = (
+  lidEntities: LabwareEntity[],
+  allLabwareEntities: LabwareEntities,
+  labwareState: TimelineFrame['labware']
+): Record<string, { loadName: string; quantity: number }> =>
+  lidEntities.reduce<Record<string, { loadName: string; quantity: number }>>(
+    (acc, { id, labwareDefURI, def }) => {
+      const { stack } = labwareState[id]
+      const nonSlotStackLength = stack.length - 1
+      const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
+      const isLidStack = parentLabware.every(
+        parentLabwareId =>
+          allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+      )
+      const loadName = def.parameters.loadName
+      if (!isLidStack) {
+        return acc
+      }
+      const lidSlot = getSlotInLocationStack(stack)
+      if (!(lidSlot in acc)) {
+        return {
+          ...acc,
+          [lidSlot]: { loadName, quantity: nonSlotStackLength },
+        }
+      }
+      const { quantity } = acc[lidSlot]
+      const newQuantity = max([quantity, nonSlotStackLength]) ?? quantity
+      return { ...acc, [lidSlot]: { loadName, quantity: newQuantity } }
+    },
+    {}
+  )
+
+export const getLoadLidStacks = (
+  allLabwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware']
+): string => {
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
+  )
+
+  // store quantity here
+  const lidStacks = _getLidStacks(
+    lidEntities,
+    allLabwareEntities,
+    labwareRobotState
+  )
+
+  const pythonLidStacks = Object.entries(lidStacks)
+    .map<string>(([slot, { loadName, quantity }]) => {
+      const loadNameArg = `load_name=${formatPyStr(loadName)}`
+      const locationArg = `location=${formatPyStr(slot)}`
+      const quantityArg = `quantity=${quantity}`
+      const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
+      const allArgsIndented = indentPyLines(allArgs)
+      return (
+        `lid_stack_${slot} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
+        `${allArgsIndented},\n` +
+        `)`
+      )
+    })
+    .join('\n')
+  return pythonLidStacks ? `# Load Lid Stacks:\n${pythonLidStacks}` : ''
+}
+
 export function getLoadLabware(
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
@@ -176,13 +242,15 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
+
   const pythonLabware = Object.values(labwareEntities)
-    .map(labware => {
+    .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
       const { metadata, parameters, namespace, version } = def
       const lidEntity = Object.values(lidEntities).find(
         lid => labwareRobotState[lid.id].stack[1] === id
       )
+
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -219,11 +287,12 @@ export function getLoadLabware(
             : []),
           `version=${version}`,
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware(\n` +
-          `${indentPyLines(loadLabwareArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadLabwareArgs)},\n` +
+            `)`,
+        ]
       } else {
         // custom labware
         const loadFromDefnArgs = [
@@ -231,13 +300,14 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware_from_definition(\n` +
-          `${indentPyLines(loadFromDefnArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadFromDefnArgs)},\n` +
+            `)`,
+        ]
       }
-    })
+    }, [])
     .join('\n')
 
   return pythonLabware ? `# Load Labware:\n${pythonLabware}` : ''
@@ -475,6 +545,7 @@ export function pythonDefRun(
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
+    getLoadLidStacks(labwareEntities, labware),
     getLoadLabware(
       moduleEntities,
       labwareEntities,
