@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import FillHopper from '/app/assets/videos/error-recovery/FlexStacker_FillHopper.webm'
 import {
+  AnimationVideo,
   BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
@@ -104,10 +105,9 @@ export function StackerFillInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
-            {/* TODO (chb, 04-30-2025): Replace this with proper fill content */}
-            <LegacyStyledText as="p">
-              {'Replace me with a Stacker Fill image/animation'}
-            </LegacyStyledText>
+            <AnimationVideo role="presentation">
+              <source src={FillHopper} data-testid="fill-animation" />
+            </AnimationVideo>
           </Box>
         </Flex>
       </Flex>

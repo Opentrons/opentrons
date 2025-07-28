@@ -1,12 +1,13 @@
 import { css } from 'styled-components'
 
+import EmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
 import {
+  AnimationVideo,
   BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
@@ -96,10 +97,9 @@ export function StackerEmptyInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <Box margin="0 auto" width="100%">
-            {/* TODO (chb, 04-30-2025): Replace this with proper empty content */}
-            <LegacyStyledText as="p">
-              {'Replace me with a Stacker Empty image/animation'}
-            </LegacyStyledText>
+            <AnimationVideo role="presentation">
+              <source src={EmptyHopper} data-testid="empty-animation" />
+            </AnimationVideo>
           </Box>
         </Flex>
       </Flex>
