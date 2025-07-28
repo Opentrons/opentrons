@@ -148,9 +148,9 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="nest_96_wellplate_2ml_deep",
     )
     parameters.add_bool(
-        variable_name = "fill_with_manual_pipette",
-        display_name = "Fill with Manual Pipette",
-        default=False
+        variable_name="fill_with_manual_pipette",
+        display_name="Fill with Manual Pipette",
+        default=False,
     )
 
 
@@ -172,7 +172,7 @@ def aspirate_dispense_measure(
             print(f"empty labware at well {well}")
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-        fill_with_manual_pipette = ctx.params.fill_with_manual_pipette # type: ignore[attr-defined]
+        fill_with_manual_pipette = ctx.params.fill_with_manual_pipette  # type: ignore[attr-defined]
         if not fill_with_manual_pipette:
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
@@ -197,10 +197,7 @@ def aspirate_dispense_measure(
         ]
         _write_line_to_csv(ctx, line_for_csv)
         drop_tips(probe_pipette, liq_pipette)
-        i+=1
-        
-
-        
+        i += 1
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -237,13 +234,13 @@ def run(ctx: ProtocolContext) -> None:
     if frustum_labware["A1"].max_volume > 500:
         liq_racks = liq_tip_racks
     else:
-        liqracks = liq_tip_racks[:1]
+        liq_racks = liq_tip_racks[:1]
     if len(frustum_labware.wells()) <= 12:
         channel_num = 8
     else:
         channel_num = 1
     liq_pipette = ctx.load_instrument(
-       f"flex_{channel_num}channel_1000", "left", tip_racks=liq_racks
+        f"flex_{channel_num}channel_1000", "left", tip_racks=liq_racks
     )
     probe_pipette = ctx.load_instrument(
         "flex_1channel_50", "right", tip_racks=[probe_tip_rack]
@@ -287,7 +284,7 @@ def run(ctx: ProtocolContext) -> None:
     num_of_rows = 3
     low_height = 3
     mid_height = frustum_labware["A1"].depth / 2
-    high_height = frustum_labware["A1"].depth - 9
+    high_height = frustum_labware["A1"].depth - 3
     heights = [low_height, mid_height, high_height]
     frustum_volumes = {}
     udv_volumes = {}

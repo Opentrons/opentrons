@@ -1,0 +1,226 @@
+{
+  "ordering": [
+    ["A1"],
+    ["A2"],
+    ["A3"],
+    ["A4"],
+    ["A5"],
+    ["A6"],
+    ["A7"],
+    ["A8"],
+    ["A9"],
+    ["A10"],
+    ["A11"],
+    ["A12"]
+  ],
+  "schemaVersion": 2,
+  "version": 3,
+  "namespace": "opentrons",
+  "metadata": {
+    "displayName": "USA Scientific 12 Well Reservoir 22 mL",
+    "displayVolumeUnits": "mL",
+    "displayCategory": "reservoir",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.8,
+    "zDimension": 44.2
+  },
+  "parameters": {
+    "format": "trough",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "usascientific_12_reservoir_22ml",
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+  },
+  "wells": {
+    "A1": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 13.94,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A2": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 23.03,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A3": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 32.12,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A4": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 41.21,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A5": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 50.3,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A6": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 59.39,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A7": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 68.48,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A8": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 77.57,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A9": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 86.66,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A10": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 95.75,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A11": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 104.84,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    },
+    "A12": {
+      "shape": "rectangular",
+      "depth": 41.75,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
+      "totalLiquidVolume": 22000,
+      "x": 113.93,
+      "y": 42.9,
+      "z": 2.45,
+      "geometryDefinitionId": "userVolumes"
+    }
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12"
+      ],
+      "metadata": {
+        "wellBottomShape": "v"
+      }
+    }
+  ],
+  "brand": {
+    "brand": "USA Scientific",
+    "brandId": ["1061-8150"],
+    "links": [
+      "https://www.usascientific.com/12-channel-automation-reservoir.aspx"
+    ]
+  },
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "innerLabwareGeometry": {
+    "userVolumes": {
+      "heightToVolumeMap": [
+        { "height": 0, "volume": 0 },
+        { "height": 2.47575, "volume": 500 },
+        { "height": 3.72275, "volume": 1532.9 },
+        { "height": 6.47375, "volume": 3292.9 },
+        { "height": 9.20175, "volume": 5052.9 },
+        { "height": 12.16675, "volume": 6812.9 },
+        { "height": 15.07475, "volume": 8572.9 },
+        { "height": 17.83975, "volume": 10332.9 },
+        { "height": 20.18975, "volume": 12092.9 },
+        { "height": 22.92575, "volume": 13852.9 },
+        { "height": 26.42375, "volume": 15612.9 },
+        { "height": 29.54175, "volume": 17372.9 },
+        { "height": 32.67675, "volume": 19132.9 },
+        { "height": 33.10075, "volume": 19632.9 },
+        { "height": 35.83975, "volume": 21026.9 },
+        { "height": 37.34975, "volume": 22786.9 }
+      ]
+    }
+  }
+}
