@@ -5,6 +5,7 @@ import { reduce } from 'lodash'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
+  getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
   TC_MODULE_LOCATION_OT2,
@@ -36,6 +37,7 @@ import type {
 import type {
   AdditionalEquipmentName,
   DeckSlot,
+  LabwareEntities,
   LabwareEntity,
   RobotState,
 } from '@opentrons/step-generation'
@@ -365,12 +367,20 @@ export const useLabwareDropdownOptions = (
 }
 
 //  used for LabwareLocationField dropdown
-export const getUnoccupiedStackOptions = (
-  robotState: RobotState,
-  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
-  labwareIdFromDropdown: string,
+export const getUnoccupiedStackOptions = (args: {
+  robotState: RobotState
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+  labwareIdFromDropdown: string
+  labwareEntities: LabwareEntities
   t: any
-): Option[] => {
+}): Option[] => {
+  const {
+    robotState,
+    deckSetupLabware,
+    labwareIdFromDropdown,
+    labwareEntities,
+    t,
+  } = args
   if (deckSetupLabware[labwareIdFromDropdown] == null) {
     return []
   }
@@ -393,23 +403,41 @@ export const getUnoccupiedStackOptions = (
         labwareIdFromDropdown
       )
 
-      if (isTopOfStack && isCompatible && isNotCurrentLabwareStack) {
+      const isUsedLid =
+        robotState?.labware[labwareIdFromDropdown]?.isUsedLid === true
+      const newLabwareEntity = labwareEntities[labwareId]
+      const isNewLabwarePipettable =
+        newLabwareEntity?.def != null &&
+        getIsPipettableLabware(newLabwareEntity.def)
+      const isSafeLidMove = !(isUsedLid && isNewLabwarePipettable)
+
+      const isInWasteChute = slot === 'gripperWasteChute'
+
+      if (
+        isTopOfStack &&
+        isCompatible &&
+        isNotCurrentLabwareStack &&
+        isSafeLidMove &&
+        !isInWasteChute
+      ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,
           labwareOnDeck
         )
-        acc.push({
-          name:
-            similarLabwareStackIds.length > 1
-              ? t('protocol_steps:unoccupied_stack', {
-                  name: displayName,
-                })
-              : displayName,
-          value: labwareId,
-          deckLabel: slot,
-        })
+        return [
+          ...acc,
+          {
+            name:
+              similarLabwareStackIds.length > 1
+                ? t('protocol_steps:unoccupied_stack', {
+                    name: displayName,
+                  })
+                : displayName,
+            value: labwareId,
+            deckLabel: slot,
+          },
+        ]
       }
-
       return acc
     },
     []

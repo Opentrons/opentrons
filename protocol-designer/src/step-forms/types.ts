@@ -107,6 +107,7 @@ export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareByI
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
   stack: string[] // a stack of ids from top to bottom
+  isUsedLid?: boolean
 }
 export interface PipetteTemporalProperties {
   mount: Mount

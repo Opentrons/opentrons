@@ -30,7 +30,10 @@ export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
 export interface LabwareTemporalProperties {
-  stack: string[] // a stack of ids from top to bottom
+  // a stack of ids from top to bottom
+  stack: string[]
+  // isUsed is a boolean currently only used for lids that designates whether the lid was previously placed on a labware
+  isUsedLid?: boolean
 }
 
 export interface PipetteTemporalProperties {

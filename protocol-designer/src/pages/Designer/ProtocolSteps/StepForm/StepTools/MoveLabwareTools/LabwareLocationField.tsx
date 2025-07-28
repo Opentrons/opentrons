@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getEnableStacking } from '../../../../../../feature-flags/selectors'
-import { getAdditionalEquipmentEntities } from '../../../../../../step-forms/selectors'
+import { getLabwareEntities } from '../../../../../../step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
   getRobotStateAtActiveItem,
@@ -29,15 +28,19 @@ export function LabwareLocationField(
   const { t } = useTranslation(['form', 'protocol_steps'])
   const { labware, useGripper } = props
   const enableStacking = useSelector(getEnableStacking)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
-  )
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch()
+  const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const unoccupiedLabwareStackOptions: Option[] =
     robotState && enableStacking
-      ? getUnoccupiedStackOptions(robotState, deckSetupLabware, labware, t)
+      ? getUnoccupiedStackOptions({
+          robotState,
+          deckSetupLabware,
+          labwareIdFromDropdown: labware,
+          labwareEntities,
+          t,
+        })
       : []
   const isLabwareOffDeck =
     labware != null
@@ -48,26 +51,13 @@ export function LabwareLocationField(
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
-  let unoccupiedLabwareLocationsOptions = [
+  const unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
     ...unoccupiedLabwareLocationsOptionsSelector,
-  ]
-  if (useGripper || isLabwareOffDeck) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== 'offDeck'
-    )
-  }
-
-  if (
-    !useGripper &&
-    Object.values(additionalEquipmentEntities).find(
-      ae => ae.name === 'wasteChute'
-    ) != null
-  ) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== WASTE_CHUTE_CUTOUT
-    )
-  }
+  ].filter(option => {
+    const canMoveOffDeck = !(useGripper || isLabwareOffDeck)
+    return option.value !== 'offDeck' || canMoveOffDeck
+  })
 
   return (
     <DropdownStepFormField

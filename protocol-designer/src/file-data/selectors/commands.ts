@@ -4,14 +4,15 @@ import omit from 'lodash/omit'
 import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
 
+import { getIsLid, getIsPipettableLabware } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
+import { getNearestParentInStack } from '@opentrons/step-generation'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
 import type { StepIdType } from '../../form-types'
 import type {
-  LabwareOnDeck,
   LabwareTemporalProperties,
   ModuleOnDeck,
   ModuleTemporalProperties,
@@ -67,9 +68,21 @@ export const getInitialRobotState: (
     )
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
       initialDeckSetup.labware,
-      (l: LabwareOnDeck): LabwareTemporalProperties => ({
-        stack: l.stack,
-      })
+      ({ id, stack }): LabwareTemporalProperties => {
+        const labwareEntity = invariantContext.labwareEntities[id]
+        const isLid = getIsLid(labwareEntity?.def)
+        const nearestParent = getNearestParentInStack(stack)
+        const isParentPipettableLabware =
+          nearestParent != null &&
+          nearestParent in invariantContext.labwareEntities &&
+          getIsPipettableLabware(
+            invariantContext.labwareEntities[nearestParent].def
+          )
+        return {
+          stack,
+          ...(isLid && isParentPipettableLabware ? { isUsed: true } : {}),
+        }
+      }
     )
     const modules: Record<string, ModuleTemporalProperties> = mapValues(
       initialDeckSetup.modules,
