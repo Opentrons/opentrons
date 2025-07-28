@@ -241,6 +241,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     tiprackDefinition,
     volume,
     path: 'multiDispense',
+    numAspirateWells: 1,
     numDispenseWells: destWells.length,
     conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
       [number, number]

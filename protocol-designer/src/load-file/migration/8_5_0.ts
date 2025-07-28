@@ -109,6 +109,8 @@ const getClippedFlowRateForMoveLiquid = (args: {
       tiprackDefinition: tiprackDef,
       volume,
       path,
+      numAspirateWells:
+        'aspirate_wells' in formData ? formData.aspirate_wells : formData.wells,
       numDispenseWells:
         'dispense_wells' in formData ? formData.dispense_wells : formData.wells,
       aspirateAirGapByVolume: tipLiquidSpecs.aspirate.retract
