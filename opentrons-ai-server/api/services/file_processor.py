@@ -4,9 +4,6 @@ Server handles all file processing
 """
 
 import base64
-import csv
-import io
-import json
 import logging
 from typing import Literal, Optional, TypedDict
 
@@ -14,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Type definitions for better type safety
 FileType = Literal["pdf", "csv", "python", "unknown"]
-MediaType = Literal["application/pdf", "application/json", "text/csv", "text/x-python", "text/plain"]
+MediaType = Literal["application/pdf", "text/csv", "text/x-python", "text/plain"]
 
 
 class ProcessedFileResult(TypedDict):
@@ -33,7 +30,6 @@ class FileProcessor:
     UNIT_MB = UNIT_KB * UNIT_KB
 
     # Maximum sizes for different processing operations
-    MAX_CSV_JSON_SIZE_KB = 500 * UNIT_KB  # 500KB limit for JSON conversion
     # Conservative base64 limit: ~100KB binary PDF → ~133KB base64 → ~150KB with overhead
     # Anthropic has ~200K token limit, so this leaves room for conversation context
     MAX_PDF_BASE64_LENGTH = 150000
@@ -88,36 +84,13 @@ class FileProcessor:
 
     @staticmethod
     def _process_csv(filename: str, content: str) -> ProcessedFileResult:
-        """Process CSV file with robust parsing"""
+        """Process CSV file - Claude handles CSV natively, no conversion needed"""
         if not content:
-            logger.info(f"CSV file {filename} is empty, returning empty JSON array")
-            return {"content": "[]", "media_type": "application/json", "file_type": "csv"}
+            logger.info(f"CSV file {filename} is empty")
+            return {"content": "", "media_type": "text/csv", "file_type": "csv"}
 
-        # Check if CSV is too large to convert to JSON
-        if len(content) > FileProcessor.MAX_CSV_JSON_SIZE_KB:
-            logger.info(f"CSV file {filename} is large ({len(content)} bytes), sending as raw text")
-            return {"content": content, "media_type": "text/csv", "file_type": "csv"}
-
-        try:
-            # Use Python's CSV module for robust parsing
-            csv_reader = csv.DictReader(io.StringIO(content))
-            data = list(csv_reader)
-
-            # Convert to JSON
-            json_content = json.dumps(data, separators=(",", ":"))  # Compact format
-
-            # If resulting JSON is too large, fall back to CSV
-            if len(json_content) > FileProcessor.MAX_CSV_JSON_SIZE_KB * 2:
-                logger.info(f"Converted JSON for {filename} is too large ({len(json_content)} bytes), sending as CSV")
-                return {"content": content, "media_type": "text/csv", "file_type": "csv"}
-
-            logger.info(f"Successfully converted CSV file {filename} to JSON ({len(json_content)} characters)")
-            return {"content": json_content, "media_type": "application/json", "file_type": "csv"}
-
-        except Exception as e:
-            # If CSV parsing fails, return as raw text
-            logger.warning(f"CSV parsing failed for {filename}: {str(e)}")
-            return {"content": content, "media_type": "text/csv", "file_type": "csv"}
+        logger.info(f"Processing CSV file {filename} ({len(content)} bytes) as plain text")
+        return {"content": content, "media_type": "text/csv", "file_type": "csv"}
 
     @staticmethod
     def _process_python(filename: str, content: str) -> ProcessedFileResult:
