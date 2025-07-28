@@ -117,6 +117,7 @@ const getCheckedPath = (
           tiprackDefinition: tiprackDef,
           volume,
           path,
+          numAspirateWells: hydratedFormData.aspirate_wells.length,
           numDispenseWells: hydratedFormData.dispense_wells.length,
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,
@@ -128,6 +129,7 @@ const getCheckedPath = (
           tiprackDefinition: tiprackDef,
           volume,
           path,
+          numAspirateWells: hydratedFormData.aspirate_wells.length,
           numDispenseWells: hydratedFormData.dispense_wells.length,
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,

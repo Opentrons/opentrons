@@ -1,3 +1,4 @@
+import max from 'lodash/max'
 import min from 'lodash/min'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
@@ -148,7 +149,7 @@ export function getChannels(
   return pipette.spec.channels
 }
 export const DISPOSAL_VOL_DIGITS = 1
-export function getMaxDisposalVolumeForMultidispense(
+export function getMaxDisposalVolumeForMultiDispense(
   values: {
     aspirate_airGap_checkbox?: boolean | null
     aspirate_airGap_volume?: string | null
@@ -172,7 +173,10 @@ export function getMaxDisposalVolumeForMultidispense(
   const airGapChecked = values.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
-  return round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS)
+  return max([
+    round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS),
+    0,
+  ])
 }
 // Ensures that 2x volume can fit in pipette
 // NOTE: ensuring that disposalVolume_volume will not exceed pipette capacity
@@ -626,6 +630,8 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
       dispense_retract_mmFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       dispense_retract_delay_seconds:
         allOT2Defaults.dispense_retract_delay_seconds,
+      blowout_flowRate:
+        matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ?? null,
       ...dipsosalFields,
     }
     return {
@@ -655,6 +661,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     >,
     volume,
     path: rawForm.path as PathOption,
+    numAspirateWells: rawForm.aspirate_wells.length,
     numDispenseWells: rawForm.dispense_wells.length,
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
@@ -794,6 +801,10 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     dispense_touchTip_mmFromTop: dispense.retract.touchTip.params?.zOffset,
     dispense_retract_delay_seconds: 0,
     dispense_submerge_delay_seconds: 0,
+    blowout_flowRate:
+      dispense.retract.blowout.params?.flowRate ??
+      matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ??
+      null,
   }
   return {
     ...getDefaultsForStepType(stepType),
@@ -1028,6 +1039,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
     disposalByVolume,
     volume,
     path: rawForm.path as PathOption,
+    numAspirateWells: rawForm.aspirate_wells.length,
     numDispenseWells: rawForm.dispense_wells.length,
     aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
       [number, number]
