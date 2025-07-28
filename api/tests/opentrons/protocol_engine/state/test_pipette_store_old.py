@@ -73,6 +73,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         liquid_presence_detection_by_id={},
         ready_to_aspirate_by_id={},
         has_clean_tips_by_id={},
+        last_tiprack_well_by_id={},
     )
 
 
@@ -280,7 +281,9 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="abc",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="xyz", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="abc", clean_tip=True
@@ -292,6 +295,7 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["abc"] == FluidStack()
+    assert subject.state.last_tiprack_well_by_id["abc"] == ("xyz", "123")
 
     subject.handle_action(
         SucceedCommandAction(
@@ -339,7 +343,9 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="xyz",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="xyz", clean_tip=False
@@ -351,6 +357,7 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["xyz"] == FluidStack()
+    assert subject.state.last_tiprack_well_by_id["xyz"] == ("abc", "123")
 
     subject.handle_action(
         SucceedCommandAction(
@@ -397,7 +404,9 @@ def test_handles_unsafe_drop_tip_in_place(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="xyz",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="xyz", clean_tip=False
@@ -409,6 +418,7 @@ def test_handles_unsafe_drop_tip_in_place(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["xyz"] == FluidStack()
+    assert subject.state.last_tiprack_well_by_id["xyz"] == ("abc", "123")
 
     subject.handle_action(
         SucceedCommandAction(
@@ -462,7 +472,9 @@ def test_aspirate_adds_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="pipette-id", clean_tip=True
@@ -520,7 +532,9 @@ def test_dispense_subtracts_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="pipette-id", clean_tip=True
@@ -578,7 +592,9 @@ def test_blow_out_clears_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="pipette-id", clean_tip=True
@@ -749,7 +765,9 @@ def test_prepare_to_aspirate_marks_pipette_ready(
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=None,
+                    well_picked_up_from=update_types.Well(
+                        labware_id="abc", well_name="123"
+                    ),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                     pipette_id="xyz", clean_tip=True

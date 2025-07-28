@@ -82,6 +82,9 @@ class LegacyInstrumentCoreSimulator(
             protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
         self._liquid_presence_detection = False
+        self._last_tiprack_and_well: Optional[
+            Tuple[LegacyLabwareCore, LegacyWellCore]
+        ] = None
 
     def get_default_speed(self) -> float:
         return self._default_speed
@@ -224,6 +227,11 @@ class LegacyInstrumentCoreSimulator(
             num_channels=self.get_channels(),
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
+        # In practice this will always resolve to a labware, since location should be either
+        # a well or labware
+        parent_labware, _ = location.labware.get_parent_labware_and_well()
+        if parent_labware is not None:
+            self._last_tiprack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
 
     def drop_tip(
         self,
@@ -422,6 +430,11 @@ class LegacyInstrumentCoreSimulator(
 
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         return self._pipette_dict["blow_out_flow_rate"] * rate
+
+    def get_last_well_tip_picked_up_from(
+        self,
+    ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
+        return self._last_tiprack_and_well
 
     def set_flow_rate(
         self,

@@ -1049,6 +1049,22 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def get_liquid_presence_detection(self) -> bool:
         return self._liquid_presence_detection
 
+    def get_last_well_tip_picked_up_from(
+        self,
+    ) -> Optional[Tuple[LabwareCore, WellCore]]:
+        tiprack_ids = (
+            self._engine_client.state.pipettes.get_last_tiprack_well_picked_up_from(
+                self._pipette_id
+            )
+        )
+        if tiprack_ids is None:
+            return None
+        else:
+            labware_id, well_name = tiprack_ids
+            tiprack_labware_core = self._protocol_core._labware_cores_by_id[labware_id]
+            tip_well_core = tiprack_labware_core.get_well_core(well_name)
+            return tiprack_labware_core, tip_well_core
+
     def is_tip_tracking_available(self) -> bool:
         if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
             return True

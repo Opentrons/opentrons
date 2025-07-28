@@ -311,6 +311,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
+    def get_last_well_tip_picked_up_from(
+        self,
+    ) -> Optional[Tuple[LabwareCoreType, WellCoreType]]:
+        ...
+
+    @abstractmethod
     def _pressure_supported_by_pipette(self) -> bool:
         ...
 

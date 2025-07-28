@@ -67,6 +67,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             api_level=self._api_version,
         )
         self._liquid_presence_detection = False
+        self._last_tiprack_and_well: Optional[
+            Tuple[LegacyLabwareCore, LegacyWellCore]
+        ] = None
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -252,6 +255,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             num_channels=self.get_channels(),
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
+        # In practice this will always resolve to a labware, since location should be either
+        # a well or labware
+        parent_labware, _ = location.labware.get_parent_labware_and_well()
+        if parent_labware is not None:
+            self._last_tiprack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
 
     def drop_tip(
         self,
@@ -531,6 +539,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
 
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
+
+    def get_last_well_tip_picked_up_from(
+        self,
+    ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
+        return self._last_tiprack_and_well
 
     def set_flow_rate(
         self,
