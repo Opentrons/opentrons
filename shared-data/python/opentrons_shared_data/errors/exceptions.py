@@ -853,6 +853,35 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
         )
 
 
+class FlexStackerNotEmptyError(RoboticsInteractionError):
+    """An error occurred when the Flex Stacker Shuttle is not empty when it should be."""
+
+    def __init__(
+        self,
+        serial: str,
+        shuttle_state: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerShuttleOccupiedError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["shuttle_state"] = shuttle_state
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Flex Stacker {serial} shuttle is not empty."
+        super().__init__(
+            ErrorCodes.STACKER_SHUTTLE_OCCUPIED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
 

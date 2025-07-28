@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerNotEmptyError,
 )
 
 from ..command import (
@@ -41,6 +42,7 @@ from .common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
     primary_location_sequence,
     adapter_location_sequence,
     lid_location_sequence,
@@ -147,7 +149,8 @@ _ExecuteReturn = Union[
     DefinedErrorData[FlexStackerStallOrCollisionError]
     | DefinedErrorData[FlexStackerShuttleError]
     | DefinedErrorData[FlexStackerHopperError]
-    | DefinedErrorData[FlexStackerLabwareRetrieveError],
+    | DefinedErrorData[FlexStackerLabwareRetrieveError]
+    | DefinedErrorData[FlexStackerShuttleOccupiedError],
 ]
 
 
@@ -175,6 +178,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         | DefinedErrorData[FlexStackerShuttleError]
         | DefinedErrorData[FlexStackerHopperError]
         | DefinedErrorData[FlexStackerLabwareRetrieveError]
+        | DefinedErrorData[FlexStackerShuttleOccupiedError]
     ):
         """Handle a recoverable error raised during command execution."""
         error_map = {
@@ -182,6 +186,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             FlexStackerShuttleMissingError: FlexStackerShuttleError,
             FlexStackerHopperLabwareError: FlexStackerHopperError,
             FlexStackerShuttleLabwareError: FlexStackerLabwareRetrieveError,
+            FlexStackerNotEmptyError: FlexStackerShuttleOccupiedError,
         }
         return DefinedErrorData(
             public=error_map[type(error)](
@@ -280,6 +285,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
                 FlexStackerShuttleLabwareError,
+                FlexStackerNotEmptyError,
             ) as e:
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update

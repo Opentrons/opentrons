@@ -222,6 +222,10 @@
       "detail": "Flex Stacker Hopper Labware Detection Failed",
       "category": "roboticsInteractionError"
     },
+    "3023": {
+      "detail": "Flex Stacker Shuttle Occupied",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

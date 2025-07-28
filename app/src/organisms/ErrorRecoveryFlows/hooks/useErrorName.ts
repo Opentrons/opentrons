@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { ERROR } from '/app/redux/robot-update'
+
 import { ERROR_KINDS } from '../constants'
 
 import type { ErrorKind } from '../types'
@@ -33,6 +35,8 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('shuttle_missing')
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
       return t('labware_not_retrieved')
+    case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+      return t('stacker_shuttle_not_empty')
     default:
       return t('error')
   }
