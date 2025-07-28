@@ -1,5 +1,5 @@
-import { getExportTestFile, ExportTestFilePath } from '../support/TestFiles'
-import { verifyImportProtocolPage } from '../support/Import'
+import { getExportTestFile, ExportTestFilePath } from '../support/TestFiles';
+import { verifyImportProtocolPage } from '../support/Import';
 
 describe('Import, Export, and Analyze Protocols', () => {
   // Get all the test file paths from your TestFiles helper
@@ -9,7 +9,6 @@ describe('Import, Export, and Analyze Protocols', () => {
   const downloadsFolder = 'cypress/downloads';
 
   // Runs once before all tests in this describe block.
-  // This ensures all exported protocols from the run are collected.
   before(() => {
     // Clean the downloads folder once before the entire test suite runs
     cy.exec(`rm -rf ${downloadsFolder}/*`, { log: true, failOnNonZeroExit: false });
@@ -26,7 +25,7 @@ describe('Import, Export, and Analyze Protocols', () => {
   for (const exportProtocol of exportTestFilePaths) {
     it(`should import ${exportProtocol}, export it, and verify with opentrons analyze`, () => {
       const file = getExportTestFile(exportProtocol);
-      const protocolName = file.path.split('/').pop(); // Get filename for logging
+      const protocolName = file.path.split('/').pop() ?? 'Unknown Protocol'; // Get filename for logging
 
       // Step 1: Import the JSON protocol
       cy.importProtocol(file.path);
@@ -36,39 +35,55 @@ describe('Import, Export, and Analyze Protocols', () => {
       // Step 2: Verify the protocol loaded correctly on the page
       verifyImportProtocolPage(file);
 
-      // Step 3: Export the protocol, which triggers the download
-      cy.contains('Export protocol').click();
+      // --- ROBUST DOWNLOAD HANDLING ---
 
-      // Step 4: Find the most recently downloaded .py file
-      cy.exec(`ls -t ${downloadsFolder}/*.py | head -n 1`, { timeout: 10000 })
-        .then(({ stdout }) => {
-          const downloadedFile = stdout.trim();
-          const analysisOutputFile = `${downloadedFile}.analysis.json`;
-          cy.log(`Found downloaded file: ${downloadedFile}`);
+      // Get a list of all python files in the downloads folder *before* triggering the download.
+      // This gives us a baseline to compare against.
+      cy.exec(`find ${downloadsFolder} -name "*.py"`, { failOnNonZeroExit: false })
+        .then(({ stdout: filesBeforeDownload }) => {
+          // Step 3: Export the protocol, which triggers the asynchronous download
+          cy.contains('Export protocol').click();
 
-          // Ensure the file path is not empty using a linter-friendly 'assert' style
-          assert.isNotEmpty(downloadedFile, `Failed to find downloaded file for ${protocolName}`);
+          // Step 4: Poll the downloads folder until a new file appears.
+          // The .should() command makes Cypress retry cy.exec until the assertion passes or it times out.
+          // This is the key to reliably waiting for the download to complete.
+          cy.exec(`find ${downloadsFolder} -name "*.py"`, { timeout: 15000 })
+            .should('not.eq', filesBeforeDownload)
+            .then(({ stdout: filesAfterDownload }) => {
+              // Now that a new file exists, determine its exact name by comparing
+              // the file list from before and after the download.
+              const filesBefore = filesBeforeDownload.split('\n').filter(f => f.length > 0);
+              const filesAfter = filesAfterDownload.split('\n').filter(f => f.length > 0);
+              const newFile = filesAfter.filter(f => !filesBefore.includes(f))[0];
 
-          // Step 5: Analyze the protocol using the more robust JSON output method.
-          // This command will fail the test if analysis returns a non-zero exit code.
-          cy.exec(`python -m opentrons.cli analyze ${downloadedFile} --json-output ${analysisOutputFile}`)
-            .then(() => {
-              // Step 6: Read the generated JSON analysis file and verify its contents.
-              cy.readFile(analysisOutputFile).then((analysisResult) => {
-                // If errors exist, format them into a concise message for the assertion.
-                const errorDetails = (analysisResult.errors || [])
-                  .map((error: { detail: string }) => `- ${error.detail}`)
-                  .join('\n');
-                  
-                const errorMessage = `Analysis of ${protocolName} found errors:\n${errorDetails}`;
+              // Ensure we successfully identified the newly downloaded file.
+              assert.isDefined(newFile, `Failed to find newly downloaded file for ${protocolName}`);
+              const downloadedFile = newFile.trim();
+              cy.log(`Found downloaded file: ${downloadedFile}`);
 
-                // Assert that the errors array is empty using a linter-friendly 'assert' style.
-                // If it's not, Cypress will fail the test and display our custom, concise error message.
-                assert.strictEqual(analysisResult.errors.length, 0, errorMessage);
-              });
+              // --- ANALYSIS OF THE DOWNLOADED FILE ---
+
+              const analysisOutputFile = `${downloadedFile}.analysis.json`;
+
+              // Step 5: Analyze the protocol with a longer timeout for complex analyses.
+              cy.exec(`python -m opentrons.cli analyze "${downloadedFile}" --json-output "${analysisOutputFile}"`, { timeout: 60000 })
+                .then(() => {
+                  // Step 6: Read the generated JSON analysis file and verify its contents.
+                  cy.readFile(analysisOutputFile).then((analysisResult) => {
+                    // If errors exist, format them into a concise message for the assertion.
+                    const errorDetails = (analysisResult.errors ?? [])
+                      .map((error: { detail: string }) => `- ${error.detail}`)
+                      .join('\n');
+                      
+                    const errorMessage = `Analysis of ${protocolName} found errors:\n${errorDetails}`;
+
+                    // Assert that the errors array is empty.
+                    assert.strictEqual(analysisResult.errors.length, 0, errorMessage);
+                  });
+                });
+
+              cy.log(`Successfully analyzed ${downloadedFile}`);
             });
-
-          cy.log(`Successfully analyzed ${downloadedFile}`);
         });
     });
   }
