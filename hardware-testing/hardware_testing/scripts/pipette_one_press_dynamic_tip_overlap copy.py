@@ -29,6 +29,7 @@ PRESS_DISTANCE = 15
 NOZZLE_DIAMETER = 5
 RADIUS = NOZZLE_DIAMETER/2 + 2.0
 PREP_PRESS_DISTANCE = 5
+TIP_PRESS_MOTOR_CURRENT = 0.1 
 
 
 @dataclass
@@ -43,7 +44,7 @@ def dict_keys_to_line(dict):
 
 def file_setup(test_data, details):
     today = datetime.date.today()
-    test_name = "{}-dynamic-tipoverlap-test-{}".format(
+    test_name = "{}-one-press-dynamic-tipoverlap-test-{}".format(
         details[0],  # Pipette model
         details[1],  # Motor Current
     )
@@ -371,7 +372,6 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
         await hw_api.home()
         await hw_api.set_lights(rails=True)
         home_position = await hw_api.current_position_ot3(mount)
-        start_time = time.perf_counter()
         cp = CriticalPoint.NOZZLE
         if (args.measure_nozzles):
             home_wo_tip = await hw_api.current_position_ot3(mount, cp)
@@ -422,10 +422,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             prep_target = Point(x=pickup_loc.x+RADIUS, 
                                 y=pickup_loc.y, 
                                 z=pickup_loc.z+PREP_PRESS_DISTANCE)
-            
             await move_direct(hw_api, mount, prep_target, cp)
             # async with hw_api._backend.motor_current(run_currents=spec.tip_action_moves[0].currents):
-            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.1}):
+            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): TIP_PRESS_MOTOR_CURRENT}):
                 target = Point(x=pickup_loc.x+RADIUS, 
                                 y=pickup_loc.y, 
                                 z=pickup_loc.z-PRESS_DISTANCE)
@@ -440,9 +439,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
             # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
             print(f'init_tipoverlap: {init_tipoverlap}')
-            pick_up_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
+            pickup_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
             # Let's pressed onto the tip -> stall and measure the encoder position
-            await move_direct(hw_api, mount, pick_up_location, cp)
+            await move_direct(hw_api, mount, pickup_location, cp)
             # This would be my initial press position
             # the first tip overlap value passed to pickup tip is a placeholder
             tip_overlap_dict = await hw_api.pick_up_tip(
@@ -456,12 +455,8 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             instr = hw_api._pipette_handler.get_pipette(mount)
             current_tipL = instr.current_tip_length
             print(f'current_tip end effector: {current_tipL}')
-            # instr.remove_tip()
             current_position = await hw_api.current_position_ot3(mount)
-            print(current_position)
-            # instr.add_tip((tip_length[args.tip_size]-tip_overlap))
-
-            # instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
+            print(f'current end effector: {current_position}')
             new_tipL = instr.current_tip_length
             print(f'new_current end effector: {new_tipL}')
 
@@ -487,19 +482,19 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             save_config_(path+cal_fn, deck_slot)
 
         tips_to_use = args.nozzles
-        # tips_to_use = (num_of_columns * 8)
+        total_tips = int(24)
         x_coord_offset = 0
         y_coord_offset = 0
         true_tip_count = 1
+        tip_count = 0
         trial = 1
         num_of_columns = args.num_cols
         print(f'Trial: {trial}')
         measurements_2_map = []
-        while True:
+        for tip in range(1, total_tips+1):
             encoder_pos = []
             cp = CriticalPoint.TIP
             if args.dial_indicator:
-                tip_count = 0
                 x_offset = 0
                 y_offset = 0
                 measurement_map = []
@@ -543,7 +538,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 print(f'TipOverlap Measurements: {tip_overlap_measurements}')
 
             cp = CriticalPoint.TIP
-            drop_tip_location =  Point(30 , 60 , 104.5)
+            drop_tip_location =  Point(pickup_location.x,
+                                       pickup_location.y,
+                                       pickup_location.z-(tip_length[args.tip_size]-tip_length[args.tip_size]*0.5))
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
             measurement_map.append(true_tip_count)
@@ -570,38 +567,36 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             cp = CriticalPoint.NOZZLE
             x_dir, y_dir = (1,-1)
             true_tip_count += 1
-            if true_tip_count % 8 == 0:
+            y_coord_offset = y_coord_offset + y_dir*9
+            if (true_tip_count) % 9 == 0:
                 x_coord_offset = x_coord_offset + x_dir*9
                 y_coord_offset = 0
                 y_dir = 0
-            y_coord_offset = y_coord_offset + y_dir*9
+                true_tip_count = 1
+                
             pickup_location = Point(pickup_loc[0] + x_coord_offset,
                                 pickup_loc[1] + y_coord_offset,
                                 pickup_loc[2])
             print(f'pick up location: {pickup_location}')
             await move_to_point(hw_api, mount, pickup_location, cp)
-            #-----------Get the top of the tip by pressing on it with low current--------------
-            prep_target = Point(x=pickup_location.x+RADIUS,
-                                y=pickup_location.y,
-                                z=pickup_location.z+PREP_PRESS_DISTANCE)
+            
+            if args.method == "every":
+            # #     #-----------Get the top of the tip by pressing on it with low current--------------
+                prep_target = Point(x=pickup_location.x+RADIUS,
+                                    y=pickup_location.y,
+                                    z=pickup_location.z+PREP_PRESS_DISTANCE)
 
-            await move_direct(hw_api, mount, prep_target, cp)
-
-            # await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-            #                                     hw_api,
-            #                                     Axis.by_mount(mount),
-            #                                     run_current=spec.tip_action_moves[0].currents[Axis.by_mount(mount)],
-            #                                         )
-            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.1}):       
-                target = Point(x=pickup_location.x+RADIUS, 
-                                y=pickup_location.y, 
-                                z=pickup_location.z-PRESS_DISTANCE)
-                await hw_api.move_to(mount=mount, 
-                                    abs_position=target, 
-                                    speed=10, 
-                                    critical_point=CriticalPoint.NOZZLE,
-                                    max_speeds=None,
-                                    expect_stalls=True)
+                await move_direct(hw_api, mount, prep_target, cp)   
+                async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): TIP_PRESS_MOTOR_CURRENT}):       
+                    target = Point(x=pickup_location.x+RADIUS, 
+                                    y=pickup_location.y, 
+                                    z=pickup_location.z-PRESS_DISTANCE)
+                    await hw_api.move_to(mount=mount, 
+                                        abs_position=target, 
+                                        speed=10, 
+                                        critical_point=CriticalPoint.NOZZLE,
+                                        max_speeds=None,
+                                        expect_stalls=True)
             await hw_api._update_position_estimation([Axis.by_mount(mount)])
             init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
             # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
@@ -616,6 +611,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
+            
             print(f'Init Position: {init_tipoverlap}')
             print(f'Tip overlap positions: {tip_overlap_dict}')
             enc_tipoverlap = (tip_overlap_dict['init'] - tip_overlap_dict['final']) + args.press_comp
@@ -623,11 +619,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             tip_overlap_measurements.append(enc_tipoverlap)
             instr = hw_api._pipette_handler.get_pipette(mount)
             print(f'current_tipL: {instr.current_tip_length}')
-            # instr.remove_tip()
             current_position = await hw_api.current_position_ot3(mount)
-            # instr.add_tip((tip_length[args.tip_size]-tip_overlap))
-
-            # instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
             new_tipL = instr.current_tip_length
             print(f'new_current_tipL: {new_tipL}')
             cp = CriticalPoint.TIP
@@ -636,6 +628,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
     finally:
+        await hw_api.home()
         await hw_api.disengage_axes([Axis.X, Axis.Y])
         await hw_api.clean_up()
 
@@ -671,6 +664,7 @@ if __name__ == "__main__":
     parser.add_argument("--nozzles", type=int, default=1)
     parser.add_argument("--press_comp", type=float, default = 0.0)
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], default=1000)
+    parser.add_argument("--method", type=str, choices=["one", "eight", "every"], default="every")
     parser.add_argument(
         "--dial_port", type=str, default="/dev/ttyUSB1", help="Dial indicator Port"
     )
@@ -685,7 +679,7 @@ if __name__ == "__main__":
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
     tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
-    tip_overlap = 10.0
+    tip_overlap = 9.651
     if args.mount == "left":
         mount = OT3Mount.LEFT
     else:

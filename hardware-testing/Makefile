@@ -160,6 +160,12 @@ lint:
 	$(python) -m black --check hardware_testing tests
 	$(python) -m flake8 hardware_testing tests
 
+.PHONY: lint-file
+lint-file:
+	$(python) -m mypy $(lint_file)
+	$(python) -m black --check $(lint_file)
+	$(python) -m flake8 $(lint_file)
+
 .PHONY: format
 format:
 	$(python) -m black hardware_testing tests
