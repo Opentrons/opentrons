@@ -250,13 +250,23 @@ const getLabwareInfo = (
   nicknamesById: Record<string, string>,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
-  robotType: RobotType
+  robotType: RobotType,
+  t: any
 ): { nickName: string; latestSlot: string } => {
-  const { modules, labware } = activeDeckSetup
-  const stack = labware[labwareId].stack
-  const latestSlot = resolveSlotLocation(modules, stack, robotType)
-
-  return { nickName: nicknamesById[labwareId], latestSlot }
+  const { modules } = activeDeckSetup
+  const stack = activeDeckSetup.labware[labwareId]?.stack
+  const latestSlot =
+    stack != null
+      ? resolveSlotLocation(modules, stack, robotType)
+      : 'unknown slot'
+  const name = nicknamesById[labwareId]
+  let nickName: string = name
+  if (latestSlot != null && latestSlot !== 'offDeck') {
+    nickName = t('labware_in_slot', { name, slot: latestSlot })
+  } else if (latestSlot != null && latestSlot === 'offDeck') {
+    nickName = t('labware_offdeck', { name })
+  }
+  return { nickName, latestSlot }
 }
 
 export const useLabwareDropdownOptions = (
@@ -277,7 +287,9 @@ export const useLabwareDropdownOptions = (
       labwareId: string
     ): DropdownOption[] => {
       const { def } = labwareEntity
-      const deckSlot = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
+      const deckSlot = getSlotInLocationStack(
+        deckSetupLabware[labwareId]?.stack
+      )
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
         deckSlot
@@ -306,7 +318,8 @@ export const useLabwareDropdownOptions = (
         nicknamesById,
         activeDeckSetup,
         labwareId,
-        robotType
+        robotType,
+        t
       )
       const isTiprack = getIsTiprack(def)
       const isFilterOffDeck =

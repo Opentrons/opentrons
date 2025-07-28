@@ -12,7 +12,6 @@ import {
   RobotCoordsForeignObject,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
-  STACKER_HOPPER_LABWARE_Y_OFFSET,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -67,11 +66,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           ? STACKER_HOPPER_LABWARE_X_OFFSET
           : 0
       }
-      y={
-        moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-          ? STACKER_HOPPER_LABWARE_Y_OFFSET
-          : 0
-      }
+      y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{

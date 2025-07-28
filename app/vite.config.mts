@@ -62,6 +62,9 @@ export default defineConfig(
       },
       resolve: {
         alias: {
+          '@opentrons/components/styles/global': path.resolve(
+            '../components/src/styles/global.css'
+          ),
           '@opentrons/components/styles': path.resolve(
             '../components/src/index.module.css'
           ),

@@ -26,6 +26,7 @@ import {
 
 import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
+  ChangeTipOptions,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -116,7 +117,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace } = def
+      const { parameters, namespace, version } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -138,10 +139,7 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -248,7 +246,7 @@ export function getLoadLabware(
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace } = def
+      const { metadata, parameters, namespace, version } = def
       const lidEntity = Object.values(lidEntities).find(
         lid => labwareRobotState[lid.id].stack[1] === id
       )
@@ -287,10 +285,7 @@ export function getLoadLabware(
           ...(lidEntity != null
             ? [`lid=${formatPyStr(lidEntity.def.parameters.loadName)}`]
             : []),
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
         return [
           ...acc,
@@ -597,5 +592,19 @@ export function pythonCustomLabwareDict(
     )}""")`
   } else {
     return ''
+  }
+}
+
+export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
+  switch (changeTip) {
+    case 'perDest': {
+      return 'per destination'
+    }
+    case 'perSource': {
+      return 'per source'
+    }
+    default: {
+      return changeTip
+    }
   }
 }

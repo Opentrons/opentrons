@@ -7,7 +7,6 @@ import {
   Flex,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
-  STACKER_HOPPER_LABWARE_Y_OFFSET,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -139,11 +138,6 @@ export function SetupLabwareMap({
                 xOffset={
                   moduleType === FLEX_STACKER_MODULE_TYPE
                     ? STACKER_HOPPER_LABWARE_X_OFFSET
-                    : 0
-                }
-                yOffset={
-                  moduleType === FLEX_STACKER_MODULE_TYPE
-                    ? STACKER_HOPPER_LABWARE_Y_OFFSET
                     : 0
                 }
               />

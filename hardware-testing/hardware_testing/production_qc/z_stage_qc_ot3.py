@@ -32,32 +32,55 @@ LOG.setLevel(logging.CRITICAL)
 
 # Test Parameters
 FORCE_SPEED = 10
-FORCE_MARGIN = 15  # Percentage
-FORCE_TEST_SETTINGS = [
-    {"CURRENT": 0.15, "F_MAX": 50},
-    {"CURRENT": 0.2, "F_MAX": 73},
-    {"CURRENT": 0.3, "F_MAX": 120},
-    {"CURRENT": 0.4, "F_MAX": 160},
-    {"CURRENT": 0.5, "F_MAX": 200},
-    {"CURRENT": 0.6, "F_MAX": 230},
-    {"CURRENT": 0.7, "F_MAX": 260},
-    {"CURRENT": 1.4, "F_MAX": 480},
-    {"CURRENT": 1.5, "F_MAX": 520},
+FORCE_MARGIN = 35  # Percentage
+FORCE_TEST_LEFT_SETTINGS = [
+    {"CURRENT": 0.15, "F_MAX": 39},
+    {"CURRENT": 0.2, "F_MAX": 63},
+    {"CURRENT": 0.3, "F_MAX": 107},
+    {"CURRENT": 0.4, "F_MAX": 148},
+    {"CURRENT": 0.5, "F_MAX": 189},
+    {"CURRENT": 0.6, "F_MAX": 226},
+    {"CURRENT": 0.7, "F_MAX": 259},
+    {"CURRENT": 1.4, "F_MAX": 498},
+    {"CURRENT": 1.5, "F_MAX": 528},
 ]
+FORCE_TEST_RIGHT_SETTINGS = [
+    {"CURRENT": 0.15, "F_MAX": 35},
+    {"CURRENT": 0.2, "F_MAX": 57},
+    {"CURRENT": 0.3, "F_MAX": 98},
+    {"CURRENT": 0.4, "F_MAX": 129},
+    {"CURRENT": 0.5, "F_MAX": 168},
+    {"CURRENT": 0.6, "F_MAX": 196},
+    {"CURRENT": 0.7, "F_MAX": 228},
+    {"CURRENT": 1.4, "F_MAX": 410},
+    {"CURRENT": 1.5, "F_MAX": 448},
+]
+
+ONLY_COUNT_USING_CURRENT_YIELD = True
 CYCLES_CURRENT = 5
 
-TEST_PARAMETERS: Dict[str, float] = {
+TEST_LEFT_PARAMETERS: Dict[str, float] = {
     "SPEED": FORCE_SPEED,
     "FORCE_MARGIN": FORCE_MARGIN,
     "CYCLES": CYCLES_CURRENT,
 }
-for i in FORCE_TEST_SETTINGS:
-    TEST_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
 
+TEST_RIGHT_PARAMETERS: Dict[str, float] = {
+    "SPEED": FORCE_SPEED,
+    "FORCE_MARGIN": FORCE_MARGIN,
+    "CYCLES": CYCLES_CURRENT,
+}
+
+for i in FORCE_TEST_LEFT_SETTINGS:
+    TEST_LEFT_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
+
+for i in FORCE_TEST_RIGHT_SETTINGS:
+    TEST_RIGHT_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
 
 # Global variables
 thread_sensor = False
 force_output = []
+valid_fail = []
 
 
 def _connect_to_mark10_fixture(simulate: bool) -> Union[Mark10, SimMark10]:
@@ -81,7 +104,7 @@ def build_test_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     mount_data_line: List[Union[CSVLine, CSVLineRepeating]] = [
         CSVLine("TEST_CURRENTS", [str, str, str, str, str])
     ]
-    for setting in FORCE_TEST_SETTINGS:
+    for setting in FORCE_TEST_LEFT_SETTINGS:
         mount_data_line.append(
             CSVLine(
                 _get_test_tag(setting["CURRENT"]),
@@ -98,8 +121,18 @@ def _build_csv_report() -> CSVReport:
         test_name="z-stage-test-qc-ot3",
         sections=[
             CSVSection(
-                title="TEST_PARAMETERS",
-                lines=[CSVLine(parameter, [int]) for parameter in TEST_PARAMETERS],
+                title="TEST_LEFT_PARAMETERS",
+                lines=[
+                    CSVLine(parameter, [int, CSVResult])
+                    for parameter in TEST_LEFT_PARAMETERS
+                ],
+            ),
+            CSVSection(
+                title="TEST_RIGHT_PARAMETERS",
+                lines=[
+                    CSVLine(parameter, [int, CSVResult])
+                    for parameter in TEST_RIGHT_PARAMETERS
+                ],
             ),
             CSVSection(
                 title=OT3Mount.LEFT.name,
@@ -190,7 +223,6 @@ def check_force(
         qc_pass = True
     else:
         qc_pass = False
-
     _tag = _get_test_tag(current)
     report(
         mount.name,
@@ -203,12 +235,15 @@ def check_force(
             CSVResult.from_bool(qc_pass),
         ],
     )
-
     return qc_pass
 
 
 async def _force_gauge(
-    api: OT3API, mount: OT3Mount, report: CSVReport, simulate: bool
+    api: OT3API,
+    mount: OT3Mount,
+    report: CSVReport,
+    simulate: bool,
+    arguments: argparse.Namespace,
 ) -> bool:
     """Apply force to the gague and log."""
     global thread_sensor
@@ -235,11 +270,40 @@ async def _force_gauge(
         ["MAX", "MAX_RANGE", "AVERAGE", "AVERAGE_RANGE", "RESULT"],
     )
     # Test each current setting
-    for test in FORCE_TEST_SETTINGS:
+    if mount == OT3Mount.LEFT:
+        force_test_setting = FORCE_TEST_LEFT_SETTINGS
+    else:
+        force_test_setting = FORCE_TEST_RIGHT_SETTINGS
+    for test in force_test_setting:
         # Test each current setting several times and average the results
         max_results = []
         avg_results = []
         test_current = test["CURRENT"]
+        if arguments.user_current == "None":
+            pass
+        else:
+            if test_current != float(arguments.user_current):
+                continue
+            else:
+                for i in range(100):
+                    await api.move_to(mount=mount, abs_position=pre_test_pos)
+                    ui.print_header(f"Cycle {i+1}: Testing Current = {test_current}")
+                    try:
+                        async with api._backend.motor_current():
+                            await api._backend.set_active_current({z_ax: test_current})
+                            await api.move_to(
+                                mount=mount,
+                                abs_position=press_pos,
+                                speed=FORCE_SPEED,
+                                expect_stalls=True,
+                            )
+                    finally:
+                        pass
+                    await api._update_position_estimation([Axis.by_mount(mount)])
+                    await api.refresh_positions()
+
+                    await api.move_to(mount=mount, abs_position=pre_test_pos)
+
         for i in range(CYCLES_CURRENT):
             # Move to just above force gauge
             await api.move_to(mount=mount, abs_position=pre_test_pos)
@@ -272,10 +336,12 @@ async def _force_gauge(
                 avg_results.append(round(analyzed_avg, 1))
             else:
                 ui.print_error(
-                    "DATA INVALID - z-stage did not contact or guage not zeroed"
+                    "DATA INVALID - z-stage did not contact or guage not zeroed \n"
+                    f"Mount {mount.name} fail !"
                 )
+                valid_fail.append(mount.name)
                 qc_pass = False
-                break
+                return False
 
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
@@ -296,7 +362,12 @@ async def _force_gauge(
             ui.print_header(f"CURRENT: {test_current} - PASS")
         else:
             ui.print_header(f"CURRENT: {test_current} - FAIL")
-        qc_pass = qc_pass and res
+        # only calculate 0.2 & 0.5
+        if ONLY_COUNT_USING_CURRENT_YIELD:
+            if test_current == 0.2 or test_current == 0.5:
+                qc_pass = qc_pass and res
+        else:
+            qc_pass = qc_pass and res
 
     return qc_pass
 
@@ -306,11 +377,15 @@ async def _run(api: OT3API, arguments: argparse.Namespace, report: CSVReport) ->
     qc_pass = True
 
     if not arguments.skip_left:
-        res = await _force_gauge(api, OT3Mount.LEFT, report, arguments.simulate)
+        res = await _force_gauge(
+            api, OT3Mount.LEFT, report, arguments.simulate, arguments
+        )
         qc_pass = res and qc_pass
 
     if not arguments.skip_right:
-        res = await _force_gauge(api, OT3Mount.RIGHT, report, arguments.simulate)
+        res = await _force_gauge(
+            api, OT3Mount.RIGHT, report, arguments.simulate, arguments
+        )
         qc_pass = res and qc_pass
 
     return qc_pass
@@ -327,8 +402,12 @@ async def _main(arguments: argparse.Namespace) -> None:
     dut = helpers_ot3.DeviceUnderTest.OTHER
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
-    for k, v in TEST_PARAMETERS.items():
-        report("TEST_PARAMETERS", k, [v])
+    # NOTE: We submit an automatic "PASS" result for these parameter lists.
+    # They do not test any logic but only add the list of parameters used to the CSV
+    for k, v in TEST_LEFT_PARAMETERS.items():
+        report("TEST_LEFT_PARAMETERS", k, [v, CSVResult.PASS])
+    for k, v in TEST_RIGHT_PARAMETERS.items():
+        report("TEST_RIGHT_PARAMETERS", k, [v, CSVResult.PASS])
 
     # Attempt to home if first homing fails because of OT-3 in box Y axis issue
     try:
@@ -354,6 +433,14 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     try:
         qc_pass = await _run(api, arguments, report)
+        await api.home(
+            [
+                Axis.X,
+                Axis.Y,
+                Axis.by_mount(OT3Mount.LEFT),
+                Axis.by_mount(OT3Mount.RIGHT),
+            ]
+        )
     except KeyboardInterrupt:
         print("Cancelled")
     except Exception as e:
@@ -364,6 +451,12 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
+        if len(valid_fail) == 0:
+            pass
+        else:
+            print("Data Invalid, Please Re-Test This Unit (数据验证失败, 请复测当前Z轴) !")
+            for item in valid_fail:
+                print(f"Mount {item} Fail")
         report.save_to_disk()
         report.print_results()
 
@@ -373,6 +466,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
+    arg_parser.add_argument("--user_current", type=str, default="None")
     old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
