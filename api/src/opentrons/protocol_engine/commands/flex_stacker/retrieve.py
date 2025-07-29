@@ -59,6 +59,7 @@ RecoverableExceptions = Union[
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerNotEmptyError,
 ]
 
 
