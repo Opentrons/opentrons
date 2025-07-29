@@ -5,9 +5,11 @@ import platform
 from urllib.parse import urlparse
 import subprocess
 import time
+import argparse
+import os
+import json
 
-
-def connect_to_wifi_mac() -> None:
+def connect_to_wifi_mac(network_name: str, password: str) -> None:
     """Scan and connect to a Wi-Fi network on macOS using airport (deprecated but still works)."""
     airport_cmd = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
     
@@ -22,19 +24,16 @@ def connect_to_wifi_mac() -> None:
         print(f"❌ Error scanning networks: {e.stderr if e.stderr else str(e)}")
         return
 
-    ssid = input("\nEnter the SSID (Wi-Fi name) you wish to connect to: ")
-    password = input("Enter the Wi-Fi password (leave blank if none): ")
-
     try:
         subprocess.run(
-            ["networksetup", "-setairportnetwork", "en0", ssid, password],
+            ["networksetup", "-setairportnetwork", "en0", network_name, password],
             check=True,
             capture_output=True,
             text=True,
         )
-        print(f"✅ Connected to '{ssid}'")
+        print(f"✅ Connected to '{network_name}'")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to connect to '{ssid}': {e.stderr.strip() if e.stderr else str(e)}")
+        print(f"❌ Failed to connect to '{network_name}': {e.stderr.strip() if e.stderr else str(e)}")
 
 
 class GoProCamera:
@@ -128,10 +127,34 @@ class GoProManager:
 
 if __name__ == "__main__":
     """Test out Go Pro Connection."""
-    connect_to_wifi_mac()
-    gopro_ip = "10.5.5.9:8080"
-    camera = GoProCamera(gopro_ip)
-    camera.stop_recording()
-    camera.delete_files()
-    time.sleep(3)  # <-- Add delay to let the GoPro recover
-    camera.start_recording()
+    parser = argparse.ArgumentParser(description="Read run logs on google drive.")
+    parser.add_argument(
+        "storage_directory",
+        metavar="STORAGE_DIRECTORY",
+        type=str,
+        nargs=1,
+        help="Path to long term storage directory for run logs.",
+    )
+    args = parser.parse_args()
+    storage_directory = args.storage_directory[0]
+    ip_json_file = os.path.join(storage_directory, "IPs.json")
+    try:
+        ip_file = json.load(open(ip_json_file))
+        robot_dict = ip_file.get("ip_address_list")
+    except FileNotFoundError:
+        print(f"Add .json file with robot IPs to: {storage_directory}.")
+        sys.exit()
+    # Build dictionary: robot -> password (only if password exists and is not empty)
+    robot_passwords = {
+        values[0]: values[-1]
+        for _, values in robot_dict
+        if len(values) >= 3 and values[-1]
+    }
+    for robot, password in robot_password.items():
+        connect_to_wifi_mac(robot,password)
+        gopro_ip = "10.5.5.9:8080"
+        camera = GoProCamera(gopro_ip)
+        camera.stop_recording()
+        camera.delete_files()
+        time.sleep(3)  # <-- Add delay to let the GoPro recover
+        camera.start_recording()
