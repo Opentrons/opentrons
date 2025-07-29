@@ -1,4 +1,5 @@
 """Class that schedules motion on can bus."""
+
 import asyncio
 from collections import defaultdict
 import logging
@@ -611,7 +612,7 @@ class MoveScheduler:
 
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
-        for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
+        for node_id, seq_id in self._moves[group_id - self._start_at_index]:
             if node_id not in nodes:
                 nodes.append(NodeId(node_id))
         return nodes
@@ -678,7 +679,7 @@ class MoveScheduler:
 
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
         full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
-        start_time = time.time()
+        start_time = time.monotonic()
 
         try:
             # The staged timeout handles some times when a move takes a liiiittle extra
@@ -686,17 +687,20 @@ class MoveScheduler:
                 self._event.wait(),
                 full_timeout,
             )
-            duration = time.time() - start_time
-            await self._send_stop_if_necessary(can_messenger, group_id)
+            duration = time.monotonic() - start_time
 
             if duration >= expected_time:
                 log.warning(
                     f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
                 )
         except asyncio.TimeoutError:
-            missing_node_msg = ", ".join(
-                node.name for node in self._get_nodes_in_move_group(group_id)
-            )
+            missing_nodes = self._get_nodes_in_move_group(group_id)
+            if not missing_nodes:
+                log.warning(
+                    f"Move timeout fired with no missing nodes after {time.monotonic() - start_time}s on a {full_timeout}s timeout; may not have been scheduled"
+                )
+                return
+            missing_node_msg = ", ".join(node.name for node in missing_nodes)
             log.error(
                 f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}. Missing: {missing_node_msg}"
             )
@@ -707,7 +711,7 @@ class MoveScheduler:
                     "missing-nodes": missing_node_msg,
                     "full-timeout": str(full_timeout),
                     "expected-time": str(expected_time),
-                    "elapsed": str(time.time() - start_time),
+                    "elapsed": str(time.monotonic() - start_time),
                 },
             )
         except EnumeratedError:
@@ -716,6 +720,8 @@ class MoveScheduler:
         except BaseException as e:
             log.exception("canceling move group scheduler")
             raise PythonException(e) from e
+        finally:
+            await self._send_stop_if_necessary(can_messenger, group_id)
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
