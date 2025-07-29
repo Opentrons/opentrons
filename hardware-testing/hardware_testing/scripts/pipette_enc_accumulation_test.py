@@ -38,14 +38,15 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
     test_tag = pipette.name
 
     test_name = "pipette-mixing-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
+    run_name = data.create_run_id()
+    file_name = data.create_file_name(test_name=test_name, run_id=run_name, tag=test_tag)
 
     header = ['Cycle', 'Test Pipette',
               'Init Estimate Pos (mm)', 'Init Enc Pos (mm)',
               'Top Estimate Pos (mm)', 'Top Enc Pos (mm)', 'Top Pos Difference (mm)',
               'Bottom Estimate Pos (mm)', 'Bottom Enc Pos (mm)', 'Bottom Pos Difference (mm)']
     header_str = data.convert_list_to_csv_line(header)
-    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+    data.append_data_to_file(test_name=test_name, run_id=run_name,file_name=file_name, data=header_str)
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
@@ -82,7 +83,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
                       top_est, top_enc, top_est - top_enc,
                       bot_est, bot_enc, bot_est - bot_enc]
         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-        data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
+        data.append_data_to_file(test_name=test_name, run_id=run_name, file_name=file_name, data=cycle_data_str)
 
 
 
