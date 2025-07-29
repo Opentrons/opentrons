@@ -463,10 +463,7 @@ def _parent_origin_to_flex_tip_rack_lid_feature(
     )
     assert flex_tip_rack_lid_as_parent is not None
 
-    x_mid = parent_deck_item.extents.total.frontRightTop.x / 2
-    y_mid = parent_deck_item.extents.total.frontRightTop.y / 2
-
-    return Point(x=x_mid, y=y_mid, z=flex_tip_rack_lid_as_parent["matingZ"])
+    return Point(x=0, y=0, z=flex_tip_rack_lid_as_parent["matingZ"])
 
 
 def _parent_origin_to_slot_bottom_center(
@@ -512,10 +509,7 @@ def _flex_tip_rack_lid_feature_to_child_origin(
     )
     assert flex_tip_rack_lid_as_child is not None
 
-    x_mid = child_labware.extents.total.frontRightTop.x / 2
-    y_mid = child_labware.extents.total.frontRightTop.y / 2
-
-    return Point(x=x_mid, y=y_mid, z=flex_tip_rack_lid_as_child["matingZ"]) * -1
+    return Point(x=0, y=0, z=flex_tip_rack_lid_as_child["matingZ"])
 
 
 def slot_bottom_center_to_child_origin(

@@ -506,7 +506,7 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         parent_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT,
         is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="flex-tip-rack-lid-parent"),
-        expected_total_offset=Point(x=95, y=690, z=10),
+        expected_total_offset=Point(x=0, y=0, z=40),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
@@ -515,7 +515,7 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         labware_location=AddressableAreaLocation(
             addressableAreaName="test_area_with_flex_lid"
         ),
-        expected_total_offset=Point(x=145, y=990, z=15),
+        expected_total_offset=Point(x=0, y=0, z=45),
     ),
 ]
 
