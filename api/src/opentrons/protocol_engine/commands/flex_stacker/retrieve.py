@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 
 from ..command import (
@@ -41,6 +42,7 @@ from .common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
     primary_location_sequence,
     adapter_location_sequence,
     lid_location_sequence,
@@ -57,6 +59,7 @@ RecoverableExceptions = Union[
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 ]
 
 
@@ -147,7 +150,8 @@ _ExecuteReturn = Union[
     DefinedErrorData[FlexStackerStallOrCollisionError]
     | DefinedErrorData[FlexStackerShuttleError]
     | DefinedErrorData[FlexStackerHopperError]
-    | DefinedErrorData[FlexStackerLabwareRetrieveError],
+    | DefinedErrorData[FlexStackerLabwareRetrieveError]
+    | DefinedErrorData[FlexStackerShuttleOccupiedError],
 ]
 
 
@@ -175,6 +179,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         | DefinedErrorData[FlexStackerShuttleError]
         | DefinedErrorData[FlexStackerHopperError]
         | DefinedErrorData[FlexStackerLabwareRetrieveError]
+        | DefinedErrorData[FlexStackerShuttleOccupiedError]
     ):
         """Handle a recoverable error raised during command execution."""
         error_map = {
@@ -182,6 +187,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             FlexStackerShuttleMissingError: FlexStackerShuttleError,
             FlexStackerHopperLabwareError: FlexStackerHopperError,
             FlexStackerShuttleLabwareError: FlexStackerLabwareRetrieveError,
+            FlexStackerShuttleNotEmptyError: FlexStackerShuttleOccupiedError,
         }
         return DefinedErrorData(
             public=error_map[type(error)](
@@ -269,13 +275,18 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             try:
                 stacker_hw.set_stacker_identify(True)
                 await stacker_hw.dispense_labware(
-                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                    labware_height=stacker_state.get_pool_height_minus_overlap(),
+                    # TODO (ba, 2025-07-18): This disables Labware sensing on the
+                    # stacker tower due to inconsistensies with data seen
+                    # in PVT stacker, review this once we have more data.
+                    enforce_hopper_lw_sensing=False,
                 )
             except (
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
                 FlexStackerShuttleLabwareError,
+                FlexStackerShuttleNotEmptyError,
             ) as e:
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update

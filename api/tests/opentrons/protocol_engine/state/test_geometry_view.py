@@ -4,7 +4,7 @@ import inspect
 import json
 from datetime import datetime
 from math import isclose
-from typing import cast, List, Tuple, Optional, NamedTuple, Dict
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict, Any
 from unittest.mock import sentinel
 from os import listdir, path
 
@@ -120,14 +120,18 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
 )
+
+from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
-from opentrons.protocol_engine.state.frustum_helpers import (
+from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _volume_from_height_circular,
     _volume_from_height_rectangular,
-    find_height_at_well_volume,
-    find_volume_at_well_height,
+    find_height_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_inner_well_geometry,
+    find_volume_user_defined_volumes,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
@@ -187,6 +191,15 @@ _MOCK_LABWARE_DEFINITION3 = LabwareDefinition3.model_construct(  # type: ignore[
         ),
     ),
 )
+
+_MOCK_LABWARE_DEFINITION2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    dimensions=LabwareDimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    parameters=LabwareDefinition2Parameters.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
+)
+
 
 MOCK_ADDRESSABLE_AREA = AddressableArea(
     area_name="1",
@@ -367,6 +380,30 @@ def nice_labware_definition() -> LabwareDefinition:
 
 
 @pytest.fixture
+def inner_labware_geometry_fixture() -> LabwareDefinition:
+    """Load a labware def containing an InnerWellGeometry object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data("labware/fixtures/3/fixture_corning_24_plate.json").decode(
+                "utf-8"
+            )
+        )
+    )
+
+
+@pytest.fixture
+def user_volumes_fixture() -> LabwareDefinition:
+    """Load a labware def containing a UserDefinedVolumes object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data(
+                "labware/fixtures/2/fixture_user_volumes_prototype.json"
+            ).decode("utf-8")
+        )
+    )
+
+
+@pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
     return labware_definition_type_adapter.validate_python(
@@ -376,6 +413,35 @@ def nice_adapter_definition() -> LabwareDefinition:
             ).decode("utf-8")
         )
     )
+
+
+@pytest.fixture
+def mock_well_math_utils(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> Dict[str, Any]:
+    """Patch inner_well_math_utils functions."""
+    mocks = {}
+    mocks["volume_user_volumes"] = decoy.mock(func=find_volume_user_defined_volumes)
+    mocks["height_user_volumes"] = decoy.mock(func=find_height_user_defined_volumes)  # type: ignore[assignment]
+    mocks["volume_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
+        func=find_volume_inner_well_geometry
+    )
+    mocks["height_inner_well_geometry"] = decoy.mock(  # type: ignore[assignment]
+        func=find_height_inner_well_geometry
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_user_defined_volumes", mocks["volume_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_user_defined_volumes", mocks["height_user_volumes"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_volume_inner_well_geometry", mocks["volume_inner_well_geometry"]
+    )
+    monkeypatch.setattr(
+        geometry, "find_height_inner_well_geometry", mocks["height_inner_well_geometry"]
+    )
+    return mocks
 
 
 _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
@@ -2678,31 +2744,76 @@ def test_ensure_location_not_occupied_raises(
     )
 
 
-def test_get_labware_grip_point(
+def test_get_labware_grip_point_v2_definition(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the grip point of the labware at the specified location."""
+    """It should get the grip point of a LabwareDefinition2 labware at the specified location."""
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
-            sentinel.labware_definition
-        )
+        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION2)
     ).then_return(100)
 
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
     ).then_return(Point(x=101, y=102, z=103))
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_1.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = Point(0, 0, 0)
+
     labware_center = subject.get_labware_grip_point(
-        labware_definition=sentinel.labware_definition,
+        labware_definition=_MOCK_LABWARE_DEFINITION2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     assert labware_center == Point(
-        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        102.0 + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        203 + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        102.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        203 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
+    )
+
+
+def test_get_labware_grip_point_v3_definition(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the grip point of a LabwareDefinition3 labware at the specified location."""
+    decoy.when(
+        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION3)
+    ).then_return(100)
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(x=101, y=102, z=103))
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_1.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
+    labware_center = subject.get_labware_grip_point(
+        labware_definition=_MOCK_LABWARE_DEFINITION3,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    )
+
+    assert labware_center == Point(
+        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        102.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        203 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2733,15 +2844,31 @@ def test_get_labware_grip_point_on_labware(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
     ).then_return(Point(x=5, y=9, z=10))
 
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_4.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.definition,
         location=OnLabwareLocation(labwareId="below-id"),
     )
 
     assert grip_point == Point(
-        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and adapter
-        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
-        110.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
+        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2 + expected_lw_origin_to_parent.x,
+        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2 + expected_lw_origin_to_parent.y,
+        10.0
+        + 100
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2811,14 +2938,23 @@ def test_get_labware_grip_point_for_labware_on_module(
         )
     ).then_return(Point(x=0, y=0, z=0))
 
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=ModuleLocation(moduleId="module-id"),
     )
     assert result_grip_point == Point(
-        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2896,6 +3032,15 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         "magneticBlockV1C3"
     )
 
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=OnLabwareLocation(labwareId="below-id-9"),
@@ -2903,9 +3048,14 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
 
     assert result_grip_point == Point(
         x=492.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and module beneath it.
-        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
-        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2  # The labware and module beneath it.
+        + expected_lw_origin_to_parent.x,
+        y=350.0
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2
+        + expected_lw_origin_to_parent.y,
+        z=838.0
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + expected_lw_origin_to_parent.z,
     )
 
 
@@ -3803,7 +3953,7 @@ def test_validate_dispense_volume_into_well_meniscus(
 ) -> None:
     """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
     well_def = well_plate_def.wells["A1"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
         well_def
@@ -4390,7 +4540,7 @@ def test_virtual_get_well_height_after_liquid_handling(
         well_plate_def
     )
     well_def = well_plate_def.wells["B2"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
@@ -4419,12 +4569,12 @@ def test_virtual_find_height_and_volume(
     target_height_volume: LiquidTrackingType,
 ) -> None:
     """Make sure geometry math helpers return the expected liquid tracking type."""
-    height_estimate = find_height_at_well_volume(
+    height_estimate = find_height_inner_well_geometry(
         target_volume=target_height_volume,
         well_geometry=_TEST_INNER_WELL_GEOMETRY,
     )
 
-    volume_estimate = find_volume_at_well_height(
+    volume_estimate = find_volume_inner_well_geometry(
         target_height=target_height_volume, well_geometry=_TEST_INNER_WELL_GEOMETRY
     )
 
@@ -4432,6 +4582,64 @@ def test_virtual_find_height_and_volume(
     #  SimulatedProbeResult
     if isinstance(target_height_volume, SimulatedProbeResult):
         assert height_estimate == volume_estimate == target_height_volume
+
+
+@pytest.mark.parametrize("target_measurement", ["height", "volume"])
+@pytest.mark.parametrize("well_def_type", ["user_volumes", "inner_well_geometry"])
+def test_find_well_height_and_volume(
+    mock_labware_view: LabwareView,
+    mock_well_math_utils: Dict[str, Any],
+    user_volumes_fixture: LabwareDefinition,
+    inner_labware_geometry_fixture: LabwareDefinition,
+    decoy: Decoy,
+    subject: GeometryView,
+    target_measurement: str,
+    well_def_type: str,
+) -> None:
+    """Test that find_volume_at_well_height and find_height_at_well_volume call the correct functions."""
+    assert inner_labware_geometry_fixture.innerLabwareGeometry is not None
+    assert user_volumes_fixture.innerLabwareGeometry is not None
+    inner_well_geometry = [
+        well for well in inner_labware_geometry_fixture.innerLabwareGeometry.values()
+    ][0]
+    user_defined_volumes = [
+        well for well in user_volumes_fixture.innerLabwareGeometry.values()
+    ][0]
+    if well_def_type == "inner_well_geometry":
+        labware_id = "iwg"
+        geometry_def = inner_well_geometry
+    else:
+        labware_id = "udv"
+        geometry_def = user_defined_volumes
+
+    decoy.when(mock_labware_view.get_well_geometry(labware_id, "A1")).then_return(
+        geometry_def
+    )
+    # mock the correct inner_well_math_utils functions
+    decoy.when(
+        mock_well_math_utils[target_measurement + "_" + well_def_type](
+            sentinel.arbitrary_height_volume, geometry_def
+        )
+    ).then_return(sentinel.arbitrary_return_val)
+
+    if target_measurement == "height":
+        assert (
+            subject.find_height_at_well_volume(
+                labware_id=labware_id,
+                well_name="A1",
+                target_volume=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
+    elif target_measurement == "volume":
+        assert (
+            subject.find_volume_at_well_height(
+                labware_id=labware_id,
+                well_name="A1",
+                target_height=sentinel.arbitrary_height_volume,
+            )
+            == sentinel.arbitrary_return_val
+        )
 
 
 @pytest.mark.parametrize(
@@ -4458,7 +4666,7 @@ def test_get_liquid_handling_z_change(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
     ).then_return(fake_min_height)
     well_def = well_plate_def.wells["A1"]
-    # make the depth match the phoney baloney innerwellgeoemtry
+    # make the depth match the phoney baloney innerwellgeomtry
     well_def = well_def.model_copy(update={"depth": 45.0})
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
         well_def

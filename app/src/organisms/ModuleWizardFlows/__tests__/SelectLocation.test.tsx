@@ -89,6 +89,12 @@ const mockSimpleDeckConfig: CutoutConfig[] = [
 const attachedModule: Partial<AttachedModule> = {
   moduleModel: 'temperatureModuleV2',
   serialNumber: 'test123',
+  usbPort: {
+    path: '/dev/ot_module_tempdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 const RUN_ID_1: string = 'mock_run_1'
 const mockUpdateDeckConfiguration = vi.fn()
@@ -137,7 +143,7 @@ describe('SelectLocation', () => {
     render(props)
     screen.getByText('Select module location')
     screen.getByText(
-      'Select the slot where you installed the Temperature Module GEN2 on the deck map to the right. The location must be correct for successful calibration.'
+      'Select the slot where you installed the Temperature Module GEN2 connected to USB-1. The location must be correct for successful calibration.'
     )
 
     const confirmBtn = screen.getByText('Confirm location')

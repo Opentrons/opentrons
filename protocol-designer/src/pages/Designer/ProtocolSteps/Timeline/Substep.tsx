@@ -26,6 +26,7 @@ interface SubstepProps {
   trashName: AdditionalEquipmentName | null
   stepId: string
   substepIndex: number
+  isNested: boolean
   volume?: number | string | null
   source?: SubstepWellData
   dest?: SubstepWellData
@@ -47,6 +48,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
     isSameLabware,
     aspirateVolume,
     dispenseVolume,
+    isNested,
   } = props
   const { i18n, t } = useTranslation([
     'application',
@@ -93,7 +95,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {isMix ? (
-        <ListItem type="default">
+        <ListItem type={isNested ? 'defaultOnColor' : 'default'}>
           <Flex
             gridGap={SPACING.spacing4}
             padding={SPACING.spacing12}
@@ -123,7 +125,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       ) : (
         <>
           {source != null ? (
-            <ListItem type="default">
+            <ListItem type={isNested ? 'defaultOnColor' : 'default'}>
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}
@@ -152,7 +154,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
             </ListItem>
           ) : null}
           {dest != null ? (
-            <ListItem type="default">
+            <ListItem type={isNested ? 'defaultOnColor' : 'default'}>
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}

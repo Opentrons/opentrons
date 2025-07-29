@@ -66,9 +66,9 @@ class Mitutoyo_Digimatic_Indicator:
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
-        then = time.time()
+        then = time.monotonic()
         values = [self.read(), self.read(), self.read(), self.read(), self.read()]
-        while (time.time() - then) < timeout:
+        while (time.monotonic() - then) < timeout:
             if numpy.allclose(values, list(reversed(values))):
                 return values[-1]
             values = values[1:] + [self.read()]
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     print("Mitutoyo ABSOLUTE Digimatic Indicator")
     gauge = Mitutoyo_Digimatic_Indicator(port="/dev/ttyUSB0")
     gauge.connect()
-    start_time = time.time()
+    start_time = time.monotonic()
     while True:
-        elapsed_time = round(time.time() - start_time, 3)
+        elapsed_time = round(time.monotonic() - start_time, 3)
         distance = gauge.read()
         print("Time: {} Distance: {}".format(elapsed_time, distance))

@@ -67,7 +67,7 @@ jobs:
         with:
           project: 'g-code-testing'
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild

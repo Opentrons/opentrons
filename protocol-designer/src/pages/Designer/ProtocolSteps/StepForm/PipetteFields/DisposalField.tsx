@@ -9,7 +9,7 @@ import {
   InputStepFormField,
 } from '/protocol-designer/components/molecules'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
-import { getMaxDisposalVolumeForMultidispense } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getMaxDisposalVolumeForMultiDispense } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 
 import { getBlowoutLocationOptionsForForm } from '../utils'
@@ -31,7 +31,6 @@ interface DisposalFieldProps {
   volume: string | null
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
-  tipRack?: string | null
 }
 
 export function DisposalField(props: DisposalFieldProps): JSX.Element {
@@ -43,7 +42,6 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
     propsForFields,
     aspirate_airGap_checkbox,
     aspirate_airGap_volume,
-    tipRack,
     formData,
   } = props
   const { t } = useTranslation(['application', 'form'])
@@ -54,7 +52,8 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
     path,
     stepType,
   })
-  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+  const tipRack = formData.tipRack
+  const maxDisposalVolume = getMaxDisposalVolumeForMultiDispense(
     {
       aspirate_airGap_checkbox,
       aspirate_airGap_volume,

@@ -20,6 +20,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 import {
   getSlotInLocationStack,
   wellFillFromWellContents,
@@ -105,17 +106,13 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 ? allWellContentsForActiveItem[lw.id]
                 : null
               const definition = lw.def
-              const { dimensions } = definition
-              const xyzDimensions = {
-                xDimension: dimensions.xDimension ?? 0,
-                yDimension: dimensions.yDimension ?? 0,
-                zDimension: dimensions.zDimension ?? 0,
-              }
+              const viewBox = getLabwareViewBox(definition)
+
               return (
                 <Flex id={lw.id} flexDirection={DIRECTION_COLUMN} key={lw.id}>
                   <RobotWorkSpace
                     key={lw.id}
-                    viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
+                    viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.xDimension} ${viewBox.yDimension}`}
                     width="9.5625rem"
                     height="6.375rem"
                   >
@@ -123,7 +120,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                       <>
                         <LabwareRender
                           definition={definition}
-                          positioningMode="offsetInSlot"
+                          positioningMode="passThrough"
                           wellFill={wellFillFromWellContents(
                             wellContents,
                             liquidDisplayColors
@@ -135,8 +132,11 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                           setShowMenuListForId={setShowMenuListForId}
                           menuListId={menuListId}
                           setHover={setHoverSlot}
-                          slotBoundingBox={xyzDimensions}
-                          slotPosition={ZERO_SLOT_POSITION}
+                          slotBoundingBox={{
+                            x: viewBox.xDimension,
+                            y: viewBox.yDimension,
+                          }}
+                          slotPosition={{ x: viewBox.minX, y: viewBox.minY }}
                           labwareId={lw.id}
                           terminalItemId={terminalItemId}
                         />

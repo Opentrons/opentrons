@@ -80,8 +80,8 @@ export default defineConfig(
       },
       resolve: {
         alias: {
-          '@opentrons/components/styles': path.resolve(
-            '../components/src/index.module.css'
+          '@opentrons/components/styles/global': path.resolve(
+            '../components/src/styles/global.css'
           ),
           '@opentrons/components': path.resolve('../components/src/index.ts'),
           '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),

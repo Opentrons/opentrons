@@ -108,10 +108,10 @@ class GCodeEngine:
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
         # Wait for modules to be present
-        wait_begins = time.time()
+        wait_begins = time.monotonic()
         while len(emulator.attached_modules) != len(modules):
             time.sleep(0.1)
-            if (time.time() - wait_begins) > 30:
+            if (time.monotonic() - wait_begins) > 30:
                 proc.kill()
                 proc.join()
                 raise RuntimeError(

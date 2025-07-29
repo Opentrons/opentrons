@@ -111,6 +111,7 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_CENTER}
         width="100%"
+        height="100%"
       >
         {children}
       </Flex>

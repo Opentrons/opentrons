@@ -1,8 +1,12 @@
 import { COLORS, LabwareRender } from '@opentrons/components'
-import { wellFillFromWellContents } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame, getMissingTips } from './utils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2, Liquid } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
@@ -14,11 +18,23 @@ interface LabwareOnDeckProps {
   liquids: Liquid[]
   x: number
   y: number
+  setSelectedSlot: Dispatch<SetStateAction<string | null>>
+  setHoveredSlot: Dispatch<SetStateAction<string | null>>
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
-  const { labwareDef, labwareId, x, y, robotState, liquids } = props
-  const { tipState, pipettes: pipetteState, liquidState } = robotState
+  const {
+    labwareDef,
+    labwareId,
+    x,
+    y,
+    robotState,
+    liquids,
+    setSelectedSlot,
+    setHoveredSlot,
+  } = props
+  const { tipState, pipettes: pipetteState, liquidState, labware } = robotState
+  const slot = getSlotInLocationStack(labware[labwareId].stack)
   const pipetteTemporalProperties = Object.entries(pipetteState).find(
     ([_, pipette]) => pipette.entityId === labwareId
   )
@@ -50,7 +66,19 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const missingTips = getMissingTips(tipState, labwareId)
 
   return (
-    <g transform={`translate(${x}, ${y})`}>
+    <g
+      transform={`translate(${x}, ${y})`}
+      onMouseEnter={() => {
+        setHoveredSlot(slot)
+      }}
+      onMouseLeave={() => {
+        setHoveredSlot(null)
+      }}
+      onClick={() => {
+        setSelectedSlot(slot)
+      }}
+      cursor="pointer"
+    >
       <LabwareRender
         positioningMode="offsetInSlot"
         definition={labwareDef}

@@ -468,6 +468,7 @@ export function Ot2Modules(): JSX.Element {
                           }
                           targetSlotId={slotId}
                           targetDeckId={deckDef.otId}
+                          childrenPositioningMode="offsetToSlot"
                         />
                       </Fragment>
                     )

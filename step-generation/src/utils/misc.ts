@@ -57,6 +57,7 @@ import type {
   LabwareEntity,
   LabwareTemporalProperties,
   LocationLiquidState,
+  ModuleEntities,
   PathOption,
   PipetteEntity,
   RobotState,
@@ -892,6 +893,61 @@ export const getTopLocationInStack = (stack?: string[]): string => {
   }
 }
 
+export const getNearestParentInStack = (stack: string[]): string | null =>
+  stack.length >= 2 ? stack[1] : null
+
+export const getLargestStackInSlot = (
+  labwareState: RobotState['labware'],
+  slot: string
+): string[] =>
+  Object.values(labwareState).reduce<string[]>((acc, { stack }) => {
+    if (stack[stack.length - 1] === slot && stack.length > acc.length) {
+      acc = stack
+    }
+    return acc
+  }, [])
+
+export const getIsLabwareCompatibleWithStack = (
+  labwareId: string,
+  stack: string[],
+  labwareEntities: LabwareEntities,
+  moduleEntities: ModuleEntities
+): boolean => {
+  // if stack is empty, moving directly to empty slot
+  if (stack.length === 0) {
+    return true
+  }
+  const topIdInStack = getTopLocationInStack(stack)
+
+  // check compatibility with labware
+  if (topIdInStack in labwareEntities) {
+    const movingLabwareEntity = labwareEntities[labwareId]
+    const topLabwareEntity = labwareEntities[topIdInStack]
+    const loadNameToCheck = topLabwareEntity.def.parameters.loadName
+    return (
+      // check compatible labware key
+      movingLabwareEntity.def.compatibleParentLabware?.some(
+        loadName => loadName === loadNameToCheck
+      ) ||
+      // check stacking offset map for legacy compatibility
+      Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
+        lw => lw === loadNameToCheck
+      )
+    )
+    // check compatibility with module
+  } else if (topIdInStack in moduleEntities) {
+    const topModuleEntity = moduleEntities[topIdInStack]
+    const { model: stackingModel } = topModuleEntity
+    return (
+      // check compatible labware key
+      Object.keys(
+        labwareEntities[labwareId].def.stackingOffsetWithModule ?? {}
+      ).some(model => stackingModel === model)
+    )
+  }
+  return false
+}
+
 export const getModuleIdFromRobotStateStack = (
   modules: RobotState['modules'],
   stack?: string[]
@@ -956,6 +1012,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   tiprackDefinition: LabwareDefinition2 | null
   volume: number
   path: PathOption
+  numAspirateWells: number
   numDispenseWells: number
   aspirateAirGapByVolume: Array<[number, number]>
   conditioningByVolume: Array<[number, number]> | null
@@ -975,6 +1032,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     conditioningByVolume,
     disposalByVolume,
     numDispenseWells,
+    numAspirateWells,
     aspirateAirGapByVolume,
   } = args
   const { liquids } = pipetteSpecs
@@ -1015,6 +1073,20 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           : 0)
   const isMultiAspirateAvailable =
     maxWorkingVolume > minVolumeForMultiAspirateDispense
+
+  if (path === 'multiAspirate' && numAspirateWells <= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiAspirate path'
+    )
+  } else if (path === 'multiDispense' && numAspirateWells >= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiDispense path'
+    )
+  } else if (path === 'single' && numAspirateWells !== numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for single path'
+    )
+  }
 
   // early return if multiAspirate/multiDispense cannot be accommodated
   if (
@@ -1111,9 +1183,15 @@ export const getTransferPlanAndReferenceVolumes = (args: {
       },
     }
   }
+
   // path is valid multiAspirate
   const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
-  const volumeTotalAspiration = maxSourcesPerAspiration * volume
+  const sourcesPerAspiration = Math.min(
+    maxSourcesPerAspiration,
+    numAspirateWells
+  )
+  const volumeTotalAspiration = sourcesPerAspiration * volume
+
   return {
     referenceVolumes: {
       airGap: {
@@ -1134,7 +1212,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     },
     multiWellHandling: {
       isSupported: true,
-      numWellsToFitInTip: maxSourcesPerAspiration,
+      numWellsToFitInTip: sourcesPerAspiration,
     },
   }
 }

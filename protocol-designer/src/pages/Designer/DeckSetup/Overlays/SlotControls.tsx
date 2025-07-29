@@ -157,7 +157,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
 
   drag(drop(ref))
 
-  const hoverOpacity = (hover != null && hover === itemId) || isOver ? '1' : '0'
+  const hoverOpacity = (hover != null && hover === itemId) || isOver ? 1 : 0
 
   let body = (
     <RobotCoordsForeignDiv
@@ -167,10 +167,10 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       width={slotBoundingBox.xDimension}
       height={slotBoundingBox.yDimension}
       innerDivProps={{
-        style: {
-          opacity: hoverOpacity,
-          ...DECK_CONTROLS_STYLE,
-        },
+        opacity: hoverOpacity,
+        ...DECK_CONTROLS_STYLE,
+      }}
+      innerDivEvents={{
         onMouseEnter: () => {
           setHover(itemId)
         },
