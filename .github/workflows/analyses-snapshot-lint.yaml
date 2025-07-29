@@ -35,3 +35,6 @@ jobs:
       - name: ruff-check
         working-directory: ./analyses-snapshot-testing
         run: make ruff-check
+      - name: unit tests
+        working-directory: ./analyses-snapshot-testing
+        run: make unit-tests

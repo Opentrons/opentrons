@@ -105,9 +105,6 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
-      - name: Install Opentrons
-        working-directory: ./analyses-snapshot-testing
-        run: make install-ot
       - uses: actions/download-artifact@v4
         with:
           name: chunks
@@ -145,9 +142,6 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
-      - name: Install Opentrons
-        working-directory: ./analyses-snapshot-testing
-        run: make install-ot
       - name: Download All Analysis Results
         uses: actions/download-artifact@v4
         with:
