@@ -11511,7 +11511,7 @@
       "idleCurrent": 0.3
     }
   },
-  "mutableConfigs": [
+    "mutableConfigs": [
     "top",
     "bottom",
     "blowout",
