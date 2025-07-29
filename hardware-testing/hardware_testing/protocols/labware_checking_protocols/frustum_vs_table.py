@@ -128,7 +128,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="labware_type",
         display_name="Labware Type",
         choices=[
-            {"display_name": "corning 24", "value": "corning_24_wellplate_3.4ml_flat"},
             {
                 "display_name": "usa96deep",
                 "value": "usascientific_96_wellplate_2.4ml_deep",
@@ -145,7 +144,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="usascientific_96_wellplate_2.4ml_deep",
+        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
@@ -211,13 +210,14 @@ def run(ctx: ProtocolContext) -> None:
     )
     frustum_labware.load_empty(frustum_labware.wells())
     udv_version = ctx.params.labware_version_of_table  # type: ignore[attr-defined]
-    udv_labware = ctx.load_labware(labware_type, SLOT_UDV_LABWARE, version=udv_version)
+    udv_labware_type = "custom_" + labware_type
+    udv_labware = ctx.load_labware(udv_labware_type, SLOT_UDV_LABWARE)
     udv_labware.load_empty(udv_labware.wells())
     src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
     # LOAD TIP RACKS AND PIPETTES
     if frustum_labware["A1"].max_volume < 100:
         liq_rack_vol = 50
@@ -324,6 +324,11 @@ def run(ctx: ProtocolContext) -> None:
         liq_pipette,
         ethanol,
     )
+
+    pick_up_tips(probe_pipette, liq_pipette)
+    # Find Height of Source Reservoir
+    liq_pipette.measure_liquid_height(src["A1"])
+    liq_pipette.drop_tip()
 
     # USER DEFINED DEFINITION
     _write_line_to_csv(

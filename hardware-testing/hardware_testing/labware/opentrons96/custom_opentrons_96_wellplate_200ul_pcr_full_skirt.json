@@ -1,15 +1,15 @@
 {
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 4,
   "schemaVersion": 2,
   "parameters": {
-    "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+    "loadName": "custom_opentrons_96_wellplate_200ul_pcr_full_skirt",
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": true
   },
   "metadata": {
-    "displayName": "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
+    "displayName": "Custom Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []

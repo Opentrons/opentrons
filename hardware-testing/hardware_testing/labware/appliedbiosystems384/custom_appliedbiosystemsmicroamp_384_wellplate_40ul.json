@@ -441,7 +441,7 @@
     ]
   },
   "metadata": {
-    "displayName": "Applied Biosystems MicroAmp 384 Well Plate 40 µL",
+    "displayName": "Custom Applied Biosystems MicroAmp 384 Well Plate 40 µL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -4691,9 +4691,9 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "appliedbiosystemsmicroamp_384_wellplate_40ul"
+    "loadName": "custom_appliedbiosystemsmicroamp_384_wellplate_40ul"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 3,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {

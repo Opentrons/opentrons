@@ -6,7 +6,7 @@
     "links": ["https://www.nest-biotech.com/reagent-reserviors/59178416.html"]
   },
   "metadata": {
-    "displayName": "NEST 1 Well Reservoir 195 mL",
+    "displayName": "Custom NEST 1 Well Reservoir 195 mL",
     "displayCategory": "reservoir",
     "displayVolumeUnits": "mL",
     "tags": []
@@ -44,9 +44,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-    "loadName": "nest_1_reservoir_195ml"
+    "loadName": "custom_nest_1_reservoir_195ml"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 3,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
@@ -62,7 +62,9 @@
         { "height": 5.66775, "volume": 31880 },
         { "height": 10.84975, "volume": 77860.94 },
         { "height": 16.66575, "volume": 123841.88 },
-        { "height": 22.14475, "volume": 169822.82 }
+        { "height": 22.14475, "volume": 169822.82 },
+        { "height": 26.85, "volume": 195000 }
+
       ]
     }
   }

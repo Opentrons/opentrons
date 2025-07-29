@@ -21,7 +21,7 @@
     ]
   },
   "metadata": {
-    "displayName": "USA Scientific 96 Deep Well Plate 2.4 mL",
+    "displayName": "Custom USA Scientific 96 Deep Well Plate 2.4 mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "mL",
     "tags": []
@@ -1199,9 +1199,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 14.94,
-    "loadName": "usascientific_96_wellplate_2.4ml_deep"
+    "loadName": "custom_usascientific_96_wellplate_2.4ml_deep"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 3,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {

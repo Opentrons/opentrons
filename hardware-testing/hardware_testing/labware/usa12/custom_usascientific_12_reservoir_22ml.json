@@ -15,9 +15,9 @@
   ],
   "schemaVersion": 2,
   "version": 3,
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "metadata": {
-    "displayName": "USA Scientific 12 Well Reservoir 22 mL",
+    "displayName": "Custom USA Scientific 12 Well Reservoir 22 mL",
     "displayVolumeUnits": "mL",
     "displayCategory": "reservoir",
     "tags": []
@@ -31,7 +31,7 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "usascientific_12_reservoir_22ml",
+    "loadName": "custom_usascientific_12_reservoir_22ml",
     "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
   },
   "wells": {

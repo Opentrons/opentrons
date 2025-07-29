@@ -19,7 +19,7 @@
     "links": ["https://www.nest-biotech.com/deep-well-plates/59253726.html"]
   },
   "metadata": {
-    "displayName": "NEST 96 Deep Well Plate 2 mL",
+    "displayName": "Custom NEST 96 Deep Well Plate 2 mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1199,10 +1199,10 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
-    "loadName": "nest_96_wellplate_2ml_deep",
+    "loadName": "custom_nest_96_wellplate_2ml_deep",
     "magneticModuleEngageHeight": 6.8
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 4,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
@@ -1236,32 +1236,32 @@
   },
   "innerLabwareGeometry": {
     "userVolumes": {
-      "heightToVolumeMap":
-        [
-          { "height": 0, "volume": 0 },
-          { "height": 2.07875, "volume": 110 },
-          { "height": 2.58575, "volume": 144.254 },
-          { "height": 3.57075, "volume": 205.71938 },
-          { "height": 4.73775, "volume": 283.01209 },
-          { "height": 6.20075, "volume": 373.17404 },
-          { "height": 7.52875, "volume": 463.33599 },
-          { "height": 8.94175, "volume": 553.49794 },
-          { "height": 10.42975, "volume": 643.65989 },
-          { "height": 11.84575, "volume": 733.82183 },
-          { "height": 13.09775, "volume": 823.98378 },
-          { "height": 14.45675, "volume": 925.32581 },
-          { "height": 16.16275, "volume": 1026.66784 },
-          { "height": 17.89675, "volume": 1128.00988 },
-          { "height": 18.98375, "volume": 1217.49489 },
-          { "height": 20.71275, "volume": 1325.45856 },
-          { "height": 22.49175, "volume": 1421.06038 },
-          { "height": 23.82175, "volume": 1503.32576 },
-          { "height": 24.64075, "volume": 1585.59113 },
-          { "height": 26.40075, "volume": 1695.86786 },
-          { "height": 27.75875, "volume": 1791.80862 },
-          { "height": 29.19075, "volume": 1887.74938 },
-          { "height": 30.43875, "volume": 1983.69014 }
-        ]        
+      "heightToVolumeMap": [
+        { "height": 0, "volume": 0 },
+        { "height": 2.07875, "volume": 110 },
+        { "height": 2.58575, "volume": 144.254 },
+        { "height": 3.57075, "volume": 205.71938 },
+        { "height": 4.73775, "volume": 283.01209 },
+        { "height": 6.20075, "volume": 373.17404 },
+        { "height": 7.52875, "volume": 463.33599 },
+        { "height": 8.94175, "volume": 553.49794 },
+        { "height": 10.42975, "volume": 643.65989 },
+        { "height": 11.84575, "volume": 733.82183 },
+        { "height": 13.09775, "volume": 823.98378 },
+        { "height": 14.45675, "volume": 925.32581 },
+        { "height": 16.16275, "volume": 1026.66784 },
+        { "height": 17.89675, "volume": 1128.00988 },
+        { "height": 18.98375, "volume": 1217.49489 },
+        { "height": 20.71275, "volume": 1325.45856 },
+        { "height": 22.49175, "volume": 1421.06038 },
+        { "height": 23.82175, "volume": 1503.32576 },
+        { "height": 24.64075, "volume": 1585.59113 },
+        { "height": 26.40075, "volume": 1695.86786 },
+        { "height": 27.75875, "volume": 1791.80862 },
+        { "height": 29.19075, "volume": 1887.74938 },
+        { "height": 30.43875, "volume": 1983.69014 },
+        { "height": 38, "volume": 2000 }
+      ]
     }
   }
 }
