@@ -123,6 +123,15 @@ def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) ->
     return True
 
 
+def get_visibility_mask(
+    visibility_dict: DefaultDict[str, List[int]], key: str, total: int
+) -> List[bool]:
+    mask = [False] * total
+    for i in visibility_dict[key]:
+        mask[i] = True
+    return mask
+
+
 def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
     """Parses common arguments."""
     return {
@@ -235,14 +244,6 @@ def read_filtered_data(
 def plot_baseline(args: argparse.Namespace) -> None:
     """Plots the baseline and dataframe."""
 
-    def _get_visibility_mask(
-        visibility_dict: DefaultDict[str, List[int]], key: str, total: int
-    ) -> List[bool]:
-        mask = [False] * total
-        for i in visibility_dict[key]:
-            mask[i] = True
-        return mask
-
     config = parse_common_args(args)
     measurements, samples = read_filtered_data(args.dataframe, config)
     for baseline_path in args.baseline:
@@ -320,7 +321,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                             method="update",
                             args=[
                                 {
-                                    "visible": _get_visibility_mask(
+                                    "visible": get_visibility_mask(
                                         trace_visibility, key, total
                                     )
                                 },
@@ -335,7 +336,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                             method="update",
                             args=[
                                 {
-                                    "visible": _get_visibility_mask(
+                                    "visible": get_visibility_mask(
                                         zone_visibility, z, total
                                     )
                                 },
@@ -480,11 +481,12 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
 
             # The baseline is stored as string, so convert to dict
             for axis, platform in product(["x", "z"], ["extend", "retract"]):
-                figures.update({axis: go.Figure()})
+                figures.update({axis: {"fig": go.Figure(), "trace": defaultdict(list)}})
                 data = literal_eval(baseline[axis][platform])
                 baseline[axis][platform] = data
                 for zone, bins in data.items():
-                    figures[axis].add_trace(
+                    figure = figures[axis]
+                    figure["fig"].add_trace(
                         go.Scatter(
                             x=list(range(NUMBER_OF_BINS)),
                             y=bins,
@@ -494,6 +496,8 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                             line=dict(dash="dash", color="blue", width=2),
                         )
                     )
+                    idx = len(figure["fig"].data) - 1  # type: ignore
+                    figure["trace"][zone].append(idx)
 
             # Go through measurements
             for axis in config["axis_list"]:
@@ -508,6 +512,7 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                         measurements.get(axis, {}).get(platform, {}).items()
                     ):
                         for sample, data in samples.items():
+                            legendgroup = f"{stacker} s{sample}"
                             detected = False
                             for zone in set(
                                 config["zone_list_x"] + config["zone_list_z"]
@@ -530,7 +535,8 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                     if raw_data_value > threshold and delta > 0:
                                         detected = True
                                         mark = "+++" if labware == "baseline" else ""
-                                        figures[axis].add_trace(
+                                        figure = figures[axis]
+                                        figure["fig"].add_trace(
                                             go.Scatter(
                                                 x=list(range(NUMBER_OF_BINS)),
                                                 y=raw_data,
@@ -538,8 +544,12 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                                 name=f"zone {zone} {mark}",
                                                 visible=True,
                                                 line=dict(color="green", width=1),
+                                                legendgroup=legendgroup,
+                                                legendgrouptitle=dict(text=legendgroup),
                                             )
                                         )
+                                        idx = len(figure["fig"].data) - 1  # type: ignore
+                                        figure["trace"][zone].append(idx)
                                         detected_labware[stacker].append(
                                             dict(
                                                 labware=labware,
@@ -558,7 +568,8 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                         break
                                 if not detected:
                                     detected = False
-                                    figures[axis].add_trace(
+                                    figure = figures[axis]
+                                    figure["fig"].add_trace(
                                         go.Scatter(
                                             x=list(range(NUMBER_OF_BINS)),
                                             y=raw_data,
@@ -566,19 +577,58 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                             name=f"zone {zone}",
                                             visible=True,
                                             line=dict(color="red", width=2),
+                                            legendgroup=legendgroup,
+                                            legendgrouptitle=dict(text=legendgroup),
                                         )
                                     )
+                                    idx = len(figure["fig"].data) - 1  # type: ignore
+                                    figure["trace"][zone].append(idx)
                                     undetected_labware[stacker].add(
                                         (labware, axis, platform, zone)
                                     )
-                figures[axis].update_layout(
-                    title=f"Validate Baseline {axis}",
+
+                zone_visibility = figures[axis]["trace"]
+                total = len(figures[axis]["fig"].data)  # type: ignore
+                buttons = [
+                    *[
+                        dict(
+                            label="All",
+                            method="update",
+                            args=[{"visible": [True] * total}, {}],
+                        )
+                    ],
+                    *[
+                        dict(
+                            label=f"Zone {z}",
+                            method="update",
+                            args=[
+                                {
+                                    "visible": get_visibility_mask(
+                                        zone_visibility, z, total
+                                    )
+                                },
+                                {},
+                            ],
+                        )
+                        for z in zone_visibility
+                    ],
+                ]
+                figures[axis]["fig"].update_layout(
+                    title=f"Validate Baseline {config['labware_list']} {axis} {args.graph_name}",
                     xaxis_title="Bins",
                     yaxis_title="Photon Count",
                     template="plotly_white",
+                    updatemenus=[
+                        dict(
+                            type="buttons",
+                            direction="down",
+                            showactive=True,
+                            buttons=buttons,
+                        )
+                    ],
                 )
                 if not args.disable_validation_plot:
-                    figures[axis].show()
+                    figures[axis]["fig"].show()
 
     print("\n---------------- RESULT -------------- \n")
     print("ZONES DETECTED\n")
@@ -613,7 +663,7 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
     if all_detected:
         print("\nSUCCESS: ALL SAMPLES DETECTED!\n")
     else:
-        print("\nFAULED: SOME SAMPLES NOT DETECTED!\n")
+        print("\nFAILED: SOME SAMPLES NOT DETECTED!\n")
 
 
 def main(args: argparse.Namespace) -> None:
