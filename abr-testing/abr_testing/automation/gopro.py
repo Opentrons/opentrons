@@ -11,7 +11,7 @@ import sys
 import platform
 
 
-def connect_to_wifi(network_name: str, password: str) -> None:
+def connect_to_wifi(network_name: str, password: str) -> bool:
     """Connect to a Wi-Fi network on macOS or Windows."""
     system = platform.system()
 
@@ -25,10 +25,10 @@ def connect_to_wifi(network_name: str, password: str) -> None:
             subprocess.run([airport_cmd, "-s"], check=True)
         except FileNotFoundError:
             print("❌ 'airport' tool not found.")
-            return
+            return False
         except subprocess.CalledProcessError as e:
             print(f"❌ Error scanning networks: {e.stderr if e.stderr else str(e)}")
-            return
+            return False
 
         try:
             subprocess.run(
@@ -37,13 +37,27 @@ def connect_to_wifi(network_name: str, password: str) -> None:
                 capture_output=True,
                 text=True,
             )
-            print(f"✅ Connected to '{network_name}' on macOS")
+
+            # Wait and verify connection
+            time.sleep(5)  # give it a few seconds to connect
+            result = subprocess.run(
+                ["netsh", "wlan", "show", "interfaces"],
+                capture_output=True,
+                text=True,
+            )
+
+            if network_name in result.stdout:
+                print(f"✅ Connected to '{network_name}' on macOS")
+                return True
+            else:
+                print(f"❌ Attempted to connect, but not connected to '{network_name}'.")
+                return False
         except subprocess.CalledProcessError as e:
             print(
                 f"""❌ Failed to connect to '{network_name}':
                 {e.stderr.strip() if e.stderr else str(e)}"""
             )
-
+            return False
     elif system == "Windows":
         print(
             f"🔍 [Windows] Attempting to connect to Wi-Fi network '{network_name}'...\n"
@@ -95,16 +109,32 @@ def connect_to_wifi(network_name: str, password: str) -> None:
                 capture_output=True,
                 text=True,
             )
-            print(f"✅ Connected to '{network_name}' on Windows")
+            # Wait and verify connection
+            time.sleep(5)  # give it a few seconds to connect
+            result = subprocess.run(
+                ["netsh", "wlan", "show", "interfaces"],
+                capture_output=True,
+                text=True,
+            )
+
+            if network_name in result.stdout:
+                print(f"✅ Connected to '{network_name}' on Windows")
+                return True
+            else:
+                print(f"❌ Attempted to connect, but not connected to '{network_name}'.")
+                return False
         except subprocess.CalledProcessError as e:
             print(
                 f"""❌ Failed to connect to '{network_name}':
                 {e.stderr.strip() if e.stderr else str(e)}"""
             )
+            return False
         except Exception as e:
             print(f"❌ Unexpected error: {e}")
+            return False
     else:
         print(f"❌ Unsupported operating system: {system}")
+        return False
 
 
 class GoProCamera:
@@ -180,18 +210,8 @@ class GoProCamera:
             return {"error": str(e)}
 
 
-if __name__ == "__main__":
-    """Test out Go Pro Connection."""
-    parser = argparse.ArgumentParser(description="Read run logs on google drive.")
-    parser.add_argument(
-        "storage_directory",
-        metavar="STORAGE_DIRECTORY",
-        type=str,
-        nargs=1,
-        help="Path to long term storage directory for run logs.",
-    )
-    args = parser.parse_args()
-    storage_directory = args.storage_directory[0]
+def run(storage_directory: str) -> None:
+    """Run script."""
     ip_json_file = os.path.join(storage_directory, "IPs.json")
     try:
         ip_file = json.load(open(ip_json_file))
@@ -207,11 +227,28 @@ if __name__ == "__main__":
     }
     gopro_ip = "10.5.5.9:8080"
     for robot, password in robot_passwords.items():
-        connect_to_wifi(robot, password)
-        camera = GoProCamera(gopro_ip)
-        camera.stop_recording()
-        camera.delete_files()
-    for robot, password in robot_passwords.items():
-        connect_to_wifi(robot, password)
-        camera = GoProCamera(gopro_ip)
-        camera.start_recording()
+        connected = connect_to_wifi(robot, password)
+        if connected:
+            camera = GoProCamera(gopro_ip)
+            camera.stop_recording()
+            camera.delete_files()
+        for robot, password in robot_passwords.items():
+            connected = connect_to_wifi(robot, password)
+            if connected:
+                camera = GoProCamera(gopro_ip)
+                camera.start_recording()
+
+
+if __name__ == "__main__":
+    """Connect to GoPros, Erase Footage and Start Recording."""
+    parser = argparse.ArgumentParser(description="Read run logs on google drive.")
+    parser.add_argument(
+        "storage_directory",
+        metavar="STORAGE_DIRECTORY",
+        type=str,
+        nargs=1,
+        help="Path to long term storage directory for run logs.",
+    )
+    args = parser.parse_args()
+    storage_directory = args.storage_directory[0]
+    run(storage_directory)
