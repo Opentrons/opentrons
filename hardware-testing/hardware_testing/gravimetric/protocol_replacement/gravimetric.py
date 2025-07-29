@@ -1012,19 +1012,27 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
-    offset = _get_offset_for_channel(
+    asp_offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.submerge_depth
     )
-    transfer_properties.aspirate.submerge.start_position.offset = offset
-    transfer_properties.dispense.submerge.start_position.offset = offset
-    transfer_properties.aspirate.aspirate_position.offset = offset
-    transfer_properties.dispense.dispense_position.offset = offset
-    transfer_properties.aspirate.retract.end_position.offset = offset
-    transfer_properties.dispense.retract.end_position.offset = offset
+    disp_offset = _get_offset_for_channel(
+        fixture_settings, channel, fixture_settings.submerge_depth
+    )
+    disp_retract_offset = _get_offset_for_channel(
+        fixture_settings, channel, 5 + fixture_settings.submerge_depth
+    )
+    transfer_properties.dispense.submerge.start_position.offset = disp_offset
+    transfer_properties.aspirate.aspirate_position.offset = asp_offset
+    transfer_properties.dispense.dispense_position.offset = disp_offset
+    transfer_properties.aspirate.retract.end_position.offset = disp_retract_offset
+    transfer_properties.dispense.retract.end_position.offset = disp_retract_offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
     transfer_properties.dispense.dispense_position.position_reference = (
+        PositionReference.LIQUID_MENISCUS
+    )
+    transfer_properties.dispense.retract.end_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
@@ -1043,7 +1051,7 @@ def run_one_test(
     well_top = fixture_settings.liquid_source.top().point
     above_scale = Point(
         well_top.x,
-        well_top.y + offset.y,
+        well_top.y + asp_offset.y,
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
