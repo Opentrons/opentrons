@@ -45,24 +45,22 @@ def test_correction_volume_not_negative(liquid_class_name: str) -> None:
     liquid_class_def = load_definition(liquid_class_name)
     for by_pipette in liquid_class_def.byPipette:
         for by_tip_type in by_pipette.byTipType:
-            for action_name, correction_by_volume in [
-                ("aspirate", by_tip_type.aspirate.correctionByVolume),
-                ("singleDispense", by_tip_type.singleDispense.correctionByVolume),
-                ("multiDispense", by_tip_type.multiDispense.correctionByVolume),
-            ]:
-                # The correction volume at 0 must be 0:
+            # We just need to check one of aspirate/singleDispense/multiDispense, because
+            # the test above ensures that all 3 are the same.
+            correction_by_volume = by_tip_type.aspirate.correctionByVolume
+            # The correction volume at 0 must be 0:
+            assert (
+                0.0,
+                0.0,
+            ) in correction_by_volume, f"Correction volume not 0 at 0 in {by_pipette.pipetteModel} {by_tip_type.tiprack}"
+            # The nominal volume + correction volume must never be below 0.
+            # (Seth thinks this check is sufficient to ensure that the plunger won't
+            # go below the zero position, whereas David thinks we need a stronger
+            # check that takes into account ul_per_mm(). But this is a start.)
+            for nominal_volume, correction_volume in correction_by_volume:
                 assert (
-                    0.0,
-                    0.0,
-                ) in correction_by_volume, f"Correction volume not 0 at 0 in {by_pipette.pipetteModel} {by_tip_type.tiprack} {action_name}"
-                # The nominal volume + correction volume must never be below 0.
-                # (Seth thinks this check is sufficient for ensuring that the plunger
-                # won't go below the zero position, whereas David thinks we need a
-                # stronger check that takes into account ul_per_mm(). But it's a start.)
-                for nominal_volume, correction_volume in correction_by_volume:
-                    assert (
-                        nominal_volume + correction_volume >= 0
-                    ), f"Volume + correction volume is negative in {by_pipette.pipetteModel} {by_tip_type.tiprack} {action_name}"
+                    nominal_volume + correction_volume >= 0
+                ), f"Volume + correction volume is negative in {by_pipette.pipetteModel} {by_tip_type.tiprack}"
 
 
 @pytest.mark.parametrize("liquid_class_name", list(_get_all_liquid_classes()))
