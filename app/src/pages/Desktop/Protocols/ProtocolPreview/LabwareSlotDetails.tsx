@@ -7,6 +7,7 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 import { wellFillFromWellContents } from '@opentrons/step-generation'
 
 import { ActiveWellSlotDetails } from './ActiveWellSlotDetails'
@@ -115,6 +116,9 @@ export function LabwareSlotDetails(
           pipetteTemporalProperties[1].nozzles
         )
       : 1
+
+  const labwareViewBox = getLabwareViewBox(labwareDef)
+
   return (
     <>
       <div>
@@ -151,12 +155,13 @@ export function LabwareSlotDetails(
             <RobotWorkSpace
               key={topLabwareOnSlotId}
               width="14rem"
-              viewBox={`0 0 ${labwareDef.dimensions.xDimension} ${labwareDef.dimensions.yDimension}`}
+              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
             >
               {() => (
                 <g>
                   <LabwareRender
                     definition={labwareDef}
+                    positioningMode="passThrough"
                     wellFill={wellFill}
                     missingTips={missingTips}
                     highlightedWells={wellGroup}

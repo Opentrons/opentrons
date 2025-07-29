@@ -8,7 +8,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  ETHANOL_LIQUID_CLASS_NAME,
+  getAllLiquidClassDefs,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  NONE_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -52,13 +58,25 @@ export function SelectLiquidClass({
     schemaVersion: 1,
   }
 
+  const mapLiquidClassToInternalName: Record<
+    LiquidClass['liquidClassName'],
+    string
+  > = {
+    ethanol_80: ETHANOL_LIQUID_CLASS_NAME,
+    glycerol_50: GLYCEROL_LIQUID_CLASS_NAME,
+    water: WATER_LIQUID_CLASS_NAME,
+    none: NONE_LIQUID_CLASS_NAME,
+  }
+
   const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
   const handleClickNext = (): void => {
-    dispatch({
-      type: 'SET_LIQUID_CLASS',
-      liquidClass: selectedLiquidClass ?? noLiquidClass,
-    })
-
+    if (selectedLiquidClass != null) {
+      dispatch({
+        type: 'SET_LIQUID_CLASS',
+        liquidClassName:
+          mapLiquidClassToInternalName[selectedLiquidClass.liquidClassName],
+      })
+    }
     onNext()
   }
 
@@ -99,33 +117,35 @@ export function SelectLiquidClass({
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        gridGap={SPACING.spacing24}
         width="100%"
       >
         <StyledText oddStyle="level4HeaderRegular">
           {t('apply_predefined_settings')}
         </StyledText>
-        {liquidClassOptions.map(option => (
-          <RadioButton
-            key={option.liquidClassName}
-            isSelected={
-              selectedLiquidClass?.liquidClassName === option.liquidClassName
-            }
-            buttonLabel={option.displayName}
-            buttonValue={option.liquidClassName}
-            buttonSubLabel={{ label: option.description, align: 'vertical' }}
-            onChange={() => {
-              setSelectedLiquidClass(option)
-            }}
-            onClick={() => {
-              handleClick(option)
-            }}
-            ariaDisabled={
-              checkLiquidClassCompatibility(option, state).incompatible
-            }
-          />
-        ))}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {liquidClassOptions.map(option => (
+            <RadioButton
+              key={option.liquidClassName}
+              isSelected={
+                selectedLiquidClass?.liquidClassName === option.liquidClassName
+              }
+              buttonLabel={option.displayName}
+              buttonValue={option.liquidClassName}
+              buttonSubLabel={{ label: option.description, align: 'vertical' }}
+              onChange={() => {
+                setSelectedLiquidClass(option)
+              }}
+              onClick={() => {
+                handleClick(option)
+              }}
+              ariaDisabled={
+                checkLiquidClassCompatibility(option, state).incompatible
+              }
+            />
+          ))}
+        </Flex>
       </Flex>
     </Flex>
   )

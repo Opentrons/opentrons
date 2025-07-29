@@ -394,9 +394,23 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
 
+      - name: 'backup upload folders before checkout'
+        run: |
+          # Move upload folders to temp location to preserve them during checkout
+          mkdir -p ${{ runner.temp }}/upload_backup
+          mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
         uses: 'actions/checkout@v4'
+      - name: 'restore upload folders after checkout'
+        run: |
+          # Restore upload folders from temp location
+          mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true
       - uses: ./.github/actions/js/setup
+      - name: 'print upload folders contents'
+        run: |
+          echo "Test Outputs"
+          echo "Contents of to_upload_internal-release: $(ls -l ./to_upload_internal-release)"
+          echo "Contents of to_upload_release: $(ls -l ./to_upload_release)"
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |

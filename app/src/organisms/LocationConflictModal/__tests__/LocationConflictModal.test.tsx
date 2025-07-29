@@ -138,7 +138,7 @@ describe('LocationConflictModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
-    screen.getByText('Flex Stacker Module GEN1 in USB-1')
+    screen.getByText('Flex Stacker Module GEN1 in S-1')
     screen.getByText('Identify')
     fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()

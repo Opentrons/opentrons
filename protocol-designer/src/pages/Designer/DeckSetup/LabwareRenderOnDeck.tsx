@@ -13,7 +13,7 @@ export function LabwareRenderOnDeck(
   const { x, y, labwareDef } = props
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <LabwareRender definition={labwareDef} />
+      <LabwareRender definition={labwareDef} positioningMode="offsetInSlot" />
     </g>
   )
 }

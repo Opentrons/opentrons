@@ -62,22 +62,20 @@ export function DeckItemHighlight(
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
         innerDivProps={{
-          style: {
-            position: POSITION_ABSOLUTE,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            transform: 'rotate(180deg) scaleX(-1)',
-            zIndex: 1,
-            border: `3px solid ${COLORS.blue50}`,
-            display: DISPLAY_FLEX,
-            alignItems: ALIGN_CENTER,
-            color: COLORS.white,
-            fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
-            borderRadius: BORDERS.borderRadius8,
-            cursor: CURSOR_POINTER,
-          },
+          position: POSITION_ABSOLUTE,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          transform: 'rotate(180deg) scaleX(-1)',
+          zIndex: 1,
+          border: `3px solid ${COLORS.blue50}`,
+          display: DISPLAY_FLEX,
+          alignItems: ALIGN_CENTER,
+          color: COLORS.white,
+          fontSize: PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold,
+          borderRadius: BORDERS.borderRadius8,
+          cursor: CURSOR_POINTER,
         }}
       />
       <DeckLabelSet

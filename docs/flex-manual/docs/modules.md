@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Modules"
+---
+
 # Modules
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
@@ -69,6 +73,16 @@ In general, to install a module caddy:
 4.  Seat the module caddy into the slot and screw it into place.
 
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
+
+!!!warning
+    The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
+
+    * Align the connector's flat side with the flat side of the module's power port.
+    * Connect the cable to the module first, before plugging it in to a wall outlet.
+
+    ![DIN power connector](images/module-power-connector.png){width="40%"}
+
+    _Do not_ force cable connections, or you may damage the module.
 
 ## Module calibration
 
@@ -293,20 +307,72 @@ Outside of protocols, the Opentrons App can display the current status of the He
 
 ### Heater-Shaker specifications
 
-| **Specification**               | **Details**  |
-|---------------------------------|--------------|
-| **Dimensions**                  | 152 × 90 × 82 mm (L/W/H)                                                   |
-| **Weight**                      | 1.34 kg                                                                    |
-| **Module power input**          | 36 VDC, 6.1 A                                                              |
-| **Power adapter input**         | 100–240 VAC, 50/60 Hz                                                      |
-| **Mains supply voltage fluctuation** | ±10%                                                                  |
-| **Overvoltage**                 | Category II                                                                |
-| **Power consumption**           | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | 20–25 °C                                                                   |
-| **Relative humidity**           | Up to 80%, non-condensing                                                  |
-| **Altitude**                    | Up to 2,000 m above sea level                                              |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>152 × 90 × 82 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.34 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power input</strong></td>
+      <td>36 VDC, 6.1 A</td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter input</strong></td>
+      <td>100–240 VAC, 50/60 Hz</td>
+    </tr>
+    <tr>
+      <td><strong>Mains supply voltage fluctuation</strong></td>
+      <td>±10%</td>
+    </tr>
+    <tr>
+      <td><strong>Overvoltage</strong></td>
+      <td>Category II</td>
+    </tr>
+    <tr>
+      <td><strong>Power consumption</strong></td>
+      <td>
+        Idle: 3 W<br />Typical:
+        <ul>
+          <li>Shaking: 4–11 W</li>
+          <li>Heating: 10–30 W</li>
+          <li>Heating and shaking: 10–40 W</li>
+        </ul>
+        Maximum: 125–130 W
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>20–25 °C</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 80%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2,000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## HEPA/UV Module
 
@@ -483,16 +549,53 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Temperature Module specifications
 
-| **Specification**               | **Details**                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| **Dimensions**                  | 194 × 90 × 84 mm (L/W/H)                                                   |
-| **Weight**                      | 1.5 kg                                                                    |
-| **Module power**                | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | <22 °C (recommended for optimal cooling)                                  |
-| **Relative humidity**           | Up to 60%, non-condensing                                                  |
-| **Altitude**                    | Up to 2000 m above sea level                                               |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th><strong>Specification</strong></th>
+      <th><strong>Details</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>194 × 90 × 84 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.5 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power</strong></td>
+      <td>
+        <ul>
+          <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
+          <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>&lt;22 °C (recommended for optimal cooling)</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 60%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Thermocycler Module GEN2
 
@@ -500,7 +603,7 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Thermocycler features
 
-The Opentrons Thermocycler Module GEN2 is a fully automated on-deck thermocycler, providing hands-free PCR in a 96-well plate format. Its heated lid and disposable seal fit tightly over the plate, ensuring efficient sample heating and minimal evaporation.
+The Opentrons Thermocycler Module is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
 
 #### Heating and cooling
 
@@ -522,9 +625,18 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
-#### Rubber automation seals
+#### Thermocycler lid seals
 
-The Thermocycler comes with rubber automation seals to help reduce evaporation. Each seal must be sterilized before use and can be used for several runs. [Replacement seals](https://opentrons.com/products/gen2-thermocycler-seals) come in packages of 10, which you can purchase directly from Opentrons.
+The Thermocycler works with two different plate seals to help protect your samples. These are the the [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+
+| Lid Type | Description |
+|----|----|
+| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are Gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
+| Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
+
+!!!warning
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](images/thermocycler-lid-warning.png)
 
 #### Software control
 

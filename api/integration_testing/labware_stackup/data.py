@@ -110,6 +110,7 @@ TEST_LATEST_LABWARE: list[tuple[str, int]] = [
     ("opentrons_tough_pcr_auto_sealing_lid", 2),
     ("opentrons_tough_universal_lid", 1),
     ("opentrons_universal_flat_adapter", 1),
+    ("opentrons_universal_flat_adapter_type_b", 1),
     ("opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat", 1),
     ("protocol_engine_lid_stack_object", 1),
     ("thermoscientificnunc_96_wellplate_1300ul", 2),

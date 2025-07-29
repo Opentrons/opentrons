@@ -1,3 +1,7 @@
+---
+title: "Flex Stacker: Installing the Stacker"
+---
+
 # Installing the Stacker
 
 Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](preinstall.md).
@@ -6,13 +10,19 @@ Before you begin, make sure you've read and are familiar with the information pr
 
 Your Stacker ships in two separate  boxes; one contains the module, and the other includes a special User Kit. Follow these instructions to begin:
 
+<div class="instruction-list" markdown>
+
 1. Open the shipping boxes and remove the internal boxes that hold the Stacker and User Kit.
 
 1. Open the Stacker's box and the User Kit. Remove any additional shipping and packaging material inside these boxes.
 
+</div>
+
 ## Part 2: Replacing the Side Window Panel
 
 The Stacker attaches to the right side of your robot and requires a replacement window panel. This panel blocks UV-C light from an installed Flex HEPA/UV module. Follow these instructions to replace the side window panel. If this panel is already in place from a previous Stacker installation, skip to [Step 6](#identify-access-panels).
+
+<div class="instruction-list" markdown>
 
 3. Turn off the power to the robot.
 
@@ -28,11 +38,21 @@ The Stacker attaches to the right side of your robot and requires a replacement 
     !!!Note
         A properly attached panel fits flush and square to the robot's frame, without gaps or misalignment. This helps ensure a good connection between the safety interlock pins on panel and Flex.
 
-1. <div id="identify-access-panels" markdown> After attaching the replacement window, identify the four, smaller access panels on the window. Select the panel that matches the deck slot where you will attach the Stacker.</div>
+</div>
+
+<div id="identify-access-panels" class="instruction-list" markdown>
+
+6. After attaching the replacement window, identify the four, smaller access panels on the window. Select the panel that matches the deck slot where you will attach the Stacker.
 
     ![Removing the small access panel](images/access-panel.png){: .img-medium }
 
-1. Remove the 2 screws from your selected access panel and detach it. Save the screws and panel for future use.
+</div>
+
+<div class="instruction-list" markdown>
+
+7. Remove the 2 screws from your selected access panel and detach it. Save the screws and panel for future use.
+
+</div>
 
 ## Part 3: Attaching the Stacker
 
@@ -42,6 +62,8 @@ With the new window panel in place, it's time to install a deck plate adapter an
     The Stacker is heavy. Ask a lab partner to assist with lifting and attaching this module.
 
 To install the deck adapter and attach the Stacker:
+
+<div class="instruction-list" markdown>
 
 8. Unscrew the deck plate from the slot in column 3 that matches the previously removed window access panel.
 
@@ -62,9 +84,13 @@ To install the deck adapter and attach the Stacker:
 
 1. Remove the packing tape from the Stacker door and peel the protective film from the door window.
 
+</div>
+
 ## Part 4: Connecting the Hub and Cables
 
 After attaching the Stacker to the robot, you can connect all the cables and turn on the power. See [Physical Connections](preinstall.md#physical-connections) for more information about the type and purpose of each cable. To connect the power and data cables to the hub:
+
+<div class="instruction-list" markdown>
 
 13. Remove the power/data hub from the User Kit. Place it with its back flush against the robot.
 
@@ -117,6 +143,8 @@ After attaching the Stacker to the robot, you can connect all the cables and tur
     </table>
 
 1. Check each cable to make sure it's connected securely and turn on the power to your Flex and the Stacker.
+
+</div>
 
 ## Next Steps
 

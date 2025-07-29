@@ -6,7 +6,11 @@ import { i18n } from '/app/i18n'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
-import { RetryStepInfo, StackerHopperLwInfo } from '../../shared'
+import {
+  RetryStepInfo,
+  StackerEnsureShuttleEmpty,
+  StackerHopperLwInfo,
+} from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 import { StackerHopperEmptyRetry } from '../StackerHopperEmptyRetry'
 
@@ -38,6 +42,9 @@ describe('StackerHopperEmptyRetry', () => {
       <div>MOCK_STACKER_HOPPER_LW_INFO</div>
     )
     vi.mocked(RetryStepInfo).mockReturnValue(<div>MOCK_RETRY_STEP_INFO</div>)
+    vi.mocked(StackerEnsureShuttleEmpty).mockReturnValue(
+      <div>MOCK_TWO_COLUMN_AND_IMAGE</div>
+    )
   })
 
   afterEach(() => {
@@ -49,6 +56,13 @@ describe('StackerHopperEmptyRetry', () => {
       RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.STEPS.FILL_HOPPER
     render(props)
     screen.getByText('MOCK_STACKER_HOPPER_LW_INFO')
+  })
+
+  it(`renders twoColumnAndImage when step is ${RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY}`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY
+    render(props)
+    screen.getByText('MOCK_TWO_COLUMN_AND_IMAGE')
   })
 
   it(`renders RetryStepInfo when step is ${RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.STEPS.RETRY}`, () => {

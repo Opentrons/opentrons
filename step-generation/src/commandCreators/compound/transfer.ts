@@ -19,6 +19,7 @@ import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
+  formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
@@ -376,7 +377,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     `dest=${
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
     }`,
-    `new_tip=${formatPyStr(changeTip)}`,
+    `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,

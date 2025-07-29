@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Protocol Development"
+---
+
 # Protocol Development
 
 The Opentrons Flex system can run a wide variety of automated protocols, for tasks such as PCR, NGS, ELISA, and many more. You can run fully built and verified protocols, edit community protocols to suit your needs, or design protocols from scratch—with or without writing code.
