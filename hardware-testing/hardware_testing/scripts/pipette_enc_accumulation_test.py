@@ -5,7 +5,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point, Axis
+from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point, Axis
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -15,7 +15,7 @@ STALL_THRESHOLD = 0.25
 
 async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> (float, float):
     print("Checking alignment...\n")
-    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     current_pos = await api.current_position_ot3(mount, refresh=True)
     est = current_pos[pipette_ax]
     encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
@@ -48,7 +48,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
     top_pos, bottom_pos, _, drop_pos = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
 
     print("Move to bottom position\n")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
