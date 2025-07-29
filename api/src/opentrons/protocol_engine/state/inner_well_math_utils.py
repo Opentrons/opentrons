@@ -3,7 +3,7 @@ from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 from math import isclose
 
-from ..errors.exceptions import InvalidLiquidHeightFound
+from ..errors.exceptions import InvalidLiquidHeightFound, InvalidUserDefinedVolumesError
 
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
@@ -364,9 +364,11 @@ def _linear_interpolation(
     interpolating_from: List[float], to_interpolate: List[float], target_val: float
 ) -> float:
     if len(interpolating_from) != len(to_interpolate):
-        raise ValueError("Height and volume data have unequal sizes")
+        raise InvalidUserDefinedVolumesError(
+            "Height and volume data have unequal sizes"
+        )
     if not (interpolating_from[0] == to_interpolate[0] == 0.0):
-        raise ValueError("height and volume data must start with 0.0")
+        raise ValueError("linear interpolation datasets must start with 0.0")
 
     if target_val == 0.0:
         return 0.0
