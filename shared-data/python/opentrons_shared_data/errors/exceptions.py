@@ -853,7 +853,7 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
         )
 
 
-class FlexStackerNotEmptyError(RoboticsInteractionError):
+class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
     """An error occurred when the Flex Stacker Shuttle is not empty when it should be."""
 
     def __init__(
@@ -865,7 +865,7 @@ class FlexStackerNotEmptyError(RoboticsInteractionError):
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a FlexStackerShuttleOccupiedError."""
+        """Build a FlexStackerShuttleNotEmptyError."""
         checked_detail: Dict[str, Any] = detail or {}
         checked_detail["serial"] = serial
         checked_detail["shuttle_state"] = shuttle_state
