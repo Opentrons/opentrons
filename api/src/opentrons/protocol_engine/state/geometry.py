@@ -1056,20 +1056,12 @@ class GeometryView:
         mod_cal_offset = self._get_calibrated_module_offset(location)
         location_center = self._addressable_areas.get_addressable_area_center(aa_name)
 
-        return Point(
-            x=location_center.x
-            + parent_to_lw_offset.x
-            + lw_origin_to_parent.x
-            + mod_cal_offset.x,
-            y=location_center.y
-            + parent_to_lw_offset.y
-            + lw_origin_to_parent.y
-            + mod_cal_offset.y,
-            z=location_center.z
-            + parent_to_lw_offset.z
-            + lw_origin_to_parent.z
-            + mod_cal_offset.z
-            + grip_height_from_labware_bottom,
+        return (
+            location_center
+            + parent_to_lw_offset
+            + lw_origin_to_parent
+            + mod_cal_offset
+            + Point(0, 0, grip_height_from_labware_bottom)
         )
 
     def _get_lw_origin_to_parent(
