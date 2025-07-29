@@ -10,7 +10,10 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     UserDefinedVolumes,
     HeightVolumePair,
+    LabwareDefinition,
+    labware_definition_type_adapter,
 )
+from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _cross_section_area_rectangular,
     _cross_section_area_circular,
@@ -407,12 +410,17 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
 def test_get_user_volumes(user_defined_volumes_params: Dict[str, Any]) -> None:
     """Test linear interpolation math for user-defined volumes."""
     user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    max_height = user_defined_volumes_obj.heightToVolumeMap[-1].height
+    max_volume = user_defined_volumes_obj.heightToVolumeMap[-1].volume
     inputs_expected_outputs = user_defined_volumes_params[
         "volume_inputs_expected_outputs"
     ]
     for height, expected_vol in inputs_expected_outputs:
         volume_estimate = find_volume_user_defined_volumes(
-            target_height=height, well_geometry=user_defined_volumes_obj
+            target_height=height,
+            well_geometry=user_defined_volumes_obj,
+            total_well_height=max_height,
+            total_well_volume=max_volume,
         )
         assert isinstance(volume_estimate, float)
         assert isclose(volume_estimate, expected_vol, abs_tol=0.001)
@@ -426,10 +434,15 @@ def test_get_user_heights(
     inputs_expected_outputs = user_defined_volumes_params[
         "height_inputs_expected_outputs"
     ]
+    max_height = user_defined_volumes_obj.heightToVolumeMap[-1].height
+    max_volume = user_defined_volumes_obj.heightToVolumeMap[-1].volume
 
     for vol, expected_height in inputs_expected_outputs:
         height_estimate = find_height_user_defined_volumes(
-            target_volume=vol, well_geometry=user_defined_volumes_obj
+            target_volume=vol,
+            well_geometry=user_defined_volumes_obj,
+            total_well_height=max_height,
+            total_well_volume=max_volume,
         )
         assert isinstance(height_estimate, float)
         assert isclose(height_estimate, expected_height, abs_tol=0.001)

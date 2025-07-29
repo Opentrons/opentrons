@@ -383,26 +383,44 @@ def _linear_interpolation(
     raise ValueError("linear interpolation failed")
 
 
-def find_volume_user_defined_volumes(
-    target_height: LiquidTrackingType, well_geometry: UserDefinedVolumes
-) -> LiquidTrackingType:
-    """Return a linear interpolation of volume based on target height."""
-    if isinstance(target_height, SimulatedProbeResult):
-        return target_height
+def _format_user_defined_volumes_height_volume(
+    total_well_height: float,
+    total_well_volume: float,
+    well_geometry: UserDefinedVolumes,
+) -> Tuple[List[float], List[float]]:
     sorted_volume_map = sorted(
         well_geometry.heightToVolumeMap, key=lambda section: section.height
     )
-    max_height = sorted_volume_map[-1].height
-    if target_height < 0 or target_height > max_height:
-        raise InvalidLiquidHeightFound(
-            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
-        )
+
     volumes = [0.0]
     heights = [0.0]
     for pair in sorted_volume_map:
         volumes.append(pair.volume)
         heights.append(pair.height)
+    if total_well_height not in heights or total_well_volume not in volumes:
+        heights.append(total_well_height)
+        volumes.append(total_well_volume)
+    return heights, volumes
 
+
+def find_volume_user_defined_volumes(
+    target_height: LiquidTrackingType,
+    total_well_height: float,
+    total_well_volume: float,
+    well_geometry: UserDefinedVolumes,
+) -> LiquidTrackingType:
+    """Return a linear interpolation of volume based on target height."""
+    if isinstance(target_height, SimulatedProbeResult):
+        return target_height
+    if target_height < 0 or target_height > total_well_height:
+        raise InvalidLiquidHeightFound(
+            f"Invalid target height {target_height} mm; max well height is {total_well_height} mm."
+        )
+    heights, volumes = _format_user_defined_volumes_height_volume(
+        total_well_height=total_well_height,
+        total_well_volume=total_well_volume,
+        well_geometry=well_geometry,
+    )
     try:
         return _linear_interpolation(
             interpolating_from=heights, to_interpolate=volumes, target_val=target_height
@@ -415,26 +433,22 @@ def find_volume_user_defined_volumes(
 
 def find_height_user_defined_volumes(
     target_volume: LiquidTrackingType,
+    total_well_volume: float,
+    total_well_height: float,
     well_geometry: UserDefinedVolumes,
 ) -> LiquidTrackingType:
     """Return a linear interpolation of height based on target volume."""
     if isinstance(target_volume, SimulatedProbeResult):
         return target_volume
-    sorted_volume_map = sorted(
-        well_geometry.heightToVolumeMap, key=lambda section: section.height
-    )
-    max_volume = sorted_volume_map[-1].volume
-    if target_volume < 0 or target_volume > max_volume:
+    if target_volume < 0 or target_volume > total_well_volume:
         raise InvalidLiquidHeightFound(
-            f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
+            f"Invalid target volume {target_volume} uL; max well volume is {total_well_volume} uL."
         )
-
-    volumes = [0.0]
-    heights = [0.0]
-    for pair in sorted_volume_map:
-        volumes.append(pair.volume)
-        heights.append(pair.height)
-
+    heights, volumes = _format_user_defined_volumes_height_volume(
+        total_well_height=total_well_height,
+        total_well_volume=total_well_volume,
+        well_geometry=well_geometry,
+    )
     try:
         return _linear_interpolation(
             interpolating_from=volumes, to_interpolate=heights, target_val=target_volume

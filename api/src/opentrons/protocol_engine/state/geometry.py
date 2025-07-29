@@ -2078,13 +2078,19 @@ class GeometryView:
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_volumetric_capacity = float(well_def.totalLiquidVolume)
         if isinstance(well_geometry, InnerWellGeometry):
             return find_volume_inner_well_geometry(
-                target_height=target_height, well_geometry=well_geometry
+                target_height=target_height,
+                well_geometry=well_geometry,
             )
         else:
             return find_volume_user_defined_volumes(
-                target_height=target_height, well_geometry=well_geometry
+                target_height=target_height,
+                well_geometry=well_geometry,
+                total_well_height=well_def.depth,
+                total_well_volume=well_volumetric_capacity,
             )
 
     def find_height_at_well_volume(
@@ -2097,13 +2103,19 @@ class GeometryView:
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
         )
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_volumetric_capacity = float(well_def.totalLiquidVolume)
         if isinstance(well_geometry, InnerWellGeometry):
             return find_height_inner_well_geometry(
-                target_volume=target_volume, well_geometry=well_geometry
+                target_volume=target_volume,
+                well_geometry=well_geometry,
             )
         else:
             return find_height_user_defined_volumes(
-                target_volume=target_volume, well_geometry=well_geometry
+                target_volume=target_volume,
+                well_geometry=well_geometry,
+                total_well_volume=well_volumetric_capacity,
+                total_well_height=well_def.depth,
             )
 
     def get_well_height_after_liquid_handling(
