@@ -6,6 +6,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     ParameterContext,
     LiquidClass,
+    OFF_DECK
 )
 from typing import List, Dict, Optional
 from opentrons.types import Point
@@ -144,7 +145,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="usascientific_96_wellplate_2.4ml_deep",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
@@ -206,20 +207,18 @@ def run(ctx: ProtocolContext) -> None:
     """Protocol."""
     global DIAL_PORT, RUN_ID, FILE_NAME
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
-    # LOAD LABWARE AND DIAL
+
+    # LOAD FRUSTUM LABWARE AND DIAL
     frustum_labware = ctx.load_labware(
         labware_type, SLOT_FRUSTUM_LABWARE
     )
     frustum_labware.load_empty(frustum_labware.wells())
-    udv_version = ctx.params.labware_version_of_table  # type: ignore[attr-defined]
-    udv_labware_type = "custom_" + labware_type
-    udv_labware = ctx.load_labware(udv_labware_type, SLOT_UDV_LABWARE)
-    udv_labware.load_empty(udv_labware.wells())
     src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+
     # LOAD TIP RACKS AND PIPETTES
     if frustum_labware["A1"].max_volume < 100:
         liq_rack_vol = 50
@@ -297,10 +296,11 @@ def run(ctx: ProtocolContext) -> None:
             wells_in_row = frustum_labware.rows()[0]
         well_names = [str(well).split(" ")[0] for well in wells_in_row][:6]
         frustum_vol = frustum_labware["A1"].volume_from_height(heights[i])
-        ud_vol = udv_labware["A1"].volume_from_height(heights[i])
+        ud_vol = frustum_labware["A1"].volume_from_height(heights[i])  # placeholder, will update after loading UDV
         for well in well_names:
             frustum_volumes[well] = frustum_vol
             udv_volumes[well] = ud_vol
+
     # Pick up Tips
     pick_up_tips(probe_pipette, liq_pipette)
 
@@ -321,6 +321,27 @@ def run(ctx: ProtocolContext) -> None:
         liq_pipette,
         ethanol,
     )
+
+    drop_tips(probe_pipette, liq_pipette)
+
+    
+    ctx.move_labware(frustum_labware, OFF_DECK, use_gripper=False)
+    udv_version = ctx.params.labware_version_of_table  # type: ignore[attr-defined]
+    udv_labware_type = "custom_" + labware_type
+    udv_labware = ctx.load_labware(udv_labware_type, SLOT_FRUSTUM_LABWARE)
+    udv_labware.load_empty(udv_labware.wells())
+
+    
+    for i in range(num_of_rows):
+        row_idx = i + num_of_rows  
+        try:
+            wells_in_row = udv_labware.rows()[row_idx]
+        except IndexError:
+            wells_in_row = udv_labware.rows()[0]
+        well_names = [str(well).split(" ")[0] for well in wells_in_row][:6]
+        ud_vol = udv_labware["A1"].volume_from_height(heights[i])
+        for well in well_names:
+            udv_volumes[well] = ud_vol
 
     pick_up_tips(probe_pipette, liq_pipette)
 
