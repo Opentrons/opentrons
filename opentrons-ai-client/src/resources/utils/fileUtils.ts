@@ -91,10 +91,21 @@ export const prepareFilesForMultipart = (files: File[]): File[] | null => {
 }
 
 /**
- * Get file extension for display in the icon container
- * e.g., example.py, something.pdf, first.csv
+ * Get file extension for display in the icon container based on validated file type
+ * This ensures consistency - if a file is validated as Python based on MIME type,
+ * it will show .py regardless of actual filename extension
  */
-export const getFileExtension = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  return extension != null && extension !== '' ? `.${extension}` : '.file'
+export const getFileExtension = (file: File): string => {
+  const fileType = getFileType(file)
+
+  switch (fileType) {
+    case 'pdf':
+      return '.pdf'
+    case 'csv':
+      return '.csv'
+    case 'python':
+      return '.py'
+    default:
+      return '.file'
+  }
 }

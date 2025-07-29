@@ -30,7 +30,7 @@ export function AttachedFileItem({
     <div className={containerClass}>
       <div className={styles.file_icon_container}>
         <div className={styles.file_extension}>
-          {getFileExtension(file.name)}
+          {getFileExtension(file as File)}
         </div>
       </div>
       <div className={styles.file_details_container}>
