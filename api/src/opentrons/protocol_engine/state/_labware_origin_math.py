@@ -403,6 +403,8 @@ def _parent_deck_item_to_child_labware_feature_offset(
         parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
         and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
     ):
+        # TODO(jh, 07-29-25): Support center X/Y calculation after addressing grip point
+        # calculations. See #18929 discussion.
         return _parent_origin_to_flex_tip_rack_lid_feature(
             parent_deck_item
         ) + _flex_tip_rack_lid_feature_to_child_origin(child_labware)
