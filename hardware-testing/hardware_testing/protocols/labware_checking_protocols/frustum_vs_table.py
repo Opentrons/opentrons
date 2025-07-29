@@ -217,7 +217,7 @@ def run(ctx: ProtocolContext) -> None:
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
+    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     # LOAD TIP RACKS AND PIPETTES
     if frustum_labware["A1"].max_volume < 100:
         liq_rack_vol = 50
