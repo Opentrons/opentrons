@@ -73,8 +73,7 @@ class AnthropicPredict:
             {
                 "role": "user",
                 "content": [
-                    # TextBlockParam(type="text", text=DOCUMENTS.format(doc_content=self.get_docs()), cache_control={"type": "ephemeral"})
-                    TextBlockParam(type="text", text=DOCUMENTS.format(doc_content=""), cache_control={"type": "ephemeral"})
+                    TextBlockParam(type="text", text=DOCUMENTS.format(doc_content=self.get_docs()), cache_control={"type": "ephemeral"})
                 ],
             }
         ]
@@ -403,7 +402,7 @@ class AnthropicPredict:
 
     def _create_current_user_message(self, prompt: str, new_file_references: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
         """Create the current user message with file attachments."""
-        relevant_api_docs = ""  # self.get_relevant_api_docs(prompt, user_id)
+        relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
         prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
         # Create current user message with any new file attachments
@@ -526,7 +525,7 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            relevant_api_docs = ""  # self.get_relevant_api_docs(prompt, user_id)
+            relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
             prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
             # Create user message with file attachments if present
