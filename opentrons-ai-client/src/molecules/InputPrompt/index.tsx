@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
+import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
+import { AttachFileButton } from '/ai-client/atoms/AttachFileButton'
 import { SendButton } from '/ai-client/atoms/SendButton'
 import {
   chatDataAtom,
@@ -41,14 +43,12 @@ import {
   parseProtocolContent,
 } from '/ai-client/resources/utils/protocolUtils'
 
-import { AttachedFileItem } from '../../atoms/AttachedFileItem'
-import { AttachFileButton } from '../../atoms/AttachFileButton'
 import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ChatData } from '/ai-client/resources/types'
 import type { FileType } from '/ai-client/resources/utils/fileUtils'
-import type { ChatData } from '../../resources/types'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -151,7 +151,7 @@ export function InputPrompt(): JSX.Element {
         validatedFiles.length > 0
           ? validatedFiles.map(file => {
               const fileType = getFileType(file)
-              if (!fileType) {
+              if (fileType === null) {
                 throw new Error(
                   `Unexpected: validated file has no type: ${file.name}`
                 )

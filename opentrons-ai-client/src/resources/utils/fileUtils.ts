@@ -33,7 +33,7 @@ export const MAX_FILES_PER_MESSAGE = 5
 export const validateFile = (file: File): FileValidationResult => {
   const fileType = getFileType(file)
 
-  if (!fileType) {
+  if (fileType === null) {
     return {
       isValid: false,
       error:

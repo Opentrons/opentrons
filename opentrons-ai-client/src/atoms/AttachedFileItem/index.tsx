@@ -26,6 +26,19 @@ export function AttachedFileItem({
       : styles.container_without_remove
   }`
 
+  const getFileTypeLabel = (type: ReturnType<typeof getFileType>): string => {
+    switch (type) {
+      case 'pdf':
+        return 'PDF file'
+      case 'csv':
+        return 'CSV file'
+      case 'python':
+        return 'Python file'
+      default:
+        return 'Unknown file'
+    }
+  }
+
   return (
     <div className={containerClass}>
       <div className={styles.file_icon_container}>
@@ -35,15 +48,7 @@ export function AttachedFileItem({
       </div>
       <div className={styles.file_details_container}>
         <div className={styles.file_name}>{file.name}</div>
-        <div className={styles.file_details}>
-          {fileType === 'pdf'
-            ? 'PDF file'
-            : fileType === 'csv'
-            ? 'CSV file'
-            : fileType === 'python'
-            ? 'Python file'
-            : 'Unknown file'}
-        </div>
+        <div className={styles.file_details}>{getFileTypeLabel(fileType)}</div>
       </div>
       {showRemoveButton && onRemove != null && (
         <button

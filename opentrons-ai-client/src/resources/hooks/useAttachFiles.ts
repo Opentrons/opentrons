@@ -80,7 +80,7 @@ export function useAttachFiles(): UseAttachFilesReturn {
 
     for (const file of validatedFiles) {
       const fileType = getFileType(file)
-      if (fileType) {
+      if (fileType !== null) {
         fileAttachmentsWithContent.push({
           id: uuidv4(),
           filename: file.name,
