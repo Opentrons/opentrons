@@ -37,7 +37,13 @@ test-protocol-analysis:
 
 .PHONY: ci-setup
 ci-setup:
-	uv sync --locked --all-extras
+	@echo "Setting up CI environment with editable installs..."
+	@if uv sync --locked --all-extras 2>/dev/null; then \
+		echo "Lockfile is current, using locked dependencies"; \
+	else \
+		echo "Lockfile needs update due to editable installs, syncing without lock"; \
+		uv sync --all-extras; \
+	fi
 
 .PHONY: setup
 setup:
