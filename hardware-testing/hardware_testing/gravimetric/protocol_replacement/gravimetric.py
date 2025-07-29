@@ -1238,6 +1238,15 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         )
                         + avg_disp_evap
                     )
+                    if (
+                        fixture_settings.increment
+                        or fixture_settings.pipette_channels == 96
+                    ):
+                        avg_asp_evap = avg_asp_evap / fixture_settings.pipette_channels
+                        disp_with_evap = (
+                            disp_with_evap / fixture_settings.pipette_channels
+                        )
+
                     if fixture_settings.ctx.is_simulating():
                         cur_height: float = 10.0
                     else:
