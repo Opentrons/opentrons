@@ -221,8 +221,6 @@ You can create your own liquid class to customize transfer behavior for any liqu
 
 To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use :py:meth:`~.ProtocolContext.get_liquid_class` to specify the liquid class you'll make changes to::
 
-  # get base liquid class and custom properties for the Flex pipette and tips 
-
     custom_water = protocol.get_liquid_class(name="water")
     custom_water_properties=custom_water.get_for(pipette, tiprack)
 
@@ -256,7 +254,6 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 .. code-block:: python
 
-   # add required properties in a dictionary for the chosen pipette and tip racks
    custom_liquid_class_properties = {
       "p20_single_gen2": {
           "opentrons/opentrons_96_tiprack_20ul/1": {
