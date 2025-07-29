@@ -1094,11 +1094,11 @@ export const getMainAAForAFixture = (
 
 export const getMainUsbModuleFixtureIdForComboFixture = (
   compatibleCutoutFixtureIds: CutoutFixtureId[]
-): CutoutFixtureId => {
+): CutoutFixtureId | null => {
   return (
     compatibleCutoutFixtureIds.find(cf =>
       FLEX_USB_MODULE_FIXTURES.includes(cf)
-    ) ?? compatibleCutoutFixtureIds[0]
+    ) ?? null
   )
 }
 

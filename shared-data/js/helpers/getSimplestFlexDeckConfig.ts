@@ -1,6 +1,9 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
-import { FLEX_ROBOT_TYPE, FLEX_USB_MODULE_FIXTURES } from '../constants'
-import { getAddressableAreaFromSlotId } from '../fixtures'
+import { FLEX_ROBOT_TYPE } from '../constants'
+import {
+  getAddressableAreaFromSlotId,
+  getMainUsbModuleFixtureIdForComboFixture,
+} from '../fixtures'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
@@ -189,10 +192,12 @@ export function getSimplestFixtureForAddressableAreas(
     cutoutFixturesForCutoutId
   )
   if (nextCompatibleCutoutFixtures.length > 1) {
+    const mainUsbModuleFixture = getMainUsbModuleFixtureIdForComboFixture(
+      nextCompatibleCutoutFixtures.map(cf => cf.id)
+    )
     return (
-      nextCompatibleCutoutFixtures.find(cf =>
-        FLEX_USB_MODULE_FIXTURES.includes(cf.id)
-      ) ?? null
+      nextCompatibleCutoutFixtures.find(cf => cf.id === mainUsbModuleFixture) ??
+      null
     )
   } else {
     return nextCompatibleCutoutFixtures?.[0] ?? null
