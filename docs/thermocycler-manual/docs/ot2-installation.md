@@ -10,11 +10,11 @@ To attach the Thermocycler to your OT-2:
 
 1. Use a 2.5 mm hex screwdriver or L-key to attach the exhaust duct to the back of the module. Use the two included screws, one on either side of the duct.
 
-    ![Attaching the exhaust duct](../images/ot2-exhaust-duct.png)
+    ![Attaching the exhaust duct](images/ot2-exhaust-duct.png)
 
-2. Using both hands, lift the module carefully, set it in its supported deck location and press gently into place.
+2. Using both hands, lift the module carefully, set it in its supported deck location, and gently press it into place.
 
-3. Connect the USB cable to the module. Route the remaining cable through the cable management bracket and connect the other end of the USB cable to a USB port on the OT-2.
+3. Connect the USB cable to the module. Route the remaining cable through the cable management bracket, then connect the other end of the USB cable to a USB port on the OT-2.
 
 4. Connect one end of the power cable to the module and then to the external power supply unit. Manually tighten the locking ring to secure it to the power supply.
 

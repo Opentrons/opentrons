@@ -4,7 +4,7 @@ title: "Thermocycler Module: Product Specifications"
 
 # Product Specifications
 
-![Thermocycler with labeled main features](../images/specifications.png)
+![Thermocycler with labeled main features](images/specifications.png)
 
 ## Model Number
 
@@ -12,18 +12,18 @@ TCG2
 
 ## Included Parts
 
-![Thermocycler box contents and quantities](../images/box-contents.png)
+![Thermocycler box contents and quantities](images/box-contents.png)
 
 ## Physical Specifications
 
 <table>
   <tbody>
     <tr>
-      <th>Dimensions with lid open</th>
+      <th>Dimensions (lid open)</th>
       <td>244.95 mm L x 172 mm W x 310.1 mm H</td>
     </tr>
     <tr>
-      <th>Dimensions with lid closed</th>
+      <th>Dimensions (lid closed)</th>
       <td>244.95 mm L x 172 mm W x 170.25 mm H</td>
     </tr>
     <tr>

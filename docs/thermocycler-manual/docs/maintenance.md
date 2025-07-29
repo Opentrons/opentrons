@@ -28,7 +28,7 @@ The following table lists the chemicals you can use to clean your Thermocycler. 
     <tr>
       <td>Alcohol</td>
       <td>
-        Includes ethyl/ethanol, isopropyl, and methanol.<br>
+        Includes ethyl/ethanol, isopropyl alcohol, and methanol.<br>
         Dilute to 70% for cleaning.<br>
         Do not use 100% alcohol.
       </td>
@@ -49,7 +49,7 @@ The following table lists the chemicals you can use to clean your Thermocycler. 
   </tbody>
 </table>
 
-Be sure to turn the Thermocycler's power off before cleaning it. You can clean the top surfaces of the module while it's installed in a deck slot. However, for better access, you may want to:
+Be sure to turn the Thermocycler's power off before cleaning it. You can clean the top surfaces of the module while it is installed in a deck slot. However, for better access, you may want to:
 
 - Disconnect any USB or power cables before you begin.
 - Remove the caddy (Flex only) and module from the deck slot.

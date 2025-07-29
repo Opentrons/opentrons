@@ -4,14 +4,13 @@ title: "Thermocycler Module: Before You Begin"
 
 # Before You Begin
 
-Review this section for important information about deck
-placement, alignment, and anchor adjustments for the Thermocycler.
+Review this section for important information about the Thermocycler's deck placement, alignment, and anchor adjustments.
 
 ## Flex Caddies
 
 When used with a Flex robot, the Thermocycler fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the [Modules chapter](../flex-manual/modules.md) in the Flex Instruction Manual for more information.
 
-![Flex caddy with labels](../images/flex-caddy.png)
+![Flex caddy with labels](images/flex-caddy.png)
 
 The OT-2 does not use caddies. Modules clip directly to the deck. Also, the Thermocycler ships with a short exhaust duct, which is used by the OT-2 only. The module will not fit properly in its caddy with the OT-2 duct attached.
 

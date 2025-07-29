@@ -2,21 +2,6 @@ site_name: thermocycler-manual
 
 theme:
   name: material
-
-nav:
-  - Product Description: index.md
-  - Safety and Compliance: compliance.md
-  - Product Specifications: specifications.md
-  - Before You Begin: preinstall.md
-  - Installing the Thermocycler:
-      - Flex Attachment Steps: flex-installation.md
-      - OT-2 Attachment Steps: ot2-installation.md
-  - Thermocycler Lid Seals: lid-seals.md
-  - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
-
-theme:
-  name: material
   features:
     - navigation.path
   palette:
@@ -27,6 +12,19 @@ theme:
   icon:
     admonition:
       tip: material/lightbulb-on-outline
+
+nav:
+  - Product Description: index.md
+  - Safety and Compliance: compliance.md
+  - Product Specifications: specifications.md
+  - Installing the Thermocycler:
+      - Before You Begin: preinstall.md
+      - Flex Attachment Steps: flex-installation.md
+      - OT-2 Attachment Steps: ot2-installation.md
+  - Thermocycler Lid Seals: lid-seals.md
+  - Maintenance and Cleaning: maintenance.md
+  - Additional Product Information: warranty.md
+
 
 plugins:
   - search
@@ -54,6 +52,5 @@ markdown_extensions:
 
 extra_css:
   - manual.css
-  - ../opentrons-theme.css
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
