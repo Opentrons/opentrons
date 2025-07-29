@@ -9,11 +9,11 @@ from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Poi
 
 from opentrons.hardware_control.ot3api import OT3API
 
-# from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
+from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 STALL_THRESHOLD = 0.25
 
-async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> (float, float):
+async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> (float, float, float):
     print("Checking alignment...\n")
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
     current_pos = await api.current_position_ot3(mount, refresh=True)
@@ -22,10 +22,10 @@ async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> (float, float):
     enc = encoder_pos[pipette_ax]
     stalled_mm = est - enc
     if abs(stalled_mm) < STALL_THRESHOLD:
-        print(f"=== ALIGNED: {round(stalled_mm, 2)} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
+        print(f"=== ALIGNED: {stalled_mm} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
     else:
-        print(f"=== STALLED: {round(stalled_mm, 2)} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
-    return est, enc
+        print(f"=== STALLED: {stalled_mm} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
+    return est, enc, stalled_mm
 
 
 async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: str) -> None:
@@ -64,27 +64,55 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
 
     # await api.move_rel(mount, delta=Point(z=10))
 
+    cumulative_error = 0
+    abs_error = 0
+    completed_moves = 0
+    stall = False
+
     for cycle in range(cycles):
         print(f"\n=========== Cycle {cycle + 1}/{cycles} ===========\n")
 
-        print("Move to top plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
-        top_est, top_enc = await _plunger_alignment(api, mount)
+        try:
+            print("Move to top plunger position\n")
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+            top_est, top_enc, top_diff = await _plunger_alignment(api, mount)
+            cumulative_error += top_diff
+            abs_error += abs(top_diff)
+            completed_moves += 1
+        except StallOrCollisionDetectedError as e:
+            print(f"Stall or collision detected while moving to top position: {e}")
+            stall = True
 
-        print("Move to bottom plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-        bot_est, bot_enc = await _plunger_alignment(api, mount)
 
-        if cycle > 0:
-            test_tag = ""
+        try:
+            print("Move to bottom plunger position\n")
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+            bot_est, bot_enc, bot_diff = await _plunger_alignment(api, mount)
+            cumulative_error += bot_diff
+            abs_error += abs(bot_diff)
+            completed_moves += 1
+        except StallOrCollisionDetectedError as e:
+            print(f"Stall or collision detected while moving to bottom position: {e}")
+            stall = True
+        finally:
+            if cycle > 0:
+                test_tag = ""
 
-        cycle_data = [cycle + 1, test_tag,
-                      init_pos[pipette_ax], init_encoder_pos[pipette_ax],
-                      top_est, top_enc, top_est - top_enc,
-                      bot_est, bot_enc, bot_est - bot_enc]
-        cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-        data.append_data_to_file(test_name=test_name, run_id=run_name, file_name=file_name, data=cycle_data_str)
+            cycle_data = [cycle + 1, test_tag,
+                          init_pos[pipette_ax], init_encoder_pos[pipette_ax],
+                          top_est, top_enc, top_est - top_enc,
+                          bot_est, bot_enc, bot_est - bot_enc]
+            cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+            data.append_data_to_file(test_name=test_name, run_id=run_name, file_name=file_name, data=cycle_data_str)
+            if stall:
+                print("Stall detected, stopping test.")
+                break
 
+    print("\n=========== Test Complete ===========\n")
+    print(f"Total cycles: {completed_moves}")
+    print(f"Stall detected: {stall}")
+    print(f"Cumulative error: {cumulative_error} mm")
+    print(f"Absolute error average: {abs_error / completed_moves} mm")
 
 
 if __name__ == "__main__":
