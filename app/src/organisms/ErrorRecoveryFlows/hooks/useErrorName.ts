@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
 
-import { ERROR } from '/app/redux/robot-update'
-
 import { ERROR_KINDS } from '../constants'
 
 import type { ErrorKind } from '../types'
