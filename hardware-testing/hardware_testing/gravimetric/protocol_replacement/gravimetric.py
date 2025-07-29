@@ -172,6 +172,7 @@ class FixtureSettings:
     fast_simulate: bool
     retract_discontinuity: float
     disc_ver_cuttoff: int
+    lld_every_tip: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -250,6 +251,7 @@ class FixtureSettings:
         )
         disc_ver_cuttoff = int(lookup_key("disc_ver_cuttoff", csv_params)[0])
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
+        lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -427,6 +429,7 @@ class FixtureSettings:
             fast_simulate=fast_simulate,
             retract_discontinuity=retract_discontinuity,
             disc_ver_cuttoff=disc_ver_cuttoff,
+            lld_every_tip=lld_every_tip,
         )
 
     def validate_settings(self) -> bool:
@@ -1060,15 +1063,18 @@ def run_one_test(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
-    volume_lost_since_last_trial = calculate_change_in_volume(
-        last_measurement, pre_aspirate, liq
-    )
-    if not fixture_settings.ctx.is_simulating():
-        fixture_settings.liquid_source.load_liquid(
-            fixture_settings.liquid,
-            fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
-            - volume_lost_since_last_trial,
+    if fixture_settings.lld_every_tip:
+        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    else:
+        volume_lost_since_last_trial = calculate_change_in_volume(
+            last_measurement, pre_aspirate, liq
         )
+        if not fixture_settings.ctx.is_simulating():
+            fixture_settings.liquid_source.load_liquid(
+                fixture_settings.liquid,
+                fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
+                - volume_lost_since_last_trial,
+            )
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings, tip, volume, trial, channel, transfer_properties
