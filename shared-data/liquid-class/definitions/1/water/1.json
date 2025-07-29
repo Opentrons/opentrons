@@ -122,7 +122,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 50.0
@@ -1086,7 +1086,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.5
+                "duration": 1.0
               }
             }
           },
@@ -1124,7 +1124,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 478.0
@@ -1166,7 +1166,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -1374,7 +1374,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 478.0
@@ -1416,7 +1416,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -2543,7 +2543,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.5
+                "duration": 1.0
               }
             }
           },
@@ -2581,7 +2581,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 478.0
@@ -2623,7 +2623,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -2831,7 +2831,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 478.0
@@ -2873,7 +2873,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 20.0]],
+            "pushOutByVolume": [[1.0, 5.0]],
             "delay": {
               "enable": false,
               "params": {
