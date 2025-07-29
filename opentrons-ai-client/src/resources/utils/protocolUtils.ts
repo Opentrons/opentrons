@@ -18,9 +18,7 @@ export const parseProtocolContent = (
   }
 
   // Ensure result is a non-null object; otherwise fall back to {}
-  return parsed != null && typeof parsed === 'object'
-    ? (parsed as Record<string, unknown>)
-    : {}
+  return parsed != null ? (parsed as Record<string, unknown>) : {}
 }
 
 /**
