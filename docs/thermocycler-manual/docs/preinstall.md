@@ -9,7 +9,7 @@ placement, alignment, and anchor adjustments for the Thermocycler.
 
 ## Flex Caddies
 
-When used with a Flex robot, the Thermocycler fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the Modules chapter in the Flex Instruction Manual for more information.
+When used with a Flex robot, the Thermocycler fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the [Modules chapter](../flex-manual/modules.md) in the Flex Instruction Manual for more information.
 
 ![Flex caddy with labels](../images/flex-caddy.png)
 

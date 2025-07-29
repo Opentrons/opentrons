@@ -42,7 +42,8 @@ TCG2
       <td>
         <ul>
           <li>Range: 4–99 °C</li>
-          <li>Maximum heating ramp rate: 4.25 °C/s from ambient to 95 °C to ambient</li>
+          <li>Maximum heating ramp rate: 4.25 °C/s from ambient to 95 °C</li>
+          <li>Maximum cooling ramp rate: 2.0 °C/s from 95 °C to ambient</li>
         </ul>
       </td>
     </tr>

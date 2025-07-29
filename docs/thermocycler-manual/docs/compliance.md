@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Safety and Compliance"
+title: "Thermocycler Module: Safety and Compliance"
 ---
 
 # Safety Information and Regulatory Compliance
@@ -33,7 +33,7 @@ The following table lists and defines the environmental operating conditions for
 
 | Environmental Conditions | Recommended | Acceptable | Storage and Transportation |
 |----|----|----|----|
-| Ambient Temperatures | +20 to +25 °C | +2 to +40 °C | -10 to +60 °C |
+| Ambient Temperatures | +20 to +25 °C | +2 to +40 °C | –10 to +60 °C |
 | Relative Humidity | 30–80%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
 | Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
 
@@ -42,8 +42,7 @@ The following table lists and defines standards for recommended use, acceptable 
 | Operating Conditions | Description |
 |----|----|
 | Recommended | Opentrons has validated the Thermocycler’s performance in the conditions recommended for system operation. Operating the Thermocycler in these conditions helps provide optimal results. |
-| Acceptable | The Thermocycler is safe to use in conditions acceptable for system operation,
-but results may vary. |
+| Acceptable | The Thermocycler is safe to use in conditions acceptable for system operation, but results may vary. |
 | Storage | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment. |
 
 ### Low Temperature Condensation
@@ -51,8 +50,7 @@ but results may vary. |
 Setting the Thermocycler to hold a temperature below the ambient temperature for a long time can cause condensation to develop in and on the device.
 
 !!!warning
-    Do not set the plate temperature below
-the ambient temperature for over two hours, as the resulting condensation could affect performance or damage the module.
+    Do not set the plate temperature below the ambient temperature for over two hours, as the resulting condensation could affect performance or damage the module.
 
 ### Software Requirements
 
@@ -157,14 +155,14 @@ The Thermocycler has been tested and found to be in compliance with all applicab
 ### Safety
 
 - IEC/UL/CSA 61010-1 Safety­ Requirements­ for­ Electrical Equipment­ for Measurement­ Control­ and­ Laboratory Use–­Part­ 1:­ General Requirements
-- IEC/UL/CSA ­ 61010-2-010­ Particular­ Requirements­ for Laboratory­ Equipment for­ the Heating­ of­ Materials
+- IEC/UL/CSA­ 61010-2-010­ Particular­ Requirements­ for Laboratory­ Equipment for­ the Heating­ of­ Materials
 
 ### Electromagnetic Compatibility
 
 - EN/BSI 61326-1­ Electrical ­ Equipment­ for Measurement Control­ and­ Laboratory­ Use­–EMC Requirements–Part­ 1: General­ Requirements
 - EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency­ Disturbance Characteristics–Limits­ and­ Methods of­ Measurement
 - FCC 47CFR Part 15 Subpart B Class A: Unintentional Radiators
-- IC ICES–003 Spectrum Management and Telecommunications Interference Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus)
+- IC ICES-003 Spectrum Management and Telecommunications Interference Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus)
 
 ### FCC Warnings and Notes
 
@@ -177,7 +175,7 @@ The Thermocycler has been tested and found to be in compliance with all applicab
 
 ### Canada ISED
 
-Canada ICES–003(A)/NMB–003(A)
+Canada ICES-003(A)/NMB-003(A)
 This­ product­ meets­ the­ applicable­ Innovation,­ Science­ and Economic Development Canada technical specifications.
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
