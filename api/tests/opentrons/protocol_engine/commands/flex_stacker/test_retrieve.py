@@ -14,6 +14,7 @@ from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -60,6 +61,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 
 
@@ -686,6 +688,12 @@ async def test_retrieve_primary_adapter_and_lid(
                 serial="123", labware_expected=True, shuttle_state=""
             ),
             FlexStackerLabwareRetrieveError,
+        ),
+        (
+            FlexStackerShuttleNotEmptyError(
+                serial="123", labware_expected=True, shuttle_state=""
+            ),
+            FlexStackerShuttleOccupiedError,
         ),
     ],
 )
