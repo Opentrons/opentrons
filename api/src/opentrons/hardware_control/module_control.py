@@ -183,24 +183,29 @@ class AttachedModulesControl:
 
         # build new mods
         for mod in unsorted_mods_at_port:
-            new_instance = await self.build_module(
-                port=mod.port,
-                usb_port=mod.usb_port,
-                type=modules.MODULE_TYPE_BY_NAME[mod.name],
-                sim_serial_number=(
-                    mod.serial_number
-                    if isinstance(mod, SimulatingModuleAtPort)
-                    else None
-                ),
-                sim_model=(
-                    mod.model if isinstance(mod, SimulatingModuleAtPort) else None
-                ),
-            )
-            self._available_modules.append(new_instance)
-            log.info(
-                f"Module {mod.name} discovered and attached"
-                f" at port {mod.port}, new_instance: {new_instance}"
-            )
+            try:
+                new_instance = await self.build_module(
+                    port=mod.port,
+                    usb_port=mod.usb_port,
+                    type=modules.MODULE_TYPE_BY_NAME[mod.name],
+                    sim_serial_number=(
+                        mod.serial_number
+                        if isinstance(mod, SimulatingModuleAtPort)
+                        else None
+                    ),
+                    sim_model=(
+                        mod.model if isinstance(mod, SimulatingModuleAtPort) else None
+                    ),
+                )
+                self._available_modules.append(new_instance)
+                log.info(
+                    f"Module {mod.name} discovered and attached"
+                    f" at port {mod.port}, new_instance: {new_instance}"
+                )
+            except Exception as e:
+                log.exception(
+                    f"Failed to build module {mod.name} at port {mod.port}: {e}"
+                )
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )

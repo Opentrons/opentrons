@@ -57,6 +57,8 @@ export function getErrorKind(
         return ERROR_KINDS.STACKER_SHUTTLE_MISSING
       case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY:
         return ERROR_KINDS.STACKER_SHUTTLE_EMPTY
+      case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_OCCUPIED:
+        return ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED
       default: {
         console.error(`Unhandled error type ${errorType}`)
         return ERROR_KINDS.GENERAL_ERROR

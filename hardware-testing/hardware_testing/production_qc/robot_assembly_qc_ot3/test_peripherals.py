@@ -4,7 +4,7 @@ from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
 from urllib.request import urlopen
-from time import time
+from time import monotonic
 from typing import Tuple
 
 from opentrons_hardware.hardware_control.rear_panel_settings import set_ui_color
@@ -223,19 +223,19 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     ui.print_header("DOOR SWITCH")
     door_timeout_seconds = 10
     print("CLOSE the front door")
-    start_time_seconds = time()
+    start_time_seconds = monotonic()
     while not api.is_simulator and api.door_state != DoorState.CLOSED:
         await asyncio.sleep(0.1)
-        if time() - start_time_seconds > door_timeout_seconds:
+        if monotonic() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to close")
             break
     print(api.door_state)
     is_closed = api.door_state == DoorState.CLOSED
     print("OPEN the front door")
-    start_time_seconds = time()
+    start_time_seconds = monotonic()
     while not api.is_simulator and api.door_state != DoorState.OPEN:
         await asyncio.sleep(0.1)
-        if time() - start_time_seconds > door_timeout_seconds:
+        if monotonic() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to open")
             break
     print(api.door_state)

@@ -30,6 +30,7 @@ export const DEFINED_ERROR_TYPES = {
   HOPPER_LABWARE_MISSING: 'flexStackerHopperLabwareFailed',
   STACKER_SHUTTLE_MISSING: 'flexStackerShuttleMissing',
   STACKER_SHUTTLE_EMPTY: 'flexStackerLabwareRetrieveFailed',
+  STACKER_SHUTTLE_OCCUPIED: 'flexStackerShuttleOccupied',
 } as const
 
 // Client-defined error-handling flows.
@@ -47,6 +48,7 @@ export const ERROR_KINDS = {
   STACKER_HOPPER_EMPTY: 'STACKER_HOPPER_EMPTY',
   STACKER_SHUTTLE_MISSING: 'STACKER_SHUTTLE_MISSING',
   STACKER_SHUTTLE_EMPTY: 'STACKER_SHUTTLE_EMPTY',
+  STACKER_SHUTTLE_OCCUPIED: 'STACKER_SHUTTLE_OCCUPIED',
 } as const
 
 export const STACKER_ERROR_KINDS: ErrorKind[] = [
@@ -54,6 +56,7 @@ export const STACKER_ERROR_KINDS: ErrorKind[] = [
   ERROR_KINDS.STACKER_SHUTTLE_MISSING,
   ERROR_KINDS.STACKER_HOPPER_EMPTY,
   ERROR_KINDS.STACKER_SHUTTLE_EMPTY,
+  ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED,
 ] as const
 
 // TODO(jh, 06-14-24): Consolidate motion routes to a single route with several steps.

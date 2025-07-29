@@ -329,7 +329,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
         await self.stacker_setup()
         await self.file_setup()
         print("\n-> Starting Stacker Test!\n")
-        self.start_time = time.time()
+        self.start_time = time.monotonic()
 
     async def stacker_setup(self) -> None:
         """Detect Stackers."""

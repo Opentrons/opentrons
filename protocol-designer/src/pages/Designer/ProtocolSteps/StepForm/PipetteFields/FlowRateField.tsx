@@ -101,10 +101,14 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
       ? getTransferPlanAndReferenceVolumes({
           volume: Number(formData.volume),
           path: (formData.path as PathOption) ?? 'single',
+          numAspirateWells:
+            formData.stepType === 'moveLiquid'
+              ? formData.aspirate_wells.length
+              : formData.wells.length,
           numDispenseWells:
             formData.stepType === 'moveLiquid'
               ? formData.dispense_wells.length
-              : 1,
+              : formData.wells.length,
           pipetteSpecs: pipette?.spec,
           tiprackDefinition: tiprackDef,
           // multi-dispense is valid on OT-2, even though liquid class values are null
