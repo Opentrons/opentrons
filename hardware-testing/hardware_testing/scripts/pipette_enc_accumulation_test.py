@@ -35,7 +35,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
     await api.home_plunger(mount)
 
     pipette = helpers_ot3._get_pipette_from_mount(api, mount)
-    test_tag = pipette['name']
+    test_tag = pipette.name
 
     test_name = "pipette-mixing-test"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
@@ -47,7 +47,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-    top_pos, bottom_pos, _, drop_pos = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
 
     print("Move to bottom position\n")
