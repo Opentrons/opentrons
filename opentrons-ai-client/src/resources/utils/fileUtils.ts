@@ -113,13 +113,11 @@ export const getSimpleFileTypeLabel = (
       return 'PDF file'
     case 'csv':
       return 'CSV file'
-    case 'image':
-      return 'Image file'
-    case 'json':
-      return 'JSON file'
-    default:
-      return 'File'
+    case 'python':
+      return 'Python file'
   }
+
+  return `${type.toUpperCase()} file`
 }
 
 /**
