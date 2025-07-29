@@ -20,7 +20,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_ROBOT_TYPE,
@@ -70,7 +69,6 @@ export function DeviceDetailsDeckConfiguration({
     setShowSetupInstructionsModal,
   ] = useState<boolean>(false)
 
-  const { data: modulesData } = useModulesQuery()
   const deckConfig =
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
@@ -99,15 +97,7 @@ export function DeviceDetailsDeckConfiguration({
     displayList: Array<{ displayLocation: string; displayName: string }>
     groupedCutoutIds: CutoutId[]
   }>(
-    (
-      acc,
-      {
-        cutoutId,
-        cutoutFixtureId,
-        opentronsModuleSerialNumber,
-        addressableAreaId,
-      }
-    ) => {
+    (acc, { cutoutId, cutoutFixtureId, addressableAreaId }) => {
       const areaInCheck = getAAByAAId(addressableAreaId, deckDef)
       const shouldShowAA =
         areaInCheck.areaType !== 'slot' &&
@@ -120,21 +110,13 @@ export function DeviceDetailsDeckConfiguration({
       ) {
         return acc
       }
-      const usbPort = modulesData?.data.find(
-        m => m.serialNumber === opentronsModuleSerialNumber
-      )?.usbPort
-      const portDisplay =
-        usbPort?.hubPort != null
-          ? `${usbPort.port}.${usbPort.hubPort}`
-          : usbPort?.port
       const displayName =
         getAAComboFixtureDisplayName(
           cutoutFixtureId,
           addressableAreaId,
           deckDef,
-          t as TFunction,
-          portDisplay
-        ) ?? getFixtureDisplayName(cutoutFixtureId, portDisplay)
+          t as TFunction
+        ) ?? getFixtureDisplayName(cutoutFixtureId)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}

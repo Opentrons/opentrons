@@ -28,7 +28,15 @@ export function forMoveLabware(
       modules[newLocation.moduleId].slot
     )
   } else if ('slotName' in newLocation) {
-    newLocationStack.push(newLocation.slotName)
+    // need to handle slotName being a labwareId or a slotId (misleading property name)
+    const { slotName } = newLocation
+    // new location is a labware stack
+    if (slotName in labware) {
+      newLocationStack.push(...labware[slotName].stack)
+    } else {
+      // new location is a slot
+      newLocationStack.push(slotName)
+    }
   } else if ('labwareId' in newLocation) {
     const labwareId = newLocation.labwareId
     const labwareIdStack = labware[labwareId].stack

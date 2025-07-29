@@ -2835,7 +2835,7 @@ class OT3API(
         if not probe_settings:
             probe_settings = deepcopy(self.config.liquid_sense)
 
-        # We need to significatly slow down the 96 channel liquid probe
+        # We need to significantly slow down the 96 channel liquid probe
         if self.gantry_load in [
             GantryLoad.HIGH_THROUGHPUT_1000,
             GantryLoad.HIGH_THROUGHPUT_200,

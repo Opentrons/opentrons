@@ -190,25 +190,6 @@ export const NewSecondaryBtn = styled(SecondaryBtn)`
 
   ${styleProps}
 `
-/**
- * Red primary button variant used in app
- *
- * @component
- */
-export const NewAlertPrimaryBtn = styled(NewPrimaryBtn)`
-  background-color: ${Styles.C_ERROR_DARK};
-
-  &:hover,
-  &:focus {
-    background-color: ${Styles.C_ERROR_DARK};
-  }
-
-  &:active {
-    background-color: ${Styles.C_ERROR_LIGHT};
-  }
-
-  ${styleProps}
-`
 
 /**
  * Red secondary button variant used in app

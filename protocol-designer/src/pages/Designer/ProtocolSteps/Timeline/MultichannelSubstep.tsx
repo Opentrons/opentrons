@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Btn,
+  COLORS,
   DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ListButton,
+  ListItem,
   SPACING,
   StyledText,
   Tag,
@@ -81,55 +84,86 @@ export function MultichannelSubstep(
         selectSubstep(null)
       }}
     >
-      <ListButton type="noActive" onClick={handleToggleCollapsed}>
+      <ListItem type="default">
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
+          padding={SPACING.spacing12}
           width="100%"
+          height={collapsed ? '3rem' : 'auto'}
         >
           <Flex
-            padding={SPACING.spacing12}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            width="100%"
-            gridGap={SPACING.spacing8}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {titleCopy}
-            </StyledText>
-            <Tag
-              text={`${formatVolume(rowGroup[0].volume)} ${t(
-                'units.microliter'
-              )}`}
-              type="default"
-              shrinkToContent
-            />
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {firstChannelSource != null && firstChannelDest == null
-                ? t('protocol_steps:from')
-                : t('protocol_steps:into')}
-            </StyledText>
-            {deckLabel}
+            <Flex
+              gridGap={SPACING.spacing4}
+              paddingRight={SPACING.spacing12}
+              alignItems={ALIGN_CENTER}
+            >
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {titleCopy}
+              </StyledText>
+              <Tag
+                text={`${formatVolume(rowGroup[0].volume)} ${t(
+                  'units.microliter'
+                )}`}
+                type="default"
+                shrinkToContent
+              />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {firstChannelSource != null && firstChannelDest == null
+                  ? t('protocol_steps:from')
+                  : t('protocol_steps:into')}
+              </StyledText>
+              {deckLabel}
+            </Flex>
+            <Btn onClick={handleToggleCollapsed}>
+              <Icon
+                name={collapsed ? 'chevron-down' : 'chevron-up'}
+                size="1.5rem"
+              />
+            </Btn>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            {!collapsed &&
-              rowGroup.map((row, rowKey) => {
-                return (
-                  <Substep
-                    trashName={trashName}
-                    key={rowKey}
-                    volume={row.volume}
-                    source={row.source}
-                    dest={row.dest}
-                    stepId={stepId}
-                    substepIndex={substepIndex}
-                    isSameLabware={isSameLabware}
-                  />
-                )
-              })}
+            {!collapsed ? (
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                paddingTop={SPACING.spacing8}
+                gridGap={SPACING.spacing8}
+              >
+                <StyledText
+                  color={COLORS.grey60}
+                  desktopStyle="bodyDefaultRegular"
+                >
+                  {t('protocol_steps:individual_wells')}
+                </StyledText>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  alignItems={ALIGN_CENTER}
+                >
+                  {rowGroup.map((row, rowKey) => {
+                    return (
+                      <Substep
+                        isNested
+                        trashName={trashName}
+                        key={rowKey}
+                        volume={row.volume}
+                        source={row.source}
+                        dest={row.dest}
+                        stepId={stepId}
+                        substepIndex={substepIndex}
+                        isSameLabware={isSameLabware}
+                      />
+                    )
+                  })}
+                </Flex>
+              </Flex>
+            ) : null}
           </Flex>
         </Flex>
-      </ListButton>
+      </ListItem>
     </Flex>
   )
 }

@@ -64,7 +64,7 @@
   "migration_header": "Your protocol was made in an older version of Protocol Designer",
   "migrations": {
     "generic": {
-      "body1": "Your protocol will be automatically updated to the latest version. We recommend making a separate copy of your file before importing."
+      "body1": "Your protocol and included labware will be automatically updated to the latest version. We recommend making a separate copy of your file before importing."
     }
   },
   "magneticBlockAndStagingArea": "{{module}} with Staging Area",

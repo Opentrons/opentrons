@@ -240,6 +240,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       volume: state.volume,
       tiprackDefinition: state.tipRack,
       path: state.path,
+      numAspirateWells: state.sourceWells.length,
       numDispenseWells: state.destinationWells.length,
       aspirateAirGapByVolume:
         (retract?.airGapByVolume as Array<[number, number]>) ?? null,

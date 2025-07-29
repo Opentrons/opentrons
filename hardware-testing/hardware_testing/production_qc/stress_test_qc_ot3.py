@@ -131,7 +131,7 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=sn)
     csv_display_name = os.path.join(run_path, file_name)
     print(f"CSV: {csv_display_name}")
-    start_time = time.time()
+    start_time = time.monotonic()
 
     def _append_csv_data(
         data_list: List[Any],
@@ -142,7 +142,7 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
         # every line in the CSV file begins with the elapsed seconds
         if not first_row_value_included:
             if first_row_value is None:
-                first_row_value = str(round(time.time() - start_time, 2))
+                first_row_value = str(round(time.monotonic() - start_time, 2))
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:

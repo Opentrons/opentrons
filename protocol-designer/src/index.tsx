@@ -10,7 +10,7 @@ import { configureStore } from './configureStore'
 import { initialize } from './initialize'
 import { initializeSentry } from './resources/sentry'
 
-import '@opentrons/components/styles'
+import '@opentrons/components/styles/global'
 
 // initialize Redux
 const store = configureStore()

@@ -10,7 +10,6 @@ import {
   belowPipetteMinimumVolume,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
 } from '../warnings'
@@ -66,90 +65,6 @@ describe('Below pipette minimum volume', () => {
     expect(belowPipetteMinimumVolume(fields).type).toBe(
       'BELOW_PIPETTE_MINIMUM_VOLUME'
     )
-  })
-})
-describe('Below min disposal volume', () => {
-  let fieldsWithPipette: {
-    pipette: { spec: { liquids: { default: { minVolume: number } } } }
-    disposalVolume_checkbox: boolean
-    disposalVolume_volume: number
-    path: string
-  }
-  beforeEach(() => {
-    fieldsWithPipette = {
-      pipette: {
-        spec: {
-          liquids: {
-            default: {
-              minVolume: 100,
-            },
-          },
-        },
-      },
-      disposalVolume_checkbox: true,
-      disposalVolume_volume: 100,
-      path: 'multiDispense',
-    }
-  })
-  it('should NOT return a warning when there is no pipette', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      pipette: undefined,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when there is no pipette spec', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      pipette: { spec: undefined },
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the path is NOT multi dispense', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      path: 'another_path',
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is equal to the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 100,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 100,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-
-  it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 99,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
-  })
-  it('should return a warning when the path is multi dispense and the checkbox is unchecked', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_checkbox: false,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
-  })
-  it('should return a warning when the path is multi dispense and there is no disposal volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: undefined,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
 })
 describe('Max dispense well volume', () => {

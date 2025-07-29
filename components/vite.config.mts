@@ -61,6 +61,9 @@ export default defineConfig({
       '@opentrons/components/styles': path.resolve(
         '../components/src/index.module.css'
       ),
+      '@opentrons/components/styles/global': path.resolve(
+        '../components/src/styles/global.css'
+      ),
       '@opentrons/step-generation': path.resolve(
         '../step-generation/src/index.ts'
       ),

@@ -407,6 +407,9 @@
       "sterility": "sterility",
       "sterility&motion": "sterility & motion"
     },
+    "temperature": {
+      "state": "Temperature Module state"
+    },
     "tipRack": "tip rack",
     "wellSelectionLabel": {
       "choose_wells": "Choose wells",

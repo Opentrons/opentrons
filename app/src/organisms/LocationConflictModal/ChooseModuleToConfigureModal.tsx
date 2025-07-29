@@ -29,6 +29,8 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useModuleUSBPort } from '/app/local-resources/modules'
+import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
@@ -43,7 +45,7 @@ const MODULE_IDENTIFY_TIME_MS = 10000
 
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
-  usbPort?: number | string
+  usbPort?: string
   serialNumber?: string
 }
 interface ChooseModuleToConfigureModalProps {
@@ -69,6 +71,7 @@ export const ChooseModuleToConfigureModal = (
     displaySlotName,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -104,13 +107,9 @@ export const ChooseModuleToConfigureModal = (
 
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
     attachedMod => {
-      const portDisplay =
-        attachedMod.usbPort.hubPort != null
-          ? `${attachedMod.usbPort.port}.${attachedMod.usbPort.hubPort}`
-          : attachedMod.usbPort.port
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: portDisplay,
+        usbPort: parseModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
@@ -154,7 +153,23 @@ export const ChooseModuleToConfigureModal = (
         unconfiguredModuleMatches.find(m => m.serialNumber === serialNumber) ??
         null
       if (moduleModel === 'flexStackerModuleV1' && selectedModule !== null) {
-        return (
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleStackerClearAndConfigureModule(selectedModule)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            secondaryButtonText={i18n.format(
+              t('shared:identify'),
+              'capitalize'
+            )}
+            secondaryOnClickHandler={() => {
+              handleIdentifyFixture(selectedModule)
+            }}
+          />
+        ) : (
           <FixtureOption
             key={serialNumber}
             onClickHandler={() => {
@@ -169,11 +184,19 @@ export const ChooseModuleToConfigureModal = (
             secondaryOnClickHandler={() => {
               handleIdentifyFixture(selectedModule)
             }}
-            isOnDevice={isOnDevice}
           />
         )
       } else {
-        return (
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleConfigureModule(serialNumber)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+          />
+        ) : (
           <FixtureOption
             key={serialNumber}
             onClickHandler={() => {
@@ -181,7 +204,6 @@ export const ChooseModuleToConfigureModal = (
             }}
             optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
-            isOnDevice={isOnDevice}
           />
         )
       }

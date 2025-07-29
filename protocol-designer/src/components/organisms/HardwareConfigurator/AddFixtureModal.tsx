@@ -137,7 +137,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
-            isOnDevice={false}
           />
         )}
         <FixtureOption
@@ -147,7 +146,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}
-          isOnDevice={false}
         />
       </>
     )
@@ -163,7 +161,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         onClickHandler={() => {
           setOptionStage('wasteChuteOptions')
         }}
-        isOnDevice={false}
       />
     )
   }
@@ -309,7 +306,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         onClickHandler={() => {
           handleAddFixture(cutoutConfigs)
         }}
-        isOnDevice={false}
       />
     )
   })
