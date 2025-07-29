@@ -1907,7 +1907,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
 
         return self
@@ -2045,7 +2044,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
 
         return self
@@ -2183,7 +2181,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
 
         return self
